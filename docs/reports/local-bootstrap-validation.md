@@ -5,7 +5,8 @@
 本报告对应[本地初始化计划](../../.harness/plans/local-bootstrap.md)，
 记录本项目实际检查，不继承上游模板的验证结论。
 
-2026-09-22，工作区检查已完成。业务需求、运行模型、业务架构和产品验收标准仍待讨论。
+2026-09-22，本地初始化、工作区检查与干净克隆检查已完成。
+业务需求、运行模型、业务架构和产品验收标准仍待讨论。
 
 ## 已核对证据
 
@@ -23,6 +24,7 @@
 | `scripts/quality/check.sh --check-tools-only` | PASS：最低及精确工具版本均满足合同 |
 | `scripts/quality/check.sh` | PASS：Bash、ShellCheck、shfmt、Markdown、模板完整性及五组流程回归 |
 | `git diff --cached --check` | PASS：暂存内容无空白错误 |
+| `scripts/quality/check_template.sh --source-audit` | PASS：显式来源残留审计 |
 | 原文 Git blob SHA | PASS：与固定来源一致 |
 | 模板脚本和 GitHub 文件 | PASS：20 个文件的内容和权限与固定模板一致 |
 | 暂存文件和忽略目录 | PASS：64 个文件，工具安装目录未进入 Git |
@@ -53,9 +55,21 @@ Node.js 官方 Linux x64 压缩包摘要与同版本官方 SHASUMS256.txt 一致
 14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647
 ```
 
-## 首次提交后的核对
+## 首次提交与干净克隆
 
-首次提交后将执行独立本地克隆，回读提交和原文摘要，并记录干净检出检查结果。
+首次本地根提交：`eebbebb25963a3698d95dee18fbbd93a75abc3e8`。
+
+- main 采用独立历史，根提交没有父提交，未继承模板 Git 历史。
+- 通过 `git clone --no-local` 从本地仓库创建独立克隆，回读提交与根提交一致。
+- 干净克隆不包含忽略的工具安装目录；检查使用已安装的声明版本工具。
+- 取消 GH_TOKEN、GITHUB_TOKEN、GH_ENTERPRISE_TOKEN，并使用空 GH_CONFIG_DIR；
+  克隆内完整质量入口及五组流程回归全部 PASS。
+- 原始资料 Git blob SHA 与固定来源一致。
+- `git show --format= --check HEAD` PASS。
+- 质量检查后克隆工作区保持干净；本项目仓库未配置 remote。
+
+本节完整质量结果绑定上述根提交。后续补记仅修改本报告，检查 Markdown、
+模板引用和 Git 空白差异；代码、工具合同、原文和流程回归文件保持不变。
 
 ## 证据边界
 

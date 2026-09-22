@@ -44,8 +44,9 @@ checks are declared in project knowledge and added explicitly to delivery plans.
 ## SQL APM Current Phase
 
 Read `.project-wiki/index.md` and `.harness/plans/local-bootstrap.md` for the
-current project context. The authorized scope is local repository bootstrap
-and preservation of the original requirements source.
+current project context. Local bootstrap is complete. The user has authorized
+initial publication of the committed repository to the public GitHub repository
+`shenxg13/sql-apm`, including the original requirements source.
 
 The SQL Baseline snapshot is raw discussion input. Its recommendations and
 previous conversational implementation suggestions are not accepted product
@@ -53,5 +54,8 @@ requirements. Business architecture, stack, scope, thresholds, acceptance
 criteria and the project operating model remain pending user discussion.
 Preserve the raw snapshot bytes; record later confirmed requirements separately.
 
-No GitHub remote has been authorized for this bootstrap. Upstream historical
-plans and reports do not authorize publication or prove this project's checks.
+Initial publication, its verification and necessary repairs remain part of the
+bootstrap handoff. After connection, new requirements and delivery follow
+`.harness/workflows/github-planning.md`. Publication evidence belongs in
+`docs/reports/initial-publication.md`; upstream historical plans and reports
+do not prove this project's checks.

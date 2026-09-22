@@ -30,6 +30,7 @@
 - [本地开发与检查](../docs/runbooks/local-development.md)。
 - [模板来源及本地定制](../docs/provenance.md)。
 - [本地初始化验证](../docs/reports/local-bootstrap-validation.md)。
+- [GitHub 首次发布范围与验证](../docs/reports/initial-publication.md)。
 - [知识更新记录](log.md)。
 
 上述内容描述开发协作方式，不定义 SQL APM 的业务架构。

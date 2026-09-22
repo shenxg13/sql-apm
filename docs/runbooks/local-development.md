@@ -39,6 +39,7 @@ git hash-object .project-wiki/raw/sql-baseline.md
 ## 当前协作方式
 
 从 [AGENTS.md](../../AGENTS.md) 进入开发流程。
-首次远程建立前按[本地流程](../../.harness/workflows/local-bootstrap.md)推进；
-后续确认的需求与决策另行记录，保留原文供追溯。
-GitHub 目标、发布范围和许可证需在接入远程前明确。
+GitHub 目标为公开仓库 shenxg13/sql-apm。
+首次发布及其验证按[本地初始化流程](../../.harness/workflows/local-bootstrap.md)完成交接；
+接入后的新需求按 [GitHub 工作流](../../.harness/workflows/github-planning.md)推进。
+后续确认的需求与决策另行记录，保留原文供追溯；许可证选择仍待讨论。

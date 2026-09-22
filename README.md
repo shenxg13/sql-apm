@@ -42,4 +42,7 @@ scripts/quality/check.sh
 后续按[人工更新流程](docs/updating.md)审阅模板更新。
 本地验证结果见[初始化验证记录](docs/reports/local-bootstrap-validation.md)。
 
-当前交付范围为本地仓库；GitHub 发布和许可证安排留待确定。
+GitHub 仓库：[shenxg13/sql-apm](https://github.com/shenxg13/sql-apm)，公开，默认分支 main。
+首次同步范围与验证见[首次发布记录](docs/reports/initial-publication.md)。
+接入远程后的需求和交付遵循 [GitHub 工作流](.harness/workflows/github-planning.md)。
+许可证尚未选择，当前文件集不包含 LICENSE。

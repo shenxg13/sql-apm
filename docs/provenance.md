@@ -8,7 +8,8 @@
 - 采纳日期：2026-09-22。
 - 本地项目：sql-apm，独立 main 历史。
 - 固定来源包含 60 个跟踪文件；导入其文件与可执行权限，合并项目已有知识索引。
-- 本次授权为创建本地仓库；远程仓库、可见性和许可证待确定。
+- 最初授权为创建本地仓库；用户后续明确授权首次公开同步至 shenxg13/sql-apm。
+- 许可证尚未选择，本次沿用现有文件集，不新增 LICENSE。
 
 更早的模板提取历史保存在
 [上游来源记录](https://github.com/shenxg13/agent-harness/blob/859c39d1697241579b9bde443125477f88b1827c/docs/provenance.md)。
@@ -53,3 +54,4 @@
 
 此配置也供模板自带的残留检测回归使用；正常质量检查允许本项目业务知识。
 本次验证结果见[本地初始化验证记录](reports/local-bootstrap-validation.md)。
+首次远程同步的授权范围、设置和验证见[首次发布记录](reports/initial-publication.md)。

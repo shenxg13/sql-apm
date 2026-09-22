@@ -3,7 +3,7 @@
 | Task | Workflow | Knowledge |
 | --- | --- | --- |
 | New repository before its first remote | [Local bootstrap](workflows/local-bootstrap.md) | [Getting started](../docs/getting-started.md) |
-| SQL APM requirements discussion before first remote | Root rules and [knowledge sync](workflows/knowledge-sync.md) | [Project knowledge](../.project-wiki/index.md), [local scope](plans/local-bootstrap.md) |
+| SQL APM requirements discussion after initial publication | [GitHub planning](workflows/github-planning.md), [knowledge sync](workflows/knowledge-sync.md) | [Project knowledge](../.project-wiki/index.md), [publication scope](plans/local-bootstrap.md) |
 | Tool discovery or diagnosis | [Tooling runtime](tooling-runtime.md) | [Tool contract](../docs/runbooks/issue-pr-quality-tooling.md) |
 | Copy or string edit | Root rules, then target file | Target file |
 | Small local change | [Small change](workflows/small-change.md) | Relevant wiki entity |

@@ -1,0 +1,11 @@
+{
+  "scope": "AGENTS.md,CLAUDE.md,CODEX.md,.harness,.project-wiki,.github,scripts,docs,quality configuration",
+  "sourceRepository": "https://github.com/shenxg13/agent-harness",
+  "lastSyncedCommit": "859c39d1697241579b9bde443125477f88b1827c",
+  "lastSyncedDate": "2026-09-22",
+  "notes": [
+    "Fixed template snapshot adopted for the SQL APM local repository.",
+    "Project knowledge and local customizations are recorded in docs/provenance.md.",
+    "Future updates require manual review; this record does not enable automatic synchronization."
+  ]
+}

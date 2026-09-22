@@ -1,0 +1,4 @@
+# 仅隐藏普通贡献者在模板选择器中的 Blank 入口；具有其他创建路径或
+# 权限的用户仍可能创建空白 Issue。status:planned 准入检查负责阻止领取。
+blank_issues_enabled: false
+contact_links: []

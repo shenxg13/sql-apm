@@ -1,0 +1,34 @@
+name: Harness quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Read tool contract
+        id: tools
+        shell: bash
+        run: |
+          source scripts/quality/tool-versions.env
+          printf 'node=%s\n' "$NODE_VERSION" >> "$GITHUB_OUTPUT"
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ steps.tools.outputs.node }}
+      - name: Install pinned quality tools
+        run: scripts/quality/install_ci_tools.sh
+      - name: Check harness and offline regressions
+        run: scripts/quality/check.sh

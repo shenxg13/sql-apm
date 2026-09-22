@@ -1,0 +1,6 @@
+config:
+  MD013: false
+  MD041: false
+# Preserve the exact upstream bytes of the raw requirements snapshot.
+ignores:
+  - ".project-wiki/raw/sql-baseline.md"

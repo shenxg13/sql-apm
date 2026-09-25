@@ -1,0 +1,3696 @@
+{
+  "contract_version": "1.0.0",
+  "profile": "hashdata-csv/1",
+  "dataset_id": "synthetic-offline-contract-v1",
+  "synthetic_only": true,
+  "description": "base is a complete logical fixture; case boundary projections are inputs plus explicit expected outcomes, not runtime tests or production evidence",
+  "metric_names": [
+    "min_ms",
+    "max_ms",
+    "mean_ms",
+    "p25_ms",
+    "p50_ms",
+    "p75_ms",
+    "p90_ms",
+    "p95_ms",
+    "p99_ms",
+    "stddev_ms",
+    "cv",
+    "mad_ms",
+    "iqr_ms",
+    "log_median",
+    "log_mad",
+    "p95_p50",
+    "p99_p50"
+  ],
+  "raw_csv_fixture": {
+    "file_id": "F1",
+    "dialect": "comma / double quote / LF / UTF-8",
+    "rows": [
+      [
+        "2026-09-21 09:00:00.000000 CST",
+        "demo_user",
+        "demo_db",
+        "p1",
+        "th1",
+        "192.0.2.10",
+        "50000",
+        "2026-09-21 08:00:00 CST",
+        "0",
+        "con1",
+        "cmd1",
+        "seg-1",
+        "",
+        "",
+        "",
+        "",
+        "LOG",
+        "00000",
+        "duration: 10.000 ms",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "SELECT item_id\nFROM demo_items WHERE item_id = 7;",
+        "",
+        "",
+        "postgres.c",
+        "1946",
+        ""
+      ]
+    ]
+  },
+  "base": {
+    "sources": {
+      "S1": {
+        "source_id": "S1",
+        "system_kind": "hashdata",
+        "scope_id": "CL1",
+        "mapping_ref": "synthetic:source-map/1",
+        "declared_build": "synthetic fixture for surveyed HashData 3.13.13 profile",
+        "timezone": "UTC+08:00",
+        "declaration_evidence": "synthetic operator declaration; no production identity"
+      }
+    },
+    "files": {
+      "F1": {
+        "file_id": "F1",
+        "source_id": "S1",
+        "content_identity": "synthetic-content-1",
+        "checksum": {
+          "algorithm": "sha256",
+          "value": "934fb6d31b0298683640a1c1ea6bf0b372eae17fc364e0f859a5f30379fa8f3b"
+        },
+        "byte_count": 225,
+        "locator": "synthetic://F1.csv",
+        "closed_and_copied": true,
+        "declaration_evidence": "synthetic closed/copied declaration"
+      }
+    },
+    "batches": {
+      "B1": {
+        "batch_id": "B1",
+        "scope_id": "CL1",
+        "declared_dates": [
+          "2026-09-21"
+        ],
+        "files_confirmed_complete": true,
+        "entries": [
+          {
+            "file_id": "F1",
+            "final_attempt_id": "I1"
+          }
+        ],
+        "state": "complete",
+        "problem_ids": []
+      }
+    },
+    "import_attempts": {
+      "I1": {
+        "attempt_id": "I1",
+        "batch_id": "B1",
+        "file_id": "F1",
+        "retry_of": null,
+        "state": "succeeded",
+        "started_at": "2026-09-22T08:00:00+08:00",
+        "finished_at": "2026-09-22T08:00:01+08:00",
+        "duplicate_of": null,
+        "reliable_record_count": 1,
+        "problem_ids": []
+      }
+    },
+    "evidence_records": {
+      "R1": {
+        "record_id": "R1",
+        "file_id": "F1",
+        "record_no": 1,
+        "line_start": 1,
+        "line_end": 2,
+        "decode_state": "decoded",
+        "observed": {
+          "00": "2026-09-21 09:00:00.000000 CST",
+          "01": "demo_user",
+          "02": "demo_db",
+          "03": "p1",
+          "04": "th1",
+          "05": "192.0.2.10",
+          "06": "50000",
+          "07": "2026-09-21 08:00:00 CST",
+          "08": "0",
+          "09": "con1",
+          "10": "cmd1",
+          "11": "seg-1",
+          "12": "",
+          "13": "",
+          "14": "",
+          "15": "",
+          "16": "LOG",
+          "17": "00000",
+          "18": "duration: 10.000 ms",
+          "19": "",
+          "20": "",
+          "21": "",
+          "22": "",
+          "23": "",
+          "24": "SELECT item_id\nFROM demo_items WHERE item_id = 7;",
+          "25": "",
+          "26": "",
+          "27": "postgres.c",
+          "28": "1946",
+          "29": ""
+        },
+        "problem_ids": []
+      }
+    },
+    "analyses": {
+      "A1": {
+        "analysis_id": "A1",
+        "file_ids": [
+          "F1"
+        ],
+        "profile": "hashdata-csv/1",
+        "mapping_version": "design:hashdata-mapping/1",
+        "parser_version": "synthetic:source-parser/1",
+        "association_version": "synthetic:association/1",
+        "supersedes": null,
+        "evidence_manifest": "synthetic explicit records [R1]"
+      }
+    },
+    "sql_texts": {
+      "Q1": {
+        "sql_id": "Q1",
+        "text": "SELECT item_id\nFROM demo_items WHERE item_id = 7;",
+        "evidence_refs": [
+          "R1"
+        ]
+      }
+    },
+    "occurrences": {
+      "O1": {
+        "occurrence_id": "O1",
+        "analysis_id": "A1",
+        "scope_id": "CL1",
+        "source_id": "S1",
+        "anchor_ref": "R1",
+        "evidence_refs": [
+          "R1"
+        ],
+        "unit": "request",
+        "request_shape": "single",
+        "database": "demo_db",
+        "execution_user": "demo_user",
+        "sql_id": "Q1",
+        "sql_state": "complete",
+        "timing_type": "request",
+        "timing_reason": null,
+        "outcome": "success",
+        "outcome_evidence_refs": [
+          "R1"
+        ],
+        "association": {
+          "state": "reliable",
+          "method": "synthetic complete request evidence; not an implemented detector",
+          "evidence_refs": [
+            "R1"
+          ],
+          "reason": null
+        },
+        "end_at": "2026-09-21T09:00:00.000000+08:00",
+        "duration_ms": "10.000",
+        "estimated_start_at": "2026-09-21T08:59:59.990000+08:00",
+        "start_basis": "end_minus_duration",
+        "value_reasons": {}
+      }
+    },
+    "normalizations": {
+      "N1": {
+        "normalization_id": "N1",
+        "algorithm_version": "synthetic:sql-fingerprint/1",
+        "parser_version": "synthetic:sql-parser/1",
+        "dictionary_schema_version": 1,
+        "dictionary_rules_version": "1.0.1",
+        "dictionary_digest": {
+          "algorithm": "example-opaque",
+          "value": "synthetic-dictionary-content-1.0.1"
+        },
+        "rules_ref": "synthetic:normalization/1; actual dictionary contract is rules/functions/README.md"
+      }
+    },
+    "fingerprints": {
+      "P1": {
+        "fingerprint_id": "P1",
+        "sql_id": "Q1",
+        "normalization_id": "N1",
+        "state": "reliable",
+        "value": "synthetic:select-demo-items-where-business-value",
+        "reason": null
+      }
+    },
+    "groups": {
+      "G1": {
+        "group_id": "G1",
+        "profile": "hashdata-csv/1",
+        "normalization_id": "N1",
+        "cluster_id": "CL1",
+        "database": "demo_db",
+        "execution_user": "demo_user",
+        "fingerprint_id": "P1",
+        "timing_type": "request"
+      }
+    },
+    "input_snapshots": {
+      "IN1": {
+        "input_id": "IN1",
+        "scope_id": "CL1",
+        "batch_ids": [
+          "B1"
+        ],
+        "file_ids": [
+          "F1"
+        ],
+        "analysis_ids": [
+          "A1"
+        ],
+        "selection": {
+          "kind": "explicit",
+          "refs": [
+            {
+              "analysis_id": "A1",
+              "occurrence_id": "O1"
+            }
+          ],
+          "manifest_ref": null
+        },
+        "frozen_at": "2026-10-01T08:00:00+08:00"
+      }
+    },
+    "config_snapshots": {
+      "CFG1": {
+        "config_id": "CFG1",
+        "scope_id": "CL1",
+        "source_mapping_refs": [
+          "synthetic:source-map/1"
+        ],
+        "normalization_id": "N1",
+        "window": {
+          "cutoff_date": "2026-09-30",
+          "days": 30,
+          "start": "2026-09-01T00:00:00+08:00",
+          "end": "2026-10-01T00:00:00+08:00"
+        },
+        "blacklist": {
+          "category_ref": "synthetic:confirmed-issue2-category-boundaries/1",
+          "template_ref": "synthetic:empty-template-list/1",
+          "category_rules": [
+            "SET (ordinary run parameters only)",
+            "BEGIN",
+            "COMMIT",
+            "VACUUM",
+            "ANALYZE",
+            "CREATE INDEX",
+            "ALTER TABLE"
+          ],
+          "template_rules": []
+        },
+        "exclusions": [],
+        "thresholds": {
+          "overall": {
+            "basic_count": 30,
+            "p95_count": 200,
+            "p99_count": 1000,
+            "coverage_kind": "active_days",
+            "coverage_min": 7
+          },
+          "day": {
+            "basic_count": 30,
+            "p95_count": 200,
+            "p99_count": 1000,
+            "coverage_kind": "none",
+            "coverage_min": 0
+          },
+          "week": {
+            "basic_count": 30,
+            "p95_count": 200,
+            "p99_count": 1000,
+            "coverage_kind": "active_days",
+            "coverage_min": 3
+          },
+          "weekday": {
+            "basic_count": 30,
+            "p95_count": 200,
+            "p99_count": 1000,
+            "coverage_kind": "active_weeks",
+            "coverage_min": 4
+          },
+          "hour": {
+            "basic_count": 30,
+            "p95_count": 200,
+            "p99_count": 1000,
+            "coverage_kind": "active_days",
+            "coverage_min": 7
+          }
+        },
+        "statistics_version": "design:accepted-formulas/1; synthetic values at displayed precision"
+      }
+    },
+    "decisions": {
+      "D1": {
+        "decision_id": "D1",
+        "build_id": "V1",
+        "occurrence_ref": {
+          "analysis_id": "A1",
+          "occurrence_id": "O1"
+        },
+        "fingerprint_id": "P1",
+        "group_id": "G1",
+        "state": "included",
+        "in_window": true,
+        "count_scope": "group",
+        "reasons": [],
+        "rule_evaluations": {
+          "outcome": "not_matched",
+          "duration": "not_matched",
+          "association": "not_matched",
+          "sql": "not_matched",
+          "fingerprint": "not_matched",
+          "blacklist": "not_matched",
+          "exclusion_interval": "not_matched",
+          "window": "not_matched"
+        }
+      }
+    },
+    "problems": {},
+    "statistics": {
+      "ST1": {
+        "statistic_id": "ST1",
+        "build_id": "V1",
+        "group_id": "G1",
+        "bucket": {
+          "layer": "overall",
+          "key": null,
+          "range_start": "2026-09-01T00:00:00+08:00",
+          "range_end": "2026-10-01T00:00:00+08:00",
+          "partial_week": null
+        },
+        "included_count": 1,
+        "excluded_count": 0,
+        "exclusions_by_reason": {},
+        "active_dates": [
+          "2026-09-21"
+        ],
+        "active_week_starts": [
+          "2026-09-21"
+        ],
+        "first_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "last_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sufficiency": {
+          "basic": {
+            "required_count": 30,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p95": {
+            "required_count": 200,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p99": {
+            "required_count": 1000,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          }
+        }
+      },
+      "ST2": {
+        "statistic_id": "ST2",
+        "build_id": "V1",
+        "group_id": "G1",
+        "bucket": {
+          "layer": "day",
+          "key": "2026-09-21",
+          "range_start": "2026-09-21T00:00:00+08:00",
+          "range_end": "2026-09-22T00:00:00+08:00",
+          "partial_week": null
+        },
+        "included_count": 1,
+        "excluded_count": 0,
+        "exclusions_by_reason": {},
+        "active_dates": [
+          "2026-09-21"
+        ],
+        "active_week_starts": [
+          "2026-09-21"
+        ],
+        "first_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "last_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sufficiency": {
+          "basic": {
+            "required_count": 30,
+            "actual_count": 1,
+            "coverage_kind": "none",
+            "required_coverage": 0,
+            "actual_coverage": 0,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min"
+            ]
+          },
+          "p95": {
+            "required_count": 200,
+            "actual_count": 1,
+            "coverage_kind": "none",
+            "required_coverage": 0,
+            "actual_coverage": 0,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min"
+            ]
+          },
+          "p99": {
+            "required_count": 1000,
+            "actual_count": 1,
+            "coverage_kind": "none",
+            "required_coverage": 0,
+            "actual_coverage": 0,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min"
+            ]
+          }
+        }
+      },
+      "ST3": {
+        "statistic_id": "ST3",
+        "build_id": "V1",
+        "group_id": "G1",
+        "bucket": {
+          "layer": "week",
+          "key": "2026-09-21",
+          "range_start": "2026-09-21T00:00:00+08:00",
+          "range_end": "2026-09-28T00:00:00+08:00",
+          "partial_week": false
+        },
+        "included_count": 1,
+        "excluded_count": 0,
+        "exclusions_by_reason": {},
+        "active_dates": [
+          "2026-09-21"
+        ],
+        "active_week_starts": [
+          "2026-09-21"
+        ],
+        "first_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "last_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sufficiency": {
+          "basic": {
+            "required_count": 30,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 3,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p95": {
+            "required_count": 200,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 3,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p99": {
+            "required_count": 1000,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 3,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          }
+        }
+      },
+      "ST4": {
+        "statistic_id": "ST4",
+        "build_id": "V1",
+        "group_id": "G1",
+        "bucket": {
+          "layer": "weekday",
+          "key": 1,
+          "range_start": "2026-09-01T00:00:00+08:00",
+          "range_end": "2026-10-01T00:00:00+08:00",
+          "partial_week": null
+        },
+        "included_count": 1,
+        "excluded_count": 0,
+        "exclusions_by_reason": {},
+        "active_dates": [
+          "2026-09-21"
+        ],
+        "active_week_starts": [
+          "2026-09-21"
+        ],
+        "first_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "last_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sufficiency": {
+          "basic": {
+            "required_count": 30,
+            "actual_count": 1,
+            "coverage_kind": "active_weeks",
+            "required_coverage": 4,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_weeks_below_min"
+            ]
+          },
+          "p95": {
+            "required_count": 200,
+            "actual_count": 1,
+            "coverage_kind": "active_weeks",
+            "required_coverage": 4,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_weeks_below_min"
+            ]
+          },
+          "p99": {
+            "required_count": 1000,
+            "actual_count": 1,
+            "coverage_kind": "active_weeks",
+            "required_coverage": 4,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_weeks_below_min"
+            ]
+          }
+        }
+      },
+      "ST5": {
+        "statistic_id": "ST5",
+        "build_id": "V1",
+        "group_id": "G1",
+        "bucket": {
+          "layer": "hour",
+          "key": 8,
+          "range_start": "2026-09-01T00:00:00+08:00",
+          "range_end": "2026-10-01T00:00:00+08:00",
+          "partial_week": null
+        },
+        "included_count": 1,
+        "excluded_count": 0,
+        "exclusions_by_reason": {},
+        "active_dates": [
+          "2026-09-21"
+        ],
+        "active_week_starts": [
+          "2026-09-21"
+        ],
+        "first_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "last_sample_at": "2026-09-21T08:59:59.990000+08:00",
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sufficiency": {
+          "basic": {
+            "required_count": 30,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p95": {
+            "required_count": 200,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          },
+          "p99": {
+            "required_count": 1000,
+            "actual_count": 1,
+            "coverage_kind": "active_days",
+            "required_coverage": 7,
+            "actual_coverage": 1,
+            "met": false,
+            "reasons": [
+              "sample_count_below_min",
+              "active_days_below_min"
+            ]
+          }
+        }
+      }
+    },
+    "builds": {
+      "V1": {
+        "build_id": "V1",
+        "scope_id": "CL1",
+        "input_id": "IN1",
+        "config_id": "CFG1",
+        "retry_of": null,
+        "state": "calculated",
+        "started_at": "2026-10-01T08:00:00+08:00",
+        "finished_at": "2026-10-01T08:00:01+08:00",
+        "results_saved": true,
+        "checks": {
+          "batch_complete": {
+            "state": "passed",
+            "reason": null
+          },
+          "rules_consistent": {
+            "state": "passed",
+            "reason": null
+          },
+          "results_complete": {
+            "state": "passed",
+            "reason": null
+          },
+          "results_saved": {
+            "state": "passed",
+            "reason": null
+          },
+          "counts_consistent": {
+            "state": "passed",
+            "reason": null
+          },
+          "values_consistent": {
+            "state": "passed",
+            "reason": null
+          }
+        },
+        "timing_coverage": {
+          "request": {
+            "included_count": 1,
+            "excluded_count": 0,
+            "group_ids": [
+              "G1"
+            ]
+          },
+          "execute_first": {
+            "included_count": 0,
+            "excluded_count": 0,
+            "group_ids": []
+          },
+          "execute_fetch": {
+            "included_count": 0,
+            "excluded_count": 0,
+            "group_ids": []
+          },
+          "parse": {
+            "included_count": 0,
+            "excluded_count": 0,
+            "group_ids": []
+          },
+          "bind": {
+            "included_count": 0,
+            "excluded_count": 0,
+            "group_ids": []
+          }
+        },
+        "statistic_ids": [
+          "ST1",
+          "ST2",
+          "ST3",
+          "ST4",
+          "ST5"
+        ],
+        "coverage_index": [
+          {
+            "group_id": "G1",
+            "layer": "overall",
+            "computed_keys": [
+              null
+            ],
+            "empty_keys": []
+          },
+          {
+            "group_id": "G1",
+            "layer": "day",
+            "computed_keys": [
+              "2026-09-21"
+            ],
+            "empty_keys": [
+              "2026-09-01",
+              "2026-09-02",
+              "2026-09-03",
+              "2026-09-04",
+              "2026-09-05",
+              "2026-09-06",
+              "2026-09-07",
+              "2026-09-08",
+              "2026-09-09",
+              "2026-09-10",
+              "2026-09-11",
+              "2026-09-12",
+              "2026-09-13",
+              "2026-09-14",
+              "2026-09-15",
+              "2026-09-16",
+              "2026-09-17",
+              "2026-09-18",
+              "2026-09-19",
+              "2026-09-20",
+              "2026-09-22",
+              "2026-09-23",
+              "2026-09-24",
+              "2026-09-25",
+              "2026-09-26",
+              "2026-09-27",
+              "2026-09-28",
+              "2026-09-29",
+              "2026-09-30"
+            ]
+          },
+          {
+            "group_id": "G1",
+            "layer": "week",
+            "computed_keys": [
+              "2026-09-21"
+            ],
+            "empty_keys": [
+              "2026-08-31",
+              "2026-09-07",
+              "2026-09-14",
+              "2026-09-28"
+            ]
+          },
+          {
+            "group_id": "G1",
+            "layer": "weekday",
+            "computed_keys": [
+              1
+            ],
+            "empty_keys": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          {
+            "group_id": "G1",
+            "layer": "hour",
+            "computed_keys": [
+              8
+            ],
+            "empty_keys": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23
+            ]
+          }
+        ],
+        "problem_ids": []
+      }
+    },
+    "publications": {
+      "PUB1": {
+        "publication_id": "PUB1",
+        "scope_id": "CL1",
+        "build_id": "V1",
+        "previous_build_id": null,
+        "result": "published",
+        "reason": null,
+        "at": "2026-10-01T08:00:02+08:00"
+      }
+    },
+    "current_versions": {
+      "CL1": {
+        "scope_id": "CL1",
+        "build_id": "V1",
+        "last_success_at": "2026-10-01T08:00:02+08:00",
+        "publication_id": "PUB1"
+      }
+    },
+    "tasks": {
+      "T1": {
+        "task_id": "T1",
+        "scope_id": "CL1",
+        "mode": "full",
+        "state": "succeeded",
+        "stage": "publish",
+        "batch_ids": [
+          "B1"
+        ],
+        "build_ids": [
+          "V1"
+        ],
+        "publication_ids": [
+          "PUB1"
+        ],
+        "busy_task_id": null,
+        "reason": null
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "E01",
+      "title": "单条请求与五层完整输出",
+      "constraints": [
+        "C01",
+        "C02",
+        "C04",
+        "C05",
+        "C08",
+        "C09"
+      ],
+      "boundary": "full_fixture",
+      "input": {
+        "fixture": "base"
+      },
+      "expected": {
+        "contract": "accept",
+        "decision_ref": "D1",
+        "five_layer_sample_sums": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "publication": "published",
+        "note": "全部组不足仍可发布；调用类别无样本，不借旧版补齐"
+      }
+    },
+    {
+      "case_id": "E02",
+      "title": "相同原文两次真实执行",
+      "constraints": [
+        "C03",
+        "C04"
+      ],
+      "boundary": "identity",
+      "input": {
+        "sql_id": "Q1",
+        "events": [
+          {
+            "occurrence_id": "O1",
+            "anchor": "R1",
+            "record_no": 1
+          },
+          {
+            "occurrence_id": "O2",
+            "anchor": "R2",
+            "record_no": 2
+          }
+        ],
+        "same_source_and_sql": true,
+        "distinct_event_evidence": true
+      },
+      "expected": {
+        "contract": "accept",
+        "sql_text_count": 1,
+        "request_count": 2,
+        "included_count": 2,
+        "forbidden": "merge O1 and O2 because SQL is equal"
+      }
+    },
+    {
+      "case_id": "E03",
+      "title": "混合批次整体纳入",
+      "constraints": [
+        "C04",
+        "C06",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql": "SET work_mem = '4MB'; BEGIN; INSERT INTO demo_items VALUES (7); COMMIT;",
+        "request_shape": "batch",
+        "duration_ms": "20",
+        "other_eligibility": "reliable_success",
+        "category_results": [
+          "excluded",
+          "excluded",
+          "not_excluded",
+          "excluded"
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "included",
+        "sample_count": 1,
+        "duration_ms": "20",
+        "substatement_samples": 0
+      }
+    },
+    {
+      "case_id": "E04",
+      "title": "纯黑名单批次排除",
+      "constraints": [
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql": "SET work_mem = '4MB'; BEGIN; COMMIT;",
+        "request_shape": "batch",
+        "other_eligibility": "reliable_success"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "blacklist_category"
+        ],
+        "excluded_count": 1,
+        "retained_detail": true
+      }
+    },
+    {
+      "case_id": "E05",
+      "title": "execute_first 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RY",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2764",
+            "message": "execute demo_portal: SELECT item_id FROM demo_items;",
+            "sql": "SELECT item_id FROM demo_items;"
+          },
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 2,
+            "source_file": "postgres.c",
+            "source_line": "2843",
+            "message": "duration: 5.250 ms",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "execute_first",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E06",
+      "title": "execute_fetch 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RY",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2764",
+            "message": "execute fetch from demo_portal: SELECT item_id FROM demo_items;",
+            "sql": "SELECT item_id FROM demo_items;"
+          },
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 2,
+            "source_file": "postgres.c",
+            "source_line": "2843",
+            "message": "duration: 5.250 ms",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "execute_fetch",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E07",
+      "title": "parse 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2219",
+            "message": "duration: 5.250 ms",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "parse",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E08",
+      "title": "parse 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2224",
+            "message": "duration: 5.250 ms  parse demo_stmt: SELECT item_id FROM demo_items;",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "parse",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E09",
+      "title": "bind 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2603",
+            "message": "duration: 5.250 ms",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "bind",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E10",
+      "title": "bind 的来源分支",
+      "constraints": [
+        "C05",
+        "C06"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "evidence_projection": [
+          {
+            "record_id": "RX",
+            "file_id": "FX",
+            "source_id": "S1",
+            "record_no": 1,
+            "source_file": "postgres.c",
+            "source_line": "2608",
+            "message": "duration: 5.250 ms  bind demo_portal: SELECT item_id FROM demo_items;",
+            "sql": "SELECT item_id FROM demo_items;",
+            "end_at": "2026-09-21T09:00:00+08:00"
+          }
+        ],
+        "association": "same source, verified session, ordered records, matching SQL; synthetic stipulated evidence",
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": "bind",
+        "state": "included",
+        "sample_count": 1,
+        "complete_request_count": 0,
+        "duration_ms": "5.250",
+        "estimated_start_at": "2026-09-21T08:59:59.994750+08:00",
+        "start_basis": "end_minus_duration"
+      }
+    },
+    {
+      "case_id": "E11",
+      "title": "Execute 未配对",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "source_line": "2843",
+        "sql_id": "Q1",
+        "duration_ms": "10",
+        "association": "unpaired",
+        "matching_2764": null
+      },
+      "expected": {
+        "contract": "accept",
+        "unit": "call",
+        "timing_type": null,
+        "timing_reason": "unpaired Execute",
+        "decision": "unresolved",
+        "count_scope": "batch",
+        "five_category_sample_increment": 0
+      }
+    },
+    {
+      "case_id": "E12",
+      "title": "事件边界歧义",
+      "constraints": [
+        "C04",
+        "C05",
+        "C07"
+      ],
+      "boundary": "problem",
+      "input": {
+        "record_refs": [
+          "R-candidate-a",
+          "R-candidate-b"
+        ],
+        "reliably_identified_occurrence": false
+      },
+      "expected": {
+        "contract": "accept",
+        "new_occurrences": 0,
+        "problem_level": "batch",
+        "problem_count_unit": "log_record",
+        "problem_count": 2,
+        "group_exclusion_increment": 0
+      }
+    },
+    {
+      "case_id": "E13",
+      "title": "SQL missing",
+      "constraints": [
+        "C04",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql_state": "missing",
+        "sql_id": null,
+        "duration_ms": "10",
+        "outcome": "success",
+        "evidence_retained": true
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "unresolved",
+        "reasons": [
+          "sql_missing"
+        ],
+        "group_id": null,
+        "count_scope": "batch",
+        "raw_hash_fallback": false,
+        "blacklist_evaluation": "not_evaluated"
+      }
+    },
+    {
+      "case_id": "E14",
+      "title": "SQL incomplete",
+      "constraints": [
+        "C04",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql_state": "incomplete",
+        "sql_id": null,
+        "duration_ms": "10",
+        "outcome": "success",
+        "evidence_retained": true
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "unresolved",
+        "reasons": [
+          "sql_incomplete"
+        ],
+        "group_id": null,
+        "count_scope": "batch",
+        "raw_hash_fallback": false,
+        "blacklist_evaluation": "not_evaluated"
+      }
+    },
+    {
+      "case_id": "E15",
+      "title": "SQL invalid_encoding",
+      "constraints": [
+        "C04",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql_state": "invalid_encoding",
+        "sql_id": null,
+        "duration_ms": "10",
+        "outcome": "success",
+        "evidence_retained": true
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "unresolved",
+        "reasons": [
+          "sql_encoding_invalid"
+        ],
+        "group_id": null,
+        "count_scope": "batch",
+        "raw_hash_fallback": false,
+        "blacklist_evaluation": "not_evaluated"
+      }
+    },
+    {
+      "case_id": "E16",
+      "title": "完整文本但解析不支持",
+      "constraints": [
+        "C06",
+        "C07"
+      ],
+      "boundary": "fingerprint",
+      "input": {
+        "sql_id": "Q1",
+        "sql_state": "complete",
+        "outcome": "success",
+        "fingerprint": {
+          "state": "unsupported_syntax",
+          "value": null,
+          "reason": "synthetic unsupported syntax"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "decision": "unresolved",
+        "reasons": [
+          "fingerprint_failed"
+        ],
+        "outcome": "success",
+        "group_id": null,
+        "raw_hash_fallback": false
+      }
+    },
+    {
+      "case_id": "E17",
+      "title": "可归属的 failed",
+      "constraints": [
+        "C05",
+        "C07",
+        "C10"
+      ],
+      "boundary": "decision",
+      "input": {
+        "occurrence_ref": {
+          "analysis_id": "A1",
+          "occurrence_id": "O1"
+        },
+        "outcome": "failed",
+        "termination_evidence": "synthetic reliable failed",
+        "group_id": "G1",
+        "duration_ms": "10",
+        "estimated_start_at": "2026-09-21T08:59:59.990000+08:00"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "execution_failed"
+        ],
+        "count_scope": "group",
+        "excluded_count": 1,
+        "retained_detail": true,
+        "import_failed": false
+      }
+    },
+    {
+      "case_id": "E18",
+      "title": "可归属的 cancelled",
+      "constraints": [
+        "C05",
+        "C07",
+        "C10"
+      ],
+      "boundary": "decision",
+      "input": {
+        "occurrence_ref": {
+          "analysis_id": "A1",
+          "occurrence_id": "O1"
+        },
+        "outcome": "cancelled",
+        "termination_evidence": "synthetic reliable cancelled",
+        "group_id": "G1",
+        "duration_ms": "10",
+        "estimated_start_at": "2026-09-21T08:59:59.990000+08:00"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "execution_cancelled"
+        ],
+        "count_scope": "group",
+        "excluded_count": 1,
+        "retained_detail": true,
+        "import_failed": false
+      }
+    },
+    {
+      "case_id": "E19",
+      "title": "可归属的 timed_out",
+      "constraints": [
+        "C05",
+        "C07",
+        "C10"
+      ],
+      "boundary": "decision",
+      "input": {
+        "occurrence_ref": {
+          "analysis_id": "A1",
+          "occurrence_id": "O1"
+        },
+        "outcome": "timed_out",
+        "termination_evidence": "synthetic reliable timed_out",
+        "group_id": "G1",
+        "duration_ms": "10",
+        "estimated_start_at": "2026-09-21T08:59:59.990000+08:00"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "execution_timed_out"
+        ],
+        "count_scope": "group",
+        "excluded_count": 1,
+        "retained_detail": true,
+        "import_failed": false
+      }
+    },
+    {
+      "case_id": "E20",
+      "title": "未知耗时与失败结果分别表达",
+      "constraints": [
+        "C01",
+        "C05",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "outcome": "failed",
+        "duration_ms": null,
+        "end_at": "2026-09-21T09:00:00.000000+08:00",
+        "estimated_start_at": null,
+        "start_basis": null,
+        "value_reasons": {
+          "duration_ms": "not logged",
+          "estimated_start_at": "duration unknown"
+        },
+        "group_id": "G1"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "execution_failed",
+          "duration_unknown",
+          "start_unknown"
+        ],
+        "count_scope": "batch",
+        "duration_display": "unknown",
+        "group_exclusion_increment": 0,
+        "exclusion_interval_evaluation": "not_evaluated"
+      }
+    },
+    {
+      "case_id": "E21",
+      "title": "日志真实零耗时",
+      "constraints": [
+        "C01",
+        "C05",
+        "C08"
+      ],
+      "boundary": "statistic",
+      "input": {
+        "durations_ms": [
+          "0"
+        ],
+        "outcome": "success",
+        "other_eligibility": "reliable"
+      },
+      "expected": {
+        "contract": "accept",
+        "included_count": 1,
+        "metrics": {
+          "min_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": null,
+            "reason": "zero_denominator"
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "0.0",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": null,
+            "reason": "zero_denominator"
+          },
+          "p99_p50": {
+            "value": null,
+            "reason": "zero_denominator"
+          }
+        },
+        "sample_sufficient": false
+      }
+    },
+    {
+      "case_id": "E22",
+      "title": "一条事件多重原因",
+      "constraints": [
+        "C07",
+        "C08"
+      ],
+      "boundary": "decision",
+      "input": {
+        "event": "one request",
+        "sql": "SET work_mem = '4MB';",
+        "start_at": "2026-09-21T09:50:00+08:00",
+        "end_at": "2026-09-21T10:10:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "scope_id": "CL1"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "excluded",
+        "reasons": [
+          "blacklist_category",
+          "excluded_interval"
+        ],
+        "excluded_count": 1,
+        "exclusions_by_reason": {
+          "blacklist_category": 1,
+          "excluded_interval": 1
+        }
+      }
+    },
+    {
+      "case_id": "E23",
+      "title": "维护区间端点 09:50—10:00",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "interval",
+      "input": {
+        "sample_start": "2026-09-21T09:50:00+08:00",
+        "sample_end": "2026-09-21T10:00:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "same_scope": true
+      },
+      "expected": {
+        "contract": "accept",
+        "interval_matches": false,
+        "note": "only this exclusion rule; other eligibility still applies"
+      }
+    },
+    {
+      "case_id": "E24",
+      "title": "维护区间端点 10:30—10:40",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "interval",
+      "input": {
+        "sample_start": "2026-09-21T10:30:00+08:00",
+        "sample_end": "2026-09-21T10:40:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "same_scope": true
+      },
+      "expected": {
+        "contract": "accept",
+        "interval_matches": false,
+        "note": "only this exclusion rule; other eligibility still applies"
+      }
+    },
+    {
+      "case_id": "E25",
+      "title": "维护区间端点 10:00—10:00",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "interval",
+      "input": {
+        "sample_start": "2026-09-21T10:00:00+08:00",
+        "sample_end": "2026-09-21T10:00:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "same_scope": true
+      },
+      "expected": {
+        "contract": "accept",
+        "interval_matches": true,
+        "note": "only this exclusion rule; other eligibility still applies"
+      }
+    },
+    {
+      "case_id": "E26",
+      "title": "维护区间端点 10:30—10:30",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "interval",
+      "input": {
+        "sample_start": "2026-09-21T10:30:00+08:00",
+        "sample_end": "2026-09-21T10:30:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "same_scope": true
+      },
+      "expected": {
+        "contract": "accept",
+        "interval_matches": false,
+        "note": "only this exclusion rule; other eligibility still applies"
+      }
+    },
+    {
+      "case_id": "E27",
+      "title": "维护区间端点 09:50—10:40",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "interval",
+      "input": {
+        "sample_start": "2026-09-21T09:50:00+08:00",
+        "sample_end": "2026-09-21T10:40:00+08:00",
+        "exclude_start": "2026-09-21T10:00:00+08:00",
+        "exclude_end": "2026-09-21T10:30:00+08:00",
+        "same_scope": true
+      },
+      "expected": {
+        "contract": "accept",
+        "interval_matches": true,
+        "note": "only this exclusion rule; other eligibility still applies"
+      }
+    },
+    {
+      "case_id": "E28",
+      "title": "跨日跨周按推算开始归属",
+      "constraints": [
+        "C05",
+        "C08"
+      ],
+      "boundary": "time",
+      "input": {
+        "end_at": "2026-09-21T00:00:01+08:00",
+        "duration_ms": "2000",
+        "window": {
+          "cutoff_date": "2026-09-30",
+          "days": 30,
+          "start": "2026-09-01T00:00:00+08:00",
+          "end": "2026-10-01T00:00:00+08:00"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "estimated_start_at": "2026-09-20T23:59:59+08:00",
+        "day": "2026-09-20",
+        "week": "2026-09-14",
+        "weekday": 7,
+        "hour": 23,
+        "sample_count": 1,
+        "duration_ms": "2000"
+      }
+    },
+    {
+      "case_id": "E29",
+      "title": "恰好周一零点开始",
+      "constraints": [
+        "C05",
+        "C08"
+      ],
+      "boundary": "time",
+      "input": {
+        "end_at": "2026-09-21T00:00:01+08:00",
+        "duration_ms": "1000",
+        "window": {
+          "cutoff_date": "2026-09-30",
+          "days": 30,
+          "start": "2026-09-01T00:00:00+08:00",
+          "end": "2026-10-01T00:00:00+08:00"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "estimated_start_at": "2026-09-21T00:00:00+08:00",
+        "day": "2026-09-21",
+        "week": "2026-09-21",
+        "weekday": 1,
+        "hour": 0
+      }
+    },
+    {
+      "case_id": "E30",
+      "title": "窗口首尾不足整周",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "bucket",
+      "input": {
+        "window": {
+          "cutoff_date": "2026-09-30",
+          "days": 30,
+          "start": "2026-09-01T00:00:00+08:00",
+          "end": "2026-10-01T00:00:00+08:00"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "first_week": {
+          "key": "2026-08-31",
+          "range_start": "2026-09-01T00:00:00+08:00",
+          "range_end": "2026-09-07T00:00:00+08:00",
+          "partial_week": true
+        },
+        "last_week": {
+          "key": "2026-09-28",
+          "range_start": "2026-09-28T00:00:00+08:00",
+          "range_end": "2026-10-01T00:00:00+08:00",
+          "partial_week": true
+        },
+        "outside_window_samples_added": 0
+      }
+    },
+    {
+      "case_id": "E31",
+      "title": "零有效样本但有排除计数",
+      "constraints": [
+        "C07",
+        "C08"
+      ],
+      "boundary": "statistic",
+      "input": {
+        "included_count": 0,
+        "excluded_decisions": [
+          {
+            "event": "X1",
+            "reasons": [
+              "blacklist_category",
+              "excluded_interval"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "included_count": 0,
+        "excluded_count": 1,
+        "exclusions_by_reason": {
+          "blacklist_category": 1,
+          "excluded_interval": 1
+        },
+        "metrics": {
+          "min_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "max_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "mean_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p25_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p50_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p75_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p90_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p95_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p99_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "stddev_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "cv": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "mad_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "iqr_ms": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "log_median": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "log_mad": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p95_p50": {
+            "value": null,
+            "reason": "no_samples"
+          },
+          "p99_p50": {
+            "value": null,
+            "reason": "no_samples"
+          }
+        },
+        "active_dates": [],
+        "active_week_starts": [],
+        "first_sample_at": null,
+        "last_sample_at": null
+      }
+    },
+    {
+      "case_id": "E32",
+      "title": "单个正样本",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "statistic",
+      "input": {
+        "durations_ms": [
+          "10"
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "included_count": 1,
+        "metrics": {
+          "min_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "cv": {
+            "value": "0",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "log_median": {
+            "value": "2.3978952727983707",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "0",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1",
+            "reason": null
+          }
+        },
+        "sample_sufficient": false
+      }
+    },
+    {
+      "case_id": "E33",
+      "title": "两样本的全部公式",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "statistic",
+      "input": {
+        "durations_ms": [
+          "0",
+          "10"
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "included_count": 2,
+        "metrics": {
+          "min_ms": {
+            "value": "0",
+            "reason": null
+          },
+          "max_ms": {
+            "value": "10",
+            "reason": null
+          },
+          "mean_ms": {
+            "value": "5",
+            "reason": null
+          },
+          "p25_ms": {
+            "value": "2.5",
+            "reason": null
+          },
+          "p50_ms": {
+            "value": "5",
+            "reason": null
+          },
+          "p75_ms": {
+            "value": "7.5",
+            "reason": null
+          },
+          "p90_ms": {
+            "value": "9",
+            "reason": null
+          },
+          "p95_ms": {
+            "value": "9.5",
+            "reason": null
+          },
+          "p99_ms": {
+            "value": "9.9",
+            "reason": null
+          },
+          "stddev_ms": {
+            "value": "5",
+            "reason": null
+          },
+          "cv": {
+            "value": "1",
+            "reason": null
+          },
+          "mad_ms": {
+            "value": "5",
+            "reason": null
+          },
+          "iqr_ms": {
+            "value": "5",
+            "reason": null
+          },
+          "log_median": {
+            "value": "1.1989476363991853",
+            "reason": null
+          },
+          "log_mad": {
+            "value": "1.1989476363991853",
+            "reason": null
+          },
+          "p95_p50": {
+            "value": "1.9",
+            "reason": null
+          },
+          "p99_p50": {
+            "value": "1.98",
+            "reason": null
+          }
+        },
+        "note": "先 ln(1+x) 再求中位数，不是 ln(1+5)；每层直接使用自身样本"
+      }
+    },
+    {
+      "case_id": "E34",
+      "title": "day 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "day",
+        "included_count": 200,
+        "active_days": 1,
+        "active_weeks": 1,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "none",
+          "coverage_min": 0
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": true,
+          "p95": true,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E35",
+      "title": "overall 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "overall",
+        "included_count": 200,
+        "active_days": 7,
+        "active_weeks": 2,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_days",
+          "coverage_min": 7
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": true,
+          "p95": true,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E36",
+      "title": "hour 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "hour",
+        "included_count": 29,
+        "active_days": 7,
+        "active_weeks": 2,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_days",
+          "coverage_min": 7
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": false,
+          "p95": false,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E37",
+      "title": "week 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "week",
+        "included_count": 200,
+        "active_days": 3,
+        "active_weeks": 1,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_days",
+          "coverage_min": 3
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": true
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": true,
+          "p95": true,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E38",
+      "title": "week 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "week",
+        "included_count": 1000,
+        "active_days": 1,
+        "active_weeks": 1,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_days",
+          "coverage_min": 3
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": false,
+          "p95": false,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E39",
+      "title": "weekday 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "weekday",
+        "included_count": 30,
+        "active_days": 4,
+        "active_weeks": 4,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_weeks",
+          "coverage_min": 4
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": true,
+          "p95": false,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E40",
+      "title": "weekday 独立样本条件",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "threshold",
+      "input": {
+        "layer": "weekday",
+        "included_count": 1000,
+        "active_days": 1,
+        "active_weeks": 1,
+        "thresholds": {
+          "basic_count": 30,
+          "p95_count": 200,
+          "p99_count": 1000,
+          "coverage_kind": "active_weeks",
+          "coverage_min": 4
+        },
+        "timing_types": [
+          "request",
+          "execute_first",
+          "execute_fetch",
+          "parse",
+          "bind"
+        ],
+        "partial_week": null
+      },
+      "expected": {
+        "contract": "accept",
+        "met": {
+          "basic": false,
+          "p95": false,
+          "p99": false
+        },
+        "retain_computable_metrics": true,
+        "borrow_other_buckets": false,
+        "automatic_anomaly_capability": false
+      }
+    },
+    {
+      "case_id": "E41",
+      "title": "同源成功文件改名重复提交",
+      "constraints": [
+        "C03"
+      ],
+      "boundary": "import",
+      "input": {
+        "source_id": "S1",
+        "same_content": true,
+        "previous_attempt": {
+          "attempt_id": "I1",
+          "state": "succeeded"
+        },
+        "new_locator": "synthetic://renamed.csv"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "duplicate_skipped",
+        "duplicate_of": "I1",
+        "new_sample_increment": 0,
+        "batch_entry_complete": true
+      }
+    },
+    {
+      "case_id": "E42",
+      "title": "失败重试复用文件身份",
+      "constraints": [
+        "C03"
+      ],
+      "boundary": "import",
+      "input": {
+        "file_id": "F1",
+        "previous_attempt": {
+          "attempt_id": "I0",
+          "state": "interrupted"
+        },
+        "partial_processed_record_nos": [
+          1
+        ],
+        "retry_attempt_id": "I2",
+        "content_unchanged": true
+      },
+      "expected": {
+        "contract": "accept",
+        "retry_of": "I0",
+        "duplicate_skipped": false,
+        "final_success_record_nos": [
+          1
+        ],
+        "record_count": 1,
+        "partial_before_success_is_build_input": false
+      }
+    },
+    {
+      "case_id": "E43",
+      "title": "可靠部分重叠冲突",
+      "constraints": [
+        "C03",
+        "C09"
+      ],
+      "boundary": "import",
+      "input": {
+        "different_file_ids": [
+          "F1",
+          "F2"
+        ],
+        "reliable_same_source_record_overlap": true,
+        "evidence": "synthetic upstream record identity range proves overlap"
+      },
+      "expected": {
+        "contract": "accept",
+        "attempt_state": "conflict",
+        "batch_state": "conflict",
+        "auto_merge": false,
+        "publication": "check_failed",
+        "current_build_unchanged": true
+      }
+    },
+    {
+      "case_id": "E44",
+      "title": "文件名时间或 SQL 相同不足以判重",
+      "constraints": [
+        "C03",
+        "C04"
+      ],
+      "boundary": "import",
+      "input": {
+        "same_filename": true,
+        "time_ranges_overlap": true,
+        "same_sql": true,
+        "reliable_record_overlap_evidence": false
+      },
+      "expected": {
+        "contract": "accept",
+        "dedup_or_conflict_proven": false,
+        "discard_records": false,
+        "note": "需要补充可靠证据；不能以这三项自动暂停为已证实重叠或自动去重"
+      }
+    },
+    {
+      "case_id": "E45",
+      "title": "记录问题隔离与文件边界损坏",
+      "constraints": [
+        "C03",
+        "C07",
+        "C09"
+      ],
+      "boundary": "import",
+      "input": {
+        "alternatives": [
+          {
+            "record_boundaries_reliable": true,
+            "affected_scope_isolated": true
+          },
+          {
+            "record_boundaries_reliable": false,
+            "affected_scope_isolated": false
+          }
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "alternatives": [
+          {
+            "file_state": "succeeded",
+            "record_problem": "isolated",
+            "publication_blocked_by_problem_alone": false
+          },
+          {
+            "file_state": "failed",
+            "batch_complete": false,
+            "publication": "check_failed"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "E46",
+      "title": "全部组不足仍发布",
+      "constraints": [
+        "C08",
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "timing_coverage": {
+          "request": 1,
+          "execute_first": 0,
+          "execute_fetch": 0,
+          "parse": 0,
+          "bind": 0
+        },
+        "all_checks_passed": true,
+        "results_saved": true,
+        "all_groups_insufficient": true,
+        "previous_current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00"
+        },
+        "candidate_build": "V1"
+      },
+      "expected": {
+        "contract": "accept",
+        "publication_result": "published",
+        "current_build_id": "V1",
+        "last_success_changes": true,
+        "copy_old_missing_categories": false
+      }
+    },
+    {
+      "case_id": "E47",
+      "title": "仅调用有样本也可发布",
+      "constraints": [
+        "C08",
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "timing_coverage": {
+          "request": 0,
+          "execute_first": 0,
+          "execute_fetch": 1,
+          "parse": 0,
+          "bind": 0
+        },
+        "all_checks_passed": true,
+        "results_saved": true,
+        "all_groups_insufficient": true,
+        "previous_current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00"
+        },
+        "candidate_build": "V1"
+      },
+      "expected": {
+        "contract": "accept",
+        "publication_result": "published",
+        "current_build_id": "V1",
+        "last_success_changes": true,
+        "copy_old_missing_categories": false
+      }
+    },
+    {
+      "case_id": "E48",
+      "title": "五类全部零样本",
+      "constraints": [
+        "C08",
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "timing_coverage": {
+          "request": 0,
+          "execute_first": 0,
+          "execute_fetch": 0,
+          "parse": 0,
+          "bind": 0
+        },
+        "all_checks_passed": true,
+        "results_saved": true,
+        "all_groups_insufficient": true,
+        "previous_current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00"
+        },
+        "candidate_build": "V1"
+      },
+      "expected": {
+        "contract": "accept",
+        "publication_result": "no_samples",
+        "current_build_id": "V0",
+        "last_success_changes": false,
+        "copy_old_missing_categories": false
+      }
+    },
+    {
+      "case_id": "E49",
+      "title": "必需结果保存失败",
+      "constraints": [
+        "C08",
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "timing_coverage": {
+          "request": 1,
+          "execute_first": 0,
+          "execute_fetch": 0,
+          "parse": 0,
+          "bind": 0
+        },
+        "all_checks_passed": false,
+        "results_saved": false,
+        "all_groups_insufficient": true,
+        "previous_current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00"
+        },
+        "candidate_build": "V1"
+      },
+      "expected": {
+        "contract": "accept",
+        "publication_result": "check_failed",
+        "current_build_id": "V0",
+        "last_success_changes": false,
+        "copy_old_missing_categories": false
+      }
+    },
+    {
+      "case_id": "E50",
+      "title": "发布写入失败保持指针",
+      "constraints": [
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "candidate_build": "V1",
+        "checks_passed": true,
+        "results_saved": true,
+        "has_samples": true,
+        "publication_write_succeeded": false,
+        "previous_current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00",
+          "publication_id": "PUB0"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "publication_result": "publish_failed",
+        "current": {
+          "build_id": "V0",
+          "last_success_at": "2026-09-30T08:00:00+08:00",
+          "publication_id": "PUB0"
+        }
+      }
+    },
+    {
+      "case_id": "E51",
+      "title": "无旧版且整窗无样本",
+      "constraints": [
+        "C09"
+      ],
+      "boundary": "publication",
+      "input": {
+        "previous_current": null,
+        "five_types_zero": true,
+        "checks_passed": true
+      },
+      "expected": {
+        "contract": "accept",
+        "result": "no_samples",
+        "current_build_id": null,
+        "last_success_at": null,
+        "display": "暂无基线"
+      }
+    },
+    {
+      "case_id": "E52",
+      "title": "构建失败后重新计算",
+      "constraints": [
+        "C09"
+      ],
+      "boundary": "build",
+      "input": {
+        "previous_build": {
+          "build_id": "V0",
+          "state": "interrupted",
+          "input_id": "IN1"
+        },
+        "new_build": {
+          "build_id": "V1",
+          "retry_of": "V0",
+          "input_id": "IN1",
+          "config_id": "CFG1"
+        },
+        "input_batches_complete": true
+      },
+      "expected": {
+        "contract": "accept",
+        "reimport_required": false,
+        "statistics_resume": false,
+        "recompute": "whole selected window / five types / five layers",
+        "retain_failed_build": true
+      }
+    },
+    {
+      "case_id": "E53",
+      "title": "固定输入与普通配置更新",
+      "constraints": [
+        "C09",
+        "C11"
+      ],
+      "boundary": "build",
+      "input": {
+        "running_build": {
+          "build_id": "V1",
+          "input_id": "IN1",
+          "config_id": "CFG1"
+        },
+        "new_data": "not in IN1",
+        "new_config": "CFG2"
+      },
+      "expected": {
+        "contract": "accept",
+        "running_build_unchanged": true,
+        "new_data_for_next_build": true,
+        "mixed_config_allowed": false
+      }
+    },
+    {
+      "case_id": "E54",
+      "title": "规则升级保留历史引用",
+      "constraints": [
+        "C04",
+        "C06",
+        "C09",
+        "C10",
+        "C11"
+      ],
+      "boundary": "version",
+      "input": {
+        "old_build": {
+          "build_id": "V0",
+          "normalization_id": "N0",
+          "group_id": "G0",
+          "fingerprint_value": "old-shape"
+        },
+        "new_build": {
+          "build_id": "V1",
+          "normalization_id": "N1",
+          "group_id": "G1",
+          "fingerprint_value": "new-shape"
+        },
+        "both_reference": {
+          "sql_id": "Q1",
+          "occurrence_id": "O1"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "old_group_unchanged": true,
+        "whole_window_uses": "N1 for V1",
+        "copied_sql_or_occurrences": 0,
+        "historical_search_normalization": "N0 for V0",
+        "viewing_old_changes_current": false
+      }
+    },
+    {
+      "case_id": "E55",
+      "title": "同集群忙时拒绝",
+      "constraints": [
+        "C09"
+      ],
+      "boundary": "task",
+      "input": {
+        "running": {
+          "task_id": "T1",
+          "scope_id": "CL1",
+          "stage": "build"
+        },
+        "incoming": {
+          "task_id": "T2",
+          "scope_id": "CL1",
+          "mode": "import_only"
+        }
+      },
+      "expected": {
+        "contract": "accept",
+        "incoming_state": "busy_rejected",
+        "busy_task_id": "T1",
+        "existing_task_unchanged": true,
+        "auto_queue": false,
+        "other_scope_independent": true
+      }
+    },
+    {
+      "case_id": "E56",
+      "title": "非数据库对象扩展边界",
+      "constraints": [
+        "C10",
+        "C11"
+      ],
+      "boundary": "extension",
+      "input": {
+        "contract_version": "1.0.0",
+        "profile": "batch-job-example/1",
+        "scope_id": "scheduler-demo",
+        "object": {
+          "kind": "job_definition",
+          "definition_id": "daily-load-demo"
+        },
+        "run": {
+          "run_id": "run-demo-1",
+          "definition_id": "daily-load-demo",
+          "end_at": "2026-09-21T02:00:00+08:00",
+          "elapsed_ms": "1200"
+        },
+        "semantic_note": "synthetic job duration; future identity/training/grouping rules unconfirmed"
+      },
+      "expected": {
+        "contract": "accept_as_boundary_example_only",
+        "sql_required": false,
+        "database_required": false,
+        "execution_user_required": false,
+        "hashdata_fingerprint_required": false,
+        "mix_with_hashdata": false,
+        "hashdata_thresholds_inherited": false,
+        "adapter_delivered": false
+      }
+    },
+    {
+      "case_id": "E57",
+      "title": "契约与规则版本独立",
+      "constraints": [
+        "C11"
+      ],
+      "boundary": "version",
+      "input": {
+        "contract_version": "1.0.0",
+        "dictionary_schema_version": 1,
+        "dictionary_rules_version": "1.0.1",
+        "build_id": "V1",
+        "changes": [
+          "optional diagnostic note",
+          "duration_ms changes to seconds",
+          "new unknown timing enum"
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "handling": [
+          "minor if optional and semantics unchanged",
+          "major incompatible change",
+          "unsupported contract; retain input, do not train as known type"
+        ]
+      }
+    },
+    {
+      "case_id": "N01",
+      "title": "未知耗时填零",
+      "constraints": [
+        "C01",
+        "C05"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "observed_duration": null,
+        "duration_ms": "0",
+        "value_reasons": {}
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "unknown is not observed zero",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N02",
+      "title": "续取伪装完整请求",
+      "constraints": [
+        "C05"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "unit": "request",
+        "timing_type": "execute_fetch"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "unit conflicts with timing semantics",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N03",
+      "title": "同文执行合并",
+      "constraints": [
+        "C03",
+        "C04"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "distinct_event_anchors": [
+          "R1",
+          "R2"
+        ],
+        "occurrence_count": 1,
+        "reason": "same SQL"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "text equality is not event identity",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N04",
+      "title": "指纹失败用原文摘要训练",
+      "constraints": [
+        "C06",
+        "C07"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "fingerprint_state": "unsupported_syntax",
+        "group_fingerprint": "raw-text-hash",
+        "decision": "included"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "no fallback to raw hash",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N05",
+      "title": "未知 Execute 强行分首次",
+      "constraints": [
+        "C05"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "association_state": "unpaired",
+        "timing_type": "execute_first"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "type requires reliable pair",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N06",
+      "title": "原因相加作为排除总数",
+      "constraints": [
+        "C07",
+        "C08"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "one_event_reasons": [
+          "blacklist_category",
+          "excluded_interval"
+        ],
+        "excluded_count": 2
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "one event counts once",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N07",
+      "title": "五层计数不一致",
+      "constraints": [
+        "C08",
+        "C09"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "overall": 10,
+        "day_sum": 10,
+        "week_sum": 9,
+        "weekday_sum": 10,
+        "hour_sum": 10
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "counts_consistent fails; block publication",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N08",
+      "title": "新旧统计补齐",
+      "constraints": [
+        "C09",
+        "C11"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "candidate_build": "V1",
+        "missing_type": "request",
+        "copied_from": "V0"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "one version cannot include old results",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N09",
+      "title": "失败导入被当成功跳过",
+      "constraints": [
+        "C03"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "duplicate_of_state": "interrupted",
+        "new_state": "duplicate_skipped"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "must reference succeeded import",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N10",
+      "title": "丢失引用与跨集群发布",
+      "constraints": [
+        "C01",
+        "C09"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "candidate_scope": "CL1",
+        "current_scope": "CL2",
+        "build_id": "missing"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "dangling and cross-scope references",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N11",
+      "title": "样本不足清空可计算指标",
+      "constraints": [
+        "C08"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "durations_ms": [
+          "10"
+        ],
+        "p50_ms": null,
+        "reason": "insufficient samples"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "keep computable 10 ms",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N12",
+      "title": "负数耗时或不相符开始",
+      "constraints": [
+        "C01",
+        "C05"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "duration_ms": "-1",
+        "estimated_start_at": "before end"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "invalid duration and derivation",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "N13",
+      "title": "混用归一化规则",
+      "constraints": [
+        "C06",
+        "C09",
+        "C11"
+      ],
+      "boundary": "invalid_projection",
+      "input": {
+        "build_normalization": "N1",
+        "some_decisions_normalization": "N0"
+      },
+      "expected": {
+        "contract": "reject",
+        "reason": "rules_consistent fails; block publication",
+        "retain_source_evidence": true,
+        "publish_invalid_result": false
+      }
+    },
+    {
+      "case_id": "E58",
+      "title": "状态未知并不等于成功",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "outcome": "unknown",
+        "duration_ms": "10",
+        "sql_id": "Q1",
+        "group_id": "G1",
+        "estimated_start_at": "2026-09-21T08:59:59.990000+08:00"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "unresolved",
+        "reasons": [
+          "outcome_unknown"
+        ],
+        "count_scope": "group",
+        "included_count": 0,
+        "excluded_count": 1
+      }
+    },
+    {
+      "case_id": "E59",
+      "title": "窗口边界按开始筛选",
+      "constraints": [
+        "C05",
+        "C07",
+        "C08"
+      ],
+      "boundary": "time",
+      "input": {
+        "window": {
+          "cutoff_date": "2026-09-30",
+          "days": 30,
+          "start": "2026-09-01T00:00:00+08:00",
+          "end": "2026-10-01T00:00:00+08:00"
+        },
+        "samples": [
+          {
+            "end_at": "2026-09-01T00:00:01+08:00",
+            "duration_ms": "2000"
+          },
+          {
+            "end_at": "2026-10-01T00:00:01+08:00",
+            "duration_ms": "2000"
+          }
+        ]
+      },
+      "expected": {
+        "contract": "accept",
+        "sample_decisions": [
+          "outside_window",
+          "included_if_other_eligibility_passes"
+        ],
+        "start_dates": [
+          "2026-08-31",
+          "2026-09-30"
+        ],
+        "late_completion_can_be_used_after_import": true
+      }
+    },
+    {
+      "case_id": "E60",
+      "title": "未知来源类别不强纳五类",
+      "constraints": [
+        "C05",
+        "C07"
+      ],
+      "boundary": "occurrence",
+      "input": {
+        "source_file": "autostats.c",
+        "source_line": "334",
+        "duration_ms": "10"
+      },
+      "expected": {
+        "contract": "accept",
+        "timing_type": null,
+        "five_category_sample_increment": 0,
+        "problem_count_unit": "log_record"
+      }
+    },
+    {
+      "case_id": "E61",
+      "title": "未明确排除类别仍检查其他资格",
+      "constraints": [
+        "C06",
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "sql": "CREATE TABLE demo_copy AS SELECT * FROM demo_items;",
+        "category_rule_match": false,
+        "other_eligibility": "reliable_success"
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "included",
+        "reason": "not all DDL is blacklisted"
+      }
+    },
+    {
+      "case_id": "E62",
+      "title": "成功长耗时不自动排除",
+      "constraints": [
+        "C07"
+      ],
+      "boundary": "decision",
+      "input": {
+        "duration_ms": "3600000",
+        "outcome": "success",
+        "other_eligibility": "reliable",
+        "blacklist_match": false,
+        "interval_match": false
+      },
+      "expected": {
+        "contract": "accept",
+        "state": "included",
+        "automatic_outlier_label": false
+      }
+    },
+    {
+      "case_id": "E63",
+      "title": "未命中字典可保守保留而非指纹失败",
+      "constraints": [
+        "C06"
+      ],
+      "boundary": "fingerprint",
+      "input": {
+        "dictionary_decision": "preserve",
+        "reason": "unknown function",
+        "sql_structure_reliable": true
+      },
+      "expected": {
+        "contract": "accept",
+        "fingerprint_failure_required": false,
+        "preserve_subtree": true
+      }
+    }
+  ]
+}

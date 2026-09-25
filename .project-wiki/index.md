@@ -10,6 +10,7 @@
 | --- | --- |
 | [项目范围、资料来源与交付顺序](decisions/project-scope.md) | 首次了解项目、确认范围、设计后续接入或核对原始资料时阅读。 |
 | [运行环境、组件与资源边界](decisions/runtime-and-components.md) | 准备环境、选择依赖或讨论组件职责时阅读。 |
+| [离线基线逻辑数据契约](contracts/offline-data-contract.md) | 设计或实现跨模块对象、字段、来源映射、版本及验收样例时阅读。 |
 | [SQL 原文、明细与留存](contracts/sql-storage.md) | 设计 SQL 原文、执行／调用明细或历史版本存储时阅读。 |
 | [HashData 日志事实与证据边界](contracts/log-evidence.md) | 调查日志格式、来源行号或解释现有样本覆盖时阅读。 |
 | [日志导入、来源与异常处理](features/log-ingestion.md) | 修改导入、文件识别、批次完整性或导入诊断时阅读。 |

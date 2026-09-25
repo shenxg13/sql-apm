@@ -4,7 +4,7 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/project-scope.md
-updated: 2026-09-25
+updated: 2026-09-26
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -17,6 +17,7 @@ related:
   - feature.log-ingestion
   - contract.timing-and-grouping
   - contract.sql-fingerprints
+  - contract.offline-data-contract
 confidence: high
 ---
 
@@ -98,6 +99,10 @@ confidence: high
 - 本次确认设计边界及 Issue 创建，不表示字段设计、数据契约或产品实现已经完成。
   详细交付契约和验收项以 Issue 实时正文与评论为准，按既有流程收敛确认；
   本页不维护 Issue 正文或执行状态的副本。
+
+2026-09-26 按已确认 Issue 契约产出的[离线逻辑数据契约](../contracts/offline-data-contract.md)
+包含字段、来源映射和合成样例，供后续模块实现及独立评审核对；产品解析、统计、
+存储和运行时校验器尚未交付。此前确认记录保留作为设计边界的来源。
 
 ### 已确认的多类型系统接入扩展约束
 

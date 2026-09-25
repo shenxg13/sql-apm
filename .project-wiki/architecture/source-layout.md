@@ -6,13 +6,15 @@ owners:
   - sql_apm/
   - tests/
   - scripts/functions/
-updated: 2026-09-25
+updated: 2026-09-26
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457
     status: current
   - path: sql_apm/sql/function_dictionary.py
     status: current
   - path: sql_apm/diagnostics/function_probe.py
+    status: current
+  - path: sql_apm/diagnostics/statement_census.py
     status: current
 related:
   - decision.project-scope
@@ -65,7 +67,8 @@ sql-apm/
 │   ├── storage/                # 后续：PostgreSQL 读写、事务、查询
 │   └── diagnostics/
 │       ├── __init__.py
-│       └── function_probe.py
+│       ├── function_probe.py
+│       └── statement_census.py  # 只读类别调查及来源回放，非训练过滤器
 ├── tests/                      # 随模块增长按对应业务职责组织
 ├── rules/                      # 版本化规则数据
 ├── scripts/                    # 开发、维护、规则生成、验证工具
@@ -115,6 +118,11 @@ sql-apm/
 规则语义、数据、版本和摘要未变。后续 R1 整改单独新增 `sql/type_policy.py`，
 修复既有语义边界并生成规则 1.0.1；原 1.0.0 文件保留，详见
 [整改报告](../../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)。
+
+2026-09-26 类别调查新增 `diagnostics/statement_census.py`，仅做本地 CSV 词法
+类别清点及有界回放；`scripts/diagnostics/statement_census.py` 为薄入口。该工具
+不承载产品导入、语法解析或黑名单判定，证据与限制见
+[类别核查报告](../../docs/reports/statement-category-census-2026-09-26.md)。
 
 ## Workflows
 

@@ -60,6 +60,7 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [HashData 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
+| [语句类别黑名单核查（2026-09-26）](reports/statement-category-census-2026-09-26.md) | 分析证据 | 全部日志的类别、别名及异常覆盖，保守名单依据与合成规则验收。 |
 | [119、120 集群日志分析（2026-09-24）](reports/cluster-log-analysis-2026-09-24.md) | 分析证据 | 两组日志的覆盖、格式、SQL 文本及计时分类观察。 |
 | [HashData duration 源码位置核查（2026-09-24）](reports/hashdata-duration-source-mapping-2026-09-24.md) | 分析证据 | 请求、Execute、Parse、Bind 的计时解释及上游源码对照边界。 |
 | [生产 SQL 日志样本分析（2026-09-23）](reports/production-log-analysis-2026-09-23.md) | 分析证据 | 早期生产样本的覆盖范围、文本缺失、编码和多语句现象。 |

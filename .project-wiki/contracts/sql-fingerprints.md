@@ -11,8 +11,12 @@ sources:
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
     status: current
   - path: rules/functions/v1.json
+    status: historical
+  - path: rules/functions/v1.0.1.json
     status: current
   - path: docs/reports/function-dictionary-2026-09-25.md
+    status: historical
+  - path: docs/reports/function-dictionary-r1-remediation-2026-09-25.md
     status: current
 related:
   - decision.project-scope
@@ -179,11 +183,16 @@ confidence: high
   自身规则；控制参数及未知函数子树整体保留。对象、表达式、显式转换、批次顺序
   和 SET／LIMIT／OFFSET 既定边界继续有效，NULL／布尔保留。
   字典可用于 SELECT 中命中的函数，不因此归一化 SELECT 的其他算术或 CASE 常量。
-- 规则版本为 1.0.0，格式版本为 1；加载形成固定快照及确定摘要。新语义使用新
+- R1 整改落实既有对象身份和类型保留要求：仅明确的业务标量转换允许向下处理；
+  对象身份、布尔、结构化和未知类型转换子树整体保留，外层 text 不绕过内层保护。
+  anyelement 不作为标量依据；已知多态候选按有限内置类型事实检查类别及关联，
+  未知类别／现场类型返回需解析器的保守原因，完整规则及支持边界见字典说明。
+- 当前规则版本为 1.0.1，原 1.0.0 文件按原字节保留，格式版本为 1；加载形成固定快照及确定摘要。新语义使用新
   规则版本；后续构建固定算法版本、字典版本与摘要，同一窗口不混用规则，
   历史基线保留原依据、源 SQL 不改写。本次只交付该接口约定，不实施整窗重建。
 - 字段、逐函数依据、嵌套边界和维护步骤见[字典说明](../../rules/functions/README.md)；
   目录分母、人工用例、脱敏有界重放及证据限制见[验证报告](../../docs/reports/function-dictionary-2026-09-25.md)。
+  R1 修复与新版证据见[整改报告](../../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)。
   词法候选命中与人工树预期不等同于完整 SQL 指纹验证。
 
 关联条款：[已确认的归一化规则版本与更新处理](../features/baseline-versions.md#已确认的归一化规则版本与更新处理)。

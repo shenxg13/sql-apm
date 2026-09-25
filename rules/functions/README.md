@@ -1,6 +1,6 @@
 # 函数参数规则
 
-本目录提供 HashData 首期指纹处理的函数规则，版本为 `1.0.0`。
+本目录提供 HashData 首期指纹处理的函数规则，当前版本为 `1.0.1`。
 规则选择器接受结构化调用描述；不解析 SQL、不查询数据库、不生成完整 SQL 指纹。
 人工 SQL 的归并预期仍需后续主引擎接入验证。
 
@@ -8,7 +8,8 @@
 
 | 文件 | 用途 |
 | --- | --- |
-| [v1.json](v1.json) | 可加载的版本字典，逐重载参数动作及依据 |
+| [v1.0.1.json](v1.0.1.json) | 当前版本字典，修复对象身份与多态输入边界 |
+| [v1.json](v1.json) | 原 1.0.0 字典，按原字节保留供历史追溯，新构建使用 1.0.1 |
 | [review-policies.json](review-policies.json) | 按函数维护的语义审查策略，生成字典的维护输入 |
 | [postgres-9.4.26-inventory.json](postgres-9.4.26-inventory.json) | 固定上游源码的签名事实、文档条目和 SHA-256 |
 | [special-syntax.json](special-syntax.json) | 特殊语法、表格片段和历史／其他系统名称的处置 |
@@ -17,14 +18,14 @@
 
 覆盖分母为 PostgreSQL 9.4.26 `func.sgml` 的第 9 章表格及函数引用，
 再用同版本初始目录展开重载。共 409 个函数名、775 个签名；
-176 个签名允许至少一个业务参数归一化，599 个签名明确保留。
+174 个签名允许至少一个业务参数归一化，601 个签名明确保留。
 目录另外保留 1,805 个章外签名事实用于审计，未把它们计为已审查。
 这不是 PostgreSQL 所有扩展或 HashData 现场函数的穷尽目录。
 
 Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5 条只有用途说明、
 缺精确类型证据的条目标为 `pending`。尚未取得 HashData 3.13.13 现场函数目录及
 自定义函数定义，不能把上游资料当成现场验证。来源和实测指标见
-[覆盖报告](../../docs/reports/function-dictionary-2026-09-25.md)。
+[整改验证报告](../../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)。
 
 ## 字典字段
 
@@ -60,13 +61,23 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 3. 参数类型使用目录内部名称，例如 int4、float8、timestamp、_text。
    类型来自调用方的可靠信息；不从字符串外观猜类型，不实现隐式转换或类型别名解析。
    所有类型已知时精确签名优先；只有部分类型或无类型时，候选动作必须一致。
+   多态匹配只识别 `type_policy.py` 明确列出的 37 个内置非数组类型及其 37 个数组类型、
+   6 个内置范围子类型关系，检查数组／范围类别及同一调用中的类型关联；不凭名称
+   前缀猜测自定义类型。已知不兼容签名返回 `no_matching_rule`，需要现场类型元数据时
+   返回 `polymorphic_requires_resolver`；此时 rule_ids 仅为未决候选，不表示已解析命中。
+   完整伪类型声明与目录签名相等可用于目录审计，不代表实际调用类型已解析；混合
+   伪类型和具体类型需要解析器。枚举／domain／未支持类型不从名称推断类别。
+   `anyelement` 不构成业务标量证明，包含多态输入的当前规则均保留。
 4. 未知函数、未知签名、歧义、停用或 pending 均返回保留及具体原因。
    命名参数、特殊调用形式、可变参数返回保留；可变参数尚需主引擎区分展开与
    `VARIADIC` 数组形式，不以此字典恢复可变参数绑定。
 5. 普通已命中函数可用于 SELECT 等位置；已有 SET、LIMIT、OFFSET 保护边界优先。
    未授权的其他位置不会因字典出现而自动归一化。
 6. 业务位置直接数字／字符串叶子和原生 `$n` 用统一业务标记；布尔与 NULL 保留。
-   显式类型转换保留，转换内部业务叶子可替换。列名、对象、运算结构、批次顺序保留；
+   显式转换节点保留；仅 `type_policy.py` 中明确的业务标量转换允许继续处理内部
+   业务叶子。对象身份（OID／regclass／regtype 等）、布尔、JSON、数组和未知类型
+   的转换子树整体保留；外层 text 等转换不能绕过内层保护，原生参数及嵌套调用
+   同样受此边界约束。不解析类型别名、修饰符或隐式转换。列名、对象、运算结构、批次顺序保留；
    算术表达式内原本未授权的常量继续保留，不扩大为任意深度替换。
 7. 业务输入中的已知嵌套函数遵循各自规则。控制参数、未知函数及不支持节点的
    子树整体保留，内层规则不能绕过外层保留要求。递归预览深度上限为 100。
@@ -82,7 +93,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 在仓库根目录、Python 3.9.5 环境执行：
 
 ```bash
-.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.1.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```
@@ -94,7 +105,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ```
 
 ```bash
-.venv/bin/python -m sql_apm.sql.function_dictionary select rules/functions/v1.json /tmp/call.json
+.venv/bin/python -m sql_apm.sql.function_dictionary select rules/functions/v1.0.1.json /tmp/call.json
 ```
 
 返回 decision、reason、逐参数 actions、命中 rule_ids、rules_version 和 sha256。
@@ -108,7 +119,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ```bash
 .venv/bin/python scripts/functions/import_postgres.py /tmp/postgresql-9.4.26 \
   --output /tmp/postgres-inventory.json
-.venv/bin/python scripts/functions/build_dictionary.py --output /tmp/v1-rebuilt.json
+.venv/bin/python scripts/functions/build_dictionary.py --output /tmp/v1.0.1-rebuilt.json
 ```
 
 导入器读取 `pg_proc.h`、`pg_type.h`、`system_views.sql` 和 `func.sgml`，
@@ -120,7 +131,13 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 纯类型资料不自动推出业务动作；不要根据 volatility、strict 或函数名相似性自动归一化。
 在同一目标 schema／name／types／kind 下不允许重复定义优先级覆盖。
 
-已发布的 v1.json 必须保留原样；语义更新生成新文件并增加 rules_version，
+R1 整改移除 anyelement 标量白名单，规则 1285／1290 从 normalize 改为 preserve；
+3176（to_json）仅更新保留理由。新文件为 v1.0.1.json（1.0.1），v1.json（1.0.0）保持
+原字节及摘要。当前生成器和审查输入重建 1.0.1；重放旧输入及旧算法请固定原提交
+`96ae6da`，不能把新策略生成内容强行标成旧版。人工树预览／选择算法的修复独立于
+字典文件版本，历史算法回放还需固定代码提交，不能只加载旧 JSON。
+
+已发布的规则文件必须保留原样；语义更新生成新文件并增加 rules_version，
 停用规则通过新版本的 enabled=false 表示，同时保留旧版本可追溯。
 新增版本时更新对应维护输入、生成器与验证目标，旧文件仍按原摘要校验。
 不要把本地编辑过的字典继续宣称为原版本；将变更理由、来源和测试保存在提交与 PR 中。

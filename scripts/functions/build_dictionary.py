@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def build(inventory, policies, rules_version='1.0.0'):
+def build(inventory, policies, rules_version='1.0.1'):
     rules = []
     for proc in inventory['catalog']:
         if proc['name'] not in inventory['document_mentions']:
@@ -60,8 +60,8 @@ def build(inventory, policies, rules_version='1.0.0'):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,default=ROOT/'rules/functions/v1.json')
-    parser.add_argument('--rules-version',default='1.0.0')
+    parser.add_argument('--output',type=Path,default=ROOT/'rules/functions/v1.0.1.json')
+    parser.add_argument('--rules-version',default='1.0.1')
     args=parser.parse_args()
     inventory=json.loads((ROOT/'rules/functions/postgres-9.4.26-inventory.json').read_text())
     policies=json.loads((ROOT/'rules/functions/review-policies.json').read_text())

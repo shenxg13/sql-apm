@@ -57,6 +57,7 @@ sql-apm/
 │   ├── sql/
 │   │   ├── __init__.py
 │   │   ├── function_dictionary.py
+│   │   ├── type_policy.py       # 有限内置类型事实与保守匹配约束
 │   │   ├── parsing.py          # 后续：SQL 解析适配
 │   │   ├── normalization.py    # 后续：归一化
 │   │   └── fingerprint.py      # 后续：结构指纹
@@ -110,8 +111,10 @@ sql-apm/
 
 首版合并前统一更新全部仓库调用方，不保留旧模块路径的转发文件。
 外部手工调用需改用新路径；维护命令见[脚本说明](../../scripts/README.md)和
-[字典维护说明](../../rules/functions/README.md)。两份模块实现按字节搬迁，
-规则语义、数据、版本和摘要保持不变。
+[字典维护说明](../../rules/functions/README.md)。迁移提交 `96ae6da` 中两份模块实现按字节搬迁，
+规则语义、数据、版本和摘要未变。后续 R1 整改单独新增 `sql/type_policy.py`，
+修复既有语义边界并生成规则 1.0.1；原 1.0.0 文件保留，详见
+[整改报告](../../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)。
 
 ## Workflows
 

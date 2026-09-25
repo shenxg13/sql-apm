@@ -7,6 +7,8 @@ import re
 import sys
 from pathlib import Path
 
+from .type_policy import NORMALIZABLE_CASTS, signature_compatibility
+
 
 class DictionaryError(ValueError):
     """Invalid configuration; callers must not use a partial dictionary."""
@@ -144,6 +146,7 @@ class FunctionDictionary:
             return fallback('unsupported_identifier')
         rules = self._index.get((resolved_schema, resolved_name), [])
         matches = []
+        unresolved = []
         for rule in rules:
             if rule['kind'] != kind or (schema is None and not rule['allow_unqualified']):
                 continue
@@ -157,15 +160,19 @@ class FunctionDictionary:
             if not count - rule['defaults'] <= arity <= count:
                 continue
             expected = rule['types'][:arity]
-            if types is not None and any(actual is not None and actual != target and
-                                         not target.startswith('any')
-                                         for actual, target in zip(types, expected)):
+            compatible = signature_compatibility(types, expected)
+            if compatible is False:
+                continue
+            if compatible is None:
+                unresolved.append(rule['id'])
                 continue
             exact = types is not None and all(t is not None for t in types) and types == expected
             actions = [a['action'] for a in sorted(rule['arguments'], key=lambda a: a['position'])][:arity]
             matches.append((rule, actions, exact))
         if any(exact for _, _, exact in matches):
             matches = [m for m in matches if m[2]]
+        elif unresolved:
+            return fallback('polymorphic_requires_resolver', unresolved)
         if not matches:
             return fallback('no_matching_rule')
         ids = [r['id'] for r, _, _ in matches]
@@ -208,6 +215,10 @@ class FunctionDictionary:
                 if set(node) == {'kind', 'index'} and type(node['index']) is int and node['index'] > 0:
                     return {'kind': 'business_value'}
             elif tag == 'cast':
+                # Preserve the entire subtree across identity, structured, bool
+                # and unknown conversions, even inside an outer text cast.
+                if node.get('type') not in NORMALIZABLE_CASTS:
+                    return result
                 result['expr'] = visit(node['expr'], business, depth + 1)
             elif tag == 'operator':
                 result['args'] = [visit(child, False, depth + 1) for child in node['args']]

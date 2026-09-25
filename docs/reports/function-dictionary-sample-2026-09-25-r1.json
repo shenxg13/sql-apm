@@ -1,0 +1,796 @@
+{
+  "rules_version": "1.0.1",
+  "dictionary_sha256": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+  "method": "lexical candidates, not parsed SQL or execution counts",
+  "limits": {
+    "root": "raw/inbox/hashdata",
+    "records": 2000,
+    "files": 2,
+    "bytes": 8388608
+  },
+  "clusters": {
+    "119": [
+      {
+        "file": "gpdb-2026-07-01_000000.csv",
+        "file_size": 147939173,
+        "bytes_read": 1162007,
+        "physical_lines_read": 10814,
+        "prefix_sha256": "6f4b86622aa4726d46363109f138e6c0f9b0934d8962d45a091e44e8142371eb",
+        "counts": {
+          "call_candidates": 4261,
+          "csv_records": 2000,
+          "empty_sql_records": 284,
+          "lexically_readable_records": 1583,
+          "matched_normalize": 154,
+          "matched_preserve": 422,
+          "record_limit_reached": 1,
+          "sql_records": 1716,
+          "syntax_or_uncertain_candidates": 3909,
+          "unresolved_sql_records": 133
+        },
+        "reasons": {
+          "aggregate_or_window_requires_context": 152,
+          "ambiguous_overload": 3067,
+          "ddl_or_procedural_sql": 133,
+          "matched": 576,
+          "no_matching_rule": 244,
+          "unsupported_call_form": 222
+        },
+        "known_rule_candidate_counts": {
+          "pg94-1215": 30,
+          "pg94-1216": 30,
+          "pg94-1299": 178,
+          "pg94-1621": 2,
+          "pg94-1699": 12,
+          "pg94-1707": 6,
+          "pg94-1768": 15,
+          "pg94-1770": 15,
+          "pg94-1772": 15,
+          "pg94-1773": 15,
+          "pg94-1774": 15,
+          "pg94-1775": 15,
+          "pg94-1776": 15,
+          "pg94-2013": 12,
+          "pg94-2026": 4,
+          "pg94-2049": 15,
+          "pg94-2073": 12,
+          "pg94-2085": 34,
+          "pg94-2087": 85,
+          "pg94-877": 34,
+          "pg94-89": 180,
+          "pg94-937": 12
+        },
+        "unresolved_candidates": [
+          {
+            "arity": 0,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 8
+          },
+          {
+            "arity": 1,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 144
+          },
+          {
+            "arity": 1,
+            "reason": "ambiguous_overload",
+            "count": 3051
+          },
+          {
+            "arity": 1,
+            "reason": "no_matching_rule",
+            "count": 241
+          },
+          {
+            "arity": 1,
+            "reason": "unsupported_call_form",
+            "count": 113
+          },
+          {
+            "arity": 2,
+            "reason": "ambiguous_overload",
+            "count": 16
+          },
+          {
+            "arity": 2,
+            "reason": "unsupported_call_form",
+            "count": 79
+          },
+          {
+            "arity": 3,
+            "reason": "unsupported_call_form",
+            "count": 30
+          },
+          {
+            "arity": 6,
+            "reason": "no_matching_rule",
+            "count": 3
+          }
+        ],
+        "replay": [
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 51,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 81,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 111,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1707"
+            ]
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 117,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 150,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 303,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-2026"
+            ]
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 421,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1299"
+            ]
+          },
+          {
+            "record": 15,
+            "physical_line_end": 51,
+            "offset": 455,
+            "reason": "unsupported_call_form",
+            "rule_ids": []
+          }
+        ]
+      },
+      {
+        "file": "gpdb-2026-07-04_000000.csv",
+        "file_size": 116179145,
+        "bytes_read": 1210937,
+        "physical_lines_read": 11483,
+        "prefix_sha256": "231420b4e8c2ef869cc281ef794853f3c9515b4c66756a72416d5f0ec0478b94",
+        "counts": {
+          "call_candidates": 4504,
+          "csv_records": 2000,
+          "empty_sql_records": 271,
+          "lexically_readable_records": 1578,
+          "matched_normalize": 146,
+          "matched_preserve": 453,
+          "record_limit_reached": 1,
+          "sql_records": 1729,
+          "syntax_or_uncertain_candidates": 4214,
+          "unresolved_sql_records": 151
+        },
+        "reasons": {
+          "aggregate_or_window_requires_context": 113,
+          "ambiguous_overload": 3343,
+          "ddl_or_procedural_sql": 151,
+          "matched": 599,
+          "no_matching_rule": 229,
+          "unsupported_call_form": 220
+        },
+        "known_rule_candidate_counts": {
+          "pg94-1215": 34,
+          "pg94-1216": 34,
+          "pg94-1299": 177,
+          "pg94-1621": 2,
+          "pg94-1699": 12,
+          "pg94-1707": 6,
+          "pg94-1768": 3,
+          "pg94-1770": 3,
+          "pg94-1772": 3,
+          "pg94-1773": 3,
+          "pg94-1774": 3,
+          "pg94-1775": 3,
+          "pg94-1776": 3,
+          "pg94-2013": 12,
+          "pg94-2026": 4,
+          "pg94-2049": 3,
+          "pg94-2073": 12,
+          "pg94-2085": 38,
+          "pg94-2087": 85,
+          "pg94-877": 38,
+          "pg94-89": 204,
+          "pg94-937": 12
+        },
+        "unresolved_candidates": [
+          {
+            "arity": 0,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 8
+          },
+          {
+            "arity": 1,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 105
+          },
+          {
+            "arity": 1,
+            "reason": "ambiguous_overload",
+            "count": 3343
+          },
+          {
+            "arity": 1,
+            "reason": "no_matching_rule",
+            "count": 229
+          },
+          {
+            "arity": 1,
+            "reason": "unsupported_call_form",
+            "count": 103
+          },
+          {
+            "arity": 2,
+            "reason": "unsupported_call_form",
+            "count": 83
+          },
+          {
+            "arity": 3,
+            "reason": "unsupported_call_form",
+            "count": 34
+          }
+        ],
+        "replay": [
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 51,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 81,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 111,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1707"
+            ]
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 117,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 150,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 303,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-2026"
+            ]
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 421,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1299"
+            ]
+          },
+          {
+            "record": 18,
+            "physical_line_end": 54,
+            "offset": 455,
+            "reason": "unsupported_call_form",
+            "rule_ids": []
+          }
+        ]
+      }
+    ],
+    "120": [
+      {
+        "file": "gpdb-2026-09-16_000000.csv",
+        "file_size": 124666079,
+        "bytes_read": 2015388,
+        "physical_lines_read": 40487,
+        "prefix_sha256": "75c3753daffe92e70e7864151bce83ca04a7bb2c74f53076450b16331ac0cb78",
+        "counts": {
+          "call_candidates": 5014,
+          "csv_records": 2000,
+          "empty_sql_records": 196,
+          "lexically_readable_records": 1420,
+          "matched_normalize": 2371,
+          "matched_preserve": 189,
+          "record_limit_reached": 1,
+          "sql_records": 1804,
+          "syntax_or_uncertain_candidates": 3978,
+          "unresolved_sql_records": 384
+        },
+        "reasons": {
+          "aggregate_or_window_requires_context": 630,
+          "ambiguous_overload": 579,
+          "ddl_or_procedural_sql": 365,
+          "matched": 2560,
+          "no_matching_rule": 461,
+          "unbalanced_bracket": 15,
+          "unclosed_quote": 4,
+          "unsupported_call_form": 368,
+          "variadic_requires_resolver": 416
+        },
+        "known_rule_candidate_counts": {
+          "pg94-1215": 2,
+          "pg94-1216": 2,
+          "pg94-1299": 145,
+          "pg94-1394": 34,
+          "pg94-1395": 34,
+          "pg94-1396": 34,
+          "pg94-1397": 34,
+          "pg94-1398": 34,
+          "pg94-1621": 2,
+          "pg94-1680": 2,
+          "pg94-1705": 34,
+          "pg94-1707": 186,
+          "pg94-1709": 6,
+          "pg94-1768": 68,
+          "pg94-1770": 68,
+          "pg94-1772": 68,
+          "pg94-1773": 68,
+          "pg94-1774": 68,
+          "pg94-1775": 68,
+          "pg94-1776": 68,
+          "pg94-1778": 20,
+          "pg94-1780": 1515,
+          "pg94-2012": 2,
+          "pg94-2026": 12,
+          "pg94-2049": 68,
+          "pg94-2074": 2,
+          "pg94-2077": 4,
+          "pg94-2085": 36,
+          "pg94-2086": 12,
+          "pg94-2087": 52,
+          "pg94-2765": 16,
+          "pg94-3060": 422,
+          "pg94-877": 36,
+          "pg94-883": 12,
+          "pg94-89": 24,
+          "pg94-936": 2
+        },
+        "unresolved_candidates": [
+          {
+            "arity": 0,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 17
+          },
+          {
+            "arity": 1,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 593
+          },
+          {
+            "arity": 1,
+            "reason": "ambiguous_overload",
+            "count": 579
+          },
+          {
+            "arity": 1,
+            "reason": "no_matching_rule",
+            "count": 364
+          },
+          {
+            "arity": 1,
+            "reason": "unsupported_call_form",
+            "count": 140
+          },
+          {
+            "arity": 2,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 20
+          },
+          {
+            "arity": 2,
+            "reason": "no_matching_rule",
+            "count": 23
+          },
+          {
+            "arity": 2,
+            "reason": "unsupported_call_form",
+            "count": 22
+          },
+          {
+            "arity": 2,
+            "reason": "variadic_requires_resolver",
+            "count": 416
+          },
+          {
+            "arity": 3,
+            "reason": "unsupported_call_form",
+            "count": 2
+          },
+          {
+            "arity": 4,
+            "reason": "no_matching_rule",
+            "count": 46
+          },
+          {
+            "arity": 4,
+            "reason": "unsupported_call_form",
+            "count": 2
+          },
+          {
+            "arity": 5,
+            "reason": "unsupported_call_form",
+            "count": 5
+          },
+          {
+            "arity": 6,
+            "reason": "no_matching_rule",
+            "count": 2
+          },
+          {
+            "arity": 8,
+            "reason": "no_matching_rule",
+            "count": 1
+          },
+          {
+            "arity": 8,
+            "reason": "unsupported_call_form",
+            "count": 35
+          },
+          {
+            "arity": 9,
+            "reason": "unsupported_call_form",
+            "count": 162
+          },
+          {
+            "arity": 10,
+            "reason": "no_matching_rule",
+            "count": 8
+          },
+          {
+            "arity": 12,
+            "reason": "no_matching_rule",
+            "count": 2
+          },
+          {
+            "arity": 13,
+            "reason": "no_matching_rule",
+            "count": 12
+          },
+          {
+            "arity": 14,
+            "reason": "no_matching_rule",
+            "count": 1
+          },
+          {
+            "arity": 20,
+            "reason": "no_matching_rule",
+            "count": 1
+          },
+          {
+            "arity": 68,
+            "reason": "no_matching_rule",
+            "count": 1
+          }
+        ],
+        "replay": [
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 282,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1780"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1072,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1299"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1130,
+            "reason": "unsupported_call_form",
+            "rule_ids": []
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1195,
+            "reason": "aggregate_or_window_requires_context",
+            "rule_ids": []
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1331,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1780"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1385,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1780"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1512,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1780"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 57,
+            "offset": 1567,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1780"
+            ]
+          }
+        ]
+      },
+      {
+        "file": "gpdb-2026-09-16_000000.csv.1",
+        "file_size": 529475791,
+        "bytes_read": 2347599,
+        "physical_lines_read": 32529,
+        "prefix_sha256": "c3462d4a2647e1fb75c2212409a4dea1d39f687f6418dfd32158a13b58a8dda7",
+        "counts": {
+          "call_candidates": 2114,
+          "csv_records": 2000,
+          "empty_sql_records": 39,
+          "lexically_readable_records": 1949,
+          "matched_normalize": 709,
+          "matched_preserve": 133,
+          "record_limit_reached": 1,
+          "sql_records": 1961,
+          "syntax_or_uncertain_candidates": 3129,
+          "unresolved_sql_records": 12
+        },
+        "reasons": {
+          "aggregate_or_window_requires_context": 801,
+          "ambiguous_overload": 10,
+          "ddl_or_procedural_sql": 12,
+          "matched": 842,
+          "no_matching_rule": 300,
+          "unsupported_call_form": 161
+        },
+        "known_rule_candidate_counts": {
+          "pg94-1217": 227,
+          "pg94-1218": 227,
+          "pg94-1299": 111,
+          "pg94-1680": 4,
+          "pg94-1716": 4,
+          "pg94-1768": 458,
+          "pg94-1770": 458,
+          "pg94-1772": 458,
+          "pg94-1773": 458,
+          "pg94-1774": 458,
+          "pg94-1775": 458,
+          "pg94-1776": 458,
+          "pg94-1777": 16,
+          "pg94-2012": 4,
+          "pg94-2020": 227,
+          "pg94-2049": 458,
+          "pg94-2074": 4,
+          "pg94-2085": 4,
+          "pg94-2331": 18,
+          "pg94-877": 4,
+          "pg94-936": 4
+        },
+        "unresolved_candidates": [
+          {
+            "arity": 0,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 13
+          },
+          {
+            "arity": 1,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 772
+          },
+          {
+            "arity": 1,
+            "reason": "ambiguous_overload",
+            "count": 10
+          },
+          {
+            "arity": 1,
+            "reason": "no_matching_rule",
+            "count": 90
+          },
+          {
+            "arity": 1,
+            "reason": "unsupported_call_form",
+            "count": 39
+          },
+          {
+            "arity": 2,
+            "reason": "aggregate_or_window_requires_context",
+            "count": 16
+          },
+          {
+            "arity": 2,
+            "reason": "no_matching_rule",
+            "count": 60
+          },
+          {
+            "arity": 4,
+            "reason": "no_matching_rule",
+            "count": 120
+          },
+          {
+            "arity": 4,
+            "reason": "unsupported_call_form",
+            "count": 117
+          },
+          {
+            "arity": 5,
+            "reason": "no_matching_rule",
+            "count": 8
+          },
+          {
+            "arity": 5,
+            "reason": "unsupported_call_form",
+            "count": 5
+          },
+          {
+            "arity": 7,
+            "reason": "no_matching_rule",
+            "count": 22
+          }
+        ],
+        "replay": [
+          {
+            "record": 1,
+            "physical_line_end": 18,
+            "offset": 178,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1768",
+              "pg94-1770",
+              "pg94-1772",
+              "pg94-1773",
+              "pg94-1774",
+              "pg94-1775",
+              "pg94-1776",
+              "pg94-2049"
+            ]
+          },
+          {
+            "record": 2,
+            "physical_line_end": 53,
+            "offset": 178,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1768",
+              "pg94-1770",
+              "pg94-1772",
+              "pg94-1773",
+              "pg94-1774",
+              "pg94-1775",
+              "pg94-1776",
+              "pg94-2049"
+            ]
+          },
+          {
+            "record": 3,
+            "physical_line_end": 54,
+            "offset": 17,
+            "reason": "no_matching_rule",
+            "rule_ids": []
+          },
+          {
+            "record": 4,
+            "physical_line_end": 55,
+            "offset": 17,
+            "reason": "no_matching_rule",
+            "rule_ids": []
+          },
+          {
+            "record": 5,
+            "physical_line_end": 60,
+            "offset": 126,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1299"
+            ]
+          },
+          {
+            "record": 6,
+            "physical_line_end": 63,
+            "offset": 126,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1299"
+            ]
+          },
+          {
+            "record": 7,
+            "physical_line_end": 81,
+            "offset": 178,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1768",
+              "pg94-1770",
+              "pg94-1772",
+              "pg94-1773",
+              "pg94-1774",
+              "pg94-1775",
+              "pg94-1776",
+              "pg94-2049"
+            ]
+          },
+          {
+            "record": 8,
+            "physical_line_end": 116,
+            "offset": 178,
+            "reason": "matched",
+            "rule_ids": [
+              "pg94-1768",
+              "pg94-1770",
+              "pg94-1772",
+              "pg94-1773",
+              "pg94-1774",
+              "pg94-1775",
+              "pg94-1776",
+              "pg94-2049"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

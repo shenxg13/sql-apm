@@ -11,7 +11,7 @@ from sql_apm.sql.function_dictionary import DictionaryError, FunctionDictionary,
 from sql_apm.diagnostics.function_probe import call_candidates, ProbeError
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = read_json(ROOT/'rules/functions/v1.json')
+DATA = read_json(ROOT/'rules/functions/v1.0.1.json')
 
 
 class DictionaryTests(unittest.TestCase):

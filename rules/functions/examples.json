@@ -777,5 +777,271 @@
     "reason": "保护上下文优先；set 的树仅为上下文开关测试，SQL 是独立预期",
     "context": "offset",
     "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-identity",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regclass"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regclass",
+          "expr": {
+            "kind": "literal",
+            "value": "orders"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regclass"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regclass",
+          "expr": {
+            "kind": "literal",
+            "value": "customers"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('orders'::regclass);",
+    "sql_right": "SELECT quote_nullable('customers'::regclass);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-type-identity",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regtype"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regtype",
+          "expr": {
+            "kind": "literal",
+            "value": "int4"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regtype"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regtype",
+          "expr": {
+            "kind": "literal",
+            "value": "text"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('int4'::regtype);",
+    "sql_right": "SELECT quote_nullable('text'::regtype);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-json",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "json"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "json",
+          "expr": {
+            "kind": "literal",
+            "value": "{\"a\":1}"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "json"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "json",
+          "expr": {
+            "kind": "literal",
+            "value": "{\"b\":2}"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('{\"a\":1}'::json);",
+    "sql_right": "SELECT quote_nullable('{\"b\":2}'::json);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-array",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "_int4"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "_int4",
+          "expr": {
+            "kind": "literal",
+            "value": "{1}"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "_int4"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "_int4",
+          "expr": {
+            "kind": "literal",
+            "value": "{1,2}"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('{1}'::int4[]);",
+    "sql_right": "SELECT quote_nullable('{1,2}'::int4[]);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-bool",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "bool"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "bool",
+          "expr": {
+            "kind": "literal",
+            "value": "true"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "bool"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "bool",
+          "expr": {
+            "kind": "literal",
+            "value": "false"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('true'::bool);",
+    "sql_right": "SELECT quote_nullable('false'::bool);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-nested-identity",
+    "left": {
+      "kind": "call",
+      "name": "length",
+      "types": [
+        "text"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "cast",
+            "type": "regclass",
+            "expr": {
+              "kind": "literal",
+              "value": "orders"
+            }
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "length",
+      "types": [
+        "text"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "cast",
+            "type": "regclass",
+            "expr": {
+              "kind": "literal",
+              "value": "customers"
+            }
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT length(('orders'::regclass)::text);",
+    "sql_right": "SELECT length(('customers'::regclass)::text);",
+    "reason": "外层 text 不绕过内层对象身份保护",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
   }
 ]

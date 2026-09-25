@@ -15,11 +15,11 @@ from scripts.functions.build_dictionary import build
 def coverage():
     base=ROOT/'rules/functions'
     inventory=read_json(base/'postgres-9.4.26-inventory.json')
-    data=read_json(base/'v1.json')
+    data=read_json(base/'v1.0.1.json')
     dictionary=FunctionDictionary(data)
     policies=read_json(base/'review-policies.json')
     if build(inventory,policies)!=data:
-        raise ValueError('v1.json differs from reviewed policies; regenerate and review changes')
+        raise ValueError('v1.0.1.json differs from reviewed policies; regenerate and review changes')
     rules={r['id']:r for r in data['rules']}
     documented=[p for p in inventory['catalog'] if p['name'] in inventory['document_mentions']]
     if any(p['id'] not in rules for p in documented):

@@ -1,5 +1,5 @@
 {
-  "review_version": 1,
+  "review_version": 2,
   "scalar_types": [
     "int2",
     "int4",
@@ -18,8 +18,7 @@
     "timetz",
     "timestamp",
     "timestamptz",
-    "interval",
-    "anyelement"
+    "interval"
   ],
   "policies": {
     "abs": {

@@ -117,7 +117,7 @@ def main():
     if args.output.resolve().is_relative_to(args.root.resolve()):
         parser.error('output must be outside the immutable input directory')
     csv.field_size_limit(1024*1024)
-    dictionary=FunctionDictionary.load(ROOT/'rules/functions/v1.json')
+    dictionary=FunctionDictionary.load(ROOT/'rules/functions/v1.0.1.json')
     result=dict(rules_version=dictionary.rules_version, dictionary_sha256=dictionary.sha256,
                 method='lexical candidates, not parsed SQL or execution counts', limits=vars(args).copy(), clusters={})
     result['limits']['root']=str(args.root)

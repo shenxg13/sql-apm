@@ -111,3 +111,4 @@
 | 2026-09-25 | 用户确认先完成[数据契约设计](decisions/project-scope.md#已确认的数据契约设计范围)，已创建 [Issue #3](https://github.com/shenxg13/sql-apm/issues/3)：定义逻辑对象、字段约束、来源映射、版本兼容及样例；数据库物理表结构和建表脚本留给后续 Issue。保留 HashData 首期语义与多类型接入边界，详细验收草案在 Issue 中收敛，尚未启动设计交付或产品实现 |
 | 2026-09-25 | 用户暂停 Issue #1 业务实施，授权先准备 Python 环境；已在 Alma 本机构建 Python 3.9.5、重建 `.venv/` 并验证包工具、标准库与 HTTPS，系统 Python 未改动；事实和边界见[运行环境](decisions/runtime-and-components.md)及[验证记录](../docs/reports/python-environment-2026-09-25.md) |
 | 2026-09-25 | 按 Issue #1 确认范围实现版本函数字典、校验／选择工具及覆盖证据；775 个 PostgreSQL 文档重载明确分类，Greenplum 扩展分已审查与待核实，人工树与日志词法探测不当作完整 SQL 指纹验证；见[规则正文](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护) |
+| 2026-09-25 | 用户确认将[Python 源码布局](architecture/source-layout.md)写入项目知识并开始迁移；函数字典迁至 `sql_apm/sql/`，词法候选诊断迁至 `sql_apm/diagnostics/`，同步调用、命令、测试与 CI。目标结构按职责逐步创建，当前不预建未来功能、不迁入 src 布局；规则语义、版本及数据保持不变，在线 Issue #1 增加 A8 承接验收 |

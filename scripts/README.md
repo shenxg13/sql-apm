@@ -36,7 +36,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 以下产品检查独立于 Harness，实施／评审时分别运行：
 
 ```bash
-.venv/bin/python -m sql_apm.function_dictionary validate rules/functions/v1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```

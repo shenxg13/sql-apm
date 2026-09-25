@@ -35,6 +35,6 @@ jobs:
       - name: Check function dictionary with host Python
         run: |
           python3 --version
-          python3 -m sql_apm.function_dictionary validate rules/functions/v1.json
+          python3 -m sql_apm.sql.function_dictionary validate rules/functions/v1.json
           python3 -m unittest discover -s tests -v
           python3 scripts/functions/coverage.py

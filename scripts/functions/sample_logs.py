@@ -10,8 +10,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from sql_apm.function_dictionary import FunctionDictionary
-from sql_apm.function_probe import call_candidates, ProbeError
+from sql_apm.sql.function_dictionary import FunctionDictionary
+from sql_apm.diagnostics.function_probe import call_candidates, ProbeError
 
 
 class LimitReached(Exception):

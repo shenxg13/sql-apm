@@ -82,7 +82,7 @@ ambiguous_overload。聚合／窗口需要真实语法上下文，可变参数�
 - 日志探测的引号、注释、数组括号、特殊语法、损坏输入、字节预算及隐私边界通过。
 
 ```bash
-.venv/bin/python -m sql_apm.function_dictionary validate rules/functions/v1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```
@@ -92,6 +92,14 @@ CI 额外使用 GitHub runner 的系统 Python 执行相同的纯标准库检查
 
 完整 `scripts/quality/check.sh` 已通过：工具版本、Shell 检查、文档／模板完整性及
 五组离线工作流回归通过。`git diff --cached --check` 未发现空白错误。
+
+## 目录迁移说明
+
+2026-09-25 按用户确认的[源码布局](../../.project-wiki/architecture/source-layout.md)，
+函数字典模块迁入 `sql_apm/sql/`，词法候选诊断迁入 `sql_apm/diagnostics/`。
+上面的重放命令已更新为新路径；原实现提交 `0a45d40` 使用包根目录下的模块路径。
+迁移仅调整路径及调用方，两份模块源码、规则 JSON 和已保存覆盖／抽样 JSON 保持原字节；
+规则版本与摘要不因目录迁移变化。迁移后的检查证据随 PR 更新记录。
 
 ## 限制与后续接入
 

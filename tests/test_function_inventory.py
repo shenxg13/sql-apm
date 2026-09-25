@@ -2,7 +2,7 @@ import importlib.util
 from pathlib import Path
 import unittest
 
-from sql_apm.function_dictionary import read_json
+from sql_apm.sql.function_dictionary import read_json
 from scripts.functions.coverage import coverage
 from scripts.functions.import_postgres import functions
 

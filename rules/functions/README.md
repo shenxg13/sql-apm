@@ -82,7 +82,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 在仓库根目录、Python 3.9.5 环境执行：
 
 ```bash
-.venv/bin/python -m sql_apm.function_dictionary validate rules/functions/v1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```
@@ -94,7 +94,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ```
 
 ```bash
-.venv/bin/python -m sql_apm.function_dictionary select rules/functions/v1.json /tmp/call.json
+.venv/bin/python -m sql_apm.sql.function_dictionary select rules/functions/v1.json /tmp/call.json
 ```
 
 返回 decision、reason、逐参数 actions、命中 rule_ids、rules_version 和 sha256。

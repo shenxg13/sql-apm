@@ -23,6 +23,8 @@
 
 ## 流程、操作与来源
 
+- [Python 源码布局与模块职责](architecture/source-layout.md)：新增模块、调整目录或检查依赖方向时阅读；区分目标布局与已实现目录。
+
 - [知识维护方法](methods/knowledge-maintenance.md)：确认记录、按需阅读与单处维护。
 - [Agent 开发流程](architecture/agent-development-harness.md)与[工程原则](decisions/engineering-principles.md)：协作及工程边界。
 - [开发说明](../docs/runbooks/local-development.md)：环境准备与实际检查命令。

@@ -7,8 +7,8 @@ import sys
 import tempfile
 import unittest
 
-from sql_apm.function_dictionary import DictionaryError, FunctionDictionary, digest, read_json, validate
-from sql_apm.function_probe import call_candidates, ProbeError
+from sql_apm.sql.function_dictionary import DictionaryError, FunctionDictionary, digest, read_json, validate
+from sql_apm.diagnostics.function_probe import call_candidates, ProbeError
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = read_json(ROOT/'rules/functions/v1.json')
@@ -153,7 +153,7 @@ class DictionaryTests(unittest.TestCase):
             for text in ('{"x":1,"x":2}', '{"x":NaN}'):
                 path.write_text(text)
                 with self.assertRaises(DictionaryError):read_json(path)
-            result=subprocess.run([sys.executable,'-m','sql_apm.function_dictionary','validate',str(path)],
+            result=subprocess.run([sys.executable,'-m','sql_apm.sql.function_dictionary','validate',str(path)],
                                   cwd=ROOT,capture_output=True,text=True)
             self.assertNotEqual(result.returncode,0)
             self.assertIn('ERROR:',result.stderr)

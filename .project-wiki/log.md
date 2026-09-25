@@ -109,3 +109,7 @@
 | 2026-09-25 | 用户引用逐天门槛建议并回复“你建议的门槛”，按该选择记录[逐天试行参数](contracts/baseline-statistics.md#暂定的逐天样本门槛)：每个分组及计时类别的当天有效样本，基础／P95／P99 分别至少 30／200／1,000 个，不加跨天覆盖要求。各日独立检查、不足仍保留可计算统计；参数可调整，达标仅表示数量条件满足，不自动确定异常应用或额外质量标签，尚未实现 |
 | 2026-09-25 | 用户选择[首期先展示指标、自动质量标签后定](contracts/training-eligibility.md#成功长耗时执行的处理)：保存展示 CV、MAD、IQR 等既有统计值和样本不足信息，“高波动／疑似离群”自动标签及阈值留待实际数据评估后另行确定。成功长耗时样本保留规则、样本门槛标记及已知排除原因继续适用；功能尚未实现 |
 | 2026-09-25 | 用户确认先完成[数据契约设计](decisions/project-scope.md#已确认的数据契约设计范围)，已创建 [Issue #3](https://github.com/shenxg13/sql-apm/issues/3)：定义逻辑对象、字段约束、来源映射、版本兼容及样例；数据库物理表结构和建表脚本留给后续 Issue。保留 HashData 首期语义与多类型接入边界，详细验收草案在 Issue 中收敛，尚未启动设计交付或产品实现 |
+| 2026-09-25 | 用户暂停 Issue #1 业务实施，授权先准备 Python 环境；已在 Alma 本机构建 Python 3.9.5、重建 `.venv/` 并验证包工具、标准库与 HTTPS，系统 Python 未改动；事实和边界见[运行环境](decisions/runtime-and-components.md)及[验证记录](../docs/reports/python-environment-2026-09-25.md) |
+| 2026-09-25 | 按 Issue #1 确认范围实现版本函数字典、校验／选择工具及覆盖证据；775 个 PostgreSQL 文档重载明确分类，Greenplum 扩展分已审查与待核实，人工树与日志词法探测不当作完整 SQL 指纹验证；见[规则正文](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护) |
+| 2026-09-25 | 用户确认将[Python 源码布局](architecture/source-layout.md)写入项目知识并开始迁移；函数字典迁至 `sql_apm/sql/`，词法候选诊断迁至 `sql_apm/diagnostics/`，同步调用、命令、测试与 CI。目标结构按职责逐步创建，当前不预建未来功能、不迁入 src 布局；规则语义、版本及数据保持不变，在线 Issue #1 增加 A8 承接验收 |
+| 2026-09-25 | 按用户授权修复 R1-F001/F002：受保护转换子树阻断叶子替换，多态匹配检查有限内置类型类别及关联、未知类型保守回退；生成规则 1.0.1，旧 1.0.0 原样保留。同步[函数规则](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)与[源码布局](architecture/source-layout.md)，证据见[整改报告](../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)；独立 R2 另行验收 |

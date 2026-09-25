@@ -1,0 +1,2070 @@
+{
+  "review_version": 2,
+  "scalar_types": [
+    "int2",
+    "int4",
+    "int8",
+    "float4",
+    "float8",
+    "numeric",
+    "text",
+    "varchar",
+    "bpchar",
+    "bytea",
+    "bit",
+    "varbit",
+    "date",
+    "time",
+    "timetz",
+    "timestamp",
+    "timestamptz",
+    "interval"
+  ],
+  "policies": {
+    "abs": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "acos": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "asin": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "atan": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "atan2": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "cbrt": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "ceil": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "ceiling": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "cos": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "cot": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "degrees": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "exp": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "floor": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "ln": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "radians": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "sign": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "sin": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "sqrt": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "tan": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "ascii": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "bit_length": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "char_length": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "character_length": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "chr": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "initcap": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "length": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "lower": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "md5": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "octet_length": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "reverse": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "to_hex": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "upper": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "age": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "isfinite": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "justify_days": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "justify_hours": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "justify_interval": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "make_date": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "make_time": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "make_timestamp": {
+      "family": "scalar_input",
+      "policy": "all",
+      "rationale": "标量计算或格式无关的输入值可归一化；保留调用、列引用、运算及显式类型转换。"
+    },
+    "to_char": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "to_date": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "to_number": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "to_timestamp": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "round": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "trunc": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "power": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "mod": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "div": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "log": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "width_bucket": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "btrim": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "ltrim": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "rtrim": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "left": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "right": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "lpad": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "rpad": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "substr": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "substring": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "overlay": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "regexp_matches": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "regexp_replace": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "regexp_split_to_array": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "regexp_split_to_table": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "repeat": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "replace": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "split_part": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "translate": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "encode": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "decode": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "convert": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "convert_from": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "convert_to": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "to_ascii": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "get_bit": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "get_byte": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "set_bit": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "set_byte": {
+      "family": "input_and_controls",
+      "policy": "first",
+      "rationale": "第一个参数为待处理数据；后续模板、精度、进制、边界、位置、长度、模式、替换方式或编码等控制参数保留。"
+    },
+    "date_part": {
+      "family": "time_field",
+      "policy": "second",
+      "rationale": "第一个参数决定时间字段、截断单位或时区，保留；第二个时间输入可归一化。"
+    },
+    "date_trunc": {
+      "family": "time_field",
+      "policy": "second",
+      "rationale": "第一个参数决定时间字段、截断单位或时区，保留；第二个时间输入可归一化。"
+    },
+    "timezone": {
+      "family": "time_field",
+      "policy": "second",
+      "rationale": "第一个参数决定时间字段、截断单位或时区，保留；第二个时间输入可归一化。"
+    },
+    "strpos": {
+      "family": "substring_search",
+      "policy": "all",
+      "rationale": "搜索字符串和被搜索文本作为业务输入归一化；调用与参数顺序保留。"
+    },
+    "position": {
+      "family": "substring_search",
+      "policy": "all",
+      "rationale": "搜索字符串和被搜索文本作为业务输入归一化；调用与参数顺序保留。"
+    },
+    "quote_literal": {
+      "family": "quote_input",
+      "policy": "first",
+      "rationale": "字面值引用函数的数据参数可归一化；NULL 和布尔特殊值在预览层继续保留。"
+    },
+    "quote_nullable": {
+      "family": "quote_input",
+      "policy": "first",
+      "rationale": "字面值引用函数的数据参数可归一化；NULL 和布尔特殊值在预览层继续保留。"
+    },
+    "setseed": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "pg_sleep": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "pg_sleep_for": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "pg_sleep_until": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "make_interval": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "generate_series": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "generate_subscripts": {
+      "family": "workload_controls",
+      "policy": "preserve",
+      "rationale": "随机种子、等待时长、区间分量、生成范围、步长或维度会直接决定行为和工作量；全部保留。"
+    },
+    "quote_ident": {
+      "family": "identity_and_format",
+      "policy": "preserve",
+      "rationale": "标识符引用、格式串或可变拼接可能构造对象／SQL，首版明确保留整个参数树。"
+    },
+    "format": {
+      "family": "identity_and_format",
+      "policy": "preserve",
+      "rationale": "标识符引用、格式串或可变拼接可能构造对象／SQL，首版明确保留整个参数树。"
+    },
+    "concat": {
+      "family": "identity_and_format",
+      "policy": "preserve",
+      "rationale": "标识符引用、格式串或可变拼接可能构造对象／SQL，首版明确保留整个参数树。"
+    },
+    "concat_ws": {
+      "family": "identity_and_format",
+      "policy": "preserve",
+      "rationale": "标识符引用、格式串或可变拼接可能构造对象／SQL，首版明确保留整个参数树。"
+    },
+    "abbrev": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "area": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "array_agg": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_append": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_cat": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_dims": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_fill": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_length": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_lower": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_ndims": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_prepend": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_remove": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_replace": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_to_json": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "array_to_string": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "array_upper": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "avg": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "bit_and": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "bit_or": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "bool_and": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "bool_or": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "box": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "broadcast": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "cardinality": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "center": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "circle": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "clock_timestamp": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "col_description": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "corr": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "count": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "covar_pop": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "covar_samp": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "cume_dist": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "current_database": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "current_query": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "current_schema": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "current_schemas": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "current_setting": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "current_user": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "currval": {
+      "family": "functions-sequence",
+      "policy": "preserve",
+      "rationale": "序列对象身份、序列状态和控制标志保留。"
+    },
+    "cursor_to_xml": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "dense_rank": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "diameter": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "enum_first": {
+      "family": "functions-enum",
+      "policy": "preserve",
+      "rationale": "枚举边界依赖具体类型及成员身份，保留所有参数。"
+    },
+    "enum_last": {
+      "family": "functions-enum",
+      "policy": "preserve",
+      "rationale": "枚举边界依赖具体类型及成员身份，保留所有参数。"
+    },
+    "enum_range": {
+      "family": "functions-enum",
+      "policy": "preserve",
+      "rationale": "枚举边界依赖具体类型及成员身份，保留所有参数。"
+    },
+    "every": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "family": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "first_value": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "format_type": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "get_current_ts_config": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "has_any_column_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_column_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_database_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_foreign_data_wrapper_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_function_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_language_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_schema_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_sequence_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_server_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_table_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_tablespace_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "has_type_privilege": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "height": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "host": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "hostmask": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "inet_client_addr": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "inet_client_port": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "inet_server_addr": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "inet_server_port": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "isclosed": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "isempty": {
+      "family": "functions-range",
+      "policy": "preserve",
+      "rationale": "范围边界、开闭及类型结构保留；不能套用同名字符串函数的业务动作。"
+    },
+    "isopen": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "json_agg": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_array_elements": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_array_elements_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_array_length": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_build_array": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_build_object": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_each": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_each_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_extract_path": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_extract_path_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_object": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_object_agg": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_object_keys": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_populate_record": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_populate_recordset": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_to_record": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_to_recordset": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "json_typeof": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_array_elements": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_array_elements_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_array_length": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_each": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_each_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_extract_path": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_extract_path_text": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_object_keys": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_populate_record": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_populate_recordset": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_to_record": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_to_recordset": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "jsonb_typeof": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "lag": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "last_value": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "lastval": {
+      "family": "functions-sequence",
+      "policy": "preserve",
+      "rationale": "序列对象身份、序列状态和控制标志保留。"
+    },
+    "lead": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "like": {
+      "family": "functions-matching",
+      "policy": "preserve",
+      "rationale": "匹配模式或匹配语义保留，不对模式表达式做业务值替换。"
+    },
+    "line": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "lower_inc": {
+      "family": "functions-range",
+      "policy": "preserve",
+      "rationale": "范围边界、开闭及类型结构保留；不能套用同名字符串函数的业务动作。"
+    },
+    "lower_inf": {
+      "family": "functions-range",
+      "policy": "preserve",
+      "rationale": "范围边界、开闭及类型结构保留；不能套用同名字符串函数的业务动作。"
+    },
+    "lseg": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "make_timestamptz": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "masklen": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "max": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "min": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "mode": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "netmask": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "network": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "nextval": {
+      "family": "functions-sequence",
+      "policy": "preserve",
+      "rationale": "序列对象身份、序列状态和控制标志保留。"
+    },
+    "now": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "npoints": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "nth_value": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "ntile": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "numnode": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "obj_description": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "path": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "pclose": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "percent_rank": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "percentile_cont": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "percentile_disc": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "pg_advisory_lock": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_lock_shared": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_unlock": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_unlock_all": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_unlock_shared": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_xact_lock": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_advisory_xact_lock_shared": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_backend_pid": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_backup_start_time": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_cancel_backend": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_client_encoding": {
+      "family": "functions-string",
+      "policy": "preserve",
+      "rationale": "字符串处理中的结构或控制用途按首版保留策略处理。"
+    },
+    "pg_collation_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_column_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_conf_load_time": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_conversion_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_create_logical_replication_slot": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_create_physical_replication_slot": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_create_restore_point": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_current_xlog_insert_location": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_current_xlog_location": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_database_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_describe_object": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_drop_replication_slot": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_event_trigger_dropped_objects": {
+      "family": "functions-event-triggers",
+      "policy": "preserve",
+      "rationale": "事件触发上下文函数保留，不执行或推断现场状态。"
+    },
+    "pg_export_snapshot": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_filenode_relation": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_function_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_constraintdef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_expr": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_function_arguments": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_function_identity_arguments": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_function_result": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_functiondef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_indexdef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_keywords": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_ruledef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_serial_sequence": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_triggerdef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_userbyid": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_get_viewdef": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_has_role": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_identify_object": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_indexes_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_is_in_backup": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_is_in_recovery": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_is_other_temp_schema": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_is_xlog_replay_paused": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_last_xact_replay_timestamp": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_last_xlog_receive_location": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_last_xlog_replay_location": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_listening_channels": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_logical_slot_get_binary_changes": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_logical_slot_get_changes": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_logical_slot_peek_binary_changes": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_logical_slot_peek_changes": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_ls_dir": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_my_temp_schema": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_opclass_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_operator_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_opfamily_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_options_to_table": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_postmaster_start_time": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_read_binary_file": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_read_file": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_relation_filenode": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_relation_filepath": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_relation_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_reload_conf": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_rotate_logfile": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_size_pretty": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_start_backup": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_stat_file": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_stop_backup": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_switch_xlog": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_table_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_table_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_tablespace_databases": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_tablespace_location": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_tablespace_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_terminate_backend": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_total_relation_size": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_trigger_depth": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_try_advisory_lock": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_try_advisory_lock_shared": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_try_advisory_xact_lock": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_try_advisory_xact_lock_shared": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_ts_config_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_ts_dict_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_ts_parser_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_ts_template_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_type_is_visible": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_typeof": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "pg_xlog_location_diff": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_xlog_replay_pause": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_xlog_replay_resume": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_xlogfile_name": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pg_xlogfile_name_offset": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "pi": {
+      "family": "functions-math",
+      "policy": "preserve",
+      "rationale": "数学常数或随机函数没有业务参数；保留调用。"
+    },
+    "plainto_tsquery": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "point": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "polygon": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "popen": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "query_to_xml": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "querytree": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "radius": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "random": {
+      "family": "functions-math",
+      "policy": "preserve",
+      "rationale": "数学常数或随机函数没有业务参数；保留调用。"
+    },
+    "rank": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_avgx": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_avgy": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_count": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_intercept": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_r2": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_slope": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_sxx": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_sxy": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "regr_syy": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "row_number": {
+      "family": "functions-window",
+      "policy": "preserve",
+      "rationale": "窗口值、偏移、桶数、默认值及窗口结构保留；首版不按普通标量参数展开。"
+    },
+    "row_to_json": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "session_user": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "set_config": {
+      "family": "functions-admin",
+      "policy": "preserve",
+      "rationale": "系统管理参数含配置值、路径、锁键、对象身份或操作控制，全部保留。"
+    },
+    "set_masklen": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "setval": {
+      "family": "functions-sequence",
+      "policy": "preserve",
+      "rationale": "序列对象身份、序列状态和控制标志保留。"
+    },
+    "setweight": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "shobj_description": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "statement_timestamp": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "stddev": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "stddev_pop": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "stddev_samp": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "string_agg": {
+      "family": "functions-string",
+      "policy": "preserve",
+      "rationale": "字符串处理中的结构或控制用途按首版保留策略处理。"
+    },
+    "string_to_array": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "strip": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "sum": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "suppress_redundant_updates_trigger": {
+      "family": "functions-trigger",
+      "policy": "preserve",
+      "rationale": "触发器语义依赖触发上下文，保留调用和参数。"
+    },
+    "table_to_xml": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "table_to_xml_and_xmlschema": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "text": {
+      "family": "functions-net",
+      "policy": "preserve",
+      "rationale": "地址、网络前缀和掩码构成网络对象身份或结构，首版明确保留。"
+    },
+    "timeofday": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "to_json": {
+      "family": "functions-json",
+      "policy": "preserve",
+      "rationale": "JSON 键、路径和文档结构均保留，避免把结构化内容整体压缩为业务占位值。"
+    },
+    "to_regclass": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_regoper": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_regoperator": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_regproc": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_regprocedure": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_regtype": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "to_tsquery": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "to_tsvector": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "transaction_timestamp": {
+      "family": "functions-datetime",
+      "policy": "preserve",
+      "rationale": "时间环境或无参调用保留；不计算当前时间或恢复会话状态。"
+    },
+    "ts_debug": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_headline": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_lexize": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_parse": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_rank": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_rank_cd": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_rewrite": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_stat": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "ts_token_type": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "tsvector_update_trigger": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "tsvector_update_trigger_column": {
+      "family": "functions-textsearch",
+      "policy": "preserve",
+      "rationale": "文本检索配置、词典、查询结构和排序控制混合，首版整树保留，避免把查询结构当作普通文本。"
+    },
+    "txid_current": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "txid_current_snapshot": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "txid_snapshot_xip": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "txid_snapshot_xmax": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "txid_snapshot_xmin": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "txid_visible_in_snapshot": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "unnest": {
+      "family": "functions-array",
+      "policy": "preserve",
+      "rationale": "数组形状、长度、维度和元素上下文保留，待主引擎可靠识别后再单独扩展。"
+    },
+    "upper_inc": {
+      "family": "functions-range",
+      "policy": "preserve",
+      "rationale": "范围边界、开闭及类型结构保留；不能套用同名字符串函数的业务动作。"
+    },
+    "upper_inf": {
+      "family": "functions-range",
+      "policy": "preserve",
+      "rationale": "范围边界、开闭及类型结构保留；不能套用同名字符串函数的业务动作。"
+    },
+    "var_pop": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "var_samp": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "variance": {
+      "family": "functions-aggregate",
+      "policy": "preserve",
+      "rationale": "聚合参数、排序集合和直接参数具有不同结构角色；首版明确整树保留，保留 DISTINCT、ORDER BY 和 FILTER 等结构。"
+    },
+    "version": {
+      "family": "functions-info",
+      "policy": "preserve",
+      "rationale": "系统信息的对象名称、OID、权限、角色及查询身份保留；无参函数保留调用。"
+    },
+    "width": {
+      "family": "functions-geometry",
+      "policy": "preserve",
+      "rationale": "几何形状、维度与构造结构可能影响工作量，首版明确保留整个输入。"
+    },
+    "xml_is_well_formed": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xml_is_well_formed_content": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xml_is_well_formed_document": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xmlagg": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xmlcomment": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xmlexists": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xpath": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    },
+    "xpath_exists": {
+      "family": "functions-xml",
+      "policy": "preserve",
+      "rationale": "XML 路径、命名空间、文档结构或动态 SQL 不作为普通标量业务值替换。"
+    }
+  }
+}

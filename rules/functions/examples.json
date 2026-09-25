@@ -1,0 +1,1047 @@
+[
+  {
+    "id": "date-input",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "2026-01-01"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYY-MM-DD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "2026-02-02"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYY-MM-DD"
+        }
+      ]
+    },
+    "expected_same": true,
+    "sql_left": "SELECT to_date('2026-01-01','YYYY-MM-DD');",
+    "sql_right": "SELECT to_date('2026-02-02','YYYY-MM-DD');",
+    "reason": "to_date 业务输入变化归并",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "date-template",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYDDMM"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date('20260101','YYYYMMDD');",
+    "sql_right": "SELECT to_date('20260101','YYYYDDMM');",
+    "reason": "to_date 控制模板保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "native-parameter",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "parameter",
+          "index": 1
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": true,
+    "sql_left": "SELECT to_date($1,'YYYYMMDD');",
+    "sql_right": "SELECT to_date('20260101','YYYYMMDD');",
+    "reason": "函数业务参数的原生参数与字面值归并",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "control-parameter",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "parameter",
+          "index": 2
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date('20260101',$2);",
+    "sql_right": "SELECT to_date('20260101','YYYYMMDD');",
+    "reason": "不推断控制参数绑定值",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "cast-retained",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "parameter",
+            "index": 1
+          }
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "parameter",
+          "index": 1
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date($1::text,'YYYYMMDD');",
+    "sql_right": "SELECT to_date($1,'YYYYMMDD');",
+    "reason": "显式类型转换保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "cast-business",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "parameter",
+            "index": 1
+          }
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "literal",
+            "value": "20260101"
+          }
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": true,
+    "sql_left": "SELECT to_date($1::text,'YYYYMMDD');",
+    "sql_right": "SELECT to_date('20260101'::text,'YYYYMMDD');",
+    "reason": "相同转换中的业务叶子归并",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "known-nested",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "call",
+          "name": "to_char",
+          "args": [
+            {
+              "kind": "literal",
+              "value": 20260101
+            },
+            {
+              "kind": "literal",
+              "value": "99999999"
+            }
+          ]
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "call",
+          "name": "to_char",
+          "args": [
+            {
+              "kind": "literal",
+              "value": 20260202
+            },
+            {
+              "kind": "literal",
+              "value": "99999999"
+            }
+          ]
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": true,
+    "sql_left": "SELECT to_date(to_char(20260101,'99999999'),'YYYYMMDD');",
+    "sql_right": "SELECT to_date(to_char(20260202,'99999999'),'YYYYMMDD');",
+    "reason": "业务输入中的已知嵌套规则",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "control-subtree",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "parameter",
+          "index": 1
+        },
+        {
+          "kind": "call",
+          "name": "to_char",
+          "args": [
+            {
+              "kind": "literal",
+              "value": 11
+            },
+            {
+              "kind": "literal",
+              "value": "99"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "parameter",
+          "index": 1
+        },
+        {
+          "kind": "call",
+          "name": "to_char",
+          "args": [
+            {
+              "kind": "literal",
+              "value": 22
+            },
+            {
+              "kind": "literal",
+              "value": "99"
+            }
+          ]
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date($1,to_char(11,'99'));",
+    "sql_right": "SELECT to_date($1,to_char(22,'99'));",
+    "reason": "控制子树禁止内部归一化；仅用于结构边界，不执行函数",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "unknown-parent",
+    "left": {
+      "kind": "call",
+      "name": "custom_fn",
+      "args": [
+        {
+          "kind": "call",
+          "name": "to_date",
+          "args": [
+            {
+              "kind": "literal",
+              "value": "20260101"
+            },
+            {
+              "kind": "literal",
+              "value": "YYYYMMDD"
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "custom_fn",
+      "args": [
+        {
+          "kind": "call",
+          "name": "to_date",
+          "args": [
+            {
+              "kind": "literal",
+              "value": "20260202"
+            },
+            {
+              "kind": "literal",
+              "value": "YYYYMMDD"
+            }
+          ]
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT custom_fn(to_date('20260101','YYYYMMDD'));",
+    "sql_right": "SELECT custom_fn(to_date('20260202','YYYYMMDD'));",
+    "reason": "未知函数整树保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "unknown-child",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "call",
+          "name": "custom_fn",
+          "args": [
+            {
+              "kind": "literal",
+              "value": "a"
+            }
+          ]
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "call",
+          "name": "custom_fn",
+          "args": [
+            {
+              "kind": "literal",
+              "value": "b"
+            }
+          ]
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date(custom_fn('a'),'YYYYMMDD');",
+    "sql_right": "SELECT to_date(custom_fn('b'),'YYYYMMDD');",
+    "reason": "已知业务参数中的未知函数保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "explicit-schema",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ],
+      "schema": "pg_catalog"
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date('20260101','YYYYMMDD');",
+    "sql_right": "SELECT pg_catalog.to_date('20260101','YYYYMMDD');",
+    "reason": "显式 schema 是保留结构",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "same-name-custom",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260101"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ],
+      "schema": "custom"
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "20260202"
+        },
+        {
+          "kind": "literal",
+          "value": "YYYYMMDD"
+        }
+      ],
+      "schema": "custom"
+    },
+    "expected_same": false,
+    "sql_left": "SELECT custom.to_date('20260101','YYYYMMDD');",
+    "sql_right": "SELECT custom.to_date('20260202','YYYYMMDD');",
+    "reason": "其他 schema 不自动命中",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "arity",
+    "left": {
+      "kind": "call",
+      "name": "to_timestamp",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 1
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_timestamp",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "1"
+        },
+        {
+          "kind": "literal",
+          "value": "SS"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_timestamp(1);",
+    "sql_right": "SELECT to_timestamp('1','SS');",
+    "reason": "不同参数个数保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "unknown-arity",
+    "left": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "a"
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_date",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "b"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_date('a');",
+    "sql_right": "SELECT to_date('b');",
+    "reason": "非法签名回退；不声称 SQL 可执行",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "boolean",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "args": [
+        {
+          "kind": "literal",
+          "value": true
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "args": [
+        {
+          "kind": "literal",
+          "value": false
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable(true);",
+    "sql_right": "SELECT quote_nullable(false);",
+    "reason": "布尔特殊值保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "null",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "args": [
+        {
+          "kind": "literal",
+          "value": null
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "args": [
+        {
+          "kind": "literal",
+          "value": "x"
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable(NULL);",
+    "sql_right": "SELECT quote_nullable('x');",
+    "reason": "NULL 与业务值区分",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "arithmetic-constant",
+    "left": {
+      "kind": "call",
+      "name": "to_timestamp",
+      "args": [
+        {
+          "kind": "operator",
+          "operator": "+",
+          "args": [
+            {
+              "kind": "column",
+              "name": "epoch"
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "to_timestamp",
+      "args": [
+        {
+          "kind": "operator",
+          "operator": "+",
+          "args": [
+            {
+              "kind": "column",
+              "name": "epoch"
+            },
+            {
+              "kind": "literal",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT to_timestamp(epoch+1);",
+    "sql_right": "SELECT to_timestamp(epoch+2);",
+    "reason": "未授权的算术常量保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "protected-set",
+    "left": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 1
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 2
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SET application_name = 'one';",
+    "sql_right": "SET application_name = 'two';",
+    "reason": "保护上下文优先；set 的树仅为上下文开关测试，SQL 是独立预期",
+    "context": "set",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "protected-limit",
+    "left": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 1
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 2
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT 1 LIMIT abs(1);",
+    "sql_right": "SELECT 1 LIMIT abs(2);",
+    "reason": "保护上下文优先；set 的树仅为上下文开关测试，SQL 是独立预期",
+    "context": "limit",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "protected-offset",
+    "left": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 1
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "abs",
+      "args": [
+        {
+          "kind": "literal",
+          "value": 2
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT 1 OFFSET abs(1);",
+    "sql_right": "SELECT 1 OFFSET abs(2);",
+    "reason": "保护上下文优先；set 的树仅为上下文开关测试，SQL 是独立预期",
+    "context": "offset",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-identity",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regclass"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regclass",
+          "expr": {
+            "kind": "literal",
+            "value": "orders"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regclass"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regclass",
+          "expr": {
+            "kind": "literal",
+            "value": "customers"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('orders'::regclass);",
+    "sql_right": "SELECT quote_nullable('customers'::regclass);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-type-identity",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regtype"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regtype",
+          "expr": {
+            "kind": "literal",
+            "value": "int4"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "regtype"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "regtype",
+          "expr": {
+            "kind": "literal",
+            "value": "text"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('int4'::regtype);",
+    "sql_right": "SELECT quote_nullable('text'::regtype);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-json",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "json"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "json",
+          "expr": {
+            "kind": "literal",
+            "value": "{\"a\":1}"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "json"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "json",
+          "expr": {
+            "kind": "literal",
+            "value": "{\"b\":2}"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('{\"a\":1}'::json);",
+    "sql_right": "SELECT quote_nullable('{\"b\":2}'::json);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-array",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "_int4"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "_int4",
+          "expr": {
+            "kind": "literal",
+            "value": "{1}"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "_int4"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "_int4",
+          "expr": {
+            "kind": "literal",
+            "value": "{1,2}"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('{1}'::int4[]);",
+    "sql_right": "SELECT quote_nullable('{1,2}'::int4[]);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-bool",
+    "left": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "bool"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "bool",
+          "expr": {
+            "kind": "literal",
+            "value": "true"
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "quote_nullable",
+      "types": [
+        "bool"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "bool",
+          "expr": {
+            "kind": "literal",
+            "value": "false"
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT quote_nullable('true'::bool);",
+    "sql_right": "SELECT quote_nullable('false'::bool);",
+    "reason": "受保护类型和多态输入整体保留",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  },
+  {
+    "id": "r1-nested-identity",
+    "left": {
+      "kind": "call",
+      "name": "length",
+      "types": [
+        "text"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "cast",
+            "type": "regclass",
+            "expr": {
+              "kind": "literal",
+              "value": "orders"
+            }
+          }
+        }
+      ]
+    },
+    "right": {
+      "kind": "call",
+      "name": "length",
+      "types": [
+        "text"
+      ],
+      "args": [
+        {
+          "kind": "cast",
+          "type": "text",
+          "expr": {
+            "kind": "cast",
+            "type": "regclass",
+            "expr": {
+              "kind": "literal",
+              "value": "customers"
+            }
+          }
+        }
+      ]
+    },
+    "expected_same": false,
+    "sql_left": "SELECT length(('orders'::regclass)::text);",
+    "sql_right": "SELECT length(('customers'::regclass)::text);",
+    "reason": "外层 text 不绕过内层对象身份保护",
+    "context": "ordinary",
+    "verification": "structured_preview_only; SQL expectation awaits engine"
+  }
+]

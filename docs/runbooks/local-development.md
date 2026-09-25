@@ -21,14 +21,30 @@
 ## Python 项目环境
 
 项目运行及兼容验证使用精确版本 **Python 3.9.5**，与用户确认的现网版本一致。
-后续先准备该版本的独立解释器，再由它在仓库根目录创建 `.venv/`。
-`venv` 沿用创建它的解释器版本，不能仅通过创建虚拟环境切换 Python 的补丁版本。
-创建后需核对 `.venv/bin/python` 的实际版本为 3.9.5，再安装兼容并锁定的项目依赖。
+2026-09-25 已从官方源码构建独立解释器至 `var/python-3.9.5/`，并创建 `.venv/`。
+虚拟环境实际版本已核对为 3.9.5，不包含系统 site-packages；系统 Python 保持 3.9.25。
+两个本地目录均由 Git 忽略。
 
-2026-09-22 的本机检查发现默认 `/usr/bin/python3` 为 3.9.25，
-在检查的常见安装位置中未发现 3.9.5，项目 `.venv/` 尚未创建。
-这只是当前开发机的观察结果，不代表现网服务器状态。
-`.venv/` 已由 `.gitignore` 忽略；解释器准备和环境创建留待后续执行。
+当前仅安装 pip 26.0.1、setuptools 82.0.1、wheel 0.48.0、packaging 26.0。
+业务依赖仍须兼容 Python 3.9.5，并在实施时验证和锁定。
+
+在仓库根目录使用：
+
+```bash
+source .venv/bin/activate
+python --version
+python -m pip --version
+python -m pip check
+```
+
+也可直接调用 `.venv/bin/python`，避免依赖终端激活状态；使用 `deactivate` 退出。
+`venv` 沿用创建它的解释器版本，不能通过创建虚拟环境切换 Python 补丁版本。
+仓库迁移到其他路径或其他机器时应重新创建环境，不要移动现有虚拟环境后继续使用。
+
+bz2、lzma、sqlite3、SSL、时区和多进程等本机功能验证已通过。
+构建依赖、引导工具版本、重建方法及未构建的可选模块见
+[Python 环境验证记录](../reports/python-environment-2026-09-25.md)。
+本机验证不代表 Kylin 离线部署或全部业务兼容验证。
 
 ## PostgreSQL 项目环境
 

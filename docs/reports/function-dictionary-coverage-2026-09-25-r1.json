@@ -1,0 +1,249 @@
+{
+  "rules_version": "1.0.1",
+  "dictionary_sha256": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+  "source_scope": "PostgreSQL 9.4.26 func.sgml chapter 9 tables and function mentions; catalog overload expansion",
+  "catalog_signatures": 2580,
+  "documented_function_names": 409,
+  "documented_catalog_signatures": 775,
+  "documented_reviewed": 775,
+  "documented_decisions": {
+    "preserve": 601,
+    "normalize": 174
+  },
+  "catalog_outside_document_scope": 1805,
+  "outside_scope_note": "catalog facts retained for audit; not claimed reviewed or normalized",
+  "document_signature_mentions": 559,
+  "document_boundary_counts": {
+    "syntax": 27,
+    "table_fragment": 2,
+    "reference_only": 5
+  },
+  "extension_decisions": {
+    "preserve": 4,
+    "pending": 5
+  },
+  "pending_rules": [
+    {
+      "id": "gp6-__gp_aocsseg_history_name",
+      "reason": "文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。"
+    },
+    {
+      "id": "gp6-__gp_aocsseg_name",
+      "reason": "文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。"
+    },
+    {
+      "id": "gp6-__gp_aoseg_history_name",
+      "reason": "文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。"
+    },
+    {
+      "id": "gp6-__gp_aoseg_name",
+      "reason": "文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。"
+    },
+    {
+      "id": "gp6-gp_param_setting",
+      "reason": "文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。"
+    }
+  ],
+  "unavailable_evidence": [
+    "HashData 3.13.13 field function catalog and custom-function semantic definitions"
+  ],
+  "artificial_examples": 26,
+  "categories": [
+    {
+      "section": "functions-logical",
+      "signatures": 0,
+      "decisions": {}
+    },
+    {
+      "section": "functions-comparison",
+      "signatures": 0,
+      "decisions": {}
+    },
+    {
+      "section": "functions-math",
+      "signatures": 53,
+      "decisions": {
+        "normalize": 49,
+        "preserve": 4
+      }
+    },
+    {
+      "section": "functions-string",
+      "signatures": 104,
+      "decisions": {
+        "normalize": 84,
+        "preserve": 20
+      }
+    },
+    {
+      "section": "functions-binarystring",
+      "signatures": 44,
+      "decisions": {
+        "normalize": 38,
+        "preserve": 6
+      }
+    },
+    {
+      "section": "functions-bitstring",
+      "signatures": 36,
+      "decisions": {
+        "normalize": 32,
+        "preserve": 4
+      }
+    },
+    {
+      "section": "functions-matching",
+      "signatures": 19,
+      "decisions": {
+        "preserve": 3,
+        "normalize": 16
+      }
+    },
+    {
+      "section": "functions-formatting",
+      "signatures": 12,
+      "decisions": {
+        "normalize": 12
+      }
+    },
+    {
+      "section": "functions-datetime",
+      "signatures": 58,
+      "decisions": {
+        "normalize": 42,
+        "preserve": 16
+      }
+    },
+    {
+      "section": "functions-enum",
+      "signatures": 4,
+      "decisions": {
+        "preserve": 4
+      }
+    },
+    {
+      "section": "functions-geometry",
+      "signatures": 43,
+      "decisions": {
+        "preserve": 39,
+        "normalize": 4
+      }
+    },
+    {
+      "section": "functions-net",
+      "signatures": 21,
+      "decisions": {
+        "preserve": 18,
+        "normalize": 3
+      }
+    },
+    {
+      "section": "functions-textsearch",
+      "signatures": 44,
+      "decisions": {
+        "preserve": 40,
+        "normalize": 4
+      }
+    },
+    {
+      "section": "functions-xml",
+      "signatures": 14,
+      "decisions": {
+        "preserve": 14
+      }
+    },
+    {
+      "section": "functions-json",
+      "signatures": 39,
+      "decisions": {
+        "preserve": 39
+      }
+    },
+    {
+      "section": "functions-sequence",
+      "signatures": 5,
+      "decisions": {
+        "preserve": 5
+      }
+    },
+    {
+      "section": "functions-conditional",
+      "signatures": 0,
+      "decisions": {}
+    },
+    {
+      "section": "functions-array",
+      "signatures": 19,
+      "decisions": {
+        "preserve": 19
+      }
+    },
+    {
+      "section": "functions-range",
+      "signatures": 9,
+      "decisions": {
+        "preserve": 7,
+        "normalize": 2
+      }
+    },
+    {
+      "section": "functions-aggregate",
+      "signatures": 137,
+      "decisions": {
+        "preserve": 137
+      }
+    },
+    {
+      "section": "functions-window",
+      "signatures": 19,
+      "decisions": {
+        "preserve": 19
+      }
+    },
+    {
+      "section": "functions-subquery",
+      "signatures": 0,
+      "decisions": {}
+    },
+    {
+      "section": "functions-comparisons",
+      "signatures": 0,
+      "decisions": {}
+    },
+    {
+      "section": "functions-srf",
+      "signatures": 9,
+      "decisions": {
+        "preserve": 9
+      }
+    },
+    {
+      "section": "functions-info",
+      "signatures": 159,
+      "decisions": {
+        "preserve": 159
+      }
+    },
+    {
+      "section": "functions-admin",
+      "signatures": 75,
+      "decisions": {
+        "preserve": 75
+      }
+    },
+    {
+      "section": "functions-trigger",
+      "signatures": 1,
+      "decisions": {
+        "preserve": 1
+      }
+    },
+    {
+      "section": "functions-event-triggers",
+      "signatures": 1,
+      "decisions": {
+        "preserve": 1
+      }
+    }
+  ]
+}

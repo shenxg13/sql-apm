@@ -113,3 +113,4 @@
 | 2026-09-25 | 按 Issue #1 确认范围实现版本函数字典、校验／选择工具及覆盖证据；775 个 PostgreSQL 文档重载明确分类，Greenplum 扩展分已审查与待核实，人工树与日志词法探测不当作完整 SQL 指纹验证；见[规则正文](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护) |
 | 2026-09-25 | 用户确认将[Python 源码布局](architecture/source-layout.md)写入项目知识并开始迁移；函数字典迁至 `sql_apm/sql/`，词法候选诊断迁至 `sql_apm/diagnostics/`，同步调用、命令、测试与 CI。目标结构按职责逐步创建，当前不预建未来功能、不迁入 src 布局；规则语义、版本及数据保持不变，在线 Issue #1 增加 A8 承接验收 |
 | 2026-09-25 | 按用户授权修复 R1-F001/F002：受保护转换子树阻断叶子替换，多态匹配检查有限内置类型类别及关联、未知类型保守回退；生成规则 1.0.1，旧 1.0.0 原样保留。同步[函数规则](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)与[源码布局](architecture/source-layout.md)，证据见[整改报告](../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)；独立 R2 另行验收 |
+| 2026-09-26 | 用户确认新增[人类文档导航](../docs/README.md)：按了解项目、业务规则、设计、开发操作、分析依据和协作追溯分类，提供阅读顺序、类型、用途和链接。根 README 与知识索引增加入口，[知识维护方法](methods/knowledge-maintenance.md)及相关工作流明确文档变化时同步导航；既有需求正文和历史证据保持原位 |

@@ -15,6 +15,8 @@ Use this when a durable requirement, decision or knowledge structure changes.
    contract changes; do not duplicate business requirements into root entries,
    the index or operational runbooks.
 6. Update `.project-wiki/index.md` only for changed pages, paths or reading routes.
+   Maintain the human reading guide as defined in the
+   [knowledge maintenance method](../../.project-wiki/methods/knowledge-maintenance.md).
    Record a concise change summary and owning-topic link in `.project-wiki/log.md`.
 7. For restructuring, map every old section to its destination and verify retained
    content, provenance and links. Run checks proportionate to the actual change.

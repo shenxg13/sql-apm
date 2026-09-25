@@ -4,11 +4,13 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/training-eligibility.md
-updated: 2026-09-25
+updated: 2026-09-26
 sources:
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
+    status: current
+  - path: docs/reports/statement-category-census-2026-09-26.md
     status: current
 related:
   - contract.timing-and-grouping
@@ -82,20 +84,107 @@ confidence: high
 
 关联条款：[已确认的执行历史记录范围](../features/sql-search-and-views.md#已确认的执行历史记录范围)；[已确认的基线更新与历史版本保留](../features/baseline-versions.md#已确认的基线更新与历史版本保留)。
 
-### 首版黑名单规则的后续梳理
+### 首版黑名单规则的维护入口
 
 - 确认日期：2026-09-25。
 - 来源：用户要求创建 Issue，并随后明确只梳理语句类别黑名单。
 - 来源状态：current；已更新并回读核对
   [Issue #2：梳理首版 SQL 语句类别黑名单及适用范围](https://github.com/shenxg13/sql-apm/issues/2)。
 - 该 Issue 仅承接类别清单、类别候选及排除理由、别名／变体覆盖，以及单条／
-  纯黑名单批次／混合批次的类别规则正反例。具体类别与完整验收契约继续在
-  该 Issue 确认，当前不展开实施细节。
+  纯黑名单批次／混合批次的类别规则正反例。2026-09-26 用户已确认交付契约并
+  授权实施；保守名单与判定边界见下节，后续扩展仍在在线契约中确认。
 - 按具体 SQL 模板排除的能力已确认，但其条目梳理和匹配功能设计／实现均不由
   Issue #2 交付。用户运行中维护条目的安排，不改变既有语句类别名单。
 - 这里只记录已确认分工与任务入口。实时正文、评论及交付状态以 GitHub 为准，
   后续 Issue 工作前回读，不在本地维护其正文或状态镜像。本次未实现黑名单
   过滤器、配置解析或基线构建功能。
+
+### 首版类别边界与保守维护规则
+
+- 确认日期：2026-09-26。
+- 来源：用户确认 Issue #2 实施计划并要求“日志核查尽量全面，名单要稍微保守一些，
+  不确定的不要放入黑名单”。本节据此细化已有七项的边界，未新增排除类别。
+- 来源状态：current；交付业务规则和诊断证据，产品过滤器尚未实现。
+- [全量核查报告](../../docs/reports/statement-category-census-2026-09-26.md)记录
+  119／120 全部 46 个文件的观察、候选、来源与限制；观察频率不是排除依据。
+- 以下规则适用于能可靠识别的**顶层完整语句**。大小写、普通空白和注释不改变
+  类别；字符串、引号标识符、美元引用体内的关键字不形成额外命中。
+  词法前缀只是调查线索，不能代替语法和执行资格判定。
+
+| 已确认类别 | 业务解释与排除理由 | 同一语句的覆盖边界 | 不据此扩大排除 |
+| --- | --- | --- | --- |
+| `SET` | 调整运行参数，作为会话／事务执行上下文，不单独训练其参数设置耗时 | 普通运行参数的 `SET`、`SET SESSION`、`SET LOCAL`，以及运行参数写法 `SET TIME ZONE`、`SET NAMES`、`SET SCHEMA`、`SET SEED` | `RESET`、`SELECT set_config(...)`、`UPDATE pg_settings`；身份、约束及事务特征设置见下述暂缓边界 |
+| `BEGIN` | 开始事务，单独作为控制步骤排除 | `BEGIN`、`BEGIN WORK`、`BEGIN TRANSACTION` 及该命令的事务模式选项 | `START TRANSACTION` 尚不自动折叠；过程体中的 `BEGIN` 不作为独立控制语句 |
+| `COMMIT` | 提交事务，单独作为控制步骤排除，不以耗时短为前提 | `COMMIT`、`COMMIT WORK`、`COMMIT TRANSACTION` | `END`、`COMMIT PREPARED` 另列候选；不按 `COMMIT` 前缀覆盖所有事务命令 |
+| `VACUUM` | 空间回收／维护，其单条维护耗时按已确认决定排除 | 确认属于 `VACUUM` 的 `FULL`、`FREEZE`、`VERBOSE`、`ANALYZE` 选项和合法目标范围 | `REINDEX`、`CLUSTER`、`CHECKPOINT`；不把所有维护任务或维护时段内的 SQL 当成此类别 |
+| `ANALYZE` | 收集优化器统计信息，其单条维护耗时排除 | `ANALYZE`、`ANALYZE VERBOSE`，合法表／列目标；方言专有选项须能可靠确认仍属该命令 | 英式拼写 `ANALYSE` 暂缓自动折叠；`EXPLAIN ANALYZE` 属于 `EXPLAIN` |
+| `CREATE INDEX` | 创建索引，为指定的结构维护类别 | `CREATE INDEX` 与 `CREATE UNIQUE INDEX`；其他选项以目标方言有效且确属建索引为前提 | `ALTER INDEX`、`REINDEX`、`CREATE TABLE` 及 `CREATE TABLE AS SELECT` |
+| `ALTER TABLE` | 修改表定义，为已确认的指定 DDL 类别；不按具体子动作耗时决定排除 | 明确属于 `ALTER TABLE` 的加／删列、改名、设置及分区等合法子动作，含 `IF EXISTS`、`ONLY` 等修饰 | `ALTER INDEX`、`ALTER VIEW`、`ALTER DATABASE`；不能扩大为全部 `ALTER` 或全部 DDL |
+
+七项排除意图来自此前用户确认；表内 SQL 语义依据见报告的固定上游源码和官方文档。
+业务理由是对已确认控制／维护分工的解释，不是从频率或耗时推断其没有业务价值。
+方言语法被上游接受，不等于已验证目标 HashData 构建可成功执行该语法。
+
+#### 不确定类别与别名的处理
+
+首版保持七项。对未逐项确认的类别或会扩大排除范围的别名，不因语义近似或
+在日志里出现就启用。下表的“暂缓”由用户本次统一的保守原则授权，**不表示
+用户逐项确认了这些候选的业务价值或永久拒绝**。它们不因本类别规则排除，
+但仍须满足其他训练资格；后续新增须有业务依据、正反例并逐项确认。
+
+| 候选／边界 | 调查结论与当前决定 | 重新评估条件 |
+| --- | --- | --- |
+| `END`、`START TRANSACTION`、`ANALYSE` | 上游语法证实与已有命令存在别名／等效关系；业务覆盖尚未逐项确认，暂缓自动折叠 | 用户确认相应别名覆盖及目标方言识别范围 |
+| `SET ROLE`、`SET SESSION AUTHORIZATION`、`SET TRANSACTION`、`SET SESSION CHARACTERISTICS AS TRANSACTION`、`SET CONSTRAINTS` | 具有身份、事务或约束语义，不能仅靠首词 `SET` 合并为普通运行参数设置；保守暂缓 | 明确哪些设置作为独立训练对象排除，以及混合批次预期 |
+| `ROLLBACK`／`ABORT`、保存点命令、两阶段事务命令 | 控制用途是候选理由，但单条控制耗时及回滚归属可能有分析价值；暂缓 | 用户确认控制类别的完整范围；与执行失败资格分别解释 |
+| `RESET`、`DISCARD`、`SHOW`、预备语句／游标管理命令 | 可能属于连接初始化、清理或客户端调用；暂缓，不统一排除 | 区分管理命令与实际执行／取数，不能丢掉 `EXECUTE`／`FETCH` 业务耗时 |
+| `LOCK`、`EXPLAIN`、`REINDEX`、`CLUSTER`、`CHECKPOINT` | 有控制、诊断或维护用途，但耗时可能正是关注对象；暂缓 | 逐类给出业务理由，尤其区分 `EXPLAIN` 与实际执行的 `EXPLAIN ANALYZE` |
+| `CREATE/DROP TABLE`、外部表、视图、序列、权限及注释命令 | 可以是正常业务批次的一部分，未采纳“一并排除 DDL／管理语句”的扩展 | 如有新增排除需求，逐项确认，不依名称扩大 |
+| `SELECT`、`WITH`、DML、`COPY`、过程或函数调用 | 未采纳按整个类别排除；监控查询、特定函数或短／长耗时不改变此结论 | 特定业务 SQL 的排除由用户后续维护模板条目 |
+| 未识别、截断、编码异常或分句不可靠文本 | 不推断为黑名单；也不把“未命中”误当成可训练 | 按既有训练资格处理可靠性，明确原因，无法归属时留在批次层面 |
+
+#### 类别判定验收样例
+
+下列 SQL 均为人工合成，仅走查规则，不执行数据库操作。“不因类别排除”不
+保证成功执行、计时完整、关联可靠或满足故障时段及其他训练资格。
+
+| 编号 | 合成输入 | 类别规则预期与边界 |
+| --- | --- | --- |
+| C01 | `SET LOCAL work_mem = '16MB';` | 排除单条运行参数设置 |
+| C02 | `BEGIN WORK;` | 排除单条事务开始 |
+| C03 | `COMMIT TRANSACTION;` | 排除单条普通事务提交 |
+| C04 | `VACUUM ANALYZE demo;` | 排除一个维护命令，不算两个子语句 |
+| C05 | `ANALYZE VERBOSE demo;` | 排除统计收集命令 |
+| C06 | `CREATE UNIQUE INDEX demo_i ON demo (id);` | 排除建索引类别 |
+| C07 | `ALTER TABLE demo ADD COLUMN flag integer;` | 排除改表类别 |
+| C08 | `SET work_mem = '16MB'; BEGIN; COMMIT;` | 纯黑名单批次，整批排除 |
+| C09 | `SET work_mem = '16MB'; BEGIN; INSERT INTO demo VALUES (1); COMMIT;` | 不因类别排除；按整批计时，包含控制语句贡献 |
+| C10 | `ALTER TABLE demo ADD COLUMN flag integer; ANALYZE demo; INSERT INTO demo VALUES (1, 2);` | 不因类别排除；维护与业务混合批次，不拆分时长 |
+| C11 | `CREATE TABLE demo_copy AS SELECT 1 AS id;` | 不因类别排除；不扩展到全部 DDL |
+| C12 | `EXPLAIN ANALYZE SELECT 1;` | 不因类别排除；不能因内含 `ANALYZE` 命中维护类别 |
+| C13 | `SELECT 'SET; COMMIT', $$ALTER TABLE demo$$;` | 不因类别排除；字符串内关键字与分号不是子语句 |
+| C14 | `/* SELECT */ sEt work_mem = '16MB'; -- INSERT` | 排除；普通注释不改变实际 `SET` 类别 |
+| C15 | `END;` / `START TRANSACTION;` / `ANALYSE demo;` | 三个独立别名案例均不因当前类别规则排除，覆盖暂缓 |
+| C16 | `COMMIT PREPARED 'demo_tx';` | 不因类别排除；与普通 `COMMIT` 分开 |
+| C17 | `RESET ALL;` / `SET ROLE NONE;` / `SET TRANSACTION READ ONLY;` | 三个独立案例均不因当前类别规则排除，扩展暂缓 |
+| C18 | `SELECT set_config('work_mem', '16MB', false);` | 不因类别排除；函数效果不把 `SELECT` 变为 `SET` |
+| C19 | `ALTER INDEX demo_i RENAME TO demo_j;` | 不因类别排除；不是 `ALTER TABLE` |
+| C20 | `SET work_mem = '16MB'; SELECT 'cut` | 文本不完整，不声称纯黑名单；按可靠性资格暂不训练 |
+| C21 | `; /* comment */ ;` | 没有可识别执行语句，不虚构样本，也不声称黑名单命中 |
+| C22 | `DO $$BEGIN PERFORM 1; END$$;` | 不因类别排除；过程体不是独立 `BEGIN`／`END` 批次 |
+| C23 | `ROLLBACK;` / `SHOW work_mem;` / `DEALLOCATE ALL;` / `LOCK TABLE demo IN ACCESS SHARE MODE;` | 四个独立新增候选案例均暂缓，不因类别排除 |
+| C24 | `SET work_mem = '16MB'; SELECT 1;` | 不因首条 `SET` 排除整批 |
+| C25 | `SET work_mem = '16MB'; END;` | `END` 暂缓，不能认定为纯黑名单批次；其他资格仍独立检查 |
+
+类别判断与其他规则的关系继续遵守本页单条／批次和基本资格条款：
+
+- 一次整批执行仍是一个候选样本，不将控制或维护子句的耗时分摊、扣除或补造。
+- 类别规则只影响训练资格，不删除源日志、原文、已保留明细或历史基线；可靠归属
+  的排除原因继续保留，无法可靠归属的问题留在批次层面，见[SQL 留存](sql-storage.md)。
+- 请求整体、Execute 首次、Execute 续取、Parse、Bind 独立统计，见[计时分类](timing-and-grouping.md)。
+  本次日志类别计数包括阶段、内部与重复出现文本，不能相加为完整执行次数。
+- 构建使用固定输入和规则配置，普通更新不改写运行中的构建或已保存历史，见
+  [构建与版本](../features/baseline-versions.md)。
 
 ### 已确认的单条语句与多语句批次
 
@@ -241,5 +330,5 @@ confidence: high
 
 ## Open Questions
 
-类别清单完善见 Issue #2；模板细则及具体实现仍按各条款分别落实。自动“高波动／
+类别新增、别名及特殊 SET 覆盖按上述保守边界暂缓；模板细则及具体实现仍按各条款分别落实。自动“高波动／
 疑似离群”标签及其阈值已明确后续结合实际数据另行确定。各节已有待定说明继续有效。

@@ -43,3 +43,10 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 来源重建、有界日志核对、规则升级及维护入口见[函数字典说明](../rules/functions/README.md)。
 日志探测使用本地忽略输入；普通测试仅使用人工数据，不访问数据库或生产服务。
+
+## 语句类别调查
+
+`scripts/diagnostics/statement_census.py` 只读盘点 HashData CSV 的词法类别与异常，
+输出固定标签、计数、摘要和来源定位，不执行 SQL、不判定训练黑名单。
+全量扫描及有界回放命令见[类别核查报告](../docs/reports/statement-category-census-2026-09-26.md)。
+生产输入保留在本地忽略目录；合成回归随 `.venv/bin/python -m unittest discover -s tests -v` 运行。

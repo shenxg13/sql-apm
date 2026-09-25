@@ -1,0 +1,5954 @@
+{
+  "clusters": {
+    "119": {
+      "counts": {
+        "duration_records": 2854821,
+        "inline_differs_sql": 71662,
+        "inline_equals_sql": 1460076,
+        "records": 5728640
+      },
+      "distinct_observed_batch_prefixes": 48,
+      "files": [
+        {
+          "bytes": 147939173,
+          "counts": {
+            "duration_records": 56446,
+            "inline_differs_sql": 1890,
+            "inline_equals_sql": 30514,
+            "records": 117152
+          },
+          "file": "gpdb-2026-07-01_000000.csv",
+          "sha256": "237b8fe5a5eac889d7f765a23cf571dc7cd8ed9525c12d2a22ecaa0c0d6748c9"
+        },
+        {
+          "bytes": 116179145,
+          "counts": {
+            "duration_records": 92412,
+            "inline_differs_sql": 2440,
+            "inline_equals_sql": 48414,
+            "records": 189535
+          },
+          "file": "gpdb-2026-07-04_000000.csv",
+          "sha256": "3cdf4c040cb5b8d4314ae85139491f35da2ae1e6321dc9f674d5fa6c87328970"
+        },
+        {
+          "bytes": 116282276,
+          "counts": {
+            "duration_records": 91833,
+            "inline_differs_sql": 2413,
+            "inline_equals_sql": 48114,
+            "records": 188238
+          },
+          "file": "gpdb-2026-07-05_000000.csv",
+          "sha256": "90468cc573678d3894877282b15d90f894ec3f2ab8e1c5277e564d4dd8ee6a06"
+        },
+        {
+          "bytes": 191838741,
+          "counts": {
+            "duration_records": 111047,
+            "inline_differs_sql": 2406,
+            "inline_equals_sql": 54921,
+            "records": 215732
+          },
+          "file": "gpdb-2026-07-06_000000.csv",
+          "sha256": "8a99adb8c1015e9183cc22cc0f9fc64b82dfea1a84c365d5c4ee6e3d3fc1587b"
+        },
+        {
+          "bytes": 150247477,
+          "counts": {
+            "duration_records": 101162,
+            "inline_differs_sql": 2449,
+            "inline_equals_sql": 51525,
+            "records": 202277
+          },
+          "file": "gpdb-2026-07-07_000000.csv",
+          "sha256": "0fd4e7e8f6959ef532114854f4a70e2c8f6da35bd30686f8d48c524b6369c047"
+        },
+        {
+          "bytes": 167933596,
+          "counts": {
+            "duration_records": 103908,
+            "inline_differs_sql": 2759,
+            "inline_equals_sql": 52413,
+            "records": 206678
+          },
+          "file": "gpdb-2026-07-08_000000.csv",
+          "sha256": "a8351e2f48568318147d430da6ee051d3505dd71818f3a6f257d35180ae65041"
+        },
+        {
+          "bytes": 158832781,
+          "counts": {
+            "duration_records": 102264,
+            "inline_differs_sql": 2562,
+            "inline_equals_sql": 52187,
+            "records": 205229
+          },
+          "file": "gpdb-2026-07-09_000000.csv",
+          "sha256": "9d0d80fea45f030fa3317930807a8a69b5b5d7bba30e681ea3fe65451e40d409"
+        },
+        {
+          "bytes": 143693751,
+          "counts": {
+            "duration_records": 101453,
+            "inline_differs_sql": 2449,
+            "inline_equals_sql": 52031,
+            "records": 203152
+          },
+          "file": "gpdb-2026-07-10_000000.csv",
+          "sha256": "addd8194894834a321ce94c08200b049c249da3b3860b8d78b5b00eba2c85eff"
+        },
+        {
+          "bytes": 118325562,
+          "counts": {
+            "duration_records": 95017,
+            "inline_differs_sql": 2454,
+            "inline_equals_sql": 49222,
+            "records": 192913
+          },
+          "file": "gpdb-2026-07-11_000000.csv",
+          "sha256": "72a80324e325e418bde02d66d286f844aa02cb58016994c1bc489fff59be32b2"
+        },
+        {
+          "bytes": 116002893,
+          "counts": {
+            "duration_records": 93816,
+            "inline_differs_sql": 2387,
+            "inline_equals_sql": 48727,
+            "records": 190601
+          },
+          "file": "gpdb-2026-07-12_000000.csv",
+          "sha256": "691aa60f82de544aed532088fc9e13b223c19c192ce9feb806ff7b00f5a8f9cc"
+        },
+        {
+          "bytes": 163016278,
+          "counts": {
+            "duration_records": 102823,
+            "inline_differs_sql": 2413,
+            "inline_equals_sql": 52107,
+            "records": 204155
+          },
+          "file": "gpdb-2026-07-13_000000.csv",
+          "sha256": "bc12d7631606187fb0141402a26a30caf9597345b9e47a2481e21119cd90bf2c"
+        },
+        {
+          "bytes": 144909604,
+          "counts": {
+            "duration_records": 99609,
+            "inline_differs_sql": 2520,
+            "inline_equals_sql": 50797,
+            "records": 199881
+          },
+          "file": "gpdb-2026-07-14_000000.csv",
+          "sha256": "e06a3e57679cd285afa5e7ab5d9556b40071d039fb61ce5c08a79805d5726eea"
+        },
+        {
+          "bytes": 147642320,
+          "counts": {
+            "duration_records": 100803,
+            "inline_differs_sql": 2486,
+            "inline_equals_sql": 51146,
+            "records": 201547
+          },
+          "file": "gpdb-2026-07-15_000000.csv",
+          "sha256": "a8787801e05bfa1b0dcd3a0e5685ba8250f012eb0c4bfd7a9f87bdf96c81d8f5"
+        },
+        {
+          "bytes": 153670772,
+          "counts": {
+            "duration_records": 104524,
+            "inline_differs_sql": 2568,
+            "inline_equals_sql": 52716,
+            "records": 207207
+          },
+          "file": "gpdb-2026-07-16_000000.csv",
+          "sha256": "0c8262bc96dd52491427e71fcb136323e374ad95a093ff2acd13b8687071738d"
+        },
+        {
+          "bytes": 148633328,
+          "counts": {
+            "duration_records": 102698,
+            "inline_differs_sql": 2645,
+            "inline_equals_sql": 52219,
+            "records": 204907
+          },
+          "file": "gpdb-2026-07-17_000000.csv",
+          "sha256": "f3e9cc75cf757fa9dab2f682e485792c284467eabfcb5a7594b7dd2ff6d4d6e3"
+        },
+        {
+          "bytes": 114233125,
+          "counts": {
+            "duration_records": 90888,
+            "inline_differs_sql": 2438,
+            "inline_equals_sql": 47827,
+            "records": 187224
+          },
+          "file": "gpdb-2026-07-18_000000.csv",
+          "sha256": "596f7e6378bea7bbde5af191504d546adb76c6033adbb6c1235eec0f876b038b"
+        },
+        {
+          "bytes": 114870764,
+          "counts": {
+            "duration_records": 91697,
+            "inline_differs_sql": 2398,
+            "inline_equals_sql": 47985,
+            "records": 187752
+          },
+          "file": "gpdb-2026-07-19_000000.csv",
+          "sha256": "7ca8becad6cdda595b7960506a9464aa73e5cc0757a562e5bfba061e12de2d7a"
+        },
+        {
+          "bytes": 173200913,
+          "counts": {
+            "duration_records": 104192,
+            "inline_differs_sql": 2521,
+            "inline_equals_sql": 52473,
+            "records": 206209
+          },
+          "file": "gpdb-2026-07-20_000000.csv",
+          "sha256": "d3656130438ecafa0274b43b13d772c5a38c3d0fab7042feffb31b27d0e4b19b"
+        },
+        {
+          "bytes": 159448460,
+          "counts": {
+            "duration_records": 104267,
+            "inline_differs_sql": 2542,
+            "inline_equals_sql": 52654,
+            "records": 207074
+          },
+          "file": "gpdb-2026-07-21_000000.csv",
+          "sha256": "30651e53b9ca302dcb403694d3e400b4c118b516a439d1a9ffb5c1b317ecd91b"
+        },
+        {
+          "bytes": 164437354,
+          "counts": {
+            "duration_records": 108581,
+            "inline_differs_sql": 2626,
+            "inline_equals_sql": 54213,
+            "records": 212876
+          },
+          "file": "gpdb-2026-07-22_000000.csv",
+          "sha256": "d59bd5eb4b21676d9c7f4b36a3c47747a82a3e768624284182dc789105eb5558"
+        },
+        {
+          "bytes": 154211029,
+          "counts": {
+            "duration_records": 100732,
+            "inline_differs_sql": 2475,
+            "inline_equals_sql": 51187,
+            "records": 201436
+          },
+          "file": "gpdb-2026-07-23_000000.csv",
+          "sha256": "b190504ca809afc200434bc6c3fdb640214c697225850bfc1e7d163b144f89c0"
+        },
+        {
+          "bytes": 174226350,
+          "counts": {
+            "duration_records": 100193,
+            "inline_differs_sql": 2468,
+            "inline_equals_sql": 51039,
+            "records": 200927
+          },
+          "file": "gpdb-2026-07-24_000000.csv",
+          "sha256": "a7ef3eba3b26f5cbcc9d109a889f1f45546b071bf9b2969b7b06a05823b73357"
+        },
+        {
+          "bytes": 116745476,
+          "counts": {
+            "duration_records": 93860,
+            "inline_differs_sql": 2432,
+            "inline_equals_sql": 48854,
+            "records": 191289
+          },
+          "file": "gpdb-2026-07-25_000000.csv",
+          "sha256": "d503ead82c9a108c7044216a74cda433678da827e27f4dc06deb1a0e4a947749"
+        },
+        {
+          "bytes": 114340538,
+          "counts": {
+            "duration_records": 91117,
+            "inline_differs_sql": 2397,
+            "inline_equals_sql": 47844,
+            "records": 187195
+          },
+          "file": "gpdb-2026-07-26_000000.csv",
+          "sha256": "6dbe13ca39a53a0b172881fe696dba5d83965e760a710832aceca55ccfa60154"
+        },
+        {
+          "bytes": 191535524,
+          "counts": {
+            "duration_records": 104068,
+            "inline_differs_sql": 2592,
+            "inline_equals_sql": 52839,
+            "records": 207270
+          },
+          "file": "gpdb-2026-07-27_000000.csv",
+          "sha256": "aa4c3c5af5a709911d49800873db27a2448177cef57ef3cd2f1e3fd2c5c6ac47"
+        },
+        {
+          "bytes": 162575016,
+          "counts": {
+            "duration_records": 103846,
+            "inline_differs_sql": 2488,
+            "inline_equals_sql": 52475,
+            "records": 206230
+          },
+          "file": "gpdb-2026-07-28_000000.csv",
+          "sha256": "8fcf4d70c23093b292a85cddd0924563bfbe0c3459104bc143716f759eb82081"
+        },
+        {
+          "bytes": 135254466,
+          "counts": {
+            "duration_records": 79191,
+            "inline_differs_sql": 2248,
+            "inline_equals_sql": 39598,
+            "records": 157799
+          },
+          "file": "gpdb-2026-07-29_000000.csv",
+          "sha256": "bf8f3784b34f3b11afaa942fbafefcf952f57cb4b42cb42bff54fa80fa2eaf8e"
+        },
+        {
+          "bytes": 17589465,
+          "counts": {
+            "duration_records": 20000,
+            "inline_differs_sql": 207,
+            "inline_equals_sql": 10987,
+            "records": 41365
+          },
+          "file": "gpdb-2026-07-29_161546.csv",
+          "sha256": "88e2570ee869fa6027702d9ad71107e137838aaa81753b34215423bbe4fa8234"
+        },
+        {
+          "bytes": 160491551,
+          "counts": {
+            "duration_records": 101785,
+            "inline_differs_sql": 2490,
+            "inline_equals_sql": 51561,
+            "records": 203063
+          },
+          "file": "gpdb-2026-07-30_000000.csv",
+          "sha256": "c9fe13a9ae28f20170ec571b693e82063da15d7631474d2488c7e28bfbb165b4"
+        },
+        {
+          "bytes": 164320624,
+          "counts": {
+            "duration_records": 100589,
+            "inline_differs_sql": 2499,
+            "inline_equals_sql": 51487,
+            "records": 201727
+          },
+          "file": "gpdb-2026-07-31_000000.csv",
+          "sha256": "bd39c77cfac7a603d03cd269048090dbc3b678e40f0e34f000e72e2fe7e1fc39"
+        }
+      ],
+      "groups": {
+        "inline_distinct/postgres.c:1239": {
+          "categories": {},
+          "empty": 0,
+          "issues": {
+            "unbalanced_bracket": 33
+          },
+          "readable": 0,
+          "records": 33,
+          "shapes": {}
+        },
+        "inline_distinct/postgres.c:1685": {
+          "categories": {
+            "BEGIN": 1200,
+            "CREATE TABLE": 1596,
+            "DELETE": 1092,
+            "DO": 28,
+            "DROP TABLE": 1338,
+            "END": 1228,
+            "INSERT": 2339,
+            "SELECT": 26973,
+            "SET": 22064,
+            "TRUNCATE": 290,
+            "WITH": 62
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 28417,
+          "records": 28417,
+          "shapes": {
+            "batch": 23358,
+            "single": 5059
+          }
+        },
+        "inline_distinct/postgres.c:2224": {
+          "categories": {
+            "DELETE": 1,
+            "INSERT": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "inline_distinct/postgres.c:2764": {
+          "categories": {
+            "ANALYZE": 113,
+            "DELETE": 1227,
+            "DROP TABLE": 79,
+            "INSERT": 4288,
+            "SELECT": 35395,
+            "SET": 28,
+            "TRUNCATE": 2078
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 43208,
+          "records": 43208,
+          "shapes": {
+            "single": 43208
+          }
+        },
+        "sql/COptTasks.cpp:299": {
+          "categories": {
+            "BEGIN": 678,
+            "COPY": 794,
+            "CREATE TABLE": 863,
+            "DELETE": 1839,
+            "DROP TABLE": 161,
+            "END": 678,
+            "INSERT": 11776,
+            "SELECT": 324051,
+            "UPDATE": 60,
+            "WITH": 851
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 338761,
+          "records": 338761,
+          "shapes": {
+            "batch": 702,
+            "single": 338059
+          }
+        },
+        "sql/COptTasks.cpp:769": {
+          "categories": {
+            "COPY": 406,
+            "CREATE TABLE": 2,
+            "DELETE": 350,
+            "INSERT": 310,
+            "SELECT": 174,
+            "WITH": 116
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1358,
+          "records": 1358,
+          "shapes": {
+            "single": 1358
+          }
+        },
+        "sql/OTHER": {
+          "categories": {
+            "COMMENT": 244,
+            "CREATE TABLE": 11,
+            "DROP TABLE": 4,
+            "GRANT": 56,
+            "INSERT": 4,
+            "SELECT": 10,
+            "SHOW": 1,
+            "UNKNOWN": 1,
+            "WITH": 9
+          },
+          "empty": 21973,
+          "issues": {
+            "unbalanced_bracket": 4
+          },
+          "readable": 27,
+          "records": 22004,
+          "shapes": {
+            "batch": 2,
+            "single": 25
+          }
+        },
+        "sql/aclchk.c:3914": {
+          "categories": {
+            "SELECT": 11
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 11,
+          "records": 11,
+          "shapes": {
+            "single": 11
+          }
+        },
+        "sql/analyze.c:311": {
+          "categories": {
+            "ANALYZE": 28
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 28,
+          "records": 28,
+          "shapes": {
+            "single": 28
+          }
+        },
+        "sql/appendonlywriter_hdw.c:82": {
+          "categories": {
+            "COPY": 682,
+            "DELETE": 1364,
+            "SET": 1364
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2046,
+          "records": 2046,
+          "shapes": {
+            "batch": 1364,
+            "single": 682
+          }
+        },
+        "sql/auth.c:315": {
+          "categories": {},
+          "empty": 49020,
+          "issues": {},
+          "readable": 0,
+          "records": 49020,
+          "shapes": {}
+        },
+        "sql/autostats.c:334": {
+          "categories": {
+            "BEGIN": 1595,
+            "CREATE TABLE": 10212,
+            "DELETE": 1450,
+            "DROP TABLE": 8507,
+            "END": 1623,
+            "INSERT": 13115,
+            "SET": 224,
+            "TRUNCATE": 579
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 9296,
+          "records": 9296,
+          "shapes": {
+            "batch": 2050,
+            "single": 7246
+          }
+        },
+        "sql/bgworker.c:376": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/bgworker.c:562": {
+          "categories": {},
+          "empty": 2,
+          "issues": {},
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/bgworker_hotrange.c:128": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/bgworker_hotrange.c:424": {
+          "categories": {},
+          "empty": 13243,
+          "issues": {},
+          "readable": 0,
+          "records": 13243,
+          "shapes": {}
+        },
+        "sql/bgworker_hotrange.c:93": {
+          "categories": {},
+          "empty": 2,
+          "issues": {},
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/bgworker_io.c:145": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/bgworker_io.c:147": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/catalogproxy.c:83": {
+          "categories": {
+            "INSERT": 11043,
+            "SELECT": 827,
+            "SET": 5328,
+            "UPDATE": 87,
+            "WITH": 58
+          },
+          "empty": 680216,
+          "issues": {
+            "unbalanced_bracket": 1143,
+            "unclosed_string": 217
+          },
+          "readable": 12015,
+          "records": 693591,
+          "shapes": {
+            "batch": 5328,
+            "single": 6687
+          }
+        },
+        "sql/cdbgang.c:750": {
+          "categories": {},
+          "empty": 20,
+          "issues": {},
+          "readable": 0,
+          "records": 20,
+          "shapes": {}
+        },
+        "sql/cdbgang_async.c:219": {
+          "categories": {
+            "INSERT": 2,
+            "SELECT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "sql/cdbutil.c:1845": {
+          "categories": {
+            "DEALLOCATE": 1,
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/copy_hdw.c:153": {
+          "categories": {
+            "COPY": 8731,
+            "CREATE EXTERNAL": 21818
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 30549,
+          "records": 30549,
+          "shapes": {
+            "single": 30549
+          }
+        },
+        "sql/csm.c:59": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/execUtils.c:1902": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/gophermeta.c:207": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/hba.c:2086": {
+          "categories": {},
+          "empty": 2879,
+          "issues": {},
+          "readable": 0,
+          "records": 2879,
+          "shapes": {}
+        },
+        "sql/heap.c:1486": {
+          "categories": {
+            "CREATE EXTERNAL": 19640
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 19640,
+          "records": 19640,
+          "shapes": {
+            "single": 19640
+          }
+        },
+        "sql/heap.c:587": {
+          "categories": {
+            "CREATE TABLE": 1222
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1222,
+          "records": 1222,
+          "shapes": {
+            "single": 1222
+          }
+        },
+        "sql/index_cache_shm_impl.c:399": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/invalmsg_shared.c:258": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/metacache_mgr.c:808": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/misc.c:116": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/namespace.c:259": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/namespace.c:2951": {
+          "categories": {
+            "SELECT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/namespace.c:424": {
+          "categories": {
+            "INSERT": 3,
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "sql/namespace.c:429": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/nodeMotion.c:197": {
+          "categories": {
+            "CREATE TABLE": 20,
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {
+            "unbalanced_bracket": 29
+          },
+          "readable": 21,
+          "records": 50,
+          "shapes": {
+            "single": 21
+          }
+        },
+        "sql/numeric.c:1066": {
+          "categories": {
+            "CREATE TABLE": 6
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 6,
+          "records": 6,
+          "shapes": {
+            "single": 6
+          }
+        },
+        "sql/parse_agg.c:1112": {
+          "categories": {
+            "SELECT": 1,
+            "WITH": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/parse_coerce.c:1421": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/parse_coerce.c:576": {
+          "categories": {
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/parse_expr.c:2468": {
+          "categories": {
+            "SELECT": 7
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 7,
+          "records": 7,
+          "shapes": {
+            "single": 7
+          }
+        },
+        "sql/parse_func.c:529": {
+          "categories": {
+            "SELECT": 1,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/parse_relation.c:1040": {
+          "categories": {
+            "DELETE": 57,
+            "SELECT": 6
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 63,
+          "records": 63,
+          "shapes": {
+            "single": 63
+          }
+        },
+        "sql/parse_relation.c:1061": {
+          "categories": {
+            "SELECT": 2,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/parse_relation.c:3351": {
+          "categories": {
+            "SELECT": 8,
+            "WITH": 6
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 14,
+          "records": 14,
+          "shapes": {
+            "single": 14
+          }
+        },
+        "sql/parse_relation.c:3376": {
+          "categories": {
+            "SELECT": 1,
+            "WITH": 10
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 11,
+          "records": 11,
+          "shapes": {
+            "single": 11
+          }
+        },
+        "sql/parse_relation.c:3390": {
+          "categories": {
+            "SELECT": 9,
+            "WITH": 6
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 15,
+          "records": 15,
+          "shapes": {
+            "single": 15
+          }
+        },
+        "sql/parse_type.c:269": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/postgres.c:1239": {
+          "categories": {
+            "CREATE TABLE": 30,
+            "DELETE": 145,
+            "INSERT": 13879,
+            "SELECT": 1330,
+            "SET": 5445,
+            "UPDATE": 290,
+            "WITH": 145
+          },
+          "empty": 0,
+          "issues": {
+            "invalid_encoding_or_nul": 7,
+            "unbalanced_bracket": 2420,
+            "unclosed_comment": 58,
+            "unclosed_string": 360
+          },
+          "readable": 15819,
+          "records": 18664,
+          "shapes": {
+            "batch": 5445,
+            "single": 10374
+          }
+        },
+        "sql/postgres.c:1455": {
+          "categories": {
+            "CREATE TABLE": 30,
+            "DELETE": 145,
+            "INSERT": 13879,
+            "SELECT": 1330,
+            "SET": 5445,
+            "UPDATE": 290,
+            "WITH": 145
+          },
+          "empty": 0,
+          "issues": {
+            "invalid_encoding_or_nul": 7,
+            "unbalanced_bracket": 2419,
+            "unclosed_comment": 58,
+            "unclosed_string": 360
+          },
+          "readable": 15819,
+          "records": 18663,
+          "shapes": {
+            "batch": 5445,
+            "single": 10374
+          }
+        },
+        "sql/postgres.c:1685": {
+          "categories": {
+            "ALTER TABLE": 989,
+            "ANALYSE": 28,
+            "ANALYZE": 5507,
+            "BEGIN": 47206,
+            "COMMENT": 466,
+            "COMMIT": 33070,
+            "COPY": 11230,
+            "CREATE EXTERNAL": 21818,
+            "CREATE TABLE": 15101,
+            "DEALLOCATE": 24727,
+            "DELETE": 41964,
+            "DO": 28,
+            "DROP EXTERNAL": 2178,
+            "DROP TABLE": 5671,
+            "END": 23226,
+            "GRANT": 144,
+            "INSERT": 76594,
+            "SELECT": 384470,
+            "SET": 149096,
+            "SET TRANSACTION": 2178,
+            "TRUNCATE": 16099,
+            "UPDATE": 4874,
+            "VACUUM": 1722,
+            "WITH": 15078
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 47
+          },
+          "readable": 841405,
+          "records": 841452,
+          "shapes": {
+            "batch": 56725,
+            "empty_tokens": 22427,
+            "single": 762253
+          }
+        },
+        "sql/postgres.c:1946": {
+          "categories": {
+            "ALTER TABLE": 989,
+            "ANALYSE": 28,
+            "ANALYZE": 5507,
+            "BEGIN": 47206,
+            "COMMENT": 256,
+            "COMMIT": 33070,
+            "COPY": 10548,
+            "CREATE EXTERNAL": 2178,
+            "CREATE TABLE": 15087,
+            "DEALLOCATE": 24727,
+            "DELETE": 40512,
+            "DO": 28,
+            "DROP EXTERNAL": 2178,
+            "DROP TABLE": 5663,
+            "END": 23226,
+            "GRANT": 88,
+            "INSERT": 76578,
+            "SELECT": 384416,
+            "SET": 147732,
+            "SET TRANSACTION": 2178,
+            "TRUNCATE": 16099,
+            "UPDATE": 4874,
+            "VACUUM": 1722,
+            "WITH": 15049
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 47
+          },
+          "readable": 819530,
+          "records": 819577,
+          "shapes": {
+            "batch": 55359,
+            "empty_tokens": 22427,
+            "single": 741744
+          }
+        },
+        "sql/postgres.c:2219": {
+          "categories": {
+            "ALTER TABLE": 2080,
+            "ANALYZE": 2192,
+            "BEGIN": 5515,
+            "COMMIT": 1504,
+            "CREATE TABLE": 110,
+            "DELETE": 9966,
+            "DROP TABLE": 75,
+            "INSERT": 132885,
+            "SELECT": 242179,
+            "SET": 203152,
+            "SHOW": 43010,
+            "TRUNCATE": 2078,
+            "WITH": 31
+          },
+          "empty": 9637,
+          "issues": {},
+          "readable": 644777,
+          "records": 654414,
+          "shapes": {
+            "single": 644777
+          }
+        },
+        "sql/postgres.c:2224": {
+          "categories": {
+            "DELETE": 47,
+            "INSERT": 24,
+            "SELECT": 38
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 109,
+          "records": 109,
+          "shapes": {
+            "single": 109
+          }
+        },
+        "sql/postgres.c:2603": {
+          "categories": {
+            "ALTER TABLE": 4655,
+            "ANALYZE": 4767,
+            "BEGIN": 5515,
+            "COMMIT": 5515,
+            "CREATE TABLE": 114,
+            "DELETE": 10524,
+            "DROP TABLE": 79,
+            "INSERT": 133038,
+            "SELECT": 245305,
+            "SET": 203152,
+            "SHOW": 43010,
+            "TRUNCATE": 2078,
+            "WITH": 31
+          },
+          "empty": 23514,
+          "issues": {},
+          "readable": 657783,
+          "records": 681297,
+          "shapes": {
+            "single": 657783
+          }
+        },
+        "sql/postgres.c:2764": {
+          "categories": {
+            "ALTER TABLE": 4655,
+            "ANALYZE": 4767,
+            "BEGIN": 5515,
+            "COMMIT": 5515,
+            "CREATE TABLE": 114,
+            "DELETE": 10524,
+            "DROP TABLE": 79,
+            "INSERT": 133038,
+            "SELECT": 259042,
+            "SET": 203152,
+            "SHOW": 43010,
+            "TRUNCATE": 2078,
+            "WITH": 31
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 671520,
+          "records": 671520,
+          "shapes": {
+            "single": 671520
+          }
+        },
+        "sql/postgres.c:2843": {
+          "categories": {
+            "ALTER TABLE": 4654,
+            "ANALYZE": 4767,
+            "BEGIN": 5515,
+            "COMMIT": 5515,
+            "CREATE TABLE": 108,
+            "DELETE": 10524,
+            "DROP TABLE": 56,
+            "INSERT": 133038,
+            "SELECT": 259017,
+            "SET": 203152,
+            "SHOW": 43010,
+            "TRUNCATE": 2078,
+            "WITH": 31
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 671465,
+          "records": 671465,
+          "shapes": {
+            "single": 671465
+          }
+        },
+        "sql/postgres.c:3835": {
+          "categories": {},
+          "empty": 5245,
+          "issues": {},
+          "readable": 0,
+          "records": 5245,
+          "shapes": {}
+        },
+        "sql/postgres.c:3851": {
+          "categories": {},
+          "empty": 20,
+          "issues": {},
+          "readable": 0,
+          "records": 20,
+          "shapes": {}
+        },
+        "sql/postgres.c:3885": {
+          "categories": {
+            "DELETE": 30,
+            "INSERT": 14,
+            "SELECT": 33,
+            "WITH": 3
+          },
+          "empty": 3,
+          "issues": {},
+          "readable": 80,
+          "records": 83,
+          "shapes": {
+            "single": 80
+          }
+        },
+        "sql/postgres.c:3955": {
+          "categories": {
+            "DELETE": 30,
+            "INSERT": 14
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 44,
+          "records": 44,
+          "shapes": {
+            "single": 44
+          }
+        },
+        "sql/postgres.c:4013": {
+          "categories": {
+            "SELECT": 33,
+            "WITH": 3
+          },
+          "empty": 1,
+          "issues": {},
+          "readable": 36,
+          "records": 37,
+          "shapes": {
+            "single": 36
+          }
+        },
+        "sql/postmaster.c:2567": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2713": {
+          "categories": {},
+          "empty": 2,
+          "issues": {},
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2721": {
+          "categories": {},
+          "empty": 25,
+          "issues": {},
+          "readable": 0,
+          "records": 25,
+          "shapes": {}
+        },
+        "sql/postmaster.c:3108": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:3136": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:3315": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:3317": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:3737": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:4004": {
+          "categories": {},
+          "empty": 4,
+          "issues": {},
+          "readable": 0,
+          "records": 4,
+          "shapes": {}
+        },
+        "sql/postmaster.c:4250": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:4425": {
+          "categories": {},
+          "empty": 9,
+          "issues": {},
+          "readable": 0,
+          "records": 9,
+          "shapes": {}
+        },
+        "sql/postmaster.c:6235": {
+          "categories": {},
+          "empty": 8,
+          "issues": {},
+          "readable": 0,
+          "records": 8,
+          "shapes": {}
+        },
+        "sql/pqcomm.c:1572": {
+          "categories": {},
+          "empty": 20,
+          "issues": {},
+          "readable": 0,
+          "records": 20,
+          "shapes": {}
+        },
+        "sql/pqcomm.c:935": {
+          "categories": {},
+          "empty": 46,
+          "issues": {},
+          "readable": 0,
+          "records": 46,
+          "shapes": {}
+        },
+        "sql/resscheduler.c:264": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/rpc.c:158": {
+          "categories": {},
+          "empty": 3,
+          "issues": {},
+          "readable": 0,
+          "records": 3,
+          "shapes": {}
+        },
+        "sql/syslogger.c:742": {
+          "categories": {},
+          "empty": 42,
+          "issues": {},
+          "readable": 0,
+          "records": 42,
+          "shapes": {}
+        },
+        "sql/syslogger.c:756": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/tablecmds.c:1195": {
+          "categories": {
+            "COMMENT": 88,
+            "CREATE TABLE": 7,
+            "DROP TABLE": 6,
+            "GRANT": 28
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "batch": 1
+          }
+        },
+        "sql/tablecmds.c:1214": {
+          "categories": {
+            "COMMENT": 122,
+            "CREATE TABLE": 7,
+            "DROP TABLE": 25,
+            "GRANT": 28
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 24,
+          "records": 24,
+          "shapes": {
+            "batch": 1,
+            "single": 23
+          }
+        },
+        "sql/tablecmds.c:15822": {
+          "categories": {
+            "ALTER TABLE": 5388
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 5388,
+          "records": 5388,
+          "shapes": {
+            "single": 5388
+          }
+        },
+        "sql/variable.c:605": {
+          "categories": {
+            "SET TRANSACTION": 2178
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2178,
+          "records": 2178,
+          "shapes": {
+            "single": 2178
+          }
+        },
+        "sql/varsup.c:79": {
+          "categories": {
+            "ALTER TABLE": 5440,
+            "ANALYSE": 28,
+            "ANALYZE": 7499,
+            "BEGIN": 1200,
+            "COMMENT": 466,
+            "COPY": 682,
+            "CREATE EXTERNAL": 8,
+            "CREATE TABLE": 3999,
+            "DELETE": 47756,
+            "DO": 28,
+            "DROP EXTERNAL": 2170,
+            "DROP TABLE": 1613,
+            "END": 1228,
+            "GRANT": 144,
+            "INSERT": 23524,
+            "SELECT": 892,
+            "SET": 6809,
+            "TRUNCATE": 9950,
+            "UPDATE": 262,
+            "VACUUM": 31167
+          },
+          "empty": 7340,
+          "issues": {},
+          "readable": 129706,
+          "records": 137046,
+          "shapes": {
+            "batch": 8112,
+            "single": 121594
+          }
+        },
+        "sql/xact.c:4615": {
+          "categories": {
+            "COMMIT": 3849,
+            "END": 5346,
+            "INSERT": 28,
+            "TRUNCATE": 28
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 9195,
+          "records": 9195,
+          "shapes": {
+            "batch": 28,
+            "single": 9167
+          }
+        },
+        "sql/xlog_kv.c:194": {
+          "categories": {},
+          "empty": 8176,
+          "issues": {},
+          "readable": 0,
+          "records": 8176,
+          "shapes": {}
+        }
+      },
+      "scan_seconds": 106.883
+    },
+    "120": {
+      "counts": {
+        "duration_records": 2929866,
+        "inline_differs_sql": 109145,
+        "inline_equals_sql": 1941821,
+        "records": 6730129
+      },
+      "distinct_observed_batch_prefixes": 135,
+      "files": [
+        {
+          "bytes": 529475791,
+          "counts": {
+            "duration_records": 290651,
+            "inline_differs_sql": 7794,
+            "inline_equals_sql": 196297,
+            "records": 668674
+          },
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "sha256": "7637211ed5d2a85952a6d8b77efbb370d53e3a3ccc94ada577678c8f29eb20db"
+        },
+        {
+          "bytes": 526755139,
+          "counts": {
+            "duration_records": 62747,
+            "inline_differs_sql": 1594,
+            "inline_equals_sql": 50045,
+            "records": 183401
+          },
+          "file": "gpdb-2026-09-16_000000.csv.2",
+          "sha256": "8210741a0a6c174e4daef192a748f0f35cf2a29dc0abc9f1dcc72a55ef285f25"
+        },
+        {
+          "bytes": 528150833,
+          "counts": {
+            "duration_records": 258444,
+            "inline_differs_sql": 14346,
+            "inline_equals_sql": 154382,
+            "records": 594218
+          },
+          "file": "gpdb-2026-09-16_000000.csv.3",
+          "sha256": "91285a731f21cca24e3634be3eecaf8c915dbb310473ac067742f499f76c5603"
+        },
+        {
+          "bytes": 124666079,
+          "counts": {
+            "duration_records": 75764,
+            "inline_differs_sql": 4128,
+            "inline_equals_sql": 44179,
+            "records": 163273
+          },
+          "file": "gpdb-2026-09-16_000000.csv",
+          "sha256": "4951fe869607d30300a769d32480d647b4dd13780a9c914f1338f6376ac1c560"
+        },
+        {
+          "bytes": 524732770,
+          "counts": {
+            "duration_records": 292092,
+            "inline_differs_sql": 4834,
+            "inline_equals_sql": 215942,
+            "records": 688482
+          },
+          "file": "gpdb-2026-09-17_000000.csv.1",
+          "sha256": "890505ac82d6b1b6cf21ca756796d4f463e53735c741146377b8dfec6f84ddc6"
+        },
+        {
+          "bytes": 525793242,
+          "counts": {
+            "duration_records": 64076,
+            "inline_differs_sql": 1152,
+            "inline_equals_sql": 55901,
+            "records": 196968
+          },
+          "file": "gpdb-2026-09-17_000000.csv.2",
+          "sha256": "6dba60e5bf29a498ecc80f7b109af3408ce40b443e1b84e54262e63f84bc9e7d"
+        },
+        {
+          "bytes": 524770216,
+          "counts": {
+            "duration_records": 270978,
+            "inline_differs_sql": 13844,
+            "inline_equals_sql": 166125,
+            "records": 619381
+          },
+          "file": "gpdb-2026-09-17_000000.csv.3",
+          "sha256": "f3171ea36c87fec1bdec194927948f136b7ee02dfb896336f69f1587b0496b12"
+        },
+        {
+          "bytes": 373615414,
+          "counts": {
+            "duration_records": 236785,
+            "inline_differs_sql": 7805,
+            "inline_equals_sql": 157819,
+            "records": 517573
+          },
+          "file": "gpdb-2026-09-17_000000.csv",
+          "sha256": "0f3de2f89abe906fea23f849390ea55279f9af299020a46575894a1b7ba2d1e6"
+        },
+        {
+          "bytes": 524439546,
+          "counts": {
+            "duration_records": 242825,
+            "inline_differs_sql": 6940,
+            "inline_equals_sql": 151439,
+            "records": 519178
+          },
+          "file": "gpdb-2026-09-18_000000.csv.1",
+          "sha256": "b4716eba07d4440f78a896bfd356c146358ffc921c65ed5209f073f5b2dc6a19"
+        },
+        {
+          "bytes": 527328017,
+          "counts": {
+            "duration_records": 60493,
+            "inline_differs_sql": 1385,
+            "inline_equals_sql": 48128,
+            "records": 178287
+          },
+          "file": "gpdb-2026-09-18_000000.csv.2",
+          "sha256": "390df0cc11a0bcfee65e72b8175ebc98be2ed5c424108bfbb8133ac51d056c3c"
+        },
+        {
+          "bytes": 525499344,
+          "counts": {
+            "duration_records": 259991,
+            "inline_differs_sql": 13958,
+            "inline_equals_sql": 154344,
+            "records": 587981
+          },
+          "file": "gpdb-2026-09-18_000000.csv.3",
+          "sha256": "387d41e98567013cff091171a3f583aca4909785f89f8a1aed715e95c1845451"
+        },
+        {
+          "bytes": 161216033,
+          "counts": {
+            "duration_records": 99903,
+            "inline_differs_sql": 5250,
+            "inline_equals_sql": 58188,
+            "records": 214498
+          },
+          "file": "gpdb-2026-09-18_000000.csv",
+          "sha256": "965cb9f643f0a4780464964812e7bfe60a175524977e82755648ade1b8cc209d"
+        },
+        {
+          "bytes": 524322867,
+          "counts": {
+            "duration_records": 377840,
+            "inline_differs_sql": 10053,
+            "inline_equals_sql": 275067,
+            "records": 790132
+          },
+          "file": "gpdb-2026-09-19_000000.csv.1",
+          "sha256": "eb359163f0408f5a1bdf8b3188ef589399fce4f7c7dfebd014c60e60a13a57d2"
+        },
+        {
+          "bytes": 527561226,
+          "counts": {
+            "duration_records": 86276,
+            "inline_differs_sql": 2156,
+            "inline_equals_sql": 65207,
+            "records": 237515
+          },
+          "file": "gpdb-2026-09-19_000000.csv.2",
+          "sha256": "22679be64278796011410abd1f9bd1490078f08391d04a6290d7e4a4a3a81277"
+        },
+        {
+          "bytes": 568743370,
+          "counts": {
+            "duration_records": 247078,
+            "inline_differs_sql": 13752,
+            "inline_equals_sql": 146240,
+            "records": 560928
+          },
+          "file": "gpdb-2026-09-19_000000.csv.3",
+          "sha256": "ef64b490933002d1bbb5ee980647289423aae84bf8167777d328952785f950b9"
+        },
+        {
+          "bytes": 5131812,
+          "counts": {
+            "duration_records": 3923,
+            "inline_differs_sql": 154,
+            "inline_equals_sql": 2518,
+            "records": 9640
+          },
+          "file": "gpdb-2026-09-19_000000.csv",
+          "sha256": "f159b5e17c152b434a5b58d7b703f50eb974eb3d9ad79c8c19bf6cd72ea2ebc5"
+        }
+      ],
+      "groups": {
+        "inline_distinct/postgres.c:1239": {
+          "categories": {
+            "DELETE": 24,
+            "INSERT": 24,
+            "SELECT": 24
+          },
+          "empty": 0,
+          "issues": {
+            "unbalanced_bracket": 44
+          },
+          "readable": 48,
+          "records": 92,
+          "shapes": {
+            "batch": 24,
+            "single": 24
+          }
+        },
+        "inline_distinct/postgres.c:1685": {
+          "categories": {
+            "ALTER TABLE": 2704,
+            "ANALYZE": 52,
+            "BEGIN": 48,
+            "COMMIT": 2312,
+            "CREATE EXTERNAL": 688,
+            "CREATE TABLE": 3310,
+            "DELETE": 1344,
+            "DROP EXTERNAL": 688,
+            "DROP TABLE": 275,
+            "END": 48,
+            "INSERT": 5675,
+            "SELECT": 40837,
+            "SET": 39057,
+            "TRUNCATE": 687,
+            "UPDATE": 731,
+            "WITH": 12
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 1,
+            "invalid_encoding_or_nul": 1,
+            "unbalanced_bracket": 68,
+            "unclosed_string": 61
+          },
+          "readable": 47525,
+          "records": 47656,
+          "shapes": {
+            "batch": 43288,
+            "single": 4237
+          }
+        },
+        "inline_distinct/postgres.c:2608": {
+          "categories": {
+            "SELECT": 4
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "inline_distinct/postgres.c:2764": {
+          "categories": {
+            "CREATE TABLE": 2,
+            "DELETE": 48,
+            "INSERT": 254,
+            "SELECT": 60908,
+            "UPDATE": 48
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 12,
+            "unbalanced_bracket": 29,
+            "unclosed_string": 92
+          },
+          "readable": 61260,
+          "records": 61393,
+          "shapes": {
+            "single": 61260
+          }
+        },
+        "sql/COptTasks.cpp:299": {
+          "categories": {
+            "COMMIT": 96,
+            "COPY": 1013,
+            "CREATE EXTERNAL": 255,
+            "CREATE TABLE": 2742,
+            "DELETE": 5590,
+            "DO": 187,
+            "DROP EXTERNAL": 255,
+            "END": 444,
+            "INSERT": 28640,
+            "SELECT": 711874,
+            "TRUNCATE": 16,
+            "UPDATE": 657,
+            "WITH": 2286
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 44,
+            "unbalanced_bracket": 832,
+            "unclosed_string": 2498
+          },
+          "readable": 752350,
+          "records": 755724,
+          "shapes": {
+            "batch": 795,
+            "single": 751555
+          }
+        },
+        "sql/COptTasks.cpp:769": {
+          "categories": {
+            "COPY": 588,
+            "CREATE TABLE": 1414,
+            "DELETE": 1561,
+            "DO": 80,
+            "DROP TABLE": 32,
+            "INSERT": 42498,
+            "SELECT": 5066,
+            "UPDATE": 357
+          },
+          "empty": 0,
+          "issues": {
+            "unbalanced_bracket": 7928
+          },
+          "readable": 51564,
+          "records": 59492,
+          "shapes": {
+            "batch": 32,
+            "single": 51532
+          }
+        },
+        "sql/OTHER": {
+          "categories": {
+            "CREATE TABLE": 2,
+            "DELETE": 4,
+            "INSERT": 4,
+            "SELECT": 917,
+            "UNKNOWN": 13,
+            "UPDATE": 1,
+            "WITH": 50
+          },
+          "empty": 22486,
+          "issues": {
+            "unbalanced_bracket": 25,
+            "unclosed_comment": 1,
+            "unclosed_string": 7
+          },
+          "readable": 991,
+          "records": 23510,
+          "shapes": {
+            "single": 991
+          }
+        },
+        "sql/aclchk.c:3914": {
+          "categories": {
+            "SELECT": 23
+          },
+          "empty": 0,
+          "issues": {
+            "unclosed_string": 2
+          },
+          "readable": 23,
+          "records": 25,
+          "shapes": {
+            "single": 23
+          }
+        },
+        "sql/analyze.c:2720": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/analyze.c:3090": {
+          "categories": {
+            "UPDATE": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/analyze.c:311": {
+          "categories": {
+            "ANALYSE": 32,
+            "ANALYZE": 28
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 60,
+          "records": 60,
+          "shapes": {
+            "single": 60
+          }
+        },
+        "sql/analyze.c:868": {
+          "categories": {
+            "INSERT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/auth.c:315": {
+          "categories": {},
+          "empty": 6912,
+          "issues": {},
+          "readable": 0,
+          "records": 6912,
+          "shapes": {}
+        },
+        "sql/autostats.c:334": {
+          "categories": {
+            "ALTER TABLE": 17,
+            "ANALYZE": 9,
+            "BEGIN": 5,
+            "COMMIT": 369,
+            "COPY": 99,
+            "CREATE EXTERNAL": 255,
+            "CREATE TABLE": 38399,
+            "DELETE": 176,
+            "DROP EXTERNAL": 255,
+            "DROP TABLE": 124,
+            "INSERT": 29603,
+            "SET": 79,
+            "TRUNCATE": 779,
+            "UPDATE": 268,
+            "WITH": 8
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 272,
+            "unbalanced_bracket": 1,
+            "unclosed_string": 4
+          },
+          "readable": 67061,
+          "records": 67338,
+          "shapes": {
+            "batch": 918,
+            "single": 66143
+          }
+        },
+        "sql/bgworker_hotrange.c:424": {
+          "categories": {},
+          "empty": 1258,
+          "issues": {},
+          "readable": 0,
+          "records": 1258,
+          "shapes": {}
+        },
+        "sql/bool.c:151": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/catalogproxy.c:83": {
+          "categories": {
+            "CREATE TABLE": 28,
+            "INSERT": 3564,
+            "SELECT": 17,
+            "SET": 744
+          },
+          "empty": 351826,
+          "issues": {
+            "invalid_encoding_or_nul": 4,
+            "unbalanced_bracket": 273,
+            "unclosed_comment": 4,
+            "unclosed_string": 49
+          },
+          "readable": 3609,
+          "records": 355765,
+          "shapes": {
+            "batch": 744,
+            "single": 2865
+          }
+        },
+        "sql/cdbdisp.c:285": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/cdbgang.c:750": {
+          "categories": {},
+          "empty": 40,
+          "issues": {},
+          "readable": 0,
+          "records": 40,
+          "shapes": {}
+        },
+        "sql/cdbgang.c:816": {
+          "categories": {},
+          "empty": 2,
+          "issues": {},
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/cdbgang_async.c:219": {
+          "categories": {
+            "INSERT": 2,
+            "SELECT": 3
+          },
+          "empty": 1,
+          "issues": {},
+          "readable": 5,
+          "records": 6,
+          "shapes": {
+            "single": 5
+          }
+        },
+        "sql/cdbsreh.c:403": {
+          "categories": {
+            "INSERT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/cdbutil.c:1845": {
+          "categories": {
+            "DEALLOCATE": 1,
+            "SELECT": 1
+          },
+          "empty": 2,
+          "issues": {},
+          "readable": 2,
+          "records": 4,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/copy.c:5313": {
+          "categories": {
+            "CREATE EXTERNAL": 85,
+            "DELETE": 85,
+            "DROP EXTERNAL": 85,
+            "INSERT": 85
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 85,
+          "records": 85,
+          "shapes": {
+            "batch": 85
+          }
+        },
+        "sql/copy_hdw.c:153": {
+          "categories": {
+            "COPY": 3786,
+            "CREATE EXTERNAL": 27869
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 31655,
+          "records": 31655,
+          "shapes": {
+            "single": 31655
+          }
+        },
+        "sql/dbsize_hdw.c:110": {
+          "categories": {
+            "SELECT": 18
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 18,
+          "records": 18,
+          "shapes": {
+            "single": 18
+          }
+        },
+        "sql/dbsize_hdw.c:81": {
+          "categories": {
+            "SELECT": 18
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 18,
+          "records": 18,
+          "shapes": {
+            "single": 18
+          }
+        },
+        "sql/dbsize_hdw.c:87": {
+          "categories": {
+            "SELECT": 18
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 18,
+          "records": 18,
+          "shapes": {
+            "single": 18
+          }
+        },
+        "sql/deadlock.c:956": {
+          "categories": {
+            "DELETE": 8,
+            "SELECT": 2,
+            "UPDATE": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 12,
+          "records": 12,
+          "shapes": {
+            "single": 12
+          }
+        },
+        "sql/execUtils.c:1902": {
+          "categories": {
+            "WITH": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/formatting.c:2223": {
+          "categories": {
+            "SELECT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/formatting.c:3524": {
+          "categories": {
+            "SELECT": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/guc.c:6049": {
+          "categories": {
+            "SELECT": 8,
+            "SET": 4
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 12,
+          "records": 12,
+          "shapes": {
+            "single": 12
+          }
+        },
+        "sql/guc.c:9584": {
+          "categories": {
+            "SET ROLE": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/hba.c:2086": {
+          "categories": {},
+          "empty": 6148,
+          "issues": {},
+          "readable": 0,
+          "records": 6148,
+          "shapes": {}
+        },
+        "sql/heap.c:1486": {
+          "categories": {
+            "CREATE EXTERNAL": 17720
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 17720,
+          "records": 17720,
+          "shapes": {
+            "single": 17720
+          }
+        },
+        "sql/heap.c:587": {
+          "categories": {
+            "CREATE TABLE": 1290
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 156
+          },
+          "readable": 1290,
+          "records": 1446,
+          "shapes": {
+            "single": 1290
+          }
+        },
+        "sql/ic_udpifc.c:5909": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/indexcmds.c:735": {
+          "categories": {
+            "CREATE INDEX": 8
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 8,
+          "records": 8,
+          "shapes": {
+            "single": 8
+          }
+        },
+        "sql/invalmsg_shared.c:282": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/misc.c:116": {
+          "categories": {
+            "SELECT": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/namespace.c:259": {
+          "categories": {
+            "SELECT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/namespace.c:2951": {
+          "categories": {
+            "SELECT": 7
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 7,
+          "records": 7,
+          "shapes": {
+            "single": 7
+          }
+        },
+        "sql/namespace.c:424": {
+          "categories": {
+            "INSERT": 8,
+            "SELECT": 1938,
+            "TRUNCATE": 8
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1954,
+          "records": 1954,
+          "shapes": {
+            "single": 1954
+          }
+        },
+        "sql/nodeHash.c:868": {
+          "categories": {},
+          "empty": 0,
+          "issues": {
+            "invalid_encoding_or_nul": 5
+          },
+          "readable": 0,
+          "records": 5,
+          "shapes": {}
+        },
+        "sql/nodeModifyTable.c:923": {
+          "categories": {
+            "UPDATE": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/nodeMotion.c:197": {
+          "categories": {
+            "SELECT": 15
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 15,
+          "records": 15,
+          "shapes": {
+            "single": 15
+          }
+        },
+        "sql/numutils.c:101": {
+          "categories": {},
+          "empty": 0,
+          "issues": {
+            "unclosed_string": 1
+          },
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/numutils.c:59": {
+          "categories": {
+            "INSERT": 60
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 60,
+          "records": 60,
+          "shapes": {
+            "single": 60
+          }
+        },
+        "sql/orca.c:62": {
+          "categories": {
+            "INSERT": 2,
+            "UPDATE": 23
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 25,
+          "records": 25,
+          "shapes": {
+            "single": 25
+          }
+        },
+        "sql/parse_agg.c:1112": {
+          "categories": {
+            "SELECT": 15,
+            "WITH": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 18,
+          "records": 18,
+          "shapes": {
+            "single": 18
+          }
+        },
+        "sql/parse_agg.c:367": {
+          "categories": {
+            "SELECT": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/parse_clause.c:3047": {
+          "categories": {
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/parse_coerce.c:1421": {
+          "categories": {
+            "SELECT": 4
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "sql/parse_coerce.c:576": {
+          "categories": {
+            "WITH": 7
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 7,
+          "records": 7,
+          "shapes": {
+            "single": 7
+          }
+        },
+        "sql/parse_expr.c:1749": {
+          "categories": {
+            "SELECT": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/parse_func.c:529": {
+          "categories": {
+            "SELECT": 2,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 3,
+          "records": 3,
+          "shapes": {
+            "single": 3
+          }
+        },
+        "sql/parse_oper.c:716": {
+          "categories": {
+            "INSERT": 3,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 4,
+          "records": 4,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "sql/parse_relation.c:1040": {
+          "categories": {
+            "SELECT": 623,
+            "WITH": 3
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 626,
+          "records": 626,
+          "shapes": {
+            "single": 626
+          }
+        },
+        "sql/parse_relation.c:1061": {
+          "categories": {
+            "SELECT": 633,
+            "WITH": 5
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 638,
+          "records": 638,
+          "shapes": {
+            "single": 638
+          }
+        },
+        "sql/parse_relation.c:3351": {
+          "categories": {
+            "INSERT": 1,
+            "SELECT": 35,
+            "WITH": 2
+          },
+          "empty": 0,
+          "issues": {
+            "unclosed_string": 6
+          },
+          "readable": 38,
+          "records": 44,
+          "shapes": {
+            "single": 38
+          }
+        },
+        "sql/parse_relation.c:3376": {
+          "categories": {
+            "INSERT": 1,
+            "SELECT": 36,
+            "WITH": 12
+          },
+          "empty": 0,
+          "issues": {
+            "unclosed_string": 1
+          },
+          "readable": 49,
+          "records": 50,
+          "shapes": {
+            "single": 49
+          }
+        },
+        "sql/parse_relation.c:3390": {
+          "categories": {
+            "INSERT": 2,
+            "SELECT": 91,
+            "WITH": 8
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 101,
+          "records": 101,
+          "shapes": {
+            "single": 101
+          }
+        },
+        "sql/parse_relation.c:571": {
+          "categories": {
+            "INSERT": 1,
+            "SELECT": 4,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 6,
+          "records": 6,
+          "shapes": {
+            "single": 6
+          }
+        },
+        "sql/parse_relation.c:686": {
+          "categories": {
+            "UPDATE": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/parse_type.c:269": {
+          "categories": {
+            "SELECT": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/pg_appendonly.c:422": {
+          "categories": {
+            "ALTER TABLE": 632
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 632,
+          "records": 632,
+          "shapes": {
+            "single": 632
+          }
+        },
+        "sql/pl_exec.c:3060": {
+          "categories": {
+            "SELECT": 13447
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 13447,
+          "records": 13447,
+          "shapes": {
+            "single": 13447
+          }
+        },
+        "sql/postgres.c:1239": {
+          "categories": {
+            "CREATE TABLE": 864,
+            "DELETE": 24,
+            "INSERT": 13880,
+            "SELECT": 211,
+            "SET": 765,
+            "UPDATE": 4,
+            "WITH": 6
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 24,
+            "invalid_encoding_or_nul": 209,
+            "unbalanced_bracket": 4181,
+            "unclosed_comment": 141,
+            "unclosed_string": 1369
+          },
+          "readable": 14965,
+          "records": 20889,
+          "shapes": {
+            "batch": 789,
+            "single": 14176
+          }
+        },
+        "sql/postgres.c:1455": {
+          "categories": {
+            "CREATE TABLE": 864,
+            "DELETE": 24,
+            "INSERT": 13881,
+            "SELECT": 211,
+            "SET": 765,
+            "UPDATE": 4,
+            "WITH": 6
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 24,
+            "invalid_encoding_or_nul": 209,
+            "unbalanced_bracket": 4179,
+            "unclosed_comment": 141,
+            "unclosed_string": 1368
+          },
+          "readable": 14966,
+          "records": 20887,
+          "shapes": {
+            "batch": 789,
+            "single": 14177
+          }
+        },
+        "sql/postgres.c:1685": {
+          "categories": {
+            "ALTER TABLE": 12244,
+            "ANALYSE": 8093,
+            "ANALYZE": 23909,
+            "BEGIN": 62509,
+            "COMMIT": 76913,
+            "COPY": 4195,
+            "CREATE EXTERNAL": 28741,
+            "CREATE INDEX": 8,
+            "CREATE SEQUENCE": 37,
+            "CREATE TABLE": 72691,
+            "CREATE VIEW": 16,
+            "DEALLOCATE": 190781,
+            "DELETE": 50024,
+            "DO": 36,
+            "DROP EXTERNAL": 18963,
+            "DROP SEQUENCE": 24,
+            "DROP TABLE": 59994,
+            "DROP VIEW": 8,
+            "END": 20546,
+            "GRANT": 2255,
+            "INSERT": 193735,
+            "LOCK": 18790,
+            "ROLLBACK": 32664,
+            "SELECT": 493931,
+            "SET": 158128,
+            "SET TRANSACTION": 10149,
+            "SHOW": 283,
+            "TRUNCATE": 32159,
+            "UNKNOWN": 3,
+            "UPDATE": 22451,
+            "VACUUM": 12225,
+            "WITH": 2575
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 754,
+            "invalid_encoding_or_nul": 8,
+            "unbalanced_bracket": 61,
+            "unclosed_string": 56
+          },
+          "readable": 1572239,
+          "records": 1573118,
+          "shapes": {
+            "batch": 58105,
+            "empty_tokens": 38069,
+            "single": 1476065
+          }
+        },
+        "sql/postgres.c:1946": {
+          "categories": {
+            "ALTER TABLE": 12235,
+            "ANALYSE": 8094,
+            "ANALYZE": 23898,
+            "BEGIN": 62499,
+            "COMMIT": 76901,
+            "COPY": 4192,
+            "CREATE EXTERNAL": 10935,
+            "CREATE INDEX": 8,
+            "CREATE SEQUENCE": 37,
+            "CREATE TABLE": 72690,
+            "CREATE VIEW": 16,
+            "DEALLOCATE": 190781,
+            "DELETE": 49930,
+            "DO": 36,
+            "DROP EXTERNAL": 18878,
+            "DROP SEQUENCE": 24,
+            "DROP TABLE": 59996,
+            "DROP VIEW": 8,
+            "END": 20546,
+            "GRANT": 2255,
+            "INSERT": 193611,
+            "LOCK": 18790,
+            "ROLLBACK": 32664,
+            "SELECT": 490548,
+            "SET": 158117,
+            "SET TRANSACTION": 10149,
+            "SHOW": 283,
+            "TRUNCATE": 32151,
+            "UNKNOWN": 3,
+            "UPDATE": 22442,
+            "VACUUM": 12225,
+            "WITH": 2567
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 754,
+            "invalid_encoding_or_nul": 8,
+            "unbalanced_bracket": 61,
+            "unclosed_string": 46
+          },
+          "readable": 1550971,
+          "records": 1551840,
+          "shapes": {
+            "batch": 58011,
+            "empty_tokens": 38069,
+            "single": 1454891
+          }
+        },
+        "sql/postgres.c:2219": {
+          "categories": {
+            "BEGIN": 8753,
+            "COMMENT": 114,
+            "COMMIT": 7917,
+            "CREATE TABLE": 16,
+            "DELETE": 12033,
+            "DROP SCHEMA": 12,
+            "DROP TABLE": 9,
+            "GRANT": 2,
+            "INSERT": 40092,
+            "ROLLBACK": 1,
+            "SELECT": 217596,
+            "SET": 44294,
+            "SET ROLE": 3,
+            "SHOW": 15868,
+            "TRUNCATE": 8,
+            "UPDATE": 10867,
+            "WITH": 270
+          },
+          "empty": 1683,
+          "issues": {
+            "ambiguous_string_escape": 16,
+            "unbalanced_bracket": 11,
+            "unclosed_string": 110
+          },
+          "readable": 357855,
+          "records": 359675,
+          "shapes": {
+            "single": 357855
+          }
+        },
+        "sql/postgres.c:2224": {
+          "categories": {
+            "DELETE": 7,
+            "INSERT": 11
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 18,
+          "records": 18,
+          "shapes": {
+            "single": 18
+          }
+        },
+        "sql/postgres.c:2603": {
+          "categories": {
+            "BEGIN": 40514,
+            "COMMENT": 114,
+            "COMMIT": 8004,
+            "CREATE TABLE": 16,
+            "DELETE": 12016,
+            "DROP SCHEMA": 12,
+            "DROP TABLE": 9,
+            "GRANT": 2,
+            "INSERT": 40082,
+            "ROLLBACK": 1,
+            "SELECT": 276399,
+            "SET": 44294,
+            "SET ROLE": 3,
+            "SHOW": 15868,
+            "TRUNCATE": 8,
+            "UPDATE": 19026,
+            "WITH": 260
+          },
+          "empty": 16216,
+          "issues": {
+            "ambiguous_string_escape": 16,
+            "unbalanced_bracket": 11,
+            "unclosed_string": 110
+          },
+          "readable": 456628,
+          "records": 472981,
+          "shapes": {
+            "single": 456628
+          }
+        },
+        "sql/postgres.c:2608": {
+          "categories": {
+            "DELETE": 24,
+            "INSERT": 20,
+            "SELECT": 9,
+            "WITH": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 54,
+          "records": 54,
+          "shapes": {
+            "single": 54
+          }
+        },
+        "sql/postgres.c:2764": {
+          "categories": {
+            "BEGIN": 40514,
+            "COMMENT": 114,
+            "COMMIT": 8004,
+            "CREATE TABLE": 16,
+            "DELETE": 12040,
+            "DROP SCHEMA": 12,
+            "DROP TABLE": 9,
+            "GRANT": 2,
+            "INSERT": 40102,
+            "ROLLBACK": 1,
+            "SELECT": 276447,
+            "SET": 44294,
+            "SET ROLE": 3,
+            "SHOW": 15868,
+            "TRUNCATE": 8,
+            "UPDATE": 19026,
+            "WITH": 499
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 16,
+            "unbalanced_bracket": 11,
+            "unclosed_string": 110
+          },
+          "readable": 456959,
+          "records": 457096,
+          "shapes": {
+            "single": 456959
+          }
+        },
+        "sql/postgres.c:2843": {
+          "categories": {
+            "BEGIN": 40514,
+            "COMMENT": 114,
+            "COMMIT": 8004,
+            "CREATE TABLE": 16,
+            "DELETE": 12040,
+            "DROP SCHEMA": 12,
+            "DROP TABLE": 9,
+            "GRANT": 2,
+            "INSERT": 40103,
+            "ROLLBACK": 1,
+            "SELECT": 276426,
+            "SET": 44294,
+            "SHOW": 15868,
+            "TRUNCATE": 8,
+            "UPDATE": 19027,
+            "WITH": 498
+          },
+          "empty": 0,
+          "issues": {
+            "ambiguous_string_escape": 16,
+            "unbalanced_bracket": 11,
+            "unclosed_string": 110
+          },
+          "readable": 456936,
+          "records": 457073,
+          "shapes": {
+            "single": 456936
+          }
+        },
+        "sql/postgres.c:3835": {
+          "categories": {
+            "INSERT": 1,
+            "SELECT": 2,
+            "UNKNOWN": 1
+          },
+          "empty": 9607,
+          "issues": {},
+          "readable": 4,
+          "records": 9611,
+          "shapes": {
+            "single": 4
+          }
+        },
+        "sql/postgres.c:3851": {
+          "categories": {
+            "SELECT": 17
+          },
+          "empty": 41,
+          "issues": {},
+          "readable": 17,
+          "records": 58,
+          "shapes": {
+            "single": 17
+          }
+        },
+        "sql/postgres.c:3885": {
+          "categories": {
+            "ANALYZE": 4,
+            "INSERT": 2,
+            "SELECT": 48,
+            "WITH": 2
+          },
+          "empty": 29,
+          "issues": {
+            "unbalanced_bracket": 1,
+            "unclosed_string": 1
+          },
+          "readable": 56,
+          "records": 87,
+          "shapes": {
+            "single": 56
+          }
+        },
+        "sql/postgres.c:3955": {
+          "categories": {
+            "ANALYZE": 4,
+            "INSERT": 2,
+            "SELECT": 13
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 19,
+          "records": 19,
+          "shapes": {
+            "single": 19
+          }
+        },
+        "sql/postgres.c:3999": {
+          "categories": {},
+          "empty": 0,
+          "issues": {
+            "unbalanced_bracket": 1,
+            "unclosed_string": 1
+          },
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/postgres.c:4013": {
+          "categories": {
+            "SELECT": 35,
+            "WITH": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 37,
+          "records": 37,
+          "shapes": {
+            "single": 37
+          }
+        },
+        "sql/postgres.c:446": {
+          "categories": {},
+          "empty": 4,
+          "issues": {},
+          "readable": 0,
+          "records": 4,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2209": {
+          "categories": {},
+          "empty": 2,
+          "issues": {},
+          "readable": 0,
+          "records": 2,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2713": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2721": {
+          "categories": {},
+          "empty": 95,
+          "issues": {},
+          "readable": 0,
+          "records": 95,
+          "shapes": {}
+        },
+        "sql/postmaster.c:2737": {
+          "categories": {},
+          "empty": 10,
+          "issues": {},
+          "readable": 0,
+          "records": 10,
+          "shapes": {}
+        },
+        "sql/pqcomm.c:1572": {
+          "categories": {
+            "SELECT": 24
+          },
+          "empty": 35,
+          "issues": {},
+          "readable": 24,
+          "records": 59,
+          "shapes": {
+            "single": 24
+          }
+        },
+        "sql/pqcomm.c:935": {
+          "categories": {},
+          "empty": 42,
+          "issues": {},
+          "readable": 0,
+          "records": 42,
+          "shapes": {}
+        },
+        "sql/rpc.c:246": {
+          "categories": {
+            "CREATE TABLE": 1
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 1,
+          "records": 1,
+          "shapes": {
+            "single": 1
+          }
+        },
+        "sql/syslogger.c:742": {
+          "categories": {},
+          "empty": 1,
+          "issues": {},
+          "readable": 0,
+          "records": 1,
+          "shapes": {}
+        },
+        "sql/tablecmds.c:15822": {
+          "categories": {
+            "ALTER TABLE": 2426,
+            "ANALYZE": 1522,
+            "BEGIN": 1514,
+            "COMMIT": 1514,
+            "END": 12,
+            "INSERT": 1514,
+            "SELECT": 124,
+            "SET": 1514
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2550,
+          "records": 2550,
+          "shapes": {
+            "batch": 1530,
+            "single": 1020
+          }
+        },
+        "sql/varchar.c:620": {
+          "categories": {
+            "UPDATE": 2
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 2,
+          "records": 2,
+          "shapes": {
+            "single": 2
+          }
+        },
+        "sql/variable.c:605": {
+          "categories": {
+            "SET TRANSACTION": 10149
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 10149,
+          "records": 10149,
+          "shapes": {
+            "single": 10149
+          }
+        },
+        "sql/varsup.c:79": {
+          "categories": {
+            "ALTER TABLE": 11231,
+            "ANALYSE": 15648,
+            "ANALYZE": 23336,
+            "BEGIN": 2520,
+            "COMMENT": 114,
+            "COMMIT": 5120,
+            "COPY": 339,
+            "CREATE EXTERNAL": 9616,
+            "CREATE SEQUENCE": 37,
+            "CREATE TABLE": 28181,
+            "CREATE VIEW": 16,
+            "DELETE": 52615,
+            "DO": 16,
+            "DROP EXTERNAL": 10219,
+            "DROP SCHEMA": 3,
+            "DROP SEQUENCE": 8,
+            "DROP TABLE": 2252,
+            "DROP VIEW": 8,
+            "END": 12,
+            "GRANT": 2257,
+            "INSERT": 155465,
+            "SELECT": 11858,
+            "SET": 2411,
+            "TRUNCATE": 24262,
+            "UPDATE": 38036,
+            "VACUUM": 10835,
+            "WITH": 24
+          },
+          "empty": 31025,
+          "issues": {
+            "ambiguous_string_escape": 379,
+            "invalid_encoding_or_nul": 8,
+            "unbalanced_bracket": 68,
+            "unclosed_string": 141
+          },
+          "readable": 380847,
+          "records": 412468,
+          "shapes": {
+            "batch": 7785,
+            "single": 373062
+          }
+        },
+        "sql/xact.c:4440": {
+          "categories": {
+            "BEGIN": 24
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 24,
+          "records": 24,
+          "shapes": {
+            "single": 24
+          }
+        },
+        "sql/xact.c:4615": {
+          "categories": {
+            "COMMIT": 19180,
+            "DELETE": 920,
+            "END": 16281,
+            "INSERT": 3128,
+            "TRUNCATE": 328,
+            "UPDATE": 668
+          },
+          "empty": 0,
+          "issues": {},
+          "readable": 35165,
+          "records": 35165,
+          "shapes": {
+            "batch": 2036,
+            "single": 33129
+          }
+        },
+        "sql/xlog_kv.c:194": {
+          "categories": {},
+          "empty": 1152,
+          "issues": {},
+          "readable": 0,
+          "records": 1152,
+          "shapes": {}
+        }
+      },
+      "scan_seconds": 170.591
+    }
+  },
+  "purpose": "lexical observations only; not execution counts or blacklist decisions",
+  "replay_targets": [
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 129558,
+      "line_start": 128098,
+      "origin": "postgres.c:1685",
+      "record": 9044,
+      "sql_sha256": "7754546c287fb3685b757274b1a1fe01c2a0b793a4779f3f08db6bc510789f53",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1127474,
+      "line_start": 1127188,
+      "origin": "postgres.c:1685",
+      "record": 167129,
+      "sql_sha256": "8aa72b21e4096d7eba1a0220560befc3e0135accf9f3a39c3f7a4ae5c5576b0c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 76493,
+      "line_start": 75203,
+      "origin": "postgres.c:1685",
+      "record": 5299,
+      "sql_sha256": "6b550a665949b3f7a25a97e848ae3b5b79a1150dcff9c6cdfaa00818f20aa67c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > TRUNCATE > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 218202,
+      "line_start": 217868,
+      "origin": "postgres.c:1685",
+      "record": 16253,
+      "sql_sha256": "69f9ffa25e99c403039cf0381473bfb2657cb73624bef4b3383e27898b4fc249",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 123548,
+      "line_start": 122842,
+      "origin": "postgres.c:1685",
+      "record": 9037,
+      "sql_sha256": "551f5787951f517e5b4293a54fc8509abf574ff9c4bac7b1ad3f28f221d99a9e",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 215467,
+      "line_start": 215205,
+      "origin": "postgres.c:1685",
+      "record": 15937,
+      "sql_sha256": "33040e1738110cfcfbddf52a92f53cb7b6e4b9c728050b1c8d97e0ec4efeb964",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 62855,
+      "line_start": 62407,
+      "origin": "postgres.c:1685",
+      "record": 4831,
+      "sql_sha256": "5db67bfa93444702c7d259db0b29d88fddd750875bcbf568355fb729a06de2b3",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > INSERT > INSERT > END",
+        "inline_distinct/category:CREATE TABLE",
+        "inline_distinct/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 24875,
+      "line_start": 24515,
+      "origin": "postgres.c:1685",
+      "record": 2666,
+      "sql_sha256": "e203fb3a468d841cd51e8c57fe85c08e3d610d9ba8e7525766efea11ed8fb854",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 55577,
+      "line_start": 54931,
+      "origin": "postgres.c:1685",
+      "record": 4248,
+      "sql_sha256": "17763d2f064e46b796e6bc5aacd86a8a75b250a1df2ca25e91d71768625adc7b",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 78037,
+      "line_start": 77141,
+      "origin": "postgres.c:1685",
+      "record": 5302,
+      "sql_sha256": "cc8483ceb9d3284f6cb8c569aa63296ad6fc7c3a7a59ba30993a7ac00259b6e4",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > TRUNCATE > INSERT > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 298888,
+      "line_start": 298712,
+      "origin": "postgres.c:1685",
+      "record": 29634,
+      "sql_sha256": "0a436b8b7b47020222dc845ba481e00f9c521a88f4e8de4152f1d20a1f3f88ee",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DROP TABLE > CREATE TABLE > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 125859,
+      "line_start": 123549,
+      "origin": "postgres.c:1685",
+      "record": 9038,
+      "sql_sha256": "b8bfeeb9d86da78c0e469fd4071f145db63aba45538bf8049568c93d7136f96c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DROP TABLE > DROP TABLE > DROP TABLE > DROP TABLE > DROP TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 1162371,
+      "line_start": 1162371,
+      "origin": "postgres.c:2764",
+      "record": 92832,
+      "sql_sha256": "1a5f5d272b222e4493df3ef9392f030e57a49923940e0a49e033a47109765625",
+      "tags": [
+        "inline_distinct/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "TRUNCATE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 18893,
+      "line_start": 18301,
+      "origin": "postgres.c:1685",
+      "record": 2565,
+      "sql_sha256": "4248267d34a6e3b4e248c3aa4bfe71b1c1a5eb529849730cd8d61070d36a70f3",
+      "tags": [
+        "inline_distinct/category:BEGIN",
+        "inline_distinct/category:END",
+        "inline_distinct/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 13929,
+      "line_start": 13197,
+      "origin": "postgres.c:1685",
+      "record": 2515,
+      "sql_sha256": "3f3c4252b950675a3d932dbd96fe6f7eefaaf2d043ee915f02c2fd7992e1568c",
+      "tags": [
+        "inline_distinct/category:DELETE",
+        "inline_distinct/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1080099,
+      "line_start": 1080001,
+      "origin": "postgres.c:1685",
+      "record": 139213,
+      "sql_sha256": "b7da4c88f722366c6ec2fc9f2b0a1728c862d7b3ac2b701e4a4e1e4d1df57e46",
+      "tags": [
+        "inline_distinct/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 57,
+      "line_start": 57,
+      "origin": "postgres.c:1685",
+      "record": 21,
+      "sql_sha256": "a5d3ad5cba644e88c7fcddb113487793bf2c75150522e1b8cf5abb99b82c8b61",
+      "tags": [
+        "inline_distinct/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 431,
+      "line_start": 203,
+      "origin": "postgres.c:1685",
+      "record": 134,
+      "sql_sha256": "fa4c5cfe2ef78bdcbefb70190d1acdfd1e0d4b3757ec266063333638afbe1c0e",
+      "tags": [
+        "inline_distinct/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-16_000000.csv",
+      "issues": [],
+      "line_end": 1548018,
+      "line_start": 1547964,
+      "origin": "postgres.c:1685",
+      "record": 166752,
+      "sql_sha256": "e82a4d30fdf1071b9ef3f0289458fce3f3b4eba37e981a73ab2169a7217933cc",
+      "tags": [
+        "inline_distinct/category:WITH"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 238247,
+      "line_start": 238169,
+      "origin": "postgres.c:1239",
+      "record": 18207,
+      "sql_sha256": "3acd8657bf899a20b1db5847344f7104f948743b4336cc8a951dd56f2deaf01c",
+      "tags": [
+        "inline_distinct/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE",
+        "COMMENT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-08_000000.csv",
+      "issues": [],
+      "line_end": 1727171,
+      "line_start": 1727167,
+      "origin": "postgres.c:1685",
+      "record": 163686,
+      "sql_sha256": "57251f766fbafd21edcc732ad3398deb23d1cd33ee466986db539f79a4ca65c9",
+      "tags": [
+        "sql/batch:ALTER TABLE > COMMENT",
+        "sql/category:COMMENT"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 129558,
+      "line_start": 128098,
+      "origin": "postgres.c:1685",
+      "record": 9044,
+      "sql_sha256": "dbd142d85bcba113b54965ae0eb34b3b1bf5f5e8136463cc7d3981e312a54c13",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1127474,
+      "line_start": 1127188,
+      "origin": "postgres.c:1685",
+      "record": 167129,
+      "sql_sha256": "8b6fe699a8be80ebd10277bf14e2c97c770677c787dc812949fec349dc031cff",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 76493,
+      "line_start": 75203,
+      "origin": "postgres.c:1685",
+      "record": 5299,
+      "sql_sha256": "4e0eabcb1eeb72ae75c922c6823a019aadc8542b1683e71548609fa5e2adf617",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > TRUNCATE > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 218202,
+      "line_start": 217868,
+      "origin": "postgres.c:1685",
+      "record": 16253,
+      "sql_sha256": "c9c24d7a3cbd5248397f92300f851b48c776f11b2e93f1d1fcac2661c3f3e4fe",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 123548,
+      "line_start": 122842,
+      "origin": "postgres.c:1685",
+      "record": 9037,
+      "sql_sha256": "84d60f4b3d308a0ced7e373c2367760299f4322aa1db6ae458b0bc95cc469b2c",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 215467,
+      "line_start": 215205,
+      "origin": "postgres.c:1685",
+      "record": 15937,
+      "sql_sha256": "7942c430efad962f6a349546c012f4fe252b4d32f0770db9aad58f2391e81b45",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 62855,
+      "line_start": 62407,
+      "origin": "postgres.c:1685",
+      "record": 4831,
+      "sql_sha256": "6010aadf24f7903a925d9f674f115531418173a5a692cd6732d563fe63fa573b",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > INSERT > INSERT > END",
+        "sql/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 24875,
+      "line_start": 24515,
+      "origin": "postgres.c:1685",
+      "record": 2666,
+      "sql_sha256": "b3a53ed1af6b702f7bb0bb19ff980d290cdd30a0e630bd189af988d39b6a2097",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 55577,
+      "line_start": 54931,
+      "origin": "postgres.c:1685",
+      "record": 4248,
+      "sql_sha256": "85f1abc45e024cb6737878bd060f189ed79279c624483fdb69ca3ad918f50527",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 78037,
+      "line_start": 77141,
+      "origin": "postgres.c:1685",
+      "record": 5302,
+      "sql_sha256": "45b1b79b116ada3dc13b705f8e52d9e5589e2b52ccbc86e75b4774a4f65ea381",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > TRUNCATE > INSERT > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 298888,
+      "line_start": 298712,
+      "origin": "postgres.c:1685",
+      "record": 29634,
+      "sql_sha256": "5d27e7d8bbe5fe9c36317224a3f3fc856d985b52ab53b573068f1f4041dc5592",
+      "tags": [
+        "sql/batch:BEGIN > DROP TABLE > CREATE TABLE > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 50151,
+      "line_start": 50149,
+      "origin": "postgres.c:1685",
+      "record": 3766,
+      "sql_sha256": "4fcee1d24f9de92a6af0030c01ce59d587d099bb0cdcf2a6881c32a763b468b3",
+      "tags": [
+        "sql/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYSE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1139462,
+      "line_start": 1139462,
+      "origin": "postgres.c:1685",
+      "record": 174641,
+      "sql_sha256": "61fb60639acfa2d00882446c8d385a0ea6b1499a497c5e98651e9bbc58157faf",
+      "tags": [
+        "sql/category:ANALYSE"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 2401,
+      "line_start": 2401,
+      "origin": "postgres.c:1685",
+      "record": 302,
+      "sql_sha256": "3f12d6f40a5adcb764250af27236387fee40bbfe82696cb6788dee1afbf93049",
+      "tags": [
+        "sql/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 110,
+      "line_start": 110,
+      "origin": "postgres.c:1685",
+      "record": 56,
+      "sql_sha256": "edd65695b320db381bb184e32a5dfcc16b4d4c822f560f090224bb840c63958b",
+      "tags": [
+        "sql/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "COMMIT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 162,
+      "line_start": 162,
+      "origin": "postgres.c:1685",
+      "record": 108,
+      "sql_sha256": "364647c86405c505850634a548a540e7738f7690d7e5f7d744edf0ba1dbbc575",
+      "tags": [
+        "sql/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "COPY"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 1871,
+      "line_start": 1871,
+      "origin": "postgres.c:1685",
+      "record": 204,
+      "sql_sha256": "810f0985625d32ad6c6c969cd7f09f9116c07db9ed5f67ae840c4ae2ecd56f9c",
+      "tags": [
+        "sql/category:COPY"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE EXTERNAL"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 646,
+      "line_start": 646,
+      "origin": "postgres.c:1685",
+      "record": 162,
+      "sql_sha256": "bee22d528bf56b9e78a4962305e03eb50c98278620ec9c7436aaf53ae15d0fe0",
+      "tags": [
+        "sql/category:CREATE EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 3038,
+      "line_start": 2978,
+      "origin": "postgres.c:1685",
+      "record": 463,
+      "sql_sha256": "c8903c31c3605a6363f06d7af6ed5e09b0f637e6336bb6cc5b8593e1d2f95fc7",
+      "tags": [
+        "sql/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "DEALLOCATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 175,
+      "line_start": 175,
+      "origin": "postgres.c:1685",
+      "record": 121,
+      "sql_sha256": "60382568e31c80b9b37a63f0fbb7fde6ca2e1285cc7ad96deaa2ad448a629e54",
+      "tags": [
+        "sql/category:DEALLOCATE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 6,
+      "line_start": 6,
+      "origin": "postgres.c:1685",
+      "record": 6,
+      "sql_sha256": "6ac23da89592ce2242593dcd70b08d072a53f223cbf1319aa0d9b3ceea2422b3",
+      "tags": [
+        "sql/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1080099,
+      "line_start": 1080001,
+      "origin": "postgres.c:1685",
+      "record": 139213,
+      "sql_sha256": "e4518944bbbb759d0e3fd02645158786071c0fc2186fe3da8d8927b89933071a",
+      "tags": [
+        "sql/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 2352,
+      "line_start": 2352,
+      "origin": "postgres.c:1685",
+      "record": 280,
+      "sql_sha256": "870d819a91ead27ff34cffa41d7d9e28172ebd474a303dba4e1378b8ec8b5e23",
+      "tags": [
+        "sql/category:DROP EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 3201,
+      "line_start": 3201,
+      "origin": "postgres.c:1685",
+      "record": 479,
+      "sql_sha256": "4e3641a87137fea13b3f561e7c0c1c217b7ddb5826639d333bf1816959352091",
+      "tags": [
+        "sql/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "GRANT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "issues": [],
+      "line_end": 1184756,
+      "line_start": 1184756,
+      "origin": "postgres.c:1685",
+      "record": 183874,
+      "sql_sha256": "b72b5258ffc16227e63bc11c4e469c62c291bbea36ae41cbe5be7ce90cfd350a",
+      "tags": [
+        "sql/category:GRANT"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "INSERT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 97,
+      "line_start": 97,
+      "origin": "postgres.c:1685",
+      "record": 43,
+      "sql_sha256": "bcd27e73a27bd2df2fc9303c2933851820f4b214cdfa607acb62f72c09e13353",
+      "tags": [
+        "sql/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 14,
+      "line_start": 14,
+      "origin": "postgres.c:1685",
+      "record": 14,
+      "sql_sha256": "ca483a67591a61ae704cf5506fcfe5d3764dde9a32851d3c6442aae10f8087d2",
+      "tags": [
+        "sql/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "SET"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 3,
+      "line_start": 3,
+      "origin": "postgres.c:1685",
+      "record": 3,
+      "sql_sha256": "8c0c26edd491cd878ef2929aecf29203b40ca1dbbe2afbd73d775b3d0ea971b8",
+      "tags": [
+        "sql/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "SET TRANSACTION"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 2349,
+      "line_start": 2349,
+      "origin": "postgres.c:1685",
+      "record": 277,
+      "sql_sha256": "a2ed0cad371dca3dcff1b4bd9d46aceea5dbecab00b9a959e9a9931f5e5deda0",
+      "tags": [
+        "sql/category:SET TRANSACTION"
+      ]
+    },
+    {
+      "categories": [
+        "SHOW"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 138,
+      "line_start": 138,
+      "origin": "postgres.c:2219",
+      "record": 84,
+      "sql_sha256": "796e4e765b73e39b59f72474cc26fce679354ccabe0e3fb587e94af61c8f1d1d",
+      "tags": [
+        "sql/category:SHOW"
+      ]
+    },
+    {
+      "categories": [
+        "TRUNCATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 2281,
+      "line_start": 2281,
+      "origin": "postgres.c:1685",
+      "record": 234,
+      "sql_sha256": "f03766ee3a9fa2fbb19133c933161be05978f8b49e7532c90edabc9b635fd922",
+      "tags": [
+        "sql/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "UNKNOWN"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-22_000000.csv",
+      "issues": [],
+      "line_end": 1547171,
+      "line_start": 1547171,
+      "origin": "OTHER",
+      "record": 162330,
+      "sql_sha256": "6b02d2fdec374dabb5e27ffca341eb02b95a394be34741e48eaffa90ac955267",
+      "tags": [
+        "sql/category:UNKNOWN"
+      ]
+    },
+    {
+      "categories": [
+        "UPDATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 36715,
+      "line_start": 36695,
+      "origin": "postgres.c:1685",
+      "record": 2924,
+      "sql_sha256": "acf4dbea7b59173fc6d35c5df29109148df6f038496b8baba31b556d2a673e57",
+      "tags": [
+        "sql/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "VACUUM"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 5462,
+      "line_start": 5462,
+      "origin": "postgres.c:1685",
+      "record": 853,
+      "sql_sha256": "dad51b605707e9f3852053353ccf347fa880389923ce6004e53579811d5b5a61",
+      "tags": [
+        "sql/category:VACUUM"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [],
+      "line_end": 51,
+      "line_start": 15,
+      "origin": "postgres.c:1685",
+      "record": 15,
+      "sql_sha256": "29c988ece95c1e69035f2495d9614b1dd8992b168e793b3e4ceed243076a1ef5",
+      "tags": [
+        "sql/category:WITH"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 780840,
+      "line_start": 780832,
+      "origin": "postgres.c:1685",
+      "record": 64256,
+      "sql_sha256": "ded65cef8bd3b330c3885e90a46b1ea915025ff670583cee7bd5fb1ae4b860b3",
+      "tags": [
+        "sql/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 148857,
+      "line_start": 148826,
+      "origin": "postgres.c:1239",
+      "record": 9223,
+      "sql_sha256": "62eb39a8faf7d467ac14af6c9d1d1c85bad0906c8702a129c31c95710646ebef",
+      "tags": [
+        "sql/issue:invalid_encoding_or_nul"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 204850,
+      "line_start": 204820,
+      "origin": "postgres.c:1239",
+      "record": 13854,
+      "sql_sha256": "250a2891a2c7f9f756f38749f6cefd5ec8c61b86de39218aec7034edad90270b",
+      "tags": [
+        "sql/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "unclosed_comment"
+      ],
+      "line_end": 732372,
+      "line_start": 732352,
+      "origin": "postgres.c:1239",
+      "record": 57340,
+      "sql_sha256": "aed6af2f6e4654db6fce5f9875364794d050445e091d1c1e0b70a8de1c4f6cb2",
+      "tags": [
+        "sql/issue:unclosed_comment"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 275583,
+      "line_start": 275501,
+      "origin": "postgres.c:1239",
+      "record": 27652,
+      "sql_sha256": "965dd9370a3ca6f62a4e93e968c0ae4d7975c64ed6691986acd2477c39404501",
+      "tags": [
+        "sql/issue:unclosed_string"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4469703,
+      "line_start": 4469619,
+      "origin": "postgres.c:1685",
+      "record": 393868,
+      "sql_sha256": "b627910a1e3cde5c72fdb65b91091fd5945af39a9993d4534a985a00aedb6a83",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE",
+        "ALTER TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 1369489,
+      "line_start": 1369475,
+      "origin": "postgres.c:1685",
+      "record": 64320,
+      "sql_sha256": "1f9d16f11ed7424815431e454cbe7cf2acbcadc241195416da7368f1418ba8da",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > ALTER TABLE > ALTER TABLE > CREATE TABLE > ALTER TABLE",
+        "inline_distinct/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4395006,
+      "line_start": 4394892,
+      "origin": "postgres.c:1685",
+      "record": 392561,
+      "sql_sha256": "f577c1cd7c6371169a8bb6f4ead53fbc80370009f802c7a4a81cd0bace88029b",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4485743,
+      "line_start": 4485539,
+      "origin": "postgres.c:1685",
+      "record": 394051,
+      "sql_sha256": "6dcf5eaa7b9d28510eb86e5ddc1a12b8eafc45d71d5ea3ceac617247a9d51e85",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4409977,
+      "line_start": 4409971,
+      "origin": "postgres.c:1685",
+      "record": 392779,
+      "sql_sha256": "4e03024644c1a8f7b031cdc0006219da77f766a1d5b8706a9b7d7c2ef475963a",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3583830,
+      "line_start": 3583032,
+      "origin": "postgres.c:1685",
+      "record": 471626,
+      "sql_sha256": "8fa2825510d3916d6ebbde9f38ebbc42b052f3e9c69b34513d8d7750cef0594c",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > DELETE > DELETE > INSERT > INSERT > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3614630,
+      "line_start": 3614470,
+      "origin": "postgres.c:1685",
+      "record": 474766,
+      "sql_sha256": "6a842e7b1e8d99f6d1d599bc51c17582255a41ba8106e1d2c62090e3879d5dfb",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3630815,
+      "line_start": 3630723,
+      "origin": "postgres.c:1685",
+      "record": 476242,
+      "sql_sha256": "c90ccbb031efe9e598b9ce25fd2c75186eb84515653da9f73eda7e74d671fb79",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3158576,
+      "line_start": 3158308,
+      "origin": "postgres.c:1685",
+      "record": 425892,
+      "sql_sha256": "5509886e8a280951b69e93cd307f92a9db871732b0dc8a68255fdc5997e70c53",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 1250913,
+      "line_start": 1250871,
+      "origin": "postgres.c:1685",
+      "record": 54258,
+      "sql_sha256": "dd27ec51a56763e3ecc9d5cd97fc0bc8fdc12f3c1edda78b26004e4e03a71d58",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 560475,
+      "line_start": 560403,
+      "origin": "postgres.c:1685",
+      "record": 72621,
+      "sql_sha256": "1556c66e5db928ed83c9e3a70d343e21e4c9ea6a3fec8710363d555b3632e38c",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT",
+        "COMMIT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 2432531,
+      "line_start": 2432461,
+      "origin": "postgres.c:1685",
+      "record": 354573,
+      "sql_sha256": "c42f465ec8446be8ad1aaafce0c1e046178bd1acffeb565eaac5ab1280c3e351",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT > COMMIT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "END",
+        "ALTER TABLE",
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2573979,
+      "line_start": 2573973,
+      "origin": "postgres.c:1685",
+      "record": 213516,
+      "sql_sha256": "5eefb01dbab2e0991fc0ea1ad6f9b538dfc1ab086add3e5c0ba43adfb087d02e",
+      "tags": [
+        "inline_distinct/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2568000,
+      "line_start": 2567996,
+      "origin": "postgres.c:1685",
+      "record": 213388,
+      "sql_sha256": "a97bfa5a7174055065aa4427c0280b4a55337067e63f1da060c5afeb4b9dbe23",
+      "tags": [
+        "inline_distinct/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 479164,
+      "line_start": 479154,
+      "origin": "postgres.c:1685",
+      "record": 66931,
+      "sql_sha256": "e1b7e4739dd4f30eebbc8e90326c9bf647121797816db6d2a1de8c87c4cf8f7a",
+      "tags": [
+        "inline_distinct/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "INSERT",
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 129814,
+      "line_start": 129796,
+      "origin": "postgres.c:1685",
+      "record": 5669,
+      "sql_sha256": "6980599985a27e6602c54cac74af9bbba394d4ad515edcc1d805615d7d6d082c",
+      "tags": [
+        "inline_distinct/category:CREATE EXTERNAL",
+        "inline_distinct/category:DROP EXTERNAL",
+        "inline_distinct/category:INSERT",
+        "inline_distinct/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 177056,
+      "line_start": 177042,
+      "origin": "postgres.c:1685",
+      "record": 7146,
+      "sql_sha256": "a20940f5ca2422561f6f207cf6f595b9cdbb2f0f1eda7ac28fabc923f6a9c107",
+      "tags": [
+        "inline_distinct/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 374038,
+      "line_start": 374026,
+      "origin": "postgres.c:1685",
+      "record": 17574,
+      "sql_sha256": "4b94bef9958cc19a0506e13698e7e1242924e7378a84589c3b7795f0a580f398",
+      "tags": [
+        "inline_distinct/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 509956,
+      "line_start": 509942,
+      "origin": "postgres.c:1685",
+      "record": 22992,
+      "sql_sha256": "558be68741ba30a25ef72350a92438d279687b8592e36bef58b9cf566838d74b",
+      "tags": [
+        "inline_distinct/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2569167,
+      "line_start": 2569163,
+      "origin": "postgres.c:1685",
+      "record": 213409,
+      "sql_sha256": "0862032287c6c5e6e8676c32cd925efbb82e6e44ad59c05d83844b589129728f",
+      "tags": [
+        "inline_distinct/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 64494,
+      "line_start": 64470,
+      "origin": "postgres.c:2764",
+      "record": 3427,
+      "sql_sha256": "e247a0bffd9f1799b576d33a6945926f4e3383bf2babded699b10674099ccad5",
+      "tags": [
+        "inline_distinct/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 173844,
+      "line_start": 173616,
+      "origin": "postgres.c:1685",
+      "record": 6923,
+      "sql_sha256": "6e1d5bd198d4ace297ed17edc0cbefe9ee01cf244c5f41223bb6ddaec0495955",
+      "tags": [
+        "inline_distinct/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "TRUNCATE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 313595,
+      "line_start": 313583,
+      "origin": "postgres.c:1685",
+      "record": 15059,
+      "sql_sha256": "31d9bee1bd6b796532f598495ab6f9bccab01486917ee556d08750197127b4c4",
+      "tags": [
+        "inline_distinct/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SET",
+        "WITH"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 69587,
+      "line_start": 69385,
+      "origin": "postgres.c:1685",
+      "record": 4519,
+      "sql_sha256": "c8a1f4829d4cdbf984298b0919754c44d4dabba94c3e2cbb73c3e2d370e701f6",
+      "tags": [
+        "inline_distinct/category:WITH"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.2",
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 2021179,
+      "line_start": 2021163,
+      "origin": "postgres.c:2764",
+      "record": 7877,
+      "sql_sha256": "8b0e9daa2a6fe2685fa7ce01c1ff0607f916e707510f95be1fbf66a2438cf3be",
+      "tags": [
+        "inline_distinct/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-17_000000.csv.1",
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 4315311,
+      "line_start": 4314569,
+      "origin": "postgres.c:1685",
+      "record": 441603,
+      "sql_sha256": "418d3c76b25e14a441a083324ded25bd92a4a32a204293f9f9385616e1fe35ae",
+      "tags": [
+        "inline_distinct/issue:invalid_encoding_or_nul"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 342400,
+      "line_start": 338935,
+      "origin": "postgres.c:1685",
+      "record": 16668,
+      "sql_sha256": "17eff5b64ac4af48c2f005a67230242d4dc6ddcad27710196b499207bf2f2a19",
+      "tags": [
+        "inline_distinct/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 783407,
+      "line_start": 781109,
+      "origin": "postgres.c:1685",
+      "record": 44102,
+      "sql_sha256": "aea78a7f6642a0d17bb7302ee8d5ea5862669135e02b72282c9514609dd41cdd",
+      "tags": [
+        "inline_distinct/issue:unclosed_string"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE",
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 5580335,
+      "line_start": 5580335,
+      "origin": "postgres.c:1685",
+      "record": 541784,
+      "sql_sha256": "4184e518f57c9e8b1201baaea383599d2529e30b9d1ee8c4a49e6c4098fb2054",
+      "tags": [
+        "sql/batch:ALTER TABLE > ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 6195310,
+      "line_start": 6195298,
+      "origin": "postgres.c:1685",
+      "record": 599631,
+      "sql_sha256": "16bf595bce84f867f246df907b8ac67af5bf1998ce648ea153d973b665f69d50",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 6713225,
+      "line_start": 6713215,
+      "origin": "postgres.c:1685",
+      "record": 645854,
+      "sql_sha256": "d38d9c5f46c750efb52b08ee88f5ffe98e6ba6d94c0e1713bf88914cb6427d0a",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4469703,
+      "line_start": 4469619,
+      "origin": "postgres.c:1685",
+      "record": 393868,
+      "sql_sha256": "88d7b97c19e300da33a231ff6e8bc7d425f7cdaf9aa804f727bb9cec16b4c3c0",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE",
+        "ALTER TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 1369489,
+      "line_start": 1369475,
+      "origin": "postgres.c:1685",
+      "record": 64320,
+      "sql_sha256": "682b1190953aeb31a238d9c6569798859bd1d3d8e06aada195cba39e9601615d",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > ALTER TABLE > ALTER TABLE > CREATE TABLE > ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4395006,
+      "line_start": 4394892,
+      "origin": "postgres.c:1685",
+      "record": 392561,
+      "sql_sha256": "e436728671b377b5ad36ea073248aa271ad1d7d3bc1c58b594ba66d88a029cbf",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4485743,
+      "line_start": 4485539,
+      "origin": "postgres.c:1685",
+      "record": 394051,
+      "sql_sha256": "ca3fb4f29bd537e80fbc845e421e1f9c1e0221f56e124f733137bb3467bc798a",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 4409977,
+      "line_start": 4409971,
+      "origin": "postgres.c:1685",
+      "record": 392779,
+      "sql_sha256": "3954c141553fd8b2ee487ed46fc3532f10b9ffb22679b12619fdfa387f9f4fc3",
+      "tags": [
+        "sql/batch:DELETE > DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3583830,
+      "line_start": 3583032,
+      "origin": "postgres.c:1685",
+      "record": 471626,
+      "sql_sha256": "d103ec7435798163b3bfdced24e4e7d6e1a275bb9d09897c2701989d9798ea29",
+      "tags": [
+        "sql/batch:DELETE > DELETE > DELETE > DELETE > INSERT > INSERT > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3614630,
+      "line_start": 3614470,
+      "origin": "postgres.c:1685",
+      "record": 474766,
+      "sql_sha256": "b3a9c5be8df5a5787aea5d82d164aff36e8aa62eca32fe51b8fef5e0bbeb1eee",
+      "tags": [
+        "sql/batch:DELETE > DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3630815,
+      "line_start": 3630723,
+      "origin": "postgres.c:1685",
+      "record": 476242,
+      "sql_sha256": "927156d8211c1e3940966e838cc27a198655bbda5f73de2a335a7d4289cf63c0",
+      "tags": [
+        "sql/batch:DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "issues": [],
+      "line_end": 3158576,
+      "line_start": 3158308,
+      "origin": "postgres.c:1685",
+      "record": 425892,
+      "sql_sha256": "7f00b40480dccf50364ed93b2c05f202ae4f2f705c3ff25913676ad847d73343",
+      "tags": [
+        "sql/batch:DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 911362,
+      "line_start": 911362,
+      "origin": "postgres.c:1685",
+      "record": 44856,
+      "sql_sha256": "de1452e3c866046907060ff85a2dc6fa1ff1392bf4ca037955d7902f512a4bb5",
+      "tags": [
+        "sql/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYSE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 54,
+      "line_start": 54,
+      "origin": "varsup.c:79",
+      "record": 3,
+      "sql_sha256": "e228c079cc28907cc572434a5117efe10d4cf61035448bb416a41b9a09ec00cd",
+      "tags": [
+        "sql/category:ANALYSE"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2451,
+      "line_start": 2451,
+      "origin": "postgres.c:1946",
+      "record": 97,
+      "sql_sha256": "32f5019fec52353a3450df7ea8f92734e86136f156fe6aeef0e71a7ff2048dd0",
+      "tags": [
+        "sql/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2225,
+      "line_start": 2225,
+      "origin": "postgres.c:1685",
+      "record": 67,
+      "sql_sha256": "e6f07d43b5c21db0fbb9a31feac2dc599787763393dd5acbfad80e247eb02ad5",
+      "tags": [
+        "sql/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "COMMENT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-17_000000.csv",
+      "issues": [],
+      "line_end": 1121708,
+      "line_start": 1121707,
+      "origin": "postgres.c:2219",
+      "record": 137157,
+      "sql_sha256": "ae383e1d1ac35a4e5eaa7dda0a6b01a8bb16bdc7bc467117cec2c465283e9180",
+      "tags": [
+        "sql/category:COMMENT"
+      ]
+    },
+    {
+      "categories": [
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 258,
+      "line_start": 258,
+      "origin": "postgres.c:1685",
+      "record": 16,
+      "sql_sha256": "364647c86405c505850634a548a540e7738f7690d7e5f7d744edf0ba1dbbc575",
+      "tags": [
+        "sql/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "COPY"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 199718,
+      "line_start": 199718,
+      "origin": "postgres.c:1685",
+      "record": 8050,
+      "sql_sha256": "bd13f5f7ec8653793efbe9d098b4a063badcced99f1890ad02ffbe5d60e99e3b",
+      "tags": [
+        "sql/category:COPY"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "INSERT",
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 129814,
+      "line_start": 129796,
+      "origin": "postgres.c:1685",
+      "record": 5669,
+      "sql_sha256": "1299689a283f953f206435c4dc9aebabef1bf1bf549b8d4d415d9ba56330729a",
+      "tags": [
+        "sql/category:CREATE EXTERNAL",
+        "sql/category:DROP EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE INDEX"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 3126777,
+      "line_start": 3126775,
+      "origin": "postgres.c:1685",
+      "record": 260883,
+      "sql_sha256": "50a6498131f555a4b7f9ff4366db68deed030d3b4b759fe6a1796c6fea95c97b",
+      "tags": [
+        "sql/category:CREATE INDEX"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE SEQUENCE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2279643,
+      "line_start": 2279627,
+      "origin": "postgres.c:1685",
+      "record": 197158,
+      "sql_sha256": "f1d529023ac5750aeda31305201864740e08863299983c6d10cb4bf00b96d956",
+      "tags": [
+        "sql/category:CREATE SEQUENCE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2410,
+      "line_start": 2410,
+      "origin": "postgres.c:1685",
+      "record": 91,
+      "sql_sha256": "aa9e21638b65b2c8210e55cfbad6d6ae609711a63f8c0df6e96a6f002583b262",
+      "tags": [
+        "sql/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE VIEW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 176870,
+      "line_start": 176826,
+      "origin": "postgres.c:1685",
+      "record": 7132,
+      "sql_sha256": "01e58b845dd811188559083ce6b542413ee086cfee06e397c6cf562cd28eca5b",
+      "tags": [
+        "sql/category:CREATE VIEW"
+      ]
+    },
+    {
+      "categories": [
+        "DEALLOCATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 1490,
+      "line_start": 1490,
+      "origin": "postgres.c:1685",
+      "record": 39,
+      "sql_sha256": "e2cce4f5d6c5b60fe1e78d18dec5f27cd12d53b334befd565ab88a0fd3f03a41",
+      "tags": [
+        "sql/category:DEALLOCATE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 3923,
+      "line_start": 3919,
+      "origin": "postgres.c:1685",
+      "record": 188,
+      "sql_sha256": "de866faad7172a064fd63c9eefb82f82ecec840cfd2a8e5f3c717c3ee0d082b4",
+      "tags": [
+        "sql/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 757794,
+      "line_start": 757718,
+      "origin": "postgres.c:1685",
+      "record": 42085,
+      "sql_sha256": "b9355b1bc573f9932411ffa3705f2d40e14d55e39d7c01c554e84d466108dd4c",
+      "tags": [
+        "sql/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "DROP SCHEMA"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2297763,
+      "line_start": 2297763,
+      "origin": "postgres.c:2219",
+      "record": 198688,
+      "sql_sha256": "1faa501974ad409ecd137072b7cf0b3507426e0dff70c73dd3e6b75d25850299",
+      "tags": [
+        "sql/category:DROP SCHEMA"
+      ]
+    },
+    {
+      "categories": [
+        "DROP SEQUENCE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2277703,
+      "line_start": 2277703,
+      "origin": "postgres.c:1685",
+      "record": 196776,
+      "sql_sha256": "437bfcca0c879357f259dce90b4084e407a39c31a67efbb62fb5b6bee3dfa82a",
+      "tags": [
+        "sql/category:DROP SEQUENCE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 48375,
+      "line_start": 48375,
+      "origin": "postgres.c:1685",
+      "record": 2590,
+      "sql_sha256": "ec4ad2c57132596f4de2c889bbbfbfd4ac445e42a1b86d22f2c6aa22acf63127",
+      "tags": [
+        "sql/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP VIEW",
+        "CREATE VIEW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv",
+      "issues": [],
+      "line_end": 273958,
+      "line_start": 273920,
+      "origin": "postgres.c:1685",
+      "record": 30740,
+      "sql_sha256": "41537f7119dad5afd2188b0d1175a9c80780dd4a12315ae11b4969a7f9d254a7",
+      "tags": [
+        "sql/category:DROP VIEW"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2357,
+      "line_start": 2357,
+      "origin": "postgres.c:1685",
+      "record": 86,
+      "sql_sha256": "4e3641a87137fea13b3f561e7c0c1c217b7ddb5826639d333bf1816959352091",
+      "tags": [
+        "sql/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "GRANT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 772197,
+      "line_start": 772197,
+      "origin": "postgres.c:1685",
+      "record": 43186,
+      "sql_sha256": "9f04aa2b3b226cd39c0e76e7a8ef1fa406f371da9dbb76591027971638aa7f11",
+      "tags": [
+        "sql/category:GRANT"
+      ]
+    },
+    {
+      "categories": [
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 18,
+      "line_start": 1,
+      "origin": "postgres.c:1946",
+      "record": 1,
+      "sql_sha256": "94128b94352702d0b7453066f7cdf39da331ab89207215090db54e2aac455c92",
+      "tags": [
+        "sql/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "LOCK"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2227,
+      "line_start": 2227,
+      "origin": "postgres.c:1685",
+      "record": 69,
+      "sql_sha256": "af8cdcd60b16dff18a61d1f53edb2f55a7d2111434c904206889828a378eb094",
+      "tags": [
+        "sql/category:LOCK"
+      ]
+    },
+    {
+      "categories": [
+        "ROLLBACK"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2039633,
+      "line_start": 2039633,
+      "origin": "postgres.c:1685",
+      "record": 171138,
+      "sql_sha256": "587fa628a9fe4642ac0e22825a97e81d388af674f7251a9fb699f96901dcb710",
+      "tags": [
+        "sql/category:ROLLBACK"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 974,
+      "line_start": 968,
+      "origin": "postgres.c:1946",
+      "record": 21,
+      "sql_sha256": "dfc48a9c779b54a0f473c82ac286b4e6b9c2fdf206ae61e43e1cdf1450d19cf4",
+      "tags": [
+        "sql/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "SET"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2222,
+      "line_start": 2222,
+      "origin": "postgres.c:1685",
+      "record": 64,
+      "sql_sha256": "b83e371db409372c3043a357f25cf434f78872c43ee84894dec0de16ebff537b",
+      "tags": [
+        "sql/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "SET ROLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2944542,
+      "line_start": 2944542,
+      "origin": "postgres.c:2219",
+      "record": 247749,
+      "sql_sha256": "6283d543ac94725462c93f178245f810cd9be38ea0eddf396a3cc0253ca761b7",
+      "tags": [
+        "sql/category:SET ROLE"
+      ]
+    },
+    {
+      "categories": [
+        "SET TRANSACTION"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 780065,
+      "line_start": 780065,
+      "origin": "postgres.c:1685",
+      "record": 43707,
+      "sql_sha256": "a2ed0cad371dca3dcff1b4bd9d46aceea5dbecab00b9a959e9a9931f5e5deda0",
+      "tags": [
+        "sql/category:SET TRANSACTION"
+      ]
+    },
+    {
+      "categories": [
+        "SHOW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 45868,
+      "line_start": 45868,
+      "origin": "postgres.c:2219",
+      "record": 2453,
+      "sql_sha256": "796e4e765b73e39b59f72474cc26fce679354ccabe0e3fb587e94af61c8f1d1d",
+      "tags": [
+        "sql/category:SHOW"
+      ]
+    },
+    {
+      "categories": [
+        "TRUNCATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 3590,
+      "line_start": 3590,
+      "origin": "postgres.c:1685",
+      "record": 153,
+      "sql_sha256": "3b3a69ec713b8edb166ccc3d4f8e556ec3a31ced3d1fae00a1d529c79088d141",
+      "tags": [
+        "sql/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "UNKNOWN"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 3330194,
+      "line_start": 3330194,
+      "origin": "postgres.c:1685",
+      "record": 282548,
+      "sql_sha256": "23c919eb06cab79e034fbf1d629dcd2044430b6200d44f569cba2df88ecd0096",
+      "tags": [
+        "sql/category:UNKNOWN"
+      ]
+    },
+    {
+      "categories": [
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 2249,
+      "line_start": 2247,
+      "origin": "postgres.c:2219",
+      "record": 72,
+      "sql_sha256": "c5ff3bcb8b0b10cd0c6e09e03de7acc95657ceb97a2f2ba7779bb9638a1eff9a",
+      "tags": [
+        "sql/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "VACUUM"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 16106,
+      "line_start": 16106,
+      "origin": "postgres.c:1685",
+      "record": 1284,
+      "sql_sha256": "45b5f08167a49be6ffdc8287c9285e27ecc3ecdf9f557276962dbacb71b7c141",
+      "tags": [
+        "sql/category:VACUUM"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [],
+      "line_end": 100440,
+      "line_start": 100348,
+      "origin": "postgres.c:1685",
+      "record": 4875,
+      "sql_sha256": "9530864e57ffb9832019595c17d6fe459574b2850ff3312fd5c1b3bfae001522",
+      "tags": [
+        "sql/category:WITH"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 1434812,
+      "line_start": 1434788,
+      "origin": "postgres.c:1685",
+      "record": 75888,
+      "sql_sha256": "dd05cae5ad7c704fb0c76d91ccb274c1255b362d0c2ead6103f981d4f171896f",
+      "tags": [
+        "sql/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 1088899,
+      "line_start": 1088877,
+      "origin": "postgres.c:1239",
+      "record": 49518,
+      "sql_sha256": "6eeeedff78a089858f596e4a92c5436068da6b2d1b1e81cdc917f0137bc8ae8a",
+      "tags": [
+        "sql/issue:invalid_encoding_or_nul"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 273146,
+      "line_start": 273104,
+      "origin": "postgres.c:1239",
+      "record": 11931,
+      "sql_sha256": "38d4c86c50df9b21955a4bae3ee7d2cf20b68289d355c3fbe90008c1a8fa20d2",
+      "tags": [
+        "sql/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "unclosed_comment"
+      ],
+      "line_end": 2383090,
+      "line_start": 2383090,
+      "origin": "OTHER",
+      "record": 204928,
+      "sql_sha256": "8b47d2c8f597989409cfe6c59af4957c43c6ced88d070d3ad795808308a54cdc",
+      "tags": [
+        "sql/issue:unclosed_comment"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 783407,
+      "line_start": 781109,
+      "origin": "postgres.c:1685",
+      "record": 44102,
+      "sql_sha256": "8ec149ed75d9df7b0aea09987fcc3fd6b01a91486e908325db11eb03d15c2cd2",
+      "tags": [
+        "sql/issue:unclosed_string"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "validation": {
+    "aggregate_invariants": "passed; every observed category and issue has a replay target per cluster and field",
+    "diagnostic_module_sha256": "ebb8de6e105fafe76ba9c936610362a06a020b0e978ea67ca058f3c39c5a9ae5",
+    "input_sha256_matches_prior_manifest": 46,
+    "python_version": "3.9.5",
+    "replay_verified": 140
+  }
+}

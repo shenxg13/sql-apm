@@ -29,3 +29,17 @@ still owns semantic correctness and external-link validity.
 
 Installation is never part of the default read-only quality command. The CI
 provisioner requires a CI environment; local setup follows the tool runbook.
+
+## 函数字典工具
+
+Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
+以下产品检查独立于 Harness，实施／评审时分别运行：
+
+```bash
+.venv/bin/python -m sql_apm.function_dictionary validate rules/functions/v1.json
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/functions/coverage.py
+```
+
+来源重建、有界日志核对、规则升级及维护入口见[函数字典说明](../rules/functions/README.md)。
+日志探测使用本地忽略输入；普通测试仅使用人工数据，不访问数据库或生产服务。

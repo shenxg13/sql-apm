@@ -10,6 +10,8 @@ sources:
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
     status: current
+  - path: docs/reports/python-environment-2026-09-25.md
+    status: current
 related:
   - decision.project-scope
   - contract.log-evidence
@@ -38,10 +40,12 @@ confidence: high
 - 确认日期：2026-09-25。
 - 来源：用户说明生产环境为 Kylin V10 SP2、完全离线，要求当前先以可联网的
   Alma 环境为准，后续通过专门 Issue 实施 Kylin 离线安装方案。
-- 来源状态：current；已确认环境事实与阶段边界，尚未安装项目运行环境。
+- 来源状态：current；已确认环境事实与阶段边界。2026-09-25 已完成下述 Python
+  开发环境准备，数据库和展示组件仍未部署。
 - 当前开发及验证以现有 Alma 环境为准。2026-09-25 只读检查
   `/etc/os-release` 得到 **AlmaLinux 9.8 (Olive Jaguar)**，`uname -m` 得到
-  **x86_64**；可联网条件由用户提供，本次未执行依赖下载或安装验证。
+  **x86_64**；当时仅由用户提供可联网条件，后续 Python 环境准备已验证官方
+  下载源访问及 HTTPS 证书校验，详见下述环境记录。
 - Python **3.9.5**、项目本地 `.venv/` 和 Baseline 存储 **PostgreSQL 17** 的
   已确认安排不变，不因采用 Alma 而改用系统默认 Python 版本。
 - 生产环境 **Kylin V10 SP2、完全离线** 作为用户提供的事实记录。其 CPU 架构
@@ -85,9 +89,13 @@ confidence: high
 - 来源状态：current；这是已确认的环境约束。现网服务器版本为用户提供的事实，
   尚未逐台核验。
 - 项目采用 Python，运行及兼容验证目标为精确版本 **3.9.5**。
-- 后续使用仓库根目录的 `.venv/` 隔离项目依赖，由 Python 3.9.5 解释器创建。
+- 使用仓库根目录的 `.venv/` 隔离项目依赖，由 Python 3.9.5 解释器创建。
 - 依赖选型须兼容 Python 3.9.5，实际依赖版本在实现时验证并锁定。
-- 当前仅确认运行约束；解释器准备和虚拟环境创建尚未执行。
+- 2026-09-25 用户暂停 Issue #1 的业务实施，明确要求先完成 Python 环境准备。
+  已在本机从官方源码构建 Python 3.9.5 至 `var/python-3.9.5/`，重建 `.venv/`，
+  安装固定版本包工具，完成标准库、HTTPS 和包构建安装的有界验证。系统 Python
+  保持原版本，业务依赖尚未安装；这不代表 Issue #1 或生产部署已经完成。
+- 当前实现和可选模块边界见[环境验证记录](../../docs/reports/python-environment-2026-09-25.md)。
 
 准备环境的说明见[本地开发说明](../../docs/runbooks/local-development.md)。
 

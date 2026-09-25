@@ -1,9 +1,47 @@
 # SQL APM 本地开发说明
 
-## 当前阶段
+本页维护实际环境说明及检查命令。产品需求、阶段与待定事项分别见
+[交付范围](../../.project-wiki/decisions/project-scope.md)、
+[运行环境与组件](../../.project-wiki/decisions/runtime-and-components.md)。
+当前以可联网 Alma 环境开展开发；Kylin 离线安装沿用后续专项工作的安排。
 
-当前仓库提供开发流程和原始项目知识。具体业务需求、项目运行模型、业务运行时
-和服务依赖在后续沟通中确认。原始资料及其状态见[知识索引](../../.project-wiki/index.md)。
+## 相关操作契约
+
+| 操作 | 对应要求 |
+| --- | --- |
+| 本地日志及来源、批次清单 | [日志导入](../../.project-wiki/features/log-ingestion.md) |
+| 导入、构建、查询任务与诊断 | [命令行与本地配置](../../.project-wiki/features/operator-cli.md) |
+| 重试、串行执行和切换版本 | [构建与发布](../../.project-wiki/features/baseline-versions.md) |
+| SQL 原文、明细和历史清理 | [存储与留存](../../.project-wiki/contracts/sql-storage.md) |
+| SQL 输入与 Grafana 展示 | [检索及历史查看](../../.project-wiki/features/sql-search-and-views.md) |
+
+业务 CLI、数据库和展示功能尚未交付；下列质量命令用于仓库 Harness。
+开发日志样本位于本地忽略目录 `raw/inbox/hashdata/`，不是既定生产接收目录。
+
+## Python 项目环境
+
+项目运行及兼容验证使用精确版本 **Python 3.9.5**，与用户确认的现网版本一致。
+后续先准备该版本的独立解释器，再由它在仓库根目录创建 `.venv/`。
+`venv` 沿用创建它的解释器版本，不能仅通过创建虚拟环境切换 Python 的补丁版本。
+创建后需核对 `.venv/bin/python` 的实际版本为 3.9.5，再安装兼容并锁定的项目依赖。
+
+2026-09-22 的本机检查发现默认 `/usr/bin/python3` 为 3.9.25，
+在检查的常见安装位置中未发现 3.9.5，项目 `.venv/` 尚未创建。
+这只是当前开发机的观察结果，不代表现网服务器状态。
+`.venv/` 已由 `.gitignore` 忽略；解释器准备和环境创建留待后续执行。
+
+## PostgreSQL 项目环境
+
+Baseline 存储采用 **PostgreSQL 17**，保存执行记录、SQL 指纹和基线结果。
+开发与正式部署的 Baseline 数据库保持相同主版本；部署时选定并记录具体 17.x
+补丁版本。当前先准备一个存储实例，使用已有真实日志开发离线 Baseline。
+
+后续测试实时采集时，按需准备独立的 **PostgreSQL 9.4.26** 实例，验证旧版
+查询状态、开始时间和锁等待等基础接口。GP/HashData 特有字段需结合现场字段定义
+和脱敏样本验证，再补充真实环境联调；普通 PostgreSQL 测试不代表完整兼容验证。
+
+数据库驱动须兼容 Python 3.9.5 及对应数据库版本，实际依赖需验证并锁定。
+当前仅确认版本安排，实例尚未部署；部署方式、具体补丁版本和驱动选择另行落实。
 
 ## 质量工具
 

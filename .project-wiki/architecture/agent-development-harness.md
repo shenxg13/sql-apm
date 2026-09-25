@@ -6,7 +6,7 @@ owners:
   - AGENTS.md
   - .harness/index.md
   - scripts/quality/check.sh
-updated: 2026-09-22
+updated: 2026-09-25
 sources:
   - path: .harness/plans/local-bootstrap.md
     status: current
@@ -16,6 +16,7 @@ sources:
     status: current
 related:
   - decision.engineering-principles
+  - method.knowledge-maintenance
 confidence: high
 ---
 
@@ -34,6 +35,9 @@ confidence: high
 
 ## Contracts
 
+- 按任务读取相关知识，索引仅保留主题路由；业务需求完整保存在各自主题页。
+- 确认需求后更新所属正文并记录简短日志；仅导航或 Agent 工作方式变化才更新入口。
+- 知识搬迁保留正文、来源、边界和待定事项，具体流程见[知识维护方法](../methods/knowledge-maintenance.md)。
 - 本地质量入口默认离线；Issue、PR 测试用可控客户端模拟。
 - 评审 JSON 校验器只验证结构与协议一致性，不证明评审实际执行。
 - 项目配置使用 Wiki 的运行模型决策和任务路由；首版不提供配置生成器。

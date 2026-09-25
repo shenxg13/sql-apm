@@ -1,49 +1,32 @@
-# SQL APM 项目知识
+# SQL APM 项目知识索引
 
-当前处于需求沟通阶段。先保存原始资料，后续通过讨论逐项确认具体需求。
+产品当前处于需求沟通阶段；先交付离线基线，再交付 SQL 检索和 Grafana 展示。
+已确认细节完整保存在下列主题页；页面标为 active 不表示产品功能已经实现。
+根据当前任务选择相关主题，跨域时沿条款链接补读，不要求每次阅读全部页面。
 
-## 原始资料
+## 按任务选择主题
 
-- [SQL Baseline 系统方法论](raw/sql-baseline.md)：原文快照，作为需求讨论的参考。
-- 来源：[shenxg13/chat-the-best · topics/sql-baseline.md](https://github.com/shenxg13/chat-the-best/blob/main/topics/sql-baseline.md)。
-- 固定版本：[a1290c3c76afc074e93e37b9acc970d450d3337b](https://github.com/shenxg13/chat-the-best/blob/a1290c3c76afc074e93e37b9acc970d450d3337b/topics/sql-baseline.md)。
-- 原文件 Git blob SHA：`d5b8c6e4ef8d317110aec7737d49088d4a9308e4`。
-- 保存日期：2026-09-22。
-- 获取状态：固定版本已读取，原文件 Git blob SHA 已核对。
-- 处理状态：raw，作为原始输入保留，尚未提升为已确认的产品契约。
+| 主题 | 何时阅读 |
+| --- | --- |
+| [项目范围、资料来源与交付顺序](decisions/project-scope.md) | 首次了解项目、确认范围、设计后续接入或核对原始资料时阅读。 |
+| [运行环境、组件与资源边界](decisions/runtime-and-components.md) | 准备环境、选择依赖或讨论组件职责时阅读。 |
+| [SQL 原文、明细与留存](contracts/sql-storage.md) | 设计 SQL 原文、执行／调用明细或历史版本存储时阅读。 |
+| [HashData 日志事实与证据边界](contracts/log-evidence.md) | 调查日志格式、来源行号或解释现有样本覆盖时阅读。 |
+| [日志导入、来源与异常处理](features/log-ingestion.md) | 修改导入、文件识别、批次完整性或导入诊断时阅读。 |
+| [训练资格、黑名单与排除时段](contracts/training-eligibility.md) | 调整训练筛选、单条／整批单位、黑名单或排除时段时阅读。 |
+| [计时分类、分组与时间归属](contracts/timing-and-grouping.md) | 实现日志计时识别、Execute 配对、分组或时间归属时阅读。 |
+| [SQL 结构指纹与归一化](contracts/sql-fingerprints.md) | 实现指纹、函数字典或 SQL 输入检索匹配时阅读。 |
+| [统计指标、训练窗口与样本门槛](contracts/baseline-statistics.md) | 实现聚合、统计公式、窗口或样本不足判断时阅读。 |
+| [基线构建、版本与发布](features/baseline-versions.md) | 实现构建、规则更新、任务串行、失败重试或版本发布时阅读。 |
+| [命令行与本地配置操作](features/operator-cli.md) | 设计导入、构建、状态或诊断命令及本地配置时阅读。 |
+| [SQL 检索、Grafana 与历史展示](features/sql-search-and-views.md) | 实现 SQL 检索、基线／历史展示，或讨论后续 activity 参照时阅读。 |
 
-## 资料状态与使用约定
+## 流程、操作与来源
 
-原始文档按上述版本原样保存。文中的“已确认”“推荐”“第一版”等表述保留其
-来源语境，不自动成为 sql-apm 项目已经确认的需求或决策。
-
-架构、技术选型、实施范围、阈值参数和验收标准均留待后续沟通确认。
-先前讨论中的实施建议也不视为已接受方案。
-
-后续确认的需求与决策另行记录，并引用本快照；原始资料保持原样以便追溯。
-
-## 已采用的开发基础
-
-- [Agent 开发流程](architecture/agent-development-harness.md)。
-- [通用工程原则](decisions/engineering-principles.md)。
-- [本地初始化范围](../.harness/plans/local-bootstrap.md)。
-- [本地开发与检查](../docs/runbooks/local-development.md)。
-- [模板来源及本地定制](../docs/provenance.md)。
-- [本地初始化验证](../docs/reports/local-bootstrap-validation.md)。
-- [GitHub 首次发布范围与验证](../docs/reports/initial-publication.md)。
-- [知识更新记录](log.md)。
-
-上述内容描述开发协作方式，不定义 SQL APM 的业务架构。
-项目运行模型暂未确认。
-
-## 知识规范与模板
-
-阅读[实体规范](schema.md)，在具体需求确认后按需建立有来源的项目知识。
-
-- [Architecture](templates/architecture.md)。
-- [Module](templates/module.md)。
-- [Feature](templates/feature.md)。
-- [Contract](templates/contract.md)。
-- [Decision](templates/decision.md)。
-- [Method](templates/method.md)。
-- [Operating model](templates/operating-model.md)：尚未采用的运行模型模板。
+- [知识维护方法](methods/knowledge-maintenance.md)：确认记录、按需阅读与单处维护。
+- [Agent 开发流程](architecture/agent-development-harness.md)与[工程原则](decisions/engineering-principles.md)：协作及工程边界。
+- [开发说明](../docs/runbooks/local-development.md)：环境准备与实际检查命令。
+- [原始资料](raw/sql-baseline.md)：按字节保留的讨论输入；[来源和确认边界](decisions/project-scope.md#原始资料)。
+- [知识日志](log.md)：历史确认与修订的追溯记录，不作为当前要求的替代。
+- [知识规范](schema.md)：新增或调整知识实体时使用。
+- [本次重组与完整性核对](../docs/reports/knowledge-reorganization-2026-09-25.md)：原章节的迁移位置和检查证据。

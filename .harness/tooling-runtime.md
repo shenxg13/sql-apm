@@ -2,7 +2,8 @@
 
 ## Discovery Order
 
-1. Read the catalog, selected workflow and relevant project knowledge.
+1. Use the root entry or catalog to locate the applicable workflow and relevant
+   knowledge; reuse context already read instead of traversing every document.
 2. Find the canonical command in [scripts](../scripts/README.md).
 3. Check tool availability and the declared version contract.
 4. Reuse an installed compatible runtime; scope environment overrides to one command.

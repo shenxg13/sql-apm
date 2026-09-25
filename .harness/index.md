@@ -2,11 +2,14 @@
 
 ## Read Order
 
-1. Read the root agent entry.
-2. Read this index and [rules](rules.md).
-3. Read [tooling and runtime](tooling-runtime.md) before invoking tools.
-4. Use the [catalog](catalog.md) to select a workflow.
-5. Read relevant project wiki entities and inspect current source and tests.
+Choose reading scope from the root entry; reuse applicable context already read.
+A copy or string edit usually needs only the target and its direct constraints.
+For non-trivial work, read [rules](rules.md), use the [catalog](catalog.md) to select
+one applicable workflow, and inspect the relevant source and tests.
+Use the wiki index to select domain topics; follow cross-topic links only when
+the task touches that boundary. Read [tooling and runtime](tooling-runtime.md)
+before repository tools or environment diagnosis. Do not require a full wiki,
+all workflows or historical bootstrap plans for each task.
 
 ## Responsibilities
 
@@ -25,7 +28,10 @@ accepted scope; routine implementation choices do not require repeated approval.
 ## Knowledge Gate
 
 When durable behavior, contracts, decisions, repeated failures or workflow rules
-change, update the wiki or record why a wiki update is unnecessary.
+change, update the owning topic or record why a wiki update is unnecessary.
+Keep full business rules in their topic pages, navigation in the wiki index,
+and short change summaries in the log. Root entries change only for routing or
+agent-wide workflow rules; do not copy each confirmed requirement into them.
 
 ## Engineering Gate
 

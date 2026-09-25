@@ -2,11 +2,14 @@
 
 Use this before handing off a meaningful wiki or harness change.
 
-1. Check that new wiki entities follow `.project-wiki/schema.md`.
-2. Check that important claims have a source entry or are listed as open
-   questions.
-3. Keep raw source material in `raw/` until promoted into structured wiki
-   entities.
-4. Check that `.project-wiki/index.md` lists new pages.
-5. Check that `.project-wiki/log.md` records meaningful knowledge changes.
-6. List unresolved open questions in the final handoff.
+1. Check changed entities against `.project-wiki/schema.md` and the affected sources.
+2. Verify confirmed requirements, observations, proposals and open questions remain
+   distinguishable; preserve raw evidence and confirmation boundaries.
+3. Keep each full rule in its owning topic. Check affected dependency links without
+   requiring every unrelated page to be read or rewritten.
+4. Ensure the short index routes to new or moved pages. Change root entries only
+   when agent-wide rules or routes change, not for ordinary business confirmations.
+5. Record a concise change summary and topic links in `.project-wiki/log.md`.
+6. For document moves, verify old-to-new coverage, content preservation and local
+   links. Report actual checks and unresolved concerns; do not claim product
+   acceptance from document or harness validation.

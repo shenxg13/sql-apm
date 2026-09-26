@@ -41,6 +41,11 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [Python 源码布局与模块职责](../.project-wiki/architecture/source-layout.md) | 设计说明 | 目标目录、模块职责、依赖方向，以及当前已实现的部分。 |
+| [离线基线逻辑数据契约](../.project-wiki/contracts/offline-data-contract.md) | 设计说明 | 三个交接边界、对象关系、身份、训练、统计、发布与演进约束。 |
+| [契约字段字典](design/offline-data-contract/fields.md) | 设计说明 | 字段类型、必填与空值、枚举、引用和全部统计指标。 |
+| [HashData 来源映射](design/offline-data-contract/hashdata-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
+| [契约样例与需求对应](design/offline-data-contract/README.md) | 设计说明 | 需求到设计条款及正反样例的对应、合成数据与核对方法。 |
+| [数据契约设计验证](design/offline-data-contract/verification.md) | 分析证据 | 文档及合成样例的实际检查结果和未覆盖的产品运行边界。 |
 | [数据契约设计范围](../.project-wiki/decisions/project-scope.md#已确认的数据契约设计范围) | 需求说明 | 逻辑数据契约的交付边界及关联 Issue；具体设计以该任务的交付为准。 |
 | [通用工程原则](../.project-wiki/decisions/engineering-principles.md) | 设计说明 | 数据正确性、恢复、资源成本与证据边界等设计约束。 |
 

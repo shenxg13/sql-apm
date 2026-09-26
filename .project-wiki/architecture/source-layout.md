@@ -20,6 +20,7 @@ related:
   - decision.project-scope
   - decision.runtime-and-components
   - contract.sql-fingerprints
+  - contract.offline-data-contract
   - feature.log-ingestion
   - feature.operator-cli
 confidence: high
@@ -83,8 +84,9 @@ sql-apm/
 ### 模块职责与依赖
 
 - `__main__.py`、`cli/` 接收参数、调用流程并展示结果；业务判断留在对应模块。
-- `contracts/` 承载跨模块的数据对象与约束，结合
-  [Issue #3](https://github.com/shenxg13/sql-apm/issues/3) 落实；不在目录规划中提前固定字段。
+- `contracts/` 后续承载跨模块的数据对象与约束，遵循
+  [离线数据契约设计](../contracts/offline-data-contract.md)；当前交付文档及合成样例，
+  尚未创建该产品子包或运行时校验器。
 - `ingestion/hashdata/` 封装 HashData 特有格式、对象识别和计时解释；通用导入流程
   管理批次、来源和异常。来源数据经明确契约进入后续处理。
 - `sql/` 只负责 SQL 专属处理；非 SQL 来源接入基线无需生成 SQL 指纹。

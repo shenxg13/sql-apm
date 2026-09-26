@@ -55,26 +55,26 @@ def statements():
         for file_id in o["file_ids"]:
             add("analysis_file", dict(analysis_id=o["analysis_id"], file_id=file_id, scope_id="CL1"))
     for o in b["sql_texts"].values():
-        sql.append("INSERT INTO sql_text (sql_id,text,content_sha256) VALUES (" + literal(o["sql_id"]) + "," + literal(o["text"]) + ",sha256(convert_to(" + literal(o["text"]) + ",'UTF8')));")
+        sql.append("INSERT INTO mpp_sql_text (sql_id,text,content_sha256) VALUES (" + literal(o["sql_id"]) + "," + literal(o["text"]) + ",sha256(convert_to(" + literal(o["text"]) + ",'UTF8')));")
         for record in o["evidence_refs"]:
-            add("sql_text_evidence", dict(sql_id=o["sql_id"], record_id=record))
+            add("mpp_sql_text_evidence", dict(sql_id=o["sql_id"], record_id=record))
     for o in b["occurrences"].values():
-        add("occurrence", fields(o, ("evidence_refs", "outcome_evidence_refs", "association"),
+        add("mpp_occurrence", fields(o, ("evidence_refs", "outcome_evidence_refs", "association"),
             association_state=o["association"]["state"], association_method=o["association"]["method"],
             association_reason=o["association"]["reason"]))
         for purpose, records in (("support", o["evidence_refs"]), ("outcome", o["outcome_evidence_refs"]),
                                  ("association", o["association"]["evidence_refs"])):
             for record in records:
-                add("occurrence_evidence", dict(analysis_id=o["analysis_id"], occurrence_id=o["occurrence_id"],
+                add("mpp_occurrence_evidence", dict(analysis_id=o["analysis_id"], occurrence_id=o["occurrence_id"],
                     record_id=record, purpose=purpose))
     for o in b["normalizations"].values():
-        add("normalization", fields(o, ("dictionary_digest",),
+        add("mpp_normalization", fields(o, ("dictionary_digest",),
             dictionary_digest_algorithm=o["dictionary_digest"]["algorithm"],
             dictionary_digest_value=o["dictionary_digest"]["value"]))
     for o in b["fingerprints"].values():
-        add("fingerprint", dict(o, profile=doc["profile"]))
+        add("mpp_fingerprint", dict(o, profile=doc["profile"]))
     for o in b["groups"].values():
-        add("baseline_group", fields(o, ("cluster_id",), scope_id=o["cluster_id"],
+        add("mpp_baseline_group", fields(o, ("cluster_id",), scope_id=o["cluster_id"],
             fingerprint_value=b["fingerprints"][o["fingerprint_id"]]["value"]))
     for o in b["input_snapshots"].values():
         add("input_snapshot", fields(o, ("batch_ids", "file_ids", "analysis_ids", "selection"),
@@ -84,7 +84,7 @@ def statements():
             for val in o[key]:
                 add(table, dict(input_id=o["input_id"], scope_id="CL1", **{id_key: val}))
         for ref in o["selection"]["refs"]:
-            add("input_occurrence", dict(ref, input_id=o["input_id"], scope_id="CL1"))
+            add("mpp_input_occurrence", dict(ref, input_id=o["input_id"], scope_id="CL1"))
     for o in b["config_snapshots"].values():
         add("config_snapshot", fields(o, ("window",), profile=doc["profile"],
             cutoff_date=o["window"]["cutoff_date"], window_days=o["window"]["days"],
@@ -95,11 +95,11 @@ def statements():
         for name, check in o["checks"].items():
             add("build_check", dict(check, build_id=o["build_id"], name=name))
         for timing, counts in o["timing_coverage"].items():
-            add("build_timing_coverage", fields(counts, ("group_ids",), build_id=o["build_id"], timing_type=timing))
+            add("mpp_build_timing_coverage", fields(counts, ("group_ids",), build_id=o["build_id"], timing_type=timing))
         for coverage in o["coverage_index"]:
-            add("build_coverage", dict(coverage, build_id=o["build_id"], **context))
+            add("mpp_build_coverage", dict(coverage, build_id=o["build_id"], **context))
     for o in b["decisions"].values():
-        add("decision", fields(o, ("occurrence_ref", "reasons"),
+        add("mpp_decision", fields(o, ("occurrence_ref", "reasons"),
             fingerprint_value=b["fingerprints"][o["fingerprint_id"]]["value"], **o["occurrence_ref"], **context))
     for o in b["statistics"].values():
         bucket = o["bucket"]
@@ -111,7 +111,7 @@ def statements():
         vals.update({k: v["value"] for k, v in o["metrics"].items()})
         for key in ("active_dates", "active_week_starts"):
             vals[key] = "{" + ",".join(o[key]) + "}"
-        add("statistic", vals)
+        add("mpp_statistic", vals)
     for o in b["publications"].values():
         add("publication", o)
     for o in b["current_versions"].values():

@@ -3,13 +3,14 @@
 set -euo pipefail
 usage() {
     cat <<'EOF'
-Usage: scripts/db/initialize.sh {all|bootstrap|schema|check}
+Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
   --host HOST_OR_SOCKET --port PORT
   [--database sql_apm] [--schema sql_apm] [--role sql_apm]
   [--admin-user USER --admin-database DATABASE] [--pg-bin DIRECTORY]
 
 Connections always name host, port, database and user explicitly.
-bootstrap/all require both admin options. schema/check use the project role.
+bootstrap/all require both admin options. schema/check/upgrade use the project role.
+upgrade explicitly migrates a verified 1.0.0 schema to 1.1.0; stop writers first.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.
@@ -21,7 +22,7 @@ die() {
 }
 mode=${1:-}
 [[ $# -gt 0 ]] && shift
-case "$mode" in all | bootstrap | schema | check) ;; -h | --help)
+case "$mode" in all | bootstrap | schema | check | upgrade) ;; -h | --help)
     usage
     exit 0
     ;;
@@ -67,13 +68,18 @@ if [[ $mode == all || $mode == bootstrap ]]; then
     "$psql" "${common[@]}" --username="$admin_user" --dbname="$admin_database" --file="$root/sql_apm/storage/bootstrap.sql"
 fi
 if [[ $mode != bootstrap ]]; then
-    phase=schema
+    phase=$mode
+    entry=initialize.sql
+    [[ $mode != upgrade ]] || entry=migrate.sql
     check_only=false
-    [[ $mode != check ]] || check_only=true
+    [[ $mode != check && $mode != upgrade ]] || check_only=true
     script_sha256=$(sha256sum "$root/sql_apm/storage/schema.sql")
     script_sha256=${script_sha256%% *}
+    legacy_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.0.0.sql")
+    legacy_sha256=${legacy_sha256%% *}
+    [[ $legacy_sha256 == df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28 ]] || die 'frozen 1.0.0 DDL checksum mismatch'
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
-        --set=script_sha256="$script_sha256" --set=check_only="$check_only" \
-        --file="$root/sql_apm/storage/initialize.sql"
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=check_only="$check_only" \
+        --file="$root/sql_apm/storage/$entry"
 fi
 printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"

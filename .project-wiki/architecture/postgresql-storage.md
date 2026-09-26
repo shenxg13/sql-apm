@@ -14,6 +14,8 @@ sources:
   - path: sql_apm/storage/schema.sql
     status: current
   - path: docs/reports/postgresql-storage-2026-09-26.md
+    status: historical
+  - path: docs/reports/mpp-storage-migration-2026-09-26.md
     status: current
 related:
   - contract.offline-data-contract
@@ -28,16 +30,18 @@ confidence: high
 
 ## Summary
 
-初版物理结构版本 1.0.0 承接离线逻辑契约 1.0.0。
-交付范围为项目账号、库、schema、表、约束、索引、结构版本及临时实例验证；
+当前物理结构版本 1.1.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径。
+交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
 业务导入、指纹、统计、写入接口、发布编排和 Grafana 尚未实现。
 
 ## Source Of Truth
 
-用户于 2026-09-26 核对初始化、统计明细及首版普通表方案后授权实施。
+用户于 2026-09-26 核对初始化、统计明细及首版普通表方案后授权实施；
+随后确认各系统独立统计表，并核对 14 张 MPP 专属表前缀、2 张公共表引用及版本升级后指示“开始调整”。
 在线 Issue 负责交付契约；[DDL](../../sql_apm/storage/schema.sql)负责实际结构，
 [物理设计](../../docs/design/postgresql-storage.md)负责对象映射与数据库／应用责任，
-[验证记录](../../docs/reports/postgresql-storage-2026-09-26.md)说明实际证据及限制。
+[初版记录](../../docs/reports/postgresql-storage-2026-09-26.md)与
+[MPP 迁移记录](../../docs/reports/mpp-storage-migration-2026-09-26.md)分别说明实际证据及限制。
 
 ## Contracts
 
@@ -45,6 +49,12 @@ confidence: high
   三个名称默认 sql_apm，可分别配置；初始化保留已有密码和数据，不接管不兼容对象。
 - 管理员 bootstrap 与项目账号 schema 阶段分开。库内 DDL／结构版本同事务，
   建库在事务块外；失败后按完成阶段修正重跑。
+- 各系统统计结果独立保存，共享适用计算代码及构建／发布框架。当前 41 张表中
+  14 张 MPP 专属表及其索引／约束使用 mpp_ 前缀，其他系统接入时再交付自身结构。
+  原名清单、公共表残留 MPP 关联及边界见物理设计；不引入公共统计／分组表。
+- 冻结的 1.0.0 DDL 保持字节不变；upgrade 先完整校验旧结构及摘要，在一笔事务中
+  改名并登记 1.1.0，保留旧版本时间与业务数据。新库及升级库按同一目标 catalog 检查。
+  需要维护窗口停写及串行操作，DDL 锁等待 5 秒，失败回滚后可重试，无自动降级。
 - 原文、执行、解释、规则、输入及构建身份分开；引用结构保证关键集群和规则上下文。
   完整内容复用、解释可靠性、不可变快照和发布原子性仍须后续应用实现。
 - 统计每行对应构建、分组和时间桶，17 指标为 numeric 列；

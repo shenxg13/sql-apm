@@ -45,7 +45,7 @@
 | [契约字段字典](design/offline-data-contract/fields.md) | 设计说明 | 字段类型、必填与空值、枚举、引用和全部统计指标。 |
 | [HashData 来源映射](design/offline-data-contract/hashdata-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
 | [契约样例与需求对应](design/offline-data-contract/README.md) | 设计说明 | 需求到设计条款及正反样例的对应、合成数据与核对方法。 |
-| [PostgreSQL 物理结构](design/postgresql-storage.md) | 设计说明 | 逻辑对象到表／约束／索引的映射，统计存储、版本及应用责任。 |
+| [PostgreSQL 物理结构](design/postgresql-storage.md) | 设计说明 | 逻辑映射、MPP 专属表、独立统计存储及版本迁移边界。 |
 | [PostgreSQL 存储知识](../.project-wiki/architecture/postgresql-storage.md) | 设计说明 | 已实现结构、初始化边界和维护入口。 |
 | [数据契约设计验证](design/offline-data-contract/verification.md) | 分析证据 | 文档及合成样例的实际检查结果和未覆盖的产品运行边界。 |
 | [数据契约设计范围](../.project-wiki/decisions/project-scope.md#已确认的数据契约设计范围) | 需求说明 | 逻辑数据契约的交付边界及关联 Issue；具体设计以该任务的交付为准。 |
@@ -57,7 +57,7 @@
 | --- | --- | --- |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
-| [数据库初始化与恢复](runbooks/database-initialization.md) | 操作说明 | 单账号引导、认证、参数、兼容重跑及失败恢复。 |
+| [数据库初始化与恢复](runbooks/database-initialization.md) | 操作说明 | 单账号引导、认证、参数、兼容重跑、MPP 版本升级及失败恢复。 |
 | [仓库脚本清单](../scripts/README.md) | 操作说明 | 质量、GitHub 流程和函数字典工具的用途及调用入口。 |
 | [函数参数规则维护](../rules/functions/README.md) | 操作说明 | 字典文件、字段、匹配边界、验证命令和来源重建方法。 |
 
@@ -68,6 +68,7 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [HashData 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
+| [MPP 结构升级验证](reports/mpp-storage-migration-2026-09-26.md) | 分析证据 | 1.0.0 到 1.1.0 的数据／对象保留、失败回滚、重跑和自定义名称验证。 |
 | [PostgreSQL 结构验证](reports/postgresql-storage-2026-09-26.md) | 分析证据 | 临时 PG17 实例的存储约束、真实账号、重跑和清理实测。 |
 | [语句类别黑名单核查（2026-09-26）](reports/statement-category-census-2026-09-26.md) | 分析证据 | 全部日志的类别、别名及异常覆盖，保守名单依据与合成规则验收。 |
 | [119、120 集群日志分析（2026-09-24）](reports/cluster-log-analysis-2026-09-24.md) | 分析证据 | 两组日志的覆盖、格式、SQL 文本及计时分类观察。 |

@@ -1,9 +1,9 @@
-# PostgreSQL 初版物理结构
+# PostgreSQL 物理结构与 MPP 命名
 
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-物理结构版本为 `1.0.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.1.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
 这是存储结构与初始化交付，尚未交付业务写入接口、解析器、指纹或统计引擎。
@@ -25,7 +25,7 @@
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留 1.0.0 的原始记录并新增 1.1.0 记录，新库只记录 1.1.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -40,22 +40,22 @@
 | ImportAttempt | `import_attempt`；retry_of/duplicate_of 自引用同一 File。重试不覆盖尝试历史。 |
 | EvidenceRecord | `evidence_record`；唯一 (file_id,record_no)，定位行区间正数；observed 为 JSONB 投影。 |
 | Analysis | `analysis` + `analysis_file`；保存解释版本、明确文件集、替代关系及不可变证据清单依据。 |
-| SqlText | `sql_text` + `sql_text_evidence`；完整原文 text，共享文本可追加来源关联。 |
-| Occurrence | `occurrence`；主键 (analysis_id,occurrence_id)，association 拆列，value_reasons 用 JSONB。 |
-| Occurrence 的三组证据 | `occurrence_evidence`，purpose 为 support/outcome/association，主证据另有 anchor_ref 外键。 |
-| Normalization | `normalization`；固定算法、解析器、字典语义／格式版本、规范内容摘要及 rules_ref。 |
-| Fingerprint | `fingerprint`；唯一 (sql_id,normalization_id,profile)，可靠结果与失败原因分开。 |
-| Group | `baseline_group`；cluster_id 映射 scope_id，冗余 fingerprint_value 通过复合外键核对。五项键加规则上下文唯一。 |
-| InputSnapshot | `input_snapshot`；列表分别为 `input_batch`、`input_file`、`input_analysis`、`input_occurrence`；也支持不可变清单引用。 |
+| SqlText | `mpp_sql_text` + `mpp_sql_text_evidence`；完整原文 text，共享文本可追加来源关联。 |
+| Occurrence | `mpp_occurrence`；主键 (analysis_id,occurrence_id)，association 拆列，value_reasons 用 JSONB。 |
+| Occurrence 的三组证据 | `mpp_occurrence_evidence`，purpose 为 support/outcome/association，主证据另有 anchor_ref 外键。 |
+| Normalization | `mpp_normalization`；固定算法、解析器、字典语义／格式版本、规范内容摘要及 rules_ref。 |
+| Fingerprint | `mpp_fingerprint`；唯一 (sql_id,normalization_id,profile)，可靠结果与失败原因分开。 |
+| Group | `mpp_baseline_group`；cluster_id 映射 scope_id，冗余 fingerprint_value 通过复合外键核对。五项键加规则上下文唯一。 |
+| InputSnapshot | `input_snapshot`；列表分别为 `input_batch`、`input_file`、`input_analysis`、`mpp_input_occurrence`；也支持不可变清单引用。 |
 | ConfigSnapshot | `config_snapshot`；window 拆列；source_mapping_refs、blacklist、exclusions、thresholds 为包含实际内容的 JSONB。 |
 | Build | `build`；同集群输入及配置、重试、状态、结果保存标志；配置／归一化上下文有复合外键。 |
 | Build.checks | `build_check`，按构建和六类检查名唯一，保存 passed/failed/not_run 及原因。 |
-| Build.timing_coverage | `build_timing_coverage`，五类计数分别保存；group_ids 从同构建覆盖记录关联 Group 得到。 |
-| Build.coverage_index | `build_coverage`，每组每层一行，computed_keys/empty_keys 为 JSONB 数组；statistic_ids 从结果表得到。 |
-| Decision | `decision`，同构建同解释事件唯一；关联 Build、Occurrence、Fingerprint、Group；rule_evaluations 用 JSONB。 |
-| Decision.reasons | `decision_reason` 按 decision/code 去重，rule_ref 落列，证据用 `decision_reason_evidence`。 |
+| Build.timing_coverage | `mpp_build_timing_coverage`，五类计数分别保存；group_ids 从同构建覆盖记录关联 Group 得到。 |
+| Build.coverage_index | `mpp_build_coverage`，每组每层一行，computed_keys/empty_keys 为 JSONB 数组；statistic_ids 从结果表得到。 |
+| Decision | `mpp_decision`，同构建同解释事件唯一；关联 Build、Occurrence、Fingerprint、Group；rule_evaluations 用 JSONB。 |
+| Decision.reasons | `mpp_decision_reason` 按 decision/code 去重，rule_ref 落列，证据用 `mpp_decision_reason_evidence`。 |
 | Problem | `problem` + `problem_evidence`；批次、文件、构建、事件定位；尝试的问题关系为 `attempt_problem`，其余 problem_ids 通过定位查询。 |
-| Statistic | `statistic`，见下一节；Build/Group 上下文通过复合外键保持一致。 |
+| Statistic | `mpp_statistic`，见下一节；Build/Group 上下文通过复合外键保持一致。 |
 | Publication | `publication`；结果、前一构建、时间、原因分别保存，失败尝试不丢弃。 |
 | CurrentVersion | `current_version` 每 scope 一行，引用成功 Publication 的构建及时间；空版本三字段同时 NULL。 |
 | Task | `task`；关联结果用 `task_batch`、`task_build`、`task_publication`，同集群引用。 |
@@ -64,6 +64,52 @@
 非 HashData 的配置／构建可以没有 normalization_id；HashData 必须具备。
 指纹、五项分组、Occurrence、五类覆盖和 17 项指标是本期 HashData 物理结构。
 未来其他来源增加自己的执行／分组／结果结构和 profile 规则，不能把合成扩展示例当作已交付适配器。
+
+## MPP 专属结构与版本升级
+
+用户于 2026-09-26 确认按系统独立保存统计结果，并授权本次 MPP 专属表调整。
+MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.project-wiki/decisions/project-scope.md#已确认的生产系统称谓)。
+各系统共享适用的统计计算代码和构建／发布框架，来源专属结果独立落表；
+当前只交付 MPP，不预建 Luban、Baichuan 或 TiDB 表，也不抽象公共统计／分组表。
+
+当前共 41 张表，其中以下 14 张由 1.0.0 原名增加 `mpp_` 前缀：
+
+| 原名 | 1.1.0 名称 |
+| --- | --- |
+| `sql_text` | `mpp_sql_text` |
+| `sql_text_evidence` | `mpp_sql_text_evidence` |
+| `occurrence` | `mpp_occurrence` |
+| `occurrence_evidence` | `mpp_occurrence_evidence` |
+| `normalization` | `mpp_normalization` |
+| `fingerprint` | `mpp_fingerprint` |
+| `baseline_group` | `mpp_baseline_group` |
+| `input_occurrence` | `mpp_input_occurrence` |
+| `decision` | `mpp_decision` |
+| `decision_reason` | `mpp_decision_reason` |
+| `decision_reason_evidence` | `mpp_decision_reason_evidence` |
+| `build_timing_coverage` | `mpp_build_timing_coverage` |
+| `build_coverage` | `mpp_build_coverage` |
+| `statistic` | `mpp_statistic` |
+
+27 张其他表保留名称。`config_snapshot.normalization_id` 的外键指向
+`mpp_normalization`，`problem` 的执行定位外键指向 `mpp_occurrence`。
+这两张公共表仍有 MPP 专属关联，未来其他系统的规则及执行定位另行设计。
+各专属表的索引和约束名称同步前缀；指标、列类型、键及约束语义保持不变。
+`system_kind=hashdata`、`profile=hashdata-csv/1`、逻辑契约 1.0.0 和历史 ID 均不改写。
+
+[冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
+[迁移入口](../../sql_apm/storage/migrate.sql)只支持明确的 1.0.0 → 1.1.0 路径。
+入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
+验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
+约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
+已在 1.1.0 的库先完整校验，成功后返回，不重复登记版本。
+
+这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
+DDL 锁等待上限为 5 秒，等待超时回滚；改名不主动扫描、复制或重写业务数据。
+小规模验证核对逐表内容、关系 OID／relfilenode 和约束 OID 保留，
+不以此声称生产升级耗时或吞吐已经验证。独立统计表也不代表共享实例的资源隔离。
+原名 SQL 调用需随版本切换，没有保留旧名兼容视图；精确操作和恢复见
+[升级说明](../runbooks/database-initialization.md#从-100-升级到-110)。
 
 ## 原文身份及证据
 

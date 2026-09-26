@@ -54,7 +54,8 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 ## 数据库初始化与验证
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
-  以项目账号安装或核对 schema、物理表、约束、索引和结构版本。
+  以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
+  `upgrade` 显式执行 1.0.0 → 1.1.0 的 MPP 命名迁移。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 

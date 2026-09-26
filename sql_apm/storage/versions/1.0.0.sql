@@ -1,4 +1,4 @@
--- Structure version 1.1.0. Called only after catalog compatibility checks.
+-- Structure version 1.0.0. Called only after catalog compatibility checks.
 -- The caller sets the verified project schema as search_path.
 CREATE TABLE IF NOT EXISTS schema_version (
     version text PRIMARY KEY,
@@ -122,20 +122,20 @@ CREATE TABLE IF NOT EXISTS analysis_file (
     FOREIGN KEY (analysis_id, scope_id) REFERENCES analysis (analysis_id, scope_id),
     FOREIGN KEY (file_id, scope_id) REFERENCES source_file (file_id, scope_id)
 );
-CREATE TABLE IF NOT EXISTS mpp_sql_text (
+CREATE TABLE IF NOT EXISTS sql_text (
     sql_id text PRIMARY KEY CHECK (sql_id <> ''),
     text text NOT NULL CHECK (text <> ''),
     content_sha256 bytea NOT NULL CHECK (octet_length(content_sha256) = 32
         AND content_sha256 = sha256(convert_to(text, 'UTF8')))
 );
 -- Hash narrows candidates only: full content equality decides reuse.
-CREATE INDEX IF NOT EXISTS mpp_sql_text_content_idx ON mpp_sql_text (content_sha256);
-CREATE TABLE IF NOT EXISTS mpp_sql_text_evidence (
-    sql_id text NOT NULL REFERENCES mpp_sql_text,
+CREATE INDEX IF NOT EXISTS sql_text_content_idx ON sql_text (content_sha256);
+CREATE TABLE IF NOT EXISTS sql_text_evidence (
+    sql_id text NOT NULL REFERENCES sql_text,
     record_id text NOT NULL REFERENCES evidence_record,
     PRIMARY KEY (sql_id, record_id)
 );
-CREATE TABLE IF NOT EXISTS mpp_occurrence (
+CREATE TABLE IF NOT EXISTS occurrence (
     analysis_id text NOT NULL,
     occurrence_id text NOT NULL CHECK (occurrence_id <> ''),
     scope_id text NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS mpp_occurrence (
     request_shape text NOT NULL CHECK (request_shape IN ('single','batch','unknown')),
     database text CHECK (database <> ''),
     execution_user text CHECK (execution_user <> ''),
-    sql_id text REFERENCES mpp_sql_text,
+    sql_id text REFERENCES sql_text,
     sql_state text NOT NULL CHECK (sql_state IN ('complete','missing','incomplete','invalid_encoding','uncertain')),
     timing_type text CHECK (timing_type IN ('request','execute_first','execute_fetch','parse','bind')),
     timing_reason text CHECK (timing_reason <> ''),
@@ -176,17 +176,17 @@ CREATE TABLE IF NOT EXISTS mpp_occurrence (
     CHECK (duration_ms IS NOT NULL OR coalesce(length(value_reasons->>'duration_ms'),0) > 0),
     CHECK (estimated_start_at IS NOT NULL OR coalesce(length(value_reasons->>'estimated_start_at'),0) > 0)
 );
-CREATE INDEX IF NOT EXISTS mpp_occurrence_scope_time_idx ON mpp_occurrence (scope_id, estimated_start_at);
-CREATE INDEX IF NOT EXISTS mpp_occurrence_sql_time_idx ON mpp_occurrence (sql_id, estimated_start_at);
-CREATE TABLE IF NOT EXISTS mpp_occurrence_evidence (
+CREATE INDEX IF NOT EXISTS occurrence_scope_time_idx ON occurrence (scope_id, estimated_start_at);
+CREATE INDEX IF NOT EXISTS occurrence_sql_time_idx ON occurrence (sql_id, estimated_start_at);
+CREATE TABLE IF NOT EXISTS occurrence_evidence (
     analysis_id text NOT NULL,
     occurrence_id text NOT NULL,
     record_id text NOT NULL REFERENCES evidence_record,
     purpose text NOT NULL CHECK (purpose IN ('support','outcome','association')),
     PRIMARY KEY (analysis_id, occurrence_id, record_id, purpose),
-    FOREIGN KEY (analysis_id, occurrence_id) REFERENCES mpp_occurrence
+    FOREIGN KEY (analysis_id, occurrence_id) REFERENCES occurrence
 );
-CREATE TABLE IF NOT EXISTS mpp_normalization (
+CREATE TABLE IF NOT EXISTS normalization (
     normalization_id text PRIMARY KEY CHECK (normalization_id <> ''),
     algorithm_version text NOT NULL CHECK (algorithm_version <> ''),
     parser_version text NOT NULL CHECK (parser_version <> ''),
@@ -196,10 +196,10 @@ CREATE TABLE IF NOT EXISTS mpp_normalization (
     dictionary_digest_value text NOT NULL CHECK (dictionary_digest_value <> ''),
     rules_ref text NOT NULL CHECK (rules_ref <> '')
 );
-CREATE TABLE IF NOT EXISTS mpp_fingerprint (
+CREATE TABLE IF NOT EXISTS fingerprint (
     fingerprint_id text PRIMARY KEY CHECK (fingerprint_id <> ''),
-    sql_id text NOT NULL REFERENCES mpp_sql_text,
-    normalization_id text NOT NULL REFERENCES mpp_normalization,
+    sql_id text NOT NULL REFERENCES sql_text,
+    normalization_id text NOT NULL REFERENCES normalization,
     profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
     state text NOT NULL CHECK (state IN ('reliable','unsupported_syntax','normalization_failed')),
     value text CHECK (value <> ''),
@@ -210,8 +210,8 @@ CREATE TABLE IF NOT EXISTS mpp_fingerprint (
     UNIQUE (fingerprint_id, normalization_id, profile),
     UNIQUE (fingerprint_id, normalization_id, profile, value)
 );
-CREATE INDEX IF NOT EXISTS mpp_fingerprint_value_idx ON mpp_fingerprint (normalization_id, profile, value);
-CREATE TABLE IF NOT EXISTS mpp_baseline_group (
+CREATE INDEX IF NOT EXISTS fingerprint_value_idx ON fingerprint (normalization_id, profile, value);
+CREATE TABLE IF NOT EXISTS baseline_group (
     group_id text PRIMARY KEY CHECK (group_id <> ''),
     scope_id text NOT NULL,
     profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS mpp_baseline_group (
     fingerprint_value text NOT NULL,
     timing_type text NOT NULL CHECK (timing_type IN ('request','execute_first','execute_fetch','parse','bind')),
     FOREIGN KEY (scope_id, profile) REFERENCES scope (scope_id, profile),
-    FOREIGN KEY (fingerprint_id, normalization_id, profile, fingerprint_value) REFERENCES mpp_fingerprint (fingerprint_id, normalization_id, profile, value),
+    FOREIGN KEY (fingerprint_id, normalization_id, profile, fingerprint_value) REFERENCES fingerprint (fingerprint_id, normalization_id, profile, value),
     UNIQUE (scope_id, profile, normalization_id, database, execution_user, fingerprint_value, timing_type),
     UNIQUE (group_id, scope_id, normalization_id, profile),
     UNIQUE (group_id, normalization_id, profile, fingerprint_value)
@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS input_analysis (
     FOREIGN KEY (input_id, scope_id) REFERENCES input_snapshot (input_id, scope_id),
     FOREIGN KEY (analysis_id, scope_id) REFERENCES analysis (analysis_id, scope_id)
 );
-CREATE TABLE IF NOT EXISTS mpp_input_occurrence (
+CREATE TABLE IF NOT EXISTS input_occurrence (
     input_id text NOT NULL,
     analysis_id text NOT NULL,
     occurrence_id text NOT NULL,
@@ -268,12 +268,12 @@ CREATE TABLE IF NOT EXISTS mpp_input_occurrence (
     PRIMARY KEY (input_id, analysis_id, occurrence_id),
     FOREIGN KEY (input_id, analysis_id) REFERENCES input_analysis,
     FOREIGN KEY (input_id, scope_id) REFERENCES input_snapshot (input_id, scope_id),
-    FOREIGN KEY (analysis_id, occurrence_id, scope_id) REFERENCES mpp_occurrence (analysis_id, occurrence_id, scope_id)
+    FOREIGN KEY (analysis_id, occurrence_id, scope_id) REFERENCES occurrence (analysis_id, occurrence_id, scope_id)
 );
 CREATE TABLE IF NOT EXISTS config_snapshot (
     config_id text PRIMARY KEY CHECK (config_id <> ''),
     scope_id text NOT NULL,
-    normalization_id text REFERENCES mpp_normalization,
+    normalization_id text REFERENCES normalization,
     profile text NOT NULL,
     source_mapping_refs jsonb NOT NULL CHECK (jsonb_typeof(source_mapping_refs) = 'array'),
     cutoff_date date NOT NULL,
@@ -317,7 +317,7 @@ CREATE TABLE IF NOT EXISTS build (
     CHECK (finished_at >= started_at)
 );
 CREATE INDEX IF NOT EXISTS build_scope_time_idx ON build (scope_id, started_at);
-CREATE TABLE IF NOT EXISTS mpp_decision (
+CREATE TABLE IF NOT EXISTS decision (
     decision_id text PRIMARY KEY CHECK (decision_id <> ''),
     build_id text NOT NULL,
     scope_id text NOT NULL,
@@ -333,11 +333,11 @@ CREATE TABLE IF NOT EXISTS mpp_decision (
     count_scope text NOT NULL CHECK (count_scope IN ('group','batch','none')),
     rule_evaluations jsonb NOT NULL CHECK (jsonb_typeof(rule_evaluations) = 'object' AND rule_evaluations ?& ARRAY['outcome','duration','association','sql','fingerprint','blacklist','exclusion_interval','window']),
     FOREIGN KEY (build_id, scope_id, normalization_id, profile) REFERENCES build (build_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (analysis_id, occurrence_id, scope_id) REFERENCES mpp_occurrence (analysis_id, occurrence_id, scope_id),
-    FOREIGN KEY (fingerprint_id, normalization_id, profile) REFERENCES mpp_fingerprint (fingerprint_id, normalization_id, profile),
-    FOREIGN KEY (fingerprint_id, normalization_id, profile, fingerprint_value) REFERENCES mpp_fingerprint (fingerprint_id, normalization_id, profile, value),
-    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES mpp_baseline_group (group_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (group_id, normalization_id, profile, fingerprint_value) REFERENCES mpp_baseline_group (group_id, normalization_id, profile, fingerprint_value),
+    FOREIGN KEY (analysis_id, occurrence_id, scope_id) REFERENCES occurrence (analysis_id, occurrence_id, scope_id),
+    FOREIGN KEY (fingerprint_id, normalization_id, profile) REFERENCES fingerprint (fingerprint_id, normalization_id, profile),
+    FOREIGN KEY (fingerprint_id, normalization_id, profile, fingerprint_value) REFERENCES fingerprint (fingerprint_id, normalization_id, profile, value),
+    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES baseline_group (group_id, scope_id, normalization_id, profile),
+    FOREIGN KEY (group_id, normalization_id, profile, fingerprint_value) REFERENCES baseline_group (group_id, normalization_id, profile, fingerprint_value),
     UNIQUE (build_id, analysis_id, occurrence_id),
     CHECK (coalesce(rule_evaluations->>'outcome' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'duration' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'association' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'sql' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'fingerprint' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'blacklist' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'exclusion_interval' IN ('matched','not_matched','not_evaluated'),false) AND coalesce(rule_evaluations->>'window' IN ('matched','not_matched','not_evaluated'),false)),
     CHECK (group_id IS NULL OR (fingerprint_id IS NOT NULL AND fingerprint_value IS NOT NULL)),
@@ -346,19 +346,19 @@ CREATE TABLE IF NOT EXISTS mpp_decision (
     CHECK ((state = 'outside_window') = (in_window IS FALSE)),
     CHECK ((state = 'outside_window') = (count_scope = 'none'))
 );
-CREATE INDEX IF NOT EXISTS mpp_decision_group_idx ON mpp_decision (build_id, group_id);
-CREATE TABLE IF NOT EXISTS mpp_decision_reason (
-    decision_id text NOT NULL REFERENCES mpp_decision,
+CREATE INDEX IF NOT EXISTS decision_group_idx ON decision (build_id, group_id);
+CREATE TABLE IF NOT EXISTS decision_reason (
+    decision_id text NOT NULL REFERENCES decision,
     code text NOT NULL CHECK (code IN ('execution_failed','execution_cancelled','execution_timed_out','outcome_unknown','duration_unknown','association_unreliable','timing_unknown','sql_missing','sql_incomplete','sql_encoding_invalid','sql_uncertain','fingerprint_failed','identity_missing','start_unknown','blacklist_category','blacklist_template','excluded_interval','outside_window')),
     rule_ref text NOT NULL CHECK (rule_ref <> ''),
     PRIMARY KEY (decision_id, code)
 );
-CREATE TABLE IF NOT EXISTS mpp_decision_reason_evidence (
+CREATE TABLE IF NOT EXISTS decision_reason_evidence (
     decision_id text NOT NULL,
     code text NOT NULL,
     record_id text NOT NULL REFERENCES evidence_record,
     PRIMARY KEY (decision_id, code, record_id),
-    FOREIGN KEY (decision_id, code) REFERENCES mpp_decision_reason
+    FOREIGN KEY (decision_id, code) REFERENCES decision_reason
 );
 CREATE TABLE IF NOT EXISTS problem (
     problem_id text PRIMARY KEY CHECK (problem_id <> ''),
@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS problem (
     count bigint NOT NULL CHECK (count >= 0),
     resolution text NOT NULL CHECK (resolution IN ('open','isolated','resolved')),
     resolution_evidence text CHECK (resolution_evidence <> ''),
-    FOREIGN KEY (analysis_id, occurrence_id) REFERENCES mpp_occurrence MATCH FULL,
+    FOREIGN KEY (analysis_id, occurrence_id) REFERENCES occurrence MATCH FULL,
     CHECK ((level = 'record' AND batch_id IS NOT NULL AND file_id IS NOT NULL)
         OR (level = 'file' AND file_id IS NOT NULL)
         OR (level = 'batch' AND batch_id IS NOT NULL)
@@ -401,14 +401,14 @@ CREATE TABLE IF NOT EXISTS build_check (
     PRIMARY KEY (build_id, name),
     CHECK ((state = 'passed') = (reason IS NULL))
 );
-CREATE TABLE IF NOT EXISTS mpp_build_timing_coverage (
+CREATE TABLE IF NOT EXISTS build_timing_coverage (
     build_id text NOT NULL REFERENCES build,
     timing_type text NOT NULL CHECK (timing_type IN ('request','execute_first','execute_fetch','parse','bind')),
     included_count bigint NOT NULL CHECK (included_count >= 0),
     excluded_count bigint NOT NULL CHECK (excluded_count >= 0),
     PRIMARY KEY (build_id, timing_type)
 );
-CREATE TABLE IF NOT EXISTS mpp_build_coverage (
+CREATE TABLE IF NOT EXISTS build_coverage (
     build_id text NOT NULL,
     group_id text NOT NULL,
     scope_id text NOT NULL,
@@ -419,10 +419,10 @@ CREATE TABLE IF NOT EXISTS mpp_build_coverage (
     empty_keys jsonb NOT NULL CHECK (jsonb_typeof(empty_keys) = 'array'),
     PRIMARY KEY (build_id, group_id, layer),
     FOREIGN KEY (build_id, scope_id, normalization_id, profile) REFERENCES build (build_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES mpp_baseline_group (group_id, scope_id, normalization_id, profile)
+    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES baseline_group (group_id, scope_id, normalization_id, profile)
 );
 
-CREATE TABLE IF NOT EXISTS mpp_statistic (
+CREATE TABLE IF NOT EXISTS statistic (
     statistic_id text PRIMARY KEY CHECK (statistic_id <> ''),
     build_id text NOT NULL,
     group_id text NOT NULL,
@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
     metric_null_reasons jsonb NOT NULL CHECK (jsonb_typeof(metric_null_reasons) = 'object'),
     sufficiency jsonb NOT NULL CHECK (jsonb_typeof(sufficiency) = 'object' AND sufficiency ?& ARRAY['basic','p95','p99']),
     FOREIGN KEY (build_id, scope_id, normalization_id, profile) REFERENCES build (build_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES mpp_baseline_group (group_id, scope_id, normalization_id, profile),
+    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES baseline_group (group_id, scope_id, normalization_id, profile),
     UNIQUE NULLS NOT DISTINCT (build_id, group_id, layer, bucket_date, bucket_number),
     CHECK (range_start < range_end),
     CHECK (
@@ -531,7 +531,7 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
             AND ((included_count = 0) = (metric_null_reasons->>'p99_p50' = 'no_samples')))),
     CHECK (min_ms <= p25_ms AND p25_ms <= p50_ms AND p50_ms <= p75_ms
         AND p75_ms <= p90_ms AND p90_ms <= p95_ms AND p95_ms <= p99_ms AND p99_ms <= max_ms),
-CONSTRAINT mpp_statistic_sufficiency_basic_check CHECK (coalesce(
+CONSTRAINT statistic_sufficiency_basic_check CHECK (coalesce(
     jsonb_typeof(sufficiency->'basic') = 'object'
     AND (sufficiency->'basic') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
     AND jsonb_typeof(sufficiency->'basic'->'required_count') = 'number'
@@ -554,7 +554,7 @@ CONSTRAINT mpp_statistic_sufficiency_basic_check CHECK (coalesce(
         AND (sufficiency->'basic'->>'actual_coverage')::numeric >= (sufficiency->'basic'->>'required_coverage')::numeric)
     AND jsonb_typeof(sufficiency->'basic'->'reasons') = 'array'
     AND ((sufficiency->'basic'->>'met')::boolean = (sufficiency->'basic'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p95_check CHECK (coalesce(
+CONSTRAINT statistic_sufficiency_p95_check CHECK (coalesce(
     jsonb_typeof(sufficiency->'p95') = 'object'
     AND (sufficiency->'p95') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
     AND jsonb_typeof(sufficiency->'p95'->'required_count') = 'number'
@@ -577,7 +577,7 @@ CONSTRAINT mpp_statistic_sufficiency_p95_check CHECK (coalesce(
         AND (sufficiency->'p95'->>'actual_coverage')::numeric >= (sufficiency->'p95'->>'required_coverage')::numeric)
     AND jsonb_typeof(sufficiency->'p95'->'reasons') = 'array'
     AND ((sufficiency->'p95'->>'met')::boolean = (sufficiency->'p95'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p99_check CHECK (coalesce(
+CONSTRAINT statistic_sufficiency_p99_check CHECK (coalesce(
     jsonb_typeof(sufficiency->'p99') = 'object'
     AND (sufficiency->'p99') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
     AND jsonb_typeof(sufficiency->'p99'->'required_count') = 'number'
@@ -606,7 +606,7 @@ CONSTRAINT mpp_statistic_sufficiency_p99_check CHECK (coalesce(
     CHECK (cardinality(active_dates) <= included_count AND cardinality(active_week_starts) <= included_count),
     CHECK (mean_ms BETWEEN min_ms AND max_ms)
 );
-CREATE INDEX IF NOT EXISTS mpp_statistic_group_build_idx ON mpp_statistic (group_id, build_id, layer);
+CREATE INDEX IF NOT EXISTS statistic_group_build_idx ON statistic (group_id, build_id, layer);
 CREATE TABLE IF NOT EXISTS publication (
     publication_id text PRIMARY KEY CHECK (publication_id <> ''),
     scope_id text NOT NULL,

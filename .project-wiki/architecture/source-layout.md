@@ -69,7 +69,7 @@ sql-apm/
 │   │   ├── normalization.py    # 后续：归一化
 │   │   └── fingerprint.py      # 后续：结构指纹
 │   ├── baseline/               # 后续：训练筛选、窗口、统计、构建、版本
-│   ├── storage/                # 已有：DDL／初始化 SQL；业务读写接口后续实现
+│   ├── storage/                # 已有：DDL／初始化及迁移 SQL；业务读写接口后续实现
 │   └── diagnostics/
 │       ├── __init__.py
 │       ├── function_probe.py
@@ -131,7 +131,7 @@ sql-apm/
 [类别核查报告](../../docs/reports/statement-category-census-2026-09-26.md)。
 
 2026-09-26 新增 `storage/` 的版本化 PostgreSQL DDL、管理员引导和 catalog 核对 SQL；
-`scripts/db/` 提供初始化及临时实例验证，`tests/database/` 映射既有人工样例。
+`scripts/db/` 提供初始化、显式版本升级及临时实例验证，`tests/database/` 映射既有人工样例。
 [存储主题](postgresql-storage.md)说明结构、事务边界及实际验证，尚无 Python 业务读写接口。
 
 ## Workflows

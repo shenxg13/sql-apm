@@ -16,6 +16,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tests"))
 from database.fixture import statements  # noqa: E402
+from database.migration import verify_migration  # noqa: E402
 
 
 def run(args, env=None, sql=None, ok=True):
@@ -100,48 +101,48 @@ class Verification:
         self.sql("CREATE TABLE owner_probe (id integer); ALTER TABLE owner_probe ADD COLUMN value text; INSERT INTO owner_probe VALUES (1,'ok'); UPDATE owner_probe SET value='changed'; DELETE FROM owner_probe; DROP TABLE owner_probe")
         self.require(True, "project account DDL and read/write access")
         self.sql("BEGIN;\n" + statements() + "\nCOMMIT;")
-        self.require(self.sql("SELECT count(*) FROM statistic") == "5", "Issue #3 base fixture, five layers and 17 metric columns stored")
-        self.require(self.sql("SELECT sum(jsonb_array_length(computed_keys)+jsonb_array_length(empty_keys)) FROM build_coverage") == "67", "sparse coverage expands to 67 logical buckets")
-        self.require(self.sql("SELECT sum(included_count) FROM build_timing_coverage") == "1", "five timing summaries preserve one actual request")
+        self.require(self.sql("SELECT count(*) FROM mpp_statistic") == "5", "Issue #3 base fixture, five layers and 17 metric columns stored")
+        self.require(self.sql("SELECT sum(jsonb_array_length(computed_keys)+jsonb_array_length(empty_keys)) FROM mpp_build_coverage") == "67", "sparse coverage expands to 67 logical buckets")
+        self.require(self.sql("SELECT sum(included_count) FROM mpp_build_timing_coverage") == "1", "five timing summaries preserve one actual request")
         # A second actual event reuses the same complete original SQL.
         self.sql("INSERT INTO evidence_record SELECT 'R2',file_id,source_id,scope_id,2,3,3,decode_state,observed FROM evidence_record WHERE record_id='R1'; "
-                 "INSERT INTO occurrence SELECT (jsonb_populate_record(NULL::occurrence,to_jsonb(o)||'{\"occurrence_id\":\"O2\",\"anchor_ref\":\"R2\"}'::jsonb)).* FROM occurrence o WHERE occurrence_id='O1'")
-        self.require(self.sql("SELECT (SELECT count(*) FROM sql_text)||':'||(SELECT count(*) FROM occurrence)") == "1:2",
+                 "INSERT INTO mpp_occurrence SELECT (jsonb_populate_record(NULL::mpp_occurrence,to_jsonb(o)||'{\"occurrence_id\":\"O2\",\"anchor_ref\":\"R2\"}'::jsonb)).* FROM mpp_occurrence o WHERE occurrence_id='O1'")
+        self.require(self.sql("SELECT (SELECT count(*) FROM mpp_sql_text)||':'||(SELECT count(*) FROM mpp_occurrence)") == "1:2",
                      "original SQL reused; actual executions retained separately")
-        self.sql("UPDATE occurrence SET duration_ms=0,estimated_start_at=end_at WHERE occurrence_id='O2'")
-        self.require(self.sql("SELECT duration_ms=0 AND estimated_start_at=end_at FROM occurrence WHERE occurrence_id='O2'") == "t", "real zero duration")
-        self.sql("UPDATE occurrence SET duration_ms=NULL,estimated_start_at=NULL,start_basis=NULL,value_reasons='{\"duration_ms\":\"unknown\",\"estimated_start_at\":\"duration unknown\"}' WHERE occurrence_id='O2'")
-        self.require(self.sql("SELECT duration_ms IS NULL FROM occurrence WHERE occurrence_id='O2'") == "t", "unknown duration remains NULL with reasons")
-        self.sql("UPDATE occurrence SET duration_ms=0.001,end_at='2026-09-21 00:00:00.000001+08',estimated_start_at='2026-09-21 00:00:00+08',start_basis='end_minus_duration',value_reasons='{}' WHERE occurrence_id='O2'")
-        self.require(self.sql("SELECT extract(epoch FROM end_at-estimated_start_at)*1000=duration_ms FROM occurrence WHERE occurrence_id='O2'") == "t",
+        self.sql("UPDATE mpp_occurrence SET duration_ms=0,estimated_start_at=end_at WHERE occurrence_id='O2'")
+        self.require(self.sql("SELECT duration_ms=0 AND estimated_start_at=end_at FROM mpp_occurrence WHERE occurrence_id='O2'") == "t", "real zero duration")
+        self.sql("UPDATE mpp_occurrence SET duration_ms=NULL,estimated_start_at=NULL,start_basis=NULL,value_reasons='{\"duration_ms\":\"unknown\",\"estimated_start_at\":\"duration unknown\"}' WHERE occurrence_id='O2'")
+        self.require(self.sql("SELECT duration_ms IS NULL FROM mpp_occurrence WHERE occurrence_id='O2'") == "t", "unknown duration remains NULL with reasons")
+        self.sql("UPDATE mpp_occurrence SET duration_ms=0.001,end_at='2026-09-21 00:00:00.000001+08',estimated_start_at='2026-09-21 00:00:00+08',start_basis='end_minus_duration',value_reasons='{}' WHERE occurrence_id='O2'")
+        self.require(self.sql("SELECT extract(epoch FROM end_at-estimated_start_at)*1000=duration_ms FROM mpp_occurrence WHERE occurrence_id='O2'") == "t",
                      "decimal milliseconds and microsecond timestamps round-trip")
-        self.rejects("UPDATE occurrence SET duration_ms=-1 WHERE occurrence_id='O2'", "negative duration rejected")
+        self.rejects("UPDATE mpp_occurrence SET duration_ms=-1 WHERE occurrence_id='O2'", "negative duration rejected")
         for bad in ("NaN", "Infinity", "-Infinity"):
-            self.rejects("UPDATE occurrence SET duration_ms='" + bad + "' WHERE occurrence_id='O2'", bad + " duration rejected")
-        self.rejects("UPDATE occurrence SET duration_ms=NULL WHERE occurrence_id='O2'", "unknown duration without explanation rejected")
-        self.rejects("UPDATE occurrence SET sql_id=NULL WHERE occurrence_id='O1'", "complete SQL cannot lose its reference")
-        self.rejects("UPDATE occurrence SET sql_id='missing' WHERE occurrence_id='O1'", "dangling original SQL reference rejected")
-        self.rejects("UPDATE occurrence SET timing_type='execute_first' WHERE occurrence_id='O1'", "request/call mismatch rejected")
-        self.rejects("UPDATE occurrence SET association_state='unpaired',association_reason='unknown',unit='call',timing_type='execute_first' WHERE occurrence_id='O1'", "unpaired execute classification rejected")
+            self.rejects("UPDATE mpp_occurrence SET duration_ms='" + bad + "' WHERE occurrence_id='O2'", bad + " duration rejected")
+        self.rejects("UPDATE mpp_occurrence SET duration_ms=NULL WHERE occurrence_id='O2'", "unknown duration without explanation rejected")
+        self.rejects("UPDATE mpp_occurrence SET sql_id=NULL WHERE occurrence_id='O1'", "complete SQL cannot lose its reference")
+        self.rejects("UPDATE mpp_occurrence SET sql_id='missing' WHERE occurrence_id='O1'", "dangling original SQL reference rejected")
+        self.rejects("UPDATE mpp_occurrence SET timing_type='execute_first' WHERE occurrence_id='O1'", "request/call mismatch rejected")
+        self.rejects("UPDATE mpp_occurrence SET association_state='unpaired',association_reason='unknown',unit='call',timing_type='execute_first' WHERE occurrence_id='O1'", "unpaired execute classification rejected")
         self.rejects("UPDATE evidence_record SET record_no=1 WHERE record_id='R2'", "file logical record uniqueness")
-        self.rejects("UPDATE statistic SET bucket_number=24 WHERE layer='hour'", "invalid hour bucket rejected")
-        self.rejects("UPDATE statistic SET p95_ms=NULL WHERE statistic_id='ST1'", "missing metric without reason rejected")
-        self.rejects("UPDATE statistic SET cv=NULL,metric_null_reasons='{\"cv\":\"zero_denominator\"}' WHERE statistic_id='ST1'", "zero denominator reason must match actual denominator")
-        self.rejects("UPDATE statistic SET p95_ms=1 WHERE statistic_id='ST1'", "quantile ordering rejected")
-        self.rejects("INSERT INTO statistic SELECT (jsonb_populate_record(NULL::statistic,to_jsonb(s)||'{\"statistic_id\":\"duplicate\"}'::jsonb)).* FROM statistic s WHERE statistic_id='ST1'", "overall NULL bucket uniqueness")
-        self.rejects("DELETE FROM normalization WHERE normalization_id='N1'", "historical rule references prevent deletion")
+        self.rejects("UPDATE mpp_statistic SET bucket_number=24 WHERE layer='hour'", "invalid hour bucket rejected")
+        self.rejects("UPDATE mpp_statistic SET p95_ms=NULL WHERE statistic_id='ST1'", "missing metric without reason rejected")
+        self.rejects("UPDATE mpp_statistic SET cv=NULL,metric_null_reasons='{\"cv\":\"zero_denominator\"}' WHERE statistic_id='ST1'", "zero denominator reason must match actual denominator")
+        self.rejects("UPDATE mpp_statistic SET p95_ms=1 WHERE statistic_id='ST1'", "quantile ordering rejected")
+        self.rejects("INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,to_jsonb(s)||'{\"statistic_id\":\"duplicate\"}'::jsonb)).* FROM mpp_statistic s WHERE statistic_id='ST1'", "overall NULL bucket uniqueness")
+        self.rejects("DELETE FROM mpp_normalization WHERE normalization_id='N1'", "historical rule references prevent deletion")
         self.rejects("UPDATE current_version SET last_success_at=last_success_at+interval '1 second'", "current pointer must match successful publication time")
         self.sql("INSERT INTO publication VALUES ('PUB_FAIL','CL1','V1','V1','publish_failed','synthetic failure','2026-10-02 00:00:00+08')")
         self.rejects("UPDATE current_version SET publication_id='PUB_FAIL',last_success_at='2026-10-02 00:00:00+08'", "failed publication cannot become current")
         self.require(self.sql("SELECT build_id||':'||publication_id FROM current_version") == "V1:PUB1", "failed writes preserve current version")
         self.sql("INSERT INTO scope VALUES ('CL2','hashdata','hashdata-csv/1','1.0.0')")
-        self.rejects("UPDATE decision SET scope_id='CL2'", "cross-cluster build references rejected")
+        self.rejects("UPDATE mpp_decision SET scope_id='CL2'", "cross-cluster build references rejected")
 
-        self.rejects("UPDATE statistic SET sufficiency=jsonb_set(sufficiency,'{basic,met}','true') WHERE statistic_id='ST1'", "false sufficiency claim rejected")
-        self.rejects("UPDATE statistic SET sufficiency=jsonb_set(sufficiency,'{p95,actual_count}','99') WHERE statistic_id='ST1'", "threshold sample count must match statistic")
-        self.rejects("UPDATE decision SET rule_evaluations=jsonb_set(rule_evaluations,'{window}','null')", "unknown rule evaluation rejected")
-        self.rejects("UPDATE sql_text SET content_sha256=decode(repeat('00',32),'hex')", "SQL content checksum mismatch rejected")
-        stat = json.loads(self.sql("SELECT row_to_json(s) FROM statistic s WHERE statistic_id='ST2'"))
+        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{basic,met}','true') WHERE statistic_id='ST1'", "false sufficiency claim rejected")
+        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{p95,actual_count}','99') WHERE statistic_id='ST1'", "threshold sample count must match mpp_statistic")
+        self.rejects("UPDATE mpp_decision SET rule_evaluations=jsonb_set(rule_evaluations,'{window}','null')", "unknown rule evaluation rejected")
+        self.rejects("UPDATE mpp_sql_text SET content_sha256=decode(repeat('00',32),'hex')", "SQL content checksum mismatch rejected")
+        stat = json.loads(self.sql("SELECT row_to_json(s) FROM mpp_statistic s WHERE statistic_id='ST2'"))
         metric_names = list(json.loads((ROOT / "docs/design/offline-data-contract/examples.json").read_text())["metric_names"])
         for metric in metric_names:
             stat[metric] = None
@@ -154,7 +155,7 @@ class Verification:
             result["actual_count"] = 0
             result["actual_coverage"] = 0
         payload = json.dumps(stat).replace("'", "''")
-        self.require(self.sql("BEGIN; INSERT INTO statistic SELECT (jsonb_populate_record(NULL::statistic,'" + payload + "'::jsonb)).*; SELECT included_count=0 AND excluded_count=1 AND mean_ms IS NULL FROM statistic WHERE statistic_id='EMPTY'; ROLLBACK") == "t",
+        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT included_count=0 AND excluded_count=1 AND mean_ms IS NULL FROM mpp_statistic WHERE statistic_id='EMPTY'; ROLLBACK") == "t",
                      "zero samples with exclusions stored explicitly; all 17 metrics carry no_samples")
         stat.update(statistic_id="ZERO", included_count=1, excluded_count=0, exclusions_by_reason={},
                     active_dates=["2026-09-22"], active_week_starts=["2026-09-21"],
@@ -165,10 +166,10 @@ class Verification:
         for result in stat["sufficiency"].values():
             result["actual_count"] = 1
         payload = json.dumps(stat).replace("'", "''")
-        self.require(self.sql("BEGIN; INSERT INTO statistic SELECT (jsonb_populate_record(NULL::statistic,'" + payload + "'::jsonb)).*; SELECT mean_ms=0 AND cv IS NULL FROM statistic WHERE statistic_id='ZERO'; ROLLBACK") == "t",
+        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT mean_ms=0 AND cv IS NULL FROM mpp_statistic WHERE statistic_id='ZERO'; ROLLBACK") == "t",
                      "zero duration metrics and zero denominator reasons remain distinct")
-        self.sql("INSERT INTO normalization SELECT 'N2',algorithm_version,parser_version,dictionary_schema_version,'synthetic-next',dictionary_digest_algorithm,'synthetic-next',rules_ref FROM normalization WHERE normalization_id='N1'")
-        self.rejects("UPDATE decision SET normalization_id='N2'", "cross-normalization build/decision reference rejected")
+        self.sql("INSERT INTO mpp_normalization SELECT 'N2',algorithm_version,parser_version,dictionary_schema_version,'synthetic-next',dictionary_digest_algorithm,'synthetic-next',rules_ref FROM mpp_normalization WHERE normalization_id='N1'")
+        self.rejects("UPDATE mpp_decision SET normalization_id='N2'", "cross-mpp_normalization build/mpp_decision reference rejected")
         self.sql("INSERT INTO scope VALUES ('JOB','batch-job-example','batch-job-example/1','1.0.0'); "
                  "INSERT INTO input_snapshot VALUES ('JOB_IN','JOB','immutable_manifest','synthetic:job-runs','2026-10-01 00:00:00+00'); "
                  "INSERT INTO config_snapshot SELECT 'JOB_CFG','JOB',NULL,'batch-job-example/1','[]',cutoff_date,window_days,window_start,window_end,'{}','[]','{}','synthetic:job-formulas' FROM config_snapshot WHERE config_id='CFG1'; "
@@ -189,7 +190,7 @@ class Verification:
         before = self.sql("SELECT row_to_json(v) FROM schema_version v")
         self.init()
         self.init("check")
-        self.require(self.sql("SELECT count(*) FROM occurrence") == "2" and self.sql("SELECT row_to_json(v) FROM schema_version v") == before,
+        self.require(self.sql("SELECT count(*) FROM mpp_occurrence") == "2" and self.sql("SELECT row_to_json(v) FROM schema_version v") == before,
                      "complete rerun preserves data and original version timestamp")
         self.require(password_before == self.sql("SELECT rolpassword FROM pg_authid WHERE rolname='sql_apm'", admin=True),
                      "rerun preserves existing SCRAM password")
@@ -200,20 +201,20 @@ class Verification:
         self.sql("ALTER SCHEMA sql_apm OWNER TO apm_test_admin", admin=True, database="sql_apm")
         self.require("incompatible schema owner" in self.init(ok=False).stderr, "incompatible schema owner rejected")
         self.sql("ALTER SCHEMA sql_apm OWNER TO sql_apm", admin=True, database="sql_apm")
-        self.sql("ALTER TABLE sql_apm.statistic OWNER TO apm_test_admin", admin=True, database="sql_apm")
-        self.require("incompatible object: statistic" in self.init(ok=False).stderr, "incompatible table owner rejected")
-        self.sql("ALTER TABLE sql_apm.statistic OWNER TO sql_apm", admin=True, database="sql_apm")
-        self.sql("DROP INDEX statistic_group_build_idx; CREATE INDEX statistic_group_build_idx ON statistic (layer)")
+        self.sql("ALTER TABLE sql_apm.mpp_statistic OWNER TO apm_test_admin", admin=True, database="sql_apm")
+        self.require("incompatible object: mpp_statistic" in self.init(ok=False).stderr, "incompatible table owner rejected")
+        self.sql("ALTER TABLE sql_apm.mpp_statistic OWNER TO sql_apm", admin=True, database="sql_apm")
+        self.sql("DROP INDEX mpp_statistic_group_build_idx; CREATE INDEX mpp_statistic_group_build_idx ON mpp_statistic (layer)")
         self.require("indexes" in self.init(ok=False).stderr, "same-name index with wrong definition rejected")
-        self.sql("DROP INDEX statistic_group_build_idx; CREATE INDEX statistic_group_build_idx ON statistic (group_id,build_id,layer)")
+        self.sql("DROP INDEX mpp_statistic_group_build_idx; CREATE INDEX mpp_statistic_group_build_idx ON mpp_statistic (group_id,build_id,layer)")
         self.sql("ALTER TABLE source ADD CHECK (mapping_ref <> 'conflict')")
         self.require("constraints" in self.init(ok=False).stderr, "unexpected same-table constraint rejected")
         self.sql("ALTER TABLE source DROP CONSTRAINT source_mapping_ref_check1")
 
-        self.sql("ALTER TABLE statistic ADD COLUMN accidental integer")
+        self.sql("ALTER TABLE mpp_statistic ADD COLUMN accidental integer")
         failure = self.init(ok=False)
-        self.require("incompatible object: statistic" in failure.stderr, "catalog drift rejected with object diagnostic")
-        self.sql("ALTER TABLE statistic DROP COLUMN accidental")
+        self.require("incompatible object: mpp_statistic" in failure.stderr, "catalog drift rejected with object diagnostic")
+        self.sql("ALTER TABLE mpp_statistic DROP COLUMN accidental")
         self.init("check")
         self.sql("UPDATE schema_version SET script_sha256=repeat('0',64)")
         self.require("checksum" in self.init(ok=False).stderr, "incorrect version checksum rejected")
@@ -259,7 +260,7 @@ class Verification:
         self.require(self.sql("SELECT count(*) FROM pg_namespace WHERE nspname LIKE '_apm_expected_%'") == "0", "no scratch schema remains")
         # PostgreSQL itself is restarted to verify on-disk persistence.
         run([self.pg_bin / "pg_ctl", "-D", self.directory / "data", "-m", "fast", "-w", "restart", "-l", self.directory / "server.log"], self.env)
-        self.require(self.sql("SELECT count(*) FROM statistic") == "5", "restart persistence")
+        self.require(self.sql("SELECT count(*) FROM mpp_statistic") == "5", "restart persistence")
         print("RESULT: " + str(self.completed) + " storage checks passed", flush=True)
 
 
@@ -280,6 +281,8 @@ def main():
     signal.signal(signal.SIGINT, interrupted)
     with instance(args.pg_bin) as (directory, env):
         Verification(args.pg_bin, directory, env).tests()
+    with instance(args.pg_bin) as (directory, env):
+        verify_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

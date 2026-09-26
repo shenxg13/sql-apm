@@ -68,6 +68,7 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [HashData 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
+| [PostgreSQL 结构 R1 整改验证](reports/postgresql-storage-r1-remediation-2026-09-26.md) | 分析证据 | 外键内部触发器模式漂移的复现、轻量目录检查及恢复／迁移回归。 |
 | [MPP 结构升级验证](reports/mpp-storage-migration-2026-09-26.md) | 分析证据 | 1.0.0 到 1.1.0 的数据／对象保留、失败回滚、重跑和自定义名称验证。 |
 | [PostgreSQL 结构验证](reports/postgresql-storage-2026-09-26.md) | 分析证据 | 临时 PG17 实例的存储约束、真实账号、重跑和清理实测。 |
 | [语句类别黑名单核查（2026-09-26）](reports/statement-category-census-2026-09-26.md) | 分析证据 | 全部日志的类别、别名及异常覆盖，保守名单依据与合成规则验收。 |

@@ -123,3 +123,4 @@
 | 2026-09-26 | 用户明确生产 HashData 系统日常专称 MPP／mpp；记录[生产系统称谓及 mpp_ 前缀含义](decisions/project-scope.md#已确认的生产系统称谓)，既有技术标识保持准确，表改名和公共模型拆分尚未实施。 |
 | 2026-09-26 | 用户补充现有两个跑批系统为 luban 和 baichuan，记录[系统称谓](decisions/project-scope.md#已确认的生产系统称谓)；两者接入规则、表结构复用及专属前缀仍待设计，未实施接入。 |
 | 2026-09-26 | 用户核对按系统独立统计、14 张 MPP 专属表命名及版本迁移清单后授权调整；交付[1.1.0 结构与升级](architecture/postgresql-storage.md)，保留 1.0.0 DDL，更新映射／操作说明及验证。总表数仍为 41，其他系统接入另行落实。 |
+| 2026-09-26 | 按用户授权处理 Issue #7 的 R1 问题 I7-R1-F001；补齐[存储结构检查](architecture/postgresql-storage.md)对外键两侧内部触发器模式的检查，增加拒绝／恢复和旧库迁移验证，保留物理 DDL 及版本，证据见[R1 整改记录](../docs/reports/postgresql-storage-r1-remediation-2026-09-26.md)。 |

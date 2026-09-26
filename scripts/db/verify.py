@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tests"))
 from database.fixture import statements  # noqa: E402
 from database.migration import verify_migration  # noqa: E402
+from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
 
 def run(args, env=None, sql=None, ok=True):
@@ -281,6 +282,8 @@ def main():
     signal.signal(signal.SIGINT, interrupted)
     with instance(args.pg_bin) as (directory, env):
         Verification(args.pg_bin, directory, env).tests()
+    with instance(args.pg_bin) as (directory, env):
+        verify_current_triggers(Verification(args.pg_bin, directory, env), run)
     with instance(args.pg_bin) as (directory, env):
         verify_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.

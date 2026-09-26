@@ -17,6 +17,8 @@ sources:
     status: historical
   - path: docs/reports/mpp-storage-migration-2026-09-26.md
     status: current
+  - path: docs/reports/postgresql-storage-r1-remediation-2026-09-26.md
+    status: current
 related:
   - contract.offline-data-contract
   - decision.runtime-and-components
@@ -41,7 +43,8 @@ confidence: high
 在线 Issue 负责交付契约；[DDL](../../sql_apm/storage/schema.sql)负责实际结构，
 [物理设计](../../docs/design/postgresql-storage.md)负责对象映射与数据库／应用责任，
 [初版记录](../../docs/reports/postgresql-storage-2026-09-26.md)与
-[MPP 迁移记录](../../docs/reports/mpp-storage-migration-2026-09-26.md)分别说明实际证据及限制。
+[MPP 迁移记录](../../docs/reports/mpp-storage-migration-2026-09-26.md)分别说明实际证据及限制；
+[R1 整改记录](../../docs/reports/postgresql-storage-r1-remediation-2026-09-26.md)补充外键内部触发器的兼容性验证。
 
 ## Contracts
 
@@ -63,6 +66,8 @@ confidence: high
   首版普通表，按构建与分组索引；分区、真实容量及留存期限待实际数据评估。
 - 重跑比较实际 catalog 与事务内创建的预期空结构，并核对脚本 SHA-256。
   项目 schema 专用于版本化对象；兼容表子集可补全，结构漂移明确失败。
+  引用表及被引用表的外键内部触发器须保持默认 O 模式，D／R／A 均拒绝；
+  仅核对系统目录，不自动启用触发器，也不证明异常期间写入的历史行有效。
 - 通用构建核心允许非 SQL profile 不具备 normalization_id；当前 HashData
   执行／指纹／分组／统计结构不冒充未来所有系统的共同模型。
 
@@ -75,6 +80,7 @@ confidence: high
 ## Failure Modes
 
 - 跳过 catalog 校验直接运行 IF NOT EXISTS，静默接受同名错误结构。
+- 只核对外键定义却忽略内部触发器状态，让已停用的外键被误判为有效结构。
 - 把 SQL 摘要或结构指纹当作实际执行身份，丢失真实重复执行。
 - 将合法 NULL 或样本不足当作零，将五层样本数量相加。
 - 修改既有 DDL 字节后仍使用相同已部署结构版本。

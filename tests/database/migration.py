@@ -7,6 +7,7 @@ import subprocess
 import shutil
 
 from database.fixture import statements
+from database.trigger_compatibility import verify_trigger_modes
 
 MPP_TABLES = (
     "sql_text", "sql_text_evidence", "occurrence", "occurrence_evidence",
@@ -124,6 +125,7 @@ def verify_migration(v, root, runner):
             v.require(sql("SELECT count(*) FROM pg_namespace WHERE nspname LIKE '_apm_expected_%' OR nspname LIKE '_apm_legacy_%'") == "0",
                       "failed migrations leave no expected/legacy scratch schemas")
 
+        verify_trigger_modes(v, names, runner, state, legacy=True)
         v.init("upgrade", names=names)
         v.init("check", names=names)
         v.require(state() == before, "upgrade preserves every business row, relation OID/file and constraint OID: " + schema)

@@ -116,3 +116,11 @@
 | 2026-09-26 | 用户确认新增[人类文档导航](../docs/README.md)：按了解项目、业务规则、设计、开发操作、分析依据和协作追溯分类，提供阅读顺序、类型、用途和链接。根 README 与知识索引增加入口，[知识维护方法](methods/knowledge-maintenance.md)及相关工作流明确文档变化时同步导航；既有需求正文和历史证据保持原位 |
 | 2026-09-26 | 用户确认全面核查日志、保守维护语句类别名单；保持已有七项，未确认别名与新类别暂缓，补充[类别边界及合成样例](contracts/training-eligibility.md#首版类别边界与保守维护规则)，证据见[全量核查报告](../docs/reports/statement-category-census-2026-09-26.md)；未实现产品过滤器 |
 | 2026-09-26 | 按 Issue #3 已确认契约交付[离线数据契约设计](contracts/offline-data-contract.md)、字段字典、HashData 来源映射及[合成样例与需求对应](../docs/design/offline-data-contract/README.md)，明确事实／解释、五类五层、固定输入和版本引用；仅设计交付，产品解析、存储及统计功能仍待后续实现。 |
+| 2026-09-26 | 用户确认后续数据库结构交付包含数据库、schema、用户、角色与权限，并采用[单账号最简方案](decisions/runtime-and-components.md#已确认的数据库初始化与单账号方案)：同一账号兼任 schema owner、app 与 admin，查询沿用该账号，不拆分维护／读写／只读角色。按用户要求继续讨论需求，未创建 Issue 或数据库对象；具体命名与初始化权限继续落实。 |
+| 2026-09-26 | 用户进一步确认[数据库初始化与物理结构](decisions/runtime-and-components.md#已确认的数据库初始化与单账号方案)由同一个后续 Issue 统一实现和验收，涵盖数据库、schema、统一账号／角色及权限，以及承接逻辑契约的业务表、约束和必要索引；沿用单账号最简方案，继续讨论需求，未创建 Issue 或开展实现。 |
+| 2026-09-26 | 用户确认[数据库初始化边界](decisions/runtime-and-components.md#已确认的数据库初始化与单账号方案)：已有 PG17 实例为起点，已有管理员引导首次建库建账号，项目账号拥有数据库／schema 且无需实例级超级用户；默认三个名称均为 sql_apm 且可配置，初始化保留数据并可重跑、冲突报错、失败可恢复，同一交付包含物理设计／脚本／版本记录／说明及 disposable 验证，Python 业务接口留待后续。已创建 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接，尚未开展实施。 |
+| 2026-09-26 | 用户核对统计存储、空桶和首版普通表设计后授权实施 Issue #7；交付[PostgreSQL 物理结构与初始化](architecture/postgresql-storage.md)、单账号分阶段引导、catalog 兼容性与结构版本核对，以及合成数据的临时实例验证。已有需求确认修改予以保留；业务导入／统计／发布编排继续由后续工作实现。 |
+| 2026-09-26 | 用户明确生产 HashData 系统日常专称 MPP／mpp；记录[生产系统称谓及 mpp_ 前缀含义](decisions/project-scope.md#已确认的生产系统称谓)，既有技术标识保持准确，表改名和公共模型拆分尚未实施。 |
+| 2026-09-26 | 用户补充现有两个跑批系统为 luban 和 baichuan，记录[系统称谓](decisions/project-scope.md#已确认的生产系统称谓)；两者接入规则、表结构复用及专属前缀仍待设计，未实施接入。 |
+| 2026-09-26 | 用户核对按系统独立统计、14 张 MPP 专属表命名及版本迁移清单后授权调整；交付[1.1.0 结构与升级](architecture/postgresql-storage.md)，保留 1.0.0 DDL，更新映射／操作说明及验证。总表数仍为 41，其他系统接入另行落实。 |
+| 2026-09-26 | 按用户授权处理 Issue #7 的 R1 问题 I7-R1-F001；补齐[存储结构检查](architecture/postgresql-storage.md)对外键两侧内部触发器模式的检查，增加拒绝／恢复和旧库迁移验证，保留物理 DDL 及版本，证据见[R1 整改记录](../docs/reports/postgresql-storage-r1-remediation-2026-09-26.md)。 |

@@ -6,6 +6,9 @@ owners:
   - sql_apm/
   - tests/
   - scripts/functions/
+  - sql_apm/storage/
+  - scripts/db/
+  - tests/database/
 updated: 2026-09-26
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457
@@ -21,6 +24,7 @@ related:
   - decision.runtime-and-components
   - contract.sql-fingerprints
   - contract.offline-data-contract
+  - architecture.postgresql-storage
   - feature.log-ingestion
   - feature.operator-cli
 confidence: high
@@ -65,7 +69,7 @@ sql-apm/
 │   │   ├── normalization.py    # 后续：归一化
 │   │   └── fingerprint.py      # 后续：结构指纹
 │   ├── baseline/               # 后续：训练筛选、窗口、统计、构建、版本
-│   ├── storage/                # 后续：PostgreSQL 读写、事务、查询
+│   ├── storage/                # 已有：DDL／初始化及迁移 SQL；业务读写接口后续实现
 │   └── diagnostics/
 │       ├── __init__.py
 │       ├── function_probe.py
@@ -125,6 +129,10 @@ sql-apm/
 类别清点及有界回放；`scripts/diagnostics/statement_census.py` 为薄入口。该工具
 不承载产品导入、语法解析或黑名单判定，证据与限制见
 [类别核查报告](../../docs/reports/statement-category-census-2026-09-26.md)。
+
+2026-09-26 新增 `storage/` 的版本化 PostgreSQL DDL、管理员引导和 catalog 核对 SQL；
+`scripts/db/` 提供初始化、显式版本升级及临时实例验证，`tests/database/` 映射既有人工样例。
+[存储主题](postgresql-storage.md)说明结构、事务边界及实际验证，尚无 Python 业务读写接口。
 
 ## Workflows
 

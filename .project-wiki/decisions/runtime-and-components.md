@@ -4,13 +4,15 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-09-25
+updated: 2026-09-26
 sources:
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
     status: current
   - path: docs/reports/python-environment-2026-09-25.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/7
     status: current
 related:
   - decision.project-scope
@@ -120,6 +122,44 @@ confidence: high
 部署方式、具体补丁版本和数据库驱动尚待后续落实。
 
 关联条款：[已确认的当前开发环境与生产部署安排](runtime-and-components.md#已确认的当前开发环境与生产部署安排)。
+
+### 已确认的数据库初始化与单账号方案
+
+- 确认日期：2026-09-26；来源状态：current。
+- 来源：用户要求后续数据库结构 Issue 包含“创建数据库，schema，用户，角色，
+  权限这一套结构”，随后明确“先不要创建issue，我们先讨论需求”，并确认
+  “全部使用一个账户即可，这个账户既是schema owner，又是app用户，也是admin
+  用户，用户，schema，角色和权限采用最简化设计”。
+- 用户进一步明确“把初始化数据库和创建相关物理结构放到这个issue里统一实现”。
+  项目数据库、schema、用户、角色及权限的初始化，与业务表、字段、主外键、
+  唯一性及其他约束、必要索引等物理结构，由同一个后续 Issue 统一实现和验收。
+  物理结构承接[离线逻辑数据契约](../contracts/offline-data-contract.md)，不另拆
+  数据库初始化与建表任务。用户确认下述创建前边界后，已通过
+  [Issue #7：数据库初始化与物理结构实现](https://github.com/shenxg13/sql-apm/issues/7)
+  落实完整任务契约；执行状态以在线标签为准，创建 Issue 时数据库对象尚未实现。
+- 项目统一使用一个数据库账号，同时承担 schema owner、应用运行及管理职责。
+  后续查询／Grafana 访问也沿用同一项目账号；不采用此前建议的结构维护、
+  程序读写、查询只读三类账号拆分。
+- 用户与角色采用同一个可登录角色表达，不额外建立权限分组或角色继承体系；
+  schema 组织和授权采用满足项目功能的最简方案，不把角色分离作为验收要求。
+  PostgreSQL 的用户／角色关系见[官方角色说明](https://www.postgresql.org/docs/17/sql-createrole.html)。
+- 用户在询问创建 Issue 前还需确认的内容后，对四项边界及默认命名回复“确认”。
+  数据库、schema、账号默认均为 `sql_apm`，允许配置；具体表拆分、字段类型、
+  索引及脚本组织属于实施设计选择，不要求用户逐项预先固定。
+- 初始化从已有可用的 PostgreSQL 17 实例开始，首次账号及数据库创建由已有
+  PostgreSQL 管理员引导完成；同一项目账号拥有数据库、schema 及项目对象，
+  负责后续项目管理和应用访问，无需实例级超级用户权限。
+- 初始化须可安全重跑并保留已有数据；遇到不兼容的同名对象明确报错，不静默
+  接管或删除重建，部分失败后允许修正原因并重试。
+- 同一交付包含物理设计、初始化脚本、结构版本记录及操作说明；在 disposable
+  实例验证初始化、实际项目账号访问、约束、重跑及失败恢复。Python 业务读写
+  接口、导入和统计流程由后续任务交付，实例安装及生产部署不纳入本任务。
+  临时实例创建、停止与清理属于验证工具；环境探针不代替本任务实施验收。
+
+2026-09-26 按本条已确认范围实现[初版物理结构与初始化](../architecture/postgresql-storage.md)，
+初版采用结构版本 1.0.0，随后按用户确认升级为 MPP 命名的 1.1.0，
+保留旧 DDL 及显式迁移，并在 PG17 disposable 实例验证。该交付不表示生产实例已部署，
+也不表示 Python 业务读写、导入、统计或 Grafana 已实现。
 
 ### 已确认的首期组件分工
 

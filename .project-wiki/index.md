@@ -25,6 +25,7 @@
 ## 流程、操作与来源
 
 - [人类文档导航](../docs/README.md)：跨目录查找需求、设计、操作、分析证据和历史参考。
+- [PostgreSQL 存储结构与初始化](architecture/postgresql-storage.md)：物理映射、MPP 专属表、版本升级、重跑和应用责任。
 - [Python 源码布局与模块职责](architecture/source-layout.md)：新增模块、调整目录或检查依赖方向时阅读；区分目标布局与已实现目录。
 
 - [知识维护方法](methods/knowledge-maintenance.md)：确认记录、按需阅读与单处维护。

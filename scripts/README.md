@@ -50,3 +50,13 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 输出固定标签、计数、摘要和来源定位，不执行 SQL、不判定训练黑名单。
 全量扫描及有界回放命令见[类别核查报告](../docs/reports/statement-category-census-2026-09-26.md)。
 生产输入保留在本地忽略目录；合成回归随 `.venv/bin/python -m unittest discover -s tests -v` 运行。
+
+## 数据库初始化与验证
+
+- `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
+  以项目账号安装或核对 schema、物理表、约束、索引和结构版本。
+- `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
+  回放合成存储用例；默认不会接触已有服务或生产数据。
+
+完整参数、凭据、阶段恢复和检查方式见[数据库操作说明](../docs/runbooks/database-initialization.md)。
+SQL 资源位于 `sql_apm/storage/`，业务数据库驱动不是这两个入口的依赖。

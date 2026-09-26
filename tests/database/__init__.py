@@ -1,0 +1,1 @@
+"""Synthetic PostgreSQL verification support."""

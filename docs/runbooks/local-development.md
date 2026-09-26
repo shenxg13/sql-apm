@@ -15,7 +15,7 @@
 | SQL 原文、明细和历史清理 | [存储与留存](../../.project-wiki/contracts/sql-storage.md) |
 | SQL 输入与 Grafana 展示 | [检索及历史查看](../../.project-wiki/features/sql-search-and-views.md) |
 
-业务 CLI、数据库和展示功能尚未交付；下列质量命令用于仓库 Harness。
+业务 CLI 和展示功能尚未交付；数据库初始化／物理结构见下文，下列质量命令用于仓库 Harness。
 开发日志样本位于本地忽略目录 `raw/inbox/hashdata/`，不是既定生产接收目录。
 
 ## Python 项目环境
@@ -57,7 +57,9 @@ Baseline 存储采用 **PostgreSQL 17**，保存执行记录、SQL 指纹和基�
 和脱敏样本验证，再补充真实环境联调；普通 PostgreSQL 测试不代表完整兼容验证。
 
 数据库驱动须兼容 Python 3.9.5 及对应数据库版本，实际依赖需验证并锁定。
-当前仅确认版本安排，实例尚未部署；部署方式、具体补丁版本和驱动选择另行落实。
+本机 PG17.10 工具位于 /usr/pgsql-17/bin；已有[项目初始化与临时实例验证入口](database-initialization.md)，
+初版业务物理结构随之交付。验证使用自动停止／清理的私有临时实例，未部署生产项目实例；
+生产部署方式、补丁版本和业务驱动选择仍由后续工作落实。
 
 ## 质量工具
 

@@ -123,6 +123,10 @@ class FunctionDictionary:
     def load(cls, path):
         return cls(read_json(path))
 
+    def snapshot(self):
+        """Independent rule artifact for immutable normalization contexts."""
+        return copy.deepcopy(self._data)
+
     def select(self, name, arity, schema=None, types=None, kind='function',
                form='positional', protected=False):
         if type(arity) is not int or arity < 0 or arity > 10000:

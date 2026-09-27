@@ -1,0 +1,851 @@
+{
+  "purpose": "Synthetic parser-only cases; no business-value normalization",
+  "cases": [
+    {
+      "id": "select",
+      "family": "query",
+      "sql": "SELECT a FROM s.t WHERE id = 1;",
+      "required_atoms": [
+        "s",
+        "t",
+        "a",
+        "id"
+      ]
+    },
+    {
+      "id": "format",
+      "family": "query",
+      "sql": "select /* ordinary */ a\nFROM s.t where id=1 ;",
+      "required_atoms": []
+    },
+    {
+      "id": "schema",
+      "family": "query",
+      "sql": "SELECT a FROM other.t WHERE id = 1;",
+      "required_atoms": []
+    },
+    {
+      "id": "value",
+      "family": "query",
+      "sql": "SELECT a FROM s.t WHERE id = 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "parameter",
+      "family": "query",
+      "sql": "SELECT a FROM s.t WHERE id = $1;",
+      "required_atoms": []
+    },
+    {
+      "id": "quoted_upper",
+      "family": "identifier",
+      "sql": "SELECT a FROM \"T\";",
+      "required_atoms": [
+        "T"
+      ]
+    },
+    {
+      "id": "quoted_lower",
+      "family": "identifier",
+      "sql": "SELECT a FROM \"t\";",
+      "required_atoms": [
+        "t"
+      ]
+    },
+    {
+      "id": "cte",
+      "family": "query",
+      "sql": "WITH q AS (SELECT id FROM t WHERE id=1) SELECT q.id FROM q JOIN u ON q.id=u.id;",
+      "required_atoms": []
+    },
+    {
+      "id": "insert",
+      "family": "dml",
+      "sql": "INSERT INTO t(id,v) VALUES (1,'a'),(2,'b') RETURNING id;",
+      "required_atoms": []
+    },
+    {
+      "id": "insert_select",
+      "family": "dml",
+      "sql": "INSERT INTO t SELECT id FROM u WHERE id=$1;",
+      "required_atoms": []
+    },
+    {
+      "id": "update",
+      "family": "dml",
+      "sql": "UPDATE t SET v='paid' FROM u WHERE t.id=u.id;",
+      "required_atoms": []
+    },
+    {
+      "id": "delete",
+      "family": "dml",
+      "sql": "DELETE FROM t USING u WHERE t.id=u.id;",
+      "required_atoms": []
+    },
+    {
+      "id": "create",
+      "family": "ddl",
+      "sql": "CREATE TABLE t(id int4 PRIMARY KEY, v varchar(20) DEFAULT 'x');",
+      "required_atoms": []
+    },
+    {
+      "id": "ctas",
+      "family": "ddl",
+      "sql": "CREATE TEMP TABLE t AS SELECT id FROM u;",
+      "required_atoms": []
+    },
+    {
+      "id": "alter",
+      "family": "ddl",
+      "sql": "ALTER TABLE t ADD COLUMN v numeric(12,2);",
+      "required_atoms": []
+    },
+    {
+      "id": "index",
+      "family": "ddl",
+      "sql": "CREATE INDEX ix_demo ON t(id);",
+      "required_atoms": []
+    },
+    {
+      "id": "drop",
+      "family": "ddl",
+      "sql": "DROP TABLE IF EXISTS t;",
+      "required_atoms": []
+    },
+    {
+      "id": "copy",
+      "family": "utility",
+      "sql": "COPY t FROM STDIN WITH (FORMAT csv);",
+      "required_atoms": []
+    },
+    {
+      "id": "distributed",
+      "family": "mpp",
+      "sql": "CREATE TABLE t(id int4) DISTRIBUTED BY (id);",
+      "required_atoms": []
+    },
+    {
+      "id": "distributed_random",
+      "family": "mpp",
+      "sql": "CREATE TABLE t(id int4) DISTRIBUTED RANDOMLY;",
+      "required_atoms": []
+    },
+    {
+      "id": "distributed_replicated",
+      "family": "mpp",
+      "sql": "CREATE TABLE t(id int4) DISTRIBUTED REPLICATED;",
+      "required_atoms": []
+    },
+    {
+      "id": "appendonly",
+      "family": "mpp",
+      "sql": "CREATE TABLE t(id int4) WITH (appendonly=true, orientation=column);",
+      "required_atoms": []
+    },
+    {
+      "id": "partition",
+      "family": "mpp",
+      "sql": "CREATE TABLE t(d date) DISTRIBUTED RANDOMLY PARTITION BY RANGE(d) (START (date '2026-01-01') END (date '2026-03-01') EVERY (INTERVAL '1 month'));",
+      "required_atoms": []
+    },
+    {
+      "id": "external",
+      "family": "mpp",
+      "sql": "CREATE EXTERNAL TABLE ext(id int4) LOCATION ('gpfdist://example.invalid/a') FORMAT 'CSV';",
+      "required_atoms": [
+        "gpfdist://example.invalid/a",
+        "CSV"
+      ]
+    },
+    {
+      "id": "external_options",
+      "family": "mpp",
+      "sql": "CREATE READABLE EXTERNAL TABLE ext(id int4) LOCATION ('gpfdist://example.invalid/a') FORMAT 'CSV' (DELIMITER ',') LOG ERRORS SEGMENT REJECT LIMIT 10 ROWS;",
+      "required_atoms": []
+    },
+    {
+      "id": "writable_external",
+      "family": "mpp",
+      "sql": "CREATE WRITABLE EXTERNAL TABLE ext(id int4) LOCATION ('gpfdist://example.invalid/a') FORMAT 'TEXT' (DELIMITER '|') DISTRIBUTED BY (id);",
+      "required_atoms": []
+    },
+    {
+      "id": "web_external",
+      "family": "mpp",
+      "sql": "CREATE EXTERNAL WEB TABLE ext(id int4) EXECUTE 'echo 1' ON ALL FORMAT 'TEXT';",
+      "required_atoms": []
+    },
+    {
+      "id": "drop_external",
+      "family": "mpp",
+      "sql": "DROP EXTERNAL TABLE ext;",
+      "required_atoms": []
+    },
+    {
+      "id": "function",
+      "family": "function",
+      "sql": "SELECT to_date('20260101','YYYYMMDD');",
+      "required_atoms": [
+        "to_date",
+        "20260101",
+        "YYYYMMDD"
+      ]
+    },
+    {
+      "id": "function_format_case",
+      "family": "function",
+      "sql": "SELECT to_date('20260101','yyyymmdd');",
+      "required_atoms": [
+        "to_date",
+        "yyyymmdd"
+      ]
+    },
+    {
+      "id": "function_schema",
+      "family": "function",
+      "sql": "SELECT pg_catalog.to_date('20260101','YYYYMMDD');",
+      "required_atoms": [
+        "pg_catalog",
+        "to_date",
+        "YYYYMMDD"
+      ]
+    },
+    {
+      "id": "nested_function",
+      "family": "function",
+      "sql": "SELECT custom_fn(to_date('20260101','YYYYMMDD'));",
+      "required_atoms": [
+        "custom_fn",
+        "to_date",
+        "YYYYMMDD"
+      ]
+    },
+    {
+      "id": "function_named",
+      "family": "function",
+      "sql": "SELECT custom_fn(a := 1, b := 'x');",
+      "required_atoms": [
+        "custom_fn",
+        "a",
+        "b"
+      ]
+    },
+    {
+      "id": "special_function",
+      "family": "function",
+      "sql": "SELECT substring('abcd' FROM 1 FOR 2);",
+      "required_atoms": []
+    },
+    {
+      "id": "aggregate",
+      "family": "function",
+      "sql": "SELECT count(DISTINCT id) FILTER (WHERE v > 2) OVER (PARTITION BY k ORDER BY ts ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "cast",
+      "family": "type",
+      "sql": "SELECT $1::text;",
+      "required_atoms": []
+    },
+    {
+      "id": "no_cast",
+      "family": "type",
+      "sql": "SELECT $1;",
+      "required_atoms": []
+    },
+    {
+      "id": "protected_cast",
+      "family": "type",
+      "sql": "SELECT ('s.t'::regclass)::text;",
+      "required_atoms": [
+        "s.t",
+        "regclass",
+        "text"
+      ]
+    },
+    {
+      "id": "qualified_type",
+      "family": "type",
+      "sql": "SELECT 'a'::custom.text;",
+      "required_atoms": [
+        "custom",
+        "text"
+      ]
+    },
+    {
+      "id": "type_modifier",
+      "family": "type",
+      "sql": "SELECT 1::numeric(12,2);",
+      "required_atoms": []
+    },
+    {
+      "id": "type_modifier_changed",
+      "family": "type",
+      "sql": "SELECT 1::numeric(12,3);",
+      "required_atoms": []
+    },
+    {
+      "id": "limit",
+      "family": "protected_value",
+      "sql": "SELECT id FROM t LIMIT 10 OFFSET 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "limit_changed",
+      "family": "protected_value",
+      "sql": "SELECT id FROM t LIMIT 20 OFFSET 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "set",
+      "family": "protected_value",
+      "sql": "SET work_mem='16MB'; SELECT 1;",
+      "required_atoms": []
+    },
+    {
+      "id": "set_changed",
+      "family": "protected_value",
+      "sql": "SET work_mem='32MB'; SELECT 1;",
+      "required_atoms": []
+    },
+    {
+      "id": "batch",
+      "family": "batch",
+      "sql": "SELECT 1; SELECT 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "batch_reverse",
+      "family": "batch",
+      "sql": "SELECT 2; SELECT 1;",
+      "required_atoms": []
+    },
+    {
+      "id": "quoted_semicolon",
+      "family": "batch",
+      "sql": "SELECT 'a;b', $$c;d$$; /* ; */ SELECT 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "do",
+      "family": "batch",
+      "sql": "DO $$ BEGIN PERFORM 1; END $$; SELECT 2;",
+      "required_atoms": []
+    },
+    {
+      "id": "batch_unsupported",
+      "family": "batch",
+      "sql": "SELECT 1; CREATE TABLE t(id int4) DISTRIBUTED BY (id);",
+      "required_atoms": []
+    },
+    {
+      "id": "hint",
+      "family": "hint",
+      "sql": "SELECT /*+ SeqScan(t) */ id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_format",
+      "family": "hint",
+      "sql": "select\n/* ordinary */ /*+ SeqScan(t) */ id  FROM t ;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_changed",
+      "family": "hint",
+      "sql": "SELECT /*+ IndexScan(t) */ id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_moved",
+      "family": "hint",
+      "sql": "/*+ SeqScan(t) */ SELECT id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_none",
+      "family": "hint",
+      "sql": "SELECT id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_unicode",
+      "family": "hint",
+      "sql": "SELECT '中文', /*+ SeqScan(t) */ id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_in_string",
+      "family": "hint",
+      "sql": "SELECT '/*+ SeqScan(t) */', $$--+ fake$$;",
+      "required_atoms": []
+    },
+    {
+      "id": "hint_nested_comment",
+      "family": "hint",
+      "sql": "SELECT /* ordinary /*+ fake */ */ id FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "line_hint",
+      "family": "hint",
+      "sql": "SELECT --+ SeqScan(t)\nid FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "line_hint_changed",
+      "family": "hint",
+      "sql": "SELECT --+ IndexScan(t)\nid FROM t;",
+      "required_atoms": []
+    },
+    {
+      "id": "empty",
+      "family": "invalid",
+      "sql": "",
+      "required_atoms": []
+    },
+    {
+      "id": "comment_only",
+      "family": "invalid",
+      "sql": "/* ordinary */ ;",
+      "required_atoms": []
+    },
+    {
+      "id": "truncated",
+      "family": "invalid",
+      "sql": "SELECT * FROM",
+      "required_atoms": []
+    },
+    {
+      "id": "unclosed_string",
+      "family": "invalid",
+      "sql": "SELECT 'abc",
+      "required_atoms": []
+    },
+    {
+      "id": "batch_invalid",
+      "family": "invalid",
+      "sql": "SELECT 1; SELECT * FROM",
+      "required_atoms": []
+    },
+    {
+      "id": "unknown_syntax",
+      "family": "invalid",
+      "sql": "MYSTERY THING 42;",
+      "required_atoms": []
+    },
+    {
+      "id": "unicode_error",
+      "family": "invalid",
+      "sql": "SELECT '中文'; CREATE TABLE t(id int) DISTRIBUTED BY (id);",
+      "required_atoms": []
+    }
+  ],
+  "relations": [
+    {
+      "left": "select",
+      "right": "format",
+      "same": true,
+      "reason": "普通排版、关键字大小写与说明性注释"
+    },
+    {
+      "left": "select",
+      "right": "schema",
+      "same": false,
+      "reason": "显式 schema"
+    },
+    {
+      "left": "select",
+      "right": "value",
+      "same": false,
+      "reason": "解析阶段保留字面值；归一化另行验证"
+    },
+    {
+      "left": "quoted_upper",
+      "right": "quoted_lower",
+      "same": false,
+      "reason": "引号标识符大小写"
+    },
+    {
+      "left": "function",
+      "right": "function_format_case",
+      "same": false,
+      "reason": "函数控制文本不得预先合并"
+    },
+    {
+      "left": "function",
+      "right": "function_schema",
+      "same": false,
+      "reason": "显式函数 schema"
+    },
+    {
+      "left": "cast",
+      "right": "no_cast",
+      "same": false,
+      "reason": "显式类型转换"
+    },
+    {
+      "left": "type_modifier",
+      "right": "type_modifier_changed",
+      "same": false,
+      "reason": "类型修饰符"
+    },
+    {
+      "left": "limit",
+      "right": "limit_changed",
+      "same": false,
+      "reason": "LIMIT 数量"
+    },
+    {
+      "left": "set",
+      "right": "set_changed",
+      "same": false,
+      "reason": "SET 配置"
+    },
+    {
+      "left": "batch",
+      "right": "batch_reverse",
+      "same": false,
+      "reason": "批次顺序"
+    },
+    {
+      "left": "hint",
+      "right": "hint_format",
+      "same": true,
+      "reason": "Hint 外普通排版和注释"
+    },
+    {
+      "left": "hint",
+      "right": "hint_changed",
+      "same": false,
+      "reason": "Hint 内容"
+    },
+    {
+      "left": "hint",
+      "right": "hint_moved",
+      "same": false,
+      "reason": "Hint 位置"
+    },
+    {
+      "left": "hint",
+      "right": "hint_none",
+      "same": false,
+      "reason": "Hint 存在性"
+    },
+    {
+      "left": "hint_none",
+      "right": "hint_nested_comment",
+      "same": true,
+      "reason": "说明性嵌套注释中的伪 Hint"
+    },
+    {
+      "left": "line_hint",
+      "right": "line_hint_changed",
+      "same": false,
+      "reason": "行 Hint 候选内容"
+    }
+  ],
+  "structural_checks": [
+    {
+      "case": "function",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "funcname",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "to_date"
+    },
+    {
+      "case": "function",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "args",
+        1,
+        "A_Const",
+        "sval",
+        "sval"
+      ],
+      "expected": "YYYYMMDD"
+    },
+    {
+      "case": "function_schema",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "funcname",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "pg_catalog"
+    },
+    {
+      "case": "nested_function",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "args",
+        0,
+        "FuncCall",
+        "funcname",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "to_date"
+    },
+    {
+      "case": "protected_cast",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "TypeCast",
+        "arg",
+        "TypeCast",
+        "typeName",
+        "names",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "regclass"
+    },
+    {
+      "case": "protected_cast",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "TypeCast",
+        "typeName",
+        "names",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "text"
+    },
+    {
+      "case": "qualified_type",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "TypeCast",
+        "typeName",
+        "names",
+        0,
+        "String",
+        "sval"
+      ],
+      "expected": "custom"
+    },
+    {
+      "case": "type_modifier",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "TypeCast",
+        "typeName",
+        "typmods",
+        1,
+        "A_Const",
+        "ival",
+        "ival"
+      ],
+      "expected": 2
+    },
+    {
+      "case": "special_function",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "funcformat"
+      ],
+      "expected": "COERCE_SQL_SYNTAX"
+    },
+    {
+      "case": "aggregate",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "agg_distinct"
+      ],
+      "expected": true
+    },
+    {
+      "case": "aggregate",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "over",
+        "startOffset",
+        "A_Const",
+        "ival",
+        "ival"
+      ],
+      "expected": 1
+    },
+    {
+      "case": "aggregate",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        0,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "FuncCall",
+        "agg_filter",
+        "A_Expr",
+        "rexpr",
+        "A_Const",
+        "ival",
+        "ival"
+      ],
+      "expected": 2
+    },
+    {
+      "case": "quoted_semicolon",
+      "parser": "pglast",
+      "path": [
+        "stmts",
+        1,
+        "stmt",
+        "SelectStmt",
+        "targetList",
+        0,
+        "ResTarget",
+        "val",
+        "A_Const",
+        "ival",
+        "ival"
+      ],
+      "expected": 2
+    },
+    {
+      "case": "function",
+      "parser": "sqlglot",
+      "path": [
+        0,
+        "args",
+        "expressions",
+        0,
+        "args",
+        "format",
+        "args",
+        "this"
+      ],
+      "expected": "%Y%m%d"
+    },
+    {
+      "case": "protected_cast",
+      "parser": "sqlglot",
+      "path": [
+        0,
+        "args",
+        "expressions",
+        0,
+        "args",
+        "this",
+        "args",
+        "this",
+        "args",
+        "to",
+        "args",
+        "this"
+      ],
+      "expected": "REGCLASS"
+    }
+  ]
+}

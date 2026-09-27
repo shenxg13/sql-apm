@@ -41,6 +41,8 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [Python 源码布局与模块职责](../.project-wiki/architecture/source-layout.md) | 设计说明 | 目标目录、模块职责、依赖方向，以及当前已实现的部分。 |
+| [SQL 归一化与结构指纹接口](design/sql-normalization.md) | 设计／已实现接口 | 核心调用、规则快照、支持矩阵、命令与失败边界 |
+| [SQL 近似指纹接口与边界](design/sql-approximate.md) | 接口说明 | 观察用词法归一化、原文保留、近似结果隔离及命令。 |
 | [离线基线逻辑数据契约](../.project-wiki/contracts/offline-data-contract.md) | 设计说明 | 三个交接边界、对象关系、身份、训练、统计、发布与演进约束。 |
 | [契约字段字典](design/offline-data-contract/fields.md) | 设计说明 | 字段类型、必填与空值、枚举、引用和全部统计指标。 |
 | [HashData 来源映射](design/offline-data-contract/hashdata-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
@@ -67,6 +69,16 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [归一化与结构指纹验证](reports/sql-normalization-2026-09-27.md) | 实施验证报告 | 合成回归、1,832条有界重放及真实归组结构核对 |
+| [近似指纹与旧失败重放](reports/mpp-approximate-2026-09-27.md) | 验证报告 | 8,909个拒绝输入的近似结果及384个已修复对照，保留观察用途。 |
+| [全量解析问题修复](reports/mpp-full-repair-2026-09-27.md) | 分析证据 | 递归深度与四类真实语法修复、384个恢复输入及全部115万原文的结构回归。 |
+| [MPP日志全量解析覆盖](reports/mpp-full-scan-2026-09-27.md) | 分析证据 | 46个完整文件、115万不同原文的解析状态、真实语法缺口、深度异常及914项旧结果对照。 |
+| [解析源码目录调整](reports/parser-layout-2026-09-27.md) | 分析证据 | 核心与诊断模块归位、测试夹具迁移、入口兼容及完整结果等价验证。 |
+| [MPP解析整体扩展验证](reports/mpp-broad-validation-2026-09-27.md) | 分析证据 | 整体结构矩阵、新增564个真实输入、COPY位置修复及ANALYZE ROOTPARTITION缺口。 |
+| [混合 ALTER 完整结构修复](reports/mixed-alter-2026-09-27.md) | 分析证据 | 普通动作与 MPP SET 动作的有序保留、原碰撞修复、字段断言及350个输入回归。 |
+| [MPP 解析器扩展验证](reports/mpp-expanded-validation-2026-09-27.md) | 分析证据 | 新形态有界抽样、混合 ALTER 结构丢失修复、格式参数及 ROW 兼容、回归与剩余缺口。 |
+| [MPP 解析适配与 Hint 原型验证](reports/mpp-adapter-probe-2026-09-27.md) | 分析证据 | 显式 MPP 扩展节点、Hint 锚点、格式回归及同组日志重放，保留原型限制。 |
+| [MPP SQL 解析器结构保真探测](reports/parser-fidelity-2026-09-27.md) | 分析证据 | 两个候选的固定版本、MPP 语法／Hint／函数保真缺口、合成核对与有界重放。 |
 | [HashData 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
 | [PostgreSQL 结构 R1 整改验证](reports/postgresql-storage-r1-remediation-2026-09-26.md) | 分析证据 | 外键内部触发器模式漂移的复现、轻量目录检查及恢复／迁移回归。 |
 | [MPP 结构升级验证](reports/mpp-storage-migration-2026-09-26.md) | 分析证据 | 1.0.0 到 1.1.0 的数据／对象保留、失败回滚、重跑和自定义名称验证。 |

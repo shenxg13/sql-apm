@@ -9,7 +9,7 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457
     status: current
@@ -18,6 +18,14 @@ sources:
   - path: sql_apm/diagnostics/function_probe.py
     status: current
   - path: sql_apm/diagnostics/statement_census.py
+    status: current
+  - path: sql_apm/sql/mpp_parser.py
+    status: current
+  - path: sql_apm/sql/lexical.py
+    status: current
+  - path: docs/reports/parser-layout-2026-09-27.md
+    status: current
+  - path: docs/design/sql-normalization.md
     status: current
 related:
   - decision.project-scope
@@ -65,16 +73,25 @@ sql-apm/
 │   │   ├── __init__.py
 │   │   ├── function_dictionary.py
 │   │   ├── type_policy.py       # 有限内置类型事实与保守匹配约束
-│   │   ├── parsing.py          # 后续：SQL 解析适配
-│   │   ├── normalization.py    # 后续：归一化
-│   │   └── fingerprint.py      # 后续：结构指纹
+│   │   ├── mpp_parser.py       # 已有：MPP 解析适配，固定能力版本
+│   │   ├── lexical.py          # 已有：共用词法边界及粗粒度类别
+│   │   ├── approximate.py     # 已有：观察用近似指纹，不提供正常基线身份
+│   │   ├── pg_ast.py           # 已有：PG语法树位置字段处理
+│   │   ├── structure.py        # 已有：无递归深度依赖的结构编码
+│   │   └── normalization.py    # 已有：可靠归一化、结构指纹及规则快照
 │   ├── baseline/               # 后续：训练筛选、窗口、统计、构建、版本
 │   ├── storage/                # 已有：DDL／初始化及迁移 SQL；业务读写接口后续实现
 │   └── diagnostics/
 │       ├── __init__.py
 │       ├── function_probe.py
-│       └── statement_census.py  # 只读类别调查及来源回放，非训练过滤器
+│       ├── statement_census.py # 只读类别调查及来源回放，非训练过滤器
+│       ├── parser_fidelity.py  # 候选解析器比较
+│       ├── normalize_sql.py    # 已有：文本／文件薄入口
+│       ├── normalization_replay.py # 已有：有界归组验证
+│       └── mpp_*.py            # 适配验证、矩阵、有界抽样及重放
+├── requirements.txt           # 已有：运行解析依赖及哈希锁
 ├── tests/                      # 随模块增长按对应业务职责组织
+│   └── parser_probe/           # 可选解析实验测试、依赖锁定及fixtures/
 ├── rules/                      # 版本化规则数据
 ├── scripts/                    # 开发、维护、规则生成、验证工具
 ├── docs/
@@ -114,8 +131,8 @@ sql-apm/
 | `sql_apm/function_dictionary.py` | [sql_apm/sql/function_dictionary.py](../../sql_apm/sql/function_dictionary.py) | 字典校验、摘要、规则选择、结构化预览及现有模块命令 |
 | `sql_apm/function_probe.py` | [sql_apm/diagnostics/function_probe.py](../../sql_apm/diagnostics/function_probe.py) | 有界词法候选诊断 |
 
-当前只创建 `sql/`、`diagnostics/` 两个子包。现有测试仍在 `tests/` 下，后续随
-测试规模按业务模块组织。现有模块命令入口随文件迁移保留；统一 CLI 实施时再
+当前已有 `sql/`、`diagnostics/`、`storage/` 三个子包。解析专项测试放在
+`tests/parser_probe/`，既有测试继续保留原路径。现有模块命令入口随文件迁移保留；统一 CLI 实施时再
 将参数解析委托给 `cli/`，本次不提前新增 `__main__.py`。
 
 首版合并前统一更新全部仓库调用方，不保留旧模块路径的转发文件。
@@ -126,13 +143,61 @@ sql-apm/
 [整改报告](../../docs/reports/function-dictionary-r1-remediation-2026-09-25.md)。
 
 2026-09-26 类别调查新增 `diagnostics/statement_census.py`，仅做本地 CSV 词法
-类别清点及有界回放；`scripts/diagnostics/statement_census.py` 为薄入口。该工具
+类别清点及有界回放；当前使用 `python -m sql_apm.diagnostics.statement_census`。该工具
 不承载产品导入、语法解析或黑名单判定，证据与限制见
 [类别核查报告](../../docs/reports/statement-category-census-2026-09-26.md)。
 
 2026-09-26 新增 `storage/` 的版本化 PostgreSQL DDL、管理员引导和 catalog 核对 SQL；
 `scripts/db/` 提供初始化、显式版本升级及临时实例验证，`tests/database/` 映射既有人工样例。
 [存储主题](postgresql-storage.md)说明结构、事务边界及实际验证，尚无 Python 业务读写接口。
+
+### 解析原型与诊断工具归位（2026-09-27）
+
+用户指出SQL解析源码与用例数据堆在 `scripts/diagnostics/`，并要求开始优化调整。
+已按职责完成[目录迁移](../../docs/reports/parser-layout-2026-09-27.md)：
+
+- `sql/mpp_parser.py` 承载已有MPP解析原型，`sql/lexical.py` 承载原类别调查模块中的共用词法逻辑，
+  `sql/pg_ast.py` 承载原解析器比较脚本中的PG树清理逻辑。解析核心不导入诊断模块或脚本。
+- 六个解析探测、矩阵、抽样与重放实现归入 `diagnostics/`，调用方直接导入包内实现。用户随后要求
+  清理冗余入口，已删除这六个及类别调查共七个包装脚本，统一使用 `python -m sql_apm.diagnostics.<模块>`。
+  `scripts/` 继续保留数据库初始化、GitHub工作流、质量检查及规则维护等独立工具。
+- 两份案例JSON移至 `tests/parser_probe/fixtures/`，实验依赖锁定移至
+  `tests/parser_probe/requirements.txt`；测试直接导入 `sql_apm`。业务规则JSON仍归 `rules/`，
+  验证输出JSON仍归 `docs/reports/data/`，生产缓存仍留在忽略目录。
+- 子进程使用包模块入口及明确工作目录，模块导入不修改 `sys.path`。诊断命令从仓库根目录运行；
+  从其他目录调用时需显式配置源码包和可选依赖路径。
+- 原型版本、解析结果、拒绝原因、规则数据及历史证据摘要均保持原有语义。目录归位不表示
+  正式归一化模块已完成，不提前创建统一CLI、安装打包配置或空的产品模块。
+
+2026-09-27 用户进一步授权全量解析覆盖核查，新增
+`diagnostics/mpp_full_scan.py` 及失败／历史结果核对工具 `diagnostics/mpp_full_audit.py`，
+仍通过包模块命令执行。完整原文和临时SQLite去重索引
+留在忽略的 `var/`，对外报告只含计数、来源定位、摘要和固定诊断标签。索引是诊断中间产物，
+不属于产品持久化实现；核心解析原型版本4未因本次遍历而改变。
+
+随后用户授权修复全量核查发现的问题，解析原型升至版本5。新增 `sql/structure.py`
+提供不依赖递归栈的派生结构JSON编解码，`sql/pg_ast.py`使用显式栈清理位置字段；两者均不依赖
+诊断模块。新增 `diagnostics/mpp_full_repair.py`复用隔离工作进程，读取旧原文库、将新诊断写入
+独立忽略索引，并核对完整结构摘要；它不提供业务数据库持久化或正式指纹。
+[修复报告](../../docs/reports/mpp-full-repair-2026-09-27.md)记录源码版本、接口边界和全量回归。
+
+近似能力新增 `sql/approximate.py`，纯词法核心仅依赖标准库，解析拒绝接入延迟导入 MPP
+原型；`diagnostics/approximate_sql.py` 为文本／文件薄入口，`mpp_approximate_replay.py`
+复用全量工具的隔离进程，仅诊断层读取本地索引。生产近似规则不反向依赖诊断模块，
+没有新增 scripts 包装或数据库结构；[接口说明](../../docs/design/sql-approximate.md)记录
+近似范围；后续可靠结构归一化已由下述模块交付，观察统计仍待实施。
+
+### 可靠归一化与依赖（2026-09-27）
+
+`sql_apm/sql/normalization.py` 组合解析适配、函数字典、AST 归一化及确定性指纹，提供可复用
+Normalizer 与规则快照；`FunctionDictionary.snapshot()` 提供独立规则副本。
+`sql_apm/diagnostics/normalize_sql.py` 是文本／文件薄命令，`normalization_replay.py` 负责
+有界只读证据。没有新增 scripts 包装，核心不反向依赖 diagnostics。
+
+根目录 `requirements.txt` 将已验证的 pglast 7.18 提升为正式运行依赖；旧 parser_probe
+依赖文件额外包含 SQLGlot，仅供候选解析比较。相关解析和归一化测试仍集中于该专项目录，
+普通字典／近似测试不强制安装解析依赖。[接口文档](../../docs/design/sql-normalization.md)
+给出调用、资源边界和安装命令；当前不交付安装包、数据库业务读写或统一产品 CLI。
 
 ## Workflows
 

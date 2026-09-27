@@ -160,6 +160,13 @@ call 和主证据，但 timing_type=null；不能用 unpaired 同时给出 execu
 | Fingerprint.value | text? | 仅 reliable 必填；非 reliable 必须 null |
 | Fingerprint.reason | reason? | 非 reliable 必填；可靠时 null |
 
+2026-09-27 的[近似指纹确认](../../../.project-wiki/contracts/sql-fingerprints.md#已确认的观察用近似指纹)
+增加独立观察结果，不放宽本表 Fingerprint 的可靠性约束。近似输出须区分类型及规则
+版本，关联已记录原文／来源证据，保留结构失败原因和不完整／不确定标记；残片可以
+只引用证据，不补造完整 SqlText。具体接口由 Issue #9 实施，持久化映射后续扩展。
+现有 Group、Decision、有效训练样本及自动异常判断不接收近似值；本表和既有 v1
+合成样例不能当作近似能力已经实现的证据。
+
 ### Group
 
 | 字段 | 类型／条件 | 含义 |

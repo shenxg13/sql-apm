@@ -1,0 +1,2 @@
+# Runtime parser: CPython 3.9 / Linux x86_64; validated on Python 3.9.5.
+pglast==7.18 --hash=sha256:31873776e947e00cbdd8c04ae2e7783d52719d93a45a010796a9c14d69b867c2

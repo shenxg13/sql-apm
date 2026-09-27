@@ -46,7 +46,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 ## 语句类别调查
 
-`scripts/diagnostics/statement_census.py` 只读盘点 HashData CSV 的词法类别与异常，
+`python -m sql_apm.diagnostics.statement_census` 只读盘点 HashData CSV 的词法类别与异常，
 输出固定标签、计数、摘要和来源定位，不执行 SQL、不判定训练黑名单。
 全量扫描及有界回放命令见[类别核查报告](../docs/reports/statement-category-census-2026-09-26.md)。
 生产输入保留在本地忽略目录；合成回归随 `.venv/bin/python -m unittest discover -s tests -v` 运行。
@@ -61,3 +61,42 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 完整参数、凭据、阶段恢复和检查方式见[数据库操作说明](../docs/runbooks/database-initialization.md)。
 SQL 资源位于 `sql_apm/storage/`，业务数据库驱动不是这两个入口的依赖。
+
+## 解析器结构保真探测
+
+SQL 解析原型位于 `sql_apm/sql/mpp_parser.py`；共用词法检查及PG语法树处理位于同包的
+`lexical.py`、`pg_ast.py`。可复用探测逻辑位于 `sql_apm/diagnostics/`，诊断统一通过包模块运行，
+不再保留 `scripts/diagnostics/` 转发层。测试直接导入包内模块。
+
+| 包模块命令 | 用途 |
+| --- | --- |
+| `python -m sql_apm.diagnostics.parser_fidelity` | 候选解析器比较 |
+| `python -m sql_apm.diagnostics.mpp_adapter_probe` | 原140个定位的MPP适配重放 |
+| `python -m sql_apm.diagnostics.mpp_expansion_probe` | 扩展形态抽样和重放 |
+| `python -m sql_apm.diagnostics.mpp_expansion_matrix` | 固定JSON矩阵的字段与关系检查 |
+| `python -m sql_apm.diagnostics.mpp_broad_matrix` | 整体完整结构与批次矩阵 |
+| `python -m sql_apm.diagnostics.mpp_broad_replay` | 全部来源文件的有界抽样和重放 |
+| `python -m sql_apm.diagnostics.mpp_full_scan` | 完整EOF读取、精确原文去重与全量解析覆盖 |
+| `python -m sql_apm.diagnostics.mpp_full_audit` | 全量失败特征及历史固定结果对照 |
+| `python -m sql_apm.diagnostics.approximate_sql` | 文本／文件的解析拒绝与独立观察用近似指纹 |
+| `python -m sql_apm.diagnostics.mpp_approximate_replay` | 全部旧拒绝及已修复对照的近似能力重放 |
+| `python -m sql_apm.diagnostics.mpp_full_repair` | 固定原文库的版本修复重放与完整结构摘要对照 |
+| `python -m sql_apm.diagnostics.normalize_sql` | 可靠结构归一化、结构指纹及独立近似结果的文本／文件入口 |
+| `python -m sql_apm.diagnostics.normalization_replay` | 固定样本的归组、结构守恒及稳定性验证 |
+
+在仓库根目录运行上述模块命令，解释器使用 `.venv/bin/python`；解析实验依赖仍需通过
+`PYTHONPATH=var/parser-probe/site-packages` 指定。
+可选实验依赖锁定在 `tests/parser_probe/requirements.txt`，两份合成输入位于
+`tests/parser_probe/fixtures/`；pglast 7.18 已由根目录 `requirements.txt` 锁定为运行依赖，
+SQLGlot 仍仅用于候选实验。生产原文和缓存留在
+本地忽略区域，报告及结构摘要位于 `docs/reports/` 与 `docs/reports/data/`。
+
+[目录调整报告](../docs/reports/parser-layout-2026-09-27.md)记录迁移、依赖方向与等价验证；
+[整体扩展报告](../docs/reports/mpp-broad-validation-2026-09-27.md)记录语法支持、抽样分母和缺口。
+[全量覆盖报告](../docs/reports/mpp-full-scan-2026-09-27.md)说明完整遍历、失败分类与本地索引使用。
+[修复报告](../docs/reports/mpp-full-repair-2026-09-27.md)记录版本5、新节点与全量结构回归。
+解析探测工具仅提供诊断；可靠归一化及指纹通过 `normalize_sql` 和 Normalizer 核心调用，
+规则快照、安装方法及命令退出码见[可靠接口说明](../docs/design/sql-normalization.md)。
+
+近似能力的纯标准库核心位于 `sql_apm/sql/approximate.py`，正式接口、退出码和观察用途限制见
+[接口说明](../docs/design/sql-approximate.md)。它不提供可靠结构指纹、正常基线或统计服务。

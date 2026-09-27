@@ -1,0 +1,1700 @@
+{
+  "purpose": "Expanded synthetic structural assertions; no business normalization",
+  "cases": [
+    {
+      "id": "alter_before",
+      "sql": "ALTER TABLE t ADD COLUMN x int, SET WITH (reorganize=true)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "x"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "typeName",
+            "names",
+            1,
+            "String",
+            "sval"
+          ],
+          "value": "int4"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "options",
+            0,
+            "DefElem",
+            "arg",
+            "String",
+            "sval"
+          ],
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "id": "alter_before_other",
+      "sql": "ALTER TABLE t ADD COLUMN y text, SET WITH (reorganize=true)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "y"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "typeName",
+            "names",
+            0,
+            "String",
+            "sval"
+          ],
+          "value": "text"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "kind"
+          ],
+          "value": "alter_distribution"
+        }
+      ]
+    },
+    {
+      "id": "alter_after",
+      "sql": "ALTER TABLE t SET WITH (reorganize=true), ADD COLUMN x int",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "kind"
+          ],
+          "value": "alter_distribution"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "x"
+        }
+      ]
+    },
+    {
+      "id": "alter_both",
+      "sql": "ALTER TABLE t DROP COLUMN x, SET WITH (reorganize=true), ADD COLUMN y int",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "subtype"
+          ],
+          "value": "AT_DropColumn"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "name"
+          ],
+          "value": "x"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "kind"
+          ],
+          "value": "alter_distribution"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            2,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "y"
+        }
+      ]
+    },
+    {
+      "id": "alter_nested_comma",
+      "sql": "ALTER TABLE t ADD COLUMN x numeric(10,2), SET DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "typeName",
+            "typmods",
+            0,
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 10
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "typeName",
+            "typmods",
+            1,
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 2
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "policy",
+            "keys",
+            0,
+            "IndexElem",
+            "name"
+          ],
+          "value": "id"
+        }
+      ]
+    },
+    {
+      "id": "alter_standard",
+      "sql": "ALTER TABLE t ADD COLUMN x numeric(10,2), ALTER COLUMN id SET DEFAULT 7",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "AlterTableStmt",
+            "cmds",
+            0,
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "x"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "AlterTableStmt",
+            "cmds",
+            1,
+            "AlterTableCmd",
+            "def",
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 7
+        }
+      ]
+    },
+    {
+      "id": "alter_standard_reverse",
+      "sql": "ALTER TABLE t ALTER COLUMN id SET DEFAULT 7, ADD COLUMN x numeric(10,2)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "alter_only",
+      "sql": "ALTER TABLE ONLY s.t SET WITH (reorganize=true) DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "AlterTableStmt",
+            "relation",
+            "schemaname"
+          ],
+          "value": "s"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "policy",
+            "keys",
+            0,
+            "IndexElem",
+            "name"
+          ],
+          "value": "id"
+        }
+      ]
+    },
+    {
+      "id": "alter_other_key",
+      "sql": "ALTER TABLE ONLY s.t SET WITH (reorganize=true) DISTRIBUTED BY (other)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "partition_range",
+      "sql": "CREATE TABLE p(id int, d date) DISTRIBUTED BY (id) PARTITION BY RANGE (d) (START (date '2026-01-01') INCLUSIVE END (date '2027-01-01') EXCLUSIVE EVERY (interval '1 month'))",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "kind"
+          ],
+          "value": "range_partition"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "keys"
+          ],
+          "value": [
+            "d"
+          ]
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "partitions",
+            0,
+            "bounds",
+            "start",
+            "inclusive"
+          ],
+          "value": true
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "partitions",
+            0,
+            "bounds",
+            "end",
+            "inclusive"
+          ],
+          "value": false
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            1,
+            "partitions",
+            0,
+            "bounds",
+            "start",
+            "values",
+            0,
+            "TypeCast",
+            "arg",
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "2026-01-01"
+        }
+      ]
+    },
+    {
+      "id": "partition_list",
+      "sql": "CREATE TABLE p(id int, r text) DISTRIBUTED BY (id) PARTITION BY LIST (r) (PARTITION east VALUES ('E'), DEFAULT PARTITION other)",
+      "expect": "unsupported",
+      "classification": "known_gap",
+      "checks": []
+    },
+    {
+      "id": "partition_sub",
+      "sql": "CREATE TABLE p(id int, r text) DISTRIBUTED BY (id) PARTITION BY RANGE (id) SUBPARTITION BY LIST (r) SUBPARTITION TEMPLATE (SUBPARTITION east VALUES ('E'), DEFAULT SUBPARTITION other) (START (1) END (11) EVERY (5))",
+      "expect": "unsupported",
+      "classification": "known_gap",
+      "checks": []
+    },
+    {
+      "id": "partition_alter",
+      "sql": "ALTER TABLE p SPLIT PARTITION east AT (5) INTO (PARTITION p1, PARTITION p2)",
+      "expect": "unsupported",
+      "classification": "known_gap",
+      "checks": []
+    },
+    {
+      "id": "external_complex",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (DELIMITER E'\\t' FORCE NOT NULL id,v) OPTIONS (formatter 'demo', \"Mode\" 'fast') ENCODING 'UTF8' ENCODING 6 LOG ERRORS PERSISTENTLY SEGMENT REJECT LIMIT 2 ROWS DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "source",
+            "values",
+            1,
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "gpfdist://example.invalid/b"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value",
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "\t"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            1,
+            "value"
+          ],
+          "value": [
+            "id",
+            "v"
+          ]
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "encodings",
+            1,
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 6
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "errors",
+            "limit"
+          ],
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "external_complex_changed",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (DELIMITER E'\\t' FORCE NOT NULL id,v) OPTIONS (formatter 'demo', \"Mode\" 'slow') ENCODING 'UTF8' ENCODING 6 LOG ERRORS PERSISTENTLY SEGMENT REJECT LIMIT 2 ROWS DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_force_quote",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (FORCE QUOTE id,v)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value"
+          ],
+          "value": [
+            "id",
+            "v"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "external_force_star",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (FORCE QUOTE *)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value"
+          ],
+          "value": {
+            "star": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "external_format_columns",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (force_not_null=(id,v))",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value",
+            "column_list"
+          ],
+          "value": [
+            "id",
+            "v"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "external_format_negative",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (limit=-2)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value",
+            "Integer",
+            "ival"
+          ],
+          "value": -2
+        }
+      ]
+    },
+    {
+      "id": "external_format_label",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (select='x')",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "name"
+          ],
+          "value": "select"
+        }
+      ]
+    },
+    {
+      "id": "external_error_table",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' LOG ERRORS INTO err SEGMENT REJECT LIMIT 2 ROWS",
+      "expect": "unsupported",
+      "classification": "conservative_boundary",
+      "checks": []
+    },
+    {
+      "id": "external_segment_zero",
+      "sql": "CREATE EXTERNAL WEB TABLE e(id int) EXECUTE 'echo 1' ON SEGMENT 0 FORMAT 'TEXT'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "execution",
+            0,
+            "value"
+          ],
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "external_segment_one",
+      "sql": "CREATE EXTERNAL WEB TABLE e(id int) EXECUTE 'echo 1' ON SEGMENT 1 FORMAT 'TEXT'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_count_zero",
+      "sql": "CREATE EXTERNAL WEB TABLE e(id int) EXECUTE 'echo 1' ON 0 FORMAT 'TEXT'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "execution",
+            0,
+            "value"
+          ],
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "external_empty_columns",
+      "sql": "CREATE EXTERNAL TABLE e() LOCATION ('a') FORMAT 'TEXT'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_wrong_order",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' ENCODING 'UTF8' OPTIONS (key 'x')",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "external_invalid_limit",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' SEGMENT REJECT LIMIT 0 ROWS",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "external_write_errors",
+      "sql": "CREATE WRITABLE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' SEGMENT REJECT LIMIT 2 ROWS",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "copy_query",
+      "sql": "COPY (WITH x AS (SELECT id FROM s.t WHERE v=1) SELECT id FROM x) TO PROGRAM 'cat > /tmp/demo' WITH CSV HEADER ON SEGMENT",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CopyStmt",
+            "is_program"
+          ],
+          "value": true
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CopyStmt",
+            "filename"
+          ],
+          "value": "cat > /tmp/demo"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "enabled"
+          ],
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "copy_query_changed",
+      "sql": "COPY (WITH x AS (SELECT id FROM s.t WHERE v=2) SELECT id FROM x) TO PROGRAM 'cat > /tmp/demo' WITH CSV HEADER ON SEGMENT",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "copy_generic",
+      "sql": "COPY t FROM '/tmp/demo' WITH (format csv, delimiter '|', header true)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CopyStmt",
+            "is_from"
+          ],
+          "value": true
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CopyStmt",
+            "options",
+            1,
+            "DefElem",
+            "arg",
+            "String",
+            "sval"
+          ],
+          "value": "|"
+        }
+      ]
+    },
+    {
+      "id": "copy_generic_changed",
+      "sql": "COPY t FROM '/tmp/demo' WITH (format csv, delimiter ',', header true)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "copy_unknown_suffix",
+      "sql": "COPY t TO '/tmp/demo' ON SEGMENT BADTOKEN",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "cte_recursive",
+      "sql": "WITH RECURSIVE x(n) AS (VALUES (1) UNION ALL SELECT n+1 FROM x WHERE n<3) SELECT n FROM x ORDER BY n",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "withClause",
+            "recursive"
+          ],
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "cte_recursive_changed",
+      "sql": "WITH RECURSIVE x(n) AS (VALUES (1) UNION ALL SELECT n+1 FROM x WHERE n<4) SELECT n FROM x ORDER BY n",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "window_filter",
+      "sql": "SELECT s.id, sum(s.v) FILTER (WHERE s.v>0) OVER (PARTITION BY s.id ORDER BY s.ts ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS total FROM app.t AS s",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "targetList",
+            1,
+            "ResTarget",
+            "name"
+          ],
+          "value": "total"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "targetList",
+            1,
+            "ResTarget",
+            "val",
+            "FuncCall",
+            "over",
+            "startOffset",
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "window_filter_changed",
+      "sql": "SELECT s.id, sum(s.v) FILTER (WHERE s.v>0) OVER (PARTITION BY s.id ORDER BY s.ts ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS total FROM app.t AS s",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "grouping_sets",
+      "sql": "SELECT a,b,sum(v) FROM s.t GROUP BY GROUPING SETS ((a,b),(a),())",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "groupClause",
+            0,
+            "GroupingSet",
+            "kind"
+          ],
+          "value": "GROUPING_SET_SETS"
+        }
+      ]
+    },
+    {
+      "id": "grouping_rollup",
+      "sql": "SELECT a,b,sum(v) FROM s.t GROUP BY ROLLUP(a,b)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "insert_cte",
+      "sql": "WITH x AS (SELECT id FROM s.src WHERE flag=true) INSERT INTO s.dst(id) SELECT id FROM x RETURNING id",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "InsertStmt",
+            "relation",
+            "schemaname"
+          ],
+          "value": "s"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "InsertStmt",
+            "relation",
+            "relname"
+          ],
+          "value": "dst"
+        }
+      ]
+    },
+    {
+      "id": "insert_cte_changed",
+      "sql": "WITH x AS (SELECT id FROM s.src WHERE flag=true) INSERT INTO other.dst(id) SELECT id FROM x RETURNING id",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "update_tuple",
+      "sql": "UPDATE s.t SET (a,b)=(u.a,u.b) FROM s.u AS u WHERE t.id=u.id RETURNING t.id",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "UpdateStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "name"
+          ],
+          "value": "a"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "UpdateStmt",
+            "targetList",
+            1,
+            "ResTarget",
+            "name"
+          ],
+          "value": "b"
+        }
+      ]
+    },
+    {
+      "id": "update_tuple_changed",
+      "sql": "UPDATE s.t SET (a,b)=(u.b,u.a) FROM s.u AS u WHERE t.id=u.id RETURNING t.id",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "nested_lateral",
+      "sql": "SELECT x.id, y.v FROM s.t x LEFT JOIN LATERAL (SELECT v FROM s.u WHERE id=x.id ORDER BY ts DESC LIMIT 1) y ON true",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "fromClause",
+            0,
+            "JoinExpr",
+            "rarg",
+            "RangeSubselect",
+            "lateral"
+          ],
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "nested_lateral_changed",
+      "sql": "SELECT x.id, y.v FROM s.t x LEFT JOIN LATERAL (SELECT v FROM s.u WHERE id=x.id ORDER BY ts DESC LIMIT 2) y ON true",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "dollar_fake_hint",
+      "sql": "SELECT $tag$中文; /*+ fake */ DISTRIBUTED BY(x)$tag$ AS v; SELECT 2",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "hints"
+          ],
+          "value": []
+        },
+        {
+          "path": [
+            "statements",
+            1,
+            "base",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "escaped_string",
+      "sql": "SELECT E'a\\nb' AS v",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "a\nb"
+        }
+      ]
+    },
+    {
+      "id": "ordinary_backslash",
+      "sql": "SELECT 'a\\nb'",
+      "expect": "unsupported",
+      "classification": "conservative_boundary",
+      "checks": []
+    },
+    {
+      "id": "unicode_escape",
+      "sql": "SELECT U&'d\\0061t'",
+      "expect": "unsupported",
+      "classification": "known_gap",
+      "checks": []
+    },
+    {
+      "id": "hint_batch",
+      "sql": "SELECT 1; /*+ second */ SELECT '中文'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "hints",
+            0,
+            "raw"
+          ],
+          "value": "/*+ second */"
+        },
+        {
+          "path": [
+            "hints",
+            0,
+            "gap"
+          ],
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "hint_batch_moved",
+      "sql": "SELECT 1 /*+ second */; SELECT '中文'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "hint_nested",
+      "sql": "SELECT /*+ H /*nested*/ */ 1",
+      "expect": "unsupported",
+      "classification": "conservative_boundary",
+      "checks": []
+    },
+    {
+      "id": "hint_line",
+      "sql": "SELECT --+ keep\n1",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "hints",
+            0,
+            "raw"
+          ],
+          "value": "--+ keep"
+        }
+      ]
+    },
+    {
+      "id": "ordinary_nested_comment",
+      "sql": "SELECT /* outer /* inner */ outer */ 1",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "ordinary_plain",
+      "sql": "SELECT 1",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "hint_continued_string",
+      "sql": "SELECT 'a' /*+ keep */\n'b'",
+      "expect": "unsupported",
+      "classification": "conservative_boundary",
+      "checks": []
+    },
+    {
+      "id": "quoted_ident",
+      "sql": "SELECT \"Key\" FROM \"Schema\".\"Table\"",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "fromClause",
+            0,
+            "RangeVar",
+            "schemaname"
+          ],
+          "value": "Schema"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "ColumnRef",
+            "fields",
+            0,
+            "String",
+            "sval"
+          ],
+          "value": "Key"
+        }
+      ]
+    },
+    {
+      "id": "quoted_ident_changed",
+      "sql": "SELECT \"key\" FROM \"Schema\".\"Table\"",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "cast_control",
+      "sql": "SELECT (('s.t'::regclass)::text), to_date('20260101','YYYYMMDD')",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "cast_control_changed",
+      "sql": "SELECT (('s.t'::regclass)::text), to_date('20260101','yyyymmdd')",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "invalid_middle",
+      "sql": "SELECT 1; CREATE TABLE t(id int) DISTRIBUTED BY (); SELECT 2",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "limit_case",
+      "sql": "SELECT * FROM s.t WHERE id=$1 LIMIT 10 OFFSET 2",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "limit_case_changed",
+      "sql": "SELECT * FROM s.t WHERE id=$1 LIMIT 11 OFFSET 2",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_bare_formatter",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (formatter=s.demo_in)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value",
+            "TypeName",
+            "names",
+            0,
+            "String",
+            "sval"
+          ],
+          "value": "s"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "format_options",
+            0,
+            "value",
+            "TypeName",
+            "names",
+            1,
+            "String",
+            "sval"
+          ],
+          "value": "demo_in"
+        }
+      ]
+    },
+    {
+      "id": "external_bare_formatter_changed",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (formatter=s.other_in)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_bare_formatter_quoted",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (formatter='s.demo_in')",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_format_columns_reverse",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('gpfdist://example.invalid/a', 'gpfdist://example.invalid/b') FORMAT 'CSV' (force_not_null=(v,id))",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "external_bad_format_expression",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (formatter=demo_in+1)",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "external_bad_format_columns",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (force_not_null=(id,v+1))",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "external_bad_format_tail",
+      "sql": "CREATE EXTERNAL TABLE s.e(id int, v text) LOCATION ('a') FORMAT 'CUSTOM' (formatter=demo_in,)",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "table_row",
+      "sql": "CREATE TABLE t(id int) WITH (appendonly=true,orientation=row,compresstype=zlib) DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CreateStmt",
+            "options",
+            1,
+            "DefElem",
+            "arg",
+            "String",
+            "sval"
+          ],
+          "value": "row"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CreateStmt",
+            "options",
+            2,
+            "DefElem",
+            "arg",
+            "TypeName",
+            "names",
+            0,
+            "String",
+            "sval"
+          ],
+          "value": "zlib"
+        }
+      ]
+    },
+    {
+      "id": "table_row_quoted",
+      "sql": "CREATE TABLE t(id int) WITH (appendonly=true,orientation='row',compresstype=zlib) DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "table_column",
+      "sql": "CREATE TABLE t(id int) WITH (appendonly=true,orientation=column,compresstype=zlib) DISTRIBUTED BY (id)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "ctas_row",
+      "sql": "CREATE TEMP TABLE t WITH(orientation=ROW) AS SELECT ROW(1,2) AS v DISTRIBUTED RANDOMLY",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CreateTableAsStmt",
+            "into",
+            "options",
+            0,
+            "DefElem",
+            "arg",
+            "String",
+            "sval"
+          ],
+          "value": "row"
+        },
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CreateTableAsStmt",
+            "query",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "RowExpr",
+            "args",
+            1,
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "alter_row",
+      "sql": "ALTER TABLE t SET WITH(orientation=row)",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "extensions",
+            0,
+            "options",
+            0,
+            "DefElem",
+            "arg",
+            "String",
+            "sval"
+          ],
+          "value": "row"
+        }
+      ]
+    },
+    {
+      "id": "row_literal_guard",
+      "sql": "CREATE TABLE t WITH(orientation=row) AS SELECT 'orientation=row' AS v DISTRIBUTED RANDOMLY",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "CreateTableAsStmt",
+            "query",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "orientation=row"
+        }
+      ]
+    },
+    {
+      "id": "row_invalid_expression",
+      "sql": "CREATE TABLE t(id int) WITH(orientation=row+1) DISTRIBUTED RANDOMLY",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "row_invalid_duplicate",
+      "sql": "CREATE TABLE t(id int) WITH(orientation=row) WITH(orientation=row)",
+      "expect": "unsupported",
+      "classification": "invalid",
+      "checks": []
+    },
+    {
+      "id": "alter_plain_before_mpp_batch",
+      "sql": "SELECT 1; ALTER TABLE t ADD COLUMN x int, SET DISTRIBUTED RANDOMLY; SELECT 2",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            1,
+            "extensions",
+            0,
+            "command",
+            "AlterTableCmd",
+            "def",
+            "ColumnDef",
+            "colname"
+          ],
+          "value": "x"
+        },
+        {
+          "path": [
+            "statements",
+            1,
+            "extensions",
+            1,
+            "policy",
+            "kind"
+          ],
+          "value": "random"
+        },
+        {
+          "path": [
+            "statements",
+            2,
+            "base",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "A_Const",
+            "ival",
+            "ival"
+          ],
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "nonfinite_string",
+      "sql": "SELECT 'NaN'::numeric, 'Infinity'::float8, interval '1 day'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": []
+    },
+    {
+      "id": "escaped_newline",
+      "sql": "SELECT E'a\\nb'",
+      "expect": "structured",
+      "classification": "supported",
+      "checks": [
+        {
+          "path": [
+            "statements",
+            0,
+            "base",
+            "SelectStmt",
+            "targetList",
+            0,
+            "ResTarget",
+            "val",
+            "A_Const",
+            "sval",
+            "sval"
+          ],
+          "value": "a\nb"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "left": "alter_standard",
+      "right": "alter_standard_reverse",
+      "same": false
+    },
+    {
+      "left": "alter_only",
+      "right": "alter_other_key",
+      "same": false
+    },
+    {
+      "left": "external_complex",
+      "right": "external_complex_changed",
+      "same": false
+    },
+    {
+      "left": "external_force_quote",
+      "right": "external_force_star",
+      "same": false
+    },
+    {
+      "left": "external_segment_zero",
+      "right": "external_segment_one",
+      "same": false
+    },
+    {
+      "left": "copy_query",
+      "right": "copy_query_changed",
+      "same": false
+    },
+    {
+      "left": "copy_generic",
+      "right": "copy_generic_changed",
+      "same": false
+    },
+    {
+      "left": "cte_recursive",
+      "right": "cte_recursive_changed",
+      "same": false
+    },
+    {
+      "left": "window_filter",
+      "right": "window_filter_changed",
+      "same": false
+    },
+    {
+      "left": "grouping_sets",
+      "right": "grouping_rollup",
+      "same": false
+    },
+    {
+      "left": "insert_cte",
+      "right": "insert_cte_changed",
+      "same": false
+    },
+    {
+      "left": "update_tuple",
+      "right": "update_tuple_changed",
+      "same": false
+    },
+    {
+      "left": "nested_lateral",
+      "right": "nested_lateral_changed",
+      "same": false
+    },
+    {
+      "left": "hint_batch",
+      "right": "hint_batch_moved",
+      "same": false
+    },
+    {
+      "left": "ordinary_nested_comment",
+      "right": "ordinary_plain",
+      "same": true
+    },
+    {
+      "left": "quoted_ident",
+      "right": "quoted_ident_changed",
+      "same": false
+    },
+    {
+      "left": "cast_control",
+      "right": "cast_control_changed",
+      "same": false
+    },
+    {
+      "left": "limit_case",
+      "right": "limit_case_changed",
+      "same": false
+    },
+    {
+      "left": "external_bare_formatter",
+      "right": "external_bare_formatter_changed",
+      "same": false
+    },
+    {
+      "left": "external_bare_formatter",
+      "right": "external_bare_formatter_quoted",
+      "same": false
+    },
+    {
+      "left": "external_format_columns",
+      "right": "external_format_columns_reverse",
+      "same": false
+    },
+    {
+      "left": "table_row",
+      "right": "table_row_quoted",
+      "same": true
+    },
+    {
+      "left": "table_row",
+      "right": "table_column",
+      "same": false
+    },
+    {
+      "left": "alter_before",
+      "right": "alter_before_other",
+      "same": false
+    },
+    {
+      "left": "alter_before",
+      "right": "alter_after",
+      "same": false
+    }
+  ]
+}

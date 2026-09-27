@@ -96,8 +96,12 @@ confidence: high
 - 2026-09-25 用户暂停 Issue #1 的业务实施，明确要求先完成 Python 环境准备。
   已在本机从官方源码构建 Python 3.9.5 至 `var/python-3.9.5/`，重建 `.venv/`，
   安装固定版本包工具，完成标准库、HTTPS 和包构建安装的有界验证。系统 Python
-  保持原版本，业务依赖尚未安装；这不代表 Issue #1 或生产部署已经完成。
-- 当前实现和可选模块边界见[环境验证记录](../../docs/reports/python-environment-2026-09-25.md)。
+  保持原版本；环境准备当时未安装业务依赖，不代表 Issue #1 或生产部署已经完成。
+- 2026-09-27，可靠归一化实现将 pglast 7.18 锁定为运行依赖，根目录 `requirements.txt`
+  记录 CPython 3.9 Linux x86_64 wheel 哈希，已在 Python 3.9.5 离线验证；SQLGlot 仍只用于
+  候选解析实验。[归一化接口](../../docs/design/sql-normalization.md)记录安装及调用边界，
+  未据开发环境成功推定生产平台兼容或完成部署。
+- 环境准备阶段的实现和可选模块边界见[环境验证记录](../../docs/reports/python-environment-2026-09-25.md)。
 
 准备环境的说明见[本地开发说明](../../docs/runbooks/local-development.md)。
 

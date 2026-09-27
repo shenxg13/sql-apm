@@ -1,0 +1,2259 @@
+{
+  "cluster_occurrence_states": {
+    "119": {
+      "probe_exception": 348,
+      "prototype_parsed": 4925835,
+      "unsupported": 52651
+    },
+    "120": {
+      "probe_exception": 260,
+      "prototype_parsed": 6283671,
+      "unsupported": 106724
+    }
+  },
+  "collection_seconds": 139.008,
+  "context": {
+    "evidence_sha256": "77580f1ee63ae744f8f6141bfc0fb60dae754aeb36c6d58c01875d1b72abb0f2",
+    "limits": {
+      "max_sql_bytes": 524288,
+      "timeout_seconds": 5,
+      "worker_address_space_bytes": 536870912
+    },
+    "pglast": "7.18",
+    "prototype_version": "mpp-adapter-probe/4",
+    "python": "3.9.5",
+    "sources": {
+      "sql_apm/diagnostics/mpp_adapter_probe.py": "a76fd89306f6d41965f2a9d567826837a5600963acb4cb9268409e36ca05f392",
+      "sql_apm/diagnostics/mpp_full_scan.py": "31844c0c48bac1095964e6cce3679ff54cc056df1f4d8587d68782bcf5258f6d",
+      "sql_apm/diagnostics/parser_fidelity.py": "f0639a3165607c0635f4831bd106a9bcec1f01567c1f7101fd574866d18d59b1",
+      "sql_apm/diagnostics/statement_census.py": "b07ccfab71613af518832b9280da8ef49b9b420e97da57c301f72409cbee38cf",
+      "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+      "sql_apm/sql/mpp_parser.py": "bb222cf6be4b2aef6dc92d6a733053c713fa21e27ec7384f016e981ba570a983",
+      "sql_apm/sql/pg_ast.py": "e912338107166c0c16a157e24e571e2d5a6af64b2fdf7ba42f332076fa4db405"
+    }
+  },
+  "extensions": {
+    "alter_distribution": 1756,
+    "copy_on_segment": 1224,
+    "distribution": 19958,
+    "external_create": 13890,
+    "external_drop": 18555
+  },
+  "failure_examples": {
+    "RecursionError": [
+      {
+        "bytes": 14814,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 491938,
+          "line_start": 491938,
+          "record": 37989
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "COPY"
+          ],
+          "exception": "RecursionError",
+          "lexical_issues": [],
+          "state": "probe_exception"
+        },
+        "sql_sha256": "59e9f0f6ede27c179442f9567221f29d56dd25304e856cab3b816bf91d644608"
+      },
+      {
+        "bytes": 14814,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 494815,
+          "line_start": 494815,
+          "record": 38070
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "COPY"
+          ],
+          "exception": "RecursionError",
+          "lexical_issues": [],
+          "state": "probe_exception"
+        },
+        "sql_sha256": "ff43bb8635c846703d706a19776c2b250790b599e0c7db73dd80da786c4fba0c"
+      },
+      {
+        "bytes": 14814,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 509088,
+          "line_start": 509088,
+          "record": 38884
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "COPY"
+          ],
+          "exception": "RecursionError",
+          "lexical_issues": [],
+          "state": "probe_exception"
+        },
+        "sql_sha256": "1132c8cd21d1f3bea89d1acf8b81ffb1fd2d8397c79655885849b6c32b303ed2"
+      },
+      {
+        "bytes": 14814,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 512010,
+          "line_start": 512010,
+          "record": 38968
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "COPY"
+          ],
+          "exception": "RecursionError",
+          "lexical_issues": [],
+          "state": "probe_exception"
+        },
+        "sql_sha256": "a7ae4631d881190231dc974a0bcd338a36ba4e7f7050dbddb0aeff42db282577"
+      },
+      {
+        "bytes": 14814,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 470700,
+          "line_start": 470700,
+          "record": 37155
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "COPY"
+          ],
+          "exception": "RecursionError",
+          "lexical_issues": [],
+          "state": "probe_exception"
+        },
+        "sql_sha256": "fcf59c2bd8c1a8f845fc41cd159c91f98a1582e6c774f754a4f1dc4b35036851"
+      }
+    ],
+    "base_parser_rejected": [
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 49857,
+          "line_start": 49769,
+          "record": 3747
+        },
+        "occurrences": 58,
+        "result": {
+          "categories": [
+            "INSERT"
+          ],
+          "lexical_issues": [],
+          "reason": "base_parser_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "94480daeeba03fc6f84024a3ed84ad921e8599f402795e8a4d4fe4621917bc86"
+      },
+      {
+        "bytes": 113,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 340942,
+          "line_start": 340940,
+          "record": 32996
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [
+            "ALTER TABLE"
+          ],
+          "lexical_issues": [],
+          "reason": "base_parser_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "5d8be742c596b258f0d67b0cbb654f830875ccb6764d1a0790e3c738cb042f71"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 677176,
+          "line_start": 677124,
+          "record": 53363
+        },
+        "occurrences": 174,
+        "result": {
+          "categories": [
+            "WITH"
+          ],
+          "lexical_issues": [],
+          "reason": "base_parser_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8ad9b5097dde2c60e2c361565effe5bc57db567f062940b7b1962b44697e8cf4"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 762199,
+          "line_start": 762115,
+          "record": 62078
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [
+            "WITH"
+          ],
+          "lexical_issues": [],
+          "reason": "base_parser_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "870c9f01bc11c7857a2b64776f17fadc298673cef8f2a128e25a6da3bbfee0b5"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 868334,
+          "line_start": 868286,
+          "record": 69103
+        },
+        "occurrences": 4,
+        "result": {
+          "categories": [
+            "INSERT"
+          ],
+          "lexical_issues": [],
+          "reason": "base_parser_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "c9472b796132dbe8d8e30a8872a33d3732cbbe8738b13c97761fecb75df07543"
+      }
+    ],
+    "invalid_encoding": [
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 148857,
+          "line_start": 148826,
+          "record": 9223
+        },
+        "occurrences": 14,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "reason": "invalid_encoding",
+          "state": "unsupported"
+        },
+        "sql_sha256": "62eb39a8faf7d467ac14af6c9d1d1c85bad0906c8702a129c31c95710646ebef"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 1088899,
+          "line_start": 1088877,
+          "record": 49518
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "reason": "invalid_encoding",
+          "state": "unsupported"
+        },
+        "sql_sha256": "6eeeedff78a089858f596e4a92c5436068da6b2d1b1e81cdc917f0137bc8ae8a"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 1889389,
+          "line_start": 1889363,
+          "record": 145840
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "reason": "invalid_encoding",
+          "state": "unsupported"
+        },
+        "sql_sha256": "66f0ded6da07af826a3dd00016d896ecbca9f5da9b8c471fb96a4a09a1253770"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 1919213,
+          "line_start": 1919187,
+          "record": 151853
+        },
+        "occurrences": 4,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "reason": "invalid_encoding",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8f7551f8b49a61fc7a8b11ca8d53e1069a291b685406db57078c3f603df40ca7"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 1980424,
+          "line_start": 1980398,
+          "record": 164182
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "reason": "invalid_encoding",
+          "state": "unsupported"
+        },
+        "sql_sha256": "c311c3c0d424c0853730197287c96e9f15a6bf74e44394ab33092d0c7e1fc673"
+      }
+    ],
+    "lexical_ambiguous_string_escape": [
+      {
+        "bytes": 164,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 780840,
+          "line_start": 780832,
+          "record": 64256
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "reason": "lexical_ambiguous_string_escape",
+          "state": "unsupported"
+        },
+        "sql_sha256": "ded65cef8bd3b330c3885e90a46b1ea915025ff670583cee7bd5fb1ae4b860b3"
+      },
+      {
+        "bytes": 164,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 708328,
+          "line_start": 708320,
+          "record": 57796
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "reason": "lexical_ambiguous_string_escape",
+          "state": "unsupported"
+        },
+        "sql_sha256": "dc24c21e58bbd3202d81b9c69a8d824b2cf51793c416f3e27aa884bb7dcb75a9"
+      },
+      {
+        "bytes": 164,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-05_000000.csv",
+          "line_end": 705091,
+          "line_start": 705083,
+          "record": 57407
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "reason": "lexical_ambiguous_string_escape",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8b67e9511cff072c016241c96c8af03fca6b1dc318178c7e423c5caadefb5226"
+      },
+      {
+        "bytes": 164,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-06_000000.csv",
+          "line_end": 701958,
+          "line_start": 701950,
+          "record": 56735
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "reason": "lexical_ambiguous_string_escape",
+          "state": "unsupported"
+        },
+        "sql_sha256": "01c40f708b687b0f9af831ddd5461ebf95054e233236c82b0fa7d91c5ddba246"
+      },
+      {
+        "bytes": 564,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-06_000000.csv",
+          "line_end": 1441642,
+          "line_start": 1441628,
+          "record": 114439
+        },
+        "occurrences": 18,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "reason": "lexical_ambiguous_string_escape",
+          "state": "unsupported"
+        },
+        "sql_sha256": "ffc962044a7b09f505089c02de606c5e3ef9682ad417a9dc9927920a73e12108"
+      }
+    ],
+    "lexical_unbalanced_bracket": [
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 204850,
+          "line_start": 204820,
+          "record": 13854
+        },
+        "occurrences": 116,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "reason": "lexical_unbalanced_bracket",
+          "state": "unsupported"
+        },
+        "sql_sha256": "250a2891a2c7f9f756f38749f6cefd5ec8c61b86de39218aec7034edad90270b"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 208106,
+          "line_start": 208022,
+          "record": 14373
+        },
+        "occurrences": 6,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "reason": "lexical_unbalanced_bracket",
+          "state": "unsupported"
+        },
+        "sql_sha256": "242ea57f675377ff2d49fe2e07d30b6eac21bd467f2811f5fbfb5d2bcc619e32"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 238247,
+          "line_start": 238169,
+          "record": 18207
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "reason": "lexical_unbalanced_bracket",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8df8e668f63efbfa933d0b5a7879ee932de1b4f40bdc5603331620d227276095"
+      },
+      {
+        "bytes": 1021,
+        "locator": {
+          "cluster": "119",
+          "field": "inline_distinct",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 238247,
+          "line_start": 238169,
+          "record": 18207
+        },
+        "occurrences": 1,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "reason": "lexical_unbalanced_bracket",
+          "state": "unsupported"
+        },
+        "sql_sha256": "3acd8657bf899a20b1db5847344f7104f948743b4336cc8a951dd56f2deaf01c"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 275803,
+          "line_start": 275745,
+          "record": 27657
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "reason": "lexical_unbalanced_bracket",
+          "state": "unsupported"
+        },
+        "sql_sha256": "6b42181c9062926dff965e8ff82b912727665a939cbeaa6df49adf4761552b4c"
+      }
+    ],
+    "lexical_unclosed_comment": [
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 732372,
+          "line_start": 732352,
+          "record": 57340
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "reason": "lexical_unclosed_comment",
+          "state": "unsupported"
+        },
+        "sql_sha256": "aed6af2f6e4654db6fce5f9875364794d050445e091d1c1e0b70a8de1c4f6cb2"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 760809,
+          "line_start": 760739,
+          "record": 62042
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "reason": "lexical_unclosed_comment",
+          "state": "unsupported"
+        },
+        "sql_sha256": "f1ef742747f65b86f602172c405a08d14a237791975c8c1c81e705040184f45a"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 651316,
+          "line_start": 651296,
+          "record": 48476
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "reason": "lexical_unclosed_comment",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8f2eff5791b608ee2900df9049532580c78c895c0332bfff7d14a324000ccded"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 687543,
+          "line_start": 687473,
+          "record": 55177
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "reason": "lexical_unclosed_comment",
+          "state": "unsupported"
+        },
+        "sql_sha256": "00fdff4c689dafb05b579ca525f8ea9945a13dc65cd3781aeb751230a1d9c911"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-05_000000.csv",
+          "line_end": 647371,
+          "line_start": 647351,
+          "record": 47082
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "reason": "lexical_unclosed_comment",
+          "state": "unsupported"
+        },
+        "sql_sha256": "e4cc578326c56634f393803bb4a33a56d3335e6391b6812a2a2fe7911f805982"
+      }
+    ],
+    "lexical_unclosed_string": [
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 275583,
+          "line_start": 275501,
+          "record": 27652
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "reason": "lexical_unclosed_string",
+          "state": "unsupported"
+        },
+        "sql_sha256": "965dd9370a3ca6f62a4e93e968c0ae4d7975c64ed6691986acd2477c39404501"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 651082,
+          "line_start": 651018,
+          "record": 49400
+        },
+        "occurrences": 87,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "reason": "lexical_unclosed_string",
+          "state": "unsupported"
+        },
+        "sql_sha256": "779148f1024647e61d798f69e6d390b394229a14711c8c80843e5f427aedefc6"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 694420,
+          "line_start": 694372,
+          "record": 54682
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "reason": "lexical_unclosed_string",
+          "state": "unsupported"
+        },
+        "sql_sha256": "2cd98c6e94fcc636e40ee2589d210949e1a7cec448fec63918776eda12df1d69"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 696792,
+          "line_start": 696728,
+          "record": 54928
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "reason": "lexical_unclosed_string",
+          "state": "unsupported"
+        },
+        "sql_sha256": "7d3e89c86d3770e3f8abea898d2d23c896bb74fae779c0c2e22965c0eeef5048"
+      },
+      {
+        "bytes": 1023,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 914573,
+          "line_start": 914511,
+          "record": 72071
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [],
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "reason": "lexical_unclosed_string",
+          "state": "unsupported"
+        },
+        "sql_sha256": "1f2dffa82cf7cd208069d995667cd56ff9ab41b6aa7ac3c5737ba41bbd59fb11"
+      }
+    ],
+    "scanner_rejected": [
+      {
+        "bytes": 7787,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 3195701,
+          "line_start": 3195375,
+          "record": 268551
+        },
+        "occurrences": 11,
+        "result": {
+          "categories": [
+            "SELECT"
+          ],
+          "lexical_issues": [],
+          "reason": "scanner_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "826709718e08494182ceec1b8eaa47590257ef6857d612b9fa4e6704db36c724"
+      },
+      {
+        "bytes": 7787,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 3259994,
+          "line_start": 3259668,
+          "record": 276724
+        },
+        "occurrences": 11,
+        "result": {
+          "categories": [
+            "SELECT"
+          ],
+          "lexical_issues": [],
+          "reason": "scanner_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "c75394ad432af6246622050bbc2e27cae42b7928b6e77cebd2e8236f0a70b26d"
+      },
+      {
+        "bytes": 7787,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 3272383,
+          "line_start": 3272057,
+          "record": 278317
+        },
+        "occurrences": 11,
+        "result": {
+          "categories": [
+            "SELECT"
+          ],
+          "lexical_issues": [],
+          "reason": "scanner_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "8c6376e1847529c80465e623bbb99e6032844ebcede52846d6c7b8944333c823"
+      },
+      {
+        "bytes": 5478,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 4111885,
+          "line_start": 4111565,
+          "record": 379738
+        },
+        "occurrences": 11,
+        "result": {
+          "categories": [
+            "INSERT"
+          ],
+          "lexical_issues": [],
+          "reason": "scanner_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "78947731303903a03c4e390a3339098e077eeb8a8cb122aa6eefef98222359d0"
+      },
+      {
+        "bytes": 5415,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 4288661,
+          "line_start": 4288345,
+          "record": 391328
+        },
+        "occurrences": 11,
+        "result": {
+          "categories": [
+            "INSERT"
+          ],
+          "lexical_issues": [],
+          "reason": "scanner_rejected",
+          "state": "unsupported"
+        },
+        "sql_sha256": "1f5b22269ff4394fbb253a3ee12664820459a4005cdaeabb8ffb0e5331e7a05c"
+      }
+    ],
+    "sql_missing_or_empty": [
+      {
+        "bytes": 1,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 599,
+          "line_start": 599,
+          "record": 140
+        },
+        "occurrences": 101106,
+        "result": {
+          "categories": [],
+          "lexical_issues": [],
+          "reason": "sql_missing_or_empty",
+          "state": "unsupported"
+        },
+        "sql_sha256": "41b805ea7ac014e23556e98bb374702a08344268f92489a02f0880849394a1e4"
+      },
+      {
+        "bytes": 18584,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 437745,
+          "line_start": 436367,
+          "record": 36118
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [],
+          "reason": "sql_missing_or_empty",
+          "state": "unsupported"
+        },
+        "sql_sha256": "b0b65d82b847c5cb9f58f8d841aef2fe424befe06a7f612ea8c56ecbf8b6190f"
+      },
+      {
+        "bytes": 62546,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 461945,
+          "line_start": 455677,
+          "record": 36417
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [],
+          "reason": "sql_missing_or_empty",
+          "state": "unsupported"
+        },
+        "sql_sha256": "dbd3fe7b82ade1d74e4b954dc311dc55ff775f1123e0ba856b15329bfb5e4d3a"
+      },
+      {
+        "bytes": 47373,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 713868,
+          "line_start": 711730,
+          "record": 56232
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [],
+          "reason": "sql_missing_or_empty",
+          "state": "unsupported"
+        },
+        "sql_sha256": "0c20cac87a46cb563cf01a671cebd0c8e4222ac24070b901ee6e0cac4ee34ac1"
+      },
+      {
+        "bytes": 18584,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 421764,
+          "line_start": 420386,
+          "record": 35559
+        },
+        "occurrences": 2,
+        "result": {
+          "categories": [],
+          "lexical_issues": [],
+          "reason": "sql_missing_or_empty",
+          "state": "unsupported"
+        },
+        "sql_sha256": "ea842e4553adade582d915d6bcef9a07ad1639f724ba0ba06d140037116c7061"
+      }
+    ],
+    "unconsumed_extension": [
+      {
+        "bytes": 8086,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-18_000000.csv.1",
+          "line_end": 6116464,
+          "line_start": 6116270,
+          "record": 353434
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "CREATE TABLE"
+          ],
+          "lexical_issues": [],
+          "reason": "unconsumed_extension",
+          "state": "unsupported"
+        },
+        "sql_sha256": "36cc5eda84338908357b97b4175ec152bd415174adcd26c0e3623d7d87acd1a4"
+      },
+      {
+        "bytes": 6787,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-18_000000.csv.1",
+          "line_end": 6312495,
+          "line_start": 6312357,
+          "record": 370976
+        },
+        "occurrences": 3,
+        "result": {
+          "categories": [
+            "CREATE TABLE"
+          ],
+          "lexical_issues": [],
+          "reason": "unconsumed_extension",
+          "state": "unsupported"
+        },
+        "sql_sha256": "c834107e097faf7a9beb866ecb8be550b93622e8a4042e38853f166335b9daee"
+      }
+    ],
+    "unsupported_distribution_statement": [
+      {
+        "bytes": 21960,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-27_000000.csv",
+          "line_end": 2217886,
+          "line_start": 2217484,
+          "record": 164715
+        },
+        "occurrences": 1,
+        "result": {
+          "categories": [
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT"
+          ],
+          "lexical_issues": [],
+          "reason": "unsupported_distribution_statement",
+          "state": "unsupported"
+        },
+        "sql_sha256": "bc1be4364f89335fc5963453ad99e039aa510963db4535abad00d07f04836714"
+      },
+      {
+        "bytes": 21961,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-27_000000.csv",
+          "line_end": 2218340,
+          "line_start": 2217938,
+          "record": 164725
+        },
+        "occurrences": 1,
+        "result": {
+          "categories": [
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT"
+          ],
+          "lexical_issues": [],
+          "reason": "unsupported_distribution_statement",
+          "state": "unsupported"
+        },
+        "sql_sha256": "52b06e34baf9b7f7bdd1e5c0b31394f37c2576dce13503278c5689be07888ee4"
+      }
+    ]
+  },
+  "field_occurrence_states": {
+    "inline_distinct": {
+      "prototype_parsed": 180458,
+      "unsupported": 349
+    },
+    "sql": {
+      "probe_exception": 608,
+      "prototype_parsed": 11029048,
+      "unsupported": 159026
+    }
+  },
+  "files": [
+    {
+      "bytes": 147939173,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 1890,
+        "inputs": 104325,
+        "primary_empty": 14717,
+        "records": 117152,
+        "sql": 102435
+      },
+      "file": "gpdb-2026-07-01_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "237b8fe5a5eac889d7f765a23cf571dc7cd8ed9525c12d2a22ecaa0c0d6748c9",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 116179145,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2440,
+        "inputs": 164551,
+        "primary_empty": 27424,
+        "records": 189535,
+        "sql": 162111
+      },
+      "file": "gpdb-2026-07-04_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "3cdf4c040cb5b8d4314ae85139491f35da2ae1e6321dc9f674d5fa6c87328970",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 116282276,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2413,
+        "inputs": 163437,
+        "primary_empty": 27214,
+        "records": 188238,
+        "sql": 161024
+      },
+      "file": "gpdb-2026-07-05_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "90468cc573678d3894877282b15d90f894ec3f2ab8e1c5277e564d4dd8ee6a06",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 191838741,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2406,
+        "inputs": 187858,
+        "primary_empty": 30280,
+        "records": 215732,
+        "sql": 185452
+      },
+      "file": "gpdb-2026-07-06_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "8a99adb8c1015e9183cc22cc0f9fc64b82dfea1a84c365d5c4ee6e3d3fc1587b",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 150247477,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2449,
+        "inputs": 175465,
+        "primary_empty": 29261,
+        "records": 202277,
+        "sql": 173016
+      },
+      "file": "gpdb-2026-07-07_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "0fd4e7e8f6959ef532114854f4a70e2c8f6da35bd30686f8d48c524b6369c047",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 167933596,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2759,
+        "inputs": 179884,
+        "primary_empty": 29553,
+        "records": 206678,
+        "sql": 177125
+      },
+      "file": "gpdb-2026-07-08_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "a8351e2f48568318147d430da6ee051d3505dd71818f3a6f257d35180ae65041",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 158832781,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2562,
+        "inputs": 178409,
+        "primary_empty": 29382,
+        "records": 205229,
+        "sql": 175847
+      },
+      "file": "gpdb-2026-07-09_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "9d0d80fea45f030fa3317930807a8a69b5b5d7bba30e681ea3fe65451e40d409",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 143693751,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2449,
+        "inputs": 176337,
+        "primary_empty": 29264,
+        "records": 203152,
+        "sql": 173888
+      },
+      "file": "gpdb-2026-07-10_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "addd8194894834a321ce94c08200b049c249da3b3860b8d78b5b00eba2c85eff",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 118325562,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2454,
+        "inputs": 168125,
+        "primary_empty": 27242,
+        "records": 192913,
+        "sql": 165671
+      },
+      "file": "gpdb-2026-07-11_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "72a80324e325e418bde02d66d286f844aa02cb58016994c1bc489fff59be32b2",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 116002893,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2387,
+        "inputs": 165815,
+        "primary_empty": 27173,
+        "records": 190601,
+        "sql": 163428
+      },
+      "file": "gpdb-2026-07-12_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "691aa60f82de544aed532088fc9e13b223c19c192ce9feb806ff7b00f5a8f9cc",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 163016278,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2413,
+        "inputs": 176985,
+        "primary_empty": 29583,
+        "records": 204155,
+        "sql": 174572
+      },
+      "file": "gpdb-2026-07-13_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "bc12d7631606187fb0141402a26a30caf9597345b9e47a2481e21119cd90bf2c",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 144909604,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2520,
+        "inputs": 173355,
+        "primary_empty": 29046,
+        "records": 199881,
+        "sql": 170835
+      },
+      "file": "gpdb-2026-07-14_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "e06a3e57679cd285afa5e7ab5d9556b40071d039fb61ce5c08a79805d5726eea",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 147642320,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2486,
+        "inputs": 174814,
+        "primary_empty": 29219,
+        "records": 201547,
+        "sql": 172328
+      },
+      "file": "gpdb-2026-07-15_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "a8787801e05bfa1b0dcd3a0e5685ba8250f012eb0c4bfd7a9f87bdf96c81d8f5",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 153670772,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2568,
+        "inputs": 180477,
+        "primary_empty": 29298,
+        "records": 207207,
+        "sql": 177909
+      },
+      "file": "gpdb-2026-07-16_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "0c8262bc96dd52491427e71fcb136323e374ad95a093ff2acd13b8687071738d",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 148633328,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2645,
+        "inputs": 178134,
+        "primary_empty": 29418,
+        "records": 204907,
+        "sql": 175489
+      },
+      "file": "gpdb-2026-07-17_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "f3e9cc75cf757fa9dab2f682e485792c284467eabfcb5a7594b7dd2ff6d4d6e3",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 114233125,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2438,
+        "inputs": 162480,
+        "primary_empty": 27182,
+        "records": 187224,
+        "sql": 160042
+      },
+      "file": "gpdb-2026-07-18_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "596f7e6378bea7bbde5af191504d546adb76c6033adbb6c1235eec0f876b038b",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 114870764,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2398,
+        "inputs": 162880,
+        "primary_empty": 27270,
+        "records": 187752,
+        "sql": 160482
+      },
+      "file": "gpdb-2026-07-19_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "7ca8becad6cdda595b7960506a9464aa73e5cc0757a562e5bfba061e12de2d7a",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 173200913,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2521,
+        "inputs": 178851,
+        "primary_empty": 29879,
+        "records": 206209,
+        "sql": 176330
+      },
+      "file": "gpdb-2026-07-20_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "d3656130438ecafa0274b43b13d772c5a38c3d0fab7042feffb31b27d0e4b19b",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 159448460,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2542,
+        "inputs": 180030,
+        "primary_empty": 29586,
+        "records": 207074,
+        "sql": 177488
+      },
+      "file": "gpdb-2026-07-21_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "30651e53b9ca302dcb403694d3e400b4c118b516a439d1a9ffb5c1b317ecd91b",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 164437354,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2626,
+        "inputs": 185948,
+        "primary_empty": 29554,
+        "records": 212876,
+        "sql": 183322
+      },
+      "file": "gpdb-2026-07-22_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "d59bd5eb4b21676d9c7f4b36a3c47747a82a3e768624284182dc789105eb5558",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 154211029,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2475,
+        "inputs": 174822,
+        "primary_empty": 29089,
+        "records": 201436,
+        "sql": 172347
+      },
+      "file": "gpdb-2026-07-23_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "b190504ca809afc200434bc6c3fdb640214c697225850bfc1e7d163b144f89c0",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 174226350,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2468,
+        "inputs": 174239,
+        "primary_empty": 29156,
+        "records": 200927,
+        "sql": 171771
+      },
+      "file": "gpdb-2026-07-24_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "a7ef3eba3b26f5cbcc9d109a889f1f45546b071bf9b2969b7b06a05823b73357",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 116745476,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2432,
+        "inputs": 166552,
+        "primary_empty": 27169,
+        "records": 191289,
+        "sql": 164120
+      },
+      "file": "gpdb-2026-07-25_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "d503ead82c9a108c7044216a74cda433678da827e27f4dc06deb1a0e4a947749",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 114340538,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2397,
+        "inputs": 162427,
+        "primary_empty": 27165,
+        "records": 187195,
+        "sql": 160030
+      },
+      "file": "gpdb-2026-07-26_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "6dbe13ca39a53a0b172881fe696dba5d83965e760a710832aceca55ccfa60154",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 191535524,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2592,
+        "inputs": 179594,
+        "primary_empty": 30268,
+        "records": 207270,
+        "sql": 177002
+      },
+      "file": "gpdb-2026-07-27_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "aa4c3c5af5a709911d49800873db27a2448177cef57ef3cd2f1e3fd2c5c6ac47",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 162575016,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2488,
+        "inputs": 179088,
+        "primary_empty": 29630,
+        "records": 206230,
+        "sql": 176600
+      },
+      "file": "gpdb-2026-07-28_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "8fcf4d70c23093b292a85cddd0924563bfbe0c3459104bc143716f759eb82081",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 135254466,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2248,
+        "inputs": 138932,
+        "primary_empty": 21115,
+        "records": 157799,
+        "sql": 136684
+      },
+      "file": "gpdb-2026-07-29_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "bf8f3784b34f3b11afaa942fbafefcf952f57cb4b42cb42bff54fa80fa2eaf8e",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 17589465,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 207,
+        "inputs": 33760,
+        "primary_empty": 7812,
+        "records": 41365,
+        "sql": 33553
+      },
+      "file": "gpdb-2026-07-29_161546.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "88e2570ee869fa6027702d9ad71107e137838aaa81753b34215423bbe4fa8234",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 160491551,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2490,
+        "inputs": 176228,
+        "primary_empty": 29325,
+        "records": 203063,
+        "sql": 173738
+      },
+      "file": "gpdb-2026-07-30_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "c9fe13a9ae28f20170ec571b693e82063da15d7631474d2488c7e28bfbb165b4",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 164320624,
+      "cluster": "119",
+      "counts": {
+        "inline_distinct": 2499,
+        "inputs": 175032,
+        "primary_empty": 29194,
+        "records": 201727,
+        "sql": 172533
+      },
+      "file": "gpdb-2026-07-31_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "bd39c77cfac7a603d03cd269048090dbc3b678e40f0e34f000e72e2fe7e1fc39",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 124666079,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 4128,
+        "inputs": 152679,
+        "primary_empty": 14722,
+        "records": 163273,
+        "sql": 148551
+      },
+      "file": "gpdb-2026-09-16_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "4951fe869607d30300a769d32480d647b4dd13780a9c914f1338f6376ac1c560",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 529475791,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 7794,
+        "inputs": 628403,
+        "primary_empty": 48065,
+        "records": 668674,
+        "sql": 620609
+      },
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "7637211ed5d2a85952a6d8b77efbb370d53e3a3ccc94ada577678c8f29eb20db",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 526755139,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 1594,
+        "inputs": 177016,
+        "primary_empty": 7979,
+        "records": 183401,
+        "sql": 175422
+      },
+      "file": "gpdb-2026-09-16_000000.csv.2",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "8210741a0a6c174e4daef192a748f0f35cf2a29dc0abc9f1dcc72a55ef285f25",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 528150833,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 14346,
+        "inputs": 566803,
+        "primary_empty": 41761,
+        "records": 594218,
+        "sql": 552457
+      },
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "91285a731f21cca24e3634be3eecaf8c915dbb310473ac067742f499f76c5603",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 373615414,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 7805,
+        "inputs": 487193,
+        "primary_empty": 38185,
+        "records": 517573,
+        "sql": 479388
+      },
+      "file": "gpdb-2026-09-17_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "0f3de2f89abe906fea23f849390ea55279f9af299020a46575894a1b7ba2d1e6",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 524732770,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 4834,
+        "inputs": 666044,
+        "primary_empty": 27272,
+        "records": 688482,
+        "sql": 661210
+      },
+      "file": "gpdb-2026-09-17_000000.csv.1",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "890505ac82d6b1b6cf21ca756796d4f463e53735c741146377b8dfec6f84ddc6",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 525793242,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 1152,
+        "inputs": 190764,
+        "primary_empty": 7356,
+        "records": 196968,
+        "sql": 189612
+      },
+      "file": "gpdb-2026-09-17_000000.csv.2",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "6dba60e5bf29a498ecc80f7b109af3408ce40b443e1b84e54262e63f84bc9e7d",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 524770216,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 13844,
+        "inputs": 590499,
+        "primary_empty": 42726,
+        "records": 619381,
+        "sql": 576655
+      },
+      "file": "gpdb-2026-09-17_000000.csv.3",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "f3171ea36c87fec1bdec194927948f136b7ee02dfb896336f69f1587b0496b12",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 161216033,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 5250,
+        "inputs": 200438,
+        "primary_empty": 19310,
+        "records": 214498,
+        "sql": 195188
+      },
+      "file": "gpdb-2026-09-18_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "965cb9f643f0a4780464964812e7bfe60a175524977e82755648ade1b8cc209d",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 524439546,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 6940,
+        "inputs": 481238,
+        "primary_empty": 44880,
+        "records": 519178,
+        "sql": 474298
+      },
+      "file": "gpdb-2026-09-18_000000.csv.1",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "b4716eba07d4440f78a896bfd356c146358ffc921c65ed5209f073f5b2dc6a19",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 527328017,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 1385,
+        "inputs": 171464,
+        "primary_empty": 8208,
+        "records": 178287,
+        "sql": 170079
+      },
+      "file": "gpdb-2026-09-18_000000.csv.2",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "390df0cc11a0bcfee65e72b8175ebc98be2ed5c424108bfbb8133ac51d056c3c",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 525499344,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 13958,
+        "inputs": 558793,
+        "primary_empty": 43146,
+        "records": 587981,
+        "sql": 544835
+      },
+      "file": "gpdb-2026-09-18_000000.csv.3",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "387d41e98567013cff091171a3f583aca4909785f89f8a1aed715e95c1845451",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 5131812,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 154,
+        "inputs": 8486,
+        "primary_empty": 1308,
+        "records": 9640,
+        "sql": 8332
+      },
+      "file": "gpdb-2026-09-19_000000.csv",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "f159b5e17c152b434a5b58d7b703f50eb974eb3d9ad79c8c19bf6cd72ea2ebc5",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 524322867,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 10053,
+        "inputs": 749820,
+        "primary_empty": 50365,
+        "records": 790132,
+        "sql": 739767
+      },
+      "file": "gpdb-2026-09-19_000000.csv.1",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "eb359163f0408f5a1bdf8b3188ef589399fce4f7c7dfebd014c60e60a13a57d2",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 527561226,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 2156,
+        "inputs": 229006,
+        "primary_empty": 10665,
+        "records": 237515,
+        "sql": 226850
+      },
+      "file": "gpdb-2026-09-19_000000.csv.2",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "22679be64278796011410abd1f9bd1490078f08391d04a6290d7e4a4a3a81277",
+      "stat_unchanged": true
+    },
+    {
+      "bytes": 568743370,
+      "cluster": "120",
+      "counts": {
+        "inline_distinct": 13752,
+        "inputs": 532009,
+        "primary_empty": 42671,
+        "records": 560928,
+        "sql": 518257
+      },
+      "file": "gpdb-2026-09-19_000000.csv.3",
+      "full_file_hash_rechecked": true,
+      "read_to_eof": true,
+      "sha256": "ef64b490933002d1bbb5ee980647289423aae84bf8167777d328952785f950b9",
+      "stat_unchanged": true
+    }
+  ],
+  "occurrence_reasons": {
+    "RecursionError": 608,
+    "base_parser_rejected": 3706,
+    "invalid_encoding": 466,
+    "lexical_ambiguous_string_escape": 2578,
+    "lexical_unbalanced_bracket": 23844,
+    "lexical_unclosed_comment": 403,
+    "lexical_unclosed_string": 7080,
+    "prototype_parsed": 11209506,
+    "scanner_rejected": 298,
+    "sql_missing_or_empty": 120992,
+    "unconsumed_extension": 6,
+    "unsupported_distribution_statement": 2
+  },
+  "occurrence_states": {
+    "probe_exception": 608,
+    "prototype_parsed": 11209506,
+    "unsupported": 159375
+  },
+  "parse_seconds": 324.863,
+  "purpose": "Full parser coverage census; AST return is not structural fidelity or fingerprint acceptance",
+  "statement_roots": {
+    "AlterTableStmt": 3173,
+    "CommentStmt": 580,
+    "CopyStmt": 12586,
+    "CreateSeqStmt": 8,
+    "CreateStmt": 22189,
+    "CreateTableAsStmt": 30201,
+    "DeallocateStmt": 5506,
+    "DeleteStmt": 78141,
+    "DoStmt": 32,
+    "DropStmt": 36959,
+    "GrantStmt": 684,
+    "IndexStmt": 2,
+    "InsertStmt": 333338,
+    "LockStmt": 2348,
+    "RenameStmt": 6822,
+    "SelectStmt": 581913,
+    "TransactionStmt": 15049,
+    "TruncateStmt": 13719,
+    "UpdateStmt": 30316,
+    "VacuumStmt": 15935,
+    "VariableSetStmt": 54267,
+    "VariableShowStmt": 6,
+    "ViewStmt": 10
+  },
+  "totals": {
+    "bytes": 11324830051,
+    "files": 46,
+    "input_occurrences": 11369489,
+    "largest_sql_bytes": 80959,
+    "parsed_unique_batches": 64283,
+    "records": 12458769,
+    "unique_inputs": 1156621
+  },
+  "unique_input_categories": {
+    "ALTER TABLE": 9172,
+    "ANALYSE": 1607,
+    "ANALYZE": 13640,
+    "BEGIN": 5102,
+    "COMMENT": 125,
+    "COMMIT": 7001,
+    "COPY": 12777,
+    "CREATE EXTERNAL": 13890,
+    "CREATE INDEX": 2,
+    "CREATE SEQUENCE": 8,
+    "CREATE TABLE": 35215,
+    "CREATE VIEW": 10,
+    "DEALLOCATE": 5506,
+    "DELETE": 76600,
+    "DO": 32,
+    "DROP EXTERNAL": 18555,
+    "DROP SCHEMA": 12,
+    "DROP SEQUENCE": 9,
+    "DROP TABLE": 16218,
+    "DROP VIEW": 5,
+    "END": 2664,
+    "GRANT": 575,
+    "INSERT": 327900,
+    "LOCK": 2348,
+    "ROLLBACK": 2,
+    "SELECT": 582319,
+    "SET": 54212,
+    "SET ROLE": 1,
+    "SET TRANSACTION": 1,
+    "SHOW": 7,
+    "TRUNCATE": 13587,
+    "UNKNOWN": 14,
+    "UPDATE": 29878,
+    "VACUUM": 801,
+    "WITH": 2603
+  },
+  "unique_reasons": {
+    "RecursionError": 191,
+    "base_parser_rejected": 1462,
+    "invalid_encoding": 99,
+    "lexical_ambiguous_string_escape": 222,
+    "lexical_unbalanced_bracket": 5138,
+    "lexical_unclosed_comment": 109,
+    "lexical_unclosed_string": 1895,
+    "prototype_parsed": 1147328,
+    "scanner_rejected": 28,
+    "sql_missing_or_empty": 145,
+    "unconsumed_extension": 2,
+    "unsupported_distribution_statement": 2
+  },
+  "unique_states": {
+    "probe_exception": 191,
+    "prototype_parsed": 1147328,
+    "unsupported": 9102
+  },
+  "workers": 8
+}

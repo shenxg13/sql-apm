@@ -1,0 +1,49 @@
+[
+  {
+    "id": "copy_on_segment",
+    "synthetic_sql": "COPY (SELECT id FROM t) TO '/tmp/example.data' ON SEGMENT;",
+    "results": {
+      "pglast": {
+        "state": "parse_error",
+        "exception": "ParseError",
+        "syntax_marker": null
+      },
+      "sqlglot": {
+        "state": "parsed",
+        "roots": [
+          "Copy"
+        ],
+        "statement_count": 1,
+        "ast_digest": "f60a3e5bf7fb4b1f51539e041cd2b17a1ece39cefe94db757d12617c3bb1152a",
+        "comments_ast_digest": "f60a3e5bf7fb4b1f51539e041cd2b17a1ece39cefe94db757d12617c3bb1152a"
+      }
+    }
+  },
+  {
+    "id": "temporary_distributed",
+    "synthetic_sql": "CREATE LOCAL TEMP TABLE t(id int) WITH (appendonly=true) ON COMMIT PRESERVE ROWS DISTRIBUTED BY (id);",
+    "results": {
+      "pglast": {
+        "state": "parse_error",
+        "exception": "ParseError",
+        "syntax_marker": "DISTRIBUTED"
+      },
+      "sqlglot": {
+        "state": "opaque_command",
+        "roots": [
+          "Command"
+        ],
+        "statement_count": 1,
+        "ast_digest": "6de8ea81f5d36ab0eff843f12690b26afd4b7c2299505c788198e2660220bd04",
+        "comments_ast_digest": "6de8ea81f5d36ab0eff843f12690b26afd4b7c2299505c788198e2660220bd04"
+      }
+    }
+  },
+  {
+    "id": "unicode_error_index",
+    "synthetic_sql": "SELECT '中文'; CREATE TABLE t(id int) DISTRIBUTED BY (id);",
+    "reported_index": 32,
+    "actual_character_index": 36,
+    "actual_utf8_byte_index": 40
+  }
+]

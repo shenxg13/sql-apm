@@ -6,7 +6,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from sql_apm.diagnostics.statement_census import diagnose, replay, scan
+from sql_apm.diagnostics.statement_census import replay, scan
+from sql_apm.sql.lexical import diagnose
 
 
 class StatementCensusTests(unittest.TestCase):

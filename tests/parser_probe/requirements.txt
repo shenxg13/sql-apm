@@ -1,0 +1,3 @@
+# Probe only: CPython 3.9 / Linux x86_64. Not a production parser decision.
+pglast==7.18 --hash=sha256:31873776e947e00cbdd8c04ae2e7783d52719d93a45a010796a9c14d69b867c2
+sqlglot==30.19.0 --hash=sha256:b4500fcced395359feea582f09d2d4433bf1f36362a3a9d0d6d5ebbc1f84242e

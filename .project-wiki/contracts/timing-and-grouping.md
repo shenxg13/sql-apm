@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/timing-and-grouping.md
-updated: 2026-09-25
+updated: 2026-09-27
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -92,6 +92,9 @@ confidence: high
   不据此直接判断整条 SQL 的 activity 异常，也不自动确认阶段级异常判断方法。
 - 阶段样本的 SQL 身份、计时含义和 duration 必须可靠。若无法可靠归属 SQL
   分组，按导入批次记录问题，不为缺失或不可靠文本构造虚假的 SQL 分组。
+  2026-09-27 确认的[近似指纹观察](sql-fingerprints.md#已确认的观察用近似指纹)允许
+  单独观察已记录片段，仍保留来源、计时类别及记录／请求／调用单位，不把近似相同
+  当作可靠 SQL 身份。没有可靠计时或事件归属时不补造耗时、执行次数或正常基线。
 - 类型未知仍是识别状态，不是新增的第六类已确认耗时基线。完整 SQL 执行
   次数、排除执行总数和训练资格继续按原执行单位解释，不能将 Parse、Bind
   或续取日志加总为业务执行次数。

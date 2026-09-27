@@ -117,7 +117,9 @@ class AdapterTests(unittest.TestCase):
                 self.assertEqual(parse(sql), parse(spaced(sql)))
         sql = 'SELECT a NOT /*+ H */ IN (1)'
         self.assertEqual(parse(sql), parse(spaced(sql)))
-        self.assertEqual(parse(sql)['hints'], [{'gap': 3, 'kind': 'C_COMMENT', 'raw': '/*+ H */'}])
+        self.assertEqual({k: v for k, v in parse(sql)['hints'][0].items() if k != 'anchor'},
+                         {'gap': 3, 'kind': 'C_COMMENT', 'raw': '/*+ H */'})
+        self.assertEqual(parse(sql)['hints'][0]['anchor']['token_gap'], 3)
         self.assertEqual(parse(sql)['statements'], parse('SELECT a NOT IN (1)')['statements'])
         self.assertEqual(parse("SELECT 'a' /* ordinary */\n'b'"), parse("SELECT 'ab'"))
         self.assertEqual(parse('SELECT 1/*ordinary*/+2'), parse('SELECT 1 + 2'))

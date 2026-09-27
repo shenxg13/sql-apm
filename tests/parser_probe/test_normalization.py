@@ -173,7 +173,7 @@ class NormalizationTests(unittest.TestCase):
         r['normalized'].clear()
         snapshot = self.engine.rule_snapshot()
         snapshot['dictionary']['rules'][0]['enabled'] = False
-        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/1')
+        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/2')
         self.assertEqual(self.result(raw), self.result(raw))
 
     def test_fixed_dictionary_changes_are_traceable(self):

@@ -209,10 +209,14 @@ def cases():
         add('batch_' + str(i), 'batch', a['sql'] + '; ' + b['sql'], a['expected'] + b['expected'])
     for i, case in enumerate(representatives):
         sql = case['sql']
+        # Independent first-statement oracle, not the adapter's anchor helper.
+        kinds = ['VALUE' if t.name in ('ICONST', 'FCONST', 'SCONST', 'BCONST', 'XCONST', 'PARAM')
+                 else t.name for t in parser.scan(sql)]
+        anchor = dict(kind='statement', statement_index=0, token_gap=0, syntax_sha256=digest(kinds))
         add('hint_' + str(i), 'hint', '/*+ keep */ ' + sql, case['expected'])
-        result[-1]['hints'] = [{'kind':'C_COMMENT','raw':'/*+ keep */','gap':0}]
+        result[-1]['hints'] = [{'kind':'C_COMMENT','raw':'/*+ keep */','gap':0,'anchor':anchor}]
         add('line_hint_' + str(i), 'hint', '--+ keep\n' + sql, case['expected'])
-        result[-1]['hints'] = [{'kind':'SQL_COMMENT','raw':'--+ keep','gap':0}]
+        result[-1]['hints'] = [{'kind':'SQL_COMMENT','raw':'--+ keep','gap':0,'anchor':anchor}]
 
     invalid = [
         'INSERT INTO t(a) SELECT 1,',

@@ -4,15 +4,17 @@ Grammar evidence: GP6 gram.y at 9a08259bd1836f0cf5ba935e7e0030a5a9c0a54b.
 Every removed source span is parsed into a typed extension first. Unsupported
 forms raise a fixed diagnostic; no SQL/token-text fallback or partial batch.
 """
+from bisect import bisect_right
 from dataclasses import dataclass
+import hashlib
 
 from pglast import parser
 
 from sql_apm.sql.lexical import diagnose
 from sql_apm.sql.pg_ast import pg_clean
-from sql_apm.sql.structure import loads
+from sql_apm.sql.structure import dumps, loads
 
-VERSION = 'mpp-adapter-probe/5'
+VERSION = 'mpp-adapter-probe/6'
 
 
 class Unsupported(ValueError):
@@ -689,6 +691,44 @@ def statement(sql, tokens):
     return {'base': base, 'extensions': extensions}
 
 
+
+def _anchor_hints(hints, tokens, ranges):
+    # Full PG ASTs discard redundant parentheses. A gap alone (even scoped to
+    # a statement) can therefore identify different grammar positions. Bind
+    # each gap to the complete ordered scanner-kind frame, including brackets.
+    # The frame supplements the full AST; it is never a SQL-text fingerprint.
+    # Value kinds share a slot: the AST/normalizer owns value protection, while
+    # an otherwise identical business literal/parameter stays interchangeable.
+    values = frozenset(('ICONST', 'FCONST', 'SCONST', 'BCONST', 'XCONST', 'PARAM'))
+    ends = [t.end for t in tokens]
+    starts = [a for a, _ in ranges]
+    frames = {}
+
+    def frame(key, begin, end):
+        if key not in frames:
+            kinds = ['VALUE' if t.name in values else t.name for t in tokens[begin:end]]
+            frames[key] = hashlib.sha256(dumps(kinds).encode('ascii')).hexdigest()
+        return frames[key]
+
+    for hint in hints:
+        offset = hint.pop('start')
+        gap = bisect_right(ends, offset)
+        # Newline-separated string fragments can form one scanner token.
+        if gap < len(tokens) and tokens[gap].start < offset < tokens[gap].end:
+            raise Unsupported('hint_inside_combined_token')
+        hint['gap'] = gap
+        index = bisect_right(starts, gap) - 1
+        if index >= 0 and gap <= ranges[index][1]:
+            begin, end = ranges[index]
+            hint['anchor'] = dict(kind='statement', statement_index=index,
+                                  token_gap=gap - begin, syntax_sha256=frame(index, begin, end))
+        else:
+            # Empty statements and trailing batch comments have no statement
+            # owner. Keep their separator position and full batch frame.
+            hint['anchor'] = dict(kind='batch_boundary', statement_index=index + 1,
+                                  token_gap=gap, syntax_sha256=frame('batch', 0, len(tokens)))
+
+
 def parse(sql):
     """Return complete derived structure or raise Unsupported (no partial AST)."""
     if not isinstance(sql, str) or not sql.strip():
@@ -724,27 +764,22 @@ def parse(sql):
     except parser.ParseError:
         raise Unsupported('scanner_rejected') from None
     tokens = [Token(sql[t.start:t.end + 1], t.name, t.start, t.end + 1) for t in scanned]
-    # Ordinary comments can separate string tokens that PG concatenates across
-    # newlines. Derive gaps from the comment-free scan so following Hints stay
-    # stable; a Hint inside a combined token has no supported gap anchor.
-    for hint in hints:
-        start = hint.pop('start')
-        if any(t.start < start < t.end for t in tokens):
-            raise Unsupported('hint_inside_combined_token')
-        hint['gap'] = sum(t.end <= start for t in tokens)
     # Dollar quoted procedural bodies are one token; semicolons inside do not split.
-    groups, start = [], 0
+    ranges, start = [], 0
     for i in top_level(tokens):
         if tokens[i].word == ';':
             if i > start:
-                groups.append(tokens[start:i])
+                ranges.append((start, i))
             start = i + 1
     if start < len(tokens):
-        groups.append(tokens[start:])
-    if not groups:
+        ranges.append((start, len(tokens)))
+    if not ranges:
         raise Unsupported('sql_missing_or_empty')
+    if hints:
+        _anchor_hints(hints, tokens, ranges)
     result = []
-    for group in groups:
+    for start, stop in ranges:
+        group = tokens[start:stop]
         begin, end = group[0].start, group[-1].end
         local = [Token(t.raw, t.name, t.start - begin, t.end - begin) for t in group]
         result.append(statement(sql[begin:end], local))

@@ -1,6 +1,6 @@
 # SQL 归一化与结构指纹接口
 
-首版 `sql-normalization/1` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
+当前 `sql-normalization/2` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
 并接入独立的[观察用近似路径](sql-approximate.md)。核心位于
 [normalization.py](../../sql_apm/sql/normalization.py)，业务边界由
 [SQL 指纹契约](../../.project-wiki/contracts/sql-fingerprints.md)定义。
@@ -46,7 +46,7 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 | `normalized` | 完整有类型结构与 Hint；可靠时非空，不是可执行 SQL，也不能替代原文 |
 | `fingerprint.kind` | 固定 structural，和 approximate 明确分开 |
 | `fingerprint.state` | reliable／unsupported_syntax／normalization_failed |
-| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/1:` 加 SHA-256 |
+| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/2:` 加 SHA-256 |
 | `fingerprint.reason` | reliable 时 null，否则固定诊断，不包含解析器错误原文 |
 | `approximate` | 只在解析明确拒绝时尝试；结构异常、归一化异常、配置和资源错误不回退 |
 | `diagnostics` | 替换节点数、函数选择原因计数；不含对象名、参数值或异常原文 |
@@ -57,7 +57,7 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 空输入返回诊断，调用方不得据此伪造完整 SqlText／Fingerprint 实体；非 str／bytes 参数抛出
 TypeError。不完整文本的观察结果遵守独立近似契约，不填入可靠 Fingerprint.value。
 
-规则依据包括算法版本、适配器 `mpp-adapter-probe/5`、固定 pglast 版本、字典规范内容摘要
+规则依据包括算法版本、适配器 `mpp-adapter-probe/6`、固定 pglast 版本、字典规范内容摘要
 及算法规则摘要。`rules_ref` 是规范规则快照的内容地址；**必须连同 `rule_snapshot()` 的
 内容保存**，只有摘要不能解释历史规则。该快照含完整字典和算法规则说明，字典规则／参数
 列表按已有摘要语义排序；不把字典文件排版摘要误作 dictionary_digest。算法实现由版本化
@@ -107,15 +107,27 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 
 完整解析证据与拒绝原因见[全量修复报告](../reports/mpp-full-repair-2026-09-27.md)、
 [广覆盖矩阵](../reports/mpp-broad-validation-2026-09-27.md)；本模块真实归组证据见
-[归一化验证报告](../reports/sql-normalization-2026-09-27.md)。源码中 `probe/5` 的名字保留用于
+[归一化验证报告](../reports/sql-normalization-2026-09-27.md)。源码中 `probe/6` 的名字保留用于
 历史解析证据和能力版本追溯；产品入口为 Normalizer，不把旧探测返回 AST 当产品指纹。
 
-普通注释由扫描器确认后忽略；仅以 `/*+`、`--+` 开始的注释作为 Hint，内容原样保留，
-位置为去普通注释后的 token 间隙。普通空白、说明性注释及关键字大小写变化有稳定性验证。
-Hint 的内容、空白和位置不推断等价；嵌套歧义或 Hint 落在合并字符串 token 内明确拒绝。
-这是保守位置编码：额外括号、分号或正负数字 token 数变化可能造成拆组，尤其 Hint 在
-后续位置时；不宣称所有语义等价写法都能合并。此版本未做查询优化、交换律、绑定关系、
-目录／会话重建或隐含对象解析。
+普通注释由扫描器确认后忽略；仅以 `/*+`、`--+` 开始的注释作为 Hint，内容原样保留。
+每个 Hint 保存全局 `gap`，并增加 `anchor`：所属非空语句的零起始序号 `statement_index`、
+语句内 `token_gap` 和完整有序 token 种类序列的 `syntax_sha256`。该序列保留括号、关键字、
+分隔符等词法结构；普通字面量和参数的种类统一为 `VALUE`，值是否受保护仍由完整 AST
+与归一化规则决定。摘要使用规范 JSON 的 SHA-256，只补充 Hint 位置，不能独立替代 AST
+或作为原文哈希降级。没有 Hint 时不计算该序列摘要；同一语句的多个 Hint 复用一次摘要。
+
+`anchor.kind=statement` 表示 Hint 位于语句开始前、内部或终止分号前。
+位于空语句间或最后一个分号后的 Hint 使用 `batch_boundary`，记录下一非空语句序号
+（末尾为语句总数）、全批次间隙和包含分号的全批次序列摘要，避免猜定其语句归属。
+位置以屏蔽注释后的重新扫描结果为准；嵌套歧义或 Hint 落在合并字符串 token 内仍明确拒绝。
+普通空白、说明性注释及关键字大小写变化有稳定性验证；Hint 内容、内部空白和位置不推断等价。
+
+版本1仅保存全局 token 间隙，R1 发现冗余括号被 PG AST 清理后，不同语句或子句的 Hint
+可产生相同身份；此前“只会保守拆组”的描述不成立。版本2以语句归属和完整词法结构补足
+这一位置约束，详见[整改验证](../reports/sql-normalization-r1-remediation-2026-09-28.md)。
+新增括号、分号或正负数字 token 数变化仍可能保守拆组；不宣称所有语义等价写法都能合并。
+此版本未做查询优化、交换律、绑定关系、目录／会话重建或隐含对象解析。
 
 ## 命令、退出码及资源
 

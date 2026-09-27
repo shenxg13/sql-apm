@@ -1,7 +1,7 @@
 # SQL 近似指纹接口与边界
 
 本模块实现[已确认的近似观察规则](../../.project-wiki/contracts/sql-fingerprints.md#已确认的观察用近似指纹)。
-版本为 `sql-approximate/1`，只提供观察分组身份，不代表完整 SQL、可靠结构指纹或正常基线。
+版本为 `sql-approximate/2`，只提供观察分组身份，不代表完整 SQL、可靠结构指纹或正常基线。
 不执行 SQL，不读数据库，不尝试从其他记录补取完整 SQL，不补括号／引号或恢复绑定值。
 完整结构归一化已由[Normalizer](sql-normalization.md)提供；生产日志导入、观察统计及其持久化尚未实现。
 
@@ -35,7 +35,7 @@ near = fingerprint(b'SELECT * FROM orders WHERE id IN (1001,',
 | `structure_fingerprint` | 本步骤始终为空；parsed 只表示取得 AST，不表示已完成结构归一化 |
 | `approximate` | 仅原型明确拒绝时尝试生成；解析成功、异常或输入超限不自动回退 |
 | 近似 `kind`、`state` | kind 固定 approximate；available／unavailable／failed 区分结果与失败 |
-| 近似 `value` | 仅 available 非空，使用 `approx:sql-approximate/1:` 前缀及 SHA-256；不能写入正常 Fingerprint.value／Group |
+| 近似 `value` | 仅 available 非空，使用 `approx:sql-approximate/2:` 前缀及 SHA-256；不能写入正常 Fingerprint.value／Group |
 | `algorithm_version`、`rules_digest`、`rules_ref`、`rules` | 算法版本、内置规则的规范摘要、内置版本引用及独立规则快照；不同规则不得混比 |
 | `source` | 已取得输入的字节数、精确 SHA-256 和 base64 原字节；不是重建的完整业务 SQL |
 | `normalized` | 有类型的词法序列、词法问题、未闭合括号、原结构失败原因、固定 unverified 完整性标记 |
@@ -46,15 +46,15 @@ near = fingerprint(b'SELECT * FROM orders WHERE id IN (1001,',
 profile、规则摘要及近似表示的规范 JSON，不能与原文 SHA 或结构摘要互换。规则变化应升级
 版本并保留历史规则依据。调用方负责来源定位、事件身份及统计，不靠指纹去重真实事件。
 
-## 第一版处理范围
+## 当前处理范围
 
 扫描与括号处理均使用显式状态／栈；不依赖完整 AST，也不提高全局递归限制。
 
-| 内容／位置 | 第一版处理 |
+| 内容／位置 | 当前处理 |
 | --- | --- |
 | 普通空白、完整普通注释 | 忽略；保留 token 边界 |
 | 未加引号的词 | 仅折叠 ASCII 大小写；引号标识符和其他 Unicode 字符保留 |
-| Hint | 保留内容及在 token 序列中的位置，不推断等价写法 |
+| Hint | 原样保留内容及输出序列位置；语法上下文识别跳过 Hint，不推断等价写法 |
 | 简单 WHERE 直接列比较、直接 IN 常量列表 | 边界及位置可确定的普通数字、无反斜杠普通字符串、原生参数改为统一业务标记 |
 | UPDATE 的直接 SET 列赋值 | 同上；表达式、函数或显式类型转换不套用简单值规则 |
 | 未闭合字符串、注释、标识符、美元引用或词法歧义 | 保留从不确定位置起的全部原始片段及原因，不继续猜测其中的 SQL token |
@@ -62,6 +62,13 @@ profile、规则摘要及近似表示的规范 JSON，不能与原文 SHA 或结
 | 编码异常或 NUL | 保留原字节；遇到异常处保守保留剩余片段，不忽略或替换损坏字节 |
 | 输入末尾无后续边界的数字／参数 | 原样保留，避免把被截断的词误当作完整业务值 |
 | NULL、布尔、负号表达式、函数参数、类型转换、SELECT 表达式、INSERT VALUES、DDL、SET 配置及 LIMIT／OFFSET | 本近似版本保留；不套用可靠结构路径的全部归一化规则 |
+
+版本2先建立排除 Hint 的语法 token 视图，用同一视图判断直接业务值、函数调用和显式转换，
+再把选中位置映射回原输出序列。这样 `custom /*+ H */ (...)` 或 `(...) /*+ H */ ::boolean`
+中的 Hint 不会截断保护上下文；块／行 Hint、多个 Hint、未闭合调用和嵌套转换均有回归验证。
+整个函数或括号转换内部的业务值仍保留，Hint 自身内容、位置及原结构失败原因不丢失。
+版本1存在该保护绕过问题，不能把旧版本结果当作新版本通过证据；见
+[整改验证](../reports/sql-normalization-r1-remediation-2026-09-28.md)。
 
 有可识别 SQL 命令 token 才生成近似结果；只有分号、普通注释、从开头即不确定的注释或
 无法辨认的文本返回 `no_sql_tokens`。因此并非每个拒绝输入都生成指纹，也并非每个近似
@@ -101,12 +108,15 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
   -m unittest discover -s tests/parser_probe
 
 PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
-  -m sql_apm.diagnostics.mpp_approximate_replay \
-  --database var/parser-probe/approximate-rerun.sqlite \
-  --output var/parser-probe/approximate-rerun.json
+  -m sql_apm.diagnostics.normalization_replay \
+  --output var/parser-probe/normalization-rerun.json
 ```
 
-重放要求新的结果库和输出路径，只读使用原始全量索引及版本5结果；先后核对旧库与源码
-摘要、每条原文字节摘要及原解析结果。选择版本4所有9,293个旧失败，包含版本5剩余8,909个
-拒绝及384个已修复对照；输出仅有固定诊断、计数、指纹和来源定位，不导出 SQL 或 token 值。
-结果及解释见[验证报告](../reports/mpp-approximate-2026-09-27.md)。
+当前有界重放使用新的输出路径，复用固定历史样本及原文索引的首尾各512条，精确去重后
+为1,832条；22条结构拒绝中20条近似可用、2条不可用，可靠结果与近似结果继续隔离。
+该样本不覆盖全部旧拒绝，函数／转换间插入 Hint 的保护由定向合成回归补充验证。
+
+[历史重放报告](../reports/mpp-approximate-2026-09-27.md)记录版本1对9,293个旧失败输入的
+验证，包含解析版本5剩余8,909个拒绝及384个已修复对照；报告保持原样。
+`mpp_approximate_replay` 固定核对版本5源码摘要，只能在对应历史代码与证据下复现；
+解析器升至版本6后会按设计拒绝，不能放宽摘要校验把旧全量结论冒充当前验证。

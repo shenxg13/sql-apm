@@ -10,7 +10,7 @@ import hashlib
 import json
 import re
 
-VERSION = 'sql-approximate/1'
+VERSION = 'sql-approximate/2'
 PROFILE = 'hashdata-csv/1'
 MAX_BYTES = 512 * 1024
 _ASCII_LOWER = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
@@ -28,6 +28,7 @@ _RULES = {
     'opaque_policy': 'retain_exact_remainder_at_uncertain_lexical_boundary',
     'identifiers': 'ascii_fold_unquoted_only', 'comments': 'drop_closed_ordinary_keep_hint',
     'context': 'preserve_calls_casts_expressions_and_unknown_positions',
+    'hint_context': 'ignore_hint_tokens_for_syntax_keep_output_positions',
     'eof_value': 'preserve_unterminated_numeric_or_parameter_token',
     'eligibility': 'observation_only',
 }
@@ -237,6 +238,11 @@ def _protected_positions(tokens):
 
 def _business_positions(tokens, sql):
     """Conservative token patterns, never a tolerant SQL grammar or AST."""
+    # Hints remain in the output stream but do not interrupt grammar neighbors
+    # (function + opening bracket, closing bracket + cast, direct predicates).
+    # Run every context check in the same syntax view, then map selections back.
+    syntax_indices = [i for i, token in enumerate(tokens) if token.kind != 'hint']
+    tokens = [tokens[i] for i in syntax_indices]
     words = [t.word for t in tokens]
     modes, query, stack = [], None, []
     mode = None
@@ -304,7 +310,7 @@ def _business_positions(tokens, sql):
                 if j == len(tokens) or tokens[j].kind == 'opaque':
                     selected.update(found)
                     break
-    return selected - _protected_positions(tokens)
+    return {syntax_indices[i] for i in selected - _protected_positions(tokens)}
 
 
 def _raw(sql):

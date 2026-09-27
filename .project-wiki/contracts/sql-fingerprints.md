@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-fingerprints.md
-updated: 2026-09-27
+updated: 2026-09-28
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -39,6 +39,8 @@ sources:
   - path: docs/design/sql-normalization.md
     status: current
   - path: docs/reports/sql-normalization-2026-09-27.md
+    status: historical
+  - path: docs/reports/sql-normalization-r1-remediation-2026-09-28.md
     status: current
 related:
   - decision.project-scope
@@ -402,10 +404,27 @@ SQLGlot 继续仅作候选实验依赖。核心不访问数据库、不补取 SQ
 观察统计、导入和基线编排仍未实现。
 
 [接口及支持矩阵](../../docs/design/sql-normalization.md)定义输出字段、构造异常、512 KiB
-输入边界、特殊函数及保守 Hint token 间隙位置编码；后者可能因 token 数差异保守拆组。
+输入边界和特殊函数。该次实现仅以全局 token 间隙编码 Hint，后续 R1 发现除拆组外还会
+错误合并不同位置；现行修复及限制见下一节，旧验证不覆盖这个缺陷。
 [验证报告](../../docs/reports/sql-normalization-2026-09-27.md)记录1,832条有界输入中1,810条
 可靠、22条拒绝、1,566个可靠组及完整结构守恒检查。此为本地实现和固定样本证据，不表示
 生产部署、全量归组准确率、全部 MPP 方言支持或 Issue 已完成合并。
+
+### R1 整改实施记录（2026-09-28）
+
+用户要求“进行R1整改”后，针对独立评审的 `I9-R1-F001`、`I9-R1-F002` 完成实现修复，
+验收范围保持不变；评审结论与问题处置保留在[PR #10](https://github.com/shenxg13/sql-apm/pull/10)。
+当前版本为 `sql-normalization/2`、`mpp-adapter-probe/6` 和 `sql-approximate/2`，字典仍为1.0.1。
+可靠 Hint 以所属语句、局部间隙和保留括号的完整 token 种类序列摘要绑定位置；批次边界独立
+标记。完整 AST 继续参与身份，不以词法摘要或原文哈希替代；详细编码和保守拆组限制见
+[可靠接口](../../docs/design/sql-normalization.md)。近似路径判断语法上下文时跳过 Hint，
+输出保留原 Hint 及顺序，整个函数／显式转换保护不被 Hint 打断；见
+[近似接口](../../docs/design/sql-approximate.md)。新旧版本身份不能直接混比。
+
+[整改报告](../../docs/reports/sql-normalization-r1-remediation-2026-09-28.md)记录原8组反例、
+同类扩展及新的1,832条有界回放。可靠／拒绝状态和1,566个可靠组的成员集合与旧样本相同，
+不是旧指纹值相同，也不是全量语义准确率证明。历史全量解析和近似报告保留，未重复115万条
+全量扫描或把旧版本证据覆盖为新版；实现方验证不替代后续独立 R2。
 
 ## Workflows
 

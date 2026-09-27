@@ -56,6 +56,40 @@ class ApproximateTests(unittest.TestCase):
                 self.assertNotEqual(fp(sql)['value'], fp(sql.replace('10', '20'))['value'])
                 self.assertEqual(fp(sql)['replacements'], 0)
 
+    def test_hints_do_not_bypass_call_or_cast_protection(self):
+        for hint in ('', '/* ordinary */', '/*+ H */', '--+ H\n',
+                     '/*+ H */ /* ordinary */ --+ J\n'):
+            for template in (
+                'SELECT * FROM t WHERE custom {h} ((SELECT x FROM u WHERE id = 10)) AND (',
+                'SELECT * FROM t WHERE custom {h} ((SELECT x FROM u WHERE id = 10 AND (',
+                'SELECT * FROM t WHERE (id = 10) {h} ::boolean AND (',
+                'SELECT * FROM t WHERE ((id = 10) {h} ::boolean) {h} ::boolean AND (',
+                'SELECT * FROM t WHERE id IN (10, 2) {h} ::boolean AND (',
+                'SELECT * FROM t WHERE CAST {h} ((SELECT x FROM u WHERE id = 10) AS boolean) AND (',
+                'SELECT * FROM t WHERE "custom" {h} ((SELECT x FROM u WHERE id = 10)) AND (',
+            ):
+                sql = template.format(h=hint)
+                with self.subTest(sql=sql):
+                    a, b = fp(sql), fp(sql.replace('10', '20'))
+                    self.assertEqual(a['replacements'], 0)
+                    self.assertNotEqual(a['value'], b['value'])
+                    expected = [h for h in ('/*+ H */', '--+ J', '--+ H') if h in hint]
+                    actual = [t[1] for t in a['normalized']['tokens'] if t[0] == 'hint']
+                    self.assertEqual(actual, expected * template.count('{h}'))
+
+    def test_hints_preserve_output_order_while_transparent_to_safe_context(self):
+        sql = 'SELECT * FROM t WHERE id /*+ A */ = /*+ B */ 10 --+ C\n AND ('
+        a, b = fp(sql), fp(sql.replace('10', '20'))
+        self.assertEqual(a['replacements'], 1)
+        self.assertEqual(a['value'], b['value'])
+        tokens = a['normalized']['tokens']
+        self.assertEqual([t for t in tokens if t[0] == 'hint'],
+                         [['hint', '/*+ A */'], ['hint', '/*+ B */'], ['hint', '--+ C']])
+        i = tokens.index(['business_value'])
+        self.assertEqual(tokens[i - 1], ['hint', '/*+ B */'])
+        self.assertEqual(tokens[i + 1], ['hint', '--+ C'])
+        self.assertNotEqual(a['value'], fp(sql.replace('/*+ A */ =', '= /*+ A */'))['value'])
+
     def test_preserve_unknown_and_unclosed_literal_tails(self):
         samples = ["SELECT * FROM t WHERE x = 'tail 10", 'SELECT * FROM t /* tail 10',
                    'SELECT * FROM "tail 10', 'SELECT $body$tail 10',

@@ -15,7 +15,7 @@ from .function_dictionary import FunctionDictionary
 from .structure import dumps, loads
 from .type_policy import KNOWN_TYPES, NORMALIZABLE_CASTS
 
-ALGORITHM_VERSION = 'sql-normalization/1'
+ALGORITHM_VERSION = 'sql-normalization/2'
 PARSER_DEPENDENCY_VERSION = '7.18'
 PROFILE = 'hashdata-pg94'
 MAX_BYTES = approximate.MAX_BYTES
@@ -32,7 +32,7 @@ RULES = {
     'casts': sorted(NORMALIZABLE_CASTS),
     'other_constants': 'preserve; CASE results, SET, limits, window frames, DDL',
     'extensions': 'preserve typed MPP extension trees',
-    'hints': 'exact content and comment-free scanner token gap; no equivalence inference',
+    'hints': 'exact content, statement ownership, local token gap and ordered scanner-kind frame; retain batch boundaries',
     'encoding': 'canonical sorted ASCII JSON; arrays retain order; sha256 domain-separated',
 }
 

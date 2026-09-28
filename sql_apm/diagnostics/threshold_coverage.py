@@ -72,6 +72,10 @@ def lexical_digest(sql):
     IN value lists. Quoted identifiers and Hint tokens retain exact identity.
     Refuse uncertain lexical boundaries; successful tokenization is not parsing.
     """
+    # Validate the whole input before protected literals are erased. The shared
+    # scanner preserves dollar bodies verbatim and need not inspect their bytes.
+    if approximate._invalid(sql):
+        return dict(state='lexical_refused', reason='invalid_encoding_or_nul', fingerprint=None)
     tokens, issues, _ = approximate._scan(sql)
     if issues:
         return dict(state='lexical_refused', reason=issues[0], fingerprint=None)

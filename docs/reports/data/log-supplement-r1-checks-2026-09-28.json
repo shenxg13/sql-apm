@@ -1,0 +1,35 @@
+{
+  "audit_sha256": "73536b0a55a23cd0fb49bf51e5dde204b93ef5e058286be4984dd681ce374ae8",
+  "finding_id": "I13-R1-F001",
+  "formal_rules_and_raw_snapshot_unchanged": true,
+  "format": "log-supplement-r1-checks/1",
+  "harness": {
+    "offline": {
+      "log_sha256": "1c8796195ea433f49bf55dac5b37c0ef18692b2430b95096bee8042b56118123",
+      "passed": true
+    },
+    "online": {
+      "log_sha256": "49e00c078ff15f57cf0a367f1b0aa141c26d6c2039cc887319325ad8719f7dee",
+      "passed": true
+    }
+  },
+  "historical_reports_and_json_unchanged": true,
+  "initial_head_sha": "6cc9f63349c95df60aa24d2c4db0111dfc771183",
+  "only_changed_historical_coverage_source": "sql_apm/diagnostics/threshold_coverage.py",
+  "source_hashes_match": true,
+  "test_sources": {
+    "tests/parser_probe/test_threshold_coverage.py": "acc51465738393f51f193fe14d5b2960e0c0268c061debba602b3ab5131ceeb5"
+  },
+  "tests": {
+    "parser": {
+      "count": 161,
+      "log_sha256": "0bf440591f2c6be7d19d0de6fca391c3085afdf232cebde1780bf5ec7f6ab891",
+      "passed": true
+    },
+    "unit": {
+      "count": 49,
+      "log_sha256": "d5fbb14e4f5530db68eba03fc5eeee3d303854d72f5312723486f3487988d314",
+      "passed": true
+    }
+  }
+}

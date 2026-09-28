@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from sql_apm.diagnostics import threshold_coverage as coverage
+from sql_apm.diagnostics.threshold_encoding_audit import audit
 from sql_apm.diagnostics.mpp_full_scan import initialize, set_meta
 from sql_apm.sql.normalization import Normalizer
 
@@ -76,6 +77,72 @@ class ThresholdCoverageTests(unittest.TestCase):
             self.assertIsNone(result['fingerprint'])
             self.assertNotIn('private_unclosed', json.dumps(result))
 
+    def test_invalid_encoding_and_nul_are_refused_in_every_lexical_context(self):
+        contexts = (
+            'SELECT $${}$$', 'SELECT $body${}$body$', "SELECT '{}'",
+            "SELECT E'{}'", "SELECT B'{}'", "SELECT X'{}'", "SELECT N'{}'",
+            "SELECT U&'{}'", 'SELECT "{}"', 'SELECT U&"{}"', 'SELECT a{}b',
+            'SELECT 1 -- {}\n', 'SELECT /* {} */ 1', 'SELECT /*+ {} */ 1',
+            'SELECT /* outer /* {} */ outer */ 1', "SELECT 'unclosed{}",
+        )
+        for raw in (b'\x80', b'\xc0\xaf', b'\xed\xa0\x80', b'\xe2\x82', b'\x00'):
+            bad = raw.decode('utf-8', 'surrogateescape')
+            for context in contexts:
+                with self.subTest(raw=raw.hex(), context=context):
+                    result = coverage.lexical_digest(context.format(bad))
+                    self.assertEqual(result, dict(state='lexical_refused',
+                        reason='invalid_encoding_or_nul', fingerprint=None))
+
+    def test_legal_dollar_literals_still_fold_and_preserve_other_tokens(self):
+        expected = coverage.lexical_digest('SELECT $$ok$$')
+        self.assertEqual(expected['state'], 'lexical')
+        self.assertIsNotNone(expected['fingerprint'])
+        for tag in ('$$', '$body$'):
+            for value in ('', '中文😀', "quote' -- /* */ ;", r'\x00'):
+                with self.subTest(tag=tag, value=value):
+                    self.assertEqual(coverage.lexical_digest('SELECT ' + tag + value + tag), expected)
+        self.assertNotEqual(coverage.lexical_digest('SELECT $$ok$$ FROM t')['fingerprint'],
+                            coverage.lexical_digest('SELECT $$ok$$ FROM u')['fingerprint'])
+
+    def test_invalid_dollar_inputs_cannot_contribute_occurrences_or_active_days(self):
+        for tag in (b'$$', b'$body$'):
+            for bad in (b'\x80', b'\x00'):
+                for mixed in (False, True):
+                    with self.subTest(tag=tag, bad=bad.hex(), mixed=mixed), tempfile.TemporaryDirectory() as directory:
+                        root = Path(directory)
+                        key = '120/gpdb-2026-09-01_000000.csv'
+                        with sqlite3.connect(str(root/'source')) as db:
+                            initialize(db)
+                            set_meta(db, 'collection_complete', True)
+                            set_meta(db, 'record_dates', True)
+                            db.execute('INSERT INTO files VALUES (?,?)', (key, '{}'))
+                            raws = [b'SELECT ' + tag + bad + tag]
+                            if mixed:
+                                raws.append(b'SELECT ' + tag + b'ok' + tag)
+                            for uid, raw in enumerate(raws, 1):
+                                db.execute('INSERT INTO inputs VALUES (?,?,?,?,?)',
+                                    (uid, hashlib.sha256(raw).hexdigest(), raw, '{}', '{"state":"synthetic"}'))
+                                days = [7] if mixed and uid == 1 else range(1, 7 if mixed else 8)
+                                db.execute('INSERT INTO occurrences VALUES (?,?,?,?)', (uid, key, 'sql', 5*len(days)))
+                                for day in days:
+                                    db.execute('INSERT INTO occurrence_dates VALUES (?,?,?,?,?)',
+                                        (uid, key, '2026-09-%02d' % day, 'sql', 5))
+                        before = coverage.file_sha(root/'source')
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            result = coverage.capture(root/'source', root/'out', root/'cache', workers=1)
+                        self.assertEqual(coverage.file_sha(root/'source'), before)
+                        cluster = result['clusters']['120']
+                        self.assertEqual(cluster['input_occurrences'], 35)
+                        for scheme, item in cluster['schemes'].items():
+                            self.assertEqual(item['fingerprinted_occurrences'], 30 if mixed else 0)
+                            self.assertTrue(all(t['groups'] == t['input_occurrences'] ==
+                                t['fraction_all_input_occurrences'] == t['fraction_fingerprinted_occurrences'] == 0
+                                for t in item['thresholds'].values()))
+                        with sqlite3.connect(str(root/'cache')) as db:
+                            self.assertEqual(db.execute('SELECT state,reason,fingerprint FROM records '
+                                "WHERE input_id=1 AND scheme='tidb_lexical'").fetchone(),
+                                ('lexical_refused', 'invalid_encoding_or_nul', None))
+
     def source(self, path):
         with sqlite3.connect(str(path)) as db:
             initialize(db)
@@ -120,6 +187,36 @@ class ThresholdCoverageTests(unittest.TestCase):
             self.assertEqual(set(a['schemes']), {'v4', 'positions'})
             with self.assertRaisesRegex(ValueError, 'output_exists'):
                 coverage.capture(source, output, cache, workers=1)
+
+    def test_encoding_audit_detects_old_success_and_rejects_unrelated_drift(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.source(root/'source')
+            raw = b'SELECT $$\x80$$'
+            with sqlite3.connect(str(root/'source')) as db:
+                db.execute('UPDATE inputs SET sha256=?,sql=? WHERE id=1',
+                           (hashlib.sha256(raw).hexdigest(), raw))
+            with contextlib.redirect_stdout(io.StringIO()):
+                coverage.capture(root/'source', root/'baseline.json', root/'baseline', workers=1)
+            with sqlite3.connect(str(root/'baseline')) as db:
+                db.execute("UPDATE records SET state='lexical',reason=NULL,fingerprint=? "
+                           "WHERE scheme='tidb_lexical' AND input_id=1",
+                           (coverage.lexical_digest('SELECT $$ok$$')['fingerprint'],))
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = audit(root/'source', root/'baseline', root/'baseline.json', root/'audit.json', root/'work')
+            self.assertEqual(result['invalid_inputs'], 1)
+            self.assertEqual(result['previously_fingerprinted_invalid_inputs'], 1)
+            self.assertFalse(result['threshold_metrics_unchanged_by_guard'])
+            self.assertEqual(result['invalid_occurrences'], {'119': 35, '120': 30})
+            self.assertEqual(result['replay']['scheme_comparisons'], 15)
+            self.assertEqual(result['replay']['reason_changes'], {'None -> invalid_encoding_or_nul': 1})
+            self.assertNotIn('SELECT', (root/'audit.json').read_text())
+            self.assertNotIn('private_cut', (root/'audit.json').read_text())
+            with sqlite3.connect(str(root/'baseline')) as db:
+                db.execute("UPDATE records SET fingerprint='unexpected' WHERE scheme='v4' AND input_id=2")
+            with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'unexpected_replay_change'):
+                audit(root/'source', root/'baseline', root/'baseline.json', root/'failed.json', root/'retry')
+            self.assertFalse((root/'failed.json').exists())
 
     def test_exact_thresholds_distinct_dates_and_multiple_fields(self):
         with sqlite3.connect(':memory:') as source, sqlite3.connect(':memory:') as cache:

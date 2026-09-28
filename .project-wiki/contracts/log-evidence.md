@@ -12,6 +12,8 @@ sources:
     status: current
   - path: docs/reports/cluster-log-supplement-2026-09-28.md
     status: current
+  - path: docs/reports/log-supplement-r1-remediation-2026-09-28.md
+    status: current
 related:
   - decision.runtime-and-components
   - contract.timing-and-grouping
@@ -308,6 +310,13 @@ confidence: high
 - 本轮全量1,497,418个原文中1,486,516个返回结构、10,902个明确拒绝，无运行异常。
   120在30／7门槛下现行v4覆盖全部输入出现的53.576%，位置组合58.612%，位置＋函数
   60.289%；这些是观察分母的候选收益，不是有效训练覆盖或业务采纳。
+
+- R1 整改在词法诊断入口统一拒绝非法 UTF-8／NUL（含美元引号体），保留总分母且不贡献
+  指纹、达标组或活跃日。完整原文核查的 224 个非法编码输入在旧结果中已全部拒绝，
+  门槛覆盖数字不受影响；其中 118 个输入的首要拒绝原因调整为非法编码／NUL。
+  新代码下 361 个输入、五方案回放及同类合成回归见
+  [整改报告](../../docs/reports/log-supplement-r1-remediation-2026-09-28.md)。旧全量附件仍绑定
+  旧代码，新有界审计单独绑定修复摘要；正式归一化及近似规则均不变。
 
 ### psql 多语句计时的现场测试（2026-09-23）
 

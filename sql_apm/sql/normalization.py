@@ -21,13 +21,14 @@ PROFILE = 'hashdata-pg94'
 MAX_BYTES = approximate.MAX_BYTES
 DEFAULT_DICTIONARY = Path(__file__).resolve().parents[2] / 'rules/functions/v1.0.1.json'
 # O: ordinary; B: WHERE business expression; D: direct business value;
-# P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
+# F: legacy FILTER business values without IN bucketing; P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
 RULES = {
     'algorithm_version': ALGORITHM_VERSION,
     'marker': 'SQLAPMBusinessValue',
     'where': 'numeric/string/native parameter; preserve null/bool/controls',
     'where_in': {'marker': 'SQLAPMInBucket', 'buckets': ['1', '2-10', '11-100', '>100'],
-                 'eligibility': 'WHERE IN/NOT IN; every normalized list element is a bare SQLAPMBusinessValue; preserve all other lists'},
+                 'eligibility': 'query/update WHERE including ON CONFLICT DO UPDATE WHERE; every normalized IN/NOT IN element is a bare SQLAPMBusinessValue; FILTER keeps v3 element lists; nested query WHERE has its own context; conflict inference predicates stay protected',
+                 'hint_exception': 'preserve anchor identity; same-bucket lists may remain distinct when Hint anchors differ'},
     'writes': 'INSERT VALUES and UPDATE SET direct values only',
     'functions': 'dictionary action consensus; protected arguments are opaque',
     'special_calls': 'preserve non-positional, SQL syntax, variadic and unknown',
@@ -170,7 +171,7 @@ class Normalizer:
             tag = next(iter(node)) if len(node) == 1 else None
             body = node.get(tag) if tag is not None else None
             if mode != 'P' and isinstance(body, dict):
-                if mode in ('B', 'D') and (tag == 'ParamRef' or
+                if mode in ('B', 'F', 'D') and (tag == 'ParamRef' or
                         tag == 'A_Const' and bool(set(body) & {'ival', 'fval', 'sval', 'bsval'})):
                     parent[key] = {'SQLAPMBusinessValue': {}}
                     counters['replacements'] += 1
@@ -193,7 +194,7 @@ class Normalizer:
         return output[0]
 
     def _fields(self, tag, body, mode, counters):
-        expression = 'B' if mode == 'B' else 'O'
+        expression = mode if mode in ('B', 'F') else 'O'
         if tag == 'TypeCast':
             return {'arg': mode} if _cast_type({tag: body}) in NORMALIZABLE_CASTS else {}
         if tag == 'FuncCall':
@@ -201,8 +202,10 @@ class Normalizer:
             counters['function_' + reason] += 1
             if actions is None:
                 return {}
+            # FILTER keeps v3 value replacement without inheriting v4 IN buckets.
+            # SelectStmt encountered inside it still establishes its own WHERE.
             return {'args': ['D' if a == 'normalize' else 'P' for a in actions],
-                    'agg_filter': 'B', 'agg_order': 'O'}
+                    'agg_filter': 'F', 'agg_order': 'O'}
         if tag == 'SelectStmt':
             fields = {k: 'O' for k in ('targetList', 'fromClause', 'withClause', 'larg', 'rarg',
                        'havingClause', 'groupClause', 'sortClause', 'distinctClause')}

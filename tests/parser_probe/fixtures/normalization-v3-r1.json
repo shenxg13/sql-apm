@@ -1,0 +1,1429 @@
+{
+  "commit": "bd62856921aa806e109490c199482d099d560557",
+  "context": {
+    "algorithm_version": "sql-normalization/3",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter-probe/8",
+    "profile": "hashdata-pg94",
+    "rules_digest": "04a423680c02c7b6b8b87295346d9468d089e279cb19183b5587b57bbb51474d",
+    "rules_ref": "sha256:d2faed8791aab2845b50ff6c9d356ed2cb7b728d3a53d913da5b3e2da02eaf6f"
+  },
+  "projection_cases": [
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "A_Expr": {
+                              "kind": "AEXPR_IN",
+                              "lexpr": {
+                                "ColumnRef": {
+                                  "fields": [
+                                    {
+                                      "String": {
+                                        "sval": "x"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "name": [
+                                {
+                                  "String": {
+                                    "sval": "="
+                                  }
+                                }
+                              ],
+                              "rexpr": {
+                                "List": {
+                                  "items": [
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    },
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT sum(y) FILTER (WHERE x IN (1,2)) FROM t"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "groupClause": [
+                  {
+                    "ColumnRef": {
+                      "fields": [
+                        {
+                          "String": {
+                            "sval": "x"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "havingClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_OP",
+                    "lexpr": {
+                      "FuncCall": {
+                        "agg_filter": {
+                          "A_Expr": {
+                            "kind": "AEXPR_IN",
+                            "lexpr": {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "name": [
+                              {
+                                "String": {
+                                  "sval": "<>"
+                                }
+                              }
+                            ],
+                            "rexpr": {
+                              "List": {
+                                "items": [
+                                  {
+                                    "SQLAPMBusinessValue": {}
+                                  },
+                                  {
+                                    "SQLAPMBusinessValue": {}
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "agg_star": true,
+                        "funcformat": "COERCE_EXPLICIT_CALL",
+                        "funcname": [
+                          {
+                            "String": {
+                              "sval": "count"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": ">"
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "A_Const": {
+                        "ival": {}
+                      }
+                    }
+                  }
+                },
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "x"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT x FROM t GROUP BY x HAVING count(*) FILTER (WHERE y NOT IN (1,2))>0"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "sortClause": [
+                  {
+                    "SortBy": {
+                      "node": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "A_Expr": {
+                              "kind": "AEXPR_IN",
+                              "lexpr": {
+                                "ColumnRef": {
+                                  "fields": [
+                                    {
+                                      "String": {
+                                        "sval": "x"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "name": [
+                                {
+                                  "String": {
+                                    "sval": "="
+                                  }
+                                }
+                              ],
+                              "rexpr": {
+                                "List": {
+                                  "items": [
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    },
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "sortby_dir": "SORTBY_DEFAULT",
+                      "sortby_nulls": "SORTBY_NULLS_DEFAULT"
+                    }
+                  }
+                ],
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "x"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT x FROM t ORDER BY sum(y) FILTER (WHERE x IN (1,2))"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_OP",
+                    "lexpr": {
+                      "FuncCall": {
+                        "agg_filter": {
+                          "A_Expr": {
+                            "kind": "AEXPR_IN",
+                            "lexpr": {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "x"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "name": [
+                              {
+                                "String": {
+                                  "sval": "="
+                                }
+                              }
+                            ],
+                            "rexpr": {
+                              "List": {
+                                "items": [
+                                  {
+                                    "SQLAPMBusinessValue": {}
+                                  },
+                                  {
+                                    "SQLAPMBusinessValue": {}
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "agg_star": true,
+                        "funcformat": "COERCE_EXPLICIT_CALL",
+                        "funcname": [
+                          {
+                            "String": {
+                              "sval": "count"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": ">"
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "SQLAPMBusinessValue": {}
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE count(*) FILTER (WHERE x IN (1,2))>0"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "BoolExpr": {
+                              "args": [
+                                {
+                                  "A_Expr": {
+                                    "kind": "AEXPR_IN",
+                                    "lexpr": {
+                                      "ColumnRef": {
+                                        "fields": [
+                                          {
+                                            "String": {
+                                              "sval": "x"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "name": [
+                                      {
+                                        "String": {
+                                          "sval": "="
+                                        }
+                                      }
+                                    ],
+                                    "rexpr": {
+                                      "List": {
+                                        "items": [
+                                          {
+                                            "SQLAPMBusinessValue": {}
+                                          },
+                                          {
+                                            "SQLAPMBusinessValue": {}
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "A_Expr": {
+                                    "kind": "AEXPR_OP",
+                                    "lexpr": {
+                                      "ColumnRef": {
+                                        "fields": [
+                                          {
+                                            "String": {
+                                              "sval": "z"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "name": [
+                                      {
+                                        "String": {
+                                          "sval": "="
+                                        }
+                                      }
+                                    ],
+                                    "rexpr": {
+                                      "SQLAPMBusinessValue": {}
+                                    }
+                                  }
+                                }
+                              ],
+                              "boolop": "AND_EXPR"
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT sum(y) FILTER (WHERE x IN (1,2) AND z=42) FROM t"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "CaseExpr": {
+                              "args": [
+                                {
+                                  "CaseWhen": {
+                                    "expr": {
+                                      "A_Expr": {
+                                        "kind": "AEXPR_IN",
+                                        "lexpr": {
+                                          "ColumnRef": {
+                                            "fields": [
+                                              {
+                                                "String": {
+                                                  "sval": "x"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "name": [
+                                          {
+                                            "String": {
+                                              "sval": "="
+                                            }
+                                          }
+                                        ],
+                                        "rexpr": {
+                                          "List": {
+                                            "items": [
+                                              {
+                                                "SQLAPMBusinessValue": {}
+                                              },
+                                              {
+                                                "SQLAPMBusinessValue": {}
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "result": {
+                                      "A_Const": {
+                                        "boolval": {
+                                          "boolval": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ],
+                              "defresult": {
+                                "A_Const": {
+                                  "boolval": {}
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT sum(y) FILTER (WHERE CASE WHEN x IN (1,2) THEN true ELSE false END) FROM t"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "A_Expr": {
+                              "kind": "AEXPR_IN",
+                              "lexpr": {
+                                "ColumnRef": {
+                                  "fields": [
+                                    {
+                                      "String": {
+                                        "sval": "x"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "name": [
+                                {
+                                  "String": {
+                                    "sval": "="
+                                  }
+                                }
+                              ],
+                              "rexpr": {
+                                "List": {
+                                  "items": [
+                                    {
+                                      "A_Const": {
+                                        "ival": {
+                                          "ival": 1
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "A_Const": {
+                                        "ival": {
+                                          "ival": 2
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "custom_fn"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT custom_fn(y) FILTER (WHERE x IN (1,2)) FROM t"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "InsertStmt": {
+                "onConflictClause": {
+                  "action": "ONCONFLICT_UPDATE",
+                  "infer": {
+                    "indexElems": [
+                      {
+                        "IndexElem": {
+                          "name": "x",
+                          "nulls_ordering": "SORTBY_NULLS_DEFAULT",
+                          "ordering": "SORTBY_DEFAULT"
+                        }
+                      }
+                    ],
+                    "whereClause": {
+                      "A_Expr": {
+                        "kind": "AEXPR_IN",
+                        "lexpr": {
+                          "ColumnRef": {
+                            "fields": [
+                              {
+                                "String": {
+                                  "sval": "x"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "name": [
+                          {
+                            "String": {
+                              "sval": "="
+                            }
+                          }
+                        ],
+                        "rexpr": {
+                          "List": {
+                            "items": [
+                              {
+                                "A_Const": {
+                                  "ival": {
+                                    "ival": 1
+                                  }
+                                }
+                              },
+                              {
+                                "A_Const": {
+                                  "ival": {
+                                    "ival": 2
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "targetList": [
+                    {
+                      "ResTarget": {
+                        "name": "y",
+                        "val": {
+                          "SQLAPMBusinessValue": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                "override": "OVERRIDING_NOT_SET",
+                "relation": {
+                  "inh": true,
+                  "relname": "t",
+                  "relpersistence": "p"
+                },
+                "selectStmt": {
+                  "SelectStmt": {
+                    "limitOption": "LIMIT_OPTION_DEFAULT",
+                    "op": "SETOP_NONE",
+                    "valuesLists": [
+                      {
+                        "List": {
+                          "items": [
+                            {
+                              "SQLAPMBusinessValue": {}
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "INSERT INTO t VALUES (1) ON CONFLICT (x) WHERE x IN (1,2) DO UPDATE SET y=2"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "SubLink": {
+                              "subLinkType": "EXISTS_SUBLINK",
+                              "subselect": {
+                                "SelectStmt": {
+                                  "fromClause": [
+                                    {
+                                      "RangeVar": {
+                                        "inh": true,
+                                        "relname": "u",
+                                        "relpersistence": "p"
+                                      }
+                                    }
+                                  ],
+                                  "limitOption": "LIMIT_OPTION_DEFAULT",
+                                  "op": "SETOP_NONE",
+                                  "targetList": [
+                                    {
+                                      "ResTarget": {
+                                        "val": {
+                                          "A_Const": {
+                                            "ival": {
+                                              "ival": 1
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "whereClause": {
+                                    "A_Expr": {
+                                      "kind": "AEXPR_IN",
+                                      "lexpr": {
+                                        "ColumnRef": {
+                                          "fields": [
+                                            {
+                                              "String": {
+                                                "sval": "x"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "name": [
+                                        {
+                                          "String": {
+                                            "sval": "="
+                                          }
+                                        }
+                                      ],
+                                      "rexpr": {
+                                        "List": {
+                                          "items": [
+                                            {
+                                              "SQLAPMBusinessValue": {}
+                                            },
+                                            {
+                                              "SQLAPMBusinessValue": {}
+                                            },
+                                            {
+                                              "SQLAPMBusinessValue": {}
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT sum(y) FILTER (WHERE EXISTS (SELECT 1 FROM u WHERE x IN (1,2,3))) FROM t"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "groupClause": [
+                  {
+                    "ColumnRef": {
+                      "fields": [
+                        {
+                          "String": {
+                            "sval": "x"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "havingClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_OP",
+                    "lexpr": {
+                      "FuncCall": {
+                        "agg_filter": {
+                          "SubLink": {
+                            "subLinkType": "EXISTS_SUBLINK",
+                            "subselect": {
+                              "SelectStmt": {
+                                "fromClause": [
+                                  {
+                                    "RangeVar": {
+                                      "inh": true,
+                                      "relname": "u",
+                                      "relpersistence": "p"
+                                    }
+                                  }
+                                ],
+                                "limitOption": "LIMIT_OPTION_DEFAULT",
+                                "op": "SETOP_NONE",
+                                "targetList": [
+                                  {
+                                    "ResTarget": {
+                                      "val": {
+                                        "A_Const": {
+                                          "ival": {
+                                            "ival": 1
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ],
+                                "whereClause": {
+                                  "A_Expr": {
+                                    "kind": "AEXPR_IN",
+                                    "lexpr": {
+                                      "ColumnRef": {
+                                        "fields": [
+                                          {
+                                            "String": {
+                                              "sval": "y"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "name": [
+                                      {
+                                        "String": {
+                                          "sval": "="
+                                        }
+                                      }
+                                    ],
+                                    "rexpr": {
+                                      "List": {
+                                        "items": [
+                                          {
+                                            "SQLAPMBusinessValue": {}
+                                          },
+                                          {
+                                            "SQLAPMBusinessValue": {}
+                                          },
+                                          {
+                                            "SQLAPMBusinessValue": {}
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "agg_star": true,
+                        "funcformat": "COERCE_EXPLICIT_CALL",
+                        "funcname": [
+                          {
+                            "String": {
+                              "sval": "count"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": ">"
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "A_Const": {
+                        "ival": {}
+                      }
+                    }
+                  }
+                },
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "x"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT x FROM t GROUP BY x HAVING count(*) FILTER (WHERE EXISTS (SELECT 1 FROM u WHERE y IN (1,2,3)))>0"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "InsertStmt": {
+                "onConflictClause": {
+                  "action": "ONCONFLICT_UPDATE",
+                  "infer": {
+                    "indexElems": [
+                      {
+                        "IndexElem": {
+                          "name": "x",
+                          "nulls_ordering": "SORTBY_NULLS_DEFAULT",
+                          "ordering": "SORTBY_DEFAULT"
+                        }
+                      }
+                    ]
+                  },
+                  "targetList": [
+                    {
+                      "ResTarget": {
+                        "name": "y",
+                        "val": {
+                          "SQLAPMBusinessValue": {}
+                        }
+                      }
+                    }
+                  ],
+                  "whereClause": {
+                    "A_Expr": {
+                      "kind": "AEXPR_IN",
+                      "lexpr": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "x"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "name": [
+                        {
+                          "String": {
+                            "sval": "="
+                          }
+                        }
+                      ],
+                      "rexpr": {
+                        "List": {
+                          "items": [
+                            {
+                              "SQLAPMBusinessValue": {}
+                            },
+                            {
+                              "SQLAPMBusinessValue": {}
+                            },
+                            {
+                              "SQLAPMBusinessValue": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "override": "OVERRIDING_NOT_SET",
+                "relation": {
+                  "inh": true,
+                  "relname": "t",
+                  "relpersistence": "p"
+                },
+                "selectStmt": {
+                  "SelectStmt": {
+                    "limitOption": "LIMIT_OPTION_DEFAULT",
+                    "op": "SETOP_NONE",
+                    "valuesLists": [
+                      {
+                        "List": {
+                          "items": [
+                            {
+                              "SQLAPMBusinessValue": {}
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "INSERT INTO t VALUES (1) ON CONFLICT (x) DO UPDATE SET y=2 WHERE x IN (1,2,3)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "FuncCall": {
+                          "agg_filter": {
+                            "A_Expr": {
+                              "kind": "AEXPR_IN",
+                              "lexpr": {
+                                "ColumnRef": {
+                                  "fields": [
+                                    {
+                                      "String": {
+                                        "sval": "x"
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "name": [
+                                {
+                                  "String": {
+                                    "sval": "="
+                                  }
+                                }
+                              ],
+                              "rexpr": {
+                                "List": {
+                                  "items": [
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    },
+                                    {
+                                      "SQLAPMBusinessValue": {}
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "args": [
+                            {
+                              "ColumnRef": {
+                                "fields": [
+                                  {
+                                    "String": {
+                                      "sval": "y"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "funcformat": "COERCE_EXPLICIT_CALL",
+                          "funcname": [
+                            {
+                              "String": {
+                                "sval": "sum"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "z"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT sum(y) FILTER (WHERE x IN (1,2)) FROM t WHERE z IN (1,2,3)"
+    }
+  ],
+  "structure_sha256": {
+    "0-0": "72a0542a12f53700e9d2db4066ad6fec5fed962f74038f777124bf76eecf3fcd",
+    "0-1": "981dce3751c93b8fbfeabdfeda0fb39f769a8e429df619ee3b79c4b3dfb24c56",
+    "0-2": "72a0542a12f53700e9d2db4066ad6fec5fed962f74038f777124bf76eecf3fcd",
+    "1-0": "97e7c679c558d9c2c50b3be7569e8260546650dbce1108796412cbe037bec2a7",
+    "1-1": "b2d20e622307ab1154785cd7642ae0b9f8e86af1f96ae29d2c8374f96205a5f6",
+    "1-2": "97e7c679c558d9c2c50b3be7569e8260546650dbce1108796412cbe037bec2a7",
+    "2-0": "e303713d05f45f8a95301e45e8dcb7c2f1236e382ccc0bab80174a9ba9ba8d69",
+    "2-1": "89940fab247536d3eaf750165315c14b86df59e4dce9c052c5718e395c79bdd0",
+    "2-2": "e303713d05f45f8a95301e45e8dcb7c2f1236e382ccc0bab80174a9ba9ba8d69",
+    "3-0": "eb23cf694380d17c654f6ed62967bfc00f8165467de0bc784973650854609345",
+    "3-1": "0cdd082cf8b1275e95c2fe815e82c7ab439ef18be0f7e38fa867149d8f83be2f",
+    "3-2": "eb23cf694380d17c654f6ed62967bfc00f8165467de0bc784973650854609345",
+    "4-0": "6e9498cf454da5d853933f434a752bfe5907fb09497227c9c5773f3101ad72e8",
+    "4-1": "5366c8b5a6cdb3b3693d0a3397ca53253c765351d65638c57ff48415c95b026c",
+    "4-2": "6e9498cf454da5d853933f434a752bfe5907fb09497227c9c5773f3101ad72e8",
+    "5-0": "15e1300869f2a69995a0e4ebdb5126b6ca0ef97b46a6121ddca4e298eb056fb4",
+    "5-1": "1f2a5760ac7d50dce78fc3f9c72beaef65f4f51d61f1bc3f803aba8a5c200ac5",
+    "5-2": "15e1300869f2a69995a0e4ebdb5126b6ca0ef97b46a6121ddca4e298eb056fb4",
+    "6-0": "60a6df27e5ecde1361fbe2f4768267b90aae096458ebceebaf27e50ceb9e92d7",
+    "6-1": "115c81fbc2bc64935733b2269dcb3ffd9ce5e78e958f3b611d4a12d08a10349f",
+    "6-2": "db1d4045d40451b6d068ba2d5a1c7cc53f1d4e46efa7217abdb4f6bb61bd785d",
+    "7-0": "5824cd7bae73c20cadc4f317ef38183c1227f45274c27ae2d685400f7da51b0d",
+    "7-1": "3088199675dca781d898ee496f026bb8b364a5c6e9181885faeae099ca292257",
+    "7-2": "d6ad3feae6734f217a56d94ed45787faafe0a452e988d9207ddad8f6cd0faa68"
+  }
+}

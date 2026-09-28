@@ -207,6 +207,8 @@ Normalizer 与规则快照；`FunctionDictionary.snapshot()` 提供独立规则�
 `diagnostics/normalization_diff.py` 在本地原文索引上选择全部、字节标记或 ID 集合，
 生成脱敏 SQLite 快照，并比较分组、状态及原因。它复用 `mpp_full_scan.ParserProcess`
 的隔离与资源限制，独立的 v3→v4 结构投影仅用于验证，不参与产品归一化。
+诊断侧上下文检查同时供投影与固定回放守恒审计使用，区分 FILTER、独立查询 WHERE 和冲突更新条件；
+业务边界见[指纹契约](../contracts/sql-fingerprints.md#已确认的-where-in-列表粗分桶与-hint-编码清理)。
 快照和生产中间结果保留忽略的 `var/`；报告只提交计数、摘要、版本及 ID 示例。
 命令与跨冻结版本复现方式见[接口说明](../../docs/design/sql-normalization.md#规则变更分组差分)。
 

@@ -37,12 +37,28 @@ def digest(tree):
     return hashlib.sha256(dumps(tree).encode('ascii')).hexdigest()
 
 
+def bucket_context(parent, field, inherited):
+    """Diagnostic scope guard, independent of the product's value walker.
+
+    v3 already marks FILTER constants as business values; those markers alone
+    cannot authorize v4 list folding. A nested query establishes its own WHERE.
+    onConflictClause is a plain InsertStmt field in the canonical parser tree.
+    """
+    if parent in ('SelectStmt', 'UpdateStmt', 'DeleteStmt', 'OnConflictClause', 'onConflictClause'):
+        return field == 'whereClause'
+    if parent == 'FuncCall' or (parent == 'CaseWhen' and field == 'result') or (
+            parent == 'CaseExpr' and field == 'defresult'):
+        return False
+    return inherited
+
+
 def project_v4(tree):
     """Audit frozen v3 output, without calling the v4 walker or bucket helper.
 
     A bare business marker in an IN right-hand list is possible only in the
-    old walker's business context. A cast/function/expression is never a bare
-    marker. This leaves every other field, ordering and Hint anchor unchanged.
+    old walker's business context, including FILTER. The independent scope
+    guard excludes FILTER while allowing a nested query's own WHERE. A cast,
+    function or expression is never a bare marker. This leaves every other field, ordering and Hint anchor unchanged.
     """
     tree = loads(dumps(tree))
     counts = Counter()
@@ -50,23 +66,24 @@ def project_v4(tree):
         if 'gap' in hint:
             del hint['gap']
             counts['global_gaps_removed'] += 1
-    stack = [tree['statements']]
+    stack = [(tree['statements'], False, 'statements')]
     while stack:
-        node = stack.pop()
+        node, eligible, parent = stack.pop()
         if isinstance(node, list):
-            stack.extend(node)
+            stack.extend((child, eligible, parent) for child in node)
         elif isinstance(node, dict):
             expr = node.get('A_Expr', {})
             container = expr.get('rexpr', {}).get('List', {})
             values = container.get('items')
-            if (expr.get('kind') == 'AEXPR_IN' and isinstance(values, list) and values
+            if (eligible and expr.get('kind') == 'AEXPR_IN' and isinstance(values, list) and values
                     and all(v == {'SQLAPMBusinessValue': {}} for v in values)):
                 length = len(values)
                 label = next(label for maximum, label in ((1, '1'), (10, '2-10'),
                              (100, '11-100'), (float('inf'), '>100')) if length <= maximum)
                 container['items'] = {'SQLAPMInBucket': label}
                 counts['in_lists_bucketed'] += 1
-            stack.extend(node.values())
+            stack.extend((value, bucket_context(parent, field, eligible), field)
+                         for field, value in node.items())
     return tree, dict(counts)
 
 

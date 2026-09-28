@@ -139,19 +139,22 @@ class DiffTests(unittest.TestCase):
                 'statements': [{'A_Expr': {'kind': 'AEXPR_IN', 'rexpr': {'List': {'items': [value]*10}}}},
                     {'A_Expr': {'kind': 'AEXPR_IN', 'rexpr': {'List': {'items': [value, {'ColumnRef': {}}]}}}},
                     {'Other': {'rexpr': {'List': {'items': [value]*10}}}}]}
+        tree['statements'] = [{'SelectStmt': {'whereClause': n}} for n in tree['statements']]
         projected, changes = diff.project_v4(tree)
-        self.assertEqual(projected['statements'][0]['A_Expr']['rexpr']['List']['items'], {'SQLAPMInBucket': '2-10'})
+        self.assertEqual(projected['statements'][0]['SelectStmt']['whereClause']['A_Expr']['rexpr']['List']['items'], {'SQLAPMInBucket': '2-10'})
         self.assertEqual(projected['statements'][1:], tree['statements'][1:])
         self.assertEqual(projected['hints'], [{'raw': '/*+ synthetic */', 'anchor': {'token_gap': 3}}])
         self.assertEqual(changes, {'global_gaps_removed': 1, 'in_lists_bucketed': 1})
-        self.assertEqual(len(tree['statements'][0]['A_Expr']['rexpr']['List']['items']), 10)
+        self.assertEqual(len(tree['statements'][0]['SelectStmt']['whereClause']['A_Expr']['rexpr']['List']['items']), 10)
         for length, label in ((1,'1'), (2,'2-10'), (11,'11-100'), (100,'11-100'), (101,'>100')):
-            tree['statements'][0]['A_Expr']['rexpr']['List']['items'] = [value]*length
+            tree['statements'][0]['SelectStmt']['whereClause']['A_Expr']['rexpr']['List']['items'] = [value]*length
             result, _ = diff.project_v4(tree)
-            self.assertEqual(result['statements'][0]['A_Expr']['rexpr']['List']['items'], {'SQLAPMInBucket': label})
+            self.assertEqual(result['statements'][0]['SelectStmt']['whereClause']['A_Expr']['rexpr']['List']['items'], {'SQLAPMInBucket': label})
 
     def test_actual_frozen_v3_trees_project_to_actual_v4_results(self):
-        fixture = json.loads((Path(__file__).parent / 'fixtures/normalization-v3-preserved.json').read_text())
+        fixture = {'projection_cases': []}
+        for name in ('normalization-v3-preserved.json', 'normalization-v3-r1.json'):
+            fixture['projection_cases'].extend(json.loads((Path(__file__).parent / 'fixtures' / name).read_text())['projection_cases'])
         engine = Normalizer()
         for case in fixture['projection_cases']:
             with self.subTest(sql=case['sql']):
@@ -159,6 +162,15 @@ class DiffTests(unittest.TestCase):
                 actual = engine.normalize(case['sql'])
                 self.assertEqual(actual['fingerprint']['state'], 'reliable')
                 self.assertEqual(projected, actual['normalized'])
+
+    def test_projection_excludes_filter_even_with_business_markers(self):
+        value = {'SQLAPMBusinessValue': {}}
+        expr = {'A_Expr': {'kind': 'AEXPR_IN', 'rexpr': {'List': {'items': [value, value]}}}}
+        for field in ('targetList', 'havingClause', 'whereClause'):
+            tree = {'hints': [], 'statements': [{'SelectStmt': {field: {'FuncCall': {'agg_filter': expr}}}}]}
+            projected, changes = diff.project_v4(tree)
+            self.assertEqual(projected, tree)
+            self.assertEqual(changes, {})
 
     def test_capture_selection_reproducibility_and_privacy(self):
         source = self.source()

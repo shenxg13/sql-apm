@@ -13,6 +13,7 @@ import time
 from pglast import parser
 
 from sql_apm.diagnostics.mpp_full_audit import file_sha
+from sql_apm.diagnostics.normalization_diff import bucket_context
 from sql_apm.diagnostics.mpp_full_scan import ParserProcess, ROOT, MAX_BYTES, TIMEOUT, MEMORY_BYTES
 from sql_apm.sql.mpp_parser import parse
 from sql_apm.sql.normalization import Normalizer
@@ -23,17 +24,18 @@ SOURCES = ('sql_apm/sql/normalization.py', 'sql_apm/sql/function_dictionary.py',
            'sql_apm/sql/type_policy.py', 'sql_apm/sql/approximate.py',
            'sql_apm/sql/mpp_parser.py', 'sql_apm/sql/pg_ast.py', 'sql_apm/sql/lexical.py',
            'sql_apm/sql/structure.py', 'sql_apm/diagnostics/normalization_replay.py',
-           'sql_apm/diagnostics/mpp_full_scan.py', 'requirements.txt')
+           'sql_apm/diagnostics/mpp_full_scan.py', 'sql_apm/diagnostics/normalization_diff.py',
+           'requirements.txt')
 _ENGINE = None
 
 
 def delta_audit(original, normalized):
     """Independent conservation check: only approved value, IN-list and global Hint gap changes."""
-    changes, stack = Counter(), [(original, normalized, '')]
+    changes, stack = Counter(), [(original, normalized, '', False, '')]
     while stack:
-        left, right, path = stack.pop()
+        left, right, path, eligible, parent = stack.pop()
         if isinstance(right, dict) and set(right) == {'SQLAPMInBucket'}:
-            if (not isinstance(left, list) or not left or not path.endswith('/A_Expr/rexpr/List/items')
+            if (not eligible or not isinstance(left, list) or not left or not path.endswith('/A_Expr/rexpr/List/items')
                     or not all(isinstance(v, dict) and (set(v) == {'ParamRef'} or
                         set(v) == {'A_Const'} and set(v['A_Const']) & {'ival', 'fval', 'sval', 'bsval'})
                         for v in left)):
@@ -56,11 +58,12 @@ def delta_audit(original, normalized):
                 raise ValueError('unexpected_field_change')
             if removed_gap:
                 changes[path + '/gap_removed'] += 1
-            stack.extend((left[key], value, path + '/' + key) for key, value in right.items())
+            stack.extend((left[key], value, path + '/' + key,
+                          bucket_context(parent, key, eligible), key) for key, value in right.items())
         elif isinstance(left, list):
             if len(left) != len(right):
                 raise ValueError('unexpected_list_change')
-            stack.extend((a, b, path + '/*') for a, b in zip(left, right))
+            stack.extend((a, b, path + '/*', eligible, parent) for a, b in zip(left, right))
         elif left != right:
             raise ValueError('unexpected_value_change')
     return dict(changes)

@@ -76,7 +76,7 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 | --- | --- |
 | SELECT／UPDATE／DELETE 的 WHERE | 数字、字符串、原生 `$n` 使用统一标记；NULL／布尔保留 |
 | WHERE 的 IN／NOT IN 列表 | 全部元素归一化为裸业务值标记时，以 1／2–10／11–100／>100 桶代替元素序列 |
-| INSERT 的直接 VALUES、UPDATE 的直接 SET（含多列赋值） | 同上；算术表达式中的常量保留；原生参数号在允许位置不构成身份 |
+| INSERT 的直接 VALUES、UPDATE 的直接 SET（含多列赋值） | 数字、字符串、原生 `$n` 使用业务值标记；算术表达式中的常量保留 |
 | 函数参数 | 字典逐参数动作；允许参数中的直接业务值可替换，已知嵌套调用用自己的策略 |
 | 控制参数、未知／歧义／停用／待核实函数 | 整个受保护子树保留，外层 WHERE 或内层已知函数不能绕过 |
 | 显式转换 | 保留转换节点与类型修饰；只有已确认标量类型允许深入，bool／oid／reg*／JSON／数组／未知类型等整体保护 |
@@ -221,7 +221,7 @@ checkout 的 Normalizer 处理输入，`compare` 比较输入 ID 对应的分组
 PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
   -m sql_apm.diagnostics.normalization_diff capture \
   --output var/parser-probe/v4-in.sqlite --workers 4 \
-  --marker ' IN ' --marker 'IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
+  --marker ' IN ' --marker ' IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
 
 PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
   -m sql_apm.diagnostics.normalization_diff capture \
@@ -275,10 +275,37 @@ git show "${V4_COMMIT}:sql_apm/diagnostics/normalization_diff.py" \
   PYTHONPATH="$base_dir/var/parser-probe/site-packages" "$base_dir/.venv/bin/python" \
     -m sql_apm.diagnostics.normalization_diff capture \
     --source "$base_dir/var/parser-probe/full-scan.sqlite" --output var/v3-in.sqlite \
-    --marker ' IN ' --marker 'IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
+    --marker ' IN ' --marker ' IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
 )
 ```
 
 对 Hint 集合改用上述两个 Hint 标记；对固定1,832条回放，从其脱敏报告 records 提取
 input_id 为 JSON 数组，并在两份 checkout 上使用相同 `--ids`。比较时直接传入冻结
 checkout 内的快照路径即可。工具与核心源码摘要均写入快照；旧报告及其证据不改写。
+
+比较命令也支持 `--ids`，可在两份已完成快照内选择同一子集，复用已计算结果；缺少任何ID仍失败，
+完整快照行数仍须与元数据一致。比较输出保存选择集摘要及比较工具源码摘要。这样可以对已有
+较广快照逐项审查，无须为改变诊断选择而重复解析原文。
+
+本次200,390条契约集合的准确标记是 `b' IN '`、`b' IN('`、`VALUES`、`ARRAY`，第二项含前导空格；
+短写为 `IN(` 会额外选中词内片段。直接使用上面的准确capture命令即可复现。
+如复用较广快照，可先从同一只读索引导出ID，再比较：
+
+```bash
+.venv/bin/python - <<'PY'
+import json
+import sqlite3
+from pathlib import Path
+source = Path('var/parser-probe/full-scan.sqlite').resolve()
+markers = (b' IN ', b' IN(', b'VALUES', b'ARRAY')
+with sqlite3.connect(source.as_uri() + '?mode=ro', uri=True) as db:
+    ids = [uid for uid, raw in db.execute('SELECT id,sql FROM inputs ORDER BY id')
+           if any(marker in raw.upper() for marker in markers)]
+with Path('var/parser-probe/in-contract-ids.json').open('x') as out:
+    json.dump(ids, out)
+PY
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff compare \
+  var/parser-probe/v3-in.sqlite var/parser-probe/v4-in.sqlite \
+  --ids var/parser-probe/in-contract-ids.json --require-v4 --text
+```

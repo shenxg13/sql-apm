@@ -88,6 +88,34 @@ class DiffTests(unittest.TestCase):
         self.assertFalse(r['v4_acceptance_passed'])
         self.assertEqual(r['v4_audit']['mismatch_examples'], [2])
 
+    def test_compare_subset_reuses_complete_snapshots_and_requires_all_ids(self):
+        left = self.snapshot('left', ['a','b','c','c'])
+        right = self.snapshot('right', ['x','x','y','z'])
+        result = diff.compare(left, right, ids={1,2})
+        self.assertEqual(result['inputs'], 2)
+        self.assertEqual(result['merged_groups'], 1)
+        self.assertEqual(result['split_groups'], 0)
+        self.assertEqual(result['selection']['ids_sha256'], diff.digest([1,2]))
+        with self.assertRaisesRegex(diff.EvidenceError, 'selected_ids_missing'):
+            diff.compare(left, right, ids={1,9})
+        with sqlite3.connect(str(left)) as db:
+            diff.put_meta(db, 'records', 5)
+        with self.assertRaisesRegex(diff.EvidenceError, 'snapshot_record_count_mismatch'):
+            diff.compare(left, right, ids={1,2})
+
+    def test_compare_ids_cli_validates_selection_before_writing(self):
+        left = self.snapshot('left', ['a','b','c'])
+        right = self.snapshot('right', ['x','x','y'])
+        ids = self.root/'ids.json'
+        for values, expected in (([1,2],0), ([1,1],1), ([True],1), ([],1), ([999],1)):
+            ids.write_text(json.dumps(values))
+            stream = io.StringIO()
+            with patch('sys.argv', ['normalization_diff','compare',str(left),str(right),'--ids',str(ids)]):
+                with contextlib.redirect_stdout(stream):
+                    self.assertEqual(diff.main(), expected)
+            if expected == 0:
+                self.assertEqual(json.loads(stream.getvalue())['inputs'], 2)
+
     def test_incomplete_changed_selection_and_source_are_rejected(self):
         left = self.snapshot('left', ['a', 'b'])
         right = self.snapshot('right', ['a'])

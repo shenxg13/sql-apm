@@ -221,13 +221,16 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
     return dict(records=done, states=dict(states), seconds=round(time.monotonic() - started, 3))
 
 
-def compare(before_path, after_path, require_v4=False):
+def compare(before_path, after_path, require_v4=False, ids=None):
     with readonly(before_path) as before, readonly(after_path) as after:
         left_meta, right_meta = meta(before), meta(after)
         if any(m.get('format') != FORMAT or m.get('complete') is not True for m in (left_meta, right_meta)):
             raise EvidenceError('incomplete_or_unknown_snapshot')
         if left_meta['source_sha256'] != right_meta['source_sha256']:
             raise EvidenceError('source_index_mismatch')
+        for db, metadata in ((before, left_meta), (after, right_meta)):
+            if db.execute('SELECT count(*) FROM records').fetchone()[0] != metadata['records']:
+                raise EvidenceError('snapshot_record_count_mismatch')
         left_context, right_context = left_meta['context'], right_meta['context']
         audited = (left_meta.get('project_v4') is True
                    and left_context['algorithm_version'] == 'sql-normalization/3'
@@ -245,7 +248,12 @@ def compare(before_path, after_path, require_v4=False):
         status_count = reason_count = mismatch_count = checked = total = 0
         occurrences, eligible, reliable = {}, [0, 0], [0, 0]
         query = 'SELECT input_id,sql_sha256,state,reason,fingerprint,structure_sha256,v4_projection_sha256,in_lists,occurrences FROM records ORDER BY input_id'
-        for left, right in zip_longest(before.execute(query), after.execute(query)):
+        def rows(db):
+            for row in db.execute(query):
+                if ids is None or row[0] in ids:
+                    yield row
+
+        for left, right in zip_longest(rows(before), rows(after)):
             if left is None or right is None or left[:2] != right[:2] or left[8] != right[8]:
                 raise EvidenceError('selected_inputs_mismatch')
             uid = left[0]
@@ -277,12 +285,15 @@ def compare(before_path, after_path, require_v4=False):
                         mismatch_count += 1
                         if len(mismatches) < 20:
                             mismatches.append(uid)
-        if total != left_meta['records'] or total != right_meta['records']:
-            raise EvidenceError('snapshot_record_count_mismatch')
+        if ids is not None and total != len(ids):
+            raise EvidenceError('selected_ids_missing')
         merges = [key for key, groups in new_groups.items() if len(groups) > 1]
         splits = [key for key, groups in old_groups.items() if len(groups) > 1]
         affected = [uid for key in merges for uid in new_members[key]]
         result = dict(format=FORMAT, context_changed=left_context != right_context,
+            comparison_tool_sha256=file_sha(Path(__file__)),
+            selection=dict(kind='ids' if ids is not None else 'all_snapshot_records',
+                           ids_sha256=digest(sorted(ids)) if ids is not None else None),
             contexts={'before': left_context, 'after': right_context},
             snapshot_sha256={'before': file_sha(before_path), 'after': file_sha(after_path)},
             source_sha256=left_meta['source_sha256'], inputs=total,
@@ -318,24 +329,25 @@ def main():
     comp.add_argument('before', type=Path)
     comp.add_argument('after', type=Path)
     comp.add_argument('--output', type=Path)
+    comp.add_argument('--ids', type=Path, help='compare only these IDs; every ID must exist in both complete snapshots')
     comp.add_argument('--require-v4', action='store_true', help='fail unless every v3-to-v4 change is explained')
     comp.add_argument('--text', action='store_true', help='print a compact text summary instead of JSON')
     args = ap.parse_args()
     try:
+        ids = json.loads(args.ids.read_text()) if args.ids else None
+        if ids is not None:
+            if (not isinstance(ids, list) or not ids or any(type(i) is not int or i <= 0 for i in ids)
+                    or len(set(ids)) != len(ids)):
+                raise EvidenceError('invalid_id_selection')
+            ids = set(ids)
         if args.command == 'capture':
             if (ROOT / 'var').resolve() not in args.output.resolve().parents:
                 raise EvidenceError('snapshot_must_stay_in_local_var')
-            ids = json.loads(args.ids.read_text()) if args.ids else None
-            if ids is not None:
-                if (not isinstance(ids, list) or not ids or any(type(i) is not int or i <= 0 for i in ids)
-                        or len(set(ids)) != len(ids)):
-                    raise EvidenceError('invalid_id_selection')
-                ids = set(ids)
             result = capture(args.source, args.output, args.workers,
                              tuple(m.encode('utf-8') for m in (args.marker or [])), ids,
                              args.ignore_ascii_case)
         else:
-            result = compare(args.before, args.after, args.require_v4)
+            result = compare(args.before, args.after, args.require_v4, ids)
             if args.output:
                 args.output.parent.mkdir(parents=True, exist_ok=True)
                 with args.output.open('x') as stream:

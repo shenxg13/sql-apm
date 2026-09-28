@@ -105,3 +105,13 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 解析能力的当前正式名称为 `mpp-adapter/9`。上述候选比较、probe、扩展、全量扫描和修复模块
 是历史诊断工具，保留供既有报告追溯；不会因本次命名调整迁移或删除。规则变更验证使用
 [分组差分命令](../docs/design/sql-normalization.md#规则变更分组差分)，支持全部、字节标记或 ID 选择集。
+
+## 补充日志与样本门槛观察
+
+`python -m sql_apm.diagnostics.log_supplement` 提供扩展清单、类别对照和实际日期汇总；
+`python -m sql_apm.diagnostics.threshold_coverage` 在带 `--record-dates` 的完整原文索引上，
+按集群比较现行 v4、候选位置／函数归一及 TiDB 式词法对照的 30／200／1,000 次、7 日覆盖。
+使用与上文一致的解释器及解析依赖路径，原文／缓存保留在忽略目录。
+[操作说明](../docs/runbooks/log-supplement.md)定义方案、分母、参数、失败与恢复；
+[补充报告](../docs/reports/cluster-log-supplement-2026-09-28.md)记录本轮证据。
+这些计数不等同执行样本、训练资格或基线可用率。

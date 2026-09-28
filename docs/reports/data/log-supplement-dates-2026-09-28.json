@@ -1,0 +1,1549 @@
+{
+  "buckets": {
+    "119": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 798,
+        "unsupported": 7581
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 267,
+        "unsupported": 2172
+      },
+      "input_occurrences": 4978834,
+      "occurrence_reasons": {
+        "base_parser_rejected": 528,
+        "invalid_encoding": 14,
+        "lexical_ambiguous_string_escape": 94,
+        "lexical_unbalanced_bracket": 6048,
+        "lexical_unclosed_comment": 116,
+        "lexical_unclosed_string": 937,
+        "prototype_parsed": 4926241,
+        "sql_missing_or_empty": 44854,
+        "unsupported_distribution_statement": 2
+      },
+      "occurrence_states": {
+        "prototype_parsed": 4926241,
+        "unsupported": 52593
+      },
+      "records": 5728640,
+      "unique_inputs": 259299,
+      "unique_reasons": {
+        "base_parser_rejected": 124,
+        "invalid_encoding": 1,
+        "lexical_ambiguous_string_escape": 31,
+        "lexical_unbalanced_bracket": 1722,
+        "lexical_unclosed_comment": 58,
+        "lexical_unclosed_string": 329,
+        "prototype_parsed": 256916,
+        "sql_missing_or_empty": 116,
+        "unsupported_distribution_statement": 2
+      },
+      "unique_states": {
+        "prototype_parsed": 256916,
+        "unsupported": 2383
+      }
+    },
+    "119/2026-07-01": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 34,
+        "unsupported": 295
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 11,
+        "unsupported": 83
+      },
+      "input_occurrences": 104325,
+      "occurrence_reasons": {
+        "base_parser_rejected": 23,
+        "invalid_encoding": 6,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 215,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 48,
+        "prototype_parsed": 102649,
+        "sql_missing_or_empty": 1378
+      },
+      "occurrence_states": {
+        "prototype_parsed": 102649,
+        "unsupported": 1676
+      },
+      "records": 117152,
+      "unique_inputs": 10501,
+      "unique_reasons": {
+        "base_parser_rejected": 7,
+        "invalid_encoding": 1,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 60,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 14,
+        "prototype_parsed": 10412,
+        "sql_missing_or_empty": 4
+      },
+      "unique_states": {
+        "prototype_parsed": 10412,
+        "unsupported": 89
+      }
+    },
+    "119/2026-07-04": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 15,
+        "unsupported": 173
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 6,
+        "unsupported": 58
+      },
+      "input_occurrences": 164551,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 140,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 20,
+        "prototype_parsed": 162821,
+        "sql_missing_or_empty": 1554
+      },
+      "occurrence_states": {
+        "prototype_parsed": 162821,
+        "unsupported": 1730
+      },
+      "records": 189535,
+      "unique_inputs": 11425,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 46,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 8,
+        "prototype_parsed": 11360,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11360,
+        "unsupported": 65
+      }
+    },
+    "119/2026-07-05": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 10,
+        "unsupported": 171
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 4,
+        "unsupported": 57
+      },
+      "input_occurrences": 163437,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 134,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 18,
+        "prototype_parsed": 161753,
+        "sql_missing_or_empty": 1510
+      },
+      "occurrence_states": {
+        "prototype_parsed": 161753,
+        "unsupported": 1684
+      },
+      "records": 188238,
+      "unique_inputs": 11298,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 44,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 7,
+        "prototype_parsed": 11234,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11234,
+        "unsupported": 64
+      }
+    },
+    "119/2026-07-06": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 65,
+        "unsupported": 522
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 24,
+        "unsupported": 192
+      },
+      "input_occurrences": 187858,
+      "occurrence_reasons": {
+        "base_parser_rejected": 42,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 412,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 66,
+        "prototype_parsed": 185822,
+        "sql_missing_or_empty": 1506
+      },
+      "occurrence_states": {
+        "prototype_parsed": 185822,
+        "unsupported": 2036
+      },
+      "records": 215732,
+      "unique_inputs": 14566,
+      "unique_reasons": {
+        "base_parser_rejected": 14,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 152,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 26,
+        "prototype_parsed": 14364,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 14364,
+        "unsupported": 202
+      }
+    },
+    "119/2026-07-07": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 28,
+        "unsupported": 354
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 13,
+        "unsupported": 81
+      },
+      "input_occurrences": 175465,
+      "occurrence_reasons": {
+        "base_parser_rejected": 31,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 291,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 29,
+        "prototype_parsed": 173554,
+        "sql_missing_or_empty": 1554
+      },
+      "occurrence_states": {
+        "prototype_parsed": 173554,
+        "unsupported": 1911
+      },
+      "records": 202277,
+      "unique_inputs": 12818,
+      "unique_reasons": {
+        "base_parser_rejected": 8,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 61,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 11,
+        "prototype_parsed": 12730,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12730,
+        "unsupported": 88
+      }
+    },
+    "119/2026-07-08": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 40,
+        "unsupported": 279
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 13,
+        "unsupported": 100
+      },
+      "input_occurrences": 179884,
+      "occurrence_reasons": {
+        "base_parser_rejected": 26,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 202,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 49,
+        "prototype_parsed": 178003,
+        "sql_missing_or_empty": 1598
+      },
+      "occurrence_states": {
+        "prototype_parsed": 178003,
+        "unsupported": 1881
+      },
+      "records": 206678,
+      "unique_inputs": 13381,
+      "unique_reasons": {
+        "base_parser_rejected": 9,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 72,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 19,
+        "prototype_parsed": 13273,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13273,
+        "unsupported": 108
+      }
+    },
+    "119/2026-07-09": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 18,
+        "unsupported": 322
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 7,
+        "unsupported": 115
+      },
+      "input_occurrences": 178409,
+      "occurrence_reasons": {
+        "base_parser_rejected": 24,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 233,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 62,
+        "prototype_parsed": 176518,
+        "sql_missing_or_empty": 1566
+      },
+      "occurrence_states": {
+        "prototype_parsed": 176518,
+        "unsupported": 1891
+      },
+      "records": 205229,
+      "unique_inputs": 12968,
+      "unique_reasons": {
+        "base_parser_rejected": 8,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 82,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 24,
+        "prototype_parsed": 12846,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12846,
+        "unsupported": 122
+      }
+    },
+    "119/2026-07-10": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 30,
+        "unsupported": 195
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 11,
+        "unsupported": 68
+      },
+      "input_occurrences": 176337,
+      "occurrence_reasons": {
+        "base_parser_rejected": 21,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 143,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 28,
+        "prototype_parsed": 174573,
+        "sql_missing_or_empty": 1566
+      },
+      "occurrence_states": {
+        "prototype_parsed": 174573,
+        "unsupported": 1764
+      },
+      "records": 203152,
+      "unique_inputs": 12690,
+      "unique_reasons": {
+        "base_parser_rejected": 7,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 49,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 11,
+        "prototype_parsed": 12615,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12615,
+        "unsupported": 75
+      }
+    },
+    "119/2026-07-11": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 4,
+        "unsupported": 161
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 2,
+        "unsupported": 53
+      },
+      "input_occurrences": 168125,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 127,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 21,
+        "prototype_parsed": 166391,
+        "sql_missing_or_empty": 1570
+      },
+      "occurrence_states": {
+        "prototype_parsed": 166391,
+        "unsupported": 1734
+      },
+      "records": 192913,
+      "unique_inputs": 11852,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 41,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 8,
+        "prototype_parsed": 11792,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11792,
+        "unsupported": 60
+      }
+    },
+    "119/2026-07-12": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 7,
+        "unsupported": 174
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 3,
+        "unsupported": 58
+      },
+      "input_occurrences": 165815,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 137,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 18,
+        "prototype_parsed": 164144,
+        "sql_missing_or_empty": 1494
+      },
+      "occurrence_states": {
+        "prototype_parsed": 164144,
+        "unsupported": 1671
+      },
+      "records": 190601,
+      "unique_inputs": 11611,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 45,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 7,
+        "prototype_parsed": 11546,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11546,
+        "unsupported": 65
+      }
+    },
+    "119/2026-07-13": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 17,
+        "unsupported": 501
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 5,
+        "unsupported": 112
+      },
+      "input_occurrences": 176985,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 441,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 48,
+        "prototype_parsed": 174978,
+        "sql_missing_or_empty": 1498
+      },
+      "occurrence_states": {
+        "prototype_parsed": 174978,
+        "unsupported": 2007
+      },
+      "records": 204155,
+      "unique_inputs": 13045,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 89,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 20,
+        "prototype_parsed": 12923,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12923,
+        "unsupported": 122
+      }
+    },
+    "119/2026-07-14": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 47,
+        "unsupported": 172
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 17,
+        "unsupported": 57
+      },
+      "input_occurrences": 173355,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 132,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 24,
+        "prototype_parsed": 171607,
+        "sql_missing_or_empty": 1566
+      },
+      "occurrence_states": {
+        "prototype_parsed": 171607,
+        "unsupported": 1748
+      },
+      "records": 199881,
+      "unique_inputs": 12597,
+      "unique_reasons": {
+        "base_parser_rejected": 7,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 43,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 9,
+        "prototype_parsed": 12528,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12528,
+        "unsupported": 69
+      }
+    },
+    "119/2026-07-15": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 21,
+        "unsupported": 254
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 8,
+        "unsupported": 88
+      },
+      "input_occurrences": 174814,
+      "occurrence_reasons": {
+        "base_parser_rejected": 28,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 173,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 50,
+        "prototype_parsed": 172995,
+        "sql_missing_or_empty": 1562
+      },
+      "occurrence_states": {
+        "prototype_parsed": 172995,
+        "unsupported": 1819
+      },
+      "records": 201547,
+      "unique_inputs": 12862,
+      "unique_reasons": {
+        "base_parser_rejected": 7,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 60,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 20,
+        "prototype_parsed": 12767,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12767,
+        "unsupported": 95
+      }
+    },
+    "119/2026-07-16": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 62,
+        "unsupported": 182
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 12,
+        "unsupported": 61
+      },
+      "input_occurrences": 180477,
+      "occurrence_reasons": {
+        "base_parser_rejected": 20,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 142,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 21,
+        "prototype_parsed": 178710,
+        "sql_missing_or_empty": 1578
+      },
+      "occurrence_states": {
+        "prototype_parsed": 178710,
+        "unsupported": 1767
+      },
+      "records": 207207,
+      "unique_inputs": 13451,
+      "unique_reasons": {
+        "base_parser_rejected": 9,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 47,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 8,
+        "prototype_parsed": 13379,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13379,
+        "unsupported": 72
+      }
+    },
+    "119/2026-07-17": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 20,
+        "unsupported": 176
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 7,
+        "unsupported": 58
+      },
+      "input_occurrences": 178134,
+      "occurrence_reasons": {
+        "base_parser_rejected": 21,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 131,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 29,
+        "prototype_parsed": 176373,
+        "sql_missing_or_empty": 1570
+      },
+      "occurrence_states": {
+        "prototype_parsed": 176373,
+        "unsupported": 1761
+      },
+      "records": 204907,
+      "unique_inputs": 13163,
+      "unique_reasons": {
+        "base_parser_rejected": 12,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 42,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 11,
+        "prototype_parsed": 13088,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13088,
+        "unsupported": 75
+      }
+    },
+    "119/2026-07-18": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 4,
+        "unsupported": 156
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 2,
+        "unsupported": 52
+      },
+      "input_occurrences": 162480,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 122,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 21,
+        "prototype_parsed": 160759,
+        "sql_missing_or_empty": 1562
+      },
+      "occurrence_states": {
+        "prototype_parsed": 160759,
+        "unsupported": 1721
+      },
+      "records": 187224,
+      "unique_inputs": 11135,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 40,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 8,
+        "prototype_parsed": 11076,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11076,
+        "unsupported": 59
+      }
+    },
+    "119/2026-07-19": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 4,
+        "unsupported": 160
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 2,
+        "unsupported": 54
+      },
+      "input_occurrences": 162880,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 129,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 18,
+        "prototype_parsed": 161223,
+        "sql_missing_or_empty": 1494
+      },
+      "occurrence_states": {
+        "prototype_parsed": 161223,
+        "unsupported": 1657
+      },
+      "records": 187752,
+      "unique_inputs": 11259,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 43,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 7,
+        "prototype_parsed": 11198,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11198,
+        "unsupported": 61
+      }
+    },
+    "119/2026-07-20": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 30,
+        "unsupported": 203
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 12,
+        "unsupported": 70
+      },
+      "input_occurrences": 178851,
+      "occurrence_reasons": {
+        "base_parser_rejected": 17,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 162,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 23,
+        "prototype_parsed": 177129,
+        "sql_missing_or_empty": 1510
+      },
+      "occurrence_states": {
+        "prototype_parsed": 177129,
+        "unsupported": 1722
+      },
+      "records": 206208,
+      "unique_inputs": 13315,
+      "unique_reasons": {
+        "base_parser_rejected": 6,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 56,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 9,
+        "prototype_parsed": 13234,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13234,
+        "unsupported": 81
+      }
+    },
+    "119/2026-07-21": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 18,
+        "unsupported": 212
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 7,
+        "unsupported": 73
+      },
+      "input_occurrences": 180030,
+      "occurrence_reasons": {
+        "base_parser_rejected": 22,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 165,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 23,
+        "prototype_parsed": 178224,
+        "sql_missing_or_empty": 1586
+      },
+      "occurrence_states": {
+        "prototype_parsed": 178224,
+        "unsupported": 1806
+      },
+      "records": 207075,
+      "unique_inputs": 13380,
+      "unique_reasons": {
+        "base_parser_rejected": 8,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 56,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 9,
+        "prototype_parsed": 13297,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13297,
+        "unsupported": 83
+      }
+    },
+    "119/2026-07-22": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 43,
+        "unsupported": 217
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 17,
+        "unsupported": 76
+      },
+      "input_occurrences": 185947,
+      "occurrence_reasons": {
+        "base_parser_rejected": 20,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 173,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 29,
+        "prototype_parsed": 184161,
+        "sql_missing_or_empty": 1558
+      },
+      "occurrence_states": {
+        "prototype_parsed": 184161,
+        "unsupported": 1786
+      },
+      "records": 212875,
+      "unique_inputs": 14189,
+      "unique_reasons": {
+        "base_parser_rejected": 9,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 63,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 11,
+        "prototype_parsed": 14098,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 14098,
+        "unsupported": 91
+      }
+    },
+    "119/2026-07-23": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 24,
+        "unsupported": 253
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 9,
+        "unsupported": 94
+      },
+      "input_occurrences": 174822,
+      "occurrence_reasons": {
+        "base_parser_rejected": 13,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 206,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 31,
+        "prototype_parsed": 173000,
+        "sql_missing_or_empty": 1566
+      },
+      "occurrence_states": {
+        "prototype_parsed": 173000,
+        "unsupported": 1822
+      },
+      "records": 201436,
+      "unique_inputs": 12849,
+      "unique_reasons": {
+        "base_parser_rejected": 4,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 77,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 12,
+        "prototype_parsed": 12748,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12748,
+        "unsupported": 101
+      }
+    },
+    "119/2026-07-24": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 33,
+        "unsupported": 637
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 11,
+        "unsupported": 168
+      },
+      "input_occurrences": 174239,
+      "occurrence_reasons": {
+        "base_parser_rejected": 14,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 594,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 27,
+        "prototype_parsed": 172024,
+        "sql_missing_or_empty": 1574
+      },
+      "occurrence_states": {
+        "prototype_parsed": 172024,
+        "unsupported": 2215
+      },
+      "records": 200927,
+      "unique_inputs": 12804,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 153,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 10,
+        "prototype_parsed": 12628,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12628,
+        "unsupported": 176
+      }
+    },
+    "119/2026-07-25": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 4,
+        "unsupported": 156
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 2,
+        "unsupported": 52
+      },
+      "input_occurrences": 166552,
+      "occurrence_reasons": {
+        "base_parser_rejected": 10,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 122,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 21,
+        "prototype_parsed": 164827,
+        "sql_missing_or_empty": 1566
+      },
+      "occurrence_states": {
+        "prototype_parsed": 164827,
+        "unsupported": 1725
+      },
+      "records": 191289,
+      "unique_inputs": 11665,
+      "unique_reasons": {
+        "base_parser_rejected": 3,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 40,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 8,
+        "prototype_parsed": 11606,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11606,
+        "unsupported": 59
+      }
+    },
+    "119/2026-07-26": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 10,
+        "unsupported": 171
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 4,
+        "unsupported": 58
+      },
+      "input_occurrences": 162428,
+      "occurrence_reasons": {
+        "base_parser_rejected": 19,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 131,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 18,
+        "prototype_parsed": 160744,
+        "sql_missing_or_empty": 1510
+      },
+      "occurrence_states": {
+        "prototype_parsed": 160744,
+        "unsupported": 1684
+      },
+      "records": 187196,
+      "unique_inputs": 11174,
+      "unique_reasons": {
+        "base_parser_rejected": 6,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 44,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 7,
+        "prototype_parsed": 11109,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 11109,
+        "unsupported": 65
+      }
+    },
+    "119/2026-07-27": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 104,
+        "unsupported": 417
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 34,
+        "unsupported": 163
+      },
+      "input_occurrences": 179594,
+      "occurrence_reasons": {
+        "base_parser_rejected": 18,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 335,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 64,
+        "prototype_parsed": 177615,
+        "sql_missing_or_empty": 1550,
+        "unsupported_distribution_statement": 2
+      },
+      "occurrence_states": {
+        "prototype_parsed": 177615,
+        "unsupported": 1979
+      },
+      "records": 207270,
+      "unique_inputs": 13483,
+      "unique_reasons": {
+        "base_parser_rejected": 7,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 135,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 23,
+        "prototype_parsed": 13306,
+        "sql_missing_or_empty": 5,
+        "unsupported_distribution_statement": 2
+      },
+      "unique_states": {
+        "prototype_parsed": 13306,
+        "unsupported": 177
+      }
+    },
+    "119/2026-07-28": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 38,
+        "unsupported": 329
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 14,
+        "unsupported": 77
+      },
+      "input_occurrences": 179088,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 257,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 53,
+        "prototype_parsed": 177182,
+        "sql_missing_or_empty": 1574
+      },
+      "occurrence_states": {
+        "prototype_parsed": 177182,
+        "unsupported": 1906
+      },
+      "records": 206230,
+      "unique_inputs": 13295,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 52,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 19,
+        "prototype_parsed": 13211,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 13211,
+        "unsupported": 84
+      }
+    },
+    "119/2026-07-29": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 22,
+        "unsupported": 325
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 9,
+        "unsupported": 77
+      },
+      "input_occurrences": 172692,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "invalid_encoding": 8,
+        "lexical_ambiguous_string_escape": 2,
+        "lexical_unbalanced_bracket": 273,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 25,
+        "prototype_parsed": 170786,
+        "sql_missing_or_empty": 1578
+      },
+      "occurrence_states": {
+        "prototype_parsed": 170786,
+        "unsupported": 1906
+      },
+      "records": 199164,
+      "unique_inputs": 12557,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "invalid_encoding": 1,
+        "lexical_ambiguous_string_escape": 1,
+        "lexical_unbalanced_bracket": 60,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 10,
+        "prototype_parsed": 12473,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12473,
+        "unsupported": 84
+      }
+    },
+    "119/2026-07-30": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 21,
+        "unsupported": 212
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 7,
+        "unsupported": 75
+      },
+      "input_occurrences": 176228,
+      "occurrence_reasons": {
+        "base_parser_rejected": 13,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 172,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 24,
+        "prototype_parsed": 174435,
+        "sql_missing_or_empty": 1574
+      },
+      "occurrence_states": {
+        "prototype_parsed": 174435,
+        "unsupported": 1793
+      },
+      "records": 203063,
+      "unique_inputs": 12993,
+      "unique_reasons": {
+        "base_parser_rejected": 4,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 61,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 9,
+        "prototype_parsed": 12909,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12909,
+        "unsupported": 84
+      }
+    },
+    "119/2026-07-31": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 25,
+        "unsupported": 202
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 9,
+        "unsupported": 71
+      },
+      "input_occurrences": 175032,
+      "occurrence_reasons": {
+        "base_parser_rejected": 16,
+        "lexical_ambiguous_string_escape": 6,
+        "lexical_unbalanced_bracket": 154,
+        "lexical_unclosed_comment": 4,
+        "lexical_unclosed_string": 29,
+        "prototype_parsed": 173241,
+        "sql_missing_or_empty": 1582
+      },
+      "occurrence_states": {
+        "prototype_parsed": 173241,
+        "unsupported": 1791
+      },
+      "records": 201727,
+      "unique_inputs": 12745,
+      "unique_reasons": {
+        "base_parser_rejected": 5,
+        "lexical_ambiguous_string_escape": 3,
+        "lexical_unbalanced_bracket": 53,
+        "lexical_unclosed_comment": 2,
+        "lexical_unclosed_string": 12,
+        "prototype_parsed": 12665,
+        "sql_missing_or_empty": 5
+      },
+      "unique_states": {
+        "prototype_parsed": 12665,
+        "unsupported": 80
+      }
+    },
+    "120": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 3788,
+        "unsupported": 18135
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 903,
+        "unsupported": 6403
+      },
+      "input_occurrences": 10094128,
+      "occurrence_reasons": {
+        "base_parser_rejected": 2152,
+        "invalid_encoding": 994,
+        "lexical_ambiguous_string_escape": 4248,
+        "lexical_unbalanced_bracket": 27954,
+        "lexical_unclosed_comment": 500,
+        "lexical_unclosed_string": 9625,
+        "prototype_parsed": 9915961,
+        "scanner_rejected": 500,
+        "sql_missing_or_empty": 132194
+      },
+      "occurrence_states": {
+        "prototype_parsed": 9915961,
+        "unsupported": 178167
+      },
+      "records": 10661506,
+      "unique_inputs": 1238224,
+      "unique_reasons": {
+        "base_parser_rejected": 1359,
+        "invalid_encoding": 223,
+        "lexical_ambiguous_string_escape": 255,
+        "lexical_unbalanced_bracket": 4346,
+        "lexical_unclosed_comment": 72,
+        "lexical_unclosed_string": 2145,
+        "prototype_parsed": 1229704,
+        "scanner_rejected": 48,
+        "sql_missing_or_empty": 72
+      },
+      "unique_states": {
+        "prototype_parsed": 1229704,
+        "unsupported": 8520
+      }
+    },
+    "120/2026-09-13": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 491,
+        "unsupported": 1426
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 174,
+        "unsupported": 570
+      },
+      "input_occurrences": 1151248,
+      "occurrence_reasons": {
+        "base_parser_rejected": 144,
+        "invalid_encoding": 98,
+        "lexical_ambiguous_string_escape": 561,
+        "lexical_unbalanced_bracket": 3092,
+        "lexical_unclosed_comment": 71,
+        "lexical_unclosed_string": 1133,
+        "prototype_parsed": 1127461,
+        "scanner_rejected": 66,
+        "sql_missing_or_empty": 18622
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1127461,
+        "unsupported": 23787
+      },
+      "records": 1223471,
+      "unique_inputs": 160600,
+      "unique_reasons": {
+        "base_parser_rejected": 71,
+        "invalid_encoding": 37,
+        "lexical_ambiguous_string_escape": 106,
+        "lexical_unbalanced_bracket": 349,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 199,
+        "prototype_parsed": 159787,
+        "scanner_rejected": 6,
+        "sql_missing_or_empty": 16
+      },
+      "unique_states": {
+        "prototype_parsed": 159787,
+        "unsupported": 813
+      }
+    },
+    "120/2026-09-14": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 583,
+        "unsupported": 1810
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 215,
+        "unsupported": 664
+      },
+      "input_occurrences": 1243056,
+      "occurrence_reasons": {
+        "base_parser_rejected": 201,
+        "invalid_encoding": 160,
+        "lexical_ambiguous_string_escape": 625,
+        "lexical_unbalanced_bracket": 3413,
+        "lexical_unclosed_comment": 71,
+        "lexical_unclosed_string": 1169,
+        "prototype_parsed": 1219135,
+        "scanner_rejected": 68,
+        "sql_missing_or_empty": 18214
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1219135,
+        "unsupported": 23921
+      },
+      "records": 1319063,
+      "unique_inputs": 168116,
+      "unique_reasons": {
+        "base_parser_rejected": 111,
+        "invalid_encoding": 58,
+        "lexical_ambiguous_string_escape": 120,
+        "lexical_unbalanced_bracket": 421,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 210,
+        "prototype_parsed": 167137,
+        "scanner_rejected": 7,
+        "sql_missing_or_empty": 23
+      },
+      "unique_states": {
+        "prototype_parsed": 167137,
+        "unsupported": 979
+      }
+    },
+    "120/2026-09-15": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 546,
+        "unsupported": 2172
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 198,
+        "unsupported": 822
+      },
+      "input_occurrences": 1309168,
+      "occurrence_reasons": {
+        "base_parser_rejected": 205,
+        "invalid_encoding": 284,
+        "lexical_ambiguous_string_escape": 578,
+        "lexical_unbalanced_bracket": 3653,
+        "lexical_unclosed_comment": 71,
+        "lexical_unclosed_string": 1180,
+        "prototype_parsed": 1283909,
+        "scanner_rejected": 68,
+        "sql_missing_or_empty": 19220
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1283909,
+        "unsupported": 25259
+      },
+      "records": 1388842,
+      "unique_inputs": 178889,
+      "unique_reasons": {
+        "base_parser_rejected": 115,
+        "invalid_encoding": 106,
+        "lexical_ambiguous_string_escape": 112,
+        "lexical_unbalanced_bracket": 532,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 226,
+        "prototype_parsed": 177715,
+        "scanner_rejected": 7,
+        "sql_missing_or_empty": 47
+      },
+      "unique_states": {
+        "prototype_parsed": 177715,
+        "unsupported": 1174
+      }
+    },
+    "120/2026-09-16": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 545,
+        "unsupported": 3054
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 196,
+        "unsupported": 1282
+      },
+      "input_occurrences": 1524901,
+      "occurrence_reasons": {
+        "base_parser_rejected": 214,
+        "invalid_encoding": 147,
+        "lexical_ambiguous_string_escape": 647,
+        "lexical_unbalanced_bracket": 4358,
+        "lexical_unclosed_comment": 72,
+        "lexical_unclosed_string": 1453,
+        "prototype_parsed": 1499243,
+        "scanner_rejected": 99,
+        "sql_missing_or_empty": 18668
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1499243,
+        "unsupported": 25658
+      },
+      "records": 1609566,
+      "unique_inputs": 235790,
+      "unique_reasons": {
+        "base_parser_rejected": 124,
+        "invalid_encoding": 56,
+        "lexical_ambiguous_string_escape": 121,
+        "lexical_unbalanced_bracket": 887,
+        "lexical_unclosed_comment": 30,
+        "lexical_unclosed_string": 360,
+        "prototype_parsed": 234184,
+        "scanner_rejected": 9,
+        "sql_missing_or_empty": 19
+      },
+      "unique_states": {
+        "prototype_parsed": 234184,
+        "unsupported": 1606
+      }
+    },
+    "120/2026-09-17": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 568,
+        "unsupported": 3717
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 203,
+        "unsupported": 1635
+      },
+      "input_occurrences": 1934500,
+      "occurrence_reasons": {
+        "base_parser_rejected": 214,
+        "invalid_encoding": 101,
+        "lexical_ambiguous_string_escape": 661,
+        "lexical_unbalanced_bracket": 4828,
+        "lexical_unclosed_comment": 73,
+        "lexical_unclosed_string": 1674,
+        "prototype_parsed": 1908379,
+        "scanner_rejected": 66,
+        "sql_missing_or_empty": 18504
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1908379,
+        "unsupported": 26121
+      },
+      "records": 2022404,
+      "unique_inputs": 324658,
+      "unique_reasons": {
+        "base_parser_rejected": 110,
+        "invalid_encoding": 39,
+        "lexical_ambiguous_string_escape": 126,
+        "lexical_unbalanced_bracket": 1147,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 472,
+        "prototype_parsed": 322711,
+        "scanner_rejected": 6,
+        "sql_missing_or_empty": 18
+      },
+      "unique_states": {
+        "prototype_parsed": 322711,
+        "unsupported": 1947
+      }
+    },
+    "120/2026-09-18": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 563,
+        "unsupported": 3941
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 202,
+        "unsupported": 1653
+      },
+      "input_occurrences": 1411934,
+      "occurrence_reasons": {
+        "base_parser_rejected": 209,
+        "invalid_encoding": 106,
+        "lexical_ambiguous_string_escape": 609,
+        "lexical_unbalanced_bracket": 5089,
+        "lexical_unclosed_comment": 71,
+        "lexical_unclosed_string": 1723,
+        "prototype_parsed": 1384036,
+        "scanner_rejected": 67,
+        "sql_missing_or_empty": 20024
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1384036,
+        "unsupported": 27898
+      },
+      "records": 1499944,
+      "unique_inputs": 189211,
+      "unique_reasons": {
+        "base_parser_rejected": 106,
+        "invalid_encoding": 41,
+        "lexical_ambiguous_string_escape": 118,
+        "lexical_unbalanced_bracket": 1175,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 497,
+        "prototype_parsed": 187221,
+        "scanner_rejected": 7,
+        "sql_missing_or_empty": 17
+      },
+      "unique_states": {
+        "prototype_parsed": 187221,
+        "unsupported": 1990
+      }
+    },
+    "120/2026-09-19": {
+      "bytes_1023_occurrence_states": {
+        "prototype_parsed": 492,
+        "unsupported": 2015
+      },
+      "bytes_1023_unique_states": {
+        "prototype_parsed": 174,
+        "unsupported": 863
+      },
+      "input_occurrences": 1519320,
+      "occurrence_reasons": {
+        "base_parser_rejected": 965,
+        "invalid_encoding": 98,
+        "lexical_ambiguous_string_escape": 567,
+        "lexical_unbalanced_bracket": 3521,
+        "lexical_unclosed_comment": 71,
+        "lexical_unclosed_string": 1293,
+        "prototype_parsed": 1493797,
+        "scanner_rejected": 66,
+        "sql_missing_or_empty": 18942
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1493797,
+        "unsupported": 25523
+      },
+      "records": 1598215,
+      "unique_inputs": 308174,
+      "unique_reasons": {
+        "base_parser_rejected": 892,
+        "invalid_encoding": 37,
+        "lexical_ambiguous_string_escape": 108,
+        "lexical_unbalanced_bracket": 555,
+        "lexical_unclosed_comment": 29,
+        "lexical_unclosed_string": 286,
+        "prototype_parsed": 306245,
+        "scanner_rejected": 6,
+        "sql_missing_or_empty": 16
+      },
+      "unique_states": {
+        "prototype_parsed": 306245,
+        "unsupported": 1929
+      }
+    },
+    "120/2026-09-20": {
+      "bytes_1023_occurrence_states": {},
+      "bytes_1023_unique_states": {},
+      "input_occurrences": 1,
+      "occurrence_reasons": {
+        "prototype_parsed": 1
+      },
+      "occurrence_states": {
+        "prototype_parsed": 1
+      },
+      "records": 1,
+      "unique_inputs": 1,
+      "unique_reasons": {
+        "prototype_parsed": 1
+      },
+      "unique_states": {
+        "prototype_parsed": 1
+      }
+    }
+  },
+  "format": "log-supplement-scan/1",
+  "source_sha256": "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2"
+}

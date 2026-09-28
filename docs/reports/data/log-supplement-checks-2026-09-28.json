@@ -1,0 +1,79 @@
+{
+  "actual_dates_independently_matched": 55,
+  "artifacts": {
+    "log-supplement-census-2026-09-28.json": "75f4a40c2dbc26a585a372e2383ed8108ee9fa71097ef4290cae71ddb92b514f",
+    "log-supplement-coverage-2026-09-28.json": "daa482eb780615d777ad89c79e42090fa9e047cf5698eab403c3e21a7bafc9cc",
+    "log-supplement-dates-2026-09-28.json": "ff76343848ba54c5d7acc41d1dc13f67778d32639697d3a7d2ea3b308b3526ca",
+    "log-supplement-manifest-2026-09-28.json": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+    "log-supplement-parser-2026-09-28.json": "19df610100b31f82517b61ec907333e84cf6f560efe2978d1a7ca426226ed20c"
+  },
+  "boundary_input_id": 1244338,
+  "boundary_sensitivity": {
+    "positions": {
+      "group_days_with_tail": 2,
+      "group_days_without_tail": 1,
+      "group_occurrences_with_tail": 2,
+      "group_occurrences_without_tail": 1,
+      "qualified_group_deltas": {
+        "1000": 0,
+        "200": 0,
+        "30": 0
+      }
+    },
+    "positions_functions": {
+      "group_days_with_tail": 2,
+      "group_days_without_tail": 1,
+      "group_occurrences_with_tail": 2,
+      "group_occurrences_without_tail": 1,
+      "qualified_group_deltas": {
+        "1000": 0,
+        "200": 0,
+        "30": 0
+      }
+    },
+    "tidb_lexical": {
+      "group_days_with_tail": 2,
+      "group_days_without_tail": 1,
+      "group_occurrences_with_tail": 2,
+      "group_occurrences_without_tail": 1,
+      "qualified_group_deltas": {
+        "1000": 0,
+        "200": 0,
+        "30": 0
+      }
+    },
+    "unqualified_functions": {
+      "group_days_with_tail": 2,
+      "group_days_without_tail": 1,
+      "group_occurrences_with_tail": 2,
+      "group_occurrences_without_tail": 1,
+      "qualified_group_deltas": {
+        "1000": 0,
+        "200": 0,
+        "30": 0
+      }
+    },
+    "v4": {
+      "group_days_with_tail": 2,
+      "group_days_without_tail": 1,
+      "group_occurrences_with_tail": 2,
+      "group_occurrences_without_tail": 1,
+      "qualified_group_deltas": {
+        "1000": 0,
+        "200": 0,
+        "30": 0
+      }
+    }
+  },
+  "census_replay_targets": 57,
+  "census_replay_verified": true,
+  "coverage_denominators_match_parser": true,
+  "coverage_source_and_code_hashes_verified": true,
+  "daily_record_and_occurrence_totals_conserved": true,
+  "files_rechecked": 55,
+  "format": "log-supplement-checks/1",
+  "historical_entries_equal": 46,
+  "no_coverage_resource_or_internal_failures": true,
+  "structural_candidate_coarsening_invariants": true,
+  "threshold_nesting_invariants": true
+}

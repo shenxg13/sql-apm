@@ -13,6 +13,7 @@ import time
 from pglast import parser
 
 from sql_apm.diagnostics.mpp_full_audit import file_sha
+from sql_apm.diagnostics.normalization_diff import bucket_context
 from sql_apm.diagnostics.mpp_full_scan import ParserProcess, ROOT, MAX_BYTES, TIMEOUT, MEMORY_BYTES
 from sql_apm.sql.mpp_parser import parse
 from sql_apm.sql.normalization import Normalizer
@@ -23,16 +24,28 @@ SOURCES = ('sql_apm/sql/normalization.py', 'sql_apm/sql/function_dictionary.py',
            'sql_apm/sql/type_policy.py', 'sql_apm/sql/approximate.py',
            'sql_apm/sql/mpp_parser.py', 'sql_apm/sql/pg_ast.py', 'sql_apm/sql/lexical.py',
            'sql_apm/sql/structure.py', 'sql_apm/diagnostics/normalization_replay.py',
-           'sql_apm/diagnostics/mpp_full_scan.py', 'requirements.txt')
+           'sql_apm/diagnostics/mpp_full_scan.py', 'sql_apm/diagnostics/normalization_diff.py',
+           'requirements.txt')
 _ENGINE = None
 
 
 def delta_audit(original, normalized):
-    """Independent conservation check: only complete literal/parameter nodes change."""
-    changes, stack = Counter(), [(original, normalized, '')]
+    """Independent conservation check: only approved value, IN-list and global Hint gap changes."""
+    changes, stack = Counter(), [(original, normalized, '', False, '')]
     while stack:
-        left, right, path = stack.pop()
-        if isinstance(right, dict) and set(right) == {'SQLAPMBusinessValue'}:
+        left, right, path, eligible, parent = stack.pop()
+        if isinstance(right, dict) and set(right) == {'SQLAPMInBucket'}:
+            if (not eligible or not isinstance(left, list) or not left or not path.endswith('/A_Expr/rexpr/List/items')
+                    or not all(isinstance(v, dict) and (set(v) == {'ParamRef'} or
+                        set(v) == {'A_Const'} and set(v['A_Const']) & {'ival', 'fval', 'sval', 'bsval'})
+                        for v in left)):
+                raise ValueError('unexpected_in_bucket')
+            size = len(left)
+            expected = '1' if size == 1 else '2-10' if size <= 10 else '11-100' if size <= 100 else '>100'
+            if right['SQLAPMInBucket'] != expected:
+                raise ValueError('incorrect_in_bucket')
+            changes[path + '/in_bucket'] += 1
+        elif isinstance(right, dict) and set(right) == {'SQLAPMBusinessValue'}:
             if not isinstance(left, dict) or not (set(left) == {'ParamRef'} or
                     set(left) == {'A_Const'} and set(left['A_Const']) & {'ival', 'fval', 'sval', 'bsval'}):
                 raise ValueError('unexpected_replacement')
@@ -40,13 +53,17 @@ def delta_audit(original, normalized):
         elif type(left) is not type(right):
             raise ValueError('unexpected_type_change')
         elif isinstance(left, dict):
-            if set(left) != set(right):
+            removed_gap = path == '/hints/*' and set(left) - set(right) == {'gap'}
+            if set(left) != set(right) and not (removed_gap and set(right) < set(left)):
                 raise ValueError('unexpected_field_change')
-            stack.extend((value, right[key], path + '/' + key) for key, value in left.items())
+            if removed_gap:
+                changes[path + '/gap_removed'] += 1
+            stack.extend((left[key], value, path + '/' + key,
+                          bucket_context(parent, key, eligible), key) for key, value in right.items())
         elif isinstance(left, list):
             if len(left) != len(right):
                 raise ValueError('unexpected_list_change')
-            stack.extend((a, b, path + '/*') for a, b in zip(left, right))
+            stack.extend((a, b, path + '/*', eligible, parent) for a, b in zip(left, right))
         elif left != right:
             raise ValueError('unexpected_value_change')
     return dict(changes)

@@ -15,24 +15,27 @@ from .function_dictionary import FunctionDictionary
 from .structure import dumps, loads
 from .type_policy import KNOWN_TYPES, NORMALIZABLE_CASTS
 
-ALGORITHM_VERSION = 'sql-normalization/3'
+ALGORITHM_VERSION = 'sql-normalization/4'
 PARSER_DEPENDENCY_VERSION = '7.18'
 PROFILE = 'hashdata-pg94'
 MAX_BYTES = approximate.MAX_BYTES
 DEFAULT_DICTIONARY = Path(__file__).resolve().parents[2] / 'rules/functions/v1.0.1.json'
 # O: ordinary; B: WHERE business expression; D: direct business value;
-# P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
+# F: legacy FILTER business values without IN bucketing; P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
 RULES = {
     'algorithm_version': ALGORITHM_VERSION,
     'marker': 'SQLAPMBusinessValue',
     'where': 'numeric/string/native parameter; preserve null/bool/controls',
+    'where_in': {'marker': 'SQLAPMInBucket', 'buckets': ['1', '2-10', '11-100', '>100'],
+                 'eligibility': 'query/update WHERE including ON CONFLICT DO UPDATE WHERE; every normalized IN/NOT IN element is a bare SQLAPMBusinessValue; FILTER keeps v3 element lists; nested query WHERE has its own context; conflict inference predicates stay protected',
+                 'hint_exception': 'preserve anchor identity; same-bucket lists may remain distinct when Hint anchors differ'},
     'writes': 'INSERT VALUES and UPDATE SET direct values only',
     'functions': 'dictionary action consensus; protected arguments are opaque',
     'special_calls': 'preserve non-positional, SQL syntax, variadic and unknown',
     'casts': sorted(NORMALIZABLE_CASTS),
     'other_constants': 'preserve; CASE results, SET, limits, window frames, DDL',
     'extensions': 'preserve typed MPP extension trees',
-    'hints': 'exact content, statement ownership, constant-aware gaps/frame; source-backed PG-folded numeric signs share VALUE; skip source mapping for synthesized constants; retain brackets, operators and batch boundaries',
+    'hints': 'exact content and anchor only; exclude global gap; constant-aware local gaps/frame; source-backed PG-folded numeric signs share VALUE; skip source mapping for synthesized constants; retain brackets, operators and batch boundaries',
     'encoding': 'canonical sorted ASCII JSON; arrays retain order; sha256 domain-separated',
 }
 
@@ -136,9 +139,21 @@ class Normalizer:
         tasks = [(root, 'O', output, 0)]
         while tasks:
             node, mode, parent, key = tasks.pop()
+            if mode == 'bucket':
+                # Post-order: eligibility uses the existing value policy, so
+                # casts, expressions, NULL and protected subtrees stay intact.
+                if node and all(value == {'SQLAPMBusinessValue': {}} for value in node):
+                    size = len(node)
+                    bucket = '1' if size == 1 else '2-10' if size <= 10 else '11-100' if size <= 100 else '>100'
+                    parent[key] = {'SQLAPMInBucket': bucket}
+                    counters['in_lists_bucketed'] += 1
+                continue
             if isinstance(node, list):
                 result = [None] * len(node)
                 parent[key] = result
+                if mode == 'N':
+                    tasks.append((result, 'bucket', parent, key))
+                    mode = 'B'
                 tasks.extend((child, mode, result, i) for i, child in enumerate(node))
                 continue
             if not isinstance(node, dict):
@@ -156,7 +171,7 @@ class Normalizer:
             tag = next(iter(node)) if len(node) == 1 else None
             body = node.get(tag) if tag is not None else None
             if mode != 'P' and isinstance(body, dict):
-                if mode in ('B', 'D') and (tag == 'ParamRef' or
+                if mode in ('B', 'F', 'D') and (tag == 'ParamRef' or
                         tag == 'A_Const' and bool(set(body) & {'ival', 'fval', 'sval', 'bsval'})):
                     parent[key] = {'SQLAPMBusinessValue': {}}
                     counters['replacements'] += 1
@@ -179,7 +194,7 @@ class Normalizer:
         return output[0]
 
     def _fields(self, tag, body, mode, counters):
-        expression = 'B' if mode == 'B' else 'O'
+        expression = mode if mode in ('B', 'F') else 'O'
         if tag == 'TypeCast':
             return {'arg': mode} if _cast_type({tag: body}) in NORMALIZABLE_CASTS else {}
         if tag == 'FuncCall':
@@ -187,8 +202,10 @@ class Normalizer:
             counters['function_' + reason] += 1
             if actions is None:
                 return {}
+            # FILTER keeps v3 value replacement without inheriting v4 IN buckets.
+            # SelectStmt encountered inside it still establishes its own WHERE.
             return {'args': ['D' if a == 'normalize' else 'P' for a in actions],
-                    'agg_filter': 'B', 'agg_order': 'O'}
+                    'agg_filter': 'F', 'agg_order': 'O'}
         if tag == 'SelectStmt':
             fields = {k: 'O' for k in ('targetList', 'fromClause', 'withClause', 'larg', 'rarg',
                        'havingClause', 'groupClause', 'sortClause', 'distinctClause')}
@@ -214,6 +231,8 @@ class Normalizer:
             # NULLIF/SIMILAR are special function forms, not ordinary operators.
             if body.get('kind') in ('AEXPR_NULLIF', 'AEXPR_SIMILAR'):
                 return {}
+            if mode == 'B' and body.get('kind') == 'AEXPR_IN':
+                return {'lexpr': 'B', 'rexpr': 'N'}
             return {'lexpr': expression, 'rexpr': expression}
         if tag == 'BoolExpr':
             return {'args': expression}
@@ -285,7 +304,9 @@ class Normalizer:
             normalized = {'statements': [
                 {'base': self._walk(statement['base'], counters),
                  'extensions': loads(dumps(statement['extensions']))}
-                for statement in tree['statements']], 'hints': loads(dumps(tree['hints']))}
+                for statement in tree['statements']],
+                'hints': [{key: loads(dumps(value)) for key, value in hint.items() if key != 'gap'}
+                          for hint in tree['hints']]}
             value = _sha({'kind': 'sql-apm-structural', 'context': self._context, 'normalized': normalized})
             result['normalized'] = normalized
             result['diagnostics'] = dict(counters)

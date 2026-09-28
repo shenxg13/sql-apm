@@ -1,0 +1,1395 @@
+{
+  "commit": "bd62856921aa806e109490c199482d099d560557",
+  "context": {
+    "algorithm_version": "sql-normalization/3",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter-probe/8",
+    "profile": "hashdata-pg94",
+    "rules_digest": "04a423680c02c7b6b8b87295346d9468d089e279cb19183b5587b57bbb51474d",
+    "rules_ref": "sha256:d2faed8791aab2845b50ff6c9d356ed2cb7b728d3a53d913da5b3e2da02eaf6f"
+  },
+  "projection_cases": [
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0,1)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0,1,2,3,4,5,6,7,8,9)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0,1,2,3,4,5,6,7,8,9,10)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99)"
+    },
+    {
+      "normalized": {
+        "hints": [],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100)"
+    },
+    {
+      "normalized": {
+        "hints": [
+          {
+            "anchor": {
+              "kind": "statement",
+              "statement_index": 1,
+              "syntax_sha256": "f899834e1c8710658b542bbe2aa638e521367f8dca84aaef6b051c7d64333794",
+              "token_gap": 1
+            },
+            "gap": 8,
+            "kind": "C_COMMENT",
+            "raw": "/*+ H */"
+          }
+        ],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "a"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          },
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "u",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "b"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT (a) FROM t; SELECT /*+ H */ b FROM u"
+    },
+    {
+      "normalized": {
+        "hints": [
+          {
+            "anchor": {
+              "kind": "statement",
+              "statement_index": 1,
+              "syntax_sha256": "f899834e1c8710658b542bbe2aa638e521367f8dca84aaef6b051c7d64333794",
+              "token_gap": 1
+            },
+            "gap": 14,
+            "kind": "C_COMMENT",
+            "raw": "/*+ H */"
+          }
+        ],
+        "statements": [
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "t",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "A_Star": {}
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ],
+                "whereClause": {
+                  "A_Expr": {
+                    "kind": "AEXPR_IN",
+                    "lexpr": {
+                      "ColumnRef": {
+                        "fields": [
+                          {
+                            "String": {
+                              "sval": "x"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "name": [
+                      {
+                        "String": {
+                          "sval": "="
+                        }
+                      }
+                    ],
+                    "rexpr": {
+                      "List": {
+                        "items": [
+                          {
+                            "SQLAPMBusinessValue": {}
+                          },
+                          {
+                            "SQLAPMBusinessValue": {}
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "extensions": []
+          },
+          {
+            "base": {
+              "SelectStmt": {
+                "fromClause": [
+                  {
+                    "RangeVar": {
+                      "inh": true,
+                      "relname": "u",
+                      "relpersistence": "p"
+                    }
+                  }
+                ],
+                "limitOption": "LIMIT_OPTION_DEFAULT",
+                "op": "SETOP_NONE",
+                "targetList": [
+                  {
+                    "ResTarget": {
+                      "val": {
+                        "ColumnRef": {
+                          "fields": [
+                            {
+                              "String": {
+                                "sval": "b"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "extensions": []
+          }
+        ]
+      },
+      "sql": "SELECT * FROM t WHERE x IN (1,2); SELECT /*+ H */ b FROM u"
+    }
+  ],
+  "structure_sha256": {
+    "0-0": "406b89777d22501075eaa3bac59909f2875fc2fb13d4355df6017537ed316972",
+    "0-1": "6a89a28340e6c9bc4d73e0d98b249098ee5457b2a92829069ac215e2d55e5caa",
+    "0-2": "406b89777d22501075eaa3bac59909f2875fc2fb13d4355df6017537ed316972",
+    "1-0": "bb5787737a0fe9b57dcd29bb05fcca944e87c4d2d5973146669f18352ad17b6e",
+    "1-1": "562912af5fe5334bb09a719568ca174eea21c8c1dac456592aab6c8870263e17",
+    "1-2": "bb5787737a0fe9b57dcd29bb05fcca944e87c4d2d5973146669f18352ad17b6e",
+    "10-0": "93255465acf1ce6accfb29a343cd3a39a294a30d3cca0e34d2331d5e4eb357f5",
+    "10-1": "ed3076227c544aceaba36692408f0ced61594fa8143e62c6676f20fe5b0b412e",
+    "10-2": "bd50e877ec8f85e097b5007224b6618f66bf43ffa0386314a55c207e5d6f6ef6",
+    "11-0": "ed975515c69ac3717cc079008cc0339f0711540631e4c052589a43c5b7168021",
+    "11-1": "ebbf0bad7cef077aac23e7c4cf3e2c68c8f66374c2849dd7800910a5891342be",
+    "11-2": "956c3c74e4ecb9566bb5f3dcd917f789a8eb72c226d0aa810db0d76acef11893",
+    "12-0": "2f9329483e43a1fb0d37e653ec0c02c651ebed12a7d1904bf4e86477acd2f80b",
+    "12-1": "fc035cfc1db1b92a58614f436dfbda8746d1a9162c3c49fcbdc12d79c6a2829f",
+    "12-2": "b9adb3914a07fede688df49dfc6867e84546bbd84918d13a9c5a27ed5d83227c",
+    "13-0": "23f9894861c038200c48cad56d502ff9db6589a149cd46cc60cecb9ed548756b",
+    "13-1": "6bd71776951bc940b47f5f7439c74fe52a200e48ee203283356df7a3522ab464",
+    "13-2": "3c35d58e40dce5b661c9be9bb1733cc6b6c93aa96f84367c26181070959913c2",
+    "14-0": "77ba93ae221cff0314c56851424ccae9b4b180883a2f2a432447e03b1b8caf8a",
+    "14-1": "d475f72d0f0973f716dd164c5d6fd370ebfa60c42a92d4e92698b3a95ec9afab",
+    "14-2": "dce6709e5b3689a5198f704666ffd45e4d50efbb5d73747b51d04f73fa5e992b",
+    "15-0": "d5296c21162525f2b591b23d56672264758cb63fee0ddffd3cc157f25e04aee5",
+    "15-1": "9e2b9b834c355208dd856c3095bcb364721e82482c3d7deac0195d6b66ca443e",
+    "15-2": "f937612d281acfc45491141b8e1f6fa6956d2e58f0271a9a9a3f0dbcb8704b38",
+    "16-0": "e70d6f111afb6e4201674162eee0d07b1767eb875cab42c7dca7593995ec7e0b",
+    "16-1": "6a3ce72999d5dee2b973aebedaa2761e157fcab6d9a70e7c44cccae0f87e620b",
+    "16-2": "f62e117449986d7e37a98692dee7b077c18b09c1b9723a400eeee6345264bcd0",
+    "17-0": "457f82a3b4a01ce0b176c5e33aacdbbc6b6d107486b4ee75fadf3b2e320a50ea",
+    "17-1": "fdca28099255d8de78a5c44bef8ab48b9ef1718d176b8c41e2cb04f0a17459d2",
+    "17-2": "c3b2dbabf2d21a1da4ca09352a9b523569fcb2c82457a5d4b8e89292df21201d",
+    "18-0": "c13d79b499f53d59bf46a774d51c8c49aefab7f8678183231989387e98a68d27",
+    "18-1": "58d1788720b9a5f211f01aa2ecc976fb96af58cd92f84da059f3c0ac383a006f",
+    "18-2": "7fa0d54f40df4a3571d65798f6306a620209d4b5f887f09b0b23e9825dbfc8f6",
+    "19-0": "0022e5bf48a262fd9c5ca07c217722e47182a80b698e9495067e2e165bbec185",
+    "19-1": "60014c8fadf8e568c45f567e3786016756c3dfd5dc1b840fc7d1585492dd9528",
+    "19-2": "c061ff8d85a090b5d4163ee566ca59a5f69eaf3c80b6054fd37ab401e0a94fae",
+    "2-0": "329345b7d3e059173f678b1a5b2d83b9dca05b18190d1c6d974a9ad24d27d2b5",
+    "2-1": "2f589709b36650028e6b05f2946bd3abd8469e6986f6c420a0649fd55c9df22d",
+    "2-2": "329345b7d3e059173f678b1a5b2d83b9dca05b18190d1c6d974a9ad24d27d2b5",
+    "20-0": "56c512d3ba1c0481cf02385a9d5278b6745ebf23da9bf046b38d76bcd15e17eb",
+    "20-1": "436ac3e612e931c736a0b1a112c9439aae114895a82fecb99292118c878df484",
+    "20-2": "9df5ba0a91cd4c63bb40925af1c28c3f587d5941a6c98b617ad370ead22a1622",
+    "21-0": "45f136d43860774ac542e308217c7df1acf6947594b78ff2c66669066362a12c",
+    "21-1": "45f136d43860774ac542e308217c7df1acf6947594b78ff2c66669066362a12c",
+    "21-2": "45f136d43860774ac542e308217c7df1acf6947594b78ff2c66669066362a12c",
+    "22-0": "ec864df1c47d1cb7981d3714fe1a209ae7c34d6e988138a807fef11767466df0",
+    "22-1": "287ea0ed975aefe30578eeb3fa56e72468e856e991c541a1f8c0daa582c8fb45",
+    "22-2": "ec864df1c47d1cb7981d3714fe1a209ae7c34d6e988138a807fef11767466df0",
+    "3-0": "a35f8ed525b399cbb5d0148d8ab6eecf9940710965bff5b4a31c472dd3d122ca",
+    "3-1": "91ae618ce0a123cfc02235ed4de4eb430e302155fd7c6ea778084a4f1bc89186",
+    "3-2": "a35f8ed525b399cbb5d0148d8ab6eecf9940710965bff5b4a31c472dd3d122ca",
+    "4-0": "96569c15155619c45dcc56689cb047102ad178e524c1c3b7119d3673405c6d1c",
+    "4-1": "f2e677e7289610efbbf463724543ced00fbcc597c0030fa569162fe937de84d8",
+    "4-2": "96569c15155619c45dcc56689cb047102ad178e524c1c3b7119d3673405c6d1c",
+    "5-0": "1ad877536d4fb804ddb68be0aa4ea8bc9564d508765ef28bba3e1b783ce57418",
+    "5-1": "30244c84441c2e2400c2e2b837d4fb64a9eee01d6f40671cd363f6322d38eeed",
+    "5-2": "1ad877536d4fb804ddb68be0aa4ea8bc9564d508765ef28bba3e1b783ce57418",
+    "6-0": "bb457c1e81dc4df11a4ae1f0e730e88a411fd5aa93a7daf468876ee87f0bf874",
+    "6-1": "72c3672b537a5ca46034fef79ac317623278802cfe1b8566fad1d3b6d2ff8e4f",
+    "6-2": "a5c2e1097e58cf3803f687e5063a27ff1da0948b0ddbe864253b5a14924ccd7d",
+    "7-0": "212c1451f286bd6103d5f9b589d5921e0319b9d35c5c226733f58a1d42b2f8f2",
+    "7-1": "e898abe49123a9a4502a544ca894abdd6a2f4cc569174d6d40ff7fdddf6151bf",
+    "7-2": "4ccf637a25ff25f6f89ee2eb8b44c354ff8e151168539f0228b07eb3e4a9837a",
+    "8-0": "6a45053a5076c2a97cd828a02759d7f0083c745efa3abffade1895e1410255d3",
+    "8-1": "f7ca9b6a9539c8ec8114d7b8a3bb2b2a8148b85a15b63fac9deadcd843e26e7f",
+    "8-2": "1dba71629509220a66625d747dbaa43a2e9889d8e3d688eb7946bd9475ecf7ad",
+    "9-0": "3ee407ca6ec1e9b635bad774fca3997ca7046ddd243d2e760496193702eebe15",
+    "9-1": "c21063924a8ec99e62842202f514be7c2716329473421c28fa2ceb898afc5b91",
+    "9-2": "e68f2cf8f712fed572791d676cac783b6a731faeb020ab45ba8674329685ad54"
+  }
+}

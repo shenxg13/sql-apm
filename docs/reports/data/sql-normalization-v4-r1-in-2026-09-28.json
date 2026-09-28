@@ -1,0 +1,162 @@
+{
+  "comparison_tool_sha256": "6579d049356480e5231494e65c88959e0863d3426b8c9cc203d6415539e00c40",
+  "context_changed": true,
+  "contexts": {
+    "after": {
+      "algorithm_version": "sql-normalization/4",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter/9",
+      "profile": "hashdata-pg94",
+      "rules_digest": "ff864d482a90684f5a6dda98f921392d002c37106c2c6565adfc61699fcd97a3",
+      "rules_ref": "sha256:b7e9266a3a391253ffb977bab2686d7928537b9651c90f366d6b9f152e2c9007"
+    },
+    "before": {
+      "algorithm_version": "sql-normalization/3",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter-probe/8",
+      "profile": "hashdata-pg94",
+      "rules_digest": "04a423680c02c7b6b8b87295346d9468d089e279cb19183b5587b57bbb51474d",
+      "rules_ref": "sha256:d2faed8791aab2845b50ff6c9d356ed2cb7b728d3a53d913da5b3e2da02eaf6f"
+    }
+  },
+  "eligible_in_inputs": {
+    "after": 66175,
+    "before": 66175
+  },
+  "format": "normalization-diff/1",
+  "groups": {
+    "after": 69243,
+    "before": 71026,
+    "delta": -1783
+  },
+  "inputs": 200390,
+  "merge_examples": [
+    [
+      916,
+      917,
+      2580,
+      18340,
+      18342,
+      18855
+    ],
+    [
+      1047,
+      2748,
+      18388
+    ],
+    [
+      2597,
+      11696,
+      18863,
+      20102,
+      26439,
+      27672,
+      37241,
+      38496,
+      46260,
+      47485
+    ],
+    [
+      3187,
+      3188
+    ],
+    [
+      5677,
+      5680
+    ],
+    [
+      17557,
+      17559,
+      17560,
+      17561,
+      17562,
+      17653,
+      17655,
+      53271,
+      96466,
+      96472
+    ],
+    [
+      17654,
+      53272,
+      96467,
+      123341,
+      123343,
+      123348,
+      123356,
+      123359
+    ],
+    [
+      18391,
+      18856,
+      26187,
+      26432,
+      37009,
+      37234,
+      46016,
+      46253,
+      55605,
+      55830
+    ],
+    [
+      35935,
+      55120,
+      61152,
+      62330,
+      62331,
+      105483,
+      107270,
+      114289,
+      123180,
+      135180
+    ],
+    [
+      35940,
+      55121,
+      55122,
+      55129,
+      61239,
+      62332,
+      62333,
+      62337,
+      62343,
+      105492
+    ]
+  ],
+  "merged_groups": 1615,
+  "merged_input_occurrences": 21915,
+  "merged_inputs": 4287,
+  "reason_changes": 0,
+  "reason_transitions": {},
+  "reliable_inputs": {
+    "after": 197371,
+    "before": 197371
+  },
+  "selection": {
+    "ids_sha256": null,
+    "kind": "all_snapshot_records"
+  },
+  "snapshot_sha256": {
+    "after": "ddf5fc17294e1604f575a499f4cc4e47ddb1c5078a66b711972f8a28c17ad3ee",
+    "before": "0fe33635ea606ee81d68cb7ab77556473cb8e959e0de651e66bc08f1c8e1f2ac"
+  },
+  "source_sha256": "1608799d75685ee284f9b768af44819a8d82f89488cc814dce1b1d50e865d842",
+  "split_examples": [],
+  "split_groups": 0,
+  "status_change_examples": [],
+  "status_changes": 0,
+  "status_transitions": {},
+  "v4_acceptance_passed": true,
+  "v4_audit": {
+    "applied": true,
+    "checked": 197371,
+    "mismatch_examples": [],
+    "mismatches": 0
+  }
+}

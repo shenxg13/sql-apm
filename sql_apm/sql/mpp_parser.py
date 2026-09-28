@@ -14,7 +14,7 @@ from sql_apm.sql.lexical import diagnose
 from sql_apm.sql.pg_ast import pg_clean
 from sql_apm.sql.structure import dumps, loads
 
-VERSION = 'mpp-adapter-probe/8'
+VERSION = 'mpp-adapter/9'
 
 
 class Unsupported(ValueError):

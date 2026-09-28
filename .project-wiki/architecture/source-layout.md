@@ -9,8 +9,10 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-27
+updated: 2026-09-28
 sources:
+  - path: docs/reports/sql-normalization-v4-2026-09-28.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457
     status: current
   - path: sql_apm/sql/function_dictionary.py
@@ -88,6 +90,7 @@ sql-apm/
 │       ├── parser_fidelity.py  # 候选解析器比较
 │       ├── normalize_sql.py    # 已有：文本／文件薄入口
 │       ├── normalization_replay.py # 已有：有界归组验证
+│       ├── normalization_diff.py   # 已有：脱敏快照及规则变更分组差分
 │       └── mpp_*.py            # 适配验证、矩阵、有界抽样及重放
 ├── requirements.txt           # 已有：运行解析依赖及哈希锁
 ├── tests/                      # 随模块增长按对应业务职责组织
@@ -198,6 +201,19 @@ Normalizer 与规则快照；`FunctionDictionary.snapshot()` 提供独立规则�
 依赖文件额外包含 SQLGlot，仅供候选解析比较。相关解析和归一化测试仍集中于该专项目录，
 普通字典／近似测试不强制安装解析依赖。[接口文档](../../docs/design/sql-normalization.md)
 给出调用、资源边界和安装命令；当前不交付安装包、数据库业务读写或统一产品 CLI。
+
+### 规则变更差分工具（2026-09-28）
+
+`diagnostics/normalization_diff.py` 在本地原文索引上选择全部、字节标记或 ID 集合，
+生成脱敏 SQLite 快照，并比较分组、状态及原因。它复用 `mpp_full_scan.ParserProcess`
+的隔离与资源限制，独立的 v3→v4 结构投影仅用于验证，不参与产品归一化。
+诊断侧上下文检查同时供投影与固定回放守恒审计使用，区分 FILTER、独立查询 WHERE 和冲突更新条件；
+业务边界见[指纹契约](../contracts/sql-fingerprints.md#已确认的-where-in-列表粗分桶与-hint-编码清理)。
+快照和生产中间结果保留忽略的 `var/`；报告只提交计数、摘要、版本及 ID 示例。
+命令与跨冻结版本复现方式见[接口说明](../../docs/design/sql-normalization.md#规则变更分组差分)。
+
+解析能力采用正式名称 `mpp-adapter/9`；已有候选探测、扩展、扫描及修复模块仍是历史诊断工具，
+保留原路径供旧报告追溯。本次没有迁移或删除它们，也没有增加 scripts 包装层、数据库服务或重算编排。
 
 ## Workflows
 

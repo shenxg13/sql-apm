@@ -74,7 +74,7 @@ class NormalizationTests(unittest.TestCase):
             ('select * from a where x=1', 'select * from a where x>1'),
             ('select * from a where x=1', 'select * from a where x=1::int'),
             ("select * from a where x='x'::varchar(5)", "select * from a where x='x'::varchar(6)"),
-            ('select * from t where x in(1,2)', 'select * from t where x in(1,2,3)'),
+            ('select * from t where x in(1)', 'select * from t where x in(1,2)'),
             ('select * from "T" where x=1', 'select * from t where x=1'),
             ('select * from t where x=$1 and y=$1', 'select * from t where y=$1 and x=$1'),
         ], False)
@@ -173,7 +173,7 @@ class NormalizationTests(unittest.TestCase):
         r['normalized'].clear()
         snapshot = self.engine.rule_snapshot()
         snapshot['dictionary']['rules'][0]['enabled'] = False
-        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/3')
+        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/4')
         self.assertEqual(self.result(raw), self.result(raw))
 
     def test_fixed_dictionary_changes_are_traceable(self):

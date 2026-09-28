@@ -78,6 +78,12 @@ class HintBoundaryTests(unittest.TestCase):
                         left.replace('/*+ H */ a', 'a /*+ H */')):
             self.assertNotEqual(self.reliable(left), self.reliable(changed))
 
+    def test_spaced_plus_comments_are_ordinary_on_reliable_path(self):
+        for comment in ('/* + H */', '-- + H\n'):
+            sql = 'SELECT ' + comment + ' * FROM t WHERE id=1'
+            self.assertEqual(parse(sql)['hints'], [])
+            self.assertEqual(self.reliable(sql), self.reliable(sql.replace(comment, '')))
+
     def test_statement_and_empty_batch_boundary_anchors(self):
         for sql, kinds, indices in (
             ('/*+ A */ SELECT a; /*+ B */ SELECT b /*+ C */',

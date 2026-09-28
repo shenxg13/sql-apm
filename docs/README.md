@@ -69,6 +69,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [归一化 R2 整改验证](reports/sql-normalization-r2-remediation-2026-09-28.md) | 实施验证报告 | 含 Hint 的正负业务值归并、位置保真回归及5,333条历史 Hint 对照。 |
 | [归一化 R1 整改验证](reports/sql-normalization-r1-remediation-2026-09-28.md) | 实施验证报告 | Hint 位置碰撞与近似保护绕过修复、新版本及1,832条回放对照。 |
 | [归一化与结构指纹验证](reports/sql-normalization-2026-09-27.md) | 实施验证报告 | 合成回归、1,832条有界重放及真实归组结构核对 |
 | [近似指纹与旧失败重放](reports/mpp-approximate-2026-09-27.md) | 验证报告 | 8,909个拒绝输入的近似结果及384个已修复对照，保留观察用途。 |

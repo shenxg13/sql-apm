@@ -41,6 +41,8 @@ sources:
   - path: docs/reports/sql-normalization-2026-09-27.md
     status: historical
   - path: docs/reports/sql-normalization-r1-remediation-2026-09-28.md
+    status: historical
+  - path: docs/reports/sql-normalization-r2-remediation-2026-09-28.md
     status: current
 related:
   - decision.project-scope
@@ -414,7 +416,7 @@ SQLGlot 继续仅作候选实验依赖。核心不访问数据库、不补取 SQ
 
 用户要求“进行R1整改”后，针对独立评审的 `I9-R1-F001`、`I9-R1-F002` 完成实现修复，
 验收范围保持不变；评审结论与问题处置保留在[PR #10](https://github.com/shenxg13/sql-apm/pull/10)。
-当前版本为 `sql-normalization/2`、`mpp-adapter-probe/6` 和 `sql-approximate/2`，字典仍为1.0.1。
+该次版本为 `sql-normalization/2`、`mpp-adapter-probe/6` 和 `sql-approximate/2`，字典仍为1.0.1。
 可靠 Hint 以所属语句、局部间隙和保留括号的完整 token 种类序列摘要绑定位置；批次边界独立
 标记。完整 AST 继续参与身份，不以词法摘要或原文哈希替代；详细编码和保守拆组限制见
 [可靠接口](../../docs/design/sql-normalization.md)。近似路径判断语法上下文时跳过 Hint，
@@ -425,6 +427,22 @@ SQLGlot 继续仅作候选实验依赖。核心不访问数据库、不补取 SQ
 同类扩展及新的1,832条有界回放。可靠／拒绝状态和1,566个可靠组的成员集合与旧样本相同，
 不是旧指纹值相同，也不是全量语义准确率证明。历史全量解析和近似报告保留，未重复115万条
 全量扫描或把旧版本证据覆盖为新版；实现方验证不替代后续独立 R2。
+
+### R2 整改实施记录（2026-09-28）
+
+独立 R2 已确认两个 R1 问题修复，但发现 `I9-R2-F001`：版本2锚点把一元负号单独计数，
+导致含 Hint 的正负业务值拆组，违反 A3；原文档“正负数字可能保守拆组”不能缩减验收。
+用户要求“进行R2整改”后，当前实现升级为 `sql-normalization/3`、`mpp-adapter-probe/7`，
+`sql-approximate/2` 和字典1.0.1不变。依据 PG 数值常量节点及源位置确认折叠的负号，
+同时规范锚点摘要、全局间隙和局部间隙；保留真正的运算符和括号，不推断业务值所在位置。
+Hint 位于被折叠负号之后时明确拒绝可靠结果，避免不同位置合并；完整边界见
+[接口说明](../../docs/design/sql-normalization.md)。
+
+[新验证报告](../../docs/reports/sql-normalization-r2-remediation-2026-09-28.md)记录72组原反例
+归并恢复、198及728组位置回归、UTF-8与MPP源位置回映、1,832条固定回放以及5,333条含
+Hint 标记输入的分组对照。真实样本未出现原缺陷，因此正负业务值正确性由定向合成用例证明；
+不能用真实组数未变替代缺陷验证。另补充可靠／近似路径对 `/* + … */`、`-- + …` 的既有
+识别差异及测试，不改变近似规则。验收范围和历史证据保留，实施验证不代替独立 R3。
 
 ## Workflows
 

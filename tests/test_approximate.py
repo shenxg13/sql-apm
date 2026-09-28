@@ -113,6 +113,14 @@ class ApproximateTests(unittest.TestCase):
                 changed = raw.replace(b'\xff', b'\xfe').replace(b'\x00', b'\xfe')
                 self.assertNotEqual(result['value'], fp(changed, 'invalid_encoding')['value'])
 
+    def test_spaced_plus_comments_remain_conservative_approximate_hints(self):
+        for comment in ('/* + H */', '-- + H\n'):
+            sql = 'SELECT ' + comment + ' * FROM t WHERE id=1 AND ('
+            near = fp(sql)
+            self.assertEqual([t[1] for t in near['normalized']['tokens'] if t[0] == 'hint'],
+                             [comment.rstrip('\n')])
+            self.assertNotEqual(near['value'], fp(sql.replace(comment, ''))['value'])
+
     def test_batch_order_objects_and_hints_are_preserved(self):
         sql = 'SELECT /*+ hint_a */ * FROM "T" WHERE a = 1; UPDATE t SET b = ('
         for altered in [sql.replace('hint_a', 'hint_b'), sql.replace('"T"', '"t"'),

@@ -14,7 +14,7 @@ from sql_apm.sql.lexical import diagnose
 from sql_apm.sql.pg_ast import pg_clean
 from sql_apm.sql.structure import dumps, loads
 
-VERSION = 'mpp-adapter-probe/6'
+VERSION = 'mpp-adapter-probe/7'
 
 
 class Unsupported(ValueError):
@@ -35,14 +35,72 @@ class Token:
         return self.raw if len(self.raw) == 1 else ''
 
 
-def pg_one(sql):
+def pg_one(sql, folded_signs=None):
     try:
         stmts = loads(parser.parse_sql_json(sql))['stmts']
     except (parser.ParseError, UnicodeError):
         raise Unsupported('base_parser_rejected') from None
     if len(stmts) != 1:
         raise Unsupported('expected_one_statement')
-    return pg_clean(stmts[0]['stmt'])
+    tree = stmts[0]['stmt']
+    if folded_signs is not None:
+        folded_signs.update(_constant_sign_offsets(sql, tree))
+    return pg_clean(tree)
+
+
+def _constant_sign_offsets(sql, tree):
+    """Character offsets of unary '-' folded into numeric A_Const by PG.
+
+    Use the parsed node's source location, never infer unary/binary roles from
+    neighboring keyword spellings. Keep parentheses and every real operator.
+    JSON locations are UTF-8 byte offsets; scanner offsets are characters.
+    """
+    scanned = parser.scan(sql)
+    by_byte, previous, offset = {}, 0, 0
+    for i, token in enumerate(scanned):
+        offset += len(sql[previous:token.start].encode('utf-8'))
+        by_byte[offset] = i
+        previous = token.start
+    signs, pending = set(), [tree]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, list):
+            pending.extend(node)
+        elif isinstance(node, dict):
+            constant = node.get('A_Const')
+            if isinstance(constant, dict) and set(constant) & {'ival', 'fval'}:
+                i = by_byte.get(constant.get('location'))
+                if i is None:
+                    raise Unsupported('hint_constant_location_unmapped')
+                prefix = []
+                while i < len(scanned) and scanned[i].name in ('ASCII_45', 'ASCII_40'):
+                    if scanned[i].name == 'ASCII_45':
+                        prefix.append(scanned[i].start)
+                    i += 1
+                if prefix:
+                    if i == len(scanned) or scanned[i].name not in ('ICONST', 'FCONST'):
+                        raise Unsupported('hint_constant_span_unmapped')
+                    signs.update(prefix)
+            pending.extend(node.values())
+    return signs
+
+
+def _restore_offsets(offsets, replacements):
+    """Map PG source offsets back across the adapter's explicit replacements."""
+    spans, ends, shifts, delta = [], [], [], 0
+    for start, stop, text in sorted(replacements):
+        begin, end = start + delta, start + delta + len(text)
+        delta += len(text) - (stop - start)
+        spans.append((begin, end))
+        ends.append(end)
+        shifts.append(delta)
+    restored = set()
+    for offset in offsets:
+        i = bisect_right(ends, offset)
+        if i < len(spans) and spans[i][0] <= offset < spans[i][1]:
+            raise Unsupported('hint_sign_inside_adapter_replacement')
+        restored.add(offset - (shifts[i - 1] if i else 0))
+    return restored
 
 
 def expr(sql):
@@ -595,7 +653,7 @@ def alter_table_actions(sql, tokens):
     return {'base': {'AlterTableStmt': base}, 'extensions': actions}
 
 
-def create_row_compat(sql, tokens):
+def create_row_compat(sql, tokens, replacements=None):
     cursor = Cursor(sql, tokens)
     if not cursor.take('CREATE'):
         return sql
@@ -614,10 +672,12 @@ def create_row_compat(sql, tokens):
         if tokens[i].word == 'WITH' and i + 1 < len(tokens) and tokens[i + 1].word == '(':
             members = Cursor(sql, tokens, i + 1).group()
             spans.extend(row_option_replacements(members))
+    if replacements is not None:
+        replacements.extend(spans)
     return replace_spans(sql, spans)
 
 
-def statement(sql, tokens):
+def statement(sql, tokens, folded_signs=None):
     if not tokens:
         raise Unsupported('empty_statement')
     words = [t.word for t in tokens]
@@ -681,7 +741,12 @@ def statement(sql, tokens):
                 raise Unsupported('invalid_copy_on_segment')
             spans.append((start, end))
             extensions.append({'kind': 'copy_on_segment', 'enabled': True})
-    base = pg_one(create_row_compat(mask(sql, spans), tokens))
+    replacements = []
+    native = create_row_compat(mask(sql, spans), tokens, replacements)
+    native_signs = set() if folded_signs is not None else None
+    base = pg_one(native, native_signs)
+    if folded_signs is not None:
+        folded_signs.update(_restore_offsets(native_signs, replacements))
     if distro and set(base) not in ({'CreateStmt'}, {'CreateTableAsStmt'}):
         raise Unsupported('distribution_requires_create_table')
     if any(e['kind'] == 'range_partition' for e in extensions) and set(base) != {'CreateStmt'}:
@@ -691,8 +756,7 @@ def statement(sql, tokens):
     return {'base': base, 'extensions': extensions}
 
 
-
-def _anchor_hints(hints, tokens, ranges):
+def _anchor_hints(hints, tokens, ranges, folded_signs):
     # Full PG ASTs discard redundant parentheses. A gap alone (even scoped to
     # a statement) can therefore identify different grammar positions. Bind
     # each gap to the complete ordered scanner-kind frame, including brackets.
@@ -703,10 +767,17 @@ def _anchor_hints(hints, tokens, ranges):
     ends = [t.end for t in tokens]
     starts = [a for a, _ in ranges]
     frames = {}
+    # Prefix counts map raw scanner gaps to constant-aware anchor gaps. This
+    # must affect both local/global gaps and the frame, including later batch
+    # statements; retaining any raw count would split signed business values.
+    gaps = [0]
+    for token in tokens:
+        gaps.append(gaps[-1] + (token.start not in folded_signs))
 
     def frame(key, begin, end):
         if key not in frames:
-            kinds = ['VALUE' if t.name in values else t.name for t in tokens[begin:end]]
+            kinds = ['VALUE' if t.name in values else t.name for t in tokens[begin:end]
+                     if t.start not in folded_signs]
             frames[key] = hashlib.sha256(dumps(kinds).encode('ascii')).hexdigest()
         return frames[key]
 
@@ -716,17 +787,21 @@ def _anchor_hints(hints, tokens, ranges):
         # Newline-separated string fragments can form one scanner token.
         if gap < len(tokens) and tokens[gap].start < offset < tokens[gap].end:
             raise Unsupported('hint_inside_combined_token')
-        hint['gap'] = gap
+        # A Hint immediately after an erased sign has no unique normalized
+        # gap: before/after that sign would otherwise collapse. Fail explicitly.
+        if gap and tokens[gap - 1].start in folded_signs:
+            raise Unsupported('hint_inside_folded_sign')
+        hint['gap'] = gaps[gap]
         index = bisect_right(starts, gap) - 1
         if index >= 0 and gap <= ranges[index][1]:
             begin, end = ranges[index]
             hint['anchor'] = dict(kind='statement', statement_index=index,
-                                  token_gap=gap - begin, syntax_sha256=frame(index, begin, end))
+                                  token_gap=gaps[gap] - gaps[begin], syntax_sha256=frame(index, begin, end))
         else:
             # Empty statements and trailing batch comments have no statement
             # owner. Keep their separator position and full batch frame.
             hint['anchor'] = dict(kind='batch_boundary', statement_index=index + 1,
-                                  token_gap=gap, syntax_sha256=frame('batch', 0, len(tokens)))
+                                  token_gap=gaps[gap], syntax_sha256=frame('batch', 0, len(tokens)))
 
 
 def parse(sql):
@@ -775,12 +850,15 @@ def parse(sql):
         ranges.append((start, len(tokens)))
     if not ranges:
         raise Unsupported('sql_missing_or_empty')
-    if hints:
-        _anchor_hints(hints, tokens, ranges)
-    result = []
+    result, folded_signs = [], set()
     for start, stop in ranges:
         group = tokens[start:stop]
         begin, end = group[0].start, group[-1].end
         local = [Token(t.raw, t.name, t.start - begin, t.end - begin) for t in group]
-        result.append(statement(sql[begin:end], local))
+        signs = set() if hints and any(t.word == '-' for t in group) else None
+        result.append(statement(sql[begin:end], local, signs))
+        if signs:
+            folded_signs.update(begin + offset for offset in signs)
+    if hints:
+        _anchor_hints(hints, tokens, ranges, folded_signs)
     return {'version': VERSION, 'statements': result, 'hints': hints}

@@ -5,7 +5,7 @@ status: active
 owners:
   - .project-wiki/contracts/offline-data-contract.md
   - docs/design/offline-data-contract/
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/3
     status: current
@@ -127,6 +127,8 @@ SqlText 按完整、可可靠取得的源 SQL 精确内容复用，不去空白�
 无法可靠获得完整 SQL 时 `sql_id=null`，残片只保留在来源证据中；不得用空文本、
 原文摘要或部分可解析子句补造完整 SQL。原始占位参数保持原样，不恢复 DETAIL 实参。
 原文和明细不因每版构建而复制，沿用[存储契约](sql-storage.md)。
+2026-09-27 确认的[近似观察](sql-fingerprints.md#已确认的观察用近似指纹)可引用这些来源
+证据及其中残片，但不能强制创建完整 SqlText，也不再尝试补取完整 SQL。
 
 ### C05：计时、状态与关联证据
 
@@ -154,6 +156,13 @@ Normalization 固定算法／解析能力版本及函数字典的规则版本和
 摘要语义与现有字典工具的 `sha256` 一致，不把文件字节 SHA 当作该摘要。
 Fingerprint 针对 `(sql_id, normalization_id, profile)` 返回可靠结果或带原因的失败。
 未知函数按 #1 已交付的保守规则处理，不自动等于指纹失败；无法可靠生成结构时不训练。
+
+2026-09-27 用户确认增加独立的观察用近似结果。其类型、规则版本、原文／证据引用、
+不完整／不确定标记及结构失败原因与可靠结果分开；不能填入正常 Fingerprint.value
+或形成正常 Group，不改变上述结构失败语义。观察结果不参与正常基线训练及自动异常
+判断，不计入有效训练样本；字段接口由 Issue #9 落实，持久化及统计由后续程序扩展。
+本次是契约增补，不表示原有 v1 样例、校验器或数据库已实现近似能力；完整边界由
+[指纹主题](sql-fingerprints.md#已确认的观察用近似指纹)维护。
 
 HashData Group 的逻辑键仍为
 `cluster_id + database + execution_user + fingerprint_value + timing_type`。

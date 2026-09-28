@@ -1,0 +1,1109 @@
+{
+  "algorithm_version": "sql-approximate/1",
+  "approximate_groups": 7762,
+  "baseline_sha256": "1608799d75685ee284f9b768af44819a8d82f89488cc814dce1b1d50e865d842",
+  "changes": [],
+  "comparisons": {
+    "original_refusal_preserved": 8909,
+    "recovered_structure_unchanged": 384
+  },
+  "completed": 9293,
+  "examples": {
+    "base_parser_rejected": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 479,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 49857,
+          "line_start": 49769,
+          "record": 3747
+        },
+        "previous_reason": "base_parser_rejected",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": null,
+          "categories": [
+            "INSERT"
+          ],
+          "fingerprint": "approx:sql-approximate/1:3b6f08b0297b743139f38ef1cb439403fe4d542fc3e0f896ea0bd95a713bef1a",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "base_parser_rejected",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "94480daeeba03fc6f84024a3ed84ad921e8599f402795e8a4d4fe4621917bc86",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "94480daeeba03fc6f84024a3ed84ad921e8599f402795e8a4d4fe4621917bc86"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 5069,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 677176,
+          "line_start": 677124,
+          "record": 53363
+        },
+        "previous_reason": "base_parser_rejected",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": null,
+          "categories": [
+            "WITH"
+          ],
+          "fingerprint": "approx:sql-approximate/1:7b87de9e89add5184f3aa2d85d525d26483eb02e9ce3065ed0f6318145f4da76",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "base_parser_rejected",
+          "parser_state": "unsupported",
+          "replacements": 7,
+          "source_preserved": true,
+          "source_sha256": "8ad9b5097dde2c60e2c361565effe5bc57db567f062940b7b1962b44697e8cf4",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "8ad9b5097dde2c60e2c361565effe5bc57db567f062940b7b1962b44697e8cf4"
+      }
+    ],
+    "invalid_encoding": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 1168,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 148857,
+          "line_start": 148826,
+          "record": 9223
+        },
+        "previous_reason": "invalid_encoding",
+        "result": {
+          "approximate_diagnostics": [
+            "invalid_encoding_or_nul",
+            "unclosed_bracket"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:b497c29ad175f659265362856bd1d534e323dcf88aa08eb4bbd49f2f535fc43a",
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "observation_only": true,
+          "parser_reason": "invalid_encoding",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "62eb39a8faf7d467ac14af6c9d1d1c85bad0906c8702a129c31c95710646ebef",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "62eb39a8faf7d467ac14af6c9d1d1c85bad0906c8702a129c31c95710646ebef"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 287910,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 1088899,
+          "line_start": 1088877,
+          "record": 49518
+        },
+        "previous_reason": "invalid_encoding",
+        "result": {
+          "approximate_diagnostics": [
+            "invalid_encoding_or_nul"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:17f1ae4a28f8a1edcac9cd4d8401d016d7eb998964993f1d28d853a131e35458",
+          "lexical_issues": [
+            "invalid_encoding_or_nul"
+          ],
+          "observation_only": true,
+          "parser_reason": "invalid_encoding",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "6eeeedff78a089858f596e4a92c5436068da6b2d1b1e81cdc917f0137bc8ae8a",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "6eeeedff78a089858f596e4a92c5436068da6b2d1b1e81cdc917f0137bc8ae8a"
+      }
+    ],
+    "lexical_ambiguous_string_escape": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 5942,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 780840,
+          "line_start": 780832,
+          "record": 64256
+        },
+        "previous_reason": "lexical_ambiguous_string_escape",
+        "result": {
+          "approximate_diagnostics": [
+            "ambiguous_string_escape"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:3bdc2f1b399034575c2903adf0794839f5056b1e656e181652144d691789532b",
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_ambiguous_string_escape",
+          "parser_state": "unsupported",
+          "replacements": 1,
+          "source_preserved": true,
+          "source_sha256": "ded65cef8bd3b330c3885e90a46b1ea915025ff670583cee7bd5fb1ae4b860b3",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "ded65cef8bd3b330c3885e90a46b1ea915025ff670583cee7bd5fb1ae4b860b3"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 13308,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-04_000000.csv",
+          "line_end": 708328,
+          "line_start": 708320,
+          "record": 57796
+        },
+        "previous_reason": "lexical_ambiguous_string_escape",
+        "result": {
+          "approximate_diagnostics": [
+            "ambiguous_string_escape"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:b3ed7c99b8bd560281905508263701cfd0533513e622a574d1b361f90ec071c9",
+          "lexical_issues": [
+            "ambiguous_string_escape"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_ambiguous_string_escape",
+          "parser_state": "unsupported",
+          "replacements": 1,
+          "source_preserved": true,
+          "source_sha256": "dc24c21e58bbd3202d81b9c69a8d824b2cf51793c416f3e27aa884bb7dcb75a9",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "dc24c21e58bbd3202d81b9c69a8d824b2cf51793c416f3e27aa884bb7dcb75a9"
+      }
+    ],
+    "lexical_unbalanced_bracket": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 1717,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 204850,
+          "line_start": 204820,
+          "record": 13854
+        },
+        "previous_reason": "lexical_unbalanced_bracket",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_bracket"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:830c85131ea8438380cade488e218b9a3c0543427fe41155a72cc1f183ac1719",
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unbalanced_bracket",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "250a2891a2c7f9f756f38749f6cefd5ec8c61b86de39218aec7034edad90270b",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "250a2891a2c7f9f756f38749f6cefd5ec8c61b86de39218aec7034edad90270b"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 2011,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 238247,
+          "line_start": 238169,
+          "record": 18207
+        },
+        "previous_reason": "lexical_unbalanced_bracket",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_bracket"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:d00ae38fef903e1cac896d26f6285b7149f9eb4c9849fd10c10ed17165ab2e05",
+          "lexical_issues": [
+            "unbalanced_bracket"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unbalanced_bracket",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "8df8e668f63efbfa933d0b5a7879ee932de1b4f40bdc5603331620d227276095",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "8df8e668f63efbfa933d0b5a7879ee932de1b4f40bdc5603331620d227276095"
+      }
+    ],
+    "lexical_unclosed_comment": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 5406,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 732372,
+          "line_start": 732352,
+          "record": 57340
+        },
+        "previous_reason": "lexical_unclosed_comment",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_bracket",
+            "unclosed_comment"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:bbe12a645cd3ae53d599fefcba2fb46570e264b2382dbf7c3092dea28e4bd66c",
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unclosed_comment",
+          "parser_state": "unsupported",
+          "replacements": 16,
+          "source_preserved": true,
+          "source_sha256": "aed6af2f6e4654db6fce5f9875364794d050445e091d1c1e0b70a8de1c4f6cb2",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "aed6af2f6e4654db6fce5f9875364794d050445e091d1c1e0b70a8de1c4f6cb2"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 5646,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 760809,
+          "line_start": 760739,
+          "record": 62042
+        },
+        "previous_reason": "lexical_unclosed_comment",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_comment"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:bd84eb65362ea4a42087bc6e8f80abfe7d1dfe57abfaf820c562b286b6e48000",
+          "lexical_issues": [
+            "unclosed_comment"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unclosed_comment",
+          "parser_state": "unsupported",
+          "replacements": 4,
+          "source_preserved": true,
+          "source_sha256": "f1ef742747f65b86f602172c405a08d14a237791975c8c1c81e705040184f45a",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "f1ef742747f65b86f602172c405a08d14a237791975c8c1c81e705040184f45a"
+      }
+    ],
+    "lexical_unclosed_string": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 2425,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 275583,
+          "line_start": 275501,
+          "record": 27652
+        },
+        "previous_reason": "lexical_unclosed_string",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_bracket",
+            "unclosed_string"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:68b8bdf396d2a4e3cea89411e6977c2699be654f3f3b11dabae3cf46ca0190a5",
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unclosed_string",
+          "parser_state": "unsupported",
+          "replacements": 4,
+          "source_preserved": true,
+          "source_sha256": "965dd9370a3ca6f62a4e93e968c0ae4d7975c64ed6691986acd2477c39404501",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "965dd9370a3ca6f62a4e93e968c0ae4d7975c64ed6691986acd2477c39404501"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 4800,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 651082,
+          "line_start": 651018,
+          "record": 49400
+        },
+        "previous_reason": "lexical_unclosed_string",
+        "result": {
+          "approximate_diagnostics": [
+            "unclosed_bracket",
+            "unclosed_string"
+          ],
+          "approximate_reason": null,
+          "categories": [],
+          "fingerprint": "approx:sql-approximate/1:98183db18f43d4606dfab0e9444e1169549b82f5722cb7e44270fb53b8f0cf9b",
+          "lexical_issues": [
+            "unclosed_string"
+          ],
+          "observation_only": true,
+          "parser_reason": "lexical_unclosed_string",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "779148f1024647e61d798f69e6d390b394229a14711c8c80843e5f427aedefc6",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "779148f1024647e61d798f69e6d390b394229a14711c8c80843e5f427aedefc6"
+      }
+    ],
+    "prototype_parsed": [
+      {
+        "comparison": "recovered_structure_unchanged",
+        "input_id": 3050,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 340942,
+          "line_start": 340940,
+          "record": 32996
+        },
+        "previous_reason": "prototype_parsed",
+        "result": {
+          "approximate_absent": true,
+          "categories": [
+            "ALTER TABLE"
+          ],
+          "comparison_digest": "279734b11d2590aa3e19cebb176f809306784254a9cc73f060820d494b2c2cb7",
+          "lexical_issues": [],
+          "parser_reason": null,
+          "parser_state": "parsed",
+          "state": "prototype_parsed"
+        },
+        "sql_sha256": "5d8be742c596b258f0d67b0cbb654f830875ccb6764d1a0790e3c738cb042f71"
+      },
+      {
+        "comparison": "recovered_structure_unchanged",
+        "input_id": 3733,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 494815,
+          "line_start": 494815,
+          "record": 38070
+        },
+        "previous_reason": "prototype_parsed",
+        "result": {
+          "approximate_absent": true,
+          "categories": [
+            "COPY"
+          ],
+          "comparison_digest": "811b6ff38d41f93041b6bd8ae2ea35cff83f47776a6b045441fd9f6ca2cb131d",
+          "lexical_issues": [],
+          "parser_reason": null,
+          "parser_state": "parsed",
+          "state": "prototype_parsed"
+        },
+        "sql_sha256": "ff43bb8635c846703d706a19776c2b250790b599e0c7db73dd80da786c4fba0c"
+      }
+    ],
+    "scanner_rejected": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 322179,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 3195701,
+          "line_start": 3195375,
+          "record": 268551
+        },
+        "previous_reason": "scanner_rejected",
+        "result": {
+          "approximate_diagnostics": [
+            "ambiguous_numeric_boundary",
+            "unclosed_bracket"
+          ],
+          "approximate_reason": null,
+          "categories": [
+            "SELECT"
+          ],
+          "fingerprint": "approx:sql-approximate/1:07a5dc27d6395d016ad783f2e8f30b4732c22dd48fa649277996ccaf9590d484",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "scanner_rejected",
+          "parser_state": "unsupported",
+          "replacements": 1,
+          "source_preserved": true,
+          "source_sha256": "826709718e08494182ceec1b8eaa47590257ef6857d612b9fa4e6704db36c724",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "826709718e08494182ceec1b8eaa47590257ef6857d612b9fa4e6704db36c724"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 324254,
+        "locator": {
+          "cluster": "120",
+          "field": "sql",
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "line_end": 3259994,
+          "line_start": 3259668,
+          "record": 276724
+        },
+        "previous_reason": "scanner_rejected",
+        "result": {
+          "approximate_diagnostics": [
+            "ambiguous_numeric_boundary",
+            "unclosed_bracket"
+          ],
+          "approximate_reason": null,
+          "categories": [
+            "SELECT"
+          ],
+          "fingerprint": "approx:sql-approximate/1:43d5ec7cdf8ade7b7cd2cc244d083b0b2d250fc0a37495fe4cbd77e4c4d1e183",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "scanner_rejected",
+          "parser_state": "unsupported",
+          "replacements": 1,
+          "source_preserved": true,
+          "source_sha256": "c75394ad432af6246622050bbc2e27cae42b7928b6e77cebd2e8236f0a70b26d",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "c75394ad432af6246622050bbc2e27cae42b7928b6e77cebd2e8236f0a70b26d"
+      }
+    ],
+    "sql_missing_or_empty": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 42,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 599,
+          "line_start": 599,
+          "record": 140
+        },
+        "previous_reason": "sql_missing_or_empty",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": "no_sql_tokens",
+          "categories": [],
+          "fingerprint": null,
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "sql_missing_or_empty",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "41b805ea7ac014e23556e98bb374702a08344268f92489a02f0880849394a1e4",
+          "state": "approximate_unavailable",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "41b805ea7ac014e23556e98bb374702a08344268f92489a02f0880849394a1e4"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 3503,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-01_000000.csv",
+          "line_end": 437745,
+          "line_start": 436367,
+          "record": 36118
+        },
+        "previous_reason": "sql_missing_or_empty",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": "no_sql_tokens",
+          "categories": [],
+          "fingerprint": null,
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "sql_missing_or_empty",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "b0b65d82b847c5cb9f58f8d841aef2fe424befe06a7f612ea8c56ecbf8b6190f",
+          "state": "approximate_unavailable",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "b0b65d82b847c5cb9f58f8d841aef2fe424befe06a7f612ea8c56ecbf8b6190f"
+      }
+    ],
+    "unsupported_distribution_statement": [
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 222094,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-27_000000.csv",
+          "line_end": 2217886,
+          "line_start": 2217484,
+          "record": 164715
+        },
+        "previous_reason": "unsupported_distribution_statement",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": null,
+          "categories": [
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT"
+          ],
+          "fingerprint": "approx:sql-approximate/1:f26fcd638e6aff979d6661a3a37fb34410ff446372dfc58cc3fd0dcdbf6622ab",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "unsupported_distribution_statement",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "bc1be4364f89335fc5963453ad99e039aa510963db4535abad00d07f04836714",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "bc1be4364f89335fc5963453ad99e039aa510963db4535abad00d07f04836714"
+      },
+      {
+        "comparison": "original_refusal_preserved",
+        "input_id": 222095,
+        "locator": {
+          "cluster": "119",
+          "field": "sql",
+          "file": "gpdb-2026-07-27_000000.csv",
+          "line_end": 2218340,
+          "line_start": 2217938,
+          "record": 164725
+        },
+        "previous_reason": "unsupported_distribution_statement",
+        "result": {
+          "approximate_diagnostics": [],
+          "approximate_reason": null,
+          "categories": [
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "CREATE TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "DROP TABLE",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "COMMENT",
+            "GRANT",
+            "GRANT",
+            "GRANT",
+            "GRANT"
+          ],
+          "fingerprint": "approx:sql-approximate/1:46df6386ed1574e6a50de1f3576c0b32a65db32a0a88e85ff71d6c512423054c",
+          "lexical_issues": [],
+          "observation_only": true,
+          "parser_reason": "unsupported_distribution_statement",
+          "parser_state": "unsupported",
+          "replacements": 0,
+          "source_preserved": true,
+          "source_sha256": "52b06e34baf9b7f7bdd1e5c0b31394f37c2576dce13503278c5689be07888ee4",
+          "state": "approximate_available",
+          "structure_fingerprint_absent": true
+        },
+        "sql_sha256": "52b06e34baf9b7f7bdd1e5c0b31394f37c2576dce13503278c5689be07888ee4"
+      }
+    ]
+  },
+  "groups_with_multiple_inputs": 124,
+  "limits": {
+    "input_bytes": 524288,
+    "timeout_seconds": 5,
+    "worker_address_space_bytes": 536870912
+  },
+  "occurrences": {
+    "approximate_available": 36717,
+    "approximate_unavailable": 121076,
+    "prototype_parsed": 2190
+  },
+  "previous_results_sha256": "8402e6cf669485589fd0d26c0c0fbbd8749298a6c6495ac5f3cd5eb23f47deee",
+  "purpose": "Observation-only approximate replay of all original failures; no SQL execution or baseline statistics",
+  "reasons": {
+    "base_parser_rejected": {
+      "occurrences": 2130,
+      "replacement_inputs": 228,
+      "results": {
+        "approximate_available": 1266,
+        "approximate_unavailable": 5
+      },
+      "total_replacements": 1286,
+      "unique_inputs": 1271
+    },
+    "invalid_encoding": {
+      "occurrences": 466,
+      "replacement_inputs": 49,
+      "results": {
+        "approximate_available": 99
+      },
+      "total_replacements": 723,
+      "unique_inputs": 99
+    },
+    "lexical_ambiguous_string_escape": {
+      "occurrences": 2578,
+      "replacement_inputs": 68,
+      "results": {
+        "approximate_available": 222
+      },
+      "total_replacements": 114,
+      "unique_inputs": 222
+    },
+    "lexical_unbalanced_bracket": {
+      "occurrences": 23844,
+      "replacement_inputs": 1488,
+      "results": {
+        "approximate_available": 5138
+      },
+      "total_replacements": 14430,
+      "unique_inputs": 5138
+    },
+    "lexical_unclosed_comment": {
+      "occurrences": 403,
+      "replacement_inputs": 58,
+      "results": {
+        "approximate_available": 87,
+        "approximate_unavailable": 22
+      },
+      "total_replacements": 580,
+      "unique_inputs": 109
+    },
+    "lexical_unclosed_string": {
+      "occurrences": 7080,
+      "replacement_inputs": 182,
+      "results": {
+        "approximate_available": 1895
+      },
+      "total_replacements": 105853,
+      "unique_inputs": 1895
+    },
+    "prototype_parsed": {
+      "occurrences": 2190,
+      "replacement_inputs": 0,
+      "results": {
+        "prototype_parsed": 384
+      },
+      "total_replacements": 0,
+      "unique_inputs": 384
+    },
+    "scanner_rejected": {
+      "occurrences": 298,
+      "replacement_inputs": 27,
+      "results": {
+        "approximate_available": 27,
+        "approximate_unavailable": 1
+      },
+      "total_replacements": 27,
+      "unique_inputs": 28
+    },
+    "sql_missing_or_empty": {
+      "occurrences": 120992,
+      "replacement_inputs": 0,
+      "results": {
+        "approximate_unavailable": 145
+      },
+      "total_replacements": 0,
+      "unique_inputs": 145
+    },
+    "unsupported_distribution_statement": {
+      "occurrences": 2,
+      "replacement_inputs": 0,
+      "results": {
+        "approximate_available": 2
+      },
+      "total_replacements": 0,
+      "unique_inputs": 2
+    }
+  },
+  "result_database_sha256": "4cd4c7fecab9cf756e5039d9c1c7ef638e7dffe1c630c26ee5f714093f3d8426",
+  "rules_digest": "715c713b409b7adb3673c1bd74c22dc0aae92d27b39308a150e0007bf38cba02",
+  "seconds": 12.223,
+  "selected_input_ids_and_hashes_sha256": "bf7d584157abe230e2261232d7556aae4754848cdf2136e923fccc94d43c8357",
+  "source_databases_unchanged": true,
+  "sources": {
+    "sql_apm/diagnostics/mpp_adapter_probe.py": "bc1f54b59ca6ebf9b0b7af5e536b7246cb9392386c917fac159cc3a3cde1af78",
+    "sql_apm/diagnostics/mpp_approximate_replay.py": "123b29859f5f489fce89d2bee95b81e2b17d49b4b94dbda6d568ab233f01dd87",
+    "sql_apm/diagnostics/mpp_full_scan.py": "f213a014d0de26de5bb2766c49a5e2d7f9979259eadecb57e05b553559b11c6f",
+    "sql_apm/sql/approximate.py": "2c9b0995b2c33f41be1e68f5437775eba51edaffd6cedcd2f84049bfd71de9ce",
+    "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+    "sql_apm/sql/mpp_parser.py": "8f2ed3e2592f2243ab69be392d731600c1a196cbec322150ac2208f3567e5590",
+    "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+    "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed"
+  },
+  "states": {
+    "approximate_available": 8736,
+    "approximate_unavailable": 173,
+    "prototype_parsed": 384
+  },
+  "workers": 4
+}

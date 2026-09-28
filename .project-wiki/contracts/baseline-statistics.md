@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/baseline-statistics.md
-updated: 2026-09-25
+updated: 2026-09-27
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -25,6 +25,10 @@ confidence: high
 整体、逐天、逐周、跨周星期、跨天小时五个统计层次保留主要指标；
 公式、NULL、零值统一，样本充分性按各层适用规则分别判断。
 实现聚合、统计公式、窗口或样本不足判断时阅读。
+
+2026-09-27 确认的[近似指纹观察](sql-fingerprints.md#已确认的观察用近似指纹)独立展示
+次数及有可靠依据的耗时分布，不计入本页正常基线的有效训练样本；达到数量门槛也
+不因此获得自动异常判断资格。近似统计与可靠结构统计不混合。
 
 ## Source Of Truth
 

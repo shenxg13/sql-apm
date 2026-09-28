@@ -359,9 +359,9 @@ SHA-256 全部匹配原清单。本次读到每个文件 EOF，扫描字节数�
 输出目录必须在输入目录之外；不会连接数据库或执行 SQL：
 
 ```bash
-.venv/bin/python scripts/diagnostics/statement_census.py --root raw/inbox/hashdata/119 --output /tmp/sql-apm-category-census/119
-.venv/bin/python scripts/diagnostics/statement_census.py --root raw/inbox/hashdata/120 --output /tmp/sql-apm-category-census/120
-.venv/bin/python scripts/diagnostics/statement_census.py --root raw/inbox/hashdata --output /tmp/sql-apm-category-replay --replay docs/reports/data/statement-census-2026-09-26.json
+.venv/bin/python -m sql_apm.diagnostics.statement_census --root raw/inbox/hashdata/119 --output /tmp/sql-apm-category-census/119
+.venv/bin/python -m sql_apm.diagnostics.statement_census --root raw/inbox/hashdata/120 --output /tmp/sql-apm-category-census/120
+.venv/bin/python -m sql_apm.diagnostics.statement_census --root raw/inbox/hashdata --output /tmp/sql-apm-category-replay --replay docs/reports/data/statement-census-2026-09-26.json
 .venv/bin/python -m unittest discover -s tests -v
 PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 ```

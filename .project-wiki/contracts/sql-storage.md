@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-09-25
+updated: 2026-09-27
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -55,6 +55,9 @@ confidence: high
 - 本条限定可靠原文的逻辑保存方式，不改写原始日志、不补造缺失或不完整 SQL，
   不改变执行／调用识别、历史展示及训练资格。无法可靠归属的日志问题仍按
   既有诊断规则处理，不因能存文本就进入基线。
+- 2026-09-27 确认的[近似观察](sql-fingerprints.md#已确认的观察用近似指纹)保留已记录
+  原文／字节与来源证据；不完整片段不冒充完整 SqlText，不再补取完整 SQL。
+  近似结果的持久化映射由后续程序落实，不改变本节完整原文精确去重语义。
 - 首期自动清理暂缓，原始 CSV 由人工管理，见下节；保留天数及后续清理与
   引用处理、压缩方式、具体去重实现和物理表结构继续待定。问题记录的存储
   留存也继续另行确定；30 天训练窗口不自动作为留存期限。

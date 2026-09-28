@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/training-eligibility.md
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - path: .project-wiki/log.md
     status: historical
@@ -227,6 +227,10 @@ confidence: high
 | 成功完成，耗时完整，能可靠识别为一次执行 | 进入训练候选集 |
 | 明确失败、取消或超时 | 不参与正常耗时基线训练 |
 | 状态不明、耗时缺失或执行关联不可靠 | 暂不参与训练 |
+
+2026-09-27 确认的[近似指纹观察](sql-fingerprints.md#已确认的观察用近似指纹)不改变
+本表：近似生成成功不恢复正常训练资格，不计入有效训练样本或用于自动异常判断；
+观察中保留失败／未知状态与计时依据，记录出现次数和可靠事件次数分别解释。
 
 进入候选集不等于最终用于训练。成功执行不能仅根据耗时长短直接认定为正常或异常。
 故障与维护时段的人工排除、成功长耗时执行的处理见下述已确认规则；疑似离群及

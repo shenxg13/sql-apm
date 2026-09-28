@@ -1,0 +1,5895 @@
+{
+  "cache_sha256": "3c1458647884e7057b98d2a01a3b0823f11c3fdd27f8e2ce2d07df956a95daf9",
+  "evidence_sha256": "77580f1ee63ae744f8f6141bfc0fb60dae754aeb36c6d58c01875d1b72abb0f2",
+  "files": [
+    {
+      "cluster": "119",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "file_bytes": 147939173,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "237b8fe5a5eac889d7f765a23cf571dc7cd8ed9525c12d2a22ecaa0c0d6748c9",
+      "read_prefix_bytes": 82862080,
+      "read_prefix_sha256": "27496cf2a47538917308edbb281661345ea2bbf711bf1bedb56624102a52c956",
+      "stat_unchanged": true,
+      "stop_record": 92832
+    },
+    {
+      "cluster": "119",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "file_bytes": 116179145,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "3cdf4c040cb5b8d4314ae85139491f35da2ae1e6321dc9f674d5fa6c87328970",
+      "read_prefix_bytes": 113795072,
+      "read_prefix_sha256": "8f38667b627e3699fe8e45d11521b777db800095ce6555e894d7d87a436fa0a8",
+      "stat_unchanged": true,
+      "stop_record": 183874
+    },
+    {
+      "cluster": "119",
+      "file": "gpdb-2026-07-08_000000.csv",
+      "file_bytes": 167933596,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "a8351e2f48568318147d430da6ee051d3505dd71818f3a6f257d35180ae65041",
+      "read_prefix_bytes": 145170432,
+      "read_prefix_sha256": "f34f82bfde01c1d1b91ec46f6fbc6f84df3cba79e9d2aea1bda9bb9c68c6c8f8",
+      "stat_unchanged": true,
+      "stop_record": 163686
+    },
+    {
+      "cluster": "119",
+      "file": "gpdb-2026-07-16_000000.csv",
+      "file_bytes": 153670772,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "0c8262bc96dd52491427e71fcb136323e374ad95a093ff2acd13b8687071738d",
+      "read_prefix_bytes": 133677056,
+      "read_prefix_sha256": "d5f1d5a553c748002ea996a6ff8a4fc30eeffc933c48495a44415415b1e424a4",
+      "stat_unchanged": true,
+      "stop_record": 166752
+    },
+    {
+      "cluster": "119",
+      "file": "gpdb-2026-07-22_000000.csv",
+      "file_bytes": 164437354,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "d59bd5eb4b21676d9c7f4b36a3c47747a82a3e768624284182dc789105eb5558",
+      "read_prefix_bytes": 131653632,
+      "read_prefix_sha256": "fb9c5e3736cc18d73e63793714396c3f9b87dca2951e3fa69de7778bc8ae3dd1",
+      "stat_unchanged": true,
+      "stop_record": 162330
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-16_000000.csv",
+      "file_bytes": 124666079,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "4951fe869607d30300a769d32480d647b4dd13780a9c914f1338f6376ac1c560",
+      "read_prefix_bytes": 22806528,
+      "read_prefix_sha256": "3f07fb5186fc11cb1e93a4857fac4ad6582f6caa70c0fd3e803774ec93d0e448",
+      "stat_unchanged": true,
+      "stop_record": 30740
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "file_bytes": 529475791,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "7637211ed5d2a85952a6d8b77efbb370d53e3a3ccc94ada577678c8f29eb20db",
+      "read_prefix_bytes": 512344064,
+      "read_prefix_sha256": "81572af00749d972215afbb92071b1c4090f7b732138832ebf7aed2c193e5b4e",
+      "stat_unchanged": true,
+      "stop_record": 645854
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-16_000000.csv.2",
+      "file_bytes": 526755139,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "8210741a0a6c174e4daef192a748f0f35cf2a29dc0abc9f1dcc72a55ef285f25",
+      "read_prefix_bytes": 85426176,
+      "read_prefix_sha256": "428abb28e40e669e6f36a5a5b24889016d82d689ef444fda758243eca5487dcd",
+      "stat_unchanged": true,
+      "stop_record": 7877
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "file_bytes": 528150833,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "91285a731f21cca24e3634be3eecaf8c915dbb310473ac067742f499f76c5603",
+      "read_prefix_bytes": 385409024,
+      "read_prefix_sha256": "e9a50433058d000f04406c4e34841b6f67af421dd42b129527ea48ec117356de",
+      "stat_unchanged": true,
+      "stop_record": 476242
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-17_000000.csv",
+      "file_bytes": 373615414,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "0f3de2f89abe906fea23f849390ea55279f9af299020a46575894a1b7ba2d1e6",
+      "read_prefix_bytes": 102170624,
+      "read_prefix_sha256": "4890405106d738951e1498b236a8967d71681fa0a729240848ba044c0ea09873",
+      "stat_unchanged": true,
+      "stop_record": 137157
+    },
+    {
+      "cluster": "120",
+      "file": "gpdb-2026-09-17_000000.csv.1",
+      "file_bytes": 524732770,
+      "full_file_hash_rechecked": false,
+      "historical_file_sha256": "890505ac82d6b1b6cf21ca756796d4f463e53735c741146377b8dfec6f84ddc6",
+      "read_prefix_bytes": 375439360,
+      "read_prefix_sha256": "46b4572b5ddc20a44d523b1ad24b98a6c9b857c0e4924975897fc140fb62f45c",
+      "stat_unchanged": true,
+      "stop_record": 441603
+    }
+  ],
+  "fixture_sha256": "17c8de7eb9796bba6c48d5210222c93fb598a1d738f89af8a6e0c8243ddb2d35",
+  "fresh_process": [
+    {
+      "case": "distributed",
+      "same": true
+    },
+    {
+      "case": "external_options",
+      "same": true
+    },
+    {
+      "case": "web_external",
+      "same": true
+    },
+    {
+      "case": "hint_unicode",
+      "same": true
+    }
+  ],
+  "limits": {
+    "max_sql_bytes": 524288,
+    "timeout_seconds": 5
+  },
+  "pglast": "7.18",
+  "prototype_version": "mpp-adapter-probe/1",
+  "purpose": "MPP adaptation proof of concept, no normalization or reliable fingerprints",
+  "python": "3.9.5",
+  "reasons": {
+    "base_parser_rejected": 1,
+    "invalid_encoding": 3,
+    "lexical_ambiguous_string_escape": 3,
+    "lexical_unbalanced_bracket": 4,
+    "lexical_unclosed_comment": 2,
+    "lexical_unclosed_string": 3,
+    "prototype_parsed": 124
+  },
+  "records": [
+    {
+      "categories": [
+        "SET"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3,
+      "line_start": 3,
+      "origin": "postgres.c:1685",
+      "record": 3,
+      "result": {
+        "comparison_digest": "aac56c4a55cbe5a8846aba23ff37af47b606f4b205eccc59af94cc146ce7668e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "8c0c26edd491cd878ef2929aecf29203b40ca1dbbe2afbd73d775b3d0ea971b8",
+      "tags": [
+        "sql/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 6,
+      "line_start": 6,
+      "origin": "postgres.c:1685",
+      "record": 6,
+      "result": {
+        "comparison_digest": "b97d186b39fd876d711c0b6e75d71f582312f97b09d6c26731b247a56915f00e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6ac23da89592ce2242593dcd70b08d072a53f223cbf1319aa0d9b3ceea2422b3",
+      "tags": [
+        "sql/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 14,
+      "line_start": 14,
+      "origin": "postgres.c:1685",
+      "record": 14,
+      "result": {
+        "comparison_digest": "744530654223f7ed4348b14931ae028fb3c4da18ec95c1add48625dd180e3b3b",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "ca483a67591a61ae704cf5506fcfe5d3764dde9a32851d3c6442aae10f8087d2",
+      "tags": [
+        "sql/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 51,
+      "line_start": 15,
+      "origin": "postgres.c:1685",
+      "record": 15,
+      "result": {
+        "comparison_digest": "f498ca5b43133e70e75e5b51604d9fa3cae273eec1857b58d40a91c77aea5cfc",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "29c988ece95c1e69035f2495d9614b1dd8992b168e793b3e4ceed243076a1ef5",
+      "tags": [
+        "sql/category:WITH"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 57,
+      "line_start": 57,
+      "origin": "postgres.c:1685",
+      "record": 21,
+      "result": {
+        "comparison_digest": "3f616538fe32d7abefc3f1f2b4aba63371fe15bd3b29d24070b57b8d3f753c25",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "a5d3ad5cba644e88c7fcddb113487793bf2c75150522e1b8cf5abb99b82c8b61",
+      "tags": [
+        "inline_distinct/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "INSERT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 97,
+      "line_start": 97,
+      "origin": "postgres.c:1685",
+      "record": 43,
+      "result": {
+        "comparison_digest": "10517ea632367660d085c8b9be19601c720575d8c48c3571f3c9abdd7e4042ba",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "bcd27e73a27bd2df2fc9303c2933851820f4b214cdfa607acb62f72c09e13353",
+      "tags": [
+        "sql/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 110,
+      "line_start": 110,
+      "origin": "postgres.c:1685",
+      "record": 56,
+      "result": {
+        "comparison_digest": "fa004ac06b664d24b4baf61301008858c8fcdbe42f7eee83d41771a1350625e2",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "edd65695b320db381bb184e32a5dfcc16b4d4c822f560f090224bb840c63958b",
+      "tags": [
+        "sql/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "SHOW"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 138,
+      "line_start": 138,
+      "origin": "postgres.c:2219",
+      "record": 84,
+      "result": {
+        "comparison_digest": "c53034bfaf94f90f3e91f1b648045ba1ae749650ea13100c47177b9b85d6e82d",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableShowStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "796e4e765b73e39b59f72474cc26fce679354ccabe0e3fb587e94af61c8f1d1d",
+      "tags": [
+        "sql/category:SHOW"
+      ]
+    },
+    {
+      "categories": [
+        "COMMIT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 162,
+      "line_start": 162,
+      "origin": "postgres.c:1685",
+      "record": 108,
+      "result": {
+        "comparison_digest": "34ffd91331724ff66077d746c559175c835c03cc5b5322defd3db65ffe346f02",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "364647c86405c505850634a548a540e7738f7690d7e5f7d744edf0ba1dbbc575",
+      "tags": [
+        "sql/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DEALLOCATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 175,
+      "line_start": 175,
+      "origin": "postgres.c:1685",
+      "record": 121,
+      "result": {
+        "comparison_digest": "17fc2639c391bc18456f735c3eb4699919e38eb873cae3c25a4db0ea21ff2456",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeallocateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "60382568e31c80b9b37a63f0fbb7fde6ca2e1285cc7ad96deaa2ad448a629e54",
+      "tags": [
+        "sql/category:DEALLOCATE"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SELECT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 431,
+      "line_start": 203,
+      "origin": "postgres.c:1685",
+      "record": 134,
+      "result": {
+        "comparison_digest": "7fe333e8fedda608f528f5e8b4e1f3208585122da1f1d4100a97effc5eab4015",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "fa4c5cfe2ef78bdcbefb70190d1acdfd1e0d4b3757ec266063333638afbe1c0e",
+      "tags": [
+        "inline_distinct/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE EXTERNAL"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 646,
+      "line_start": 646,
+      "origin": "postgres.c:1685",
+      "record": 162,
+      "result": {
+        "comparison_digest": "d091e3efcec918dbe0e0b421fb0ffe9e2393f1b053cf7667ff9cc306fb995927",
+        "extensions": {
+          "external_create": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "bee22d528bf56b9e78a4962305e03eb50c98278620ec9c7436aaf53ae15d0fe0",
+      "tags": [
+        "sql/category:CREATE EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "COPY"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1871,
+      "line_start": 1871,
+      "origin": "postgres.c:1685",
+      "record": 204,
+      "result": {
+        "comparison_digest": "b8d1f078c9bcbb2104c71ccc6888a25118d1296fb7aac4290595360060e17fd5",
+        "extensions": {
+          "copy_on_segment": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CopyStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "810f0985625d32ad6c6c969cd7f09f9116c07db9ed5f67ae840c4ae2ecd56f9c",
+      "tags": [
+        "sql/category:COPY"
+      ]
+    },
+    {
+      "categories": [
+        "TRUNCATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2281,
+      "line_start": 2281,
+      "origin": "postgres.c:1685",
+      "record": 234,
+      "result": {
+        "comparison_digest": "5a4c5a0110d8d0d6d6ff34fed070a6858cb8e213588fdb296b19c34fa80cbcc6",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TruncateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "f03766ee3a9fa2fbb19133c933161be05978f8b49e7532c90edabc9b635fd922",
+      "tags": [
+        "sql/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "SET TRANSACTION"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2349,
+      "line_start": 2349,
+      "origin": "postgres.c:1685",
+      "record": 277,
+      "result": {
+        "comparison_digest": "47020edd8b52b41156884723d46e8a7c9661d81c6604ead5dc3aecf95e71288e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "a2ed0cad371dca3dcff1b4bd9d46aceea5dbecab00b9a959e9a9931f5e5deda0",
+      "tags": [
+        "sql/category:SET TRANSACTION"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2352,
+      "line_start": 2352,
+      "origin": "postgres.c:1685",
+      "record": 280,
+      "result": {
+        "comparison_digest": "8f4f3553bce46fd8b8955ff1afaa4f6c349b3d6736aed8d6bb26dac5a07e49d0",
+        "extensions": {
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "870d819a91ead27ff34cffa41d7d9e28172ebd474a303dba4e1378b8ec8b5e23",
+      "tags": [
+        "sql/category:DROP EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2401,
+      "line_start": 2401,
+      "origin": "postgres.c:1685",
+      "record": 302,
+      "result": {
+        "comparison_digest": "166a89fe0b57ed87fff8fa4a55959532e0244216af705af88a023122890bde11",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "3f12d6f40a5adcb764250af27236387fee40bbfe82696cb6788dee1afbf93049",
+      "tags": [
+        "sql/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3038,
+      "line_start": 2978,
+      "origin": "postgres.c:1685",
+      "record": 463,
+      "result": {
+        "comparison_digest": "e764f77a23d4411cc65c5b66cead0d66b3b635379ad433cbe283fae9e6859a59",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c8903c31c3605a6363f06d7af6ed5e09b0f637e6336bb6cc5b8593e1d2f95fc7",
+      "tags": [
+        "sql/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3201,
+      "line_start": 3201,
+      "origin": "postgres.c:1685",
+      "record": 479,
+      "result": {
+        "comparison_digest": "34ffd91331724ff66077d746c559175c835c03cc5b5322defd3db65ffe346f02",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4e3641a87137fea13b3f561e7c0c1c217b7ddb5826639d333bf1816959352091",
+      "tags": [
+        "sql/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "VACUUM"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 5462,
+      "line_start": 5462,
+      "origin": "postgres.c:1685",
+      "record": 853,
+      "result": {
+        "comparison_digest": "ab904dc4f2c6168947b9066abebb0ec836de0a7bdb0f8c93f262f5c53d4e86ee",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "dad51b605707e9f3852053353ccf347fa880389923ce6004e53579811d5b5a61",
+      "tags": [
+        "sql/category:VACUUM"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 13929,
+      "line_start": 13197,
+      "origin": "postgres.c:1685",
+      "record": 2515,
+      "result": {
+        "comparison_digest": "6d6bcb4fb8431519195def2261a174e315d18d838db825df6e966867f141b56b",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "3f3c4252b950675a3d932dbd96fe6f7eefaaf2d043ee915f02c2fd7992e1568c",
+      "tags": [
+        "inline_distinct/category:DELETE",
+        "inline_distinct/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "TRUNCATE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 18893,
+      "line_start": 18301,
+      "origin": "postgres.c:1685",
+      "record": 2565,
+      "result": {
+        "comparison_digest": "a06f2072898f5b9c032929d341afc58591d326d6608ce368ce8664229e1b6ef6",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "TruncateStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4248267d34a6e3b4e248c3aa4bfe71b1c1a5eb529849730cd8d61070d36a70f3",
+      "tags": [
+        "inline_distinct/category:BEGIN",
+        "inline_distinct/category:END",
+        "inline_distinct/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 24875,
+      "line_start": 24515,
+      "origin": "postgres.c:1685",
+      "record": 2666,
+      "result": {
+        "comparison_digest": "2c6a43c9622b5b9080e33af39fa49914eddf9e936f834d8fc3b486f43c73bca8",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e203fb3a468d841cd51e8c57fe85c08e3d610d9ba8e7525766efea11ed8fb854",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 24875,
+      "line_start": 24515,
+      "origin": "postgres.c:1685",
+      "record": 2666,
+      "result": {
+        "comparison_digest": "2c6a43c9622b5b9080e33af39fa49914eddf9e936f834d8fc3b486f43c73bca8",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b3a53ed1af6b702f7bb0bb19ff980d290cdd30a0e630bd189af988d39b6a2097",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "UPDATE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 36715,
+      "line_start": 36695,
+      "origin": "postgres.c:1685",
+      "record": 2924,
+      "result": {
+        "comparison_digest": "eebae057ff9e6b7a8553394e6c51cce5145805a38420972ccab041a1735ff917",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "UpdateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "acf4dbea7b59173fc6d35c5df29109148df6f038496b8baba31b556d2a673e57",
+      "tags": [
+        "sql/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 50151,
+      "line_start": 50149,
+      "origin": "postgres.c:1685",
+      "record": 3766,
+      "result": {
+        "comparison_digest": "bf91a3faa58a04ffa748281f6242582ff04f94e0e5972ed3d9d7eb1e9d4fd534",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "RenameStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4fcee1d24f9de92a6af0030c01ce59d587d099bb0cdcf2a6881c32a763b468b3",
+      "tags": [
+        "sql/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 55577,
+      "line_start": 54931,
+      "origin": "postgres.c:1685",
+      "record": 4248,
+      "result": {
+        "comparison_digest": "7d6efa466c26ddcaa79e54a64ef66d074e6334d7b9d7fba53124e11680c175e8",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "17763d2f064e46b796e6bc5aacd86a8a75b250a1df2ca25e91d71768625adc7b",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 55577,
+      "line_start": 54931,
+      "origin": "postgres.c:1685",
+      "record": 4248,
+      "result": {
+        "comparison_digest": "7d6efa466c26ddcaa79e54a64ef66d074e6334d7b9d7fba53124e11680c175e8",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "85f1abc45e024cb6737878bd060f189ed79279c624483fdb69ca3ad918f50527",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 62855,
+      "line_start": 62407,
+      "origin": "postgres.c:1685",
+      "record": 4831,
+      "result": {
+        "comparison_digest": "56b5f118541456ce47cff7ce7bf9e9e8af07ab075db239c3688e20e1468396f5",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "5db67bfa93444702c7d259db0b29d88fddd750875bcbf568355fb729a06de2b3",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > INSERT > INSERT > END",
+        "inline_distinct/category:CREATE TABLE",
+        "inline_distinct/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 62855,
+      "line_start": 62407,
+      "origin": "postgres.c:1685",
+      "record": 4831,
+      "result": {
+        "comparison_digest": "56b5f118541456ce47cff7ce7bf9e9e8af07ab075db239c3688e20e1468396f5",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6010aadf24f7903a925d9f674f115531418173a5a692cd6732d563fe63fa573b",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > INSERT > INSERT > END",
+        "sql/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 76493,
+      "line_start": 75203,
+      "origin": "postgres.c:1685",
+      "record": 5299,
+      "result": {
+        "comparison_digest": "737e27f3f5acb0cc811afd69d409561866e57c2a3fcf380c796b39700c44fc88",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "TruncateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6b550a665949b3f7a25a97e848ae3b5b79a1150dcff9c6cdfaa00818f20aa67c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > TRUNCATE > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 76493,
+      "line_start": 75203,
+      "origin": "postgres.c:1685",
+      "record": 5299,
+      "result": {
+        "comparison_digest": "737e27f3f5acb0cc811afd69d409561866e57c2a3fcf380c796b39700c44fc88",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "TruncateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4e0eabcb1eeb72ae75c922c6823a019aadc8542b1683e71548609fa5e2adf617",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > TRUNCATE > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 78037,
+      "line_start": 77141,
+      "origin": "postgres.c:1685",
+      "record": 5302,
+      "result": {
+        "comparison_digest": "a8d540d58fc9af8ee4fa95f7f8ba0c5d6be0bbd1ed0e3190f6e397b0f1ac3106",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "TruncateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "cc8483ceb9d3284f6cb8c569aa63296ad6fc7c3a7a59ba30993a7ac00259b6e4",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > TRUNCATE > INSERT > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "TRUNCATE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 78037,
+      "line_start": 77141,
+      "origin": "postgres.c:1685",
+      "record": 5302,
+      "result": {
+        "comparison_digest": "a8d540d58fc9af8ee4fa95f7f8ba0c5d6be0bbd1ed0e3190f6e397b0f1ac3106",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "TruncateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "45b1b79b116ada3dc13b705f8e52d9e5589e2b52ccbc86e75b4774a4f65ea381",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > TRUNCATE > INSERT > INSERT > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 123548,
+      "line_start": 122842,
+      "origin": "postgres.c:1685",
+      "record": 9037,
+      "result": {
+        "comparison_digest": "6b762b2f88ad5c698c392218080478061fcfaccb07a4324ecceaf1456ad65eae",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "551f5787951f517e5b4293a54fc8509abf574ff9c4bac7b1ad3f28f221d99a9e",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 123548,
+      "line_start": 122842,
+      "origin": "postgres.c:1685",
+      "record": 9037,
+      "result": {
+        "comparison_digest": "6b762b2f88ad5c698c392218080478061fcfaccb07a4324ecceaf1456ad65eae",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "84d60f4b3d308a0ced7e373c2367760299f4322aa1db6ae458b0bc95cc469b2c",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 125859,
+      "line_start": 123549,
+      "origin": "postgres.c:1685",
+      "record": 9038,
+      "result": {
+        "comparison_digest": "6fedf653818946252ecd1626315163c4b73d06a985abd8233bb9c7e16555c3ee",
+        "extensions": {
+          "distribution": 5
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DropStmt",
+          "DropStmt",
+          "DropStmt",
+          "DropStmt",
+          "DropStmt",
+          "CreateStmt",
+          "CreateStmt",
+          "CreateStmt",
+          "CreateStmt",
+          "CreateStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b8bfeeb9d86da78c0e469fd4071f145db63aba45538bf8049568c93d7136f96c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DROP TABLE > DROP TABLE > DROP TABLE > DROP TABLE > DROP TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 129558,
+      "line_start": 128098,
+      "origin": "postgres.c:1685",
+      "record": 9044,
+      "result": {
+        "comparison_digest": "b7dad79e88bb5a42ce7536d6a891aade6482eb48214de757983a2d4fa97d2394",
+        "extensions": {
+          "distribution": 7
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "7754546c287fb3685b757274b1a1fe01c2a0b793a4779f3f08db6bc510789f53",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 129558,
+      "line_start": 128098,
+      "origin": "postgres.c:1685",
+      "record": 9044,
+      "result": {
+        "comparison_digest": "b7dad79e88bb5a42ce7536d6a891aade6482eb48214de757983a2d4fa97d2394",
+        "extensions": {
+          "distribution": 7
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "dbd142d85bcba113b54965ae0eb34b3b1bf5f5e8136463cc7d3981e312a54c13",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 148857,
+      "line_start": 148826,
+      "origin": "postgres.c:1239",
+      "record": 9223,
+      "result": {
+        "reason": "invalid_encoding",
+        "state": "unsupported"
+      },
+      "sql_sha256": "62eb39a8faf7d467ac14af6c9d1d1c85bad0906c8702a129c31c95710646ebef",
+      "tags": [
+        "sql/issue:invalid_encoding_or_nul"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 204850,
+      "line_start": 204820,
+      "origin": "postgres.c:1239",
+      "record": 13854,
+      "result": {
+        "reason": "lexical_unbalanced_bracket",
+        "state": "unsupported"
+      },
+      "sql_sha256": "250a2891a2c7f9f756f38749f6cefd5ec8c61b86de39218aec7034edad90270b",
+      "tags": [
+        "sql/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 215467,
+      "line_start": 215205,
+      "origin": "postgres.c:1685",
+      "record": 15937,
+      "result": {
+        "comparison_digest": "75aa6cdaf9bb27ef046c9dcef318c5788c3974972f045d24919ab0bd8aea0a1e",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "DropStmt",
+          "DropStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "33040e1738110cfcfbddf52a92f53cb7b6e4b9c728050b1c8d97e0ec4efeb964",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 215467,
+      "line_start": 215205,
+      "origin": "postgres.c:1685",
+      "record": 15937,
+      "result": {
+        "comparison_digest": "75aa6cdaf9bb27ef046c9dcef318c5788c3974972f045d24919ab0bd8aea0a1e",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "DropStmt",
+          "DropStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "7942c430efad962f6a349546c012f4fe252b4d32f0770db9aad58f2391e81b45",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 218202,
+      "line_start": 217868,
+      "origin": "postgres.c:1685",
+      "record": 16253,
+      "result": {
+        "comparison_digest": "896af1eba9d6231a0d93b4e7052146283d602225468d8f1c1d5dde8e251673ce",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "DropStmt",
+          "DropStmt",
+          "DropStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "69f9ffa25e99c403039cf0381473bfb2657cb73624bef4b3383e27898b4fc249",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "INSERT",
+        "DROP TABLE",
+        "DROP TABLE",
+        "DROP TABLE",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 218202,
+      "line_start": 217868,
+      "origin": "postgres.c:1685",
+      "record": 16253,
+      "result": {
+        "comparison_digest": "896af1eba9d6231a0d93b4e7052146283d602225468d8f1c1d5dde8e251673ce",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DropStmt",
+          "CreateStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "DropStmt",
+          "DropStmt",
+          "DropStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c9c24d7a3cbd5248397f92300f851b48c776f11b2e93f1d1fcac2661c3f3e4fe",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > DROP TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 238247,
+      "line_start": 238169,
+      "origin": "postgres.c:1239",
+      "record": 18207,
+      "result": {
+        "reason": "lexical_unbalanced_bracket",
+        "state": "unsupported"
+      },
+      "sql_sha256": "3acd8657bf899a20b1db5847344f7104f948743b4336cc8a951dd56f2deaf01c",
+      "tags": [
+        "inline_distinct/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 275583,
+      "line_start": 275501,
+      "origin": "postgres.c:1239",
+      "record": 27652,
+      "result": {
+        "reason": "lexical_unclosed_string",
+        "state": "unsupported"
+      },
+      "sql_sha256": "965dd9370a3ca6f62a4e93e968c0ae4d7975c64ed6691986acd2477c39404501",
+      "tags": [
+        "sql/issue:unclosed_string"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 298888,
+      "line_start": 298712,
+      "origin": "postgres.c:1685",
+      "record": 29634,
+      "result": {
+        "comparison_digest": "18d9d4b4e9ae0666b9b3f4f25aa01cc557410a0b65b48c9567c2b4afa33e7904",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "0a436b8b7b47020222dc845ba481e00f9c521a88f4e8de4152f1d20a1f3f88ee",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DROP TABLE > CREATE TABLE > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DROP TABLE",
+        "CREATE TABLE",
+        "DELETE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 298888,
+      "line_start": 298712,
+      "origin": "postgres.c:1685",
+      "record": 29634,
+      "result": {
+        "comparison_digest": "18d9d4b4e9ae0666b9b3f4f25aa01cc557410a0b65b48c9567c2b4afa33e7904",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DropStmt",
+          "CreateTableAsStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "5d27e7d8bbe5fe9c36317224a3f3fc856d985b52ab53b573068f1f4041dc5592",
+      "tags": [
+        "sql/batch:BEGIN > DROP TABLE > CREATE TABLE > DELETE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "unclosed_comment"
+      ],
+      "line_end": 732372,
+      "line_start": 732352,
+      "origin": "postgres.c:1239",
+      "record": 57340,
+      "result": {
+        "reason": "lexical_unclosed_comment",
+        "state": "unsupported"
+      },
+      "sql_sha256": "aed6af2f6e4654db6fce5f9875364794d050445e091d1c1e0b70a8de1c4f6cb2",
+      "tags": [
+        "sql/issue:unclosed_comment"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": null,
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 780840,
+      "line_start": 780832,
+      "origin": "postgres.c:1685",
+      "record": 64256,
+      "result": {
+        "reason": "lexical_ambiguous_string_escape",
+        "state": "unsupported"
+      },
+      "sql_sha256": "ded65cef8bd3b330c3885e90a46b1ea915025ff670583cee7bd5fb1ae4b860b3",
+      "tags": [
+        "sql/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-01_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1162371,
+      "line_start": 1162371,
+      "origin": "postgres.c:2764",
+      "record": 92832,
+      "result": {
+        "comparison_digest": "da30efd46d8f479a38111a74906abfe4b705a9329ce1e8eca556a5ba48b85cb3",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "1a5f5d272b222e4493df3ef9392f030e57a49923940e0a49e033a47109765625",
+      "tags": [
+        "inline_distinct/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1080099,
+      "line_start": 1080001,
+      "origin": "postgres.c:1685",
+      "record": 139213,
+      "result": {
+        "comparison_digest": "ed7212ad551d1a6796c5c7a0b7db1e1e57702e0c6ea64309ff1344f0121ff8ee",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DoStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b7da4c88f722366c6ec2fc9f2b0a1728c862d7b3ac2b701e4a4e1e4d1df57e46",
+      "tags": [
+        "inline_distinct/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1080099,
+      "line_start": 1080001,
+      "origin": "postgres.c:1685",
+      "record": 139213,
+      "result": {
+        "comparison_digest": "ed7212ad551d1a6796c5c7a0b7db1e1e57702e0c6ea64309ff1344f0121ff8ee",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DoStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e4518944bbbb759d0e3fd02645158786071c0fc2186fe3da8d8927b89933071a",
+      "tags": [
+        "sql/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1127474,
+      "line_start": 1127188,
+      "origin": "postgres.c:1685",
+      "record": 167129,
+      "result": {
+        "comparison_digest": "c3c8c6be9c0f7c9f2c028406a56f94ce879a29e0f7673409ea0a751b56d8b5a2",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "8aa72b21e4096d7eba1a0220560befc3e0135accf9f3a39c3f7a4ae5c5576b0c",
+      "tags": [
+        "inline_distinct/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "INSERT",
+        "END"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1127474,
+      "line_start": 1127188,
+      "origin": "postgres.c:1685",
+      "record": 167129,
+      "result": {
+        "comparison_digest": "c3c8c6be9c0f7c9f2c028406a56f94ce879a29e0f7673409ea0a751b56d8b5a2",
+        "extensions": {
+          "distribution": 4
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "8b6fe699a8be80ebd10277bf14e2c97c770677c787dc812949fec349dc031cff",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > INSERT > END"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYSE"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1139462,
+      "line_start": 1139462,
+      "origin": "postgres.c:1685",
+      "record": 174641,
+      "result": {
+        "comparison_digest": "bcfff256e1c51812492b2bf5a3fbf992c99663f1433c784c389cf4839258ff30",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "61fb60639acfa2d00882446c8d385a0ea6b1499a497c5e98651e9bbc58157faf",
+      "tags": [
+        "sql/category:ANALYSE"
+      ]
+    },
+    {
+      "categories": [
+        "GRANT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-04_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1184756,
+      "line_start": 1184756,
+      "origin": "postgres.c:1685",
+      "record": 183874,
+      "result": {
+        "comparison_digest": "c1205908b1067b3a1ca7352e18a7b960dc2092f76444de830ae9e4053c502878",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "GrantStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b72b5258ffc16227e63bc11c4e469c62c291bbea36ae41cbe5be7ce90cfd350a",
+      "tags": [
+        "sql/category:GRANT"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE",
+        "COMMENT"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-08_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1727171,
+      "line_start": 1727167,
+      "origin": "postgres.c:1685",
+      "record": 163686,
+      "result": {
+        "comparison_digest": "05737eb76a49e24c3055a16f3374d3d53acdcf39481ba1e3f0f88eda29bbcad1",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "AlterTableStmt",
+          "CommentStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "57251f766fbafd21edcc732ad3398deb23d1cd33ee466986db539f79a4ca65c9",
+      "tags": [
+        "sql/batch:ALTER TABLE > COMMENT",
+        "sql/category:COMMENT"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "119",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-07-16_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1548018,
+      "line_start": 1547964,
+      "origin": "postgres.c:1685",
+      "record": 166752,
+      "result": {
+        "comparison_digest": "cd970bb0161b52aeae6f0e0fe9be17ade0af47a6664b9ff975726725a1cefd2f",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e82a4d30fdf1071b9ef3f0289458fce3f3b4eba37e981a73ab2169a7217933cc",
+      "tags": [
+        "inline_distinct/category:WITH"
+      ]
+    },
+    {
+      "categories": [
+        "UNKNOWN"
+      ],
+      "cluster": "119",
+      "field": "sql",
+      "file": "gpdb-2026-07-22_000000.csv",
+      "formatting_check": null,
+      "issues": [],
+      "line_end": 1547171,
+      "line_start": 1547171,
+      "origin": "OTHER",
+      "record": 162330,
+      "result": {
+        "reason": "base_parser_rejected",
+        "state": "unsupported"
+      },
+      "sql_sha256": "6b02d2fdec374dabb5e27ffca341eb02b95a394be34741e48eaffa90ac955267",
+      "tags": [
+        "sql/category:UNKNOWN"
+      ]
+    },
+    {
+      "categories": [
+        "DROP VIEW",
+        "CREATE VIEW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 273958,
+      "line_start": 273920,
+      "origin": "postgres.c:1685",
+      "record": 30740,
+      "result": {
+        "comparison_digest": "8d90300e71c283cc13266970fdd84885704472dc29f3dbc7c72abe34a98def67",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "ViewStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "41537f7119dad5afd2188b0d1175a9c80780dd4a12315ae11b4969a7f9d254a7",
+      "tags": [
+        "sql/category:DROP VIEW"
+      ]
+    },
+    {
+      "categories": [
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 18,
+      "line_start": 1,
+      "origin": "postgres.c:1946",
+      "record": 1,
+      "result": {
+        "comparison_digest": "e5a77a1f2af968d622dfc658b2dc78bfe158fe22c6e1a68eed059ca31e67a4c4",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "94128b94352702d0b7453066f7cdf39da331ab89207215090db54e2aac455c92",
+      "tags": [
+        "sql/category:INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYSE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 54,
+      "line_start": 54,
+      "origin": "varsup.c:79",
+      "record": 3,
+      "result": {
+        "comparison_digest": "04f1bf3e597839d1f10a8d235aaa8e3979c2d17570e49b42fac7b9c449b195e6",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e228c079cc28907cc572434a5117efe10d4cf61035448bb416a41b9a09ec00cd",
+      "tags": [
+        "sql/category:ANALYSE"
+      ]
+    },
+    {
+      "categories": [
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 258,
+      "line_start": 258,
+      "origin": "postgres.c:1685",
+      "record": 16,
+      "result": {
+        "comparison_digest": "34ffd91331724ff66077d746c559175c835c03cc5b5322defd3db65ffe346f02",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "364647c86405c505850634a548a540e7738f7690d7e5f7d744edf0ba1dbbc575",
+      "tags": [
+        "sql/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 974,
+      "line_start": 968,
+      "origin": "postgres.c:1946",
+      "record": 21,
+      "result": {
+        "comparison_digest": "422a37f4145d9adfcb1ff45c59dc40e5196b4d1cf1e6c2487594cf18f919e36c",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "dfc48a9c779b54a0f473c82ac286b4e6b9c2fdf206ae61e43e1cdf1450d19cf4",
+      "tags": [
+        "sql/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "DEALLOCATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1490,
+      "line_start": 1490,
+      "origin": "postgres.c:1685",
+      "record": 39,
+      "result": {
+        "comparison_digest": "a3b0cf0c54dbaad6b27a51a89debf6018f411474700de9524648ff47f43ce0fe",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeallocateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e2cce4f5d6c5b60fe1e78d18dec5f27cd12d53b334befd565ab88a0fd3f03a41",
+      "tags": [
+        "sql/category:DEALLOCATE"
+      ]
+    },
+    {
+      "categories": [
+        "SET"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2222,
+      "line_start": 2222,
+      "origin": "postgres.c:1685",
+      "record": 64,
+      "result": {
+        "comparison_digest": "9522a47cb25323f50ff233741c983e96f20a130acbd83044d39f9d3654611e3b",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b83e371db409372c3043a357f25cf434f78872c43ee84894dec0de16ebff537b",
+      "tags": [
+        "sql/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2225,
+      "line_start": 2225,
+      "origin": "postgres.c:1685",
+      "record": 67,
+      "result": {
+        "comparison_digest": "fa004ac06b664d24b4baf61301008858c8fcdbe42f7eee83d41771a1350625e2",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e6f07d43b5c21db0fbb9a31feac2dc599787763393dd5acbfad80e247eb02ad5",
+      "tags": [
+        "sql/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "LOCK"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2227,
+      "line_start": 2227,
+      "origin": "postgres.c:1685",
+      "record": 69,
+      "result": {
+        "comparison_digest": "ab03c74bb368a8764876921fed25d344df4701388f6e5f7753a8f8f9a5418417",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "LockStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "af8cdcd60b16dff18a61d1f53edb2f55a7d2111434c904206889828a378eb094",
+      "tags": [
+        "sql/category:LOCK"
+      ]
+    },
+    {
+      "categories": [
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2249,
+      "line_start": 2247,
+      "origin": "postgres.c:2219",
+      "record": 72,
+      "result": {
+        "comparison_digest": "6910597f612a06f358e0d5f6ec0bd765ed6f45509dc9280173c137da44d0cbc3",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "UpdateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c5ff3bcb8b0b10cd0c6e09e03de7acc95657ceb97a2f2ba7779bb9638a1eff9a",
+      "tags": [
+        "sql/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2357,
+      "line_start": 2357,
+      "origin": "postgres.c:1685",
+      "record": 86,
+      "result": {
+        "comparison_digest": "34ffd91331724ff66077d746c559175c835c03cc5b5322defd3db65ffe346f02",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4e3641a87137fea13b3f561e7c0c1c217b7ddb5826639d333bf1816959352091",
+      "tags": [
+        "sql/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2410,
+      "line_start": 2410,
+      "origin": "postgres.c:1685",
+      "record": 91,
+      "result": {
+        "comparison_digest": "3828917049f71e30a6e4a63560b698c5b376684f17586251b256f976be70fc90",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "aa9e21638b65b2c8210e55cfbad6d6ae609711a63f8c0df6e96a6f002583b262",
+      "tags": [
+        "sql/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2451,
+      "line_start": 2451,
+      "origin": "postgres.c:1946",
+      "record": 97,
+      "result": {
+        "comparison_digest": "fac4eb53720864a0dc5282b2403ccc86d7993eee3cac2f7a8f7e973d492be21f",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "32f5019fec52353a3450df7ea8f92734e86136f156fe6aeef0e71a7ff2048dd0",
+      "tags": [
+        "sql/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "TRUNCATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3590,
+      "line_start": 3590,
+      "origin": "postgres.c:1685",
+      "record": 153,
+      "result": {
+        "comparison_digest": "cfb97af5916c5442f10b7d4f42ba63de93db67b9230adcc92644d7969217790e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TruncateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "3b3a69ec713b8edb166ccc3d4f8e556ec3a31ced3d1fae00a1d529c79088d141",
+      "tags": [
+        "sql/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3923,
+      "line_start": 3919,
+      "origin": "postgres.c:1685",
+      "record": 188,
+      "result": {
+        "comparison_digest": "fcd0354bcf6a22f973c0856d5b214f3a9c9da632c6c96f6d729ed9f124223758",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "de866faad7172a064fd63c9eefb82f82ecec840cfd2a8e5f3c717c3ee0d082b4",
+      "tags": [
+        "sql/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "VACUUM"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 16106,
+      "line_start": 16106,
+      "origin": "postgres.c:1685",
+      "record": 1284,
+      "result": {
+        "comparison_digest": "1494c982237af568f561b4098adbc647d430f7ae7ac7c62aa7163e9acd14b3de",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "45b5f08167a49be6ffdc8287c9285e27ecc3ecdf9f557276962dbacb71b7c141",
+      "tags": [
+        "sql/category:VACUUM"
+      ]
+    },
+    {
+      "categories": [
+        "SHOW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 45868,
+      "line_start": 45868,
+      "origin": "postgres.c:2219",
+      "record": 2453,
+      "result": {
+        "comparison_digest": "c53034bfaf94f90f3e91f1b648045ba1ae749650ea13100c47177b9b85d6e82d",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableShowStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "796e4e765b73e39b59f72474cc26fce679354ccabe0e3fb587e94af61c8f1d1d",
+      "tags": [
+        "sql/category:SHOW"
+      ]
+    },
+    {
+      "categories": [
+        "DROP TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 48375,
+      "line_start": 48375,
+      "origin": "postgres.c:1685",
+      "record": 2590,
+      "result": {
+        "comparison_digest": "0d0d6fe02f69322a1bcefc54a585920068cada28ce17ef1f40fb77b588634f38",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "ec4ad2c57132596f4de2c889bbbfbfd4ac445e42a1b86d22f2c6aa22acf63127",
+      "tags": [
+        "sql/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 64494,
+      "line_start": 64470,
+      "origin": "postgres.c:2764",
+      "record": 3427,
+      "result": {
+        "comparison_digest": "a7c8cd9fcdb77ab0143c82145aa1ee445749f2ef215c665731372d22afc9014b",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e247a0bffd9f1799b576d33a6945926f4e3383bf2babded699b10674099ccad5",
+      "tags": [
+        "inline_distinct/category:SELECT"
+      ]
+    },
+    {
+      "categories": [
+        "WITH"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 100440,
+      "line_start": 100348,
+      "origin": "postgres.c:1685",
+      "record": 4875,
+      "result": {
+        "comparison_digest": "139496368f0ef4b8d02416c326e175be82d95545285f0edbecf86b48880ffc35",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "9530864e57ffb9832019595c17d6fe459574b2850ff3312fd5c1b3bfae001522",
+      "tags": [
+        "sql/category:WITH"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "INSERT",
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 129814,
+      "line_start": 129796,
+      "origin": "postgres.c:1685",
+      "record": 5669,
+      "result": {
+        "comparison_digest": "f4bbd277854328d01c630a5a6155a1860f2172ba32912162366bc6fea868c675",
+        "extensions": {
+          "external_create": 1,
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "CreateStmt",
+          "InsertStmt",
+          "UpdateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6980599985a27e6602c54cac74af9bbba394d4ad515edcc1d805615d7d6d082c",
+      "tags": [
+        "inline_distinct/category:CREATE EXTERNAL",
+        "inline_distinct/category:DROP EXTERNAL",
+        "inline_distinct/category:INSERT",
+        "inline_distinct/category:UPDATE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "INSERT",
+        "UPDATE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 129814,
+      "line_start": 129796,
+      "origin": "postgres.c:1685",
+      "record": 5669,
+      "result": {
+        "comparison_digest": "f4bbd277854328d01c630a5a6155a1860f2172ba32912162366bc6fea868c675",
+        "extensions": {
+          "external_create": 1,
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "CreateStmt",
+          "InsertStmt",
+          "UpdateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "1299689a283f953f206435c4dc9aebabef1bf1bf549b8d4d415d9ba56330729a",
+      "tags": [
+        "sql/category:CREATE EXTERNAL",
+        "sql/category:DROP EXTERNAL"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SELECT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 173844,
+      "line_start": 173616,
+      "origin": "postgres.c:1685",
+      "record": 6923,
+      "result": {
+        "comparison_digest": "8efa3b5ed574e12346474b9a440b436cb742907a4340aa27bda8eb8eb6fbc568",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6e1d5bd198d4ace297ed17edc0cbefe9ee01cf244c5f41223bb6ddaec0495955",
+      "tags": [
+        "inline_distinct/category:SET"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE VIEW"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 176870,
+      "line_start": 176826,
+      "origin": "postgres.c:1685",
+      "record": 7132,
+      "result": {
+        "comparison_digest": "ef9419c8cffe3d99f6e82a320ff70bebc7e24f376e238bec0e8d119981a8263c",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "ViewStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "01e58b845dd811188559083ce6b542413ee086cfee06e397c6cf562cd28eca5b",
+      "tags": [
+        "sql/category:CREATE VIEW"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 177056,
+      "line_start": 177042,
+      "origin": "postgres.c:1685",
+      "record": 7146,
+      "result": {
+        "comparison_digest": "37675d4ca997147af38ba0e142483b47852dc50e3e461b4e14092976ba9bcf29",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "a20940f5ca2422561f6f207cf6f595b9cdbb2f0f1eda7ac28fabc923f6a9c107",
+      "tags": [
+        "inline_distinct/category:CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "COPY"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 199718,
+      "line_start": 199718,
+      "origin": "postgres.c:1685",
+      "record": 8050,
+      "result": {
+        "comparison_digest": "8b0aca02554ad3b770054da83e710f00a9d3d3d1ff61b66395318bc3fb6a3940",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CopyStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "bd13f5f7ec8653793efbe9d098b4a063badcced99f1890ad02ffbe5d60e99e3b",
+      "tags": [
+        "sql/category:COPY"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 273146,
+      "line_start": 273104,
+      "origin": "postgres.c:1239",
+      "record": 11931,
+      "result": {
+        "reason": "lexical_unbalanced_bracket",
+        "state": "unsupported"
+      },
+      "sql_sha256": "38d4c86c50df9b21955a4bae3ee7d2cf20b68289d355c3fbe90008c1a8fa20d2",
+      "tags": [
+        "sql/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "TRUNCATE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 313595,
+      "line_start": 313583,
+      "origin": "postgres.c:1685",
+      "record": 15059,
+      "result": {
+        "comparison_digest": "6e5ad6fb466fe2a38e5bd65be6ee24fb1158cfbb6190497c813ba45365e8b99b",
+        "extensions": {
+          "external_create": 1,
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "CreateStmt",
+          "TruncateStmt",
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "31d9bee1bd6b796532f598495ab6f9bccab01486917ee556d08750197127b4c4",
+      "tags": [
+        "inline_distinct/category:TRUNCATE"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "unbalanced_bracket"
+      ],
+      "line_end": 342400,
+      "line_start": 338935,
+      "origin": "postgres.c:1685",
+      "record": 16668,
+      "result": {
+        "reason": "lexical_unbalanced_bracket",
+        "state": "unsupported"
+      },
+      "sql_sha256": "17eff5b64ac4af48c2f005a67230242d4dc6ddcad27710196b499207bf2f2a19",
+      "tags": [
+        "inline_distinct/issue:unbalanced_bracket"
+      ]
+    },
+    {
+      "categories": [
+        "DROP EXTERNAL",
+        "CREATE EXTERNAL",
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 374038,
+      "line_start": 374026,
+      "origin": "postgres.c:1685",
+      "record": 17574,
+      "result": {
+        "comparison_digest": "e82ac909c87b2899f0331fc94745697108cff41946d1f07051cd25a82fae64a7",
+        "extensions": {
+          "external_create": 1,
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "CreateStmt",
+          "DeleteStmt",
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4b94bef9958cc19a0506e13698e7e1242924e7378a84589c3b7795f0a580f398",
+      "tags": [
+        "inline_distinct/category:DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 509956,
+      "line_start": 509942,
+      "origin": "postgres.c:1685",
+      "record": 22992,
+      "result": {
+        "comparison_digest": "e894b0831e13b4163dfea22174220d3561e4d086547df57ff2e0db56375294fb",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt",
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "558be68741ba30a25ef72350a92438d279687b8592e36bef58b9cf566838d74b",
+      "tags": [
+        "inline_distinct/category:DROP TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "DO"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 757794,
+      "line_start": 757718,
+      "origin": "postgres.c:1685",
+      "record": 42085,
+      "result": {
+        "comparison_digest": "b0da7dd4f1fcc4218dd7479e703794f945672ff99436f6329007bf834f66c011",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DoStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b9355b1bc573f9932411ffa3705f2d40e14d55e39d7c01c554e84d466108dd4c",
+      "tags": [
+        "sql/category:DO"
+      ]
+    },
+    {
+      "categories": [
+        "GRANT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 772197,
+      "line_start": 772197,
+      "origin": "postgres.c:1685",
+      "record": 43186,
+      "result": {
+        "comparison_digest": "8b053503e2e609ecd4c7e5f61b61850078b6767233c895eeaf0d901326d56eb9",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "GrantStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "9f04aa2b3b226cd39c0e76e7a8ef1fa406f371da9dbb76591027971638aa7f11",
+      "tags": [
+        "sql/category:GRANT"
+      ]
+    },
+    {
+      "categories": [
+        "SET TRANSACTION"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 780065,
+      "line_start": 780065,
+      "origin": "postgres.c:1685",
+      "record": 43707,
+      "result": {
+        "comparison_digest": "47020edd8b52b41156884723d46e8a7c9661d81c6604ead5dc3aecf95e71288e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "a2ed0cad371dca3dcff1b4bd9d46aceea5dbecab00b9a959e9a9931f5e5deda0",
+      "tags": [
+        "sql/category:SET TRANSACTION"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 783407,
+      "line_start": 781109,
+      "origin": "postgres.c:1685",
+      "record": 44102,
+      "result": {
+        "reason": "lexical_unclosed_string",
+        "state": "unsupported"
+      },
+      "sql_sha256": "aea78a7f6642a0d17bb7302ee8d5ea5862669135e02b72282c9514609dd41cdd",
+      "tags": [
+        "inline_distinct/issue:unclosed_string"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "unclosed_string"
+      ],
+      "line_end": 783407,
+      "line_start": 781109,
+      "origin": "postgres.c:1685",
+      "record": 44102,
+      "result": {
+        "reason": "lexical_unclosed_string",
+        "state": "unsupported"
+      },
+      "sql_sha256": "8ec149ed75d9df7b0aea09987fcc3fd6b01a91486e908325db11eb03d15c2cd2",
+      "tags": [
+        "sql/issue:unclosed_string"
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 911362,
+      "line_start": 911362,
+      "origin": "postgres.c:1685",
+      "record": 44856,
+      "result": {
+        "comparison_digest": "3e354830cd21c2922f2df031ae3e33597ace1d6cdbd1f0cd38cadaa4bf440f64",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "RenameStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "de1452e3c866046907060ff85a2dc6fa1ff1392bf4ca037955d7902f512a4bb5",
+      "tags": [
+        "sql/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 1088899,
+      "line_start": 1088877,
+      "origin": "postgres.c:1239",
+      "record": 49518,
+      "result": {
+        "reason": "invalid_encoding",
+        "state": "unsupported"
+      },
+      "sql_sha256": "6eeeedff78a089858f596e4a92c5436068da6b2d1b1e81cdc917f0137bc8ae8a",
+      "tags": [
+        "sql/issue:invalid_encoding_or_nul"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1250913,
+      "line_start": 1250871,
+      "origin": "postgres.c:1685",
+      "record": 54258,
+      "result": {
+        "comparison_digest": "ec99dbc58670e3e19d1fd495db40ac378841b95b07cf93f8c7773a4daab2e3c8",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "dd27ec51a56763e3ecc9d5cd97fc0bc8fdc12f3c1edda78b26004e4e03a71d58",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE",
+        "ALTER TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1369489,
+      "line_start": 1369475,
+      "origin": "postgres.c:1685",
+      "record": 64320,
+      "result": {
+        "comparison_digest": "f26707d54fa46cc7c08865efd844ea5c2dabde433f91fae5c2a32d0468684d14",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt",
+          "CreateStmt",
+          "AlterTableStmt",
+          "AlterTableStmt",
+          "CreateStmt",
+          "AlterTableStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "1f9d16f11ed7424815431e454cbe7cf2acbcadc241195416da7368f1418ba8da",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > ALTER TABLE > ALTER TABLE > CREATE TABLE > ALTER TABLE",
+        "inline_distinct/category:ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE",
+        "ALTER TABLE",
+        "CREATE TABLE",
+        "ALTER TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1369489,
+      "line_start": 1369475,
+      "origin": "postgres.c:1685",
+      "record": 64320,
+      "result": {
+        "comparison_digest": "f26707d54fa46cc7c08865efd844ea5c2dabde433f91fae5c2a32d0468684d14",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt",
+          "CreateStmt",
+          "AlterTableStmt",
+          "AlterTableStmt",
+          "CreateStmt",
+          "AlterTableStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "682b1190953aeb31a238d9c6569798859bd1d3d8e06aada195cba39e9601615d",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > ALTER TABLE > ALTER TABLE > CREATE TABLE > ALTER TABLE"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 1434812,
+      "line_start": 1434788,
+      "origin": "postgres.c:1685",
+      "record": 75888,
+      "result": {
+        "reason": "lexical_ambiguous_string_escape",
+        "state": "unsupported"
+      },
+      "sql_sha256": "dd05cae5ad7c704fb0c76d91ccb274c1255b362d0c2ead6103f981d4f171896f",
+      "tags": [
+        "sql/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [
+        "ROLLBACK"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2039633,
+      "line_start": 2039633,
+      "origin": "postgres.c:1685",
+      "record": 171138,
+      "result": {
+        "comparison_digest": "6c9ee58b4893fb117d9650872a896f270d291b248ebdc26eff95597396f9e823",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "587fa628a9fe4642ac0e22825a97e81d388af674f7251a9fb699f96901dcb710",
+      "tags": [
+        "sql/category:ROLLBACK"
+      ]
+    },
+    {
+      "categories": [
+        "DROP SEQUENCE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2277703,
+      "line_start": 2277703,
+      "origin": "postgres.c:1685",
+      "record": 196776,
+      "result": {
+        "comparison_digest": "b137c4d03708a50116f52cebe5937eeef9b097b32d27eaf081d2537e939f1886",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "437bfcca0c879357f259dce90b4084e407a39c31a67efbb62fb5b6bee3dfa82a",
+      "tags": [
+        "sql/category:DROP SEQUENCE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE SEQUENCE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2279643,
+      "line_start": 2279627,
+      "origin": "postgres.c:1685",
+      "record": 197158,
+      "result": {
+        "comparison_digest": "dfef3ed70ced07b435c9c38b6049cd8dc1c83432d7246ae12feda61b9b9dfc26",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateSeqStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "f1d529023ac5750aeda31305201864740e08863299983c6d10cb4bf00b96d956",
+      "tags": [
+        "sql/category:CREATE SEQUENCE"
+      ]
+    },
+    {
+      "categories": [
+        "DROP SCHEMA"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2297763,
+      "line_start": 2297763,
+      "origin": "postgres.c:2219",
+      "record": 198688,
+      "result": {
+        "comparison_digest": "0324c905c95ebe6685388e141fee8a3095044315fa4b387baf04f5c941545cfb",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "1faa501974ad409ecd137072b7cf0b3507426e0dff70c73dd3e6b75d25850299",
+      "tags": [
+        "sql/category:DROP SCHEMA"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "unclosed_comment"
+      ],
+      "line_end": 2383090,
+      "line_start": 2383090,
+      "origin": "OTHER",
+      "record": 204928,
+      "result": {
+        "reason": "lexical_unclosed_comment",
+        "state": "unsupported"
+      },
+      "sql_sha256": "8b47d2c8f597989409cfe6c59af4957c43c6ced88d070d3ad795808308a54cdc",
+      "tags": [
+        "sql/issue:unclosed_comment"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2568000,
+      "line_start": 2567996,
+      "origin": "postgres.c:1685",
+      "record": 213388,
+      "result": {
+        "comparison_digest": "fa004ac06b664d24b4baf61301008858c8fcdbe42f7eee83d41771a1350625e2",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "a97bfa5a7174055065aa4427c0280b4a55337067e63f1da060c5afeb4b9dbe23",
+      "tags": [
+        "inline_distinct/category:BEGIN"
+      ]
+    },
+    {
+      "categories": [
+        "END"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2569167,
+      "line_start": 2569163,
+      "origin": "postgres.c:1685",
+      "record": 213409,
+      "result": {
+        "comparison_digest": "34ffd91331724ff66077d746c559175c835c03cc5b5322defd3db65ffe346f02",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "0862032287c6c5e6e8676c32cd925efbb82e6e44ad59c05d83844b589129728f",
+      "tags": [
+        "inline_distinct/category:END"
+      ]
+    },
+    {
+      "categories": [
+        "END",
+        "ALTER TABLE",
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2573979,
+      "line_start": 2573973,
+      "origin": "postgres.c:1685",
+      "record": 213516,
+      "result": {
+        "comparison_digest": "70c332d6d6eadbe8a8f886b8b61dbcbacf0f51c3087936f2f692d1bf1387cb76",
+        "extensions": {
+          "alter_distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "AlterTableStmt",
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "5eefb01dbab2e0991fc0ea1ad6f9b538dfc1ab086add3e5c0ba43adfb087d02e",
+      "tags": [
+        "inline_distinct/category:ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "SET ROLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2944542,
+      "line_start": 2944542,
+      "origin": "postgres.c:2219",
+      "record": 247749,
+      "result": {
+        "comparison_digest": "ee7391f6a801990d121d787e0881d83cf496642c077690e59b7089fd3af39c35",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6283d543ac94725462c93f178245f810cd9be38ea0eddf396a3cc0253ca761b7",
+      "tags": [
+        "sql/category:SET ROLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE INDEX"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3126777,
+      "line_start": 3126775,
+      "origin": "postgres.c:1685",
+      "record": 260883,
+      "result": {
+        "comparison_digest": "2a2a74a230da08eb093db2687745e095eb077b49d20a8d481a2feb058ad2e1fd",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "IndexStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "50a6498131f555a4b7f9ff4366db68deed030d3b4b759fe6a1796c6fea95c97b",
+      "tags": [
+        "sql/category:CREATE INDEX"
+      ]
+    },
+    {
+      "categories": [
+        "UNKNOWN"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3330194,
+      "line_start": 3330194,
+      "origin": "postgres.c:1685",
+      "record": 282548,
+      "result": {
+        "comparison_digest": "1d7dd83b3634f739558279baea2768332931fc185e0cea7f5ad89719ac73c24a",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "23c919eb06cab79e034fbf1d629dcd2044430b6200d44f569cba2df88ecd0096",
+      "tags": [
+        "sql/category:UNKNOWN"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4395006,
+      "line_start": 4394892,
+      "origin": "postgres.c:1685",
+      "record": 392561,
+      "result": {
+        "comparison_digest": "95a8415733be51d0a1f631d6dea1e95952004ad62bc879cd517fe5c58b538f06",
+        "extensions": {
+          "distribution": 5
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "f577c1cd7c6371169a8bb6f4ead53fbc80370009f802c7a4a81cd0bace88029b",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4395006,
+      "line_start": 4394892,
+      "origin": "postgres.c:1685",
+      "record": 392561,
+      "result": {
+        "comparison_digest": "95a8415733be51d0a1f631d6dea1e95952004ad62bc879cd517fe5c58b538f06",
+        "extensions": {
+          "distribution": 5
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e436728671b377b5ad36ea073248aa271ad1d7d3bc1c58b594ba66d88a029cbf",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4409977,
+      "line_start": 4409971,
+      "origin": "postgres.c:1685",
+      "record": 392779,
+      "result": {
+        "comparison_digest": "f82a48dbc6f5a2dc6e9787695567bd17f1efc1bdf2b3284b4cf9ce20f8cec3ec",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4e03024644c1a8f7b031cdc0006219da77f766a1d5b8706a9b7d7c2ef475963a",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4409977,
+      "line_start": 4409971,
+      "origin": "postgres.c:1685",
+      "record": 392779,
+      "result": {
+        "comparison_digest": "f82a48dbc6f5a2dc6e9787695567bd17f1efc1bdf2b3284b4cf9ce20f8cec3ec",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "3954c141553fd8b2ee487ed46fc3532f10b9ffb22679b12619fdfa387f9f4fc3",
+      "tags": [
+        "sql/batch:DELETE > DELETE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4469703,
+      "line_start": 4469619,
+      "origin": "postgres.c:1685",
+      "record": 393868,
+      "result": {
+        "comparison_digest": "6f42ecc3c239d83ac2c3abd1a4921125ebdc17c1606563e71ddc2794417bbff7",
+        "extensions": {
+          "distribution": 2
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b627910a1e3cde5c72fdb65b91091fd5945af39a9993d4534a985a00aedb6a83",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4469703,
+      "line_start": 4469619,
+      "origin": "postgres.c:1685",
+      "record": 393868,
+      "result": {
+        "comparison_digest": "6f42ecc3c239d83ac2c3abd1a4921125ebdc17c1606563e71ddc2794417bbff7",
+        "extensions": {
+          "distribution": 2
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "88d7b97c19e300da33a231ff6e8bc7d425f7cdaf9aa804f727bb9cec16b4c3c0",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE"
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4485743,
+      "line_start": 4485539,
+      "origin": "postgres.c:1685",
+      "record": 394051,
+      "result": {
+        "comparison_digest": "7d6c214fa0857f12fbaa12f17d471acbb775611d0aec4af72d240383a5e235e1",
+        "extensions": {
+          "distribution": 8
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6dcf5eaa7b9d28510eb86e5ddc1a12b8eafc45d71d5ea3ceac617247a9d51e85",
+      "tags": [
+        "inline_distinct/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE",
+        "CREATE TABLE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 4485743,
+      "line_start": 4485539,
+      "origin": "postgres.c:1685",
+      "record": 394051,
+      "result": {
+        "comparison_digest": "7d6c214fa0857f12fbaa12f17d471acbb775611d0aec4af72d240383a5e235e1",
+        "extensions": {
+          "distribution": 8
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt",
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "ca3fb4f29bd537e80fbc845e421e1f9c1e0221f56e124f733137bb3467bc798a",
+      "tags": [
+        "sql/batch:CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > CREATE TABLE > ..."
+      ]
+    },
+    {
+      "categories": [
+        "ALTER TABLE",
+        "ANALYZE"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 5580335,
+      "line_start": 5580335,
+      "origin": "postgres.c:1685",
+      "record": 541784,
+      "result": {
+        "comparison_digest": "e2233fa2672032f556e89ad3b4a3c917cbed291c992f7a4f3c1e6041dc7eacd9",
+        "extensions": {
+          "alter_distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "AlterTableStmt",
+          "VacuumStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "4184e518f57c9e8b1201baaea383599d2529e30b9d1ee8c4a49e6c4098fb2054",
+      "tags": [
+        "sql/batch:ALTER TABLE > ANALYZE"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 6195310,
+      "line_start": 6195298,
+      "origin": "postgres.c:1685",
+      "record": 599631,
+      "result": {
+        "comparison_digest": "8190518874bca5dd906e59e2a9cf8f892a0c6c11589648be06012cfa8d331bfb",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "16bf595bce84f867f246df907b8ac67af5bf1998ce648ea153d973b665f69d50",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "BEGIN",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.1",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 6713225,
+      "line_start": 6713215,
+      "origin": "postgres.c:1685",
+      "record": 645854,
+      "result": {
+        "comparison_digest": "c4e439f1d942e553dadfbadcb56b24bb94b3bb423ef5010124547bc0a27e8e72",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "TransactionStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "d38d9c5f46c750efb52b08ee88f5ffe98e6ba6d94c0e1713bf88914cb6427d0a",
+      "tags": [
+        "sql/batch:BEGIN > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.2",
+      "formatting_check": null,
+      "issues": [
+        "ambiguous_string_escape"
+      ],
+      "line_end": 2021179,
+      "line_start": 2021163,
+      "origin": "postgres.c:2764",
+      "record": 7877,
+      "result": {
+        "reason": "lexical_ambiguous_string_escape",
+        "state": "unsupported"
+      },
+      "sql_sha256": "8b0e9daa2a6fe2685fa7ce01c1ff0607f916e707510f95be1fbf66a2438cf3be",
+      "tags": [
+        "inline_distinct/issue:ambiguous_string_escape"
+      ]
+    },
+    {
+      "categories": [
+        "SET",
+        "SET",
+        "WITH"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 69587,
+      "line_start": 69385,
+      "origin": "postgres.c:1685",
+      "record": 4519,
+      "result": {
+        "comparison_digest": "264cf87b7acb594c591a942652d9e986ecb1b638c05fbfb35d27ebd307235052",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "VariableSetStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c8a1f4829d4cdbf984298b0919754c44d4dabba94c3e2cbb73c3e2d370e701f6",
+      "tags": [
+        "inline_distinct/category:WITH"
+      ]
+    },
+    {
+      "categories": [
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 479164,
+      "line_start": 479154,
+      "origin": "postgres.c:1685",
+      "record": 66931,
+      "result": {
+        "comparison_digest": "fc9c5baf26ea764f82d479b18338d867b743a4f068f82d0ed8e0428d1025243b",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "e1b7e4739dd4f30eebbc8e90326c9bf647121797816db6d2a1de8c87c4cf8f7a",
+      "tags": [
+        "inline_distinct/category:COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 560475,
+      "line_start": 560403,
+      "origin": "postgres.c:1685",
+      "record": 72621,
+      "result": {
+        "comparison_digest": "2990320b282fe3bd0a3b03ab61ea165a44132972da29d7553d5027a2e6a1827e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "1556c66e5db928ed83c9e3a70d343e21e4c9ea6a3fec8710363d555b3632e38c",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "INSERT",
+        "COMMIT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 2432531,
+      "line_start": 2432461,
+      "origin": "postgres.c:1685",
+      "record": 354573,
+      "result": {
+        "comparison_digest": "1ba0e8855fc23ef1af5f822e60a3f8005c741a60083f50e9cd8985dc80465eab",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c42f465ec8446be8ad1aaafce0c1e046178bd1acffeb565eaac5ab1280c3e351",
+      "tags": [
+        "inline_distinct/batch:DELETE > INSERT > COMMIT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3158576,
+      "line_start": 3158308,
+      "origin": "postgres.c:1685",
+      "record": 425892,
+      "result": {
+        "comparison_digest": "c8a066755a94f19b1b2864b59a3f5a12d44b37528a13b0688909cac9e3eef723",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "5509886e8a280951b69e93cd307f92a9db871732b0dc8a68255fdc5997e70c53",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3158576,
+      "line_start": 3158308,
+      "origin": "postgres.c:1685",
+      "record": 425892,
+      "result": {
+        "comparison_digest": "c8a066755a94f19b1b2864b59a3f5a12d44b37528a13b0688909cac9e3eef723",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "7f00b40480dccf50364ed93b2c05f202ae4f2f705c3ff25913676ad847d73343",
+      "tags": [
+        "sql/batch:DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3583830,
+      "line_start": 3583032,
+      "origin": "postgres.c:1685",
+      "record": 471626,
+      "result": {
+        "comparison_digest": "33362f649e4384a548641b632d7e3be2e3fc51abf939b408874d3aeabd413f42",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "8fa2825510d3916d6ebbde9f38ebbc42b052f3e9c69b34513d8d7750cef0594c",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > DELETE > DELETE > INSERT > INSERT > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3583830,
+      "line_start": 3583032,
+      "origin": "postgres.c:1685",
+      "record": 471626,
+      "result": {
+        "comparison_digest": "33362f649e4384a548641b632d7e3be2e3fc51abf939b408874d3aeabd413f42",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "d103ec7435798163b3bfdced24e4e7d6e1a275bb9d09897c2701989d9798ea29",
+      "tags": [
+        "sql/batch:DELETE > DELETE > DELETE > DELETE > INSERT > INSERT > INSERT > INSERT > ..."
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3614630,
+      "line_start": 3614470,
+      "origin": "postgres.c:1685",
+      "record": 474766,
+      "result": {
+        "comparison_digest": "9e02b2b50a89183fea7449f02ee5b6e0805e0080599e01add2bd17af9cf2e7b5",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "6a842e7b1e8d99f6d1d599bc51c17582255a41ba8106e1d2c62090e3879d5dfb",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3614630,
+      "line_start": 3614470,
+      "origin": "postgres.c:1685",
+      "record": 474766,
+      "result": {
+        "comparison_digest": "9e02b2b50a89183fea7449f02ee5b6e0805e0080599e01add2bd17af9cf2e7b5",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "b3a9c5be8df5a5787aea5d82d164aff36e8aa62eca32fe51b8fef5e0bbeb1eee",
+      "tags": [
+        "sql/batch:DELETE > DELETE > DELETE > INSERT > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3630815,
+      "line_start": 3630723,
+      "origin": "postgres.c:1685",
+      "record": 476242,
+      "result": {
+        "comparison_digest": "77820f158e2529050e8d0910104216199f0e107e11d6f2cbcf2599f8a3e5a632",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "c90ccbb031efe9e598b9ce25fd2c75186eb84515653da9f73eda7e74d671fb79",
+      "tags": [
+        "inline_distinct/batch:DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "DELETE",
+        "DELETE",
+        "INSERT",
+        "COMMIT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-16_000000.csv.3",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 3630815,
+      "line_start": 3630723,
+      "origin": "postgres.c:1685",
+      "record": 476242,
+      "result": {
+        "comparison_digest": "77820f158e2529050e8d0910104216199f0e107e11d6f2cbcf2599f8a3e5a632",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt",
+          "DeleteStmt",
+          "InsertStmt",
+          "TransactionStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "927156d8211c1e3940966e838cc27a198655bbda5f73de2a335a7d4289cf63c0",
+      "tags": [
+        "sql/batch:DELETE > DELETE > INSERT > COMMIT"
+      ]
+    },
+    {
+      "categories": [
+        "COMMENT"
+      ],
+      "cluster": "120",
+      "field": "sql",
+      "file": "gpdb-2026-09-17_000000.csv",
+      "formatting_check": {
+        "same": true,
+        "state": "prototype_parsed"
+      },
+      "issues": [],
+      "line_end": 1121708,
+      "line_start": 1121707,
+      "origin": "postgres.c:2219",
+      "record": 137157,
+      "result": {
+        "comparison_digest": "120b48d078f7cff1e61f534b48bcf8ec11ecafbc35817e87d6948e36294715bd",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CommentStmt"
+        ],
+        "state": "prototype_parsed"
+      },
+      "sql_sha256": "ae383e1d1ac35a4e5eaa7dda0a6b01a8bb16bdc7bc467117cec2c465283e9180",
+      "tags": [
+        "sql/category:COMMENT"
+      ]
+    },
+    {
+      "categories": [],
+      "cluster": "120",
+      "field": "inline_distinct",
+      "file": "gpdb-2026-09-17_000000.csv.1",
+      "formatting_check": null,
+      "issues": [
+        "invalid_encoding_or_nul"
+      ],
+      "line_end": 4315311,
+      "line_start": 4314569,
+      "origin": "postgres.c:1685",
+      "record": 441603,
+      "result": {
+        "reason": "invalid_encoding",
+        "state": "unsupported"
+      },
+      "sql_sha256": "418d3c76b25e14a441a083324ded25bd92a4a32a204293f9f9385616e1fe35ae",
+      "tags": [
+        "inline_distinct/issue:invalid_encoding_or_nul"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "left": "select",
+      "passed": true,
+      "reason": "\u666e\u901a\u6392\u7248\u3001\u5173\u952e\u5b57\u5927\u5c0f\u5199\u4e0e\u8bf4\u660e\u6027\u6ce8\u91ca",
+      "right": "format",
+      "same": true
+    },
+    {
+      "left": "select",
+      "passed": true,
+      "reason": "\u663e\u5f0f schema",
+      "right": "schema",
+      "same": false
+    },
+    {
+      "left": "select",
+      "passed": true,
+      "reason": "\u89e3\u6790\u9636\u6bb5\u4fdd\u7559\u5b57\u9762\u503c\uff1b\u5f52\u4e00\u5316\u53e6\u884c\u9a8c\u8bc1",
+      "right": "value",
+      "same": false
+    },
+    {
+      "left": "quoted_upper",
+      "passed": true,
+      "reason": "\u5f15\u53f7\u6807\u8bc6\u7b26\u5927\u5c0f\u5199",
+      "right": "quoted_lower",
+      "same": false
+    },
+    {
+      "left": "function",
+      "passed": true,
+      "reason": "\u51fd\u6570\u63a7\u5236\u6587\u672c\u4e0d\u5f97\u9884\u5148\u5408\u5e76",
+      "right": "function_format_case",
+      "same": false
+    },
+    {
+      "left": "function",
+      "passed": true,
+      "reason": "\u663e\u5f0f\u51fd\u6570 schema",
+      "right": "function_schema",
+      "same": false
+    },
+    {
+      "left": "cast",
+      "passed": true,
+      "reason": "\u663e\u5f0f\u7c7b\u578b\u8f6c\u6362",
+      "right": "no_cast",
+      "same": false
+    },
+    {
+      "left": "type_modifier",
+      "passed": true,
+      "reason": "\u7c7b\u578b\u4fee\u9970\u7b26",
+      "right": "type_modifier_changed",
+      "same": false
+    },
+    {
+      "left": "limit",
+      "passed": true,
+      "reason": "LIMIT \u6570\u91cf",
+      "right": "limit_changed",
+      "same": false
+    },
+    {
+      "left": "set",
+      "passed": true,
+      "reason": "SET \u914d\u7f6e",
+      "right": "set_changed",
+      "same": false
+    },
+    {
+      "left": "batch",
+      "passed": true,
+      "reason": "\u6279\u6b21\u987a\u5e8f",
+      "right": "batch_reverse",
+      "same": false
+    },
+    {
+      "left": "hint",
+      "passed": true,
+      "reason": "Hint \u5916\u666e\u901a\u6392\u7248\u548c\u6ce8\u91ca",
+      "right": "hint_format",
+      "same": true
+    },
+    {
+      "left": "hint",
+      "passed": true,
+      "reason": "Hint \u5185\u5bb9",
+      "right": "hint_changed",
+      "same": false
+    },
+    {
+      "left": "hint",
+      "passed": true,
+      "reason": "Hint \u4f4d\u7f6e",
+      "right": "hint_moved",
+      "same": false
+    },
+    {
+      "left": "hint",
+      "passed": true,
+      "reason": "Hint \u5b58\u5728\u6027",
+      "right": "hint_none",
+      "same": false
+    },
+    {
+      "left": "hint_none",
+      "passed": true,
+      "reason": "\u8bf4\u660e\u6027\u5d4c\u5957\u6ce8\u91ca\u4e2d\u7684\u4f2a Hint",
+      "right": "hint_nested_comment",
+      "same": true
+    },
+    {
+      "left": "line_hint",
+      "passed": true,
+      "reason": "\u884c Hint \u5019\u9009\u5185\u5bb9",
+      "right": "line_hint_changed",
+      "same": false
+    }
+  ],
+  "replay_and_synthetic_seconds": 21.732,
+  "source_sha256": {
+    "scripts/diagnostics/mpp_adapter_probe.py": "ebe135b50c65c24c50e5b4990d45104a2b62a6de92cbe25f9391428a114096d5",
+    "scripts/diagnostics/mpp_parser_prototype.py": "cc3829520a74564a145ad70ad71f258b48629aa980c094956880c3fd35d344c9",
+    "scripts/diagnostics/parser_fidelity.py": "4051d3a91c791209cb576a3367cfaa222e13f0e5b47eaf23dd780990bfc1fd56",
+    "sql_apm/diagnostics/statement_census.py": "ebb8de6e105fafe76ba9c936610362a06a020b0e978ea67ca058f3c39c5a9ae5",
+    "tests/parser_probe/test_mpp_adapter.py": "1d3356a9247beb0270f1c2bac835d8e2c4fe601b90e4d8389f14de96a1ed4bd0"
+  },
+  "summary": {
+    "prototype_parsed": 124,
+    "unsupported": 16
+  },
+  "synthetic_cases": [
+    {
+      "id": "select",
+      "result": {
+        "comparison_digest": "2c214e5757e415cd8db8e08ed9fe3bb2db2fb6c76399a1773e0ee3438c134786",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "format",
+      "result": {
+        "comparison_digest": "2c214e5757e415cd8db8e08ed9fe3bb2db2fb6c76399a1773e0ee3438c134786",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "schema",
+      "result": {
+        "comparison_digest": "5a0058a6a81205e860b03059b38a98ce6efef97f1ce7ec95330fe5f1dc73262f",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "value",
+      "result": {
+        "comparison_digest": "fb4aee3faa86f81492112f50031343111e6f981514c498059db09aa7cd26da75",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "parameter",
+      "result": {
+        "comparison_digest": "e0fcbf19cc65df519e56a1b55a5ac361e87714ec07491b5c8f6589c5dc26f55c",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "quoted_upper",
+      "result": {
+        "comparison_digest": "d3f9ffe61b7cca13dd1a81f3e2da7ad68c88d5f05d3f1f28f8ca8468765081d6",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "quoted_lower",
+      "result": {
+        "comparison_digest": "c8158d125692b59179a77939f0b31ecc82274abf464ef1d3c2e047e13e8d0f23",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "cte",
+      "result": {
+        "comparison_digest": "86ca899878ed8ef7bc6f36dfdd2d0ff7167af66594c57f7f606bf6d2001316af",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "insert",
+      "result": {
+        "comparison_digest": "79878c206fc7ad1c31162a02ea4d91aae89c1c08db823df06eb2143118483846",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "insert_select",
+      "result": {
+        "comparison_digest": "520d027a044d34f6ff846e496f9b8cae9f1b4a326b0f1750568aacae0a2fe6f0",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "InsertStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "update",
+      "result": {
+        "comparison_digest": "7fbaeb43d6632048f446d8549ec92e932628d5641834b68bc1b118a6924a4d4a",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "UpdateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "delete",
+      "result": {
+        "comparison_digest": "6454a8be10221be56b66285cd8206c9cdab4f302351843c58e66580da7d6a250",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DeleteStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "create",
+      "result": {
+        "comparison_digest": "3eb6013f1f6d2a622fcc8b8826dcfdaee96d6f7b84bb2660e5a458c2556efda1",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "ctas",
+      "result": {
+        "comparison_digest": "2926e3a215f8e64dfd504bd7de8b2c462c567c2fcb4454d0b0d7a50d14266534",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateTableAsStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "alter",
+      "result": {
+        "comparison_digest": "6b79a46b8cc5f6d7d3ec0fd57072cb4542f96fb9819ccd52bf8040385ab164c5",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "AlterTableStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "index",
+      "result": {
+        "comparison_digest": "c0687fdcbf2e9baeed67c7c0df034c7df2f2114ad7c814e5edf7f3cbe6c67ce0",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "IndexStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "drop",
+      "result": {
+        "comparison_digest": "f95b42958a0db3fe2938e3b3587c73576348d51f0690ef913bcb6acc71891d4f",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "copy",
+      "result": {
+        "comparison_digest": "49035588a5be2b2f5bd2eb274030d1db990c65676aea9e10ad29036f88fd01a9",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CopyStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "distributed",
+      "result": {
+        "comparison_digest": "84400c9e668c57e707e16877e067f764030463c283c537f7c5676603a8b55323",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "distributed_random",
+      "result": {
+        "comparison_digest": "69c501ff3660fd5de981e2aa53c3ee08b5e6bb9fb293820987eb35c8eac06ae9",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "distributed_replicated",
+      "result": {
+        "comparison_digest": "9ec38c3e8a2b024cfd27aaeb395f0a0e7f5f39ca6d5ea37c5f6551d2cd7554bb",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "appendonly",
+      "result": {
+        "comparison_digest": "27b0c3764c02fa48b889dc26a9ae7b890bfe3066bfe82bd6fd322ff0b5265687",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "partition",
+      "result": {
+        "reason": "unconsumed_extension",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "external",
+      "result": {
+        "comparison_digest": "61b0720a44e23620c9536bd93cac3d90d4e37d7ab4feced4a2030de048e4e67d",
+        "extensions": {
+          "external_create": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "external_options",
+      "result": {
+        "comparison_digest": "ab1c3ff4019fe73d704a40c795c408e43bb0fe251a3170e5bb4f2aacab0b278c",
+        "extensions": {
+          "external_create": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "writable_external",
+      "result": {
+        "comparison_digest": "8237bb175e86e4743b179fc0efd71781f88e5a3155f86de47fb2a074edaabaed",
+        "extensions": {
+          "external_create": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "web_external",
+      "result": {
+        "comparison_digest": "d6a7d814b1cae3808984235cb819d4cd0585c0ced1409297260f13187039a9f5",
+        "extensions": {
+          "external_create": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "drop_external",
+      "result": {
+        "comparison_digest": "01ba89e8169ac7d6ba3d17b37b4847528c436dd4a5607c7d8fc3d018fe2d7440",
+        "extensions": {
+          "external_drop": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "DropStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "function",
+      "result": {
+        "comparison_digest": "32870b6e7f9f814cd3d1895a199547145a816984f12fe6fd929daed433673d29",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "function_format_case",
+      "result": {
+        "comparison_digest": "a4a772247ec32d72627f23846ea59d82b74cd5374f8efc6d8c525350cd050079",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "function_schema",
+      "result": {
+        "comparison_digest": "91338edf923c72acb8be29750678d58d4aef568bdb6d3d7529c4704f9ad904a7",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "nested_function",
+      "result": {
+        "comparison_digest": "a14b2c08845b705426b1b4cac8b42e59c4f66f12ee8dba08125e26702538d3a5",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "function_named",
+      "result": {
+        "comparison_digest": "a8768d5ad258c789fff67e60a8c50f86982ed5b4d580b2c5972253a9b001dd4e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "special_function",
+      "result": {
+        "comparison_digest": "f0835a6e4b4d2e9c637cf12fe2212ebbb04de88c20081df43104d98796f05b07",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "aggregate",
+      "result": {
+        "comparison_digest": "33c8dd10ead96c1a400b3146f8575aca73f63c907a391e1239e9f1e697d544bf",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "cast",
+      "result": {
+        "comparison_digest": "096b28d376cf20b3564ad9ec361fe19b2fbada72a99c981b9d5920fdeb4f0d0e",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "no_cast",
+      "result": {
+        "comparison_digest": "8054e2266df64c81063782290f9b50899e4ce4779e17da4eec301c3f5826fb95",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "protected_cast",
+      "result": {
+        "comparison_digest": "8a50b4635bc43c299ed26003afbd57d25b1227197f0f5574fe8dcec5ea0d9812",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "qualified_type",
+      "result": {
+        "comparison_digest": "aac0f3147c2abefcfb6c0fa5a7028c12425aafd6eb67120e97f7816bc9bbf22a",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "type_modifier",
+      "result": {
+        "comparison_digest": "0f6b69ed103c6c5c3f5343d23010f1d359ef592e8583a966094899894f4b226d",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "type_modifier_changed",
+      "result": {
+        "comparison_digest": "b6921d429fdd8baa2e1df0e0d7d3ded7368753157eba510f009b4fdf7584f4e0",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "limit",
+      "result": {
+        "comparison_digest": "df0d2dc086cf72e375c8a8d36d79c0f63bd5f518dcd6ff2a7ebcd144c762c04a",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "limit_changed",
+      "result": {
+        "comparison_digest": "b3e02b8e3ca5159da7404a0f0138379239074de7d9ebfdb63b1fdc331f899dd1",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "set",
+      "result": {
+        "comparison_digest": "2d9d76682fe0edd8a04d607a3dd0823f80ac6c124a5c95c0eac862bc93e5ad85",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "set_changed",
+      "result": {
+        "comparison_digest": "63395333616c4e54ad294e65019cdd66952573a59ef966f4f6604ba1e6712956",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "VariableSetStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "batch",
+      "result": {
+        "comparison_digest": "7b42a6012d585b2478f0d51783521d81d72ae612d78dfbd9ea55351732d621be",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "batch_reverse",
+      "result": {
+        "comparison_digest": "774cf2989b08d1e7db595a10e880b70639c26bf72cc82c2081745c0d3942caf7",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "quoted_semicolon",
+      "result": {
+        "comparison_digest": "2b842cdf976c854876d499ad23606114d902f37324784917b83094b19a08b046",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "do",
+      "result": {
+        "comparison_digest": "ae828f4cba133027701fc1e7f951af8b77c2042467a299cb7af26d6d0e6b227c",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "DoStmt",
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "batch_unsupported",
+      "result": {
+        "comparison_digest": "85f844002babfc31cc7c2b935fa01c5f02d1e65cf3457a2dcacaa9135197391c",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt",
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint",
+      "result": {
+        "comparison_digest": "3317ad3b2c28bee23f4fa730f30fcafe1c1f773996e5fc00a7ae63062d753ada",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_format",
+      "result": {
+        "comparison_digest": "3317ad3b2c28bee23f4fa730f30fcafe1c1f773996e5fc00a7ae63062d753ada",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_changed",
+      "result": {
+        "comparison_digest": "49c40da568d59d8426c4adb70521febba196c25f228b3432e24da9bb8aaf323e",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_moved",
+      "result": {
+        "comparison_digest": "a46821cd356486b3b189c196efdabe116dd4018e22fb37330cd939bdfd0c7a55",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_none",
+      "result": {
+        "comparison_digest": "831088ac0b65b2431cfb103ceb16ce79163fe986d2e951542ec413d984030bbc",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_unicode",
+      "result": {
+        "comparison_digest": "6e8fcd8ebd1664e3505ea02dc42a97e9b57c9f2519117963bce6811f1b699621",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_in_string",
+      "result": {
+        "comparison_digest": "ac679fbc49b11b8b49ebb27f26ea69e935d8c900728524fbc4b4aa3db29ab0cc",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "hint_nested_comment",
+      "result": {
+        "comparison_digest": "831088ac0b65b2431cfb103ceb16ce79163fe986d2e951542ec413d984030bbc",
+        "extensions": {},
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "line_hint",
+      "result": {
+        "comparison_digest": "8063e03491e6a582586bc3a36ff26cee1edaea2555de957796ab6e4f3a58fb13",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "line_hint_changed",
+      "result": {
+        "comparison_digest": "efe675281c16bfbb74d334d34086ba72432bdddbb99566dc58edf7278fffdc29",
+        "extensions": {},
+        "hint_count": 1,
+        "roots": [
+          "SelectStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    },
+    {
+      "id": "empty",
+      "result": {
+        "reason": "sql_missing_or_empty",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "comment_only",
+      "result": {
+        "reason": "sql_missing_or_empty",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "truncated",
+      "result": {
+        "reason": "base_parser_rejected",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "unclosed_string",
+      "result": {
+        "reason": "lexical_unclosed_string",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "batch_invalid",
+      "result": {
+        "reason": "base_parser_rejected",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "unknown_syntax",
+      "result": {
+        "reason": "base_parser_rejected",
+        "state": "unsupported"
+      }
+    },
+    {
+      "id": "unicode_error",
+      "result": {
+        "comparison_digest": "3cb9d5607423fdd07f489760d16a41b5301695125a7d091c3e1253ea689f3594",
+        "extensions": {
+          "distribution": 1
+        },
+        "hint_count": 0,
+        "roots": [
+          "SelectStmt",
+          "CreateStmt"
+        ],
+        "state": "prototype_parsed"
+      }
+    }
+  ]
+}

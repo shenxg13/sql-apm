@@ -1,0 +1,775 @@
+{
+  "additional_signed_merge_pairs": 190,
+  "bounded_replay": {
+    "counts": {
+      "reliable": 1810,
+      "unsupported_syntax": 22
+    },
+    "failures": [],
+    "groups": 1566,
+    "inputs": 1832,
+    "prior_r1_record_comparison": "all fields equal except versioned reliable values and phase_seconds; same group partition"
+  },
+  "broad_matrix_cases": 578,
+  "expansion_case_count": 81,
+  "expansion_passed": true,
+  "expansion_relations": 25,
+  "hint_position_sweeps": [
+    198,
+    728
+  ],
+  "hint_replay": {
+    "comparison": {
+      "initial_head": {
+        "group_partition_identical": true,
+        "source_sha256": "59eb46ad515a980692dd1324c1b83deaee58d12dbd96edb94025e058dab26f50",
+        "state_reason_hint_count_changed": []
+      },
+      "r2_head": {
+        "group_partition_identical": true,
+        "source_sha256": "d9cea591f9af83de51716376b97d32caae83a7c5a4d50c0f7242e1810fc016a3",
+        "state_reason_hint_count_changed": []
+      }
+    },
+    "counts": {
+      "reliable": 5317,
+      "unsupported_syntax": 16
+    },
+    "groups": 4323,
+    "inputs": 5333
+  },
+  "original_witnesses": [
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x > {v} AND y = 2"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x IN ({v}, 2)"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x BETWEEN {v} AND 9"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "INSERT INTO t (a) VALUES ({v})"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "UPDATE t SET a = {v} WHERE id = 3"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "DELETE FROM t WHERE id = {v}"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "1",
+        "-1"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "2.5",
+        "-2.5"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "/*+ H */ ",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "suffix",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    },
+    {
+      "hint": "--+ H\n",
+      "merged_with_hint": true,
+      "merged_without_hint": true,
+      "pair": [
+        "7",
+        "- 7"
+      ],
+      "template": "SELECT * FROM t WHERE x = {v}; SELECT 1"
+    }
+  ],
+  "output_sha256": {
+    "sql-normalization-r2-2026-09-28.json": "d03ee2b36d53a80007759324580f4478843a34fdb012eee15a8f27ca2227d418",
+    "sql-normalization-r2-hints-2026-09-28.json": "94d6e708cf77e1c359364b8f98bb7a22eb9f59e90e3f6a1bf3494528734f3aad"
+  },
+  "parser_tests": 114,
+  "regression_source_sha256": {
+    "tests/parser_probe/test_hint_boundaries.py": "993f83ac97f07f70ffa03bf02dc40e4a2c1794de20f41b555fd18e49ddcf4fd6",
+    "tests/parser_probe/test_hint_signed_values.py": "50d23a731b6c3445978d61963c9c0ad5d8ab14b0eaef9ed4dc35caf87a4d801b",
+    "tests/test_approximate.py": "1489e520c97ec4528fdf4e3e8f4725c55b53f6ccb690b3470b4d0f50e15b1f19"
+  },
+  "reviewed_head": "68fe15a8a98192e3e2c0fe20438b12f06e47ba0e",
+  "unit_tests": 46
+}

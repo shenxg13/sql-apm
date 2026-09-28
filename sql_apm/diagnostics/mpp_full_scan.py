@@ -6,6 +6,7 @@ contain only fixed diagnostics, counts, hashes and source locators.
 import argparse
 from collections import Counter, OrderedDict
 import csv
+from datetime import date
 import hashlib
 import io
 import json
@@ -83,6 +84,9 @@ def initialize(db):
             field TEXT NOT NULL, count INTEGER NOT NULL,
             PRIMARY KEY (input_id, file_key, field));
         CREATE TABLE files (file_key TEXT PRIMARY KEY, evidence TEXT NOT NULL);
+        CREATE TABLE occurrence_dates (input_id INTEGER NOT NULL, file_key TEXT NOT NULL,
+            day TEXT NOT NULL, field TEXT NOT NULL, count INTEGER NOT NULL,
+            PRIMARY KEY (input_id, file_key, day, field));
     ''')
 
 
@@ -116,12 +120,13 @@ class ExactIndex:
         return cached[0]
 
 
-def collect(root, evidence, db):
+def collect(root, evidence, db, record_dates=False):
     manifest, started = json.loads(evidence.read_text()), time.monotonic()
     index = ExactIndex(db)
     csv.field_size_limit(128 * 1024 * 1024)
     set_meta(db, 'context', context(evidence))
     set_meta(db, 'collection_complete', False)
+    set_meta(db, 'record_dates', record_dates)
     db.commit()
     for cluster, data in sorted(manifest['clusters'].items()):
         for entry in sorted(data['files'], key=lambda x: x['file']):
@@ -133,6 +138,7 @@ def collect(root, evidence, db):
                 raise ValueError('source size mismatch')
             key, counts, batch = cluster + '/' + entry['file'], Counter(), Counter()
             previous_line, last_progress = 0, time.monotonic()
+            dated, records_by_date = Counter(), Counter()
             with path.open('rb', buffering=0) as raw:
                 hashing = DigestReader(raw)
                 with io.TextIOWrapper(io.BufferedReader(hashing, 1024 * 1024),
@@ -143,6 +149,12 @@ def collect(root, evidence, db):
                         if len(row) != 30:
                             raise ValueError('CSV column count mismatch')
                         counts['records'] += 1
+                        if record_dates:
+                            try:
+                                day = date.fromisoformat(row[0][:10]).isoformat()
+                            except ValueError:
+                                raise ValueError('invalid_record_date') from None
+                            records_by_date[day] += 1
                         counts['primary_empty'] += not bool(row[24].strip())
                         for field, sql in candidates(row):
                             counts['inputs'] += 1
@@ -151,8 +163,11 @@ def collect(root, evidence, db):
                                            field=field, line_start=begin, line_end=reader.line_num)
                             uid = index.observe(sql.encode('utf-8', 'surrogateescape'), locator)
                             batch[(uid, key, field)] += 1
+                            if record_dates:
+                                dated[(uid, key, day, field)] += 1
                         if number % 10000 == 0:
                             flush_counts(db, batch)
+                            flush_dates(db, dated)
                         if time.monotonic() - last_progress > 20:
                             emit(phase='collect', file=key, records=number)
                             last_progress = time.monotonic()
@@ -164,9 +179,12 @@ def collect(root, evidence, db):
                     counts['records'] != entry['counts']['records']):
                 raise ValueError('full source evidence mismatch')
             flush_counts(db, batch)
+            flush_dates(db, dated)
             file_evidence = dict(cluster=cluster, file=entry['file'], bytes=actual_bytes,
                                  sha256=actual_sha, full_file_hash_rechecked=True,
                                  read_to_eof=True, stat_unchanged=True, counts=dict(counts))
+            if record_dates:
+                file_evidence['records_by_date'] = dict(records_by_date)
             db.execute('INSERT INTO files VALUES (?,?)', (key, json.dumps(file_evidence)))
             db.commit()
             emit(phase='file_complete', file=key, counts=dict(counts),
@@ -179,6 +197,13 @@ def collect(root, evidence, db):
 def flush_counts(db, batch):
     db.executemany('''INSERT INTO occurrences VALUES (?,?,?,?)
         ON CONFLICT(input_id,file_key,field) DO UPDATE SET count=count+excluded.count''',
+                   [(*key, count) for key, count in batch.items()])
+    batch.clear()
+
+
+def flush_dates(db, batch):
+    db.executemany('''INSERT INTO occurrence_dates VALUES (?,?,?,?,?)
+        ON CONFLICT(input_id,file_key,day,field) DO UPDATE SET count=count+excluded.count''',
                    [(*key, count) for key, count in batch.items()])
     batch.clear()
 
@@ -358,6 +383,7 @@ def main():
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--phase', choices=('collect', 'parse', 'report', 'all'), default='all')
     ap.add_argument('--workers', type=int, default=4)
+    ap.add_argument('--record-dates', action='store_true', help='index actual CSV record dates')
     args = ap.parse_args()
     if platform.python_version() != '3.9.5' or version('pglast') != '7.18':
         ap.error('requires Python 3.9.5 and pglast 7.18')
@@ -377,7 +403,7 @@ def main():
         db.execute('PRAGMA cache_size=-32768')
         if args.phase in ('collect', 'all'):
             initialize(db)
-            collect(root, args.evidence, db)
+            collect(root, args.evidence, db, args.record_dates)
         if get_meta(db, 'context') != context(args.evidence):
             raise ValueError('parser/runtime/source evidence context changed')
         if not get_meta(db, 'collection_complete'):

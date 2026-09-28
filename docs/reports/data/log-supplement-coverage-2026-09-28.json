@@ -1,0 +1,472 @@
+{
+  "clusters": {
+    "119": {
+      "active_dates": 29,
+      "input_occurrences": 4978834,
+      "schemes": {
+        "positions": {
+          "fingerprinted_occurrences": 4926241,
+          "groups": 53052,
+          "occurrence_reasons": {
+            "base_parser_rejected": 528,
+            "invalid_encoding": 14,
+            "lexical_ambiguous_string_escape": 94,
+            "lexical_unbalanced_bracket": 6048,
+            "lexical_unclosed_comment": 116,
+            "lexical_unclosed_string": 937,
+            "sql_missing_or_empty": 44854,
+            "unsupported_distribution_statement": 2
+          },
+          "occurrence_states": {
+            "candidate": 4926241,
+            "unsupported_syntax": 52593
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.8455650459525262,
+              "fraction_fingerprinted_occurrences": 0.8545923758094661,
+              "groups": 236,
+              "input_occurrences": 4209928
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.8851058299995541,
+              "fraction_fingerprinted_occurrences": 0.8945553008876342,
+              "groups": 589,
+              "input_occurrences": 4406795
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.9507227997559268,
+              "fraction_fingerprinted_occurrences": 0.9608728034215135,
+              "groups": 4426,
+              "input_occurrences": 4733491
+            }
+          }
+        },
+        "positions_functions": {
+          "fingerprinted_occurrences": 4926241,
+          "groups": 41443,
+          "occurrence_reasons": {
+            "base_parser_rejected": 528,
+            "invalid_encoding": 14,
+            "lexical_ambiguous_string_escape": 94,
+            "lexical_unbalanced_bracket": 6048,
+            "lexical_unclosed_comment": 116,
+            "lexical_unclosed_string": 937,
+            "sql_missing_or_empty": 44854,
+            "unsupported_distribution_statement": 2
+          },
+          "occurrence_states": {
+            "candidate": 4926241,
+            "unsupported_syntax": 52593
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.8490182641156544,
+              "fraction_fingerprinted_occurrences": 0.8580824608459067,
+              "groups": 238,
+              "input_occurrences": 4227121
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.8893184629172212,
+              "fraction_fingerprinted_occurrences": 0.8988129082600709,
+              "groups": 602,
+              "input_occurrences": 4427769
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.9580974179898346,
+              "fraction_fingerprinted_occurrences": 0.9683261537549624,
+              "groups": 4646,
+              "input_occurrences": 4770208
+            }
+          }
+        },
+        "tidb_lexical": {
+          "fingerprinted_occurrences": 4926768,
+          "groups": 11235,
+          "occurrence_reasons": {
+            "ambiguous_string_escape": 94,
+            "empty_tokens": 44854,
+            "invalid_encoding_or_nul": 14,
+            "mismatched_bracket": 2,
+            "unclosed_bracket": 6841,
+            "unclosed_comment": 58,
+            "unclosed_string": 200,
+            "unknown_character": 3
+          },
+          "occurrence_states": {
+            "lexical": 4926768,
+            "lexical_refused": 52066
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.8974908583013613,
+              "fraction_fingerprinted_occurrences": 0.9069755263491197,
+              "groups": 167,
+              "input_occurrences": 4468458
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.9139055449528946,
+              "fraction_fingerprinted_occurrences": 0.9235636831285744,
+              "groups": 361,
+              "input_occurrences": 4550184
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.9814898428025518,
+              "fraction_fingerprinted_occurrences": 0.9918622106825408,
+              "groups": 4435,
+              "input_occurrences": 4886675
+            }
+          }
+        },
+        "unqualified_functions": {
+          "fingerprinted_occurrences": 4926241,
+          "groups": 65938,
+          "occurrence_reasons": {
+            "base_parser_rejected": 528,
+            "invalid_encoding": 14,
+            "lexical_ambiguous_string_escape": 94,
+            "lexical_unbalanced_bracket": 6048,
+            "lexical_unclosed_comment": 116,
+            "lexical_unclosed_string": 937,
+            "sql_missing_or_empty": 44854,
+            "unsupported_distribution_statement": 2
+          },
+          "occurrence_states": {
+            "candidate": 4926241,
+            "unsupported_syntax": 52593
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.8375716081315424,
+              "fraction_fingerprinted_occurrences": 0.8465135993143657,
+              "groups": 234,
+              "input_occurrences": 4170130
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.8773499980115826,
+              "fraction_fingerprinted_occurrences": 0.8867166669271763,
+              "groups": 590,
+              "input_occurrences": 4368180
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.9379167893526879,
+              "fraction_fingerprinted_occurrences": 0.947930074878594,
+              "groups": 4091,
+              "input_occurrences": 4669732
+            }
+          }
+        },
+        "v4": {
+          "fingerprinted_occurrences": 4926241,
+          "groups": 75670,
+          "occurrence_reasons": {
+            "base_parser_rejected": 528,
+            "invalid_encoding": 14,
+            "lexical_ambiguous_string_escape": 94,
+            "lexical_unbalanced_bracket": 6048,
+            "lexical_unclosed_comment": 116,
+            "lexical_unclosed_string": 937,
+            "sql_missing_or_empty": 44854,
+            "unsupported_distribution_statement": 2
+          },
+          "occurrence_states": {
+            "reliable": 4926241,
+            "unsupported_syntax": 52593
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.8341183899684143,
+              "fraction_fingerprinted_occurrences": 0.8430235142779251,
+              "groups": 232,
+              "input_occurrences": 4152937
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.8733878253422388,
+              "fraction_fingerprinted_occurrences": 0.882712193739608,
+              "groups": 580,
+              "input_occurrences": 4348453
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.9317836264474775,
+              "fraction_fingerprinted_occurrences": 0.9417314337646088,
+              "groups": 3937,
+              "input_occurrences": 4639196
+            }
+          }
+        }
+      }
+    },
+    "120": {
+      "active_dates": 8,
+      "input_occurrences": 10094128,
+      "schemes": {
+        "positions": {
+          "fingerprinted_occurrences": 9915961,
+          "groups": 696111,
+          "occurrence_reasons": {
+            "base_parser_rejected": 2152,
+            "invalid_encoding": 994,
+            "lexical_ambiguous_string_escape": 4248,
+            "lexical_unbalanced_bracket": 27954,
+            "lexical_unclosed_comment": 500,
+            "lexical_unclosed_string": 9625,
+            "scanner_rejected": 500,
+            "sql_missing_or_empty": 132194
+          },
+          "occurrence_states": {
+            "candidate": 9915961,
+            "unsupported_syntax": 178167
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.45823720483829805,
+              "fraction_fingerprinted_occurrences": 0.46647067288788246,
+              "groups": 450,
+              "input_occurrences": 4625505
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.5117846732278409,
+              "fraction_fingerprinted_occurrences": 0.5209802660579241,
+              "groups": 1911,
+              "input_occurrences": 5166020
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.58612363544429,
+              "fraction_fingerprinted_occurrences": 0.5966549283523805,
+              "groups": 16184,
+              "input_occurrences": 5916407
+            }
+          }
+        },
+        "positions_functions": {
+          "fingerprinted_occurrences": 9915961,
+          "groups": 470086,
+          "occurrence_reasons": {
+            "base_parser_rejected": 2152,
+            "invalid_encoding": 994,
+            "lexical_ambiguous_string_escape": 4248,
+            "lexical_unbalanced_bracket": 27954,
+            "lexical_unclosed_comment": 500,
+            "lexical_unclosed_string": 9625,
+            "scanner_rejected": 500,
+            "sql_missing_or_empty": 132194
+          },
+          "occurrence_states": {
+            "candidate": 9915961,
+            "unsupported_syntax": 178167
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.47053851506539246,
+              "fraction_fingerprinted_occurrences": 0.4789930093512873,
+              "groups": 472,
+              "input_occurrences": 4749676
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.5258042101308801,
+              "fraction_fingerprinted_occurrences": 0.53525170177656,
+              "groups": 1974,
+              "input_occurrences": 5307535
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.602887242959471,
+              "fraction_fingerprinted_occurrences": 0.6137197393172482,
+              "groups": 16609,
+              "input_occurrences": 6085621
+            }
+          }
+        },
+        "tidb_lexical": {
+          "fingerprinted_occurrences": 9918075,
+          "groups": 389276,
+          "occurrence_reasons": {
+            "ambiguous_numeric_boundary": 498,
+            "ambiguous_string_escape": 4248,
+            "empty_tokens": 132194,
+            "invalid_encoding_or_nul": 292,
+            "mismatched_bracket": 22,
+            "unclosed_bracket": 37999,
+            "unclosed_comment": 512,
+            "unclosed_string": 256,
+            "unknown_character": 32
+          },
+          "occurrence_states": {
+            "lexical": 9918075,
+            "lexical_refused": 176053
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.5974210947196231,
+              "fraction_fingerprinted_occurrences": 0.608025750964779,
+              "groups": 555,
+              "input_occurrences": 6030445
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.6423336418955654,
+              "fraction_fingerprinted_occurrences": 0.6537355283157266,
+              "groups": 1561,
+              "input_occurrences": 6483798
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.7098251577550829,
+              "fraction_fingerprinted_occurrences": 0.7224250673643827,
+              "groups": 14414,
+              "input_occurrences": 7165066
+            }
+          }
+        },
+        "unqualified_functions": {
+          "fingerprinted_occurrences": 9915961,
+          "groups": 795525,
+          "occurrence_reasons": {
+            "base_parser_rejected": 2152,
+            "invalid_encoding": 994,
+            "lexical_ambiguous_string_escape": 4248,
+            "lexical_unbalanced_bracket": 27954,
+            "lexical_unclosed_comment": 500,
+            "lexical_unclosed_string": 9625,
+            "scanner_rejected": 500,
+            "sql_missing_or_empty": 132194
+          },
+          "occurrence_states": {
+            "candidate": 9915961,
+            "unsupported_syntax": 178167
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.4427253151535229,
+              "fraction_fingerprinted_occurrences": 0.4506800702423093,
+              "groups": 426,
+              "input_occurrences": 4468926
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.48326393324911276,
+              "fraction_fingerprinted_occurrences": 0.49194707401531734,
+              "groups": 1562,
+              "input_occurrences": 4878128
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.5479836395971995,
+              "fraction_fingerprinted_occurrences": 0.5578296445498323,
+              "groups": 14659,
+              "input_occurrences": 5531417
+            }
+          }
+        },
+        "v4": {
+          "fingerprinted_occurrences": 9915961,
+          "groups": 827096,
+          "occurrence_reasons": {
+            "base_parser_rejected": 2152,
+            "invalid_encoding": 994,
+            "lexical_ambiguous_string_escape": 4248,
+            "lexical_unbalanced_bracket": 27954,
+            "lexical_unclosed_comment": 500,
+            "lexical_unclosed_string": 9625,
+            "scanner_rejected": 500,
+            "sql_missing_or_empty": 132194
+          },
+          "occurrence_states": {
+            "reliable": 9915961,
+            "unsupported_syntax": 178167
+          },
+          "thresholds": {
+            "1000": {
+              "fraction_all_input_occurrences": 0.4317655769770306,
+              "fraction_fingerprinted_occurrences": 0.4395234107919545,
+              "groups": 399,
+              "input_occurrences": 4358297
+            },
+            "200": {
+              "fraction_all_input_occurrences": 0.47173099053231743,
+              "fraction_fingerprinted_occurrences": 0.4802069108581609,
+              "groups": 1522,
+              "input_occurrences": 4761713
+            },
+            "30": {
+              "fraction_all_input_occurrences": 0.5357623759080526,
+              "fraction_fingerprinted_occurrences": 0.5453887928764545,
+              "groups": 14539,
+              "input_occurrences": 5408054
+            }
+          }
+        }
+      }
+    }
+  },
+  "complete": true,
+  "context": {
+    "algorithm_version": "sql-normalization/4",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter/9",
+    "profile": "hashdata-pg94",
+    "rules_digest": "ff864d482a90684f5a6dda98f921392d002c37106c2c6565adfc61699fcd97a3",
+    "rules_ref": "sha256:b7e9266a3a391253ffb977bab2686d7928537b9651c90f366d6b9f152e2c9007"
+  },
+  "date_basis": "CSV record timestamp date; not inferred execution start date",
+  "format": "threshold-coverage/1",
+  "limits": {
+    "max_sql_bytes": 524288,
+    "timeout_seconds": 5,
+    "worker_address_space_bytes": 536870912,
+    "workers": 8
+  },
+  "python": "3.9.5",
+  "schemes": [
+    "v4",
+    "positions",
+    "unqualified_functions",
+    "positions_functions",
+    "tidb_lexical"
+  ],
+  "seconds": 938.208,
+  "source_context": {
+    "evidence_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+    "limits": {
+      "max_sql_bytes": 524288,
+      "timeout_seconds": 5,
+      "worker_address_space_bytes": 536870912
+    },
+    "pglast": "7.18",
+    "prototype_version": "mpp-adapter/9",
+    "python": "3.9.5",
+    "sources": {
+      "sql_apm/diagnostics/mpp_adapter_probe.py": "bc1f54b59ca6ebf9b0b7af5e536b7246cb9392386c917fac159cc3a3cde1af78",
+      "sql_apm/diagnostics/mpp_full_scan.py": "d503647e9dae3c38b5884830fab338c5a3444b9dd10f1ae9643c45cb4ae5c8d0",
+      "sql_apm/diagnostics/parser_fidelity.py": "20bf5ceed64d930f6d172bb35370220504cfa7f2ba143f9c53fda82442eb344a",
+      "sql_apm/diagnostics/statement_census.py": "b07ccfab71613af518832b9280da8ef49b9b420e97da57c301f72409cbee38cf",
+      "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+      "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+      "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+      "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed"
+    }
+  },
+  "source_sha256": "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2",
+  "sources": {
+    "requirements.txt": "a3bbce430dd127cca2f05837f417fd3a018f0255b8ebc8077f17b3fc476db8d9",
+    "sql_apm/diagnostics/log_supplement.py": "95e19cd82ef6ea803e11167aca174cf866c11e7750652358111c9b6d05f5d43e",
+    "sql_apm/diagnostics/mpp_full_scan.py": "d503647e9dae3c38b5884830fab338c5a3444b9dd10f1ae9643c45cb4ae5c8d0",
+    "sql_apm/diagnostics/normalization_diff.py": "6579d049356480e5231494e65c88959e0863d3426b8c9cc203d6415539e00c40",
+    "sql_apm/diagnostics/threshold_coverage.py": "8ce95da9b4c1d5725cd90dec741b53dee62c12d9f58667d1a0bf8b460dfc3dd0",
+    "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+    "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+    "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+    "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+    "sql_apm/sql/normalization.py": "80146638905c13e8eb2371ac28f8519baa660fca70f63564bfa274c505da93af",
+    "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+    "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+    "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c"
+  },
+  "thresholds": {
+    "min_active_dates": 7,
+    "min_occurrences": [
+      30,
+      200,
+      1000
+    ]
+  },
+  "unique_inputs": 1497418
+}

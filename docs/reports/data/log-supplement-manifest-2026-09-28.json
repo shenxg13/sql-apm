@@ -1,0 +1,1270 @@
+{
+  "clusters": {
+    "119": {
+      "files": [
+        {
+          "bytes": 147939173,
+          "counts": {
+            "duration_records": 56446,
+            "inline_differs_sql": 1890,
+            "inline_equals_sql": 30514,
+            "records": 117152
+          },
+          "file": "gpdb-2026-07-01_000000.csv",
+          "sha256": "237b8fe5a5eac889d7f765a23cf571dc7cd8ed9525c12d2a22ecaa0c0d6748c9"
+        },
+        {
+          "bytes": 116179145,
+          "counts": {
+            "duration_records": 92412,
+            "inline_differs_sql": 2440,
+            "inline_equals_sql": 48414,
+            "records": 189535
+          },
+          "file": "gpdb-2026-07-04_000000.csv",
+          "sha256": "3cdf4c040cb5b8d4314ae85139491f35da2ae1e6321dc9f674d5fa6c87328970"
+        },
+        {
+          "bytes": 116282276,
+          "counts": {
+            "duration_records": 91833,
+            "inline_differs_sql": 2413,
+            "inline_equals_sql": 48114,
+            "records": 188238
+          },
+          "file": "gpdb-2026-07-05_000000.csv",
+          "sha256": "90468cc573678d3894877282b15d90f894ec3f2ab8e1c5277e564d4dd8ee6a06"
+        },
+        {
+          "bytes": 191838741,
+          "counts": {
+            "duration_records": 111047,
+            "inline_differs_sql": 2406,
+            "inline_equals_sql": 54921,
+            "records": 215732
+          },
+          "file": "gpdb-2026-07-06_000000.csv",
+          "sha256": "8a99adb8c1015e9183cc22cc0f9fc64b82dfea1a84c365d5c4ee6e3d3fc1587b"
+        },
+        {
+          "bytes": 150247477,
+          "counts": {
+            "duration_records": 101162,
+            "inline_differs_sql": 2449,
+            "inline_equals_sql": 51525,
+            "records": 202277
+          },
+          "file": "gpdb-2026-07-07_000000.csv",
+          "sha256": "0fd4e7e8f6959ef532114854f4a70e2c8f6da35bd30686f8d48c524b6369c047"
+        },
+        {
+          "bytes": 167933596,
+          "counts": {
+            "duration_records": 103908,
+            "inline_differs_sql": 2759,
+            "inline_equals_sql": 52413,
+            "records": 206678
+          },
+          "file": "gpdb-2026-07-08_000000.csv",
+          "sha256": "a8351e2f48568318147d430da6ee051d3505dd71818f3a6f257d35180ae65041"
+        },
+        {
+          "bytes": 158832781,
+          "counts": {
+            "duration_records": 102264,
+            "inline_differs_sql": 2562,
+            "inline_equals_sql": 52187,
+            "records": 205229
+          },
+          "file": "gpdb-2026-07-09_000000.csv",
+          "sha256": "9d0d80fea45f030fa3317930807a8a69b5b5d7bba30e681ea3fe65451e40d409"
+        },
+        {
+          "bytes": 143693751,
+          "counts": {
+            "duration_records": 101453,
+            "inline_differs_sql": 2449,
+            "inline_equals_sql": 52031,
+            "records": 203152
+          },
+          "file": "gpdb-2026-07-10_000000.csv",
+          "sha256": "addd8194894834a321ce94c08200b049c249da3b3860b8d78b5b00eba2c85eff"
+        },
+        {
+          "bytes": 118325562,
+          "counts": {
+            "duration_records": 95017,
+            "inline_differs_sql": 2454,
+            "inline_equals_sql": 49222,
+            "records": 192913
+          },
+          "file": "gpdb-2026-07-11_000000.csv",
+          "sha256": "72a80324e325e418bde02d66d286f844aa02cb58016994c1bc489fff59be32b2"
+        },
+        {
+          "bytes": 116002893,
+          "counts": {
+            "duration_records": 93816,
+            "inline_differs_sql": 2387,
+            "inline_equals_sql": 48727,
+            "records": 190601
+          },
+          "file": "gpdb-2026-07-12_000000.csv",
+          "sha256": "691aa60f82de544aed532088fc9e13b223c19c192ce9feb806ff7b00f5a8f9cc"
+        },
+        {
+          "bytes": 163016278,
+          "counts": {
+            "duration_records": 102823,
+            "inline_differs_sql": 2413,
+            "inline_equals_sql": 52107,
+            "records": 204155
+          },
+          "file": "gpdb-2026-07-13_000000.csv",
+          "sha256": "bc12d7631606187fb0141402a26a30caf9597345b9e47a2481e21119cd90bf2c"
+        },
+        {
+          "bytes": 144909604,
+          "counts": {
+            "duration_records": 99609,
+            "inline_differs_sql": 2520,
+            "inline_equals_sql": 50797,
+            "records": 199881
+          },
+          "file": "gpdb-2026-07-14_000000.csv",
+          "sha256": "e06a3e57679cd285afa5e7ab5d9556b40071d039fb61ce5c08a79805d5726eea"
+        },
+        {
+          "bytes": 147642320,
+          "counts": {
+            "duration_records": 100803,
+            "inline_differs_sql": 2486,
+            "inline_equals_sql": 51146,
+            "records": 201547
+          },
+          "file": "gpdb-2026-07-15_000000.csv",
+          "sha256": "a8787801e05bfa1b0dcd3a0e5685ba8250f012eb0c4bfd7a9f87bdf96c81d8f5"
+        },
+        {
+          "bytes": 153670772,
+          "counts": {
+            "duration_records": 104524,
+            "inline_differs_sql": 2568,
+            "inline_equals_sql": 52716,
+            "records": 207207
+          },
+          "file": "gpdb-2026-07-16_000000.csv",
+          "sha256": "0c8262bc96dd52491427e71fcb136323e374ad95a093ff2acd13b8687071738d"
+        },
+        {
+          "bytes": 148633328,
+          "counts": {
+            "duration_records": 102698,
+            "inline_differs_sql": 2645,
+            "inline_equals_sql": 52219,
+            "records": 204907
+          },
+          "file": "gpdb-2026-07-17_000000.csv",
+          "sha256": "f3e9cc75cf757fa9dab2f682e485792c284467eabfcb5a7594b7dd2ff6d4d6e3"
+        },
+        {
+          "bytes": 114233125,
+          "counts": {
+            "duration_records": 90888,
+            "inline_differs_sql": 2438,
+            "inline_equals_sql": 47827,
+            "records": 187224
+          },
+          "file": "gpdb-2026-07-18_000000.csv",
+          "sha256": "596f7e6378bea7bbde5af191504d546adb76c6033adbb6c1235eec0f876b038b"
+        },
+        {
+          "bytes": 114870764,
+          "counts": {
+            "duration_records": 91697,
+            "inline_differs_sql": 2398,
+            "inline_equals_sql": 47985,
+            "records": 187752
+          },
+          "file": "gpdb-2026-07-19_000000.csv",
+          "sha256": "7ca8becad6cdda595b7960506a9464aa73e5cc0757a562e5bfba061e12de2d7a"
+        },
+        {
+          "bytes": 173200913,
+          "counts": {
+            "duration_records": 104192,
+            "inline_differs_sql": 2521,
+            "inline_equals_sql": 52473,
+            "records": 206209
+          },
+          "file": "gpdb-2026-07-20_000000.csv",
+          "sha256": "d3656130438ecafa0274b43b13d772c5a38c3d0fab7042feffb31b27d0e4b19b"
+        },
+        {
+          "bytes": 159448460,
+          "counts": {
+            "duration_records": 104267,
+            "inline_differs_sql": 2542,
+            "inline_equals_sql": 52654,
+            "records": 207074
+          },
+          "file": "gpdb-2026-07-21_000000.csv",
+          "sha256": "30651e53b9ca302dcb403694d3e400b4c118b516a439d1a9ffb5c1b317ecd91b"
+        },
+        {
+          "bytes": 164437354,
+          "counts": {
+            "duration_records": 108581,
+            "inline_differs_sql": 2626,
+            "inline_equals_sql": 54213,
+            "records": 212876
+          },
+          "file": "gpdb-2026-07-22_000000.csv",
+          "sha256": "d59bd5eb4b21676d9c7f4b36a3c47747a82a3e768624284182dc789105eb5558"
+        },
+        {
+          "bytes": 154211029,
+          "counts": {
+            "duration_records": 100732,
+            "inline_differs_sql": 2475,
+            "inline_equals_sql": 51187,
+            "records": 201436
+          },
+          "file": "gpdb-2026-07-23_000000.csv",
+          "sha256": "b190504ca809afc200434bc6c3fdb640214c697225850bfc1e7d163b144f89c0"
+        },
+        {
+          "bytes": 174226350,
+          "counts": {
+            "duration_records": 100193,
+            "inline_differs_sql": 2468,
+            "inline_equals_sql": 51039,
+            "records": 200927
+          },
+          "file": "gpdb-2026-07-24_000000.csv",
+          "sha256": "a7ef3eba3b26f5cbcc9d109a889f1f45546b071bf9b2969b7b06a05823b73357"
+        },
+        {
+          "bytes": 116745476,
+          "counts": {
+            "duration_records": 93860,
+            "inline_differs_sql": 2432,
+            "inline_equals_sql": 48854,
+            "records": 191289
+          },
+          "file": "gpdb-2026-07-25_000000.csv",
+          "sha256": "d503ead82c9a108c7044216a74cda433678da827e27f4dc06deb1a0e4a947749"
+        },
+        {
+          "bytes": 114340538,
+          "counts": {
+            "duration_records": 91117,
+            "inline_differs_sql": 2397,
+            "inline_equals_sql": 47844,
+            "records": 187195
+          },
+          "file": "gpdb-2026-07-26_000000.csv",
+          "sha256": "6dbe13ca39a53a0b172881fe696dba5d83965e760a710832aceca55ccfa60154"
+        },
+        {
+          "bytes": 191535524,
+          "counts": {
+            "duration_records": 104068,
+            "inline_differs_sql": 2592,
+            "inline_equals_sql": 52839,
+            "records": 207270
+          },
+          "file": "gpdb-2026-07-27_000000.csv",
+          "sha256": "aa4c3c5af5a709911d49800873db27a2448177cef57ef3cd2f1e3fd2c5c6ac47"
+        },
+        {
+          "bytes": 162575016,
+          "counts": {
+            "duration_records": 103846,
+            "inline_differs_sql": 2488,
+            "inline_equals_sql": 52475,
+            "records": 206230
+          },
+          "file": "gpdb-2026-07-28_000000.csv",
+          "sha256": "8fcf4d70c23093b292a85cddd0924563bfbe0c3459104bc143716f759eb82081"
+        },
+        {
+          "bytes": 135254466,
+          "counts": {
+            "duration_records": 79191,
+            "inline_differs_sql": 2248,
+            "inline_equals_sql": 39598,
+            "records": 157799
+          },
+          "file": "gpdb-2026-07-29_000000.csv",
+          "sha256": "bf8f3784b34f3b11afaa942fbafefcf952f57cb4b42cb42bff54fa80fa2eaf8e"
+        },
+        {
+          "bytes": 17589465,
+          "counts": {
+            "duration_records": 20000,
+            "inline_differs_sql": 207,
+            "inline_equals_sql": 10987,
+            "records": 41365
+          },
+          "file": "gpdb-2026-07-29_161546.csv",
+          "sha256": "88e2570ee869fa6027702d9ad71107e137838aaa81753b34215423bbe4fa8234"
+        },
+        {
+          "bytes": 160491551,
+          "counts": {
+            "duration_records": 101785,
+            "inline_differs_sql": 2490,
+            "inline_equals_sql": 51561,
+            "records": 203063
+          },
+          "file": "gpdb-2026-07-30_000000.csv",
+          "sha256": "c9fe13a9ae28f20170ec571b693e82063da15d7631474d2488c7e28bfbb165b4"
+        },
+        {
+          "bytes": 164320624,
+          "counts": {
+            "duration_records": 100589,
+            "inline_differs_sql": 2499,
+            "inline_equals_sql": 51487,
+            "records": 201727
+          },
+          "file": "gpdb-2026-07-31_000000.csv",
+          "sha256": "bd39c77cfac7a603d03cd269048090dbc3b678e40f0e34f000e72e2fe7e1fc39"
+        }
+      ]
+    },
+    "120": {
+      "files": [
+        {
+          "bytes": 529475791,
+          "counts": {
+            "duration_records": 290651,
+            "inline_differs_sql": 7794,
+            "inline_equals_sql": 196297,
+            "records": 668674
+          },
+          "file": "gpdb-2026-09-16_000000.csv.1",
+          "sha256": "7637211ed5d2a85952a6d8b77efbb370d53e3a3ccc94ada577678c8f29eb20db"
+        },
+        {
+          "bytes": 526755139,
+          "counts": {
+            "duration_records": 62747,
+            "inline_differs_sql": 1594,
+            "inline_equals_sql": 50045,
+            "records": 183401
+          },
+          "file": "gpdb-2026-09-16_000000.csv.2",
+          "sha256": "8210741a0a6c174e4daef192a748f0f35cf2a29dc0abc9f1dcc72a55ef285f25"
+        },
+        {
+          "bytes": 528150833,
+          "counts": {
+            "duration_records": 258444,
+            "inline_differs_sql": 14346,
+            "inline_equals_sql": 154382,
+            "records": 594218
+          },
+          "file": "gpdb-2026-09-16_000000.csv.3",
+          "sha256": "91285a731f21cca24e3634be3eecaf8c915dbb310473ac067742f499f76c5603"
+        },
+        {
+          "bytes": 124666079,
+          "counts": {
+            "duration_records": 75764,
+            "inline_differs_sql": 4128,
+            "inline_equals_sql": 44179,
+            "records": 163273
+          },
+          "file": "gpdb-2026-09-16_000000.csv",
+          "sha256": "4951fe869607d30300a769d32480d647b4dd13780a9c914f1338f6376ac1c560"
+        },
+        {
+          "bytes": 524732770,
+          "counts": {
+            "duration_records": 292092,
+            "inline_differs_sql": 4834,
+            "inline_equals_sql": 215942,
+            "records": 688482
+          },
+          "file": "gpdb-2026-09-17_000000.csv.1",
+          "sha256": "890505ac82d6b1b6cf21ca756796d4f463e53735c741146377b8dfec6f84ddc6"
+        },
+        {
+          "bytes": 525793242,
+          "counts": {
+            "duration_records": 64076,
+            "inline_differs_sql": 1152,
+            "inline_equals_sql": 55901,
+            "records": 196968
+          },
+          "file": "gpdb-2026-09-17_000000.csv.2",
+          "sha256": "6dba60e5bf29a498ecc80f7b109af3408ce40b443e1b84e54262e63f84bc9e7d"
+        },
+        {
+          "bytes": 524770216,
+          "counts": {
+            "duration_records": 270978,
+            "inline_differs_sql": 13844,
+            "inline_equals_sql": 166125,
+            "records": 619381
+          },
+          "file": "gpdb-2026-09-17_000000.csv.3",
+          "sha256": "f3171ea36c87fec1bdec194927948f136b7ee02dfb896336f69f1587b0496b12"
+        },
+        {
+          "bytes": 373615414,
+          "counts": {
+            "duration_records": 236785,
+            "inline_differs_sql": 7805,
+            "inline_equals_sql": 157819,
+            "records": 517573
+          },
+          "file": "gpdb-2026-09-17_000000.csv",
+          "sha256": "0f3de2f89abe906fea23f849390ea55279f9af299020a46575894a1b7ba2d1e6"
+        },
+        {
+          "bytes": 524439546,
+          "counts": {
+            "duration_records": 242825,
+            "inline_differs_sql": 6940,
+            "inline_equals_sql": 151439,
+            "records": 519178
+          },
+          "file": "gpdb-2026-09-18_000000.csv.1",
+          "sha256": "b4716eba07d4440f78a896bfd356c146358ffc921c65ed5209f073f5b2dc6a19"
+        },
+        {
+          "bytes": 527328017,
+          "counts": {
+            "duration_records": 60493,
+            "inline_differs_sql": 1385,
+            "inline_equals_sql": 48128,
+            "records": 178287
+          },
+          "file": "gpdb-2026-09-18_000000.csv.2",
+          "sha256": "390df0cc11a0bcfee65e72b8175ebc98be2ed5c424108bfbb8133ac51d056c3c"
+        },
+        {
+          "bytes": 525499344,
+          "counts": {
+            "duration_records": 259991,
+            "inline_differs_sql": 13958,
+            "inline_equals_sql": 154344,
+            "records": 587981
+          },
+          "file": "gpdb-2026-09-18_000000.csv.3",
+          "sha256": "387d41e98567013cff091171a3f583aca4909785f89f8a1aed715e95c1845451"
+        },
+        {
+          "bytes": 161216033,
+          "counts": {
+            "duration_records": 99903,
+            "inline_differs_sql": 5250,
+            "inline_equals_sql": 58188,
+            "records": 214498
+          },
+          "file": "gpdb-2026-09-18_000000.csv",
+          "sha256": "965cb9f643f0a4780464964812e7bfe60a175524977e82755648ade1b8cc209d"
+        },
+        {
+          "bytes": 524322867,
+          "counts": {
+            "duration_records": 377840,
+            "inline_differs_sql": 10053,
+            "inline_equals_sql": 275067,
+            "records": 790132
+          },
+          "file": "gpdb-2026-09-19_000000.csv.1",
+          "sha256": "eb359163f0408f5a1bdf8b3188ef589399fce4f7c7dfebd014c60e60a13a57d2"
+        },
+        {
+          "bytes": 527561226,
+          "counts": {
+            "duration_records": 86276,
+            "inline_differs_sql": 2156,
+            "inline_equals_sql": 65207,
+            "records": 237515
+          },
+          "file": "gpdb-2026-09-19_000000.csv.2",
+          "sha256": "22679be64278796011410abd1f9bd1490078f08391d04a6290d7e4a4a3a81277"
+        },
+        {
+          "bytes": 568743370,
+          "counts": {
+            "duration_records": 247078,
+            "inline_differs_sql": 13752,
+            "inline_equals_sql": 146240,
+            "records": 560928
+          },
+          "file": "gpdb-2026-09-19_000000.csv.3",
+          "sha256": "ef64b490933002d1bbb5ee980647289423aae84bf8167777d328952785f950b9"
+        },
+        {
+          "bytes": 5131812,
+          "counts": {
+            "duration_records": 3923,
+            "inline_differs_sql": 154,
+            "inline_equals_sql": 2518,
+            "records": 9640
+          },
+          "file": "gpdb-2026-09-19_000000.csv",
+          "sha256": "f159b5e17c152b434a5b58d7b703f50eb974eb3d9ad79c8c19bf6cd72ea2ebc5"
+        },
+        {
+          "bytes": 379521071,
+          "counts": {
+            "records": 477828
+          },
+          "file": "gpdb-2026-09-13_000000.csv",
+          "sha256": "3f727a1861065e67e6d2d4061cbc54c6fabed59ec824622f668f6e72b28da8e1"
+        },
+        {
+          "bytes": 525321293,
+          "counts": {
+            "records": 172718
+          },
+          "file": "gpdb-2026-09-13_000000.csv.1",
+          "sha256": "8e74410a23a94766a98af0a40f3b694c4d45c14a51d3225186ba8f030bcbe4d9"
+        },
+        {
+          "bytes": 531873447,
+          "counts": {
+            "records": 572926
+          },
+          "file": "gpdb-2026-09-13_000000.csv.2",
+          "sha256": "42b8093a1b4ceddae68f52cb5efd4c37f1f81c5d82bba609957be5befdc06eae"
+        },
+        {
+          "bytes": 418231488,
+          "counts": {
+            "records": 585845
+          },
+          "file": "gpdb-2026-09-14_000000.csv",
+          "sha256": "40409bc24cf85f7f284654d398c87a654d6bbd692f2ae21af0bae4d19756fe47"
+        },
+        {
+          "bytes": 526404305,
+          "counts": {
+            "records": 219815
+          },
+          "file": "gpdb-2026-09-14_000000.csv.1",
+          "sha256": "d031bdae3ef6be951cb2efc5a1aeda30f7389d1b1842268fcf39fba316590d55"
+        },
+        {
+          "bytes": 549603512,
+          "counts": {
+            "records": 513403
+          },
+          "file": "gpdb-2026-09-14_000000.csv.2",
+          "sha256": "cc1c46ccbc4b28b36f696e2abc6890f1ee59f17e1fe890af2d5415168d32e426"
+        },
+        {
+          "bytes": 446859529,
+          "counts": {
+            "records": 594390
+          },
+          "file": "gpdb-2026-09-15_000000.csv",
+          "sha256": "5c863903abfe9d3787faaf7a043233c6524312172d74cb19215554f500c81ec2"
+        },
+        {
+          "bytes": 526720979,
+          "counts": {
+            "records": 226034
+          },
+          "file": "gpdb-2026-09-15_000000.csv.1",
+          "sha256": "04458f051353c037c8c84305d9222c2b3793bd02936153841129017a532c54c9"
+        },
+        {
+          "bytes": 586828138,
+          "counts": {
+            "records": 568418
+          },
+          "file": "gpdb-2026-09-15_000000.csv.2",
+          "sha256": "bd4ae5e017992f6f8cef88b4f462b787c0f1312c0da1241a0510836da1c99215"
+        }
+      ]
+    }
+  },
+  "format": "log-supplement-manifest/1",
+  "previous_sha256": "77580f1ee63ae744f8f6141bfc0fb60dae754aeb36c6d58c01875d1b72abb0f2",
+  "validation": {
+    "119": [
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-01_000000.csv",
+        "filename_date": "2026-07-01",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-01": 117152
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-04_000000.csv",
+        "filename_date": "2026-07-04",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-04": 189535
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-05_000000.csv",
+        "filename_date": "2026-07-05",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-05": 188238
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-06_000000.csv",
+        "filename_date": "2026-07-06",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-06": 215732
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-07_000000.csv",
+        "filename_date": "2026-07-07",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-07": 202277
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-08_000000.csv",
+        "filename_date": "2026-07-08",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-08": 206678
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-09_000000.csv",
+        "filename_date": "2026-07-09",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-09": 205229
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-10_000000.csv",
+        "filename_date": "2026-07-10",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-10": 203152
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-11_000000.csv",
+        "filename_date": "2026-07-11",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-11": 192913
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-12_000000.csv",
+        "filename_date": "2026-07-12",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-12": 190601
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-13_000000.csv",
+        "filename_date": "2026-07-13",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-13": 204155
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-14_000000.csv",
+        "filename_date": "2026-07-14",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-14": 199881
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-15_000000.csv",
+        "filename_date": "2026-07-15",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-15": 201547
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-16_000000.csv",
+        "filename_date": "2026-07-16",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-16": 207207
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-17_000000.csv",
+        "filename_date": "2026-07-17",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-17": 204907
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-18_000000.csv",
+        "filename_date": "2026-07-18",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-18": 187224
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-19_000000.csv",
+        "filename_date": "2026-07-19",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-19": 187752
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-20_000000.csv",
+        "filename_date": "2026-07-20",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-20": 206208,
+          "2026-07-21": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-21_000000.csv",
+        "filename_date": "2026-07-21",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-21": 207074
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-22_000000.csv",
+        "filename_date": "2026-07-22",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-22": 212875,
+          "2026-07-23": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-23_000000.csv",
+        "filename_date": "2026-07-23",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-23": 201435,
+          "2026-07-24": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-24_000000.csv",
+        "filename_date": "2026-07-24",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-24": 200926,
+          "2026-07-25": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-25_000000.csv",
+        "filename_date": "2026-07-25",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-25": 191288,
+          "2026-07-26": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-26_000000.csv",
+        "filename_date": "2026-07-26",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-26": 187195
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-27_000000.csv",
+        "filename_date": "2026-07-27",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-27": 207270
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-28_000000.csv",
+        "filename_date": "2026-07-28",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-28": 206230
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-29_000000.csv",
+        "filename_date": "2026-07-29",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-29": 157799
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-29_161546.csv",
+        "filename_date": "2026-07-29",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-29": 41365
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-30_000000.csv",
+        "filename_date": "2026-07-30",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-30": 203063
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-07-31_000000.csv",
+        "filename_date": "2026-07-31",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-07-31": 201727
+        },
+        "stat_unchanged": true
+      }
+    ],
+    "120": [
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-13_000000.csv",
+        "filename_date": "2026-09-13",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-13": 477827,
+          "2026-09-14": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-13_000000.csv.1",
+        "filename_date": "2026-09-13",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-13": 172718
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-13_000000.csv.2",
+        "filename_date": "2026-09-13",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-13": 572926
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-14_000000.csv",
+        "filename_date": "2026-09-14",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-14": 585844,
+          "2026-09-15": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-14_000000.csv.1",
+        "filename_date": "2026-09-14",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-14": 219815
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-14_000000.csv.2",
+        "filename_date": "2026-09-14",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-14": 513403
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-15_000000.csv",
+        "filename_date": "2026-09-15",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-15": 594389,
+          "2026-09-16": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-15_000000.csv.1",
+        "filename_date": "2026-09-15",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-15": 226034
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-15_000000.csv.2",
+        "filename_date": "2026-09-15",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-15": 568418
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-16_000000.csv",
+        "filename_date": "2026-09-16",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-16": 163272,
+          "2026-09-17": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-16_000000.csv.1",
+        "filename_date": "2026-09-16",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-16": 668674
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-16_000000.csv.2",
+        "filename_date": "2026-09-16",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-16": 183401
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-16_000000.csv.3",
+        "filename_date": "2026-09-16",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-16": 594218
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-17_000000.csv",
+        "filename_date": "2026-09-17",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-17": 517572,
+          "2026-09-18": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-17_000000.csv.1",
+        "filename_date": "2026-09-17",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-17": 688482
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-17_000000.csv.2",
+        "filename_date": "2026-09-17",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-17": 196968
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-17_000000.csv.3",
+        "filename_date": "2026-09-17",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-17": 619381
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-18_000000.csv",
+        "filename_date": "2026-09-18",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-18": 214497,
+          "2026-09-19": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-18_000000.csv.1",
+        "filename_date": "2026-09-18",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-18": 519178
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-18_000000.csv.2",
+        "filename_date": "2026-09-18",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-18": 178287
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-18_000000.csv.3",
+        "filename_date": "2026-09-18",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-18": 587981
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-19_000000.csv",
+        "filename_date": "2026-09-19",
+        "filename_date_matches_records": false,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-19": 9639,
+          "2026-09-20": 1
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-19_000000.csv.1",
+        "filename_date": "2026-09-19",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-19": 790132
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-19_000000.csv.2",
+        "filename_date": "2026-09-19",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-19": 237515
+        },
+        "stat_unchanged": true
+      },
+      {
+        "columns": 30,
+        "file": "gpdb-2026-09-19_000000.csv.3",
+        "filename_date": "2026-09-19",
+        "filename_date_matches_records": true,
+        "hash_rechecked": true,
+        "read_to_eof": true,
+        "records_by_date": {
+          "2026-09-19": 560928
+        },
+        "stat_unchanged": true
+      }
+    ]
+  }
+}

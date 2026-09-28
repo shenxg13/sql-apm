@@ -4,11 +4,13 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/log-evidence.md
-updated: 2026-09-25
+updated: 2026-09-28
 sources:
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
+    status: current
+  - path: docs/reports/cluster-log-supplement-2026-09-28.md
     status: current
 related:
   - decision.runtime-and-components
@@ -180,6 +182,10 @@ confidence: high
 
 ### 119、120 两集群日志观察（2026-09-24）
 
+> 本节保留原始历史观察。120 的“四天”覆盖范围已由下文
+> [七天补充观察](#120-集群七天补充观察2026-09-28)取代；旧报告和本节原文保留，
+> 其他配置、计时、来源推断及其限制仍按各自确认依据解释。
+
 - 来源状态：current；用户本轮确认两个集群均使用上述 HashData／GP／PG 版本，
   以及 `log_duration=on`、`log_min_duration_statement=1min`、`log_statement=all`。
   各自来自单一 Master，文件已关闭并拷贝完整，CST 均为北京时间。没有直接
@@ -278,6 +284,30 @@ confidence: high
   LOG／ERROR／FATAL；完整清点与有界复查已补入上述专项报告，未改变训练口径。
 
 关联条款：[已确认的五类计时统计与 Parse／Bind 纳入](timing-and-grouping.md#已确认的五类计时统计与-parsebind-纳入)；[已确认的 Execute 单次配对与调用分类统计](timing-and-grouping.md#已确认的-execute-单次配对与调用分类统计)；[已确认的阶段与调用样本门槛](baseline-statistics.md#已确认的阶段与调用样本门槛)。
+
+### 120 集群七天补充观察（2026-09-28）
+
+- 来源：[Issue #13](https://github.com/shenxg13/sql-apm/issues/13) 的已确认契约和
+  [补充报告](../../docs/reports/cluster-log-supplement-2026-09-28.md)；来源状态：current，
+  仅为本地日志范围与诊断观察，不是训练资格或新归一化规则确认。
+- 120 新增09-13至09-15的9文件，4,491,363,762字节、3,931,377条记录；当前共25文件、
+  11,513,565,461字节、10,661,506条CSV记录。119仍为原30文件、5,728,640条记录。
+  新清单逐字段沿用原46条目，独立重读全部55文件核对字节／SHA-256／记录数、30列和EOF；
+  历史证据未改写，原文及新索引留在本地忽略目录。
+- 120覆盖09-13至09-19连续七天，另保留09-20零点1条记录；119覆盖07-01及07-04至07-31。
+  12个文件各含1条次日记录，新增可选实际日期索引并据此统计，不能把轮转文件数当活跃日。
+  该日期为日志记录日期，未还原执行的推算开始日，也不能证明源端没有其他漏记／漏拷。
+- 七天主SQL与独立内联普查没有新增词法类别或诊断原因；57个固定定位回放通过。
+  SELECT类别组成下降约2.478个百分点、INSERT上升约0.929个百分点；未做显著性或耗时
+  离散检验，不据此推断业务／性能变化，不修改首版黑名单。
+- 门槛诊断比较现行v4、JOIN ON／SELECT／CASE组合、未限定名函数参数、二者叠加及
+  TiDB式词法对照；方案、版本和全量结果见补充报告及[命令说明](../../docs/runbooks/log-supplement.md)。
+  这只按“集群＋指纹”累计日志出现次数与日期，没有执行还原、数据库／用户／计时细分
+  或训练筛选；不能把30／7等覆盖比例称为有效基线覆盖率。候选身份与可靠结果分开，
+  正式v4、字典、指纹版本、训练资格和样本门槛均不变。
+- 本轮全量1,497,418个原文中1,486,516个返回结构、10,902个明确拒绝，无运行异常。
+  120在30／7门槛下现行v4覆盖全部输入出现的53.576%，位置组合58.612%，位置＋函数
+  60.289%；这些是观察分母的候选收益，不是有效训练覆盖或业务采纳。
 
 ### psql 多语句计时的现场测试（2026-09-23）
 

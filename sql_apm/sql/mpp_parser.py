@@ -14,7 +14,7 @@ from sql_apm.sql.lexical import diagnose
 from sql_apm.sql.pg_ast import pg_clean
 from sql_apm.sql.structure import dumps, loads
 
-VERSION = 'mpp-adapter-probe/7'
+VERSION = 'mpp-adapter-probe/8'
 
 
 class Unsupported(ValueError):
@@ -68,8 +68,12 @@ def _constant_sign_offsets(sql, tree):
             pending.extend(node)
         elif isinstance(node, dict):
             constant = node.get('A_Const')
-            if isinstance(constant, dict) and set(constant) & {'ival', 'fval'}:
-                i = by_byte.get(constant.get('location'))
+            location = constant.get('location') if isinstance(constant, dict) else None
+            # PG-synthesized typmods, FETCH counts and substring starts have no
+            # source token; they cannot contain a source sign folded by PG.
+            if (isinstance(constant, dict) and set(constant) & {'ival', 'fval'}
+                    and type(location) is int and location >= 0):
+                i = by_byte.get(location)
                 if i is None:
                     raise Unsupported('hint_constant_location_unmapped')
                 prefix = []

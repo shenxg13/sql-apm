@@ -57,7 +57,7 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 空输入返回诊断，调用方不得据此伪造完整 SqlText／Fingerprint 实体；非 str／bytes 参数抛出
 TypeError。不完整文本的观察结果遵守独立近似契约，不填入可靠 Fingerprint.value。
 
-规则依据包括算法版本、适配器 `mpp-adapter-probe/7`、固定 pglast 版本、字典规范内容摘要
+规则依据包括算法版本、适配器 `mpp-adapter-probe/8`、固定 pglast 版本、字典规范内容摘要
 及算法规则摘要。`rules_ref` 是规范规则快照的内容地址；**必须连同 `rule_snapshot()` 的
 内容保存**，只有摘要不能解释历史规则。该快照含完整字典和算法规则说明，字典规则／参数
 列表按已有摘要语义排序；不把字典文件排版摘要误作 dictionary_digest。算法实现由版本化
@@ -119,6 +119,9 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 或作为原文哈希降级。没有 Hint 时不计算该序列摘要；同一语句的多个 Hint 复用一次摘要。
 
 版本3使用 PG 已解析的数值 `A_Const` 源位置，确认哪些一元负号已折叠进常量。
+适配器版本8仅对 `location` 为非负整数的常量做源 token 映射。PG 为无长度的 char／bit、
+默认 FETCH 数量、substring FOR 起点和 interval 修饰生成的常量可能没有位置或位置为负；
+它们没有源 token，不能携带源码中被折叠的负号，因此跳过源位置映射，AST 中的值仍完整保留。
 这些负号不再单独计入序列、全局 `gap` 或语句内 `token_gap`，同一边界的 `1`、`-1`、
 `- -1` 等业务值因而仍可归并，包括 Hint 在值之后或批次后续语句的情况。
 二元减号、未折叠的正负号表达式、括号及类型转换继续保留；保留值的正负仍由完整 AST 区分。
@@ -127,8 +130,17 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 
 Hint 恰好位于被折叠负号之后时，规范间隙无法区分该负号前后的位置，返回
 `hint_inside_folded_sign`，整批不产生可靠指纹；例如 `x=- /*+ H */ 1`。
-二元运算符后的 `x=y - /*+ H */ 1` 仍可锚定。无法回映常量源位置或适配替换位置时也返回
-固定诊断，不能猜定锚点。具体新增证据见[R2 整改报告](../reports/sql-normalization-r2-remediation-2026-09-28.md)。
+二元运算符后的 `x=y - /*+ H */ 1` 仍可锚定。以下三项是源文本、AST 和适配替换映射
+不一致时的防御性不变量，不是受支持的有效 SQL 因包含合成常量而应被拒绝的语法边界：
+
+- `hint_constant_location_unmapped`：非负整数位置没有对应源 token。
+- `hint_constant_span_unmapped`：映射出的折叠负号没有数值常量跨度。
+- `hint_sign_inside_adapter_replacement`：负号落在适配器生成的替换文本中。
+
+这三项由构造不一致内部数据的辅助函数测试验证，仍明确拒绝而不猜定锚点；有效输入由
+定向、广覆盖及历史回放验证。证据见[收敛整改报告](../reports/sql-normalization-adj-remediation-2026-09-28.md)。
+本次保留 `sql-normalization/3`，业务值替换和规范结构编码未变；解析能力版本、Hint 规则说明
+及其摘要／快照内容地址更新，使新规则上下文可追溯，指纹仍不能跨上下文直接比较。
 
 `anchor.kind=statement` 表示 Hint 位于语句开始前、内部或终止分号前。
 位于空语句间或最后一个分号后的 Hint 使用 `batch_boundary`，记录下一非空语句序号

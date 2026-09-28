@@ -129,3 +129,91 @@ class SignedHintTests(unittest.TestCase):
                     self.assertEqual(seen.setdefault(value, oracle), oracle)
                     count += 1
         self.assertEqual(count, 728)
+
+    def test_adjudication_e1_57_synthesized_constant_cases(self):
+        forms = ('x::char', 'CAST(x AS character)', 'x::bit', 'substring(x for 2)',
+                 "interval(3) '1 day'", 'x::interval(2)')
+        tails = ('WHERE y = {v}', 'WHERE y = {v} FETCH FIRST ROWS ONLY',
+                 'WHERE y = z - 1 AND w = {v}')
+        hints = ('/*+ H */ {s}', '{s} /*+ H */', '--+ H\n{s}')
+        count = 0
+        for form, tail, hint in product(forms, tails, hints):
+            pair = ['SELECT {} FROM t {}'.format(form, tail.format(v=v)) for v in ('1', '-1')]
+            with self.subTest(form=form, tail=tail, hint=hint):
+                self.assertEqual(self.value(pair[0]), self.value(pair[1]))
+                self.assertEqual(self.value(hint.format(s=pair[0])), self.value(hint.format(s=pair[1])))
+            count += 1
+        for sql in (
+            'CREATE TABLE t (a char, b int DEFAULT -1) DISTRIBUTED RANDOMLY',
+            "UPDATE t SET a = b - 1 WHERE c::char = 'x'",
+            'INSERT INTO t (a) SELECT substring(x for 2) FROM u WHERE id = -3',
+        ):
+            with self.subTest(sql=sql):
+                self.value(sql)
+                self.value('/*+ H */ ' + sql)
+            count += 1
+        self.assertEqual(count, 57)
+
+    def test_adjudication_e2_30_targeted_forms(self):
+        forms = ('x::char', 'CAST(x AS character)', 'x::bit', 'x::character(1)',
+                 'substring(x for 2)', "interval(3) '1 day'", 'x::interval(2)',
+                 "overlay(x placing 'a' from 1)", 'x::char(1)', 'x::varchar')
+        for form, tail in product(forms, ('WHERE y = -1', 'WHERE y = z - 1', 'WHERE y = 1')):
+            with self.subTest(form=form, tail=tail):
+                self.value('/*+ H */ SELECT {} FROM t {}'.format(form, tail))
+
+    def test_adjudication_e3_180_nested_sign_and_adapter_cases(self):
+        values = ('-1', '- 1', '(-1)', '-(1)', '-((1))', '-(-1)', '-(-(-1))', '- -1',
+                  '(-1)::int', '-(1)::int', '(-1::int)', 'CAST(-1 AS integer)',
+                  '-(1::int)', 'CAST(-(-1) AS numeric)', '- /* ordinary */ 1')
+        contexts = (
+            'SELECT x::char FROM t WHERE y={v}',
+            'WITH c AS (SELECT substring(x for 2) FROM t WHERE y={v}) SELECT * FROM c',
+            'INSERT INTO t(a) SELECT x::bit FROM u WHERE y={v}',
+            'CREATE TABLE t AS SELECT x::char FROM u WHERE y={v} DISTRIBUTED BY (x)',
+            'CREATE TABLE t WITH (orientation=row) AS SELECT x::char FROM u WHERE y={v} DISTRIBUTED RANDOMLY',
+            'CREATE TABLE t WITHOUT OIDS AS SELECT x::char FROM u WHERE y={v} DISTRIBUTED RANDOMLY',
+        )
+        count = 0
+        for value, context, hint in product(values, contexts, ('/*+ H */ {s}', '{s} /*+ H */')):
+            sql = context.format(v=value)
+            with self.subTest(value=value, context=context, hint=hint):
+                self.value(sql)
+                self.value(hint.format(s=sql))
+            count += 1
+        self.assertEqual(count, 180)
+
+    def test_source_less_constants_leave_real_numeric_signs_mapped(self):
+        # PG supplies implicit typmods, FETCH counts and substring starts without
+        # a source token. A real signed constant in the same AST still maps.
+        from sql_apm.sql.mpp_parser import _constant_sign_offsets
+        for location in (None, -1, -2, '7', 7.0, True):
+            synthesized = {'ival': {'ival': 1}}
+            if location is not None:
+                synthesized['location'] = location
+            tree = [{'A_Const': synthesized}, {'A_Const': {'ival': {'ival': -1}, 'location': 7}}]
+            with self.subTest(location=location):
+                self.assertEqual(_constant_sign_offsets('SELECT -1', tree), {7})
+
+    def test_unmapped_location_is_an_internal_ast_source_invariant(self):
+        from sql_apm.sql.mpp_parser import _constant_sign_offsets
+        # Deliberately inconsistent AST: positive source location outside SQL.
+        tree = {'A_Const': {'ival': {'ival': -1}, 'location': 99}}
+        with self.assertRaisesRegex(Unsupported, '^hint_constant_location_unmapped$'):
+            _constant_sign_offsets('SELECT -1', tree)
+
+    def test_unmapped_span_is_an_internal_ast_source_invariant(self):
+        from sql_apm.sql.mpp_parser import _constant_sign_offsets
+        # PG cannot produce a numeric A_Const for a unary operator on a column.
+        tree = {'A_Const': {'ival': {'ival': -1}, 'location': 7}}
+        with self.assertRaisesRegex(Unsupported, '^hint_constant_span_unmapped$'):
+            _constant_sign_offsets('SELECT -x', tree)
+        self.assertEqual(_constant_sign_offsets('SELECT -(1)', tree), {7})
+
+    def test_sign_inside_replacement_is_an_internal_adapter_invariant(self):
+        from sql_apm.sql.mpp_parser import _restore_offsets
+        # Replacement-generated text is not an original numeric source token.
+        replacements = [(2, 6, 'X')]
+        with self.assertRaisesRegex(Unsupported, '^hint_sign_inside_adapter_replacement$'):
+            _restore_offsets({2}, replacements)
+        self.assertEqual(_restore_offsets({1, 3, 5}, replacements), {1, 6, 8})

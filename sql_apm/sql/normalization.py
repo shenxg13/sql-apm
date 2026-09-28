@@ -32,7 +32,7 @@ RULES = {
     'casts': sorted(NORMALIZABLE_CASTS),
     'other_constants': 'preserve; CASE results, SET, limits, window frames, DDL',
     'extensions': 'preserve typed MPP extension trees',
-    'hints': 'exact content, statement ownership, constant-aware gaps/frame; PG-folded numeric signs share VALUE; retain brackets, operators and batch boundaries',
+    'hints': 'exact content, statement ownership, constant-aware gaps/frame; source-backed PG-folded numeric signs share VALUE; skip source mapping for synthesized constants; retain brackets, operators and batch boundaries',
     'encoding': 'canonical sorted ASCII JSON; arrays retain order; sha256 domain-separated',
 }
 

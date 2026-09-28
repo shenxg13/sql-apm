@@ -1,6 +1,6 @@
 # SQL 归一化与结构指纹接口
 
-当前 `sql-normalization/3` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
+当前 `sql-normalization/4` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
 并接入独立的[观察用近似路径](sql-approximate.md)。核心位于
 [normalization.py](../../sql_apm/sql/normalization.py)，业务边界由
 [SQL 指纹契约](../../.project-wiki/contracts/sql-fingerprints.md)定义。
@@ -46,10 +46,10 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 | `normalized` | 完整有类型结构与 Hint；可靠时非空，不是可执行 SQL，也不能替代原文 |
 | `fingerprint.kind` | 固定 structural，和 approximate 明确分开 |
 | `fingerprint.state` | reliable／unsupported_syntax／normalization_failed |
-| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/3:` 加 SHA-256 |
+| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/4:` 加 SHA-256 |
 | `fingerprint.reason` | reliable 时 null，否则固定诊断，不包含解析器错误原文 |
 | `approximate` | 只在解析明确拒绝时尝试；结构异常、归一化异常、配置和资源错误不回退 |
-| `diagnostics` | 替换节点数、函数选择原因计数；不含对象名、参数值或异常原文 |
+| `diagnostics` | 替换节点数、IN 分桶列表数、函数选择原因计数；不含对象名、参数值或异常原文 |
 
 `context` 可映射 [Normalization](offline-data-contract/fields.md#normalization-与-fingerprint)，
 `fingerprint` 可映射 Fingerprint 的状态、值及原因。数据库 ID、SqlText、Group、训练资格和
@@ -57,7 +57,7 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 空输入返回诊断，调用方不得据此伪造完整 SqlText／Fingerprint 实体；非 str／bytes 参数抛出
 TypeError。不完整文本的观察结果遵守独立近似契约，不填入可靠 Fingerprint.value。
 
-规则依据包括算法版本、适配器 `mpp-adapter-probe/8`、固定 pglast 版本、字典规范内容摘要
+规则依据包括算法版本、适配器 `mpp-adapter/9`、固定 pglast 版本、字典规范内容摘要
 及算法规则摘要。`rules_ref` 是规范规则快照的内容地址；**必须连同 `rule_snapshot()` 的
 内容保存**，只有摘要不能解释历史规则。该快照含完整字典和算法规则说明，字典规则／参数
 列表按已有摘要语义排序；不把字典文件排版摘要误作 dictionary_digest。算法实现由版本化
@@ -75,6 +75,7 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 | 位置 | 行为 |
 | --- | --- |
 | SELECT／UPDATE／DELETE 的 WHERE | 数字、字符串、原生 `$n` 使用统一标记；NULL／布尔保留 |
+| WHERE 的 IN／NOT IN 列表 | 全部元素归一化为裸业务值标记时，以 1／2–10／11–100／>100 桶代替元素序列 |
 | INSERT 的直接 VALUES、UPDATE 的直接 SET（含多列赋值） | 同上；算术表达式中的常量保留；原生参数号在允许位置不构成身份 |
 | 函数参数 | 字典逐参数动作；允许参数中的直接业务值可替换，已知嵌套调用用自己的策略 |
 | 控制参数、未知／歧义／停用／待核实函数 | 整个受保护子树保留，外层 WHERE 或内层已知函数不能绕过 |
@@ -84,6 +85,13 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 | SET 配置、LIMIT／OFFSET、数组下标、窗口定义 | 整个控制子树保留，包括里面的函数及子查询 |
 | CTE、子查询、COPY 查询、CTAS／VIEW 查询、完整批次 | 进入各自查询上下文；WHERE 不泄漏到内层投影或控制位置；语句顺序保留 |
 | DDL 定义、存储／外表选项、MPP 扩展 | 保留完整结构和参数；不将对象名、分区边界、配置当业务值 |
+
+IN 分桶在已有业务值归一化后执行，编码为 `{"SQLAPMInBucket":"2-10"}` 等四种标记；
+IN／NOT IN 运算符、左侧表达式和其余结构继续保留。列、NULL／布尔、表达式、函数或
+显式转换节点均不是裸业务值标记，混合列表保留原有长度及元素结构，仍执行既有常量规则。
+CTE／子查询各自的 WHERE 适用同一规则；投影、JOIN／HAVING、函数参数及受保护子树不扩展。
+`IN (子查询)`、多行 VALUES 和 ANY／ARRAY 不折叠。桶边界写入规则快照；以后修改必须升级版本。
+同桶归并不保证执行计划或耗时相近，实际执行样本仍分别计数。
 
 函数名使用 AST 已解码标识符，保留引号大小写与显式 schema。只依据显式的已知类型转换
 帮助匹配；不从普通字符串、数字或列名猜函数重载、隐式转换及数据库目录。普通调用按
@@ -107,12 +115,13 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 
 完整解析证据与拒绝原因见[全量修复报告](../reports/mpp-full-repair-2026-09-27.md)、
 [广覆盖矩阵](../reports/mpp-broad-validation-2026-09-27.md)；本模块真实归组证据见
-[归一化验证报告](../reports/sql-normalization-2026-09-27.md)。源码中 `probe/7` 的名字保留用于
-历史解析证据和能力版本追溯；产品入口为 Normalizer，不把旧探测返回 AST 当产品指纹。
+[v4 验证报告](../reports/sql-normalization-v4-2026-09-28.md)。正式解析能力为 `mpp-adapter/9`；
+历史报告中的 `mpp-adapter-probe/*` 及旧探测模块保留原样，用于重现当时结果。产品入口为 Normalizer。
 
 普通注释由扫描器确认后忽略；仅以 `/*+`、`--+` 开始的注释作为 Hint，内容原样保留。
 `/* + … */`、`-- + …` 在此可靠路径属于普通注释；近似路径的更保守识别边界见其接口。
-每个 Hint 保存全局 `gap` 和 `anchor`：所属非空语句的零起始序号 `statement_index`、
+解析结果仍提供全局 `gap` 供诊断；版本4的 `normalized.hints` 排除该字段，
+位置身份只使用既有 `anchor`：所属非空语句的零起始序号 `statement_index`、
 语句内 `token_gap` 和按常量边界规范化的有序 token 种类序列摘要 `syntax_sha256`。
 该序列保留括号、关键字、分隔符及真正的运算符；普通字面量和参数的种类统一为 `VALUE`，
 值是否受保护仍由完整 AST 与归一化规则决定。摘要使用规范 JSON 的 SHA-256，只补充 Hint 位置，不能独立替代 AST
@@ -139,8 +148,8 @@ Hint 恰好位于被折叠负号之后时，规范间隙无法区分该负号前
 
 这三项由构造不一致内部数据的辅助函数测试验证，仍明确拒绝而不猜定锚点；有效输入由
 定向、广覆盖及历史回放验证。证据见[收敛整改报告](../reports/sql-normalization-adj-remediation-2026-09-28.md)。
-本次保留 `sql-normalization/3`，业务值替换和规范结构编码未变；解析能力版本、Hint 规则说明
-及其摘要／快照内容地址更新，使新规则上下文可追溯，指纹仍不能跨上下文直接比较。
+上述版本3／适配器版本8的负号规则由版本4保留；本次新增 IN 分桶并移除全局 gap，
+升级为 `sql-normalization/4`／`mpp-adapter/9`。规则摘要及快照随之改变，不能将新旧指纹值直接比较。
 
 `anchor.kind=statement` 表示 Hint 位于语句开始前、内部或终止分号前。
 位于空语句间或最后一个分号后的 Hint 使用 `batch_boundary`，记录下一非空语句序号
@@ -153,7 +162,10 @@ Hint 恰好位于被折叠负号之后时，规范间隙无法区分该负号前
 可产生相同身份；此前“只会保守拆组”的描述不成立。版本2以语句归属和完整词法结构补足
 这一位置约束，详见[整改验证](../reports/sql-normalization-r1-remediation-2026-09-28.md)。
 R2 进一步确认版本2因正负数字拆组违反业务值归并约定，版本3已修复，不能以文档限制豁免。
-新增括号或分号仍可能保守拆组；不宣称所有语义等价写法都能合并。
+版本4不再因前面另一条语句多出冗余括号、导致全局 gap 移动而拆分后续语句的 Hint。
+Hint 所属语句的局部间隙和完整词法结构摘要保持原规则；同语句的括号、列表长度或批次边界
+仍可因 anchor 不同而区分，不推断 Hint 的位置等价。IN 分桶不改写 anchor。
+不宣称所有语义等价写法都能合并。
 此版本未做查询优化、交换律、绑定关系、目录／会话重建或隐含对象解析。
 
 ## 命令、退出码及资源
@@ -194,3 +206,79 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
 AST 变化守恒，报告仅含固定字段路径、计数、指纹和来源定位。4个隔离进程，每进程512 MiB；
 每个输入包含最多4次解析的验证组合，总看门狗20秒，各阶段另外核对5秒预算。最终报告
 保留实际阶段用时；一个组合超时不能被报告为“核心单次归一化超时”。
+
+## 规则变更分组差分
+
+`python -m sql_apm.diagnostics.normalization_diff` 是本地诊断命令。`capture` 使用当前
+checkout 的 Normalizer 处理输入，`compare` 比较输入 ID 对应的分组成员集合；
+不跨上下文直接比较指纹字符串。两份快照必须来自同一原文索引，ID、原文摘要和出现次数
+逐条一致，否则明确失败。规则上下文即使不同也会在报告中完整标注。
+
+从仓库根目录运行（已有固定依赖时使用以下 PYTHONPATH）：
+
+```bash
+# 默认全部输入；重复 --marker 表示字节 OR，不是 SQL 语法过滤。
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff capture \
+  --output var/parser-probe/v4-in.sqlite --workers 4 \
+  --marker ' IN ' --marker 'IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
+
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff capture \
+  --output var/parser-probe/v4-hints.sqlite --marker '/*+' --marker=--+
+
+# IDs 文件为正整数 JSON 数组；与 --marker 互斥，缺少任何指定 ID 都失败。
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff capture \
+  --output var/parser-probe/v4-selected.sqlite --ids var/parser-probe/selected-ids.json
+
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff compare \
+  var/parser-probe/v3-in.sqlite var/parser-probe/v4-in.sqlite \
+  --require-v4 --output var/parser-probe/v4-in-diff.json --text
+```
+
+`--source` 可指定已有原文 SQLite 索引，默认 `var/parser-probe/full-scan.sqlite`；
+读取已有 inputs／occurrences 表，不更改原文索引。标记默认精确匹配 UTF-8 字节，
+`--ignore-ascii-case` 只折叠 ASCII 大小写；字符串和注释内标记也可能被选中。
+没有 marker 或 IDs 参数即处理全部输入，应按任务契约选择验证规模。
+
+快照只含 ID、原文摘要、固定状态／原因、结构指纹、结构摘要、计数及规则和源码上下文；
+不保存 SQL、Hint 原文或 AST 值。标记选择条件也仅保存摘要。出现次数来自日志字段，
+不是执行次数。快照强制放在当前 checkout 的 `var/`；输入库在运行前后核验摘要，快照摘要由比较命令记录。
+只有完整完成、源库及源码未改变时才标记 complete；中断保留不完整快照，比较命令拒绝使用，
+恢复时选择新输出重新执行。已有输出不会覆盖，没有跨版本缓存复用或产品重算编排。
+
+默认4个工作进程，可选1–8；每进程512 MiB、每输入5秒看门狗及512 KiB输入上限，复用
+现有隔离进程。资源或内部错误记录固定状态，不转为可靠结果。文本摘要和 JSON 比较结果
+只包含计数、版本、摘要及至多10组、每组至多10个 ID 示例；完整快照继续留在本地。
+合并／拆分在两侧均可靠的输入上判定；组数另按每侧全部可靠输入计算，状态变化单独报告。
+
+`compare` 默认仅报告差异，成功读取和比较返回0；格式、完整性、来源或选择集不一致返回1。
+`--require-v4` 附加检查 frozen v3／adapter8 与 v4／adapter9 的上下文及字典／依赖一致性，
+逐条核对预期结构摘要；任何状态／原因变化、拆分或无法解释的结构变化都返回1。
+旧版采集时，在原归一化结果的副本上独立替换全部裸业务值 IN 列表并移除全局 gap，
+保留其他每个字段和 Hint anchor，再生成预期摘要。新版实际完整结构必须与其相同，
+因此不会仅凭“总组数减少”就声称每次合并正确。该投影是 diagnostics 的验证逻辑，产品不调用它。
+其他未来版本仍可用通用 capture／compare；本次 v4 投影不会自动认定未来规则正确。
+
+首次引入工具时，冻结 v3 尚无该模块，按如下方式复现。`V4_COMMIT` 应设置为含工具的固定
+交付提交；在两个 checkout 中使用同一份工具，分别使用各自未经修改的产品核心和字典：
+
+```bash
+base_dir="$PWD"
+git worktree add --detach var/parser-probe/v3-evidence bd62856921aa806e109490c199482d099d560557
+git show "${V4_COMMIT}:sql_apm/diagnostics/normalization_diff.py" \
+  > var/parser-probe/v3-evidence/sql_apm/diagnostics/normalization_diff.py
+(
+  cd var/parser-probe/v3-evidence
+  PYTHONPATH="$base_dir/var/parser-probe/site-packages" "$base_dir/.venv/bin/python" \
+    -m sql_apm.diagnostics.normalization_diff capture \
+    --source "$base_dir/var/parser-probe/full-scan.sqlite" --output var/v3-in.sqlite \
+    --marker ' IN ' --marker 'IN(' --marker VALUES --marker ARRAY --ignore-ascii-case
+)
+```
+
+对 Hint 集合改用上述两个 Hint 标记；对固定1,832条回放，从其脱敏报告 records 提取
+input_id 为 JSON 数组，并在两份 checkout 上使用相同 `--ids`。比较时直接传入冻结
+checkout 内的快照路径即可。工具与核心源码摘要均写入快照；旧报告及其证据不改写。

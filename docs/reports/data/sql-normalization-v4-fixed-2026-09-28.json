@@ -1,0 +1,70 @@
+{
+  "context_changed": true,
+  "contexts": {
+    "after": {
+      "algorithm_version": "sql-normalization/4",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter/9",
+      "profile": "hashdata-pg94",
+      "rules_digest": "9f67e49566a4d3a96bf783757f069b2f531c13b294b8aa3ea2fa3401edabf0b0",
+      "rules_ref": "sha256:d7bba52aba2bdb824ce97f960a92b7acbc2712d22061018817d1444852a572b6"
+    },
+    "before": {
+      "algorithm_version": "sql-normalization/3",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter-probe/8",
+      "profile": "hashdata-pg94",
+      "rules_digest": "04a423680c02c7b6b8b87295346d9468d089e279cb19183b5587b57bbb51474d",
+      "rules_ref": "sha256:d2faed8791aab2845b50ff6c9d356ed2cb7b728d3a53d913da5b3e2da02eaf6f"
+    }
+  },
+  "eligible_in_inputs": {
+    "after": 145,
+    "before": 145
+  },
+  "format": "normalization-diff/1",
+  "groups": {
+    "after": 1565,
+    "before": 1566,
+    "delta": -1
+  },
+  "inputs": 1832,
+  "merge_examples": [
+    [
+      916,
+      917
+    ]
+  ],
+  "merged_groups": 1,
+  "merged_input_occurrences": 174,
+  "merged_inputs": 2,
+  "reason_changes": 0,
+  "reason_transitions": {},
+  "reliable_inputs": {
+    "after": 1810,
+    "before": 1810
+  },
+  "snapshot_sha256": {
+    "after": "2181381346718c9505586e6d067001d873b912691f84ac602ec8668b2346c65d",
+    "before": "becdd3d4e9c6c588ada5df14eed8a107f44d53f414516a6e324a5c1456f75345"
+  },
+  "source_sha256": "1608799d75685ee284f9b768af44819a8d82f89488cc814dce1b1d50e865d842",
+  "split_examples": [],
+  "split_groups": 0,
+  "status_change_examples": [],
+  "status_changes": 0,
+  "status_transitions": {},
+  "v4_acceptance_passed": true,
+  "v4_audit": {
+    "applied": true,
+    "checked": 1810,
+    "mismatch_examples": [],
+    "mismatches": 0
+  }
+}

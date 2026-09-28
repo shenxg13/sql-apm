@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/sql-fingerprints.md
 updated: 2026-09-28
 sources:
+  - path: docs/reports/sql-normalization-v4-2026-09-28.md
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -193,7 +195,7 @@ confidence: high
   值归一化为占位标记，归入同一个结构指纹；其他基线分组维度仍须相同：
   WHERE 条件中的业务常量，以及 INSERT … VALUES 和 UPDATE … SET 中直接
   作为列值或赋值的业务字面常量，例如数字、字符串。
-- 对象名、列名、表达式结构、显式类型转换以及批次语句顺序保留。此确认不等于
+- 对象名、列名、表达式结构、显式类型转换以及批次语句顺序保留；IN 列表长度的后续例外见下节。此确认不等于
   将 SELECT 投影、函数参数等其他语法位置的常量也无条件归一化。
 - 例如，两次独立执行 `UPDATE orders SET status = 'paid' WHERE id = 1001;`
   与 `UPDATE orders SET status = 'closed' WHERE id = 1002;` 可生成相同结构
@@ -210,6 +212,29 @@ confidence: high
   参数与业务常量的指纹归并按后文已确认规则执行。
 
 关联条款：[已确认的归一化规则版本与更新处理](../features/baseline-versions.md#已确认的归一化规则版本与更新处理)。
+
+### 已确认的 WHERE IN 列表粗分桶与 Hint 编码清理
+
+- 确认日期：2026-09-28；来源状态：current。
+- 来源：[Issue #11](https://github.com/shenxg13/sql-apm/issues/11) 正文及
+  [确认记录](https://github.com/shenxg13/sql-apm/issues/11#issuecomment-5864401115)；用户确认全部范围及 B1–B8。
+- 在已确认的 WHERE 业务常量位置，IN／NOT IN 列表全部元素均归一化为业务值时，
+  按长度 1、2–10、11–100、>100 四桶归并；桶标记进入结构指纹，字面常量与原生 `$n` 可混用。
+  这是前述“表达式结构保留”对 IN 列表长度的明确例外；没有采用任意长度折叠或 log2 分桶。
+- 列表含列、表达式、函数、NULL、子查询或其他非裸业务值元素时，整个列表保留既有结构。
+  显式转换仍保留转换节点和类型，不因内层值已替换就去除转换或折叠此类列表。
+- SELECT／UPDATE／DELETE 的 WHERE 及 CTE／子查询各自的 WHERE 适用；函数参数、
+  SELECT 投影、JOIN／HAVING、控制子树和 IN 子查询的外层结构保持原规则。
+  多行 VALUES、ANY／ARRAY、其他常量位置及观察用近似路径均不改变。
+- 可靠 Hint 的全局 gap 移出哈希，位置身份只由已有 anchor 决定；内容、所属语句、局部间隙、
+  词法结构摘要、带符号业务值归并及明确拒绝边界保持不变，不改为 AST 节点锚定或推断 Hint 等价。
+- 用户接受同桶不同列表长度可能对应不同执行计划、增加组内耗时离散的权衡；此次不评估执行计划
+  或耗时相近性。只改变结构分组，实际执行记录不合并，其他统计维度继续分别计算。
+- 版本升级为 `sql-normalization/4`；正式解析能力名由实施确定为 `mpp-adapter/9`。
+  当前尚无使用旧指纹的持久化基线，不做历史迁移；将来按[规则更新原则](../features/baseline-versions.md#已确认的归一化规则版本与更新处理)处理。
+- 已提供本地原文选择集的脱敏快照及分组差分工具，按 ID 集合比较新旧分区，并标注上下文差异。
+  源 SQL、Hint 原文和 AST 值不进入差分输出；历史诊断模块和证据保持原样。
+  实现及验证见[接口说明](../../docs/design/sql-normalization.md)和[v4 报告](../../docs/reports/sql-normalization-v4-2026-09-28.md)。
 
 ### 已确认的其余非函数参数常量保留规则
 

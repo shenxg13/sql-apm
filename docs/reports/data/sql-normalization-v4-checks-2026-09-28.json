@@ -1,0 +1,103 @@
+{
+  "artifacts": {
+    "tests/parser_probe/fixtures/normalization-v3-preserved.json": {
+      "bytes": 49367,
+      "sha256": "165a809e2ae02636e0f4f74fd02a5e7449f5edeaded7d5841efec5657e820125"
+    },
+    "var/parser-probe/issue11-coverage.json": {
+      "bytes": 5532,
+      "sha256": "676d29be1a5fad39daf19a30280eb26d5c8b273f23be9162957dac56b2649c87"
+    },
+    "var/parser-probe/issue11-expansion.json": {
+      "bytes": 62245,
+      "sha256": "bad3ebf866e3800a462b49c0fe39fff99240d41f0045a2d188e1b75d06c90c7a"
+    },
+    "var/parser-probe/issue11-parser-final.log": {
+      "bytes": 13831,
+      "sha256": "7a3d04dd60e0fb4ea8c391ab8ff0f6214ad782cf438945ffbdec165a2b089a46"
+    },
+    "var/parser-probe/issue11-replay-verified.json": {
+      "bytes": 3906622,
+      "sha256": "df3a92b24094bfbda54634199e68d077e0a56103f460c19701ef2b800ed03151"
+    },
+    "var/parser-probe/issue11-replay-verified.log": {
+      "bytes": 357,
+      "sha256": "4538993b322140418e7df76ff783ac2dbfd565d6960702dcac2f5e5f2f0cda6e"
+    },
+    "var/parser-probe/issue11-unit-tests.log": {
+      "bytes": 4282,
+      "sha256": "ec4f6e7789d04165920d2421d73f4847bdf951cf9497010b535ca1db94c3e579"
+    }
+  },
+  "context": {
+    "algorithm_version": "sql-normalization/4",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter/9",
+    "profile": "hashdata-pg94",
+    "rules_digest": "9f67e49566a4d3a96bf783757f069b2f531c13b294b8aa3ea2fa3401edabf0b0",
+    "rules_ref": "sha256:d7bba52aba2bdb824ce97f960a92b7acbc2712d22061018817d1444852a572b6"
+  },
+  "fixed_replay": {
+    "checks": {
+      "approximate_absent_passed": 1810,
+      "format_stable_passed": 1810,
+      "phase_budget_passed_passed": 1832,
+      "records_with_authorized_replacements": 947,
+      "repeat_stable_passed": 1832,
+      "source_preserved_passed": 1832,
+      "structural_absent_passed": 22
+    },
+    "counts": {
+      "reliable": 1810,
+      "unsupported_syntax": 22
+    },
+    "failures": [],
+    "groups": 1565,
+    "input_artifacts": {
+      "var/parser-probe/broad-input-cache.json": "fb07a3af145cf54166e4ecf87054cf066f84226cf0ae8a0a44780abf77da09e9",
+      "var/parser-probe/expanded-input-cache.json": "bacdf15e00d4f34613154668254feee3e8d7d910e9fb93eacca0ad596b0f7abc",
+      "var/parser-probe/full-scan.sqlite": "1608799d75685ee284f9b768af44819a8d82f89488cc814dce1b1d50e865d842",
+      "var/parser-probe/mpp-input-cache.json": "3c1458647884e7057b98d2a01a3b0823f11c3fdd27f8e2ce2d07df956a95daf9"
+    },
+    "inputs": 1832,
+    "limits": {
+      "bundle_timeout_seconds": 20,
+      "max_sql_bytes": 524288,
+      "memory_bytes": 536870912,
+      "per_phase_seconds": 5,
+      "workers": 4
+    },
+    "seconds": 17.165,
+    "selection": {
+      "edge_count_each": 512,
+      "exact_dedup": true,
+      "historical_samples": 914
+    },
+    "unchanged": true
+  },
+  "frozen_commit": "bd62856921aa806e109490c199482d099d560557",
+  "implementation_base": "a921dbbebbfb2863bb6969b043c48017ddfb7ab0",
+  "python": "3.9.5",
+  "sources": {
+    "requirements.txt": "a3bbce430dd127cca2f05837f417fd3a018f0255b8ebc8077f17b3fc476db8d9",
+    "sql_apm/diagnostics/mpp_full_scan.py": "f213a014d0de26de5bb2766c49a5e2d7f9979259eadecb57e05b553559b11c6f",
+    "sql_apm/diagnostics/normalization_replay.py": "b4a37e9ae635cae26d421cc10ce3ba431a91c48c26ba3e8e2502b05509af4136",
+    "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+    "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+    "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+    "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+    "sql_apm/sql/normalization.py": "1fdd583a03c7aab8233ddc6d3926475e76ec2764d190c20f58532f7d751d4e89",
+    "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+    "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+    "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c"
+  },
+  "validations": {
+    "dictionary_rules": 784,
+    "expansion_matrix": 81,
+    "parser_tests": 139,
+    "unit_tests": 46
+  }
+}

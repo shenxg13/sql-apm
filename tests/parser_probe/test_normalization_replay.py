@@ -14,6 +14,26 @@ class NormalizationReplayTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 delta_audit(before, after)
 
+    def test_only_approved_in_buckets_and_global_hint_gap_can_change(self):
+        literal = {'A_Const': {'ival': {'ival': 1}}}
+        before = {'A_Expr': {'kind': 'AEXPR_IN', 'rexpr': {'List': {'items': [literal, literal]}}}}
+        after = {'A_Expr': {'kind': 'AEXPR_IN', 'rexpr': {'List': {'items': {'SQLAPMInBucket': '2-10'}}}}}
+        self.assertEqual(delta_audit(before, after), {'/A_Expr/rexpr/List/items/in_bucket': 1})
+        for wrong in ('1', '11-100', '>100'):
+            after['A_Expr']['rexpr']['List']['items']['SQLAPMInBucket'] = wrong
+            with self.assertRaisesRegex(ValueError, 'incorrect_in_bucket'):
+                delta_audit(before, after)
+        after['A_Expr']['rexpr']['List']['items']['SQLAPMInBucket'] = '2-10'
+        before['A_Expr']['rexpr']['List']['items'][0] = {'ColumnRef': {}}
+        with self.assertRaisesRegex(ValueError, 'unexpected_in_bucket'):
+            delta_audit(before, after)
+        before = {'hints': [{'gap': 5, 'anchor': {'token_gap': 3}, 'raw': 'synthetic'}]}
+        after = {'hints': [{'anchor': {'token_gap': 3}, 'raw': 'synthetic'}]}
+        self.assertEqual(delta_audit(before, after), {'/hints/*/gap_removed': 1})
+        after['hints'][0]['anchor']['token_gap'] = 2
+        with self.assertRaisesRegex(ValueError, 'unexpected_value_change'):
+            delta_audit(before, after)
+
     def test_export_contains_no_input_values(self):
         result = sanitized_worker({'sql': "select * from private_object where secret_column='sensitive_value'"})
         text = dumps(result)

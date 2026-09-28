@@ -69,6 +69,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [归一化 v4 验证](reports/sql-normalization-v4-2026-09-28.md) | 实施验证报告 | IN 粗分桶、Hint gap 清理、冻结版本分组差分及逐条结构审计。 |
 | [归一化收敛裁决整改验证](reports/sql-normalization-adj-remediation-2026-09-28.md) | 实施验证报告 | PG 合成常量源位置修复、裁决退出条件及历史分组差分，一次性终验依据。 |
 | [归一化 R2 整改验证](reports/sql-normalization-r2-remediation-2026-09-28.md) | 实施验证报告 | 含 Hint 的正负业务值归并、位置保真回归及5,333条历史 Hint 对照。 |
 | [归一化 R1 整改验证](reports/sql-normalization-r1-remediation-2026-09-28.md) | 实施验证报告 | Hint 位置碰撞与近似保护绕过修复、新版本及1,832条回放对照。 |

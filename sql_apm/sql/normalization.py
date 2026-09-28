@@ -15,7 +15,7 @@ from .function_dictionary import FunctionDictionary
 from .structure import dumps, loads
 from .type_policy import KNOWN_TYPES, NORMALIZABLE_CASTS
 
-ALGORITHM_VERSION = 'sql-normalization/3'
+ALGORITHM_VERSION = 'sql-normalization/4'
 PARSER_DEPENDENCY_VERSION = '7.18'
 PROFILE = 'hashdata-pg94'
 MAX_BYTES = approximate.MAX_BYTES
@@ -26,13 +26,15 @@ RULES = {
     'algorithm_version': ALGORITHM_VERSION,
     'marker': 'SQLAPMBusinessValue',
     'where': 'numeric/string/native parameter; preserve null/bool/controls',
+    'where_in': {'marker': 'SQLAPMInBucket', 'buckets': ['1', '2-10', '11-100', '>100'],
+                 'eligibility': 'WHERE IN/NOT IN; every normalized list element is a bare SQLAPMBusinessValue; preserve all other lists'},
     'writes': 'INSERT VALUES and UPDATE SET direct values only',
     'functions': 'dictionary action consensus; protected arguments are opaque',
     'special_calls': 'preserve non-positional, SQL syntax, variadic and unknown',
     'casts': sorted(NORMALIZABLE_CASTS),
     'other_constants': 'preserve; CASE results, SET, limits, window frames, DDL',
     'extensions': 'preserve typed MPP extension trees',
-    'hints': 'exact content, statement ownership, constant-aware gaps/frame; source-backed PG-folded numeric signs share VALUE; skip source mapping for synthesized constants; retain brackets, operators and batch boundaries',
+    'hints': 'exact content and anchor only; exclude global gap; constant-aware local gaps/frame; source-backed PG-folded numeric signs share VALUE; skip source mapping for synthesized constants; retain brackets, operators and batch boundaries',
     'encoding': 'canonical sorted ASCII JSON; arrays retain order; sha256 domain-separated',
 }
 
@@ -136,9 +138,21 @@ class Normalizer:
         tasks = [(root, 'O', output, 0)]
         while tasks:
             node, mode, parent, key = tasks.pop()
+            if mode == 'bucket':
+                # Post-order: eligibility uses the existing value policy, so
+                # casts, expressions, NULL and protected subtrees stay intact.
+                if node and all(value == {'SQLAPMBusinessValue': {}} for value in node):
+                    size = len(node)
+                    bucket = '1' if size == 1 else '2-10' if size <= 10 else '11-100' if size <= 100 else '>100'
+                    parent[key] = {'SQLAPMInBucket': bucket}
+                    counters['in_lists_bucketed'] += 1
+                continue
             if isinstance(node, list):
                 result = [None] * len(node)
                 parent[key] = result
+                if mode == 'N':
+                    tasks.append((result, 'bucket', parent, key))
+                    mode = 'B'
                 tasks.extend((child, mode, result, i) for i, child in enumerate(node))
                 continue
             if not isinstance(node, dict):
@@ -214,6 +228,8 @@ class Normalizer:
             # NULLIF/SIMILAR are special function forms, not ordinary operators.
             if body.get('kind') in ('AEXPR_NULLIF', 'AEXPR_SIMILAR'):
                 return {}
+            if mode == 'B' and body.get('kind') == 'AEXPR_IN':
+                return {'lexpr': 'B', 'rexpr': 'N'}
             return {'lexpr': expression, 'rexpr': expression}
         if tag == 'BoolExpr':
             return {'args': expression}
@@ -285,7 +301,9 @@ class Normalizer:
             normalized = {'statements': [
                 {'base': self._walk(statement['base'], counters),
                  'extensions': loads(dumps(statement['extensions']))}
-                for statement in tree['statements']], 'hints': loads(dumps(tree['hints']))}
+                for statement in tree['statements']],
+                'hints': [{key: loads(dumps(value)) for key, value in hint.items() if key != 'gap'}
+                          for hint in tree['hints']]}
             value = _sha({'kind': 'sql-apm-structural', 'context': self._context, 'normalized': normalized})
             result['normalized'] = normalized
             result['diagnostics'] = dict(counters)

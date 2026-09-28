@@ -64,7 +64,7 @@ SQL 资源位于 `sql_apm/storage/`，业务数据库驱动不是这两个入口
 
 ## 解析器结构保真探测
 
-SQL 解析原型位于 `sql_apm/sql/mpp_parser.py`；共用词法检查及PG语法树处理位于同包的
+MPP 解析适配位于 `sql_apm/sql/mpp_parser.py`；共用词法检查及PG语法树处理位于同包的
 `lexical.py`、`pg_ast.py`。可复用探测逻辑位于 `sql_apm/diagnostics/`，诊断统一通过包模块运行，
 不再保留 `scripts/diagnostics/` 转发层。测试直接导入包内模块。
 
@@ -83,6 +83,7 @@ SQL 解析原型位于 `sql_apm/sql/mpp_parser.py`；共用词法检查及PG语�
 | `python -m sql_apm.diagnostics.mpp_full_repair` | 固定原文库的版本修复重放与完整结构摘要对照 |
 | `python -m sql_apm.diagnostics.normalize_sql` | 可靠结构归一化、结构指纹及独立近似结果的文本／文件入口 |
 | `python -m sql_apm.diagnostics.normalization_replay` | 固定样本的归组、结构守恒及稳定性验证 |
+| `python -m sql_apm.diagnostics.normalization_diff` | 原文选择集的脱敏快照、分组／状态差分及 v4 自动核对 |
 
 在仓库根目录运行上述模块命令，解释器使用 `.venv/bin/python`；解析实验依赖仍需通过
 `PYTHONPATH=var/parser-probe/site-packages` 指定。
@@ -100,3 +101,7 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 近似能力的纯标准库核心位于 `sql_apm/sql/approximate.py`，正式接口、退出码和观察用途限制见
 [接口说明](../docs/design/sql-approximate.md)。它不提供可靠结构指纹、正常基线或统计服务。
+
+解析能力的当前正式名称为 `mpp-adapter/9`。上述候选比较、probe、扩展、全量扫描和修复模块
+是历史诊断工具，保留供既有报告追溯；不会因本次命名调整迁移或删除。规则变更验证使用
+[分组差分命令](../docs/design/sql-normalization.md#规则变更分组差分)，支持全部、字节标记或 ID 选择集。

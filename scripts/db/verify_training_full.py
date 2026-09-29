@@ -17,6 +17,24 @@ from sql_apm.storage.training import TrainingStore
 from sql_apm.training.config import DECISION_VERSION, validate as configuration
 
 
+def decision_digest(store, frozen):
+    # Force every Decision field, including all eight evaluations and
+    # reason references. A 256-bit row hash is the only TEMP payload;
+    # four integer sums plus count give order-independent replay evidence.
+    start=time.monotonic()
+    with store.db,store.db.cursor() as cur:
+        cur.execute("""WITH hashes AS MATERIALIZED (
+            SELECT encode(sha256(convert_to(to_jsonb(d)::text,'UTF8')),'hex') AS h
+            FROM mpp_training_decisions(%s,%s) d)
+            SELECT count(*),sum(('x'||substr(h,1,16))::bit(64)::bigint),
+                sum(('x'||substr(h,17,16))::bit(64)::bigint),
+                sum(('x'||substr(h,33,16))::bit(64)::bigint),
+                sum(('x'||substr(h,49,16))::bit(64)::bigint) FROM hashes""",
+            (frozen['input_id'],frozen['config_id']))
+        values=[str(value) for value in cur.fetchone()]
+    return dict(count=int(values[0]),hash_sums=values[1:],seconds=round(time.monotonic()-start,3))
+
+
 def validate(dsn, output):
     store=TrainingStore(dsn)
     report=dict(clusters={}, method='private PostgreSQL 17; product importer; original cache and SQL derivation; measured',
@@ -52,14 +70,17 @@ def validate(dsn, output):
                 result=store.summary(frozen['input_id'],frozen['config_id'],group_sink=sink)
                 result.update(group_summary_sha256=digest.hexdigest(),group_summary_rows=count[0])
                 return result
-            first=summarize();second=summarize()
-            comparable=lambda value:{k:v for k,v in value.items() if k not in ('derive_seconds','total_seconds')}
-            assert comparable(first)==comparable(second)
+
+            first=summarize()
+            complete_first=decision_digest(store,frozen);complete_repeat=decision_digest(store,frozen)
+            assert complete_first['count']==complete_repeat['count'] and complete_first['hash_sums']==complete_repeat['hash_sums']
+
             with store.db,store.db.cursor() as cur:
                 cur.execute('SELECT count(*) FROM mpp_occurrence WHERE scope_id=%s',(scope,));expected=cur.fetchone()[0]
-            assert sum(n for state,n in first['states'])==expected
+            assert sum(n for state,n in first['states'])==expected==complete_first['count']
             for reason,state,n in first['reasons']:totals[reason]+=n
-            report['clusters'][scope]=dict(snapshot=frozen,first=first,repeat=second,repeat_equal=True)
+            report['clusters'][scope]=dict(snapshot=frozen,first=first,
+                complete_first=complete_first,complete_repeat=complete_repeat,complete_digest_equal=True)
             (output/'decision-report.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
             print(canonical(dict(phase='cluster_verified',scope='scope:'+identity(scope),count=expected,cache_seconds=frozen['cache']['seconds'],derive_seconds=first['derive_seconds'])),flush=True)
         for outcome,reason in [('failed','execution_failed'),('cancelled','execution_cancelled'),('timed_out','execution_timed_out')]:

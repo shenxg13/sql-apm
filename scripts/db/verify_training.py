@@ -117,6 +117,10 @@ def verify():
                     v.require(direct['reason_codes']==item['reason_codes'] and direct['state']==item['state'],'record query agrees: '+name)
                 groups=[];summary=store.summary(snap['input_id'],snap['config_id'],group_sink=groups.append)
                 v.require(dict(summary['states'])==dict(Counter(x['state'] for x in got.values())) and sum(g['count'] for g in groups if g['reason'] is None)==len(got),'summary and per-record conservation')
+                from verify_training_full import decision_digest
+                digest1,digest2=decision_digest(store,snap),decision_digest(store,snap)
+                v.require(digest1['count']==len(got) and digest1['hash_sums']==digest2['hash_sums'],'complete Decision fields repeat with identical per-row hash sums')
+
                 from unittest.mock import patch
                 with patch('sql_apm.storage.training.classify',side_effect=AssertionError('unexpected reclassification')):
                     repeat=store.snapshot(validate(doc,'C1'),['B1'])

@@ -1,0 +1,324 @@
+{
+  "code_sha256": {
+    "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+    "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+    "sql_apm/ingestion/hashdata/__init__.py": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+    "sql_apm/ingestion/hashdata/persistence.py": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+    "sql_apm/ingestion/hashdata/reader.py": "0abac9e179a3d62cc9cc25ddd87c7f03808432e4340901ca43e97f0bea92454b",
+    "sql_apm/ingestion/importer.py": "f00ad3470dddf45b294361d4d9cba4b38f0148949d50d8ae2f5016d637101cbf",
+    "sql_apm/ingestion/normalizing.py": "a964208e4a1d75c3e9402d70aef97e4d333cad0e92685348db3a232970a7603f"
+  },
+  "distinct_input_reasons": {
+    "inline_diagnostic_only": 101058,
+    "non_event_primary_sql": 67
+  },
+  "eligible_missing": 0,
+  "error_evidence": {
+    "119:cancelled:with_sql:master": 36,
+    "119:cancelled:without_sql:master": 1,
+    "119:other_error:with_sql:master": 21893,
+    "119:timed_out:with_sql:master": 44,
+    "120:cancelled:with_sql:master": 54,
+    "120:other_error:with_sql:master": 35392,
+    "120:other_error:without_sql:master": 4,
+    "120:timed_out:with_sql:master": 20
+  },
+  "files": [
+    {
+      "file_id": "I:f8fe17c997acafe6b5170fbd57ead9a8164b18933717f9f9003560872f41bec0",
+      "matched": true,
+      "records": 117152
+    },
+    {
+      "file_id": "I:ff5877bc68a3aa579c5077e27c796873fde542248184da00df711a19700339a3",
+      "matched": true,
+      "records": 189535
+    },
+    {
+      "file_id": "I:403ae32bb9abfc3e800974f8385bd315bde1b1df39b7f85a4a8d42ba6dd42faa",
+      "matched": true,
+      "records": 188238
+    },
+    {
+      "file_id": "I:8957a3c41e8fb6944c932b37627dedcc12e645a77cbe2970a352f95697e7009e",
+      "matched": true,
+      "records": 215732
+    },
+    {
+      "file_id": "I:4c19d106eac33e5bac9d84bf44499ad4e10de1958141392a33e2e6352411bbd6",
+      "matched": true,
+      "records": 202277
+    },
+    {
+      "file_id": "I:bb9f6b63db15e9c38724a208eb0b5a2ccb1c8d2273cbd31a86aca102767e6511",
+      "matched": true,
+      "records": 206678
+    },
+    {
+      "file_id": "I:709a6edbd6878a12221400ca11b88e9509246f691cc7d1bc22801be7d7f3eb9e",
+      "matched": true,
+      "records": 205229
+    },
+    {
+      "file_id": "I:d0b2b3aa1823c2d374a8812a9c3b714e9886997fa200319c075829ae28530472",
+      "matched": true,
+      "records": 203152
+    },
+    {
+      "file_id": "I:807c989b0398c8f0ab249c15002b5c34db71c68cb24a68311adea43bb606f44d",
+      "matched": true,
+      "records": 192913
+    },
+    {
+      "file_id": "I:9d0726e918f5898201b9a13ff12342604e16752e1bf60c1ddbf399eda722a461",
+      "matched": true,
+      "records": 190601
+    },
+    {
+      "file_id": "I:bc531830070e60805160c42a67bcef242be0da24e06e9c9151e86518664f92cb",
+      "matched": true,
+      "records": 204155
+    },
+    {
+      "file_id": "I:c7f3e6268831688270ed36ad834ab525e023d9b95e2f3c15eb8601e56b4368a0",
+      "matched": true,
+      "records": 199881
+    },
+    {
+      "file_id": "I:a4214a386e8b5c425d4a3a2fe36521af98d8f51318826c0d34c6a95366f66050",
+      "matched": true,
+      "records": 201547
+    },
+    {
+      "file_id": "I:2f73c9342278b433cd311f964118efbdfb7a619d49cf2c24270d7662887aa576",
+      "matched": true,
+      "records": 207207
+    },
+    {
+      "file_id": "I:515667916179c3e664d74c90b552255d7848d7b74ed73bf1d29b8c1f3cc7f478",
+      "matched": true,
+      "records": 204907
+    },
+    {
+      "file_id": "I:aebb2dba743ce8dd14cbf1d837d7f7d3ae2da08de6884290e55028decf56daa2",
+      "matched": true,
+      "records": 187224
+    },
+    {
+      "file_id": "I:83d8ff0674b1fccc094dceac67e49dfdfdd54b5f5f73a0dadb0b42d14ac40695",
+      "matched": true,
+      "records": 187752
+    },
+    {
+      "file_id": "I:75f35e013a0419957f0c5ab34af7453c908650c1e12655ee251d9bfd8f802aa7",
+      "matched": true,
+      "records": 206209
+    },
+    {
+      "file_id": "I:c00800c1b1a6549cada3f267fbc42a21eabdcb07fdf8ae9482aae11a263110d8",
+      "matched": true,
+      "records": 207074
+    },
+    {
+      "file_id": "I:7b730ccff32470ad8b513e8e23ed65c266239fc43fad734908f809b9ad4287de",
+      "matched": true,
+      "records": 212876
+    },
+    {
+      "file_id": "I:b7eb65f515aaf12364157ea2b98eceb03f6752af219bde7434f577f5c082520a",
+      "matched": true,
+      "records": 201436
+    },
+    {
+      "file_id": "I:12d242c2cfc63b43a062a75dd31838c48bfba4b013793629bd52ce68794eefe7",
+      "matched": true,
+      "records": 200927
+    },
+    {
+      "file_id": "I:771f31786cf6ad2bc213b13897c6e03afc6695ee3c7e30c0c382488d83598818",
+      "matched": true,
+      "records": 191289
+    },
+    {
+      "file_id": "I:7ab74de9b9e71a37e0a4409bb7177f5f5267161f41d5a5d9329e072c652f5488",
+      "matched": true,
+      "records": 187195
+    },
+    {
+      "file_id": "I:6f5a0d5a083d68ff234986b352dda23499b7592aa596e83d2082254cfc8de817",
+      "matched": true,
+      "records": 207270
+    },
+    {
+      "file_id": "I:c8ccf88ba5be69e4fbe8b1314faaf54ef236b9fdcc0ed35d0249dd050e226207",
+      "matched": true,
+      "records": 206230
+    },
+    {
+      "file_id": "I:11883b46add7b4354c443c082333f26114266d007dc568d39ba2cfd04782cb6c",
+      "matched": true,
+      "records": 157799
+    },
+    {
+      "file_id": "I:2382724e557297097167ac4d0c737be46eca01c6a8592d41db3b9809b94ff704",
+      "matched": true,
+      "records": 41365
+    },
+    {
+      "file_id": "I:c1eee7dd4bfa392465aec45fdae0b60ac07986d32fb0f9591412563e0025ddc2",
+      "matched": true,
+      "records": 203063
+    },
+    {
+      "file_id": "I:9a0efa3800d4390c6b56c3066880aaa04ebc262ca7efd63e490f860e2b1e5844",
+      "matched": true,
+      "records": 201727
+    },
+    {
+      "file_id": "I:453471c891a970bdd59e35144d10ddb9e2e40a2e826baa340ac99ee4cd29ea58",
+      "matched": true,
+      "records": 477828
+    },
+    {
+      "file_id": "I:bcad81a2b06319abe5404a272d2ce2ffc69dc4db1c5d1a98183d4219a644aaad",
+      "matched": true,
+      "records": 172718
+    },
+    {
+      "file_id": "I:af97da35fafeefd44a4ee6fb9e65c33e0e01968d5bfb91270e4b5ca60e8313a1",
+      "matched": true,
+      "records": 572926
+    },
+    {
+      "file_id": "I:07a2a73980819ce826cd6992efc850ab5a364edf0a2783f2aa3b37a3cc433867",
+      "matched": true,
+      "records": 585845
+    },
+    {
+      "file_id": "I:904bbff4d71a6addf88111c86152a700843b8d2a8681756bca5915be11fb6c64",
+      "matched": true,
+      "records": 219815
+    },
+    {
+      "file_id": "I:50ad4a0145ce91b456750148d89cf25a6a761a086056987d3587ceb11791a9d8",
+      "matched": true,
+      "records": 513403
+    },
+    {
+      "file_id": "I:b70ed5c8c4c45bdfb366c328da323732897cecd69ea4215d175398715884c5ec",
+      "matched": true,
+      "records": 594390
+    },
+    {
+      "file_id": "I:cb1ba9fd64d0b6dd684e59ee8a780c606c8fc914da0540f33e73b818dde7eec4",
+      "matched": true,
+      "records": 226034
+    },
+    {
+      "file_id": "I:a6ffebb4e52bce452644b67b3f2d9e88940d8a783eb7a5782e744bebadca4e7d",
+      "matched": true,
+      "records": 568418
+    },
+    {
+      "file_id": "I:777a9f47a3f226e3c07b2cf42920bbfce7830c609754f0516fb3b1ed35cbc895",
+      "matched": true,
+      "records": 163273
+    },
+    {
+      "file_id": "I:18aeddaa25fab727d88b5d88a13a030beffb31ad311096c4932a7b573ec49c2e",
+      "matched": true,
+      "records": 668674
+    },
+    {
+      "file_id": "I:94259e37c09144c512847b647d571f4d1ea125f4abe9ebae604e7abb1ab3b5b9",
+      "matched": true,
+      "records": 183401
+    },
+    {
+      "file_id": "I:2304ebcc4c34ab8d56a334b31cebeb524058bdb16ea5a96e3bac34f518edcd5b",
+      "matched": true,
+      "records": 594218
+    },
+    {
+      "file_id": "I:03642f220380c4e3ebba41e4567a767b22aa0a0a03894eb1f27bc1b1c0bc2599",
+      "matched": true,
+      "records": 517573
+    },
+    {
+      "file_id": "I:b9429b36572e48a4e2bfd4856aa0e5c4dc424b4b0322ed90fad094ab5ea891cf",
+      "matched": true,
+      "records": 688482
+    },
+    {
+      "file_id": "I:67c5e357ecaa377c66b8bd2c1f3c3d3a0d09bba0091971ee99b32598a09818b8",
+      "matched": true,
+      "records": 196968
+    },
+    {
+      "file_id": "I:7da9c708e1cfbe640a6452a09358fc3c4ea4e5be697a463029233f695f9697ba",
+      "matched": true,
+      "records": 619381
+    },
+    {
+      "file_id": "I:48d28aa16146ab8f880753442dc6ec349cffdeee311b245438c35926789e2d8a",
+      "matched": true,
+      "records": 214498
+    },
+    {
+      "file_id": "I:240b96ab9a660f3ecef48280df5f00ee1976e7521e4d6334469cd99a6abf9317",
+      "matched": true,
+      "records": 519178
+    },
+    {
+      "file_id": "I:262a4b50d921431ebe44e9b3bbe7aa123705edf67e5e7d29ed515bf3ee7542d1",
+      "matched": true,
+      "records": 178287
+    },
+    {
+      "file_id": "I:5779aaf988a7fc09ae6f843456bfbd739d18186af5298aa968337f90427a303e",
+      "matched": true,
+      "records": 587981
+    },
+    {
+      "file_id": "I:b6adcb85840538b7373a2c631d9b8b666e607ba5d5b420e75c2bf076ed72aa68",
+      "matched": true,
+      "records": 9640
+    },
+    {
+      "file_id": "I:e3a8b057ee8527bfda9624706a69a338d38c0985e621318509307d4605d2b42c",
+      "matched": true,
+      "records": 790132
+    },
+    {
+      "file_id": "I:49e3a34e6e1a320a38defffe76da5e47562ee0053cff9f38e57b80c7ad42c503",
+      "matched": true,
+      "records": 237515
+    },
+    {
+      "file_id": "I:887299f8d264f52e5acedcca32340a24c12a44d4de7467e64e235fc20b744210",
+      "matched": true,
+      "records": 560928
+    }
+  ],
+  "final_adapter_counts_match": true,
+  "historical_missing": 101125,
+  "missing_seen": 101125,
+  "occurrence_reasons": {
+    "inline_diagnostic_only": 256328,
+    "non_event_primary_sql": 1125
+  },
+  "record_count": 16390146,
+  "seconds": 480.697,
+  "snapshot_comparison": {
+    "changed_states_or_reasons": 0,
+    "historical_states": {
+      "reliable": 1486516,
+      "unsupported_syntax": 10902
+    },
+    "missing_states": {
+      "reliable": 100740,
+      "unsupported_syntax": 385
+    },
+    "stored_without_snapshot": 0
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "base_commit": "9f0bbbebb34d9746bde7bbb2e7b68c5ef8bcfdc8",
+  "checks": {
+    "ingestion": 125,
+    "ordinary": 57,
+    "parser": 183,
+    "storage": [
+      86,
+      56,
+      63,
+      18
+    ]
+  },
+  "deterministic_case": {
+    "input_bytes": 200008,
+    "isolated_occurrences": 1,
+    "ordinary_records": 50,
+    "problem": "fingerprint_normalization_worker_failed",
+    "reliable_occurrences": 50,
+    "state": "complete",
+    "total_occurrences": 51
+  },
+  "issue_body_sha256": "94ea6e78115b410ccc46597c91cd5ffbf5b6e101f67fb4ff876ae53f52d0b588",
+  "replay": {
+    "baseline_report_sha256": "8bf996ced59a88ecff3fb67c39746154cb9c7334b9a825d0de6475b1f1ea270d",
+    "files": [
+      {
+        "all_counts_match_baseline": true,
+        "cluster": "119",
+        "counts": {
+          "duration:autostats.c:334": 20,
+          "duration:postgres.c:1455": 157,
+          "duration:postgres.c:1946": 6548,
+          "duration:postgres.c:2219": 4428,
+          "duration:postgres.c:2603": 4433,
+          "duration:postgres.c:2843": 4414,
+          "duration_with_sql": 19945,
+          "duration_without_sql": 55,
+          "occurrences": 19898,
+          "outcome:failed": 75,
+          "outcome:success": 19823,
+          "problem:duration_ms_unknown": 75,
+          "problem:error_without_execution": 580,
+          "problem:estimated_start_at_unknown": 75,
+          "problem:fingerprint_lexical_unbalanced_bracket": 4,
+          "problem:fingerprint_sql_missing_or_empty": 61,
+          "problem:sql_missing": 55,
+          "problem:timing_out_of_scope": 177,
+          "records": 41365,
+          "timing:bind": 4433,
+          "timing:execute_fetch": 9,
+          "timing:execute_first": 4405,
+          "timing:parse": 4428,
+          "timing:request": 6548,
+          "timing:unknown": 75
+        },
+        "file_id": "I:2382724e557297097167ac4d0c737be46eca01c6a8592d41db3b9809b94ff704"
+      },
+      {
+        "all_counts_match_baseline": true,
+        "cluster": "120",
+        "counts": {
+          "duration:autostats.c:334": 90,
+          "duration:postgres.c:1455": 6,
+          "duration:postgres.c:1946": 2036,
+          "duration:postgres.c:2219": 588,
+          "duration:postgres.c:2603": 601,
+          "duration:postgres.c:2843": 602,
+          "duration_with_sql": 3923,
+          "occurrences": 3846,
+          "outcome:failed": 19,
+          "outcome:success": 3827,
+          "problem:duration_ms_unknown": 19,
+          "problem:error_without_execution": 70,
+          "problem:estimated_start_at_unknown": 19,
+          "problem:execute_start_missing": 1,
+          "problem:fingerprint_lexical_ambiguous_string_escape": 189,
+          "problem:fingerprint_sql_missing_or_empty": 31,
+          "problem:timing_out_of_scope": 96,
+          "records": 9640,
+          "timing:bind": 601,
+          "timing:execute_first": 601,
+          "timing:parse": 588,
+          "timing:request": 2036,
+          "timing:unknown": 20
+        },
+        "file_id": "I:b6adcb85840538b7373a2c631d9b8b666e607ba5d5b420e75c2bf076ed72aa68"
+      }
+    ],
+    "first_seconds": 9.159,
+    "occurrences": 23744,
+    "records": 51005,
+    "repeat_runs": [
+      {
+        "added_occurrences": 0,
+        "added_records": 0,
+        "cluster": "119",
+        "files": [
+          {
+            "added_occurrences": 0,
+            "added_records": 0,
+            "file_id": "I:2382724e557297097167ac4d0c737be46eca01c6a8592d41db3b9809b94ff704",
+            "state": "duplicate_skipped"
+          }
+        ],
+        "seconds": 0.01,
+        "state": "complete"
+      },
+      {
+        "added_occurrences": 0,
+        "added_records": 0,
+        "cluster": "120",
+        "files": [
+          {
+            "added_occurrences": 0,
+            "added_records": 0,
+            "file_id": "I:b6adcb85840538b7373a2c631d9b8b666e607ba5d5b420e75c2bf076ed72aa68",
+            "state": "duplicate_skipped"
+          }
+        ],
+        "seconds": 0.006,
+        "state": "complete"
+      }
+    ],
+    "selection": "log-ingestion-r1-replay-manifest-2026-09-29.json",
+    "total_seconds": 14.992
+  },
+  "source_sha256": {
+    "sql_apm/__init__.py": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600",
+    "sql_apm/__main__.py": "2a15deac24c936d37a171c2ce1d1255cf4ee838b9a80f61f3799d7cbdfd921fa",
+    "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+    "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+    "sql_apm/ingestion/hashdata/__init__.py": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+    "sql_apm/ingestion/hashdata/persistence.py": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+    "sql_apm/ingestion/hashdata/reader.py": "0ae7a99f6c73b8c471e790ba6f358e12b9effcf922d5e3f30f495a35de9eb96c",
+    "sql_apm/ingestion/importer.py": "1def762804fb540c22ac8c06a8c68374316dd36e88e2df96312cac2a0537a0fc",
+    "sql_apm/ingestion/normalizing.py": "e8abdde6189258092322d36fee620699c4c44a27d69c4a820c651bf574ff1f3c",
+    "sql_apm/sql/__init__.py": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+    "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+    "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+    "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+    "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+    "sql_apm/sql/normalization.py": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0",
+    "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+    "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+    "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c",
+    "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+    "sql_apm/storage/ingestion.py": "04e7453788778cb829cfb141ebfe6cc2bb23812a6655af4d6972b8470e85c1cd"
+  },
+  "validation_sha256": {
+    "scripts/db/verify_ingestion.py": "75469a508e34a5e8af09a6a78c4720c84d5298fd1b637f97198d99726b392357",
+    "scripts/db/verify_ingestion_full.py": "28a32714b562d48dee23bca2763b5e32ec2575365ac8809b38284578668d8cff",
+    "tests/parser_probe/test_ingestion_resources.py": "7afef6efec7806019aae40888d68529b33c8287904bffb96d982134c4575fd85"
+  }
+}

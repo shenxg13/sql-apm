@@ -57,8 +57,8 @@ Python 产品源码放在仓库下的 `sql_apm/` 包内，按职责组织子包�
 [在线确认记录](https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457)
 保存本次范围及影响；Issue 实时契约负责实施验收。
 
-本文记录已确认目标结构；代码路径说明当前实现，不表示规划中的导入器、完整
-SQL 引擎、统计构建器、存储和统一 CLI 已经交付。
+本文记录已确认目标结构；代码路径说明当前实现，不表示规划中的完整
+SQL 引擎、统计构建器和完整流程 CLI 已经交付；只导入范围见本页已实现边界。
 
 ## Contracts
 
@@ -68,11 +68,11 @@ SQL 引擎、统计构建器、存储和统一 CLI 已经交付。
 sql-apm/
 ├── sql_apm/
 │   ├── __init__.py
-│   ├── __main__.py             # 后续：python -m sql_apm 的薄入口
-│   ├── cli/                    # 后续：参数、输出、业务流程调用
+│   ├── __main__.py             # 已有：python -m sql_apm 的薄入口
+│   ├── cli/                    # 已有：只导入参数、输出和流程调用
 │   ├── contracts/              # 后续：跨模块数据对象与约束
-│   ├── ingestion/              # 后续：批次、来源追踪、异常处理
-│   │   └── hashdata/           # 后续：来源日志解析与计时解释
+│   ├── ingestion/              # 已有：批次、来源追踪、异常处理
+│   │   └── hashdata/           # 已有：来源日志解析与计时解释
 │   ├── sql/
 │   │   ├── __init__.py
 │   │   ├── function_dictionary.py
@@ -84,7 +84,7 @@ sql-apm/
 │   │   ├── structure.py        # 已有：无递归深度依赖的结构编码
 │   │   └── normalization.py    # 已有：可靠归一化、结构指纹及规则快照
 │   ├── baseline/               # 后续：训练筛选、窗口、统计、构建、版本
-│   ├── storage/                # 已有：DDL／初始化及迁移 SQL；业务读写接口后续实现
+│   ├── storage/                # 已有：DDL／迁移、SQL 元数据及批量导入写入
 │   └── diagnostics/
 │       ├── __init__.py
 │       ├── function_probe.py
@@ -220,6 +220,16 @@ v4→v5 投影位于 `diagnostics/normalization_v5_audit.py`；两类新位置�
 
 解析能力采用正式名称 `mpp-adapter/9`；已有候选探测、扩展、扫描及修复模块仍是历史诊断工具，
 保留原路径供旧报告追溯。本次没有迁移或删除它们，也没有增加 scripts 包装层、数据库服务或重算编排。
+
+## 已实现的导入边界
+
+Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/normalizing.py` 和
+`ingestion/hashdata/reader.py`，分别负责登记、文件／批次、受限归一化和来源解释。
+`ingestion/hashdata/persistence.py` 保存 HashData 原始字段到 MPP 表的映射，通用文件流程不解释列号。
+`storage/ingestion.py` 负责 PostgreSQL 连接、COPY、精确原文和近似写入；
+`cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
+[设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)
+说明恢复、配对和证据边界。训练、统计与发布子包仍待对应任务实现。
 
 ## Workflows
 

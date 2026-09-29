@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-09-26
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -79,7 +81,8 @@ confidence: high
 - 以上是可提供资源的用户说明，尚未分配或独立核验服务器，也未完成项目部署。
   Python 程序、PostgreSQL 与 Grafana 的具体部署位置及资源分配仍待落实。
 - 每日导入及默认 30 天窗口重建的期望完成时长尚未指定；实际耗时、峰值内存
-  和磁盘增长尚未测量，不据此声称该配置已满足完整数据规模或长期留存容量。
+  和磁盘增长仅有[55 文件本地导入实测](../../docs/reports/log-ingestion-2026-09-29.md)，
+  不据此声称该生产配置已满足完整流程或长期留存容量。
 
 ### 已确认的 Python 运行约束
 
@@ -123,7 +126,13 @@ confidence: high
 - Python 仍固定为 3.9.5；数据库驱动需同时满足 Python 兼容约束和对应数据库的
   连接要求，具体依赖版本另行验证并锁定。
 
-部署方式、具体补丁版本和数据库驱动尚待后续落实。
+2026-09-29，#18 锁定 `psycopg2-binary==2.9.10` 的 CPython 3.9 Linux x86_64 wheel，
+SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`。
+该版本提供兼容 Python 3.9 的预编译 libpq 驱动，避免增加本地编译工具链；官方依据见
+[PyPI 文件](https://pypi.org/project/psycopg2-binary/2.9.10/)和
+[2.9.10 发布记录](https://www.psycopg.org/docs/news.html#what-s-new-in-psycopg-2-9-10)。
+实际验证使用 Python 3.9.5 与 PostgreSQL 17.10 私有临时实例；生产部署与 Kylin 离线适配
+仍未完成。驱动只连接 Baseline 存储库，不执行源日志 SQL。
 
 关联条款：[已确认的当前开发环境与生产部署安排](runtime-and-components.md#已确认的当前开发环境与生产部署安排)。
 

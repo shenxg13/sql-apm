@@ -1,0 +1,40 @@
+{
+  "historical_input_sha256": [
+    "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2  var/parser-probe/issue13/full-scan.sqlite",
+    "4575082173187e3e69a099f3fc322969c0ae092da503f279495fc2c5df28fed3  var/parser-probe/issue15/v5.sqlite"
+  ],
+  "ingestion_checks": 49,
+  "ordinary_tests": 57,
+  "parser_tests": 180,
+  "product_commit": "e07381b272d9686a0fd6756c519336d28e09b7e4",
+  "product_sha256": {
+    "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+    "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+    "sql_apm/ingestion/hashdata/__init__.py": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+    "sql_apm/ingestion/hashdata/persistence.py": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+    "sql_apm/ingestion/hashdata/reader.py": "0abac9e179a3d62cc9cc25ddd87c7f03808432e4340901ca43e97f0bea92454b",
+    "sql_apm/ingestion/importer.py": "f00ad3470dddf45b294361d4d9cba4b38f0148949d50d8ae2f5016d637101cbf",
+    "sql_apm/ingestion/normalizing.py": "a964208e4a1d75c3e9402d70aef97e4d333cad0e92685348db3a232970a7603f",
+    "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+    "sql_apm/storage/ingestion.py": "eb6e77399b6af8302330798b17b595e4bcb2ca7d90926ae50f3dead6e8ae8677"
+  },
+  "source_layout_equivalence": {
+    "ast_sha256": "282d8c161537b692b28707bf162ab5f3dc8a00dc04541c62fc353d213001bd4d",
+    "base": "f67fbaffe5d6ee44b0035af9cc0392bae57c1af6",
+    "moved_function_ast_identical": true
+  },
+  "storage_checks": [
+    86,
+    56,
+    63,
+    18
+  ],
+  "validation_sources": {
+    "requirements.txt": "c2be5d6f53354c429e75d351185c6dc5ae1be9693b392b8440aadc5c64dc0092",
+    "scripts/db/reconcile_ingestion.py": "6cb6c04f7c5b84aa48fc39b37de51cd46d7951115090067049b3da7f5377c950",
+    "scripts/db/verify_ingestion.py": "48e8deb1c2b2b67c5a25cc1a5c02415a5b53e340248b0ecd0df6f058210245f0",
+    "scripts/db/verify_ingestion_full.py": "28a32714b562d48dee23bca2763b5e32ec2575365ac8809b38284578668d8cff",
+    "tests/ingestion/test_reader.py": "02fa7974b9145cdfebed76c4226c12017fa30e5b51406a92bc6d8fe06ea1cabe",
+    "tests/parser_probe/test_ingestion_resources.py": "cada671d58406645ec4fa6120c4476bee8ebc9c307ecd897c2efb07d023c2766"
+  }
+}

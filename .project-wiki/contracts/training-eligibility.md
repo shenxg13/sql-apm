@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/training-eligibility.md
-updated: 2026-09-27
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -311,6 +313,19 @@ confidence: high
   具体质量规则继续另行确认。
 
 关联条款：[暂定的样本门槛与不足处理](baseline-statistics.md#暂定的样本门槛与不足处理)；[已确认的基线更新与历史版本保留](../features/baseline-versions.md#已确认的基线更新与历史版本保留)。
+
+### 已确认的请求／调用成功证据（2026-09-29）
+
+- 来源：[Issue #18 的需求确认](https://github.com/shenxg13/sql-apm/issues/18)；来源状态 current。
+  用户确认以能可靠识别的 `postgres.c:1946` 请求完成或 `:2843` Execute duration
+  作为本次请求／调用未报错结束的证据，用于基本资格中的“成功完成”。
+- ERROR、用户取消和超时是失败证据。Execute 仍只作调用级统计，不证明 portal 已全部完成；
+  不能由此把首次或续取改成完整 SQL 执行样本。
+- Parse／Bind 按各自已完成阶段判定；之后 Execute 失败或取消不否定此前阶段样本，
+  不要求跨阶段还原。其 SQL 归属、计时、规则及样本门槛仍须独立满足。
+- 已知局限：本规则不覆盖扩展协议在 Sync 提交时才暴露的失败，以及跨文件会话的少量情况；
+  用户在知情情况下接受这一口径，不声称取得 HashData 对应私有源码后的完整证明。
+- #18 实现导入时 outcome 与计时记录；训练 `Decision`、黑名单和排除时段筛选由后续任务实现。
 
 ## Workflows
 

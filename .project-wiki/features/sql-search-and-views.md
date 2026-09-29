@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-09-25
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -144,6 +146,18 @@ confidence: high
   指纹的具体匹配、异常判定公式及多指标组合方式继续待确认。
 
 关联条款：[已确认的基线分组维度](../contracts/timing-and-grouping.md#已确认的基线分组维度)；[暂定的样本门槛与不足处理](../contracts/baseline-statistics.md#暂定的样本门槛与不足处理)；[跨天小时画像的独立样本门槛](../contracts/baseline-statistics.md#跨天小时画像的独立样本门槛)；[已确认的阶段与调用样本门槛](../contracts/baseline-statistics.md#已确认的阶段与调用样本门槛)。
+
+### 已确认的失败执行明细（2026-09-29）
+
+- 来源：[Issue #18 的需求确认](https://github.com/shenxg13/sql-apm/issues/18)；来源状态 current。
+- Master（`seg-1`）上每条带独立 SQL 字段（从 0 起第 24 列）的 ERROR 产生一条失败执行记录。
+  解析／分析阶段即报错的请求也保留，不要求已经进入执行器。
+- SQLSTATE `57014` 再结合消息：`canceling statement due to user request` 记为取消，
+  `canceling statement due to statement timeout` 记为超时；其他 ERROR 记为失败。
+- 这些记录结束时间取日志时间；耗时和推算开始未知，保存 NULL，不补零或推测耗时。
+  能可靠生成结构指纹的可按 SQL 身份查看历史，只进历史，不参与训练。
+- 不带 SQL 的 FATAL 等保留为批次问题，不构造 SQL 执行；解析器不支持语法不改变执行 outcome。
+- #18 已实现上述明细入库；历史查询服务、展示、训练判定及基线分组构建仍由后续任务交付。
 
 ## Workflows
 

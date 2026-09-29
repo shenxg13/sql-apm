@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-09-25
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -40,7 +42,7 @@ confidence: high
 - 来源：用户对日志导入、基线构建、任务状态及诊断结果查询统一提供命令行入口，
   来源映射、批次文件清单、黑名单及排除时段使用本地配置文件维护，Grafana
   继续承担既有 SQL 检索与展示范围的建议，选择“命令行与本地配置文件”。
-- 来源状态：current；已确认操作方式，命令、配置解析及界面功能尚未实现。
+- 来源状态：current；已确认操作方式；#18 已交付只导入命令及 JSON 配置，其他命令和界面尚未交付。
 - 首期为日志导入、基线构建、任务状态和诊断结果查询提供命令行入口。
   日志来源映射、导入批次文件清单、黑名单和故障／维护排除时段通过本地配置
   文件维护；具体文件格式、字段及目录在实施时确定。
@@ -61,7 +63,7 @@ confidence: high
 - 确认日期：2026-09-25。
 - 来源：用户对提供一次执行导入、构建、检查及满足条件后生效的完整流程命令，
   同时保留“只导入”和“复用已完成导入数据重新构建”两种用法的建议回复“确认”。
-- 来源状态：current；已确认流程职责，命令及阶段编排尚未实现。
+- 来源状态：current；已确认流程职责；#18 已交付只导入，完整阶段编排尚未实现。
 - 完整流程：用户确认批次文件齐全后，显式执行一次命令，依次完成导入、基线
   构建和检查；满足既有发布条件时自动生效。进入构建前，清单中所有文件仍须
   导入成功或符合既有同来源、相同内容且此前已成功导入的跳过规则。
@@ -79,6 +81,13 @@ confidence: high
   或排队要求。具体命令名、参数及阶段状态实现留待实施。
 
 关联条款：[首期导入批次的完整性判定](log-ingestion.md#首期导入批次的完整性判定)；[已确认的同集群任务串行与忙时处理](baseline-versions.md#已确认的同集群任务串行与忙时处理)；[已确认的基线计算失败重试范围](baseline-versions.md#已确认的基线计算失败重试范围)；[已确认的五类计时统一版本与发布边界](baseline-versions.md#已确认的五类计时统一版本与发布边界)。
+
+### 已实现的“只导入”命令
+
+[Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 提供 `python -m sql_apm import`，
+JSON 本地配置、显式 `--source`／`--batch` 和计数／原因码输出。
+参数、身份冻结、文件冲突和重试操作见[导入操作说明](../../docs/runbooks/log-ingestion.md)。
+当前只实现导入，尚未交付完整流程、重新构建、发布和版本切换命令。
 
 ## Workflows
 

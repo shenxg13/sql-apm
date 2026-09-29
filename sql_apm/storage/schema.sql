@@ -832,6 +832,12 @@ BEGIN
     RETURN true;
 END $function$;
 
+CREATE OR REPLACE FUNCTION training_cache_required() RETURNS boolean
+LANGUAGE plpgsql STABLE AS $function$
+BEGIN
+    RAISE EXCEPTION 'training_cache_not_prepared';
+END $function$;
+
 -- Parsed SQL bodies bind table/function identities at installation, so custom
 -- schemas work without relying on a caller-controlled search_path.
 CREATE OR REPLACE FUNCTION mpp_training_decisions(selected_input text, selected_config text,
@@ -880,6 +886,8 @@ WITH context AS MATERIALIZED (
     LEFT JOIN mpp_fingerprint f ON f.fingerprint_id=s.fingerprint_id
     WHERE (selected_analysis IS NULL OR o.analysis_id=selected_analysis)
       AND (selected_occurrence IS NULL OR o.occurrence_id=selected_occurrence)
+      AND CASE WHEN o.sql_id IS NULL OR s.sql_id IS NOT NULL THEN true
+               ELSE training_cache_required() END
 ), flags AS (
     SELECT facts.*,
         CASE WHEN database IS NOT NULL AND execution_user IS NOT NULL AND timing_type IS NOT NULL

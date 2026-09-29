@@ -170,6 +170,13 @@ def verify():
                 try:v.require(importer.run(load_config(cfg,'S1','LATER'))['state']=='complete','new completed input arrives after snapshots')
                 finally:importer.close()
                 v.require(decisions(snap)==got,'later import does not alter sealed input membership')
+                different=store.snapshot(validate(changed,'C1'),['LATER'])
+                import psycopg2
+                try:store.summary(different['input_id'],snap['config_id'])
+                except psycopg2.errors.RaiseException as error:
+                    v.require(error.diag.message_primary=='training_cache_not_prepared','unprepared input/config combination fails instead of claiming fingerprint failure')
+                else:raise AssertionError('unprepared rule result silently accepted')
+
                 # Ambiguous or incomplete input is rejected before a snapshot exists.
                 v.sql("UPDATE import_batch SET state='processing' WHERE batch_id='B1'")
                 try:store.snapshot(validate(doc,'C1'),['B1'])

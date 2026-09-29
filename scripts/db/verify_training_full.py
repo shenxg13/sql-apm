@@ -14,12 +14,13 @@ from verify import instance, Verification
 from sql_apm.ingestion.config import canonical, identity, load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.training import TrainingStore
-from sql_apm.training.config import validate as configuration
+from sql_apm.training.config import DECISION_VERSION, validate as configuration
 
 
 def validate(dsn, output):
     store=TrainingStore(dsn)
-    report=dict(clusters={},method='private PostgreSQL 17; product importer; original cache and SQL derivation; measured')
+    report=dict(clusters={}, method='private PostgreSQL 17; product importer; original cache and SQL derivation; measured',
+                normalization_context=store.context, decision_version=DECISION_VERSION, schema_version='1.3.0')
     report['code_sha256']={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted((ROOT/'sql_apm/training').glob('*.py'))+sorted((ROOT/'sql_apm/storage').glob('*.py'))+[ROOT/'sql_apm/storage/schema.sql']}
     try:

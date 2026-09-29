@@ -49,7 +49,9 @@ JSON 存放于被忽略的 `var/training/`；不执行配置或 `.env`。下面�
 重复文件按文件身份去重，重复导入不会多算事件。
 `--schema` 为 training 级选项，须放在 `snapshot`／`summary` 之前。
 
-命令返回 `input_id`、`config_id`、`rule_id`、新增原文结果数及缓存耗时。
+命令返回 `input_id`、`config_id`、`rule_id`、新增原文结果数及缓存耗时；后续使用这组快照。
+任意混用不同命令的输入和配置时，若该规则未处理新输入，数据库报 `training_cache_not_prepared`，
+不会将“未准备缓存”误计为源 SQL 指纹失败。
 快照一经封存不可修改；修改配置后重新创建快照，已有快照仍使用原规则。
 中断前已提交的原文缓存可以复用；未完成的快照事务全部回滚。
 同规则的缓存准备并发返回 `training_rule_busy`，待原会话退出后重试。

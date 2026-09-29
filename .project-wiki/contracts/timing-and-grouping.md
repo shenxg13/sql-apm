@@ -222,6 +222,13 @@ confidence: high
 
 关联条款：[已确认的五类计时统计与 Parse／Bind 纳入](timing-and-grouping.md#已确认的五类计时统计与-parsebind-纳入)；[故障与维护时段的人工排除](training-eligibility.md#故障与维护时段的人工排除)。
 
+### 已实现的计时解释与配对
+
+[Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 已实现本构建五类计时映射、
+十进制耗时、北京时间推算开始及单文件 Execute 配对；统计和训练判定仍未交付。
+算法及明确的未知原因、跨文件限制见[导入设计](../../docs/design/log-ingestion.md)。
+成功判定的追加确认见[训练资格](training-eligibility.md#已确认的请求调用成功证据2026-09-29)。
+
 ## Workflows
 
 按任务涉及的边界补读：

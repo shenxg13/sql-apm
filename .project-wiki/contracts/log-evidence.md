@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/log-evidence.md
-updated: 2026-09-28
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -346,6 +348,16 @@ confidence: high
   主机名、账号、数据库名或进程标识。
 
 关联条款：[已确认的单条语句与多语句批次](training-eligibility.md#已确认的单条语句与多语句批次)。
+
+### 导入采用的成功与失败证据（2026-09-29）
+
+来源：[Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 的用户确认，来源状态 current。
+已接受的 duration 成功证据及 Sync／跨文件限制由
+[成功证据契约](training-eligibility.md#已确认的请求调用成功证据2026-09-29)维护；
+带 SQL ERROR、取消／超时及 NULL 耗时由
+[失败执行契约](../features/sql-search-and-views.md#已确认的失败执行明细2026-09-29)维护。
+这些是已确认的产品解释规则，不将此前只读诊断当作导入验收。
+Issue #18 的来源字段、单文件配对与冲突检测边界见[导入设计](../../docs/design/log-ingestion.md)。
 
 ## Workflows
 

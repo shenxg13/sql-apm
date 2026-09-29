@@ -146,3 +146,13 @@
 | 2026-09-28 | 按用户授权完成 Issue #13 R1 整改：词法门槛诊断在常量替换前统一拒绝非法编码／NUL，新增同类与隔离聚合回归。全量字节核查及361条五方案回放确认旧覆盖数字不变，拒绝原因优先级变化单独记录；见[日志证据](contracts/log-evidence.md#120-集群七天补充观察2026-09-28)及[整改报告](../docs/reports/log-supplement-r1-remediation-2026-09-28.md)。历史证据与正式规则未改，后续独立 R2 验证退出条件。 |
 | 2026-09-29 | 按 [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 及方案 A 确认修订 [SQL 指纹契约](contracts/sql-fingerprints.md)：v5 纳入 SELECT 列表／JOIN ON 常量，并恢复集合分支独立查询上下文；同步冻结版本审计及[耗时诊断说明](../docs/runbooks/duration-dispersion.md)，实测见[v5 验证报告](../docs/reports/sql-normalization-v5-2026-09-29.md)。验收与合并状态由在线 Issue 记录。 |
 | 2026-09-29 | 按 #17 已确认范围交付[近似观察字段](../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)和[结构 1.2.0](architecture/postgresql-storage.md)，冻结旧 DDL 并验证连续升级、复用与可靠路径隔离；[全量往返](../docs/reports/approximate-storage-2026-09-29.md)覆盖10,902条 v5 拒绝原文。实际写入由 #18 同次导入，观察统计另行处理；未改变算法及训练资格。 |
+
+## 2026-09-29：首期导入与计时配对（Issue #18）
+
+- 将用户于当日确认的[duration 成功证据](contracts/training-eligibility.md#已确认的请求调用成功证据2026-09-29)
+  和[失败执行明细](features/sql-search-and-views.md#已确认的失败执行明细2026-09-29)写入负责主题，保留 Sync／跨文件局限。
+- [导入实现](features/log-ingestion.md#首期导入实现issue-18)使用结构 1.2.0，新增来源／清单 JSON、
+  文件事务与安全重试、五类计时、原文与独立近似持久化；[命令](features/operator-cli.md#已实现的只导入命令)
+  只导入，后续训练、统计和发布边界不变。
+- [运行时决策](decisions/runtime-and-components.md)锁定 psycopg2-binary 2.9.10；
+  [设计与测试用例](../docs/design/log-ingestion.md)记录资源、冲突覆盖和配对边界。

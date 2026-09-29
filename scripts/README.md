@@ -124,3 +124,11 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `report` 对已审计的 v4／v5 快照计算真实维度的门槛覆盖和新增合并子组的中位数倍数分布。
 命令、分母、脱敏及恢复规则见[耗时诊断说明](../docs/runbooks/duration-dispersion.md)。
 原文、索引和耗时缓存均留在本地忽略目录。
+
+## 首期日志导入
+
+`python -m sql_apm import` 从已登记来源按完整清单导入 HashData CSV，不构建或切换版本。
+参数、配置、重试与诊断见[操作说明](../docs/runbooks/log-ingestion.md)，
+写入与资源边界见[设计](../docs/design/log-ingestion.md)。
+`.venv/bin/python scripts/db/verify_ingestion.py` 回放合成导入用例；
+全量验收入口 `scripts/db/verify_ingestion_full.py` 需要显式本地输入与私有 PG17，常规测试不自动运行。

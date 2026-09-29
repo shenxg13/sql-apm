@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-09-27
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/18
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -206,6 +208,14 @@ confidence: high
   自动等同于无法识别 SQL 结构。
 
 关联条款：[已确认的业务常量归一化](../contracts/sql-fingerprints.md#已确认的业务常量归一化)；[首版函数参数归一化字典的后续维护](../contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)；[已确认的单条语句与多语句批次](../contracts/training-eligibility.md#已确认的单条语句与多语句批次)；[已确认的 SQL 原文存储方式](../contracts/sql-storage.md#已确认的-sql-原文存储方式)。
+
+### 首期导入实现（Issue #18）
+
+[导入设计](../../docs/design/log-ingestion.md)与[命令说明](../../docs/runbooks/log-ingestion.md)
+记录 JSON 登记、冻结清单、文件事务、幂等重试、保守冲突检测及资源边界。
+实现复用结构 1.2.0，可靠原文与近似结果分开保存；未可靠配对的 Execute 类别为 NULL。
+批次 complete 仅证明声明清单已处理，不等于训练合格、源端覆盖完整或可立即发布。
+历史各节“尚未实现”的表述记录原确认时点，本节说明本轮新增实现；验收证据见本轮报告。
 
 ## Workflows
 

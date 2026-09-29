@@ -107,10 +107,17 @@ SQL／上下文一致性的依据；记录具体 evidence_refs 和 association_v
 文件边界本身不必切断会话，但跨文件关联仍须明确顺序和来源，存在冲突或缺口就报告不确定。
 同 SQL、同命令号或时间最近均不是充分条件。成功配对不证明 portal 生命周期完整。
 
-outcome 以该请求／调用的完整证据集合判断；与它可靠关联的 ERROR、取消或超时证据
-可以给出相应状态，否则保留 unknown。本设计不规定错误归因算法，也不把 SQLSTATE
-单列或 LOG/00000 当作完整成功证明。明确业务执行失败可以是导入成功的记录，
-“解析器不支持 SQL”不能被标为 execution_failed。
+2026-09-29 用户在 [Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 确认：
+可可靠识别的 1946／2843 duration 证明本次请求／调用未报错结束；Parse／Bind 仅按阶段
+本身判定，后续 Execute 报错不追溯否定已完成阶段。Execute 不证明整个 portal 完成。
+该规则不覆盖 Sync 提交时才出现的失败及跨文件会话少量情况；SQLSTATE 或 LOG/00000
+单列仍不是充分成功证据。完整规则由[训练资格](../../../.project-wiki/contracts/training-eligibility.md#已确认的请求调用成功证据2026-09-29)维护。
+
+Master 带第 24 列 SQL 的每条 ERROR 形成失败请求，57014 按消息区分取消／超时，
+end_at 取日志时间，duration_ms 与 estimated_start_at 为 NULL；不带 SQL 的 FATAL 等
+留在批次问题。详见[失败执行明细](../../../.project-wiki/features/sql-search-and-views.md#已确认的失败执行明细2026-09-29)。
+明确业务执行失败可以是导入成功的记录，“解析器不支持 SQL”不改变 execution outcome。
+实际单次配对、包络空白处理及文件边界见[导入设计](../log-ingestion.md)。
 
 无法可靠识别事件边界时只产生批次 Problem；已知一次调用但首次／续取未知时
 可以保留 Occurrence，分类为空，并在批次层诊断，不能作为第六类训练分布。

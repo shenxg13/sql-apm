@@ -1,4 +1,4 @@
-"""PostgreSQL 1.2.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
+"""PostgreSQL 1.3.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
 from collections import OrderedDict
 import hashlib
 import io
@@ -24,8 +24,8 @@ def connect(dsn, schema):
             # a version history, so applied_at cannot identify the current version.
             cur.execute('SELECT version FROM schema_version')
             versions = {row[0] for row in cur}
-            if versions not in ({'1.2.0'}, {'1.1.0', '1.2.0'}, {'1.0.0', '1.1.0', '1.2.0'}):
-                raise IngestionError('schema_1_2_0_required')
+            if versions not in ({'1.3.0'}, {'1.2.0', '1.3.0'}, {'1.1.0', '1.2.0', '1.3.0'}, {'1.0.0', '1.1.0', '1.2.0', '1.3.0'}):
+                raise IngestionError('schema_1_3_0_required')
         connection.commit()
         return connection
     except BaseException:

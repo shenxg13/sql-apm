@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-09-25
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -281,6 +283,23 @@ confidence: high
   产品验收，不把日志源码位置覆盖率当作训练质量或已实现检查的证据。
 
 关联条款：[已确认的主要统计公式](../contracts/baseline-statistics.md#已确认的主要统计公式)；[已确认的耗时单位与统计空值口径](../contracts/baseline-statistics.md#已确认的耗时单位与统计空值口径)；[已确认的排除计数口径](../contracts/baseline-statistics.md#已确认的排除计数口径)。
+
+### 首期拆分、快照归属与判定存储（2026-09-29）
+
+- 来源：[Issue #21 需求确认](https://github.com/shenxg13/sql-apm/issues/21)；current。
+- 首期按 ⓪ 近似结果结构（#17）→ ① 导入（#18）→ ② 样本判定（#21）→
+  ③ 统计计算 → ④ 构建编排、发布检查与版本切换 顺序交付。② 与④合称“训练投影控制面”。
+  这个称谓不改变各步骤交付范围，③／④仍是后续工作。
+- 输入和配置快照由②固定记录，②不创建 Build；④引用快照并负责构建生命周期和发布。
+  ③负责五层统计及计数持久化，④负责同集群任务串行和版本切换。
+- 判定采用用户确认的方案 C：只保存不可变快照，类别与模板候选结果按去重原文和规则版本
+  各保存一份；逐条结论按原文结果、事件字段和快照即时推导，不为每次构建永久复制 Decision。
+  规则升级生成新缓存版本，旧结果保留；执行明细和原文仍复用。
+- 快照记录判定规则版本。判定逻辑改版后，旧快照只保证已保存的计数，不承诺逐条复算；
+  后续执行历史展示须说明此边界，不能以新规则静默解释旧结论。
+- 选择依据：#18 实测输入量和行大小下，逐条存储的每日 6.5～13 GiB、仅存未纳入仍约
+  0.5～1 TiB／年的量级属于 modeled，不是本实现实测。首期暂缓自动清理，故按需推导；
+  实际缓存和全量推导性能见[验证报告](../../docs/reports/training-decisions-2026-09-29.md)。
 
 ## Workflows
 

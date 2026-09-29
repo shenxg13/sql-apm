@@ -20,6 +20,7 @@ from database.fixture import statements  # noqa: E402
 from database.approximate import verify_approximate  # noqa: E402
 from database.approximate_migration import verify_approximate_migration  # noqa: E402
 from database.migration import verify_migration  # noqa: E402
+from database.training_migration import verify_training_migration
 from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
 
@@ -286,6 +287,8 @@ def main():
     signal.signal(signal.SIGINT, interrupted)
     with instance(args.pg_bin) as (directory, env):
         Verification(args.pg_bin, directory, env).tests()
+    with instance(args.pg_bin) as (directory, env):
+        verify_training_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     with instance(args.pg_bin) as (directory, env):
         verify_current_triggers(Verification(args.pg_bin, directory, env), run)
     with instance(args.pg_bin) as (directory, env):

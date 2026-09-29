@@ -403,7 +403,7 @@ def verify(pg_bin):
             upgraded = Importer(migrated_dsn, schema='ingest_upgrade', workers=1, progress=lambda **kw: None)
             cfg.write_text(json.dumps(configuration(cfg, [path], 'UPGRADED')))
             try:
-                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.2.0 migration')
+                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.3.0 migration')
             finally:
                 upgraded.close()
             upgrade_sql("INSERT INTO schema_version(version,script_sha256) VALUES ('9.0.0',repeat('0',64))")
@@ -411,7 +411,7 @@ def verify(pg_bin):
             try:
                 connection = connect(migrated_dsn, 'ingest_upgrade')
             except IngestionError as error:
-                v.require(str(error) == 'schema_1_2_0_required', 'unknown future receipt rejected')
+                v.require(str(error) == 'schema_1_3_0_required', 'unknown future receipt rejected')
             else:
                 connection.close()
                 raise AssertionError('unknown version admitted')

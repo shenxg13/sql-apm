@@ -11,6 +11,8 @@ owners:
   - tests/database/
 updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/15
     status: current
   - path: docs/reports/sql-normalization-v4-2026-09-28.md
@@ -230,6 +232,15 @@ Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/no
 `cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
 [设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)
 说明恢复、配对和证据边界。训练、统计与发布子包仍待对应任务实现。
+
+## 已实现的训练判定边界
+
+Issue #21 新增 `training/categories.py` 和 `training/config.py`，分别负责保守产品类别及本地配置；
+`storage/training.py` 管理快照、缓存和数据库查询，`cli/training.py` 是薄命令。
+`storage/schema.sql` 的 `mpp_training_decisions` 是唯一资格推导，逐条查询和诊断共用；
+产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎，也未实施③统计／④编排。
+[判定设计](../../docs/design/training-decisions.md)与[操作说明](../../docs/runbooks/training-decisions.md)
+记录接口、临时汇总和持久化边界。
 
 ## Workflows
 

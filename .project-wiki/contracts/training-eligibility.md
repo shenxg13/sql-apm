@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/training-eligibility.md
 updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
     status: current
   - path: .project-wiki/log.md
@@ -326,6 +328,19 @@ confidence: high
 - 已知局限：本规则不覆盖扩展协议在 Sync 提交时才暴露的失败，以及跨文件会话的少量情况；
   用户在知情情况下接受这一口径，不声称取得 HashData 对应私有源码后的完整证明。
 - #18 实现导入时 outcome 与计时记录；训练 `Decision`、黑名单和排除时段筛选由后续任务实现。
+
+### 模板匹配与五类计时适用（2026-09-29）
+
+- 来源：[Issue #21 的用户确认](https://github.com/shenxg13/sql-apm/issues/21)；current。
+  这次确认落实此前待定的匹配及计时细则，不新增类别或预置模板。
+- 用户填写单条或整批示例 SQL，按快照的归一化规则计算结构指纹；与事件的可靠
+  结构指纹一致即命中，可限定集群、数据库或执行用户。无法可靠归一化的模板报错，
+  不回退文本匹配。归一化规则升级后自动按新规则重算示例，用户无需重填。
+- 类别与模板黑名单均作用于请求整体、Execute 首次、Execute 续取、Parse、Bind。
+  类别仍严格按七类、暂缓别名和纯／混合批次边界；不因阶段身份豁免命中。
+- 产品实现位于 `sql_apm/training/` 与 `storage/training.py`，数据库函数是逐条资格
+  的唯一实现，诊断工具保持独立；[设计与验证](../../docs/design/training-decisions.md)
+  说明实现和证据。本文早期“尚未实现／细则待定”描述为当时边界，本节为当前增补。
 
 ## Workflows
 

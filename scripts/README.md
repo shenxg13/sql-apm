@@ -55,7 +55,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0，或由 1.1.0 扩展近似观察结构到 1.2.0。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0，支持由中间版本开始。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_approximate.py`：显式读取全量 v5 拒绝选择集，
@@ -135,3 +135,11 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 `scripts/db/reconcile_ingestion.py` 在全量入库后只读核对最终适配器计数和历史原文集合差异；
 参数及验收失败语义见上述导入操作说明。
+
+## 训练样本判定
+
+- `python -m sql_apm training snapshot`／`training summary`：本地配置、固定快照与脱敏诊断；
+  [参数与范围](../docs/runbooks/training-decisions.md)。
+- `.venv/bin/python scripts/db/verify_training.py`：私有 PG17 合成资格、快照与原文缓存验收。
+- `.venv/bin/python scripts/db/verify_training_full.py`：显式重导 55 文件、两集群快照、全量推导与计数对账；
+  高成本检查不自动加入日常 Harness，输入／输出保留本地忽略目录。

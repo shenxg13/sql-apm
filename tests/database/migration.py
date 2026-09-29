@@ -24,7 +24,8 @@ def verify_migration(v, root, runner):
     v.require(hashlib.sha256(legacy.encode()).hexdigest() == LEGACY_SHA,
               "published 1.0.0 DDL is byte-for-byte preserved")
     new_tables = {"mpp_approximate_rule", "mpp_approximate_input", "mpp_approximate_result",
-                  "mpp_approximate_evidence", "mpp_occurrence_approximate"}
+                  "mpp_approximate_evidence", "mpp_occurrence_approximate",
+                  "mpp_training_rule", "mpp_training_sql", "training_config", "input_manifest", "input_file_analysis"}
     fixture = statements()
     for name in MPP_TABLES:
         fixture = re.sub(r"\bmpp_" + name + r"\b", name, fixture)
@@ -48,10 +49,8 @@ def verify_migration(v, root, runner):
                 if table != "schema_version" and table not in new_tables:
                     key = table[4:] if table.startswith("mpp_") else table
                     data[key] = sql('SELECT coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text),\'[]\') FROM "' + table + '" t')
-            objects = sql("SELECT oid::text||':'||relfilenode::text FROM pg_class WHERE relnamespace='" + schema +
-                          "'::regnamespace AND relname NOT LIKE 'mpp_approximate_%' AND relname NOT LIKE 'mpp_occurrence_approximate%' ORDER BY oid")
-            constraints = sql("SELECT oid FROM pg_constraint WHERE connamespace='" + schema +
-                              "'::regnamespace AND conname NOT LIKE 'mpp_approximate_%' AND conname NOT LIKE 'mpp_occurrence_approximate%' AND conname <> 'mpp_fingerprint_not_approximate' ORDER BY oid")
+            objects = sql("SELECT oid::text||':'||relfilenode::text FROM pg_class WHERE oid IN (" + original_objects + ") ORDER BY oid")
+            constraints = sql("SELECT oid FROM pg_constraint WHERE oid IN (" + original_constraints + ") ORDER BY oid")
             return data, objects, constraints
 
         def versions():
@@ -64,6 +63,8 @@ def verify_migration(v, root, runner):
         sql("INSERT INTO problem SELECT 'MIG_P','record',b.batch_id,f.file_id,NULL,o.analysis_id,o.occurrence_id,"
             "'synthetic','migration provenance','informational','log_record',1,'open',NULL "
             "FROM occurrence o CROSS JOIN import_batch b CROSS JOIN source_file f LIMIT 1")
+        original_objects = sql("SELECT string_agg(oid::text,',') FROM pg_class WHERE relnamespace='" + schema + "'::regnamespace")
+        original_constraints = sql("SELECT string_agg(oid::text,',') FROM pg_constraint WHERE connamespace='" + schema + "'::regnamespace")
         before, receipt = state(), versions()
         v.require(len(tables()) == 41 and sql("SELECT count(*) FROM statistic") == "5", "legacy populated schema prepared: " + schema)
         v.init("schema", names=names, ok=False)
@@ -132,10 +133,10 @@ def verify_migration(v, root, runner):
         v.init("check", names=names)
         v.require(state() == before, "upgrade preserves every business row, relation OID/file and constraint OID: " + schema)
         after = versions()
-        v.require(set(after) == {"1.0.0", "1.1.0", "1.2.0"} and after["1.0.0"] == receipt["1.0.0"],
-                  "upgrade retains original receipt and adds both sequential receipts: " + schema)
-        v.require(len(tables()) == 46 and {t for t in tables() if t.startswith("mpp_")} == ({"mpp_" + n for n in MPP_TABLES} | new_tables)
-                  and not set(tables()).intersection(MPP_TABLES), "exact 19 MPP names, 27 common tables and no legacy names: " + schema)
+        v.require(set(after) == {"1.0.0", "1.1.0", "1.2.0", "1.3.0"} and after["1.0.0"] == receipt["1.0.0"],
+                  "upgrade retains original receipt and adds all sequential receipts: " + schema)
+        v.require(len(tables()) == 51 and {t for t in tables() if t.startswith("mpp_")} == ({"mpp_" + n for n in MPP_TABLES} | {n for n in new_tables if n.startswith("mpp_")})
+                  and not set(tables()).intersection(MPP_TABLES), "exact 21 MPP names, 30 common tables and no legacy names: " + schema)
         v.require(sql("SELECT count(*) FROM pg_constraint k JOIN pg_class t ON t.oid=k.conrelid WHERE t.relnamespace='" + schema +
                       "'::regnamespace AND t.relname LIKE 'mpp\\_%' ESCAPE '\\' AND k.conname NOT LIKE 'mpp\\_%' ESCAPE '\\'") == "0",
                   "MPP constraint names consistently prefixed: " + schema)

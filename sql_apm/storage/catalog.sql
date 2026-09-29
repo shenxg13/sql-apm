@@ -33,11 +33,17 @@ LANGUAGE sql AS $function$
         ) ORDER BY k.conname, t.tgenabled)
             FROM pg_trigger t JOIN pg_constraint k ON k.oid=t.tgconstraint
             WHERE t.tgrelid=c.oid AND t.tgisinternal AND k.contype='f' AND t.tgenabled<>'O'),
-        'triggers', (SELECT jsonb_agg(pg_get_triggerdef(t.oid) ORDER BY t.tgname)
+        'triggers', (SELECT jsonb_agg(jsonb_build_array(replace(pg_get_triggerdef(t.oid),quote_ident(ns)||'.','@.'),t.tgenabled) ORDER BY t.tgname)
             FROM pg_trigger t WHERE t.tgrelid=c.oid AND NOT t.tgisinternal),
         'policies', (SELECT jsonb_agg(p.polname ORDER BY p.polname) FROM pg_policy p WHERE p.polrelid=c.oid),
         'rules', (SELECT jsonb_agg(pg_get_ruledef(r.oid) ORDER BY r.rulename) FROM pg_rewrite r WHERE r.ev_class=c.oid)
     )
     FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-    WHERE n.nspname=ns AND c.relkind NOT IN ('i','I');
+    WHERE n.nspname=ns AND c.relkind NOT IN ('i','I')
+    UNION ALL
+    SELECT 'function:'||p.proname||'('||pg_get_function_identity_arguments(p.oid)||')',
+        jsonb_build_object('definition',replace(pg_get_functiondef(p.oid),quote_ident(ns)||'.','@.'),
+                           'owner',pg_get_userbyid(p.proowner),'acl',p.proacl::text)
+    FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=ns;
+
 $function$;

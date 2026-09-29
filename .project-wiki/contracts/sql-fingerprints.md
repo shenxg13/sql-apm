@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/sql-fingerprints.md
 updated: 2026-09-29
 sources:
+  - path: docs/reports/sql-normalization-v5-2026-09-29.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/15
     status: current
   - path: docs/reports/sql-normalization-v4-r1-remediation-2026-09-28.md

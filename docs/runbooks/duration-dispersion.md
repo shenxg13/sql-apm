@@ -2,7 +2,7 @@
 
 本地只读命令 `sql_apm.diagnostics.duration_dispersion` 用于
 [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 的耗时证据。
-使用 Python 3.9.5 和已有解析诊断依赖；不连接数据库、不执行 SQL、不构建基线。
+使用 Python 3.9.5 和已有解析诊断依赖；不连接业务数据库、不执行生产 SQL、不构建基线。
 
 ## 输入、维度与分母
 

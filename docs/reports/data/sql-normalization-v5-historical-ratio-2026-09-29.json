@@ -1,0 +1,392 @@
+{
+  "clusters": {
+    "119": {
+      "duration_samples": 2821670,
+      "merges": {
+        "comparable_groups": 120,
+        "comparable_samples": 23545,
+        "median_ratio_buckets": {
+          "2-5": {
+            "groups": 18,
+            "sample_fraction": 0.12053514546612869,
+            "samples": 2838
+          },
+          "5-10": {
+            "groups": 4,
+            "sample_fraction": 0.03695052028031429,
+            "samples": 870
+          },
+          "<=2": {
+            "groups": 97,
+            "sample_fraction": 0.8388192822255256,
+            "samples": 19750
+          },
+          ">10": {
+            "groups": 1,
+            "sample_fraction": 0.003695052028031429,
+            "samples": 87
+          }
+        },
+        "new_merged_groups": 955
+      },
+      "merges_by_category": {
+        "join_on": {
+          "comparable_groups": 15,
+          "comparable_samples": 180,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 1,
+              "sample_fraction": 0.06666666666666667,
+              "samples": 12
+            },
+            "5-10": {
+              "groups": 0,
+              "sample_fraction": 0.0,
+              "samples": 0
+            },
+            "<=2": {
+              "groups": 14,
+              "sample_fraction": 0.9333333333333333,
+              "samples": 168
+            },
+            ">10": {
+              "groups": 0,
+              "sample_fraction": 0.0,
+              "samples": 0
+            }
+          },
+          "new_merged_groups": 253
+        },
+        "select_list": {
+          "comparable_groups": 24,
+          "comparable_samples": 5518,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 6,
+              "sample_fraction": 0.08209496194273287,
+              "samples": 453
+            },
+            "5-10": {
+              "groups": 0,
+              "sample_fraction": 0.0,
+              "samples": 0
+            },
+            "<=2": {
+              "groups": 18,
+              "sample_fraction": 0.9179050380572671,
+              "samples": 5065
+            },
+            ">10": {
+              "groups": 0,
+              "sample_fraction": 0.0,
+              "samples": 0
+            }
+          },
+          "new_merged_groups": 460
+        },
+        "set_branches": {
+          "comparable_groups": 81,
+          "comparable_samples": 17847,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 11,
+              "sample_fraction": 0.13296352328122374,
+              "samples": 2373
+            },
+            "5-10": {
+              "groups": 4,
+              "sample_fraction": 0.048747688687174315,
+              "samples": 870
+            },
+            "<=2": {
+              "groups": 65,
+              "sample_fraction": 0.8134140191628845,
+              "samples": 14517
+            },
+            ">10": {
+              "groups": 1,
+              "sample_fraction": 0.004874768868717431,
+              "samples": 87
+            }
+          },
+          "new_merged_groups": 242
+        }
+      },
+      "v4_raw_reference": {
+        "comparable_groups": 93,
+        "comparable_samples": 207090,
+        "median_ratio_buckets": {
+          "2-5": {
+            "groups": 20,
+            "sample_fraction": 0.07205562798783138,
+            "samples": 14922
+          },
+          "5-10": {
+            "groups": 8,
+            "sample_fraction": 0.07774880486744894,
+            "samples": 16101
+          },
+          "<=2": {
+            "groups": 52,
+            "sample_fraction": 0.7562750494953885,
+            "samples": 156617
+          },
+          ">10": {
+            "groups": 13,
+            "sample_fraction": 0.09392051764933121,
+            "samples": 19450
+          }
+        },
+        "new_merged_groups": 4636
+      },
+      "versions": {
+        "v4": {
+          "fingerprinted_samples": 2796163,
+          "groups": 96667,
+          "thresholds": {
+            "1000": {
+              "fraction_all_duration_samples": 0.8004607200700294,
+              "fraction_fingerprinted_samples": 0.8077626375858632,
+              "groups": 192,
+              "samples": 2258636
+            },
+            "200": {
+              "fraction_all_duration_samples": 0.8767109548600651,
+              "fraction_fingerprinted_samples": 0.8847084379558703,
+              "groups": 601,
+              "samples": 2473789
+            },
+            "30": {
+              "fraction_all_duration_samples": 0.9000740696112586,
+              "fraction_fingerprinted_samples": 0.9082846743912998,
+              "groups": 1458,
+              "samples": 2539712
+            }
+          }
+        },
+        "v5": {
+          "fingerprinted_samples": 2796163,
+          "groups": 58841,
+          "thresholds": {
+            "1000": {
+              "fraction_all_duration_samples": 0.8087292277268426,
+              "fraction_fingerprinted_samples": 0.8161065717556523,
+              "groups": 199,
+              "samples": 2281967
+            },
+            "200": {
+              "fraction_all_duration_samples": 0.8854472705879851,
+              "fraction_fingerprinted_samples": 0.8935244476090987,
+              "groups": 611,
+              "samples": 2498440
+            },
+            "30": {
+              "fraction_all_duration_samples": 0.9099256823087037,
+              "fraction_fingerprinted_samples": 0.9182261549130004,
+              "groups": 1493,
+              "samples": 2567510
+            }
+          }
+        }
+      }
+    },
+    "120": {
+      "duration_samples": 4632941,
+      "merges": {
+        "comparable_groups": 639,
+        "comparable_samples": 86594,
+        "median_ratio_buckets": {
+          "2-5": {
+            "groups": 210,
+            "sample_fraction": 0.5001385777305587,
+            "samples": 43309
+          },
+          "5-10": {
+            "groups": 17,
+            "sample_fraction": 0.18322285608702682,
+            "samples": 15866
+          },
+          "<=2": {
+            "groups": 397,
+            "sample_fraction": 0.306961221331732,
+            "samples": 26581
+          },
+          ">10": {
+            "groups": 15,
+            "sample_fraction": 0.009677344850682496,
+            "samples": 838
+          }
+        },
+        "new_merged_groups": 14888
+      },
+      "merges_by_category": {
+        "join_on": {
+          "comparable_groups": 33,
+          "comparable_samples": 1047,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 4,
+              "sample_fraction": 0.18051575931232092,
+              "samples": 189
+            },
+            "5-10": {
+              "groups": 3,
+              "sample_fraction": 0.10028653295128939,
+              "samples": 105
+            },
+            "<=2": {
+              "groups": 23,
+              "sample_fraction": 0.6790830945558739,
+              "samples": 711
+            },
+            ">10": {
+              "groups": 3,
+              "sample_fraction": 0.04011461318051576,
+              "samples": 42
+            }
+          },
+          "new_merged_groups": 4247
+        },
+        "select_list": {
+          "comparable_groups": 588,
+          "comparable_samples": 84422,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 201,
+              "sample_fraction": 0.5059818530714743,
+              "samples": 42716
+            },
+            "5-10": {
+              "groups": 13,
+              "sample_fraction": 0.18464381322404114,
+              "samples": 15588
+            },
+            "<=2": {
+              "groups": 365,
+              "sample_fraction": 0.30257515813413566,
+              "samples": 25544
+            },
+            ">10": {
+              "groups": 9,
+              "sample_fraction": 0.006799175570348961,
+              "samples": 574
+            }
+          },
+          "new_merged_groups": 9937
+        },
+        "set_branches": {
+          "comparable_groups": 18,
+          "comparable_samples": 1125,
+          "median_ratio_buckets": {
+            "2-5": {
+              "groups": 5,
+              "sample_fraction": 0.3591111111111111,
+              "samples": 404
+            },
+            "5-10": {
+              "groups": 1,
+              "sample_fraction": 0.1537777777777778,
+              "samples": 173
+            },
+            "<=2": {
+              "groups": 9,
+              "sample_fraction": 0.2897777777777778,
+              "samples": 326
+            },
+            ">10": {
+              "groups": 3,
+              "sample_fraction": 0.19733333333333333,
+              "samples": 222
+            }
+          },
+          "new_merged_groups": 704
+        }
+      },
+      "v4_raw_reference": {
+        "comparable_groups": 1270,
+        "comparable_samples": 371201,
+        "median_ratio_buckets": {
+          "2-5": {
+            "groups": 215,
+            "sample_fraction": 0.17726245349554554,
+            "samples": 65800
+          },
+          "5-10": {
+            "groups": 69,
+            "sample_fraction": 0.3026231071575777,
+            "samples": 112334
+          },
+          "<=2": {
+            "groups": 944,
+            "sample_fraction": 0.36928779825485386,
+            "samples": 137080
+          },
+          ">10": {
+            "groups": 42,
+            "sample_fraction": 0.15082664109202293,
+            "samples": 55987
+          }
+        },
+        "new_merged_groups": 58659
+      },
+      "versions": {
+        "v4": {
+          "fingerprinted_samples": 4555292,
+          "groups": 1084708,
+          "thresholds": {
+            "1000": {
+              "fraction_all_duration_samples": 0.4496359871623662,
+              "fraction_fingerprinted_samples": 0.4573004321128042,
+              "groups": 299,
+              "samples": 2083137
+            },
+            "200": {
+              "fraction_all_duration_samples": 0.5424985986223437,
+              "fraction_fingerprinted_samples": 0.5517459693033948,
+              "groups": 1207,
+              "samples": 2513364
+            },
+            "30": {
+              "fraction_all_duration_samples": 0.5661425431491574,
+              "fraction_fingerprinted_samples": 0.5757929458748199,
+              "groups": 2579,
+              "samples": 2622905
+            }
+          }
+        },
+        "v5": {
+          "fingerprinted_samples": 4555292,
+          "groups": 911610,
+          "thresholds": {
+            "1000": {
+              "fraction_all_duration_samples": 0.4655589181904108,
+              "fraction_fingerprinted_samples": 0.47349478364943454,
+              "groups": 318,
+              "samples": 2156907
+            },
+            "200": {
+              "fraction_all_duration_samples": 0.5668369184930263,
+              "fraction_fingerprinted_samples": 0.5764991574634513,
+              "groups": 1320,
+              "samples": 2626122
+            },
+            "30": {
+              "fraction_all_duration_samples": 0.6002081615112301,
+              "fraction_fingerprinted_samples": 0.6104392429727886,
+              "groups": 3265,
+              "samples": 2780729
+            }
+          }
+        }
+      }
+    }
+  },
+  "formula": "(max median ms + 1)/(min median ms + 1)",
+  "historical_script_sha256": "02fc61d1b51598ab798db1630264dd7b796065ac041c71f40b49f6d8bc32f099",
+  "input_sha256": [
+    "d810bb61d3aca16f53c6b39a8936a77c22643513812e37041dac58ec0ead8419",
+    "cf868b0141790759765ec92af2331a0fd6468df5e09f7cd2b61120d65b0f3255",
+    "4575082173187e3e69a099f3fc322969c0ae092da503f279495fc2c5df28fed3"
+  ],
+  "purpose": "reconcile historical ratio formula only; not v5 acceptance"
+}

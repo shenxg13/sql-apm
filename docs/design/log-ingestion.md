@@ -48,8 +48,12 @@
 
 ## 身份与证据细节
 
-- 清单按确认路径冻结；文件按同源内容身份入库。一次完整重试处理完所有路径后，
-  核对清单最终内容集合，再检查每个最终尝试，避免修复文件或同内容多路径别名遗留错误条目。
+- 清单按确认路径冻结；文件按同源内容身份入库。先复用原有摘要扫描，比较当前内容集合与
+  本批次最终尝试为 succeeded／duplicate_skipped 的既有成员。任何成功成员消失即暂停本次批次，
+  保留原 batch_entry 及最终尝试，记录 batch_member_changed、block_publication 和新旧 file_id。
+  即使替代内容已被其他批次导入，也不当作合法跳过。不写入替代内容的事件。
+  只有未成功的旧成员可被修复内容替换；同内容别名仍按集合处理，旧成功内容仍在时不误删。
+  摘要阶段和使用前核对文件属性，变化时失败且保留原成功成员；读取时仍核对完整摘要。
   历史源文件、尝试和问题记录仍保留。
 - 重复跳过引用既有成功尝试，事件继续属于原 Analysis；后续构建按文件对应已成功解释取数，
   不把新批次中空的 Analysis 当作需要复制事件的理由。
@@ -67,3 +71,24 @@
 即使新内容已经以另一个文件身份成功导入，也先按冲突暂停，不由内容去重掩盖该变更。
 HashData 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/hashdata/persistence.py`，
 通用文件／批次流程不解释 CSV 列号；后续来源须提供独立的来源适配，不沿用本构建行号。
+
+## R1 恢复与解释版本边界
+
+- SQL 工作进程超时、异常退出／管道失败和启动失败分别使用 `normalization_timeout`、
+  `normalization_worker_failed`、`normalization_worker_start_failed`。这三类运行故障使当前文件
+  整体回滚、尝试失败，批次不能 complete；不会提交没有 SQL 关联的降级事件或缓存失败结果。
+  排查后重试整文件；正常 SQL 可重新得到可靠结果。超时受主机负载影响，持续超过限制的输入
+  仍可能再次失败。此前已提交的独立 SQL 元数据可复用，不代表文件成功。
+- map 中途异常会清理全部子进程及在途回复，防止下一文件把旧回复对应到新输入。
+  Normalizer 的结构拒绝及其他明确记录级返回仍按原契约隔离；已成功文件重导不会重新归一化。
+- Analysis 的 `parser_version` 为来源适配内的 `hashdata-csv-reader/1`，覆盖本构建 CSV 读取与
+  行解释；`mapping_version=hashdata-3.13.13/1` 与 `association_version=execute-file-sequence/1`
+  分别标识映射与配对。SQL 解析器 `mpp-adapter/9` 仍属于 Normalization，不代替来源版本。
+  复用 Analysis 时比较 scope、profile 和三个版本；不符则 `analysis_version_mismatch`，
+  在创建新任务／尝试或写事件前拒绝。包括此前把 SQL 解析版本填入 Analysis 的实验记录。
+  保留旧解释，不回写版本，也不自动建立 supersedes；跨版本重新解释属于显式后续处理。
+- qualitative：成员核对只提前执行原有每文件摘要扫描，保存 O(文件数) 的摘要和属性，
+  不增加全量字节读取；属性核对阻止预检后普通文件变化。与导入后才标冲突相比，预检避免了
+  多余归一化和替代事件写入。故障恢复继续付出重放单文件的成本；不新增逐记录恢复水位。
+
+本轮退出条件、故障注入和验证边界见[R1 整改报告](../reports/log-ingestion-r1-remediation-2026-09-29.md)。

@@ -11,8 +11,26 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'tests'))
 from verify import instance, Verification, run
 from ingestion.test_reader import row, configuration, write_csv
-from sql_apm.ingestion.config import load_config, IngestionError
+from sql_apm.ingestion.config import load_config, IngestionError, identity
 from sql_apm.ingestion.importer import Importer
+
+
+def timeout_worker(connection):
+    import time
+    connection.send('ready')
+    connection.recv_bytes()
+    time.sleep(30)
+
+
+def failed_worker(connection):
+    import os
+    connection.send('ready')
+    connection.recv_bytes()
+    os._exit(1)
+
+
+def failed_start_worker(connection):
+    connection.close()
 
 
 def verify(pg_bin):
@@ -171,6 +189,139 @@ def verify(pg_bin):
             write_csv(partial, [row(text='SELECT 1; BOGUS 2;')])
             partial_result = ingest([partial], 'PARTIAL')
             v.require(partial_result['added_occurrences'] == 1 and v.sql("SELECT count(*) FROM mpp_occurrence WHERE request_shape='batch' AND sql_state='uncertain' AND sql_id IS NULL AND outcome='success'") == '1', 'closed partially unsupported batch retains one uncertain whole request')
+            # R1-F001: real worker timeouts/deaths/startup EOF after a successful COPY.
+            from unittest.mock import patch
+            for suffix, worker in [('timeout', timeout_worker), ('failed', failed_worker), ('start_failed', failed_start_worker)]:
+                batch = 'WORKER_' + suffix
+                candidate = root / (batch + '.csv')
+                write_csv(candidate, [row(text="SELECT 'before_" + suffix + "'") for _ in range(2000)] +
+                          [row(text="SELECT 'after_" + suffix + "'")])
+                cfg.write_text(json.dumps(configuration(cfg, [candidate], batch)))
+                importer = Importer(dsn, workers=1, progress=lambda **kw: None)
+                replacement = patch('sql_apm.ingestion.normalizing.worker', worker)
+                def break_worker(number):
+                    if number == 2000:
+                        importer.pool.close()
+                        importer.pool.timeout = 0.05
+                        replacement.start()
+                importer.fault = break_worker
+                before_events = v.sql('SELECT count(*) FROM mpp_occurrence')
+                before_records = v.sql('SELECT count(*) FROM evidence_record')
+                try:
+                    failed = importer.run(load_config(cfg, 'S1', batch))
+                finally:
+                    replacement.stop()
+                    importer.close()
+                reason = 'normalization_' + ('timeout' if suffix == 'timeout' else 'worker_' + suffix)
+                fid = failed['files'][0]['file_id']
+                v.require(failed['state'] == 'failed' and failed['files'][0]['reason'] == reason and
+                          v.sql("SELECT state FROM import_batch WHERE batch_id='" + batch + "'") == 'failed', batch + ' fails file and batch with fixed reason')
+                v.require(v.sql("SELECT state FROM import_attempt WHERE batch_id='" + batch + "'") == 'failed' and
+                          v.sql("SELECT count(*) FROM problem WHERE batch_id='" + batch + "' AND code='" + reason + "' AND effect='fail_file'") == '1', batch + ' persists failed attempt and problem')
+                v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == before_events and
+                          v.sql('SELECT count(*) FROM evidence_record') == before_records and
+                          v.sql("SELECT count(*) FROM analysis_file WHERE file_id='" + fid + "'") == '0', batch + ' rolls back copied events and evidence')
+                v.require(ingest([candidate], batch)['added_occurrences'] == 2001 and
+                          v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='complete' AND sql_id IS NOT NULL") == '2001', batch + ' retry produces reliable events')
+                v.require(ingest([candidate], batch)['added_occurrences'] == 0, batch + ' successful retry then skips')
+            # R1-F002: protect succeeded and duplicate_skipped members before writes.
+            for preexisting, initially_skipped in [(False, False), (True, False), (False, True)]:
+                batch = 'MEMBER_' + str(int(preexisting)) + str(int(initially_skipped))
+                candidate = root / (batch + '.csv')
+                original_rows = [row(text="SELECT 'old_" + batch + "'")]
+                replacement_rows = [row(text="SELECT 'new_" + batch + "'")]
+                if initially_skipped:
+                    original_elsewhere = root / (batch + '_original.csv')
+                    write_csv(original_elsewhere, original_rows)
+                    ingest([original_elsewhere], batch + '_original')
+                write_csv(candidate, original_rows)
+                original_result = ingest([candidate], batch)
+                old_fid = original_result['files'][0]['file_id']
+                entries_before = v.sql("SELECT file_id||':'||final_attempt_id FROM batch_entry WHERE batch_id='" + batch + "'")
+                if preexisting:
+                    elsewhere = root / (batch + '_elsewhere.csv')
+                    write_csv(elsewhere, replacement_rows)
+                    ingest([elsewhere], batch + '_elsewhere')
+                before_events = v.sql('SELECT count(*) FROM mpp_occurrence')
+                write_csv(candidate, replacement_rows)
+                result = ingest([candidate], batch)
+                new_fid = result['files'][0]['file_id']
+                v.require(result['state'] == 'conflict' and result['files'][0]['reason'] == 'batch_member_changed' and
+                          v.sql("SELECT state FROM import_batch WHERE batch_id='" + batch + "'") == 'conflict', batch + ' replacement held, including previously imported content')
+                v.require(v.sql("SELECT file_id||':'||final_attempt_id FROM batch_entry WHERE batch_id='" + batch + "'") == entries_before and
+                          v.sql('SELECT count(*) FROM mpp_occurrence') == before_events, batch + ' preserves final member and adds no events')
+                evidence = json.loads(v.sql("SELECT reason FROM problem WHERE batch_id='" + batch + "' AND code='batch_member_changed' AND effect='block_publication'"))
+                v.require(evidence['removed_file_ids'] == [old_fid] and evidence['current_file_ids'] == [new_fid], batch + ' records old and new content identities')
+                v.require(ingest([candidate], batch)['state'] == 'conflict', batch + ' repeated conflict cannot become a successful skip')
+                write_csv(candidate, original_rows)
+                v.require(ingest([candidate], batch)['state'] == 'complete', batch + ' restoring original manifest admits safe repeat')
+            # Collapse two successful paths to one content identity: no newly seen ID.
+            left, right = root / 'collapse_a.csv', root / 'collapse_b.csv'
+            write_csv(left, [row(text='SELECT 901')]); write_csv(right, [row(text='SELECT 902')])
+            ingest([left, right], 'COLLAPSE')
+            right.write_bytes(left.read_bytes())
+            v.require(ingest([left, right], 'COLLAPSE')['state'] == 'conflict' and
+                      v.sql("SELECT count(*) FROM batch_entry WHERE batch_id='COLLAPSE'") == '2', 'collapsed aliases cannot remove a successful member')
+            # A later path can change after the batch's checksum phase. Its prior
+            # successful final attempt must remain protected for the next retry.
+            stable_a, stable_b = root / 'stable_a.csv', root / 'stable_b.csv'
+            write_csv(stable_a, [row(text='SELECT 903')]); write_csv(stable_b, [row(text='SELECT 904')])
+            ingest([stable_a, stable_b], 'STABLE')
+            prior_entries = v.sql("SELECT file_id||':'||final_attempt_id FROM batch_entry WHERE batch_id='STABLE' ORDER BY file_id")
+            stable_b_id = next(x.split(':AT:')[0] for x in prior_entries.splitlines() if x.split(':AT:')[0] !=
+                               ingest([stable_a], 'STABLE_ALIAS')['files'][0]['file_id'])
+            stable_b_attempt = v.sql("SELECT final_attempt_id FROM batch_entry WHERE batch_id='STABLE' AND file_id='" + stable_b_id + "'")
+            cfg.write_text(json.dumps(configuration(cfg, [stable_a, stable_b], 'STABLE')))
+            def change_after_preflight(**progress):
+                if progress.get('phase') == 'file_finished' and progress['index'] == 1:
+                    write_csv(stable_b, [row(text='SELECT 905')])
+            active = Importer(dsn, workers=1, progress=change_after_preflight)
+            try:
+                changed = active.run(load_config(cfg, 'S1', 'STABLE'))
+            finally:
+                active.close()
+            v.require(changed['state'] == 'failed' and changed['files'][1]['reason'] == 'file_changed_during_read' and
+                      v.sql("SELECT final_attempt_id FROM batch_entry WHERE batch_id='STABLE' AND file_id='" + stable_b_id + "'") == stable_b_attempt,
+                      'checksum-to-use mutation fails without replacing a successful final attempt')
+            v.require(ingest([stable_a, stable_b], 'STABLE')['state'] == 'conflict', 'retry still detects the previously successful changed member')
+            # R1-F003: reject every source interpretation version drift, without mutation.
+            from sql_apm.ingestion.hashdata.reader import PARSER_VERSION
+            analysis_id = 'A:' + identity('B1')
+            v.require(v.sql("SELECT parser_version FROM analysis WHERE analysis_id='" + analysis_id + "'") == PARSER_VERSION and
+                      v.sql("SELECT count(*) FROM mpp_normalization WHERE parser_version='mpp-adapter/9'") == '1', 'source parser and SQL parser have distinct version identities')
+            versions = ('mapping_version', 'parser_version', 'association_version')
+            for column in versions:
+                original = v.sql("SELECT " + column + " FROM analysis WHERE analysis_id='" + analysis_id + "'")
+                tasks_before = v.sql('SELECT count(*) FROM task')
+                v.sql("UPDATE analysis SET " + column + "='synthetic-drift' WHERE analysis_id='" + analysis_id + "'")
+                try:
+                    ingest([path], 'B1')
+                except IngestionError as error:
+                    v.require(str(error) == 'analysis_version_mismatch' and v.sql('SELECT count(*) FROM task') == tasks_before and
+                              v.sql("SELECT " + column + " FROM analysis WHERE analysis_id='" + analysis_id + "'") == 'synthetic-drift', column + ' mismatch rejects without rewriting old analysis')
+                else:
+                    raise AssertionError('analysis version drift admitted')
+                finally:
+                    v.sql("UPDATE analysis SET " + column + "='" + original + "' WHERE analysis_id='" + analysis_id + "'")
+            v.require(ingest([path], 'B1')['added_occurrences'] == 0, 'matching Analysis versions admit duplicate retry')
+            # A legacy or upgraded source version cannot absorb a repaired file.
+            drift_file = root / 'drift.csv'
+            drift_file.write_bytes(b'"unterminated')
+            ingest([path, drift_file], 'VERSION_RETRY')
+            drift_analysis = 'A:' + identity('VERSION_RETRY')
+            write_csv(drift_file, [row(text='SELECT 906')])
+            attempts_before = v.sql("SELECT count(*) FROM import_attempt WHERE batch_id='VERSION_RETRY'")
+            v.sql("UPDATE analysis SET parser_version='mpp-adapter/9' WHERE analysis_id='" + drift_analysis + "'")
+            try:
+                ingest([path, drift_file], 'VERSION_RETRY')
+            except IngestionError as error:
+                v.require(str(error) == 'analysis_version_mismatch' and
+                          v.sql("SELECT count(*) FROM import_attempt WHERE batch_id='VERSION_RETRY'") == attempts_before,
+                          'legacy Analysis rejects repaired input before new attempts or events')
+            else:
+                raise AssertionError('legacy analysis absorbed new interpretation')
+            v.sql("UPDATE analysis SET parser_version='" + PARSER_VERSION + "' WHERE analysis_id='" + drift_analysis + "'")
+            v.require(ingest([path, drift_file], 'VERSION_RETRY')['state'] == 'complete', 'matching version still permits failed-member repair')
             # Exercise the driver after the real two-step legacy migration.
             import hashlib
             names = ('ingest_upgrade',) * 3

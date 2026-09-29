@@ -53,20 +53,25 @@ class ParserWorker:
         context = multiprocessing.get_context('spawn')
         self.connection, child = context.Pipe()
         self.process = context.Process(target=worker, args=(child,), daemon=True)
-        self.process.start()
-        child.close()
-        if not self.connection.poll(30) or self.connection.recv() != 'ready':
+        try:
+            self.process.start()
+            child.close()
+            if not self.connection.poll(30) or self.connection.recv() != 'ready':
+                raise IngestionError('normalization_worker_start_failed')
+        except (OSError, EOFError, IngestionError):
+            child.close()
             self.close()
-            raise IngestionError('normalization_worker_start_failed')
+            raise IngestionError('normalization_worker_start_failed') from None
 
     def close(self):
-        if self.process is not None:
+        if self.process is not None and self.process.pid is not None:
             if self.process.is_alive():
                 self.process.terminate()
             self.process.join(2)
             if self.process.is_alive():
                 self.process.kill()
                 self.process.join()
+        if self.connection is not None:
             self.connection.close()
         self.process = self.connection = None
         self.calls = 0
@@ -80,6 +85,14 @@ class NormalizingPool:
         self.timeout = timeout_seconds
 
     def map(self, inputs):
+        try:
+            return self._map(inputs)
+        except BaseException:
+            # An interrupted map must not leave replies for a later file's inputs.
+            self.close()
+            raise
+
+    def _map(self, inputs):
         results, pending, next_index = [None] * len(inputs), {}, 0
         while next_index < len(inputs) or pending:
             for child in self.workers:
@@ -87,7 +100,10 @@ class NormalizingPool:
                     continue
                 if child.process is None:
                     child.start()
-                child.connection.send_bytes(inputs[next_index])
+                try:
+                    child.connection.send_bytes(inputs[next_index])
+                except (OSError, EOFError):
+                    raise IngestionError('normalization_worker_failed') from None
                 pending[child] = (next_index, time.monotonic())
                 next_index += 1
             ready = wait([child.connection for child in pending], timeout=0.01)

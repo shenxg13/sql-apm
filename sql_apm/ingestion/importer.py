@@ -7,7 +7,7 @@ import time
 import uuid
 
 from sql_apm.ingestion.config import IngestionError, canonical, identity
-from sql_apm.ingestion.hashdata.reader import Records, Interpreter, record_metrics
+from sql_apm.ingestion.hashdata.reader import Records, Interpreter, record_metrics, PARSER_VERSION
 from sql_apm.ingestion.hashdata.persistence import write_records
 from sql_apm.ingestion.normalizing import NormalizingPool
 from sql_apm.storage.ingestion import connect, SqlWriter
@@ -24,6 +24,11 @@ def checksum(path):
             size += len(chunk)
             sha.update(chunk)
     return sha.hexdigest(), size
+
+
+def file_stamp(path):
+    value = path.stat()
+    return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
 
 
 def emit(**values):
@@ -44,12 +49,12 @@ class Importer:
         self.sql_db.close()
         self.pool.close()
 
-    def problem(self, cur, file_id, code, effect, attempt=None, record=None, occurrence=None):
+    def problem(self, cur, file_id, code, effect, attempt=None, record=None, occurrence=None, evidence=None):
         pid = 'P:' + uuid.uuid4().hex
         cur.execute('''INSERT INTO problem VALUES (%s,%s,%s,%s,NULL,%s,%s,%s,%s,%s,%s,1,%s,NULL)''',
                     (pid, 'record' if record else 'file' if file_id else 'batch',
                      self.config['batch_id'], file_id, self.analysis_id if occurrence else None,
-                     occurrence, code, code, effect, 'log_record' if record else 'file' if file_id else 'problem',
+                     occurrence, code, canonical(evidence) if evidence is not None else code, effect, 'log_record' if record else 'file' if file_id else 'problem',
                      'isolated' if record else 'open'))
         if record:
             cur.execute('INSERT INTO problem_evidence VALUES (%s,%s)', (pid, record))
@@ -80,11 +85,20 @@ class Importer:
             if cur.fetchone()[0] != config['scope_id']:
                 raise IngestionError('batch_scope_changed')
             manifest = canonical(dict(digest=config['manifest_digest'], files=config['files'], dates=config['dates'], source=config['source_id']))
-            cur.execute('''INSERT INTO analysis VALUES (%s,%s,%s,%s,'mpp-adapter/9',%s,NULL,%s) ON CONFLICT DO NOTHING''',
-                        (self.analysis_id, config['scope_id'], PROFILE, MAPPING, ASSOCIATION, manifest))
-            cur.execute('SELECT evidence_manifest FROM analysis WHERE analysis_id=%s', (self.analysis_id,))
-            if cur.fetchone()[0] != manifest:
+            versions = (config['scope_id'], PROFILE, MAPPING, PARSER_VERSION, ASSOCIATION)
+            cur.execute('''INSERT INTO analysis VALUES (%s,%s,%s,%s,%s,%s,NULL,%s) ON CONFLICT DO NOTHING''',
+                        (self.analysis_id, *versions, manifest))
+            cur.execute('''SELECT scope_id,profile,mapping_version,parser_version,association_version,
+                           evidence_manifest FROM analysis WHERE analysis_id=%s''', (self.analysis_id,))
+            saved = cur.fetchone()
+            if saved[:5] != versions:
+                raise IngestionError('analysis_version_mismatch')
+            if saved[5] != manifest:
                 raise IngestionError('batch_manifest_changed')
+            cur.execute('''SELECT e.file_id FROM batch_entry e JOIN import_attempt a
+                ON a.attempt_id=e.final_attempt_id WHERE e.batch_id=%s
+                AND a.state IN ('succeeded','duplicate_skipped')''', (config['batch_id'],))
+            self.successful_members = {row[0] for row in cur}
             for day in config['dates']:
                 cur.execute('INSERT INTO batch_date VALUES (%s,%s) ON CONFLICT DO NOTHING', (config['batch_id'], day))
             # Lock admission proves prior task/attempt owner has exited, including SIGKILL.
@@ -100,9 +114,15 @@ class Importer:
         try:
             self.register(config)
             registered = True
+            # Reuse the normal checksum pass; decide before importing any replacement.
+            observed = [self.observe(entry) for entry in config['files']]
+            current_members = {'I:' + identity(config['source_id'], item[0]) for item in observed}
+            removed = self.successful_members - current_members
+            conflict = dict(code='batch_member_changed', previous_file_ids=sorted(self.successful_members),
+                            current_file_ids=sorted(current_members), removed_file_ids=sorted(removed)) if removed else None
             results = []
-            for index, entry in enumerate(config['files'], 1):
-                result = self.file(entry)
+            for index, (entry, observation) in enumerate(zip(config['files'], observed), 1):
+                result = self.file(entry, observation, conflict)
                 results.append(result)
                 self.progress(phase='file_finished', index=index, total=len(config['files']), **result)
             state = 'conflict' if any(r['state'] == 'conflict' for r in results) else (
@@ -110,8 +130,11 @@ class Importer:
             with self.db, self.db.cursor() as cur:
                 # Reconcile content identities only after every frozen manifest path
                 # has an attempt; aliases may legitimately share a content entry.
-                cur.execute('DELETE FROM batch_entry WHERE batch_id=%s AND NOT (file_id=ANY(%s))',
-                            (config['batch_id'], [r['file_id'] for r in results]))
+                if not conflict:
+                    cur.execute('''DELETE FROM batch_entry e WHERE batch_id=%s AND NOT (file_id=ANY(%s))
+                        AND NOT EXISTS (SELECT FROM import_attempt a WHERE a.attempt_id=e.final_attempt_id
+                                        AND a.state IN ('succeeded','duplicate_skipped'))''',
+                                (config['batch_id'], [r['file_id'] for r in results]))
                 cur.execute('''SELECT count(*) FROM batch_entry e LEFT JOIN import_attempt a
                     ON a.attempt_id=e.final_attempt_id WHERE e.batch_id=%s
                     AND (a.state IS NULL OR a.state NOT IN ('succeeded','duplicate_skipped'))''', (config['batch_id'],))
@@ -137,21 +160,35 @@ class Importer:
                 cur.execute('SELECT pg_advisory_unlock_all()')
             self.db.commit()
 
-    def file(self, entry):
+    @staticmethod
+    def observe(entry):
+        path = Path(entry['path'])
+        try:
+            before = file_stamp(path)
+            sha, size = checksum(path)
+            after = file_stamp(path)
+            return sha, size, None if before == after else 'file_changed_during_read', after
+        except OSError:
+            return 'unreadable:' + identity(str(path)), 0, 'file_unreadable', None
+
+    def file(self, entry, observation, manifest_conflict=None):
         config = self.config
         path = Path(entry['path'])
-        failure = None
-        try:
-            sha, size = checksum(path)
-        except OSError:
-            sha, size, failure = 'unreadable:' + identity(str(path)), 0, 'file_unreadable'
+        sha, size, failure, stamp = observation
+        if failure is None:
+            try:
+                if file_stamp(path) != stamp:
+                    failure = 'file_changed_during_read'
+            except OSError:
+                failure = 'file_changed_during_read'
+        observed_input = not sha.startswith('unreadable:')
         fid = 'I:' + identity(config['source_id'], sha)
         attempt = 'AT:' + uuid.uuid4().hex
         declaration = dict(origin_key=entry['origin_key'], declaration=config['source']['declaration'],
-                           input_observed=failure is None)
+                           input_observed=observed_input)
         with self.db, self.db.cursor() as cur:
             cur.execute('''INSERT INTO source_file VALUES (%s,%s,%s,%s,%s,%s,%s,%s,true,%s)
-                ON CONFLICT DO NOTHING''', (fid, config['source_id'], config['scope_id'], sha, 'sha256' if failure is None else 'unavailable',
+                ON CONFLICT DO NOTHING''', (fid, config['source_id'], config['scope_id'], sha, 'sha256' if observed_input else 'unavailable',
                                            sha, size, str(path), canonical(declaration)))
             cur.execute('SELECT attempt_id FROM import_attempt WHERE file_id=%s AND state=\'succeeded\' ORDER BY finished_at LIMIT 1', (fid,))
             success = cur.fetchone()
@@ -163,14 +200,17 @@ class Importer:
                 if any(entry['origin_key'] in (json.loads(row[0]).get('origin_keys', []) +
                                              [json.loads(row[0]).get('origin_key')]) for row in cur):
                     failure = 'origin_content_changed'
+            if manifest_conflict:
+                failure = 'batch_member_changed'
             if failure:
                 success = None
             cur.execute('''INSERT INTO import_attempt VALUES (%s,%s,%s,%s,%s,%s,%s,clock_timestamp(),
                 CASE WHEN %s THEN clock_timestamp() ELSE NULL END,NULL)''',
                 (attempt, config['batch_id'], fid, config['scope_id'], previous[0] if previous and not success else None,
                  success[0] if success else None, 'duplicate_skipped' if success else 'running', bool(success)))
-            cur.execute('''INSERT INTO batch_entry VALUES (%s,%s,%s,%s) ON CONFLICT (batch_id,file_id)
-                DO UPDATE SET final_attempt_id=excluded.final_attempt_id''', (config['batch_id'], fid, config['scope_id'], attempt))
+            if not manifest_conflict and not (failure and fid in self.successful_members):
+                cur.execute('''INSERT INTO batch_entry VALUES (%s,%s,%s,%s) ON CONFLICT (batch_id,file_id)
+                    DO UPDATE SET final_attempt_id=excluded.final_attempt_id''', (config['batch_id'], fid, config['scope_id'], attempt))
             if success:
                 if entry['origin_key']:
                     cur.execute('SELECT declaration_evidence FROM source_file WHERE file_id=%s', (fid,))
@@ -181,7 +221,9 @@ class Importer:
                         cur.execute('UPDATE source_file SET declaration_evidence=%s WHERE file_id=%s', (canonical(saved), fid))
                 return dict(file_id=fid, state='duplicate_skipped', added_records=0, added_occurrences=0)
         if failure:
-            return self.fail_file(fid, attempt, failure, 'conflict' if failure == 'origin_content_changed' else 'failed')
+            return self.fail_file(fid, attempt, failure,
+                                  'conflict' if failure in ('origin_content_changed', 'batch_member_changed') else 'failed',
+                                  evidence=manifest_conflict)
         try:
             counts = Counter()
             rows, parser = Records(path), Interpreter()
@@ -227,8 +269,8 @@ class Importer:
             reason = str(error) if isinstance(error, IngestionError) else 'file_processing_failed'
             return self.fail_file(fid, attempt, reason, 'conflict' if reason == 'record_edge_overlap' else 'failed')
 
-    def fail_file(self, fid, attempt, code, state):
+    def fail_file(self, fid, attempt, code, state, evidence=None):
         with self.db, self.db.cursor() as cur:
             cur.execute('UPDATE import_attempt SET state=%s,finished_at=clock_timestamp() WHERE attempt_id=%s', (state, attempt))
-            self.problem(cur, fid, code, 'block_publication' if state == 'conflict' else 'fail_file', attempt=attempt)
+            self.problem(cur, fid, code, 'block_publication' if state == 'conflict' else 'fail_file', attempt=attempt, evidence=evidence)
         return dict(file_id=fid, state=state, reason=code, added_records=0, added_occurrences=0)

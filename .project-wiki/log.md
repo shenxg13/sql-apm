@@ -157,3 +157,10 @@
 - [运行时决策](decisions/runtime-and-components.md)锁定 psycopg2-binary 2.9.10；
   [设计与测试用例](../docs/design/log-ingestion.md)记录资源、冲突覆盖和配对边界。
 - [55 文件导入验证](../docs/reports/log-ingestion-2026-09-29.md)记录正式入库与历史诊断的分母差异、计时与状态、幂等及资源实测；合并和评审状态以在线 Issue／PR 为准。
+
+## 2026-09-29：Issue #18 R1 整改
+
+- 按 R1-F001～F003 修正[导入恢复与成功成员保护](features/log-ingestion.md#首期导入实现issue-18)，
+  来源解析器版本与 SQL 解析器分开，旧 Analysis 不混入其他解释版本。
+- [整改报告](../docs/reports/log-ingestion-r1-remediation-2026-09-29.md)记录实际子进程故障、
+  替换／别名／失败修复及版本漂移回放；独立 R2 状态由在线交接维护。

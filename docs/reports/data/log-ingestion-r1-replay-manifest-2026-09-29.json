@@ -1,0 +1,36 @@
+{
+  "clusters": {
+    "119": {
+      "files": [
+        {
+          "bytes": 17589465,
+          "counts": {
+            "duration_records": 20000,
+            "inline_differs_sql": 207,
+            "inline_equals_sql": 10987,
+            "records": 41365
+          },
+          "file": "gpdb-2026-07-29_161546.csv",
+          "sha256": "88e2570ee869fa6027702d9ad71107e137838aaa81753b34215423bbe4fa8234"
+        }
+      ]
+    },
+    "120": {
+      "files": [
+        {
+          "bytes": 5131812,
+          "counts": {
+            "duration_records": 3923,
+            "inline_differs_sql": 154,
+            "inline_equals_sql": 2518,
+            "records": 9640
+          },
+          "file": "gpdb-2026-09-19_000000.csv",
+          "sha256": "f159b5e17c152b434a5b58d7b703f50eb974eb3d9ad79c8c19bf6cd72ea2ebc5"
+        }
+      ]
+    }
+  },
+  "parent_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "selection": "smallest complete file by bytes in each cluster"
+}

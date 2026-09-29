@@ -9,6 +9,8 @@ import re
 
 from sql_apm.ingestion.config import IngestionError, canonical
 
+PARSER_VERSION = 'hashdata-csv-reader/1'
+
 BEIJING = timezone(timedelta(hours=8))
 DURATION = re.compile(r'^duration:\s*([0-9]+(?:\.[0-9]+)?)\s+ms\b', re.I)
 EXECUTE = re.compile(r'^execute( fetch from)?\s+([^:]+):\s*(.*)$', re.I | re.S)

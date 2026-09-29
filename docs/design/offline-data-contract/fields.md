@@ -157,15 +157,60 @@ call 和主证据，但 timing_type=null；不能用 unpaired 同时给出 execu
 | Fingerprint.sql_id | ref(SqlText) | 完整原文；缺失 SQL 不伪造 Fingerprint，Decision 记录 sql_missing |
 | Fingerprint.normalization_id | ref(Normalization) | 与 Group 和 Build 一致 |
 | Fingerprint.state | reliable/unsupported_syntax/normalization_failed | 不支持不等于 SQL 执行失败 |
-| Fingerprint.value | text? | 仅 reliable 必填；非 reliable 必须 null |
+| Fingerprint.value | text? | 仅 reliable 必填且不能以 approx: 开头；非 reliable 必须 null |
 | Fingerprint.reason | reason? | 非 reliable 必填；可靠时 null |
 
-2026-09-27 的[近似指纹确认](../../../.project-wiki/contracts/sql-fingerprints.md#已确认的观察用近似指纹)
-增加独立观察结果，不放宽本表 Fingerprint 的可靠性约束。近似输出须区分类型及规则
-版本，关联已记录原文／来源证据，保留结构失败原因和不完整／不确定标记；残片可以
-只引用证据，不补造完整 SqlText。具体接口由 Issue #9 实施，持久化映射后续扩展。
-现有 Group、Decision、有效训练样本及自动异常判断不接收近似值；本表和既有 v1
-合成样例不能当作近似能力已经实现的证据。
+### ApproximateRule、ApproximateInput 与 ApproximateResult
+
+来源：2026-09-27 的[近似观察确认](../../../.project-wiki/contracts/sql-fingerprints.md#已确认的观察用近似指纹)，
+以及用户于 2026-09-29 确认的 [Issue #17](https://github.com/shenxg13/sql-apm/issues/17)。
+这是逻辑契约 1.0.0 的独立观察扩展，物理结构由 1.2.0 实现；不改变既有可靠对象及 v1 合成样例。
+字段对应 `sql-approximate/2` 的实际输出，类型和状态不与可靠 Fingerprint 混用。
+
+| 对象．字段 | 类型／条件 | 接口对应与含义 |
+| --- | --- | --- |
+| ApproximateRule.rule_id | id | 固定近似规则上下文的存储身份 |
+| algorithm_version、profile | text | 同名输出；当前为 sql-approximate/2、hashdata-csv/1，独立于可靠归一化的 profile |
+| rules_digest | SHA-256 十六进制 | 同名输出，规范规则内容摘要；不同摘要不得混比 |
+| rules_ref、rules | text、object | 同名引用及完整规则快照，不能只留摘要 |
+| ApproximateInput.input_id | id | 已取得原字节的身份，不代表完整 SqlText |
+| raw_bytes | bytes | 从调用输入保留；接口 source.bytes_base64 是其可逆编码，不解码修复非法 UTF-8 |
+| byte_length、source_sha256 | 非负整数、SHA-256 | source.byte_length、source.sha256；数据库验证原字节长度与摘要 |
+| ApproximateResult.result_id | id | 可复用的结果身份，不是执行／调用身份 |
+| input_id、rule_id | ref(ApproximateInput)、ref(ApproximateRule) | 完整原字节与固定近似上下文 |
+| kind | approximate | 同名输出，不能为 structural／reliable |
+| state | available/unavailable/failed | 同名输出，不解释为 SQL 执行结果 |
+| value | text? | 同名输出；available 必填，前缀为 approx:加算法版本；其余状态必须 null |
+| reason | reason? | 同名输出；available 必须 null，unavailable／failed 必填固定码 |
+| structural_reason | reason | 同名输出，始终必填；近似可用也不消除原结构失败 |
+| observation_only | true | 同名输出，不能升级为训练可用 |
+| completeness | unverified | 从 normalized.completeness 对应／提取；无 normalized 时同样不声明完整 |
+| normalized | object? | 同名词法表示；available 必填，保留 tokens、lexical_issues、open_brackets、structural_reason、completeness；其余状态 null |
+| diagnostics | reason[] | 同名扫描诊断，保留次序，不能因有 value 丢弃不确定性 |
+| replacements | 非负整数 | 同名实际替换数；无结果时为 0 |
+| source_bytes_included | boolean | 记录 source.bytes_base64 是否非空；读回时按此决定输出 base64 或 null，输入超限也不截断原字节 |
+| ApproximateEvidence.result_id、record_id | ref(ApproximateResult)、ref(EvidenceRecord) | 每条来源证据关联结果，可先于可靠事件识别保存 |
+| OccurrenceApproximate.analysis_id、occurrence_id | ref(Occurrence) | 每次真实请求／调用引用，保留原事件身份 |
+| rule_id、result_id、record_id | 上述对象引用 | 同一事件同一规则一条结果引用；证据必须已与结果关联 |
+| scope_id、source_id | 既有 scope、source 引用 | 事件和证据须同集群；实际证据归属及来源对应由导入器校验 |
+
+输入按摘要筛选候选后比较完整字节复用，摘要碰撞不得合并。结果按
+`(input_id, rule_id, structural_reason)` 复用；失败原因本身参与现有近似值计算，不能覆盖
+同一原文字节在不同结构拒绝原因下的历史结果。规则快照的规范摘要及字段一致性由写入方核对。
+
+`analyze` 的异常回退只返回最小 failed 字段，Normalizer 的异常回退可能没有 approximate。
+写入方若记录 failed，须从本次调用的输入及已冻结规则上下文补齐必填元数据，保留固定异常原因，
+normalized/value 为 null、replacements 为 0，不伪称接口返回过可用近似结果。接口成功／不可用
+输出按上表无损对应；本 Issue 不修改算法或异常返回形状。
+
+证据与结果可以独立保存；无法可靠识别事件时不创建 Occurrence。确认事件后，在同一次导入
+事务中写入 Occurrence 与引用，由 [#18](https://github.com/shenxg13/sql-apm/issues/18) 实施，
+不要求回填或重读 CSV。多个事件可引用一个结果，次数不合并。残片、空输入或非法编码只进入
+ApproximateInput／证据；不补造完整 SqlText，可靠完整文本若解析拒绝也可以另有近似记录。
+
+近似结果不能作为 Fingerprint、Group、Decision 的指纹引用，不进入有效样本或自动异常判断。
+Decision 仍可记录原事件的排除／未知原因，但不引用 ApproximateResult。观察统计另行处理；
+本次测试写入路径只验证结构，不是产品导入器。
 
 ### Group
 

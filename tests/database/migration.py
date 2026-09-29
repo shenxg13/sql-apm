@@ -23,6 +23,8 @@ def verify_migration(v, root, runner):
     legacy = (storage / "versions/1.0.0.sql").read_text()
     v.require(hashlib.sha256(legacy.encode()).hexdigest() == LEGACY_SHA,
               "published 1.0.0 DDL is byte-for-byte preserved")
+    new_tables = {"mpp_approximate_rule", "mpp_approximate_input", "mpp_approximate_result",
+                  "mpp_approximate_evidence", "mpp_occurrence_approximate"}
     fixture = statements()
     for name in MPP_TABLES:
         fixture = re.sub(r"\bmpp_" + name + r"\b", name, fixture)
@@ -43,13 +45,13 @@ def verify_migration(v, root, runner):
         def state():
             data = {}
             for table in tables():
-                if table != "schema_version":
+                if table != "schema_version" and table not in new_tables:
                     key = table[4:] if table.startswith("mpp_") else table
                     data[key] = sql('SELECT coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text),\'[]\') FROM "' + table + '" t')
             objects = sql("SELECT oid::text||':'||relfilenode::text FROM pg_class WHERE relnamespace='" + schema +
-                          "'::regnamespace ORDER BY oid")
+                          "'::regnamespace AND relname NOT LIKE 'mpp_approximate_%' AND relname NOT LIKE 'mpp_occurrence_approximate%' ORDER BY oid")
             constraints = sql("SELECT oid FROM pg_constraint WHERE connamespace='" + schema +
-                              "'::regnamespace ORDER BY oid")
+                              "'::regnamespace AND conname NOT LIKE 'mpp_approximate_%' AND conname NOT LIKE 'mpp_occurrence_approximate%' AND conname <> 'mpp_fingerprint_not_approximate' ORDER BY oid")
             return data, objects, constraints
 
         def versions():
@@ -130,10 +132,10 @@ def verify_migration(v, root, runner):
         v.init("check", names=names)
         v.require(state() == before, "upgrade preserves every business row, relation OID/file and constraint OID: " + schema)
         after = versions()
-        v.require(set(after) == {"1.0.0", "1.1.0"} and after["1.0.0"] == receipt["1.0.0"],
-                  "upgrade retains original receipt and adds one target receipt: " + schema)
-        v.require(len(tables()) == 41 and {t for t in tables() if t.startswith("mpp_")} == {"mpp_" + n for n in MPP_TABLES}
-                  and not set(tables()).intersection(MPP_TABLES), "exact 14 MPP names, 27 common tables and no legacy names: " + schema)
+        v.require(set(after) == {"1.0.0", "1.1.0", "1.2.0"} and after["1.0.0"] == receipt["1.0.0"],
+                  "upgrade retains original receipt and adds both sequential receipts: " + schema)
+        v.require(len(tables()) == 46 and {t for t in tables() if t.startswith("mpp_")} == ({"mpp_" + n for n in MPP_TABLES} | new_tables)
+                  and not set(tables()).intersection(MPP_TABLES), "exact 19 MPP names, 27 common tables and no legacy names: " + schema)
         v.require(sql("SELECT count(*) FROM pg_constraint k JOIN pg_class t ON t.oid=k.conrelid WHERE t.relnamespace='" + schema +
                       "'::regnamespace AND t.relname LIKE 'mpp\\_%' ESCAPE '\\' AND k.conname NOT LIKE 'mpp\\_%' ESCAPE '\\'") == "0",
                   "MPP constraint names consistently prefixed: " + schema)
@@ -155,7 +157,7 @@ def verify_migration(v, root, runner):
             sql("UPDATE schema_version SET script_sha256='" + after["1.1.0"]["script_sha256"] + "' WHERE version='1.1.0'")
         v.init("upgrade", names=names)
         v.init("schema", names=names)
-        v.require(state() == before and versions() == after, "repeat upgrade and initialization preserve rows and both timestamps: " + schema)
+        v.require(state() == before and versions() == after, "repeat upgrade and initialization preserve rows and all timestamps: " + schema)
         v.require(sql("SELECT count(*) FROM pg_namespace WHERE nspname LIKE '_apm_expected_%' OR nspname LIKE '_apm_legacy_%'") == "0",
                   "successful migrations leave no scratch schemas: " + schema)
 

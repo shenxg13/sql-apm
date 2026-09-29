@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.1.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.2.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-这是存储结构与初始化交付，尚未交付业务写入接口、解析器、指纹或统计引擎。
+本页描述存储结构与初始化；解析与指纹已有独立模块，业务写入接口和统计引擎尚未交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -25,7 +25,7 @@
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  升级保留 1.0.0 的原始记录并新增 1.1.0 记录，新库只记录 1.1.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留原始历史记录并登记经过的版本，新库只记录 1.2.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -72,7 +72,7 @@ MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.proje
 各系统共享适用的统计计算代码和构建／发布框架，来源专属结果独立落表；
 当前只交付 MPP，不预建 Luban、Baichuan 或 TiDB 表，也不抽象公共统计／分组表。
 
-当前共 41 张表，其中以下 14 张由 1.0.0 原名增加 `mpp_` 前缀：
+1.1.0 共 41 张表，1.2.0 新增 5 张近似观察表，共 46 张。其中以下 14 张由 1.0.0 原名增加 `mpp_` 前缀：
 
 | 原名 | 1.1.0 名称 |
 | --- | --- |
@@ -98,18 +98,50 @@ MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.proje
 `system_kind=hashdata`、`profile=hashdata-csv/1`、逻辑契约 1.0.0 和历史 ID 均不改写。
 
 [冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
-[迁移入口](../../sql_apm/storage/migrate.sql)只支持明确的 1.0.0 → 1.1.0 路径。
+[冻结的 1.1.0 DDL](../../sql_apm/storage/versions/1.1.0.sql)同样保持已发布字节；
+[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 及 1.1.0 → 1.2.0。
 入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
 验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
 约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
-已在 1.1.0 的库先完整校验，成功后返回，不重复登记版本。
+每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.2.0 的库只核验，不重复登记。
 
 这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
-DDL 锁等待上限为 5 秒，等待超时回滚；改名不主动扫描、复制或重写业务数据。
+DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据，1.2.0 新增
+可靠指纹前缀 CHECK 会扫描该列，既有非法 approx: 值使升级整体失败，不删除或改写该行。
 小规模验证核对逐表内容、关系 OID／relfilenode 和约束 OID 保留，
 不以此声称生产升级耗时或吞吐已经验证。独立统计表也不代表共享实例的资源隔离。
 原名 SQL 调用需随版本切换，没有保留旧名兼容视图；精确操作和恢复见
-[升级说明](../runbooks/database-initialization.md#从-100-升级到-110)。
+[升级说明](../runbooks/database-initialization.md#升级到-120)。
+
+## 近似观察结构 1.2.0
+
+用户于 2026-09-29 确认 [#17](https://github.com/shenxg13/sql-apm/issues/17) 在导入前补齐结构。
+逻辑定义和接口逐项映射见[字段字典](offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)。
+
+| 表 | 键、字段及责任 |
+| --- | --- |
+| mpp_approximate_rule | rule_id 主键；algorithm_version/profile/rules_digest 唯一；rules_ref 与完整 JSONB 规则快照。写入方按接口规范验证摘要。 |
+| mpp_approximate_input | input_id 主键；原字节 bytea、长度和 SHA-256 的 CHECK；摘要索引只缩小候选，写入方比较完整字节复用。 |
+| mpp_approximate_result | result_id 主键；input_id/rule_id/structural_reason 唯一；状态、值、原因、diagnostics、replacements、observation_only、completeness 和 source_bytes_included。 |
+| mpp_approximate_evidence | result_id/record_id 主键及外键；同结果可关联多份证据，无可靠事件也能保存。 |
+| mpp_occurrence_approximate | analysis_id/occurrence_id/rule_id 主键；引用同规则结果及已关联证据，复合外键约束事件／证据同 scope；每次事件独立。 |
+
+normalized 为 JSON 文本并检查对象语法，写入方使用 `ensure_ascii=True` 保留非法编码和 NUL
+的转义；不直接使用 JSONB。读取时反序列化还原表示，词法问题、开放括号和 unverified 标记
+不丢失。数据库验证状态条件与用途，表示内部字段、规则规范摘要、value 重算、原证据实际归属
+及同一输入的串行复用由 #18 写入方校验。不能把摘要唯一键或大型 bytea 全文 B-tree 当作复用实现。
+
+available 要求值、表示非空，reason 为空；unavailable／failed 值和表示为空，reason 非空，
+replacements 为 0。所有结果都要求算法、规则和结构失败原因，kind=approximate、
+observation_only=true、completeness=unverified。rule_id/value 索引只供观察候选查询。
+
+可靠 mpp_fingerprint 新增具名 CHECK 拒绝 approx: 前缀；Group／Decision 的既有外键仍只
+指向可靠表，不新增近似引用。其余既有表和约束语义保持不变。残片不写入 mpp_sql_text；
+同一结果可供多个事件引用，实际事件计数和训练资格不受复用影响。
+
+导入时先在同一事务写入原字节、规则／结果及证据，再写已可靠识别的事件与引用；事件来源和
+证据支持关系由导入器验证，无法识别事件则只保存记录级事实。此流程由 #18 实施，观察统计
+另行处理；本次仅提供[临时实例验证](../runbooks/database-initialization.md#近似结果全量往返验证)。
 
 ## 原文身份及证据
 

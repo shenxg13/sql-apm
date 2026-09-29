@@ -10,7 +10,7 @@ Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates a verified 1.0.0 schema to 1.1.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0 schemas to 1.2.0; stop writers first.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.
@@ -78,8 +78,11 @@ if [[ $mode != bootstrap ]]; then
     legacy_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.0.0.sql")
     legacy_sha256=${legacy_sha256%% *}
     [[ $legacy_sha256 == df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28 ]] || die 'frozen 1.0.0 DDL checksum mismatch'
+    v110_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.1.0.sql")
+    v110_sha256=${v110_sha256%% *}
+    [[ $v110_sha256 == e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3 ]] || die 'frozen 1.1.0 DDL checksum mismatch'
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
-        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=check_only="$check_only" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=check_only="$check_only" \
         --file="$root/sql_apm/storage/$entry"
 fi
 printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"

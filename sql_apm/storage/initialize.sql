@@ -20,6 +20,6 @@ END $block$;
     SELECT set_config('search_path', quote_ident(current_setting('apm.schema'))||',pg_catalog', true);
     \ir schema.sql
     INSERT INTO schema_version (version,script_sha256)
-        VALUES ('1.1.0',current_setting('apm.sha256')) ON CONFLICT (version) DO NOTHING;
+        VALUES ('1.2.0',current_setting('apm.sha256')) ON CONFLICT (version) DO NOTHING;
     COMMIT;
 \endif

@@ -1,4 +1,4 @@
--- Structure version 1.2.0. Called only after catalog compatibility checks.
+-- Structure version 1.1.0. Called only after catalog compatibility checks.
 -- The caller sets the verified project schema as search_path.
 CREATE TABLE IF NOT EXISTS schema_version (
     version text PRIMARY KEY,
@@ -203,7 +203,6 @@ CREATE TABLE IF NOT EXISTS mpp_fingerprint (
     profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
     state text NOT NULL CHECK (state IN ('reliable','unsupported_syntax','normalization_failed')),
     value text CHECK (value <> ''),
-    CONSTRAINT mpp_fingerprint_not_approximate CHECK (value NOT LIKE 'approx:%'),
     reason text CHECK (reason <> ''),
     CHECK ((state = 'reliable') = (value IS NOT NULL)),
     CHECK ((state = 'reliable') = (reason IS NULL)),
@@ -674,72 +673,3 @@ CREATE TABLE IF NOT EXISTS task_publication (
     FOREIGN KEY (task_id, scope_id) REFERENCES task (task_id, scope_id),
     FOREIGN KEY (publication_id, scope_id) REFERENCES publication (publication_id, scope_id)
 );
-
--- Independent observation results; no FK from reliable groups or decisions.
-CREATE TABLE IF NOT EXISTS mpp_approximate_rule (
-    rule_id text PRIMARY KEY CHECK (rule_id <> ''),
-    algorithm_version text NOT NULL CHECK (algorithm_version ~ '^sql-approximate/[1-9][0-9]*$'),
-    profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
-    rules_digest text NOT NULL CHECK (rules_digest ~ '^[0-9a-f]{64}$'),
-    rules_ref text NOT NULL CHECK (rules_ref <> ''),
-    rules jsonb NOT NULL CHECK (jsonb_typeof(rules) = 'object'),
-    UNIQUE (algorithm_version, profile, rules_digest),
-    UNIQUE (rule_id, algorithm_version)
-);
-CREATE TABLE IF NOT EXISTS mpp_approximate_input (
-    input_id text PRIMARY KEY CHECK (input_id <> ''),
-    raw_bytes bytea NOT NULL,
-    byte_length bigint NOT NULL CHECK (byte_length = octet_length(raw_bytes)),
-    source_sha256 bytea NOT NULL CHECK (octet_length(source_sha256) = 32
-        AND source_sha256 = sha256(raw_bytes))
-);
--- Full byte equality, not a digest alone, decides reuse in the writer.
-CREATE INDEX IF NOT EXISTS mpp_approximate_input_sha_idx ON mpp_approximate_input (source_sha256);
-CREATE TABLE IF NOT EXISTS mpp_approximate_result (
-    result_id text PRIMARY KEY CHECK (result_id <> ''),
-    input_id text NOT NULL REFERENCES mpp_approximate_input,
-    rule_id text NOT NULL,
-    algorithm_version text NOT NULL,
-    kind text NOT NULL CHECK (kind = 'approximate'),
-    state text NOT NULL CHECK (state IN ('available','unavailable','failed')),
-    value text,
-    reason text CHECK (reason ~ '^[a-z_]{1,80}$'),
-    structural_reason text NOT NULL CHECK (structural_reason ~ '^[a-z_]{1,80}$'),
-    observation_only boolean NOT NULL CHECK (observation_only),
-    completeness text NOT NULL CHECK (completeness = 'unverified'),
-    source_bytes_included boolean NOT NULL,
-    -- JSON text preserves escaped NUL/surrogateescape values rejected by JSONB.
-    normalized text CHECK (normalized IS JSON OBJECT),
-    diagnostics text[] NOT NULL CHECK (array_position(diagnostics,NULL) IS NULL),
-    replacements integer NOT NULL CHECK (replacements >= 0),
-    FOREIGN KEY (rule_id, algorithm_version) REFERENCES mpp_approximate_rule (rule_id, algorithm_version),
-    UNIQUE (input_id, rule_id, structural_reason),
-    UNIQUE (result_id, rule_id),
-    CHECK ((state = 'available' AND value IS NOT NULL AND reason IS NULL
-            AND normalized IS NOT NULL AND source_bytes_included
-            AND starts_with(value, 'approx:' || algorithm_version || ':')
-            AND substring(value FROM length('approx:' || algorithm_version || ':') + 1) ~ '^[0-9a-f]{64}$')
-        OR (state IN ('unavailable','failed') AND value IS NULL AND reason IS NOT NULL
-            AND normalized IS NULL AND replacements = 0))
-);
-CREATE INDEX IF NOT EXISTS mpp_approximate_result_value_idx ON mpp_approximate_result (rule_id, value);
-CREATE TABLE IF NOT EXISTS mpp_approximate_evidence (
-    result_id text NOT NULL REFERENCES mpp_approximate_result,
-    record_id text NOT NULL REFERENCES evidence_record,
-    PRIMARY KEY (result_id, record_id)
-);
-CREATE TABLE IF NOT EXISTS mpp_occurrence_approximate (
-    analysis_id text NOT NULL,
-    occurrence_id text NOT NULL,
-    scope_id text NOT NULL,
-    rule_id text NOT NULL,
-    result_id text NOT NULL,
-    record_id text NOT NULL,
-    source_id text NOT NULL,
-    PRIMARY KEY (analysis_id, occurrence_id, rule_id),
-    FOREIGN KEY (analysis_id, occurrence_id, scope_id) REFERENCES mpp_occurrence (analysis_id, occurrence_id, scope_id),
-    FOREIGN KEY (result_id, rule_id) REFERENCES mpp_approximate_result (result_id, rule_id),
-    FOREIGN KEY (result_id, record_id) REFERENCES mpp_approximate_evidence (result_id, record_id),
-    FOREIGN KEY (record_id, source_id, scope_id) REFERENCES evidence_record (record_id, source_id, scope_id)
-);
-CREATE INDEX IF NOT EXISTS mpp_occurrence_approximate_result_idx ON mpp_occurrence_approximate (result_id);

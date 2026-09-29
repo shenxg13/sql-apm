@@ -14,8 +14,11 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 from database.fixture import statements  # noqa: E402
+from database.approximate import verify_approximate  # noqa: E402
+from database.approximate_migration import verify_approximate_migration  # noqa: E402
 from database.migration import verify_migration  # noqa: E402
 from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
@@ -262,6 +265,7 @@ class Verification:
         # PostgreSQL itself is restarted to verify on-disk persistence.
         run([self.pg_bin / "pg_ctl", "-D", self.directory / "data", "-m", "fast", "-w", "restart", "-l", self.directory / "server.log"], self.env)
         self.require(self.sql("SELECT count(*) FROM mpp_statistic") == "5", "restart persistence")
+        verify_approximate(self)
         print("RESULT: " + str(self.completed) + " storage checks passed", flush=True)
 
 
@@ -286,6 +290,8 @@ def main():
         verify_current_triggers(Verification(args.pg_bin, directory, env), run)
     with instance(args.pg_bin) as (directory, env):
         verify_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+    with instance(args.pg_bin) as (directory, env):
+        verify_approximate_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

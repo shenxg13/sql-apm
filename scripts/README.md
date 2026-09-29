@@ -55,12 +55,14 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 的 MPP 命名迁移。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0，或由 1.1.0 扩展近似观察结构到 1.2.0。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
+- `.venv/bin/python scripts/db/verify_approximate.py`：显式读取全量 v5 拒绝选择集，
+  调用现有接口后在私有 PG17 逐条往返，输出脱敏计数／摘要；不是产品导入。
 
 完整参数、凭据、阶段恢复和检查方式见[数据库操作说明](../docs/runbooks/database-initialization.md)。
-SQL 资源位于 `sql_apm/storage/`，业务数据库驱动不是这两个入口的依赖。
+SQL 资源位于 `sql_apm/storage/`，这些入口均不依赖业务数据库驱动。
 
 ## 解析器结构保真探测
 

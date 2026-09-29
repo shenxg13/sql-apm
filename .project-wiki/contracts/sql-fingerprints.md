@@ -139,8 +139,9 @@ confidence: high
   可靠结构指纹建立正常基线”的边界；此前讨论的独立原文正常基线方案未获本次确认。
 - [Issue #9](https://github.com/shenxg13/sql-apm/issues/9)交付近似能力、调用与诊断接口
   及边界验证；具体词法规则、可处理范围、输出编码与字段由实施文档和正反用例固定。
-  日志导入、观察统计计算／展示及必要的持久化扩展由后续程序落实，不据本次确认宣称
-  已有数据库结构支持近似结果，也不把近似值填入现有可靠 Fingerprint／Group。
+  用户于 2026-09-29 确认由 [#17](https://github.com/shenxg13/sql-apm/issues/17) 先补齐
+  [存储结构 1.2.0](../../docs/design/postgresql-storage.md#近似观察结构-120)，再由 #18 同次导入
+  可靠与近似结果；观察统计计算／展示另行处理。近似值不填入可靠 Fingerprint／Group。
 
 2026-09-27 用户随后要求“开始实施，在实施完成后重新验证一遍之前失败的sql”。
 已实现 `sql-approximate/1` 的保守词法表示、简单 WHERE／UPDATE 直接业务值替换、原字节

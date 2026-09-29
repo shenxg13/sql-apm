@@ -3,7 +3,8 @@
 本模块实现[已确认的近似观察规则](../../.project-wiki/contracts/sql-fingerprints.md#已确认的观察用近似指纹)。
 版本为 `sql-approximate/2`，只提供观察分组身份，不代表完整 SQL、可靠结构指纹或正常基线。
 不执行 SQL，不读数据库，不尝试从其他记录补取完整 SQL，不补括号／引号或恢复绑定值。
-完整结构归一化已由[Normalizer](sql-normalization.md)提供；生产日志导入、观察统计及其持久化尚未实现。
+完整结构归一化已由[Normalizer](sql-normalization.md)提供；近似持久化结构已由 [#17](https://github.com/shenxg13/sql-apm/issues/17) 补齐至 1.2.0；
+生产日志导入由 #18 实施，观察统计另行处理。
 
 ## 可调用接口
 
@@ -45,6 +46,20 @@ near = fingerprint(b'SELECT * FROM orders WHERE id IN (1001,',
 同输入、同失败原因、同 profile 和规则版本的近似输出稳定。指纹编码为带类型、版本、
 profile、规则摘要及近似表示的规范 JSON，不能与原文 SHA 或结构摘要互换。规则变化应升级
 版本并保留历史规则依据。调用方负责来源定位、事件身份及统计，不靠指纹去重真实事件。
+
+## 持久化映射
+
+[字段字典](offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)逐项对应本接口，
+[物理设计](postgresql-storage.md#近似观察结构-120)说明独立表、状态约束和证据／事件关联。
+raw_bytes 使用 bytea；normalized 使用 ASCII JSON 文本，保留 NUL／非法 UTF-8 的转义，
+不能直接把含 surrogateescape 的表示转成 JSONB。读取时反序列化还原接口对象。
+规则快照可以用 JSONB，因为规则内容不包含输入字节。
+
+源字节可复用，但 structural_reason 也是算法输入；结果复用须匹配原字节、规则上下文和
+失败原因。来源关联独立追加，每次事件仍独立保留。failed 的最小异常返回缺失元数据时，
+由调用方提供本次输入与冻结规则，不修改本接口。数据库不执行算法，也不把近似值当可靠指纹。
+实际写入由 #18 在导入时完成；验证脚本及[往返报告](../reports/approximate-storage-2026-09-29.md)
+只验证存储，不能作为导入、事件识别或观察统计的验收。
 
 ## 当前处理范围
 

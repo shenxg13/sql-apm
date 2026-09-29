@@ -5,8 +5,10 @@ status: active
 owners:
   - .project-wiki/contracts/offline-data-contract.md
   - docs/design/offline-data-contract/
-updated: 2026-09-27
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/17
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/3
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/3#issuecomment-5836680294
@@ -30,7 +32,7 @@ confidence: high
 ## Summary
 
 契约版本 `1.0.0`，定义输入溯源、规范化执行／调用、统计及构建输出三个交接边界。
-这是 Issue #3 授权产出的设计；字段表和样例可供后续实现与独立评审核对，
+这是 Issue #3 授权产出的设计，2026-09-29 经用户确认由 #17 增补独立近似观察对象；字段表和样例可供后续实现与独立评审核对，
 不表示解析器、存储、统计引擎或运行时校验器已实现。既有业务规则仍由所属主题页维护。
 
 阅读顺序：本文的关系及约束 → [字段字典](../../docs/design/offline-data-contract/fields.md)
@@ -67,7 +69,7 @@ confidence: high
 | 边界 | 生产者 → 消费者 | 对象 |
 | --- | --- | --- |
 | 输入和导入 | 人工来源／文件清单与导入器 → 解析、诊断及构建编排 | Source、File、Batch、ImportAttempt、EvidenceRecord |
-| 规范化数据 | 来源适配、关联与 SQL 处理 → 训练筛选、存储、历史查询 | Analysis、SqlText、Occurrence、Normalization、Fingerprint、Group、Decision、Problem |
+| 规范化数据 | 来源适配、关联与 SQL 处理 → 训练筛选、存储、历史查询 | Analysis、SqlText、Occurrence、Normalization、Fingerprint、Group、Decision、Problem；独立观察扩展 ApproximateRule/Input/Result、证据及事件关联 |
 | 基线输出 | 构建／统计／发布 → 存储、CLI、后续查询展示 | InputSnapshot、ConfigSnapshot、Build、Statistic、Publication、CurrentVersion、Task |
 
 ```mermaid
@@ -80,6 +82,11 @@ flowchart LR
   Analysis --> Occurrence
   SqlText --> Occurrence
   SqlText --> Fingerprint
+  ApproximateInput --> ApproximateResult
+  ApproximateRule --> ApproximateResult
+  EvidenceRecord --> ApproximateResult
+  ApproximateResult --> OccurrenceApproximate
+  Occurrence --> OccurrenceApproximate
   Normalization --> Fingerprint
   Fingerprint --> Group
   Occurrence --> Decision
@@ -129,6 +136,8 @@ SqlText 按完整、可可靠取得的源 SQL 精确内容复用，不去空白�
 原文和明细不因每版构建而复制，沿用[存储契约](sql-storage.md)。
 2026-09-27 确认的[近似观察](sql-fingerprints.md#已确认的观察用近似指纹)可引用这些来源
 证据及其中残片，但不能强制创建完整 SqlText，也不再尝试补取完整 SQL。
+2026-09-29 用户确认先补存储，再由 #18 同次导入可靠与近似结果；原字节独立保存到
+ApproximateInput，每次事件通过 OccurrenceApproximate 引用复用结果，不合并事件次数。
 
 ### C05：计时、状态与关联证据
 
@@ -160,8 +169,9 @@ Fingerprint 针对 `(sql_id, normalization_id, profile)` 返回可靠结果或�
 2026-09-27 用户确认增加独立的观察用近似结果。其类型、规则版本、原文／证据引用、
 不完整／不确定标记及结构失败原因与可靠结果分开；不能填入正常 Fingerprint.value
 或形成正常 Group，不改变上述结构失败语义。观察结果不参与正常基线训练及自动异常
-判断，不计入有效训练样本；字段接口由 Issue #9 落实，持久化及统计由后续程序扩展。
-本次是契约增补，不表示原有 v1 样例、校验器或数据库已实现近似能力；完整边界由
+判断，不计入有效训练样本；字段接口由 Issue #9 落实，后续交付范围见下条。
+这是契约增补；#17 已交付[近似字段及关联](../../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)与结构 1.2.0，
+原有 v1 样例不代表近似验收，日志导入由 #18 实施、观察统计另行处理；完整边界由
 [指纹主题](sql-fingerprints.md#已确认的观察用近似指纹)维护。
 
 HashData Group 的逻辑键仍为

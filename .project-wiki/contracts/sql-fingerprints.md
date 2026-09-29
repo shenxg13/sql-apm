@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-fingerprints.md
-updated: 2026-09-28
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/15
+    status: current
   - path: docs/reports/sql-normalization-v4-r1-remediation-2026-09-28.md
     status: current
   - path: docs/reports/sql-normalization-v4-2026-09-28.md
@@ -198,7 +200,7 @@ confidence: high
   WHERE 条件中的业务常量，以及 INSERT … VALUES 和 UPDATE … SET 中直接
   作为列值或赋值的业务字面常量，例如数字、字符串。
 - 对象名、列名、表达式结构、显式类型转换以及批次语句顺序保留；IN 列表长度的后续例外见下节。此确认不等于
-  将 SELECT 投影、函数参数等其他语法位置的常量也无条件归一化。
+  将所有位置的常量无条件归一化；SELECT 列表及 JOIN ON 的后续扩展见下文 2026-09-29 确认，函数参数继续由字典决定。
 - 例如，两次独立执行 `UPDATE orders SET status = 'paid' WHERE id = 1001;`
   与 `UPDATE orders SET status = 'closed' WHERE id = 1002;` 可生成相同结构
   指纹；实际聚合仍要求集群、数据库、执行用户及计时类别相同。
@@ -227,7 +229,9 @@ confidence: high
 - 列表含列、表达式、函数、NULL、子查询或其他非裸业务值元素时，整个列表保留既有结构。
   显式转换仍保留转换节点和类型，不因内层值已替换就去除转换或折叠此类列表。
 - SELECT／UPDATE／DELETE 的 WHERE 及 CTE／子查询各自的 WHERE 适用；函数参数、
-  SELECT 投影、JOIN／HAVING、聚合 FILTER、控制子树和 IN 子查询的外层结构保持原规则。
+  HAVING、聚合 FILTER、控制子树和 IN 子查询的外层结构保持原规则。
+  #11 原先保留的 SELECT 投影和 JOIN ON IN 列表已由 2026-09-29 的
+  [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 修订：按下节同样适用四档分桶。
   已知聚合 FILTER 仍按 v3 替换业务值，但保留 IN 列表元素及长度；其中可遍历子查询的独立 WHERE
   适用分桶。`INSERT … ON CONFLICT … DO UPDATE … WHERE` 按更新条件分桶；冲突目标
   `ON CONFLICT (…) WHERE` 的推断谓词继续整体保护，不混用两种 WHERE。
@@ -239,24 +243,54 @@ confidence: high
   该例外由用户在 R1 整改中明确接受，不以真实样本暂未受影响替代规则确认。
 - 用户接受同桶不同列表长度可能对应不同执行计划、增加组内耗时离散的权衡；此次不评估执行计划
   或耗时相近性。只改变结构分组，实际执行记录不合并，其他统计维度继续分别计算。
-- 版本升级为 `sql-normalization/4`；正式解析能力名由实施确定为 `mpp-adapter/9`。
+- 本节首次交付版本为 `sql-normalization/4`；正式解析能力名为 `mpp-adapter/9`。
+  当前算法 v5 的新增位置与集合分支恢复见下节，解析能力版本不变。
   当前尚无使用旧指纹的持久化基线，不做历史迁移；将来按[规则更新原则](../features/baseline-versions.md#已确认的归一化规则版本与更新处理)处理。
 - 已提供本地原文选择集的脱敏快照及分组差分工具，按 ID 集合比较新旧分区，并标注上下文差异。
   源 SQL、Hint 原文和 AST 值不进入差分输出；历史诊断模块和证据保持原样。
   实现及验证见[接口说明](../../docs/design/sql-normalization.md)和[v4 报告](../../docs/reports/sql-normalization-v4-2026-09-28.md)；
-  当前边界修复与重新验证见[v4 R1 整改报告](../../docs/reports/sql-normalization-v4-r1-remediation-2026-09-28.md)。
+  v4 边界修复与重新验证见[v4 R1 整改报告](../../docs/reports/sql-normalization-v4-r1-remediation-2026-09-28.md)。
+
+### 已确认的 SELECT 列表、JOIN ON 与集合分支规则
+
+- 确认日期：2026-09-29；来源状态：current。
+- 来源：[Issue #15](https://github.com/shenxg13/sql-apm/issues/15)、
+  [初始确认](https://github.com/shenxg13/sql-apm/issues/15#issuecomment-5881862019)及
+  [集合分支方案 A 确认](https://github.com/shenxg13/sql-apm/issues/15#issuecomment-5882399747)。
+- SELECT 目标列表和 JOIN ON 条件按 WHERE 业务表达式归一：数字、字符串和原生
+  `$n` 使用统一标记，包括算术表达式中的常量；IN／NOT IN 的裸业务值列表适用四档分桶。
+  Hint anchor 继续保留上节已确认的同桶例外，不因位置扩展而重写。
+- CTE、子查询、INSERT … SELECT、CTAS、VIEW、COPY 查询及
+  UNION／INTERSECT／EXCEPT 每个分支建立自身查询上下文。
+  集合分支的 SELECT、WHERE（含 IN）、JOIN ON、函数字典及 FILTER
+  与独立 SELECT 使用同样的规则；v4 未遍历其未包装的分支字段，此次明确修复。
+- CASE 的 THEN／ELSE 结果、NULL／布尔、受保护转换、字典保留参数、窗口、
+  ORDER BY、GROUP BY（含序号）、DISTINCT ON、HAVING、LIMIT／OFFSET、
+  SET 及 USING 列表沿用既有保护规则。聚合 FILTER 仍替换已有业务值但保留列表结构；
+  函数参数仍按原字典，不新增激进函数合并。
+- 本确认修订 2026-09-25 的默认保留规则及 #11 中 SELECT 投影／JOIN ON IN 的保留表述。
+  `SELECT amount * 0.1 FROM orders` 与 `0.2` 现在合并；CASE 结果值仍保留。
+  其他分组维度、训练资格、样本门槛和生产日志不改变。
+- 用户接受投影标签归并及可能增加耗时离散的权衡；相同指纹不保证耗时或执行计划相同。
+  集合分支恢复不在需求阶段的第二步诊断内，实施按三类位置分别核对合并及耗时影响。
+- 算法版本为 `sql-normalization/5`，解析能力仍为 `mpp-adapter/9`，
+  字典仍为 1.0.1。v4 与 v5 上下文不同，指纹值不能直接比较；
+  目前无持久化基线，不迁移历史基线。规则更新继续遵循已有整窗重算原则。
+- 实施与验证入口见[接口说明](../../docs/design/sql-normalization.md)及
+  [耗时诊断操作](../../docs/runbooks/duration-dispersion.md)；验收、评审和合并状态以在线 Issue 为准。
 
 ### 已确认的其余非函数参数常量保留规则
 
-- 确认日期：2026-09-25。
+- 确认日期：2026-09-25；2026-09-29 按上节 Issue #15 修订 SELECT 列表／JOIN ON 范围。
 - 来源：用户引用“尚未约定的非函数参数常量先保留具体值、分别统计；已确认
   的归一化规则继续适用，函数参数留在字典 Issue 中确定”的建议回复“确认”。
 - 来源状态：current；已确认常量归并边界，当前归一化器遵循下述实现边界。
 - 除已经明确纳入归一化的位置外，其余非函数参数常量首期保留具体值；其他
   结构相同时，值不同仍生成不同的结构指纹，并按既有分组维度分别统计。
 - 例如 `SELECT amount * 0.1 FROM orders;` 与
-  `SELECT amount * 0.2 FROM orders;` 分开生成指纹。此前未约定归一化的
-  CASE 结果值也保留，不能仅因它们属于数字或字符串就替换成统一占位符。
+  `SELECT amount * 0.2 FROM orders;` 按 2026-09-29 修订合并为同一指纹。
+  `SELECT CASE WHEN x THEN 0.1 ELSE 0 END` 与 THEN 为 `0.2` 时仍区分；
+  CASE 结果值不因属于数字或字符串就替换成统一占位符。
 - WHERE 业务常量、INSERT … VALUES／UPDATE … SET 直接业务值的既有归一化，
   以及 SET 配置值、LIMIT／OFFSET 数量的既有保留规则继续适用。本条不覆盖
   已确认的特殊规则，也不把 `$n` 与字面常量的等价范围扩展到这些保留位置。
@@ -275,7 +309,7 @@ confidence: high
   合并为同一结构指纹，同时保留源 SQL 占位符、对象及表达式结构、显式类型转换
   和特殊值规则的建议回复“确认”。
 - 来源状态：current；这是已确认的指纹与检索行为，归一化已实现，检索服务尚未实现。
-- 在已确认的 WHERE 业务常量位置，以及 INSERT … VALUES／UPDATE … SET
+- 在已确认的 WHERE、SELECT 列表、JOIN ON 业务常量位置，以及 INSERT … VALUES／UPDATE … SET
   直接列值或赋值位置，原有 `$1`、`$2` 等参数占位符与业务字面常量使用统一的
   结构指纹表示；其余对象、表达式结构及显式类型转换仍须一致。
 - 例如，`SELECT * FROM orders WHERE id = $1;` 与

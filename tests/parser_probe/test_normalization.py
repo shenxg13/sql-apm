@@ -49,13 +49,19 @@ class NormalizationTests(unittest.TestCase):
             ('delete from t where x=1', 'delete from t where x=2'),
         ], True)
 
-    def test_unconfirmed_and_special_values_preserved(self):
+    def test_v5_confirmed_projection_values(self):
         self.pairs([
             ('select 1', 'select 2'), ('select $1', 'select $2'),
             ('select x*.1 from t', 'select x*.2 from t'),
+            ('insert into t select 1', 'insert into t select 2'),
+            ('select * from t where exists(select 1 from u where y=1)',
+             'select * from t where exists(select 2 from u where y=1)'),
+        ], True)
+
+    def test_unconfirmed_and_special_values_preserved(self):
+        self.pairs([
             ('update t set x=x+1', 'update t set x=x+2'),
             ('insert into t values (1+2)', 'insert into t values (1+3)'),
-            ('insert into t select 1', 'insert into t select 2'),
             ('select * from t where x=true', 'select * from t where x=false'),
             ('select * from t where x=null', 'select * from t where x=$1'),
             ('update t set x=null', 'update t set x=1'),
@@ -136,7 +142,6 @@ class NormalizationTests(unittest.TestCase):
             ('insert into t values(1) on conflict(a) do update set a=2 where t.a=3', 'insert into t values(4) on conflict(a) do update set a=5 where t.a=6'),
         ], True)
         self.pairs([
-            ('select * from t where exists(select 1 from u where y=1)', 'select * from t where exists(select 2 from u where y=1)'),
             ('select * from t where x=(select y from u limit 1)', 'select * from t where x=(select y from u limit 2)'),
             ('select * from t where x=unknown((select y from u where z=1))', 'select * from t where x=unknown((select y from u where z=2))'),
         ], False)
@@ -145,7 +150,7 @@ class NormalizationTests(unittest.TestCase):
         self.pairs([
             ('create table t(x int) distributed by(x)', 'create table t(x int) distributed randomly'),
             ('alter table t add column x int, set distributed by(x)', 'alter table t add column y int, set distributed by(y)'),
-            ('select 1; select 2', 'select 2; select 1'),
+            ('select 1 from a; select 2 from b', 'select 2 from b; select 1 from a'),
             ('copy t to stdout', 'copy t to stdout on segment'),
             ("create table t(x int) distributed by(x) partition by range(x)(start(1) end(9) every(1))", "create table t(x int) distributed by(x) partition by range(x)(start(1) end(8) every(1))"),
         ], False)
@@ -173,7 +178,7 @@ class NormalizationTests(unittest.TestCase):
         r['normalized'].clear()
         snapshot = self.engine.rule_snapshot()
         snapshot['dictionary']['rules'][0]['enabled'] = False
-        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/4')
+        self.assertEqual(self.result(raw)['context']['algorithm_version'], 'sql-normalization/5')
         self.assertEqual(self.result(raw), self.result(raw))
 
     def test_fixed_dictionary_changes_are_traceable(self):

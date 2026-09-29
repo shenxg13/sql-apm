@@ -42,6 +42,7 @@ class DiffTests(unittest.TestCase):
                 'reason TEXT, fingerprint TEXT, structure_sha256 TEXT, v4_projection_sha256 TEXT, '
                 'in_lists INTEGER, occurrences INTEGER);')
             context = Normalizer().context
+            context['algorithm_version'] = 'sql-normalization/4'
             if old:
                 context.update(algorithm_version='sql-normalization/3', parser_version='mpp-adapter-probe/8')
             for key, value in dict(format=diff.FORMAT, complete=True, source_sha256='a'*64,
@@ -87,6 +88,47 @@ class DiffTests(unittest.TestCase):
         r = diff.compare(left, right, require_v4=True)
         self.assertFalse(r['v4_acceptance_passed'])
         self.assertEqual(r['v4_audit']['mismatch_examples'], [2])
+
+    def test_v5_audit_classifies_final_merges_and_rejects_drift(self):
+        left = self.snapshot('v4', ['a','b','c','d','e','f'])
+        right = self.snapshot('v5', ['x','x','y','y','z','z'])
+        for path, version in ((left,'4'),(right,'5')):
+            with sqlite3.connect(str(path)) as db:
+                for column in ('v5_projection_sha256','select_projection_sha256','join_projection_sha256'):
+                    db.execute('ALTER TABLE records ADD COLUMN ' + column + ' TEXT')
+                ctx=diff.meta(db)['context']
+                ctx['algorithm_version']='sql-normalization/'+version
+                diff.put_meta(db,'context',ctx)
+                diff.put_meta(db,'project_v5',version=='4')
+                for uid in range(1,7):
+                    selected = 's' if uid <= 2 else str(uid)
+                    joined = 's' if uid <= 2 else 'j' if uid <= 4 else str(uid)
+                    db.execute('UPDATE records SET v5_projection_sha256=?,select_projection_sha256=?,'
+                               'join_projection_sha256=? WHERE input_id=?',('b'*64,selected,joined,uid))
+        result=diff.compare(left,right,require_v5=True)
+        self.assertTrue(result['v5_acceptance_passed'])
+        self.assertEqual(result['merge_categories'],dict(select_list=1,join_on=1,set_branches=1))
+        with self.assertRaisesRegex(diff.EvidenceError,'v5_audit_context_mismatch'):
+            diff.compare(left,left,require_v5=True)
+        with sqlite3.connect(str(right)) as db:
+            db.execute('UPDATE records SET structure_sha256=? WHERE input_id=6',('c'*64,))
+        result=diff.compare(left,right,require_v5=True)
+        self.assertFalse(result['v5_acceptance_passed'])
+        self.assertEqual(result['v5_audit']['mismatch_examples'],[6])
+        # A newly reliable member of an otherwise merged group must be reported,
+        # not crash classification because its frozen projection is absent.
+        with sqlite3.connect(str(left)) as db:
+            db.execute("UPDATE records SET state='unsupported_syntax',reason='base_parser_rejected',"
+                       "fingerprint=NULL,structure_sha256=NULL WHERE input_id=2")
+        with sqlite3.connect(str(right)) as db:
+            db.execute("UPDATE records SET fingerprint='y' WHERE input_id=2")
+        result=diff.compare(left,right,require_v5=True)
+        self.assertEqual(result['status_changes'],1)
+        self.assertFalse(result['v5_acceptance_passed'])
+        self.assertEqual(result['merge_categories']['unverified_status_change'],1)
+        with patch('sys.argv',['normalization_diff','compare',str(left),str(right),'--require-v5','--text']):
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(diff.main(),1)
 
     def test_compare_subset_reuses_complete_snapshots_and_requires_all_ids(self):
         left = self.snapshot('left', ['a','b','c','c'])
@@ -155,13 +197,17 @@ class DiffTests(unittest.TestCase):
         fixture = {'projection_cases': []}
         for name in ('normalization-v3-preserved.json', 'normalization-v3-r1.json'):
             fixture['projection_cases'].extend(json.loads((Path(__file__).parent / 'fixtures' / name).read_text())['projection_cases'])
+        frozen = json.loads((Path(__file__).parent/'fixtures/normalization-v4.json').read_text())
+        by_sql = {c['sql']:c['normalized'] for c in frozen['cases']}
         engine = Normalizer()
+        from sql_apm.diagnostics.normalization_v5_audit import project_v5
         for case in fixture['projection_cases']:
             with self.subTest(sql=case['sql']):
                 projected, _ = diff.project_v4(case['normalized'])
                 actual = engine.normalize(case['sql'])
                 self.assertEqual(actual['fingerprint']['state'], 'reliable')
-                self.assertEqual(projected, actual['normalized'])
+                self.assertEqual(projected, by_sql[case['sql']])
+                self.assertEqual(project_v5(projected, engine)[0], actual['normalized'])
 
     def test_projection_excludes_filter_even_with_business_markers(self):
         value = {'SQLAPMBusinessValue': {}}

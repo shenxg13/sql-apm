@@ -15,19 +15,23 @@ from .function_dictionary import FunctionDictionary
 from .structure import dumps, loads
 from .type_policy import KNOWN_TYPES, NORMALIZABLE_CASTS
 
-ALGORITHM_VERSION = 'sql-normalization/4'
+ALGORITHM_VERSION = 'sql-normalization/5'
 PARSER_DEPENDENCY_VERSION = '7.18'
 PROFILE = 'hashdata-pg94'
 MAX_BYTES = approximate.MAX_BYTES
 DEFAULT_DICTIONARY = Path(__file__).resolve().parents[2] / 'rules/functions/v1.0.1.json'
-# O: ordinary; B: WHERE business expression; D: direct business value;
+# O: ordinary; B: WHERE/SELECT target/JOIN ON business expression; D: direct business value;
 # F: legacy FILTER business values without IN bucketing; P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
 RULES = {
     'algorithm_version': ALGORITHM_VERSION,
     'marker': 'SQLAPMBusinessValue',
     'where': 'numeric/string/native parameter; preserve null/bool/controls',
+    'select_targets': 'WHERE business expressions including arithmetic and IN buckets; nested queries establish their own contexts',
+    'set_branches': 'UNION/INTERSECT/EXCEPT bare SelectStmt branches use independent SELECT context; restore WHERE, dictionary and FILTER rules; retain controls',
+    'join_on': 'WHERE business expressions including IN buckets; preserve USING',
+    'protected_boundaries': 'CASE results; NULL/bool; protected casts; dictionary arguments; FILTER list structure; windows; ORDER/GROUP BY; DISTINCT ON; HAVING; LIMIT/OFFSET; SET',
     'where_in': {'marker': 'SQLAPMInBucket', 'buckets': ['1', '2-10', '11-100', '>100'],
-                 'eligibility': 'query/update WHERE including ON CONFLICT DO UPDATE WHERE; every normalized IN/NOT IN element is a bare SQLAPMBusinessValue; FILTER keeps v3 element lists; nested query WHERE has its own context; conflict inference predicates stay protected',
+                 'eligibility': 'query/update WHERE including ON CONFLICT DO UPDATE WHERE, SELECT targets and JOIN ON; every normalized IN/NOT IN element is a bare SQLAPMBusinessValue; FILTER keeps v3 element lists; nested queries have their own contexts; conflict inference predicates stay protected',
                  'hint_exception': 'preserve anchor identity; same-bucket lists may remain distinct when Hint anchors differ'},
     'writes': 'INSERT VALUES and UPDATE SET direct values only',
     'functions': 'dictionary action consensus; protected arguments are opaque',
@@ -159,6 +163,15 @@ class Normalizer:
             if not isinstance(node, dict):
                 parent[key] = node
                 continue
+            if mode == 'Q':
+                # pglast stores set-operation branches as plain SelectStmt bodies.
+                # Branch VALUES is query VALUES, even under INSERT ... SELECT.
+                result = {}
+                parent[key] = result
+                fields = self._fields('SelectStmt', node, 'O', counters)
+                tasks.extend((value, fields.get(field, 'P'), result, field)
+                             for field, value in node.items())
+                continue
             if mode in ('W', 'C'):
                 fields = {'ctes': 'O'} if mode == 'W' else {'targetList': 'T', 'whereClause': 'B'}
                 result = {}
@@ -209,7 +222,7 @@ class Normalizer:
         if tag == 'SelectStmt':
             fields = {k: 'O' for k in ('targetList', 'fromClause', 'withClause', 'larg', 'rarg',
                        'havingClause', 'groupClause', 'sortClause', 'distinctClause')}
-            fields.update(withClause='W', whereClause='B', valuesLists='V' if mode == 'I' else 'O')
+            fields.update(larg='Q', rarg='Q', targetList='B', withClause='W', whereClause='B', valuesLists='V' if mode == 'I' else 'O')
             # INSERT ... SELECT ... UNION VALUES is a query, not direct VALUES.
             return fields
         if tag == 'InsertStmt':
@@ -220,7 +233,7 @@ class Normalizer:
         if tag == 'OnConflictClause':
             return {'targetList': 'T', 'whereClause': 'B'}
         if tag == 'ResTarget':
-            return {'val': 'D' if mode == 'T' else 'O'}
+            return {'val': 'D' if mode == 'T' else expression}
         if tag == 'List':
             return {'items': 'D' if mode == 'V' else mode}
         if tag == 'MultiAssignRef':
@@ -249,7 +262,7 @@ class Normalizer:
         if tag == 'SortBy':
             return {'node': 'O'}
         if tag == 'JoinExpr':
-            return {'larg': 'O', 'rarg': 'O', 'quals': 'O'}
+            return {'larg': 'O', 'rarg': 'O', 'quals': 'B'}
         if tag == 'RangeSubselect':
             return {'subquery': 'O'}
         if tag == 'RangeFunction':

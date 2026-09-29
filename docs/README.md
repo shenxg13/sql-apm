@@ -57,6 +57,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [数据库初始化与恢复](runbooks/database-initialization.md) | 操作说明 | 单账号引导、认证、参数、兼容重跑、MPP 版本升级及失败恢复。 |

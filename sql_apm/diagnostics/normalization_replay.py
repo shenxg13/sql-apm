@@ -59,7 +59,7 @@ def delta_audit(original, normalized):
             if removed_gap:
                 changes[path + '/gap_removed'] += 1
             stack.extend((left[key], value, path + '/' + key,
-                          bucket_context(parent, key, eligible), key) for key, value in right.items())
+                          bucket_context(parent, key, eligible, v5=True), key) for key, value in right.items())
         elif isinstance(left, list):
             if len(left) != len(right):
                 raise ValueError('unexpected_list_change')

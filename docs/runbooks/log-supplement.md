@@ -25,11 +25,15 @@
 ## 对照方案
 
 `threshold_coverage` 的命令输出格式名为 `threshold-coverage/1`。
-正式上下文仍为 `sql-normalization/4`、`mpp-adapter/9` 和函数字典 1.0.1。
+下表记录 #13 的冻结 v4 对照方案（`sql-normalization/4`、`mpp-adapter/9`、字典 1.0.1）。
+当前工具的基准名称随实际算法版本生成：当前为 `v5`，其对照基于当前 v5 结构；
+不能用当前 checkout 的输出冒充 #13 的 v4 实测。
+复现 #13 结果须在固定提交 `9a0f9f507a4e068f32c8704da28c761d6e65ca14`
+的冻结 checkout 使用当时的工具和 v4 核心；历史结果及缓存不改写。
 
-| `--schemes` 名称 | 相对现行 v4 的处理 | 结果性质 |
+| `--schemes` 名称 | 相对冻结 v4 的处理 | 结果性质 |
 | --- | --- | --- |
-| `v4` | 直接调用现行 Normalizer，保留其完整指纹与拒绝结果 | 当前可靠结构结果 |
+| `v4` | 直接调用冻结 v4 Normalizer，保留其完整指纹与拒绝结果 | 冻结 v4 可靠结构结果 |
 | `positions` | 在 v4 结构上扩展 JOIN ON、SELECT 列表及 CASE 的条件／结果常量处理 | 候选结构分组 |
 | `unqualified_functions` | 在 v4 结构上对未限定名称、普通位置参数调用的参数表达式归一；包括未知函数和字典原本保留的控制参数 | 激进候选，可能错误归并不同控制语义 |
 | `positions_functions` | 同时应用上述位置和函数扩展，观察叠加收益 | 激进候选结构分组 |
@@ -56,7 +60,8 @@ PG 词法器；没有运行 TiDB，不保证与任何 TiDB 版本产生相同分
 
 ## 复现命令
 
-在仓库根目录执行，Python 3.9.5、pglast 7.18 已准备。
+复现 #13 时在上述冻结 checkout 根目录执行，Python 3.9.5、pglast 7.18 已准备。
+来源根目录、索引、依赖及解释器可改为原仓库的绝对路径，输出须使用冻结 checkout 的新路径。
 以下路径是本轮实际使用的路径；重跑时选择新的输出／缓存路径，保留已有证据。
 
 ```bash
@@ -90,7 +95,10 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m sql_apm.diagnostic
   --cache var/parser-probe/issue13/coverage.sqlite --workers 8
 ```
 
-门槛命令默认执行表中五个方案；可用 `--schemes v4 positions` 选择子集。
+门槛命令默认执行五个方案；冻结 v4 可用 `--schemes v4 positions`，
+当前 v5 则用 `--schemes v5 positions`。输出 context 明确标记基准算法；
+当前候选以 v5 已有 SELECT／JOIN 分桶及集合分支规则为基础，不能与 #13 的候选数字等同。
+规则版本变化的五维 duration 观察改用[耗时诊断](duration-dispersion.md)。
 输出为汇总 JSON；成功退出 0，诊断检查失败退出 1，命令行解析错误退出 2。诊断异常只输出固定错误码，
 不输出 SQL、AST、参数值或任意异常文本。原索引只读，前后核对完整摘要，逐输入核对
 精确原文字节摘要；代码摘要、版本、字典／规则引用和隔离限制随输出保存。
@@ -118,6 +126,6 @@ PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh --pr PR --repo shenxg13/sql-apm
 ```
 
-定向用例覆盖新旧清单、完整尾部、摘要变化、跨午夜日期、方案切换、实际产品 v4 等价、
+定向用例覆盖新旧清单、完整尾部、摘要变化、跨午夜日期、方案切换、实际基准版本等价、
 候选保护边界、集群隔离、不同日期并集、29／30、199／200、999／1,000 临界数量、
 六／七日条件、拒绝分母、隔离调用、输出不含原文及源索引不变。

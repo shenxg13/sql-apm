@@ -157,6 +157,13 @@ def verify(pg_bin):
             write_csv(alias_b, [row(text='SELECT 101')])
             v.require(ingest([alias_a, alias_b], 'ALIASES')['state'] == 'complete', 'path reconciliation preserves other alias')
             v.require(v.sql("SELECT count(*) FROM batch_entry WHERE batch_id='ALIASES'") == '2', 'manifest final identities match both paths')
+            origin_alias = root / 'origin_alias.csv'
+            write_csv(origin_alias, [row(text='SELECT 50')])
+            def alternate_origin(doc):
+                next(iter(doc['batches'].values()))['files'][0]['origin_key'] = 'alternate-declared-origin'
+            v.require(ingest([origin_alias], 'ORIGIN_ALIAS', mutate=alternate_origin)['added_records'] == 0, 'duplicate content retains an additional manual origin')
+            origin_alias.write_bytes(alias_a.read_bytes())
+            v.require(ingest([origin_alias], 'ORIGIN_ALIAS_CHANGE', mutate=alternate_origin)['state'] == 'conflict', 'origin change is held even when new content already exists elsewhere')
             print('INGESTION CHECKS:', v.completed)
 
 

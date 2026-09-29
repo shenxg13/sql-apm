@@ -187,3 +187,12 @@ class Interpreter:
             else:
                 result.update(timing=previous['kind'], support=previous['ref'])
         return result
+
+
+def record_metrics(row):
+    counts = {'records': 1}
+    duration = bool(DURATION.match(row[18]))
+    if duration:
+        counts['duration_with_sql' if row[24].strip() else 'duration_without_sql'] = 1
+        counts['duration:' + site(row)] = 1
+    return counts, duration

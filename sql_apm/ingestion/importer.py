@@ -7,9 +7,10 @@ import time
 import uuid
 
 from sql_apm.ingestion.config import IngestionError, canonical, identity
-from sql_apm.ingestion.hashdata.reader import Records, Interpreter, DURATION, raw_bytes, valid_text, site
+from sql_apm.ingestion.hashdata.reader import Records, Interpreter, record_metrics
+from sql_apm.ingestion.hashdata.persistence import write_records
 from sql_apm.ingestion.normalizing import NormalizingPool
-from sql_apm.storage.ingestion import connect, copy_rows, SqlWriter
+from sql_apm.storage.ingestion import connect, SqlWriter
 
 PROFILE = 'hashdata-csv/1'
 MAPPING = 'hashdata-3.13.13/1'
@@ -156,6 +157,14 @@ class Importer:
             success = cur.fetchone()
             cur.execute('SELECT attempt_id FROM import_attempt WHERE file_id=%s ORDER BY started_at DESC LIMIT 1', (fid,))
             previous = cur.fetchone()
+            if entry['origin_key']:
+                cur.execute('''SELECT f.declaration_evidence FROM source_file f WHERE source_id=%s AND file_id<>%s
+                    AND EXISTS (SELECT FROM import_attempt a WHERE a.file_id=f.file_id AND a.state='succeeded')''', (config['source_id'], fid))
+                if any(entry['origin_key'] in (json.loads(row[0]).get('origin_keys', []) +
+                                             [json.loads(row[0]).get('origin_key')]) for row in cur):
+                    failure = 'origin_content_changed'
+            if failure:
+                success = None
             cur.execute('''INSERT INTO import_attempt VALUES (%s,%s,%s,%s,%s,%s,%s,clock_timestamp(),
                 CASE WHEN %s THEN clock_timestamp() ELSE NULL END,NULL)''',
                 (attempt, config['batch_id'], fid, config['scope_id'], previous[0] if previous and not success else None,
@@ -163,12 +172,14 @@ class Importer:
             cur.execute('''INSERT INTO batch_entry VALUES (%s,%s,%s,%s) ON CONFLICT (batch_id,file_id)
                 DO UPDATE SET final_attempt_id=excluded.final_attempt_id''', (config['batch_id'], fid, config['scope_id'], attempt))
             if success:
+                if entry['origin_key']:
+                    cur.execute('SELECT declaration_evidence FROM source_file WHERE file_id=%s', (fid,))
+                    saved = json.loads(cur.fetchone()[0])
+                    keys = saved.get('origin_keys', []) + [saved.get('origin_key')]
+                    if entry['origin_key'] not in keys:
+                        saved['origin_keys'] = sorted({key for key in keys if key} | {entry['origin_key']})
+                        cur.execute('UPDATE source_file SET declaration_evidence=%s WHERE file_id=%s', (canonical(saved), fid))
                 return dict(file_id=fid, state='duplicate_skipped', added_records=0, added_occurrences=0)
-            if entry['origin_key']:
-                cur.execute('''SELECT f.declaration_evidence FROM source_file f WHERE source_id=%s AND file_id<>%s
-                    AND EXISTS (SELECT FROM import_attempt a WHERE a.file_id=f.file_id AND a.state='succeeded')''', (config['source_id'], fid))
-                if any(json.loads(row[0]).get('origin_key') == entry['origin_key'] for row in cur):
-                    failure = 'origin_content_changed'
         if failure:
             return self.fail_file(fid, attempt, failure, 'conflict' if failure == 'origin_content_changed' else 'failed')
         try:
@@ -180,15 +191,12 @@ class Importer:
                 for number, begin, end, row in rows:
                     rid = fid + ':' + str(number)
                     event = parser.interpret(row, rid)
-                    counts['records'] += 1
-                    duration = bool(DURATION.match(row[18]))
-                    if duration:
-                        counts['duration_with_sql' if row[24].strip() else 'duration_without_sql'] += 1
-                        counts['duration:' + site(row)] += 1
+                    metrics, duration = record_metrics(row)
+                    counts.update(metrics)
                     buffer.append((rid, number, begin, end, row, event, duration))
                     buffered_bytes += sum(len(x) for x in row)
                     if len(buffer) >= 2000 or buffered_bytes >= 8 * 1024 * 1024:
-                        self.flush(cur, fid, buffer, counts)
+                        write_records(self, cur, fid, buffer, counts)
                         buffer.clear()
                         buffered_bytes = 0
                         if self.fault:
@@ -196,7 +204,7 @@ class Importer:
                     if time.monotonic() - last_progress > 20:
                         self.progress(phase='file_read', file_id=fid, records=number, occurrences=counts['occurrences'])
                         last_progress = time.monotonic()
-                self.flush(cur, fid, buffer, counts)
+                write_records(self, cur, fid, buffer, counts)
                 if self.fault:
                     self.fault(rows.count)
                 if rows.sha256 != sha or rows.byte_count != size:
@@ -224,81 +232,3 @@ class Importer:
             cur.execute('UPDATE import_attempt SET state=%s,finished_at=clock_timestamp() WHERE attempt_id=%s', (state, attempt))
             self.problem(cur, fid, code, 'block_publication' if state == 'conflict' else 'fail_file', attempt=attempt)
         return dict(file_id=fid, state=state, reason=code, added_records=0, added_occurrences=0)
-
-    def flush(self, cur, fid, buffer, counts):
-        config = self.config
-        texts = [raw_bytes(row[24]) for _, _, _, _, row, event, duration in buffer if (event or duration) and row[24].strip()]
-        resolved = self.writer.resolve(texts)
-        evidence, occurrences, sql_links, support, approx_links, approx_events, problems = [], [], [], [], [], [], []
-        for rid, number, begin, end, row, event, duration in buffer:
-            result = resolved.get(raw_bytes(row[24])) if (event or duration) and row[24].strip() else None
-            # Original files + checksums are immutable evidence. Keep scalar identity/time
-            # columns for every record, and original SQL/message on problematic records.
-            keep = (0, 1, 2, 3, 7, 9, 10, 11, 16, 17, 27, 28)
-            observed = {str(i).zfill(2): row[i] if valid_text(row[i]) else None for i in keep}
-            if event or duration or row[16] in ('ERROR', 'FATAL', 'PANIC') or site(row) == 'postgres.c:2764':
-                for i in (18, 19, 21, 24):
-                    if i == 24 and result and result['sql_id']:
-                        continue
-                    observed[str(i).zfill(2)] = row[i] if valid_text(row[i]) else None
-            decoded = all(valid_text(x) for x in row)
-            evidence.append((rid, fid, config['source_id'], config['scope_id'], number, begin, end,
-                             'decoded' if decoded else 'invalid', canonical(observed)))
-            if not decoded:
-                problems.append((rid, 'record_encoding_invalid', rid if event else None))
-            if result:
-                if result['sql_id']:
-                    sql_links.append((result['sql_id'], rid))
-                if result['approximate_id']:
-                    approx_links.append((result['approximate_id'], rid))
-                if result['fingerprint']['state'] != 'reliable':
-                    problems.append((rid, 'fingerprint_' + result['fingerprint']['reason'], rid if event else None))
-            if event is None:
-                if duration:
-                    problems.append((rid, 'timing_out_of_scope', None))
-                elif row[16] in ('ERROR', 'FATAL', 'PANIC'):
-                    problems.append((rid, 'error_without_execution', None))
-                continue
-            counts['occurrences'] += 1
-            counts['outcome:' + event['outcome']] += 1
-            counts['timing:' + (event['timing'] or 'unknown')] += 1
-            reasons = {}
-            for name, val in (('end_at', event['end']), ('duration_ms', event['duration']), ('estimated_start_at', event['start'])):
-                if val is None:
-                    reasons[name] = 'unknown_from_evidence'
-            occurrences.append((self.analysis_id, rid, config['scope_id'], config['source_id'], rid,
-                                event['unit'], result['shape'] if result else 'unknown',
-                                row[2] if row[2] and valid_text(row[2]) else None,
-                                row[1] if row[1] and valid_text(row[1]) else None,
-                                result['sql_id'] if result else None, result['sql_state'] if result else 'missing',
-                                event['timing'], event['timing_reason'], event['outcome'], event['association'],
-                                ASSOCIATION, event['association_reason'], event['end'], event['duration'], event['start'],
-                                'end_minus_duration' if event['start'] is not None else None, canonical(reasons)))
-            if event['support']:
-                support.append((self.analysis_id, rid, event['support'], 'association'))
-            if result and result['approximate_id']:
-                approx_events.append((self.analysis_id, rid, config['scope_id'], result['rule_id'], result['approximate_id'], rid, config['source_id']))
-            if not result:
-                problems.append((rid, 'sql_missing', rid))
-            if event['problem']:
-                problems.append((rid, event['problem'], rid))
-            for name in reasons:
-                problems.append((rid, name + '_unknown', rid))
-            if not row[1] or not row[2] or not valid_text(row[1]) or not valid_text(row[2]):
-                problems.append((rid, 'identity_missing', rid))
-        copy_rows(cur, 'evidence_record', 'record_id,file_id,source_id,scope_id,record_no,line_start,line_end,decode_state,observed', evidence)
-        copy_rows(cur, 'mpp_sql_text_evidence', 'sql_id,record_id', sql_links)
-        copy_rows(cur, 'mpp_approximate_evidence', 'result_id,record_id', approx_links)
-        copy_rows(cur, 'mpp_occurrence', 'analysis_id,occurrence_id,scope_id,source_id,anchor_ref,unit,request_shape,database,execution_user,sql_id,sql_state,timing_type,timing_reason,outcome,association_state,association_method,association_reason,end_at,duration_ms,estimated_start_at,start_basis,value_reasons', occurrences)
-        copy_rows(cur, 'mpp_occurrence_evidence', 'analysis_id,occurrence_id,record_id,purpose', support)
-        copy_rows(cur, 'mpp_occurrence_approximate', 'analysis_id,occurrence_id,scope_id,rule_id,result_id,record_id,source_id', approx_events)
-        # Bulk problems avoid a per-record round trip on empty SQL Parse/Bind records.
-        problem_rows, problem_refs = [], []
-        for rid, code, occurrence in problems:
-            pid = 'P:' + identity(self.analysis_id, rid, code)
-            problem_rows.append((pid, 'record', config['batch_id'], fid, None, self.analysis_id if occurrence else None,
-                                 occurrence, code, code, 'isolate_record', 'log_record', 1, 'isolated', None))
-            problem_refs.append((pid, rid))
-            counts['problem:' + code] += 1
-        copy_rows(cur, 'problem', 'problem_id,level,batch_id,file_id,build_id,analysis_id,occurrence_id,code,reason,effect,count_unit,count,resolution,resolution_evidence', problem_rows)
-        copy_rows(cur, 'problem_evidence', 'problem_id,record_id', problem_refs)

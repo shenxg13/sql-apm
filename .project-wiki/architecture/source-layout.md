@@ -225,6 +225,7 @@ v4→v5 投影位于 `diagnostics/normalization_v5_audit.py`；两类新位置�
 
 Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/normalizing.py` 和
 `ingestion/hashdata/reader.py`，分别负责登记、文件／批次、受限归一化和来源解释。
+`ingestion/hashdata/persistence.py` 保存 HashData 原始字段到 MPP 表的映射，通用文件流程不解释列号。
 `storage/ingestion.py` 负责 PostgreSQL 连接、COPY、精确原文和近似写入；
 `cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
 [设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)

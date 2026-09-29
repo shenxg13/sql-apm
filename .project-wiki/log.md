@@ -176,6 +176,7 @@
 - [Issue #21](https://github.com/shenxg13/sql-apm/issues/21)确认模板结构匹配、五类计时适用、
   ②的快照归属和方案 C；更新[训练资格](contracts/training-eligibility.md)、
   [构建与版本](features/baseline-versions.md)及[逻辑契约](contracts/offline-data-contract.md)。
+- 同步训练资格主题中的实现状态，保留统计、展示及构建发布的后续边界。
 - 首期拆分与历史逐条复算边界纳入对应主题；结构 1.3.0、命令和实现边界见
   [判定设计](../docs/design/training-decisions.md)和[操作说明](../docs/runbooks/training-decisions.md)。
 - 验证证据见[判定报告](../docs/reports/training-decisions-2026-09-29.md)；未改变原始需求、

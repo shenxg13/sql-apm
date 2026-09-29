@@ -84,12 +84,20 @@ JSON 行输出仅含固定原因码、数量、摘要和不透明文件 ID，不
 | `file_unreadable`、`csv_boundary`、`csv_columns` | 文件失败，批次未完成；修复输入／路径后重试。 |
 | `batch_member_changed`、`origin_content_changed`、`record_edge_overlap` | 文件 conflict、批次 conflict，阻止后续发布；人工核对，不自动抽取增量或合并。 |
 | `file_changed_during_read` | 两次摘要或读取期间文件属性不一致，回滚文件。 |
-| `normalization_timeout` | SQL 工作进程超过看门狗时间；文件与事件回滚、尝试 failed、批次不完整。超时受负载影响，排查后重试整文件。 |
-| `normalization_worker_failed` | 工作进程异常退出或管道失败；文件与事件回滚、尝试 failed，重试会重新归一化。 |
-| `normalization_worker_start_failed` | 子进程未成功完成启动握手；同样回滚文件并留失败尝试，排查环境后重试。 |
+| `fingerprint_normalization_timeout` | 同一输入在新子进程重试一次后仍超时；仅隔离该记录，保留实际 outcome、原文与问题，其他记录继续。 |
+| `fingerprint_normalization_worker_failed` | 同一输入两次均未取得正常结果，最后一次为进程异常退出／接收失败或进程返回异常；按记录隔离，不产生可靠 SQL 或近似替代。 |
+| `normalization_worker_failed` | 发送输入时管道失败；文件与事件回滚、尝试 failed，恢复环境后重试整文件。 |
+| `normalization_worker_start_failed` | 子进程未成功完成启动握手（包括重试时）；回滚文件并留失败尝试，排查环境后重试。 |
 | `file_processing_failed` | 其他文件处理异常，回滚文件并留失败尝试。 |
 | `execute_start_missing`、`execute_start_ambiguous` 等 | 已知调用仍保留，类别为 NULL；问题记录解释原因。 |
 | SQL 缺失／结构拒绝 | 保留事件的实际 outcome 和证据；近似按返回结果独立保存。 |
+
+单条输入已发送后的超时／异常最多尝试两次，每次失败后销毁进程，第二次使用新进程；
+若第二次成功，只保存正常结果。问题码采用第二次失败原因；首次失败原因不单独持久化。
+这只能区分一次可恢复故障和重复失败，不能证明后者由 SQL 本身引起。两次都因负载超时也会
+隔离该记录；同一 Importer 的热缓存可复用该失败状态，不能把它当可靠指纹。
+排查 `fingerprint_normalization_*` 时先定位 problem_evidence 和完整原文，再核对主机资源。
+已成功文件重导会跳过，不重新解析这些记录；当前入口不提供自动重解释或历史覆盖功能。
 
 `import_batch`、`batch_entry`、`import_attempt` 保存批次／文件历史，`problem` 和
 `problem_evidence` 提供原因与文件定位，`source_file.declaration_evidence` 保存文件计数和冲突摘要。

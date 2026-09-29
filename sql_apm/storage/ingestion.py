@@ -90,10 +90,8 @@ class SqlWriter:
             fresh = [raw for raw in missing if raw not in found or found[raw]['fingerprint']['state'] != 'reliable']
             # Rejected inputs are rare; repeat normalization rebuilds complete approximate metadata.
             parsed = self.pool.map(fresh) if fresh else []
-            for result in parsed:
-                reason = result['fingerprint']['reason']
-                if reason in ('normalization_timeout', 'normalization_worker_failed'):
-                    raise IngestionError(reason)
+            # The pool retries accepted inputs before returning an isolated failure.
+            # Startup/transport failures raise instead and roll back the whole file.
             with self.connection, self.connection.cursor() as cur:
                 cur.execute('SELECT pg_advisory_xact_lock(1835101, 1)')
                 for raw, result in zip(fresh, parsed):

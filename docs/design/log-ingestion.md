@@ -74,13 +74,20 @@ HashData 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/hashdata/pers
 
 ## R1 恢复与解释版本边界
 
-- SQL 工作进程超时、异常退出／管道失败和启动失败分别使用 `normalization_timeout`、
-  `normalization_worker_failed`、`normalization_worker_start_failed`。这三类运行故障使当前文件
-  整体回滚、尝试失败，批次不能 complete；不会提交没有 SQL 关联的降级事件或缓存失败结果。
-  排查后重试整文件；正常 SQL 可重新得到可靠结果。超时受主机负载影响，持续超过限制的输入
-  仍可能再次失败。此前已提交的独立 SQL 元数据可复用，不代表文件成功。
-- map 中途异常会清理全部子进程及在途回复，防止下一文件把旧回复对应到新输入。
-  Normalizer 的结构拒绝及其他明确记录级返回仍按原契约隔离；已成功文件重导不会重新归一化。
+- R2 整改细化 R1 的故障边界：已成功发送的单条输入若超时、接收 EOF／OSError 或工作
+  进程返回 `normalization_worker_failed`，关闭该进程，在新进程中最多重试一次（共两次）。
+  恢复成功采用正常结果，不留下第一次故障的降级事件；第二次仍失败则返回指纹状态
+  `normalization_failed`，原因为第二次的 `normalization_timeout` 或 `normalization_worker_failed`。
+  该记录写入 `fingerprint_normalization_*` 问题，保留原文证据和实际 outcome；SQL 关联为空、
+  sql_state 为 uncertain，不生成可靠指纹或近似替代。同文件其他记录继续，文件可 succeeded。
+- 这是有界重复观测，不证明输入必然有错：两次主机负载超时也会按记录隔离。最终失败可在
+  本次 Importer 的 64 MiB 热缓存中以失败状态复用，相同字节输入不重复消耗资源；不持久化为
+  可靠 SQL 元数据。已成功文件重导会跳过，不会重新归一化；需要新解释时须走显式后续处理。
+- 启动握手失败（`normalization_worker_start_failed`）及发送失败（`normalization_worker_failed`）
+  未形成可归属的输入／回复对，仍使整文件回滚、尝试 failed、批次未完成；包括重试过程中
+  的启动／发送失败。map 抛出异常时清理全部子进程和在途回复，恢复环境后重试整文件。
+  已独立提交的 SQL 元数据可复用，不代表文件成功。Normalizer 的大小上限、结构拒绝等
+  明确记录级返回无需运行故障重试，沿用原契约隔离。
 - Analysis 的 `parser_version` 为来源适配内的 `hashdata-csv-reader/1`，覆盖本构建 CSV 读取与
   行解释；`mapping_version=hashdata-3.13.13/1` 与 `association_version=execute-file-sequence/1`
   分别标识映射与配对。SQL 解析器 `mpp-adapter/9` 仍属于 Normalization，不代替来源版本。
@@ -91,4 +98,8 @@ HashData 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/hashdata/pers
   不增加全量字节读取；属性核对阻止预检后普通文件变化。与导入后才标冲突相比，预检避免了
   多余归一化和替代事件写入。故障恢复继续付出重放单文件的成本；不新增逐记录恢复水位。
 
-本轮退出条件、故障注入和验证边界见[R1 整改报告](../reports/log-ingestion-r1-remediation-2026-09-29.md)。
+R1 成员与版本保护证据见[R1 整改报告](../reports/log-ingestion-r1-remediation-2026-09-29.md)。
+当前故障分类、两次尝试与真实问题输入回放见[R2 整改报告](../reports/log-ingestion-r2-remediation-2026-09-29.md)。
+qualitative：仅遇到运行故障的输入增加一次启动和解析成本；最坏两次各 5 秒解析看门狗，
+另有每次最多 30 秒启动握手和进程清理成本。内存上限仍是每进程 512 MiB、1–8 个工作进程。
+相比无限重试或整文件反复失败，有界重试既给瞬时故障一次恢复机会，也允许可靠记录完成导入。

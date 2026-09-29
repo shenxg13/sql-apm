@@ -92,22 +92,26 @@ class NormalizingPool:
             self.close()
             raise
 
+    def _send(self, child, raw, index, attempt, pending):
+        if child.process is None:
+            child.start()
+        try:
+            child.connection.send_bytes(raw)
+        except (OSError, EOFError):
+            # No accepted input/reply pair: this is a file-level transport failure.
+            raise IngestionError('normalization_worker_failed') from None
+        pending[child] = (index, time.monotonic(), attempt)
+
     def _map(self, inputs):
         results, pending, next_index = [None] * len(inputs), {}, 0
         while next_index < len(inputs) or pending:
             for child in self.workers:
                 if child in pending or next_index == len(inputs):
                     continue
-                if child.process is None:
-                    child.start()
-                try:
-                    child.connection.send_bytes(inputs[next_index])
-                except (OSError, EOFError):
-                    raise IngestionError('normalization_worker_failed') from None
-                pending[child] = (next_index, time.monotonic())
+                self._send(child, inputs[next_index], next_index, 1, pending)
                 next_index += 1
             ready = wait([child.connection for child in pending], timeout=0.01)
-            for child, (index, start) in list(pending.items()):
+            for child, (index, start, attempt) in list(pending.items()):
                 expired = time.monotonic() - start >= self.timeout
                 if child.connection not in ready and not expired:
                     continue
@@ -118,9 +122,16 @@ class NormalizingPool:
                         result = failure('normalization_worker_failed')
                 else:
                     result = failure('normalization_timeout')
-                results[index] = result
                 del pending[child]
                 child.calls += 1
+                if result['fingerprint']['reason'] in ('normalization_timeout', 'normalization_worker_failed'):
+                    # An accepted input gets at most one retry in a fresh process.
+                    # Two failures isolate this input; startup/send failures still raise.
+                    child.close()
+                    if attempt == 1:
+                        self._send(child, inputs[index], index, 2, pending)
+                        continue
+                results[index] = result
                 if expired or result['fingerprint']['state'] == 'normalization_failed' or child.calls >= 1000:
                     child.close()
         return results

@@ -215,10 +215,13 @@ confidence: high
 记录 JSON 登记、冻结清单、文件事务、幂等重试、保守冲突检测及资源边界。
 实现复用结构 1.2.0，可靠原文与近似结果分开保存；未可靠配对的 Execute 类别为 NULL。
 批次 complete 仅证明声明清单已处理，不等于训练合格、源端覆盖完整或可立即发布。
-R1 整改后，工作进程超时／退出／启动失败按文件回滚，重试重新归一化；批次预检保护已成功
-内容成员，替换冲突保留旧条目及新旧身份。来源解释器独立版本与 Analysis 复用检查见
-[设计](../../docs/design/log-ingestion.md#r1-恢复与解释版本边界)，
-[整改报告](../../docs/reports/log-ingestion-r1-remediation-2026-09-29.md)记录三个退出条件和回归。
+R2 整改后，已发送的单条 SQL 超时／工作进程异常先在新进程中重试一次；恢复成功保留可靠
+结果，重复失败按记录隔离并保留实际 outcome。启动／发送失败仍整文件回滚。两次失败是
+操作分类依据，不能证明 SQL 必然有错；成功文件重导不重新归一化，详见
+[当前故障边界](../../docs/design/log-ingestion.md#r1-恢复与解释版本边界)与
+[R2 整改报告](../../docs/reports/log-ingestion-r2-remediation-2026-09-29.md)。
+R1 的成功内容成员保护、旧条目保留、来源解释器独立版本与 Analysis 复用检查继续有效，
+原始验证见[R1 整改报告](../../docs/reports/log-ingestion-r1-remediation-2026-09-29.md)。
 55 文件实测、逐项对账和恢复验证见[导入验证报告](../../docs/reports/log-ingestion-2026-09-29.md)。
 
 ## Workflows

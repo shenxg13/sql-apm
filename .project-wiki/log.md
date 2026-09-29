@@ -164,3 +164,9 @@
   来源解析器版本与 SQL 解析器分开，旧 Analysis 不混入其他解释版本。
 - [整改报告](../docs/reports/log-ingestion-r1-remediation-2026-09-29.md)记录实际子进程故障、
   替换／别名／失败修复及版本漂移回放；独立 R2 状态由在线交接维护。
+
+## 2026-09-29：日志导入 R2 整改
+
+- 按 R2-F001 细化[导入异常实现](features/log-ingestion.md#首期导入实现issue-18)：
+  单输入新进程重试一次，重复失败按记录隔离，启动／发送失败仍回滚文件。
+- 同步残余风险与[回放证据](../docs/reports/log-ingestion-r2-remediation-2026-09-29.md)，已确认范围未变。

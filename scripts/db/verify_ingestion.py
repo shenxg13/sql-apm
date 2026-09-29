@@ -29,6 +29,17 @@ def failed_worker(connection):
     os._exit(1)
 
 
+def returned_failure_worker(connection):
+    from sql_apm.ingestion.normalizing import failure
+    connection.send('ready')
+    connection.recv_bytes()
+    connection.send(failure('normalization_worker_failed'))
+
+
+def failed_send(raw):
+    raise BrokenPipeError()
+
+
 def failed_start_worker(connection):
     connection.close()
 
@@ -189,16 +200,34 @@ def verify(pg_bin):
             write_csv(partial, [row(text='SELECT 1; BOGUS 2;')])
             partial_result = ingest([partial], 'PARTIAL')
             v.require(partial_result['added_occurrences'] == 1 and v.sql("SELECT count(*) FROM mpp_occurrence WHERE request_shape='batch' AND sql_state='uncertain' AND sql_id IS NULL AND outcome='success'") == '1', 'closed partially unsupported batch retains one uncertain whole request')
-            # R1-F001: real worker timeouts/deaths/startup EOF after a successful COPY.
+            # R2-F001: persistent accepted-input failures isolate records; a single
+            # failure retries in a fresh process. Infrastructure failures still roll
+            # back even after a COPY of 2,000 events (R1-F001 recovery invariant).
             from unittest.mock import patch
-            for suffix, worker in [('timeout', timeout_worker), ('failed', failed_worker), ('start_failed', failed_start_worker)]:
-                batch = 'WORKER_' + suffix
+            from sql_apm.ingestion.normalizing import ParserWorker, worker as real_worker
+            original_start = ParserWorker.start
+            scenarios = [(kind, mode) for kind in ('timeout', 'failed', 'returned')
+                         for mode in ('transient', 'persistent')]
+            scenarios += [('start_failed', 'infrastructure'), ('send_failed', 'infrastructure')]
+            for suffix, mode in scenarios:
+                batch = 'WORKER_' + suffix + '_' + mode
                 candidate = root / (batch + '.csv')
-                write_csv(candidate, [row(text="SELECT 'before_" + suffix + "'") for _ in range(2000)] +
-                          [row(text="SELECT 'after_" + suffix + "'")])
+                write_csv(candidate, [row(text="SELECT 'before_" + batch + "'") for _ in range(2000)] +
+                          [row(text="SELECT 'after_" + batch + "'")])
                 cfg.write_text(json.dumps(configuration(cfg, [candidate], batch)))
                 importer = Importer(dsn, workers=1, progress=lambda **kw: None)
-                replacement = patch('sql_apm.ingestion.normalizing.worker', worker)
+                starts = []
+                target = dict(timeout=timeout_worker, failed=failed_worker,
+                              returned=returned_failure_worker, start_failed=failed_start_worker,
+                              send_failed=real_worker)[suffix]
+                def controlled_start(child):
+                    selected = real_worker if mode == 'transient' and starts else target
+                    with patch('sql_apm.ingestion.normalizing.worker', selected):
+                        original_start(child)
+                    starts.append(child.process.pid)
+                    if suffix == 'send_failed':
+                        child.connection.send_bytes = failed_send
+                replacement = patch.object(ParserWorker, 'start', controlled_start)
                 def break_worker(number):
                     if number == 2000:
                         importer.pool.close()
@@ -208,22 +237,57 @@ def verify(pg_bin):
                 before_events = v.sql('SELECT count(*) FROM mpp_occurrence')
                 before_records = v.sql('SELECT count(*) FROM evidence_record')
                 try:
-                    failed = importer.run(load_config(cfg, 'S1', batch))
+                    result = importer.run(load_config(cfg, 'S1', batch))
+                    cached = importer.writer.cache.get(("SELECT 'after_" + batch + "'").encode())
                 finally:
                     replacement.stop()
                     importer.close()
-                reason = 'normalization_' + ('timeout' if suffix == 'timeout' else 'worker_' + suffix)
-                fid = failed['files'][0]['file_id']
-                v.require(failed['state'] == 'failed' and failed['files'][0]['reason'] == reason and
-                          v.sql("SELECT state FROM import_batch WHERE batch_id='" + batch + "'") == 'failed', batch + ' fails file and batch with fixed reason')
-                v.require(v.sql("SELECT state FROM import_attempt WHERE batch_id='" + batch + "'") == 'failed' and
-                          v.sql("SELECT count(*) FROM problem WHERE batch_id='" + batch + "' AND code='" + reason + "' AND effect='fail_file'") == '1', batch + ' persists failed attempt and problem')
-                v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == before_events and
-                          v.sql('SELECT count(*) FROM evidence_record') == before_records and
-                          v.sql("SELECT count(*) FROM analysis_file WHERE file_id='" + fid + "'") == '0', batch + ' rolls back copied events and evidence')
-                v.require(ingest([candidate], batch)['added_occurrences'] == 2001 and
-                          v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='complete' AND sql_id IS NOT NULL") == '2001', batch + ' retry produces reliable events')
-                v.require(ingest([candidate], batch)['added_occurrences'] == 0, batch + ' successful retry then skips')
+                reason = ('normalization_timeout' if suffix == 'timeout' else
+                          'normalization_worker_start_failed' if suffix == 'start_failed' else
+                          'normalization_worker_failed')
+                fid = result['files'][0]['file_id']
+                if mode == 'infrastructure':
+                    v.require(result['state'] == 'failed' and result['files'][0]['reason'] == reason and
+                              v.sql("SELECT state FROM import_batch WHERE batch_id='" + batch + "'") == 'failed', batch + ' fails file and batch with fixed reason')
+                    v.require(v.sql("SELECT state FROM import_attempt WHERE batch_id='" + batch + "'") == 'failed' and
+                              v.sql("SELECT count(*) FROM problem WHERE batch_id='" + batch + "' AND code='" + reason + "' AND effect='fail_file'") == '1', batch + ' persists failed attempt and problem')
+                    v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == before_events and
+                              v.sql('SELECT count(*) FROM evidence_record') == before_records and
+                              v.sql("SELECT count(*) FROM analysis_file WHERE file_id='" + fid + "'") == '0', batch + ' rolls back copied events and evidence')
+                    v.require(ingest([candidate], batch)['added_occurrences'] == 2001 and
+                              v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='complete' AND sql_id IS NOT NULL") == '2001', batch + ' retry produces reliable events')
+                else:
+                    v.require(result['state'] == 'complete' and result['files'][0]['state'] == 'succeeded' and
+                              result['added_occurrences'] == 2001 and
+                              v.sql("SELECT state FROM import_batch WHERE batch_id='" + batch + "'") == 'complete', batch + ' completes with every event retained')
+                    v.require(len(starts) == 2 and len(set(starts)) == 2, batch + ' uses exactly two fresh processes')
+                    reliable = '2001' if mode == 'transient' else '2000'
+                    v.require(v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='complete' AND sql_id IS NOT NULL") == reliable, batch + ' preserves reliable events')
+                    if mode == 'persistent':
+                        v.require(v.sql("SELECT count(*) FROM problem WHERE batch_id='" + batch + "' AND code='fingerprint_" + reason + "' AND effect='isolate_record'") == '1', batch + ' records isolated fingerprint problem')
+                        v.require(v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='uncertain' AND sql_id IS NULL AND outcome='success'") == '1', batch + ' preserves actual outcome on isolated record')
+                        v.require(cached['fingerprint']['state'] == 'normalization_failed' and
+                                  cached['sql_id'] is None and cached['approximate_id'] is None, batch + ' never caches failure as reliable or approximate')
+                    else:
+                        v.require(v.sql("SELECT count(*) FROM problem WHERE batch_id='" + batch + "' AND code LIKE 'fingerprint_normalization_%'") == '0' and
+                                  cached['fingerprint']['state'] == 'reliable', batch + ' recovery has no permanently downgraded record')
+                v.require(ingest([candidate], batch)['added_occurrences'] == 0, batch + ' successful file then skips')
+            # Real deterministic parser failure below the input-size cap, together
+            # with ordinary records, without any worker mock or shortened timeout.
+            deterministic = root / 'deterministic.csv'
+            expression = 'SELECT ' + '1+' * 100000 + '1'
+            write_csv(deterministic, [row(text="SELECT 'ordinary_deterministic'") for _ in range(50)] +
+                      [row(text=expression)])
+            result = ingest([deterministic], 'DETERMINISTIC')
+            fid = result['files'][0]['file_id']
+            v.require(len(expression.encode()) == 200008 and result['state'] == 'complete' and
+                      result['files'][0]['state'] == 'succeeded' and result['added_occurrences'] == 51 and
+                      v.sql("SELECT state FROM import_batch WHERE batch_id='DETERMINISTIC'") == 'complete', 'deterministic input completes file and batch with all 51 events')
+            v.require(v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='complete' AND sql_id IS NOT NULL") == '50', 'deterministic input leaves all 50 ordinary records reliable')
+            v.require(v.sql("SELECT count(*) FROM problem WHERE batch_id='DETERMINISTIC' AND code='fingerprint_normalization_worker_failed' AND effect='isolate_record'") == '1' and
+                      v.sql("SELECT count(*) FROM mpp_occurrence WHERE anchor_ref LIKE '" + fid + ":%' AND sql_state='uncertain' AND sql_id IS NULL AND outcome='success'") == '1', 'deterministic failure is isolated with fixed reason and actual outcome')
+            v.require(v.sql("SELECT octet_length(observed->>'24') FROM evidence_record WHERE file_id='" + fid + "' AND record_no=51") == '200008', 'deterministic failed SQL preserved in full evidence')
+            v.require(ingest([deterministic], 'DETERMINISTIC')['added_occurrences'] == 0, 'deterministic completed file skips without normalizing anew')
             # R1-F002: protect succeeded and duplicate_skipped members before writes.
             for preexisting, initially_skipped in [(False, False), (True, False), (False, True)]:
                 batch = 'MEMBER_' + str(int(preexisting)) + str(int(initially_skipped))

@@ -4,10 +4,13 @@ import unittest
 
 class ResourceTests(unittest.TestCase):
     def test_external_timeout_recovers_worker(self):
+        from unittest.mock import patch
         from sql_apm.ingestion.normalizing import NormalizingPool
         pool = NormalizingPool(1, timeout_seconds=0.000001)
         try:
-            result = pool.map([b'SELECT ' + b'1+' * 100000 + b'1'])[0]
+            with patch.object(pool.workers[0], 'start', wraps=pool.workers[0].start) as start:
+                result = pool.map([b'SELECT ' + b'1+' * 100000 + b'1'])[0]
+                self.assertEqual(2, start.call_count)
             self.assertEqual('normalization_timeout', result['fingerprint']['reason'])
             self.assertIsNone(result['approximate'])
             pool.timeout = 5
@@ -43,5 +46,23 @@ class ResourceTests(unittest.TestCase):
                     pool.map([b'SELECT 1'])
             self.assertIsNone(pool.workers[0].process)
             self.assertEqual('reliable', pool.map([b'SELECT 2'])[0]['fingerprint']['state'])
+        finally:
+            pool.close()
+
+    def test_deterministic_failure_preserves_concurrent_input_order(self):
+        from sql_apm.ingestion.normalizing import NormalizingPool
+        from sql_apm.sql.normalization import Normalizer
+        pool = NormalizingPool(2)
+        inputs = [b'SELECT ' + b'1+' * 100000 + b'1',
+                  b'CREATE TABLE concurrent_case(id bigint)',
+                  b'INSERT INTO concurrent_case VALUES (1)', b'SELECT * FROM concurrent_case']
+        try:
+            results = pool.map(inputs)
+            self.assertEqual('normalization_failed', results[0]['fingerprint']['state'])
+            self.assertEqual('normalization_worker_failed', results[0]['fingerprint']['reason'])
+            self.assertIsNone(results[0]['approximate'])
+            for raw, result in zip(inputs[1:], results[1:]):
+                self.assertEqual(Normalizer().normalize(raw)['fingerprint'], result['fingerprint'])
+            self.assertEqual('reliable', pool.map([b'SELECT 3'])[0]['fingerprint']['state'])
         finally:
             pool.close()

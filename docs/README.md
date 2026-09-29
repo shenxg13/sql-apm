@@ -74,6 +74,7 @@
 | --- | --- | --- |
 | [结构指纹 v5 验证](reports/sql-normalization-v5-2026-09-29.md) | 实施验证报告 | SELECT／JOIN 常量与集合分支恢复、149 万原文独立差分及 745 万耗时记录的覆盖／离散。 |
 | [七天日志门槛 R1 整改验证](reports/log-supplement-r1-remediation-2026-09-28.md) | 整改验证报告 | 美元引号非法编码／NUL 统一拒绝、分母与活跃日回归、真实语料影响及新代码证据。 |
+| [日志导入 R2 整改验证](reports/log-ingestion-r2-remediation-2026-09-29.md) | 整改验证报告 | 单输入有界重试、持续失败记录隔离与基础设施故障回滚的验证。 |
 | [日志导入 R1 整改验证](reports/log-ingestion-r1-remediation-2026-09-29.md) | 分析证据 | 工作进程故障恢复、成功清单成员保护、Analysis 解释版本核验及回归。 |
 | [完整日志导入验证](reports/log-ingestion-2026-09-29.md) | 分析证据 | 55 文件正式入库、五类计时、历史原文差异、重复导入及资源实测。 |
 | [120 七天日志补充分析](reports/cluster-log-supplement-2026-09-28.md) | 分析证据 | 55 文件覆盖、实际记录日期、七天类别对照与候选方案门槛覆盖。 |

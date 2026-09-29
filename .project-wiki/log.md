@@ -156,3 +156,4 @@
   只导入，后续训练、统计和发布边界不变。
 - [运行时决策](decisions/runtime-and-components.md)锁定 psycopg2-binary 2.9.10；
   [设计与测试用例](../docs/design/log-ingestion.md)记录资源、冲突覆盖和配对边界。
+- [55 文件导入验证](../docs/reports/log-ingestion-2026-09-29.md)记录正式入库与历史诊断的分母差异、计时与状态、幂等及资源实测；合并和评审状态以在线 Issue／PR 为准。

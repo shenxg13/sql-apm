@@ -357,7 +357,8 @@ confidence: high
 带 SQL ERROR、取消／超时及 NULL 耗时由
 [失败执行契约](../features/sql-search-and-views.md#已确认的失败执行明细2026-09-29)维护。
 这些是已确认的产品解释规则，不将此前只读诊断当作导入验收。
-Issue #18 的来源字段、单文件配对与冲突检测边界见[导入设计](../../docs/design/log-ingestion.md)。
+Issue #18 的来源字段、单文件配对与冲突检测边界见[导入设计](../../docs/design/log-ingestion.md)，
+55 文件的正式入库结果见[导入验证](../../docs/reports/log-ingestion-2026-09-29.md)。
 
 ## Workflows
 

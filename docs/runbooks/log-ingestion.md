@@ -1,7 +1,8 @@
 # 完整日志批次导入
 
 本入口实现“只导入”。先按[数据库说明](database-initialization.md)初始化或核对 PostgreSQL 17
-结构 1.2.0，再用 Python 3.9.5 安装根目录锁定依赖：
+结构 1.2.0。导入器按允许的版本历史识别当前结构，支持两个迁移版本时间戳相同的情况；
+未知或不完整版本历史会拒绝。再用 Python 3.9.5 安装根目录锁定依赖：
 
 ```bash
 .venv/bin/python -m pip install --require-hashes -r requirements.txt
@@ -113,3 +114,23 @@ JSON 行输出仅含固定原因码、数量、摘要和不透明文件 ID，不
 
 报告分别统计历史诊断原文、可靠原文、片段／近似、事件及问题，不将历史诊断出现次数
 直接当作执行数。RSS 以 0.5 秒采样汇总进程树，包含共享页重复计数，不等于 PSS 或峰值瞬时值。
+
+全量入库结束后，可使用最终来源适配代码重读清单，核对每文件记录／计时／状态计数，
+并逐个解释历史诊断索引中未纳入正式存储的原文。该命令不重新归一化，不连接数据库：
+
+```bash
+.venv/bin/python scripts/db/reconcile_ingestion.py \
+  --root raw/inbox/hashdata \
+  --manifest docs/reports/data/log-supplement-manifest-2026-09-28.json \
+  --report var/ingestion/full-validation/report.json \
+  --audit var/ingestion/full-validation/identity-audit.sqlite \
+  --snapshot var/parser-probe/issue15/v5.sqlite \
+  --index var/parser-probe/issue13/full-scan.sqlite \
+  --output var/ingestion/full-validation/reconciliation.json
+```
+
+任何正式导入候选未入库或计数不一致都会失败；未采用的内联／内部 SQL 及仅出现在
+非事件日志中的原文单独说明，不静默用历史诊断分母替代产品入库分母。
+
+`--snapshot` 可选：提供同上下文的 v5 快照时，逐条核对已存原文的解析状态／拒绝原因，
+并给出历史未纳入文本的可靠／拒绝分布；版本上下文不同会拒绝。

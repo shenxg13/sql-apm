@@ -132,3 +132,6 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 写入与资源边界见[设计](../docs/design/log-ingestion.md)。
 `.venv/bin/python scripts/db/verify_ingestion.py` 回放合成导入用例；
 全量验收入口 `scripts/db/verify_ingestion_full.py` 需要显式本地输入与私有 PG17，常规测试不自动运行。
+
+`scripts/db/reconcile_ingestion.py` 在全量入库后只读核对最终适配器计数和历史原文集合差异；
+参数及验收失败语义见上述导入操作说明。

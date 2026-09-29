@@ -14,16 +14,23 @@ from sql_apm.sql.normalization import Normalizer
 def connect(dsn, schema):
     connection = psycopg2.connect(dsn, connect_timeout=5)
     connection.autocommit = False
-    with connection.cursor() as cur:
-        if not 170000 <= connection.server_version < 180000:
-            raise IngestionError('postgresql_17_required')
-        cur.execute(sql.SQL('SET search_path TO {}, pg_catalog').format(sql.Identifier(schema)))
-        cur.execute("SET TIME ZONE 'Asia/Shanghai'")
-        cur.execute("SELECT version FROM schema_version ORDER BY applied_at DESC LIMIT 1")
-        if cur.fetchone() != ('1.2.0',):
-            raise IngestionError('schema_1_2_0_required')
-    connection.commit()
-    return connection
+    try:
+        with connection.cursor() as cur:
+            if not 170000 <= connection.server_version < 180000:
+                raise IngestionError('postgresql_17_required')
+            cur.execute(sql.SQL('SET search_path TO {}, pg_catalog').format(sql.Identifier(schema)))
+            cur.execute("SET TIME ZONE 'Asia/Shanghai'")
+            # Consecutive migrations share transaction_timestamp(). Receipts form
+            # a version history, so applied_at cannot identify the current version.
+            cur.execute('SELECT version FROM schema_version')
+            versions = {row[0] for row in cur}
+            if versions not in ({'1.2.0'}, {'1.1.0', '1.2.0'}, {'1.0.0', '1.1.0', '1.2.0'}):
+                raise IngestionError('schema_1_2_0_required')
+        connection.commit()
+        return connection
+    except BaseException:
+        connection.close()
+        raise
 
 
 def copy_rows(cursor, table, columns, rows):

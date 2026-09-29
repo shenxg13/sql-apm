@@ -9,7 +9,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'tests'))
-from verify import instance, Verification
+from verify import instance, Verification, run
 from ingestion.test_reader import row, configuration, write_csv
 from sql_apm.ingestion.config import load_config, IngestionError
 from sql_apm.ingestion.importer import Importer
@@ -47,6 +47,7 @@ def verify(pg_bin):
             result = ingest([path], 'B1')
             v.require(result['state'] == 'complete', 'synthetic complete batch: ' + json.dumps(result))
             v.require(v.sql('SELECT count(*) FROM evidence_record') == '20', 'all CSV logical records retained')
+            v.require(v.sql("SELECT count(*) FROM mpp_sql_text WHERE text='SELECT $1;'") == '1', 'exact original reused and native parameter preserved')
             v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == '15', 'actual events retained, outside timing excluded')
             v.require(v.sql("SELECT count(*) FROM mpp_occurrence WHERE outcome IN ('failed','cancelled','timed_out') AND duration_ms IS NULL AND estimated_start_at IS NULL") == '3', 'failure/cancel/timeout preserve NULL times')
             v.require(v.sql("SELECT count(*) FROM mpp_occurrence WHERE timing_type IN ('execute_first','execute_fetch')") == '2', 'first and fetch each consume one anchor')
@@ -75,6 +76,8 @@ def verify(pg_bin):
             v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == before, 'partial file data rolled back')
             v.require(ingest([retry], 'RETRY')['added_occurrences'] == 2001, 'unfinished file replayed exactly once')
             v.require(ingest([retry], 'RETRY')['added_occurrences'] == 0, 'successful retry then skipped')
+            v.require(v.sql("SELECT count(*) FROM mpp_sql_text WHERE text='SELECT 8'") == '1', 'SQL metadata survives rollback and is reused exactly')
+            v.require(v.sql("SELECT count(DISTINCT s.sql_id)||':'||count(DISTINCT f.value) FROM mpp_sql_text s JOIN mpp_fingerprint f USING(sql_id) WHERE s.text IN ('SELECT 7','SELECT 8')") == '2:1', 'same structure retains distinct original parameter values')
             original = root / 'original.csv'
             write_csv(original, [row(text='SELECT 11', **{'0': '2026-07-23 01:00:00 CST'}),
                                  row(text='SELECT 12', **{'0': '2026-07-23 01:00:01 CST'})])
@@ -164,6 +167,39 @@ def verify(pg_bin):
             v.require(ingest([origin_alias], 'ORIGIN_ALIAS', mutate=alternate_origin)['added_records'] == 0, 'duplicate content retains an additional manual origin')
             origin_alias.write_bytes(alias_a.read_bytes())
             v.require(ingest([origin_alias], 'ORIGIN_ALIAS_CHANGE', mutate=alternate_origin)['state'] == 'conflict', 'origin change is held even when new content already exists elsewhere')
+            partial = root / 'partial.csv'
+            write_csv(partial, [row(text='SELECT 1; BOGUS 2;')])
+            partial_result = ingest([partial], 'PARTIAL')
+            v.require(partial_result['added_occurrences'] == 1 and v.sql("SELECT count(*) FROM mpp_occurrence WHERE request_shape='batch' AND sql_state='uncertain' AND sql_id IS NULL AND outcome='success'") == '1', 'closed partially unsupported batch retains one uncertain whole request')
+            # Exercise the driver after the real two-step legacy migration.
+            import hashlib
+            names = ('ingest_upgrade',) * 3
+            v.init('bootstrap', names=names)
+            def upgrade_sql(statement):
+                return run([pg_bin / 'psql', '-X', '-w', '-Atq', '-v', 'ON_ERROR_STOP=1',
+                            '-h', directory / 'socket', '-p', '55473', '-U', names[2], '-d', names[0]],
+                           env, 'SET search_path=ingest_upgrade,pg_catalog;\n' + statement).stdout.strip()
+            legacy = (ROOT / 'sql_apm/storage/versions/1.0.0.sql').read_text()
+            upgrade_sql('CREATE SCHEMA ingest_upgrade;\n' + legacy +
+                        "INSERT INTO schema_version(version,script_sha256) VALUES ('1.0.0','" + hashlib.sha256(legacy.encode()).hexdigest() + "')")
+            v.init('upgrade', names=names)
+            v.require(upgrade_sql("SELECT count(DISTINCT applied_at) FROM schema_version WHERE version IN ('1.1.0','1.2.0')") == '1', 'real consecutive migrations share receipt timestamp')
+            migrated_dsn = 'host=' + str(directory / 'socket') + ' port=55473 dbname=ingest_upgrade user=ingest_upgrade'
+            upgraded = Importer(migrated_dsn, schema='ingest_upgrade', workers=1, progress=lambda **kw: None)
+            cfg.write_text(json.dumps(configuration(cfg, [path], 'UPGRADED')))
+            try:
+                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.2.0 migration')
+            finally:
+                upgraded.close()
+            upgrade_sql("INSERT INTO schema_version(version,script_sha256) VALUES ('9.0.0',repeat('0',64))")
+            from sql_apm.storage.ingestion import connect
+            try:
+                connection = connect(migrated_dsn, 'ingest_upgrade')
+            except IngestionError as error:
+                v.require(str(error) == 'schema_1_2_0_required', 'unknown future receipt rejected')
+            else:
+                connection.close()
+                raise AssertionError('unknown version admitted')
             print('INGESTION CHECKS:', v.completed)
 
 

@@ -18,10 +18,11 @@ from sql_apm.diagnostics.log_supplement import file_sha, write_json
 from sql_apm.diagnostics.mpp_full_scan import ParserProcess, ROOT, MAX_BYTES, TIMEOUT, MEMORY_BYTES
 from sql_apm.diagnostics.normalization_diff import readonly, meta, code_hashes, digest
 from sql_apm.sql import approximate
-from sql_apm.sql.normalization import Normalizer
+from sql_apm.sql.normalization import ALGORITHM_VERSION, Normalizer
 
 VERSION = 'threshold-coverage/1'
-SCHEMES = ('v4', 'positions', 'unqualified_functions', 'positions_functions', 'tidb_lexical')
+BASE_SCHEME = 'v' + ALGORITHM_VERSION.rsplit('/', 1)[1]
+SCHEMES = (BASE_SCHEME, 'positions', 'unqualified_functions', 'positions_functions', 'tidb_lexical')
 THRESHOLDS = (30, 200, 1000)
 _ENGINE = None
 _VARIANTS = {}
@@ -123,7 +124,7 @@ def coverage_worker(request):
             for scheme in schemes:
                 if scheme == 'tidb_lexical':
                     continue
-                if fp['state'] != 'reliable' or scheme == 'v4':
+                if fp['state'] != 'reliable' or scheme == BASE_SCHEME:
                     results[scheme] = dict(state=fp['state'], reason=fp['reason'], fingerprint=fp['value'])
                 else:
                     if scheme not in _VARIANTS:

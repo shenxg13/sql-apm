@@ -1,8 +1,8 @@
 """Capture private-index fingerprints and compare partitions without exporting SQL.
 
 Run this same module in each checkout. Snapshots contain only IDs, digests,
-fixed status/reason codes and counts. An optional v3-to-v4 projection is an
-independent, diagnostic-only oracle; it never changes the product result.
+fixed status/reason codes and counts. Optional v3-to-v4 and v4-to-v5 projections are
+independent, diagnostic-only oracles; they never change the product result.
 """
 import argparse
 from collections import Counter, defaultdict
@@ -25,7 +25,8 @@ SOURCES = ('sql_apm/sql/normalization.py', 'sql_apm/sql/mpp_parser.py',
            'sql_apm/sql/function_dictionary.py', 'sql_apm/sql/type_policy.py',
            'sql_apm/sql/approximate.py', 'sql_apm/sql/pg_ast.py', 'sql_apm/sql/lexical.py',
            'sql_apm/sql/structure.py', 'sql_apm/diagnostics/mpp_full_scan.py',
-           'sql_apm/diagnostics/normalization_diff.py', 'requirements.txt')
+           'sql_apm/diagnostics/normalization_diff.py',
+           'sql_apm/diagnostics/normalization_v5_audit.py', 'requirements.txt')
 _ENGINE = None
 
 
@@ -37,15 +38,19 @@ def digest(tree):
     return hashlib.sha256(dumps(tree).encode('ascii')).hexdigest()
 
 
-def bucket_context(parent, field, inherited):
+def bucket_context(parent, field, inherited, v5=False):
     """Diagnostic scope guard, independent of the product's value walker.
 
     v3 already marks FILTER constants as business values; those markers alone
     cannot authorize v4 list folding. A nested query establishes its own WHERE.
     onConflictClause is a plain InsertStmt field in the canonical parser tree.
     """
+    if v5 and parent in ('larg', 'rarg'):
+        return field in ('whereClause', 'targetList')
     if parent in ('SelectStmt', 'UpdateStmt', 'DeleteStmt', 'OnConflictClause', 'onConflictClause'):
-        return field == 'whereClause'
+        return field == 'whereClause' or v5 and parent == 'SelectStmt' and field == 'targetList'
+    if v5 and parent == 'JoinExpr':
+        return field == 'quals'
     if parent == 'FuncCall' or (parent == 'CaseWhen' and field == 'result') or (
             parent == 'CaseExpr' and field == 'defresult'):
         return False
@@ -95,12 +100,21 @@ def capture_worker(request):
         result = _ENGINE.normalize(request['sql'].encode('utf-8', 'surrogateescape'))
         fp = result['fingerprint']
         safe = dict(state=fp['state'], reason=fp['reason'], fingerprint=fp['value'],
-                    structure_sha256=None, v4_projection_sha256=None,
+                    structure_sha256=None, v4_projection_sha256=None, v5_projection_sha256=None,
+                    select_projection_sha256=None, join_projection_sha256=None,
                     in_lists=0, hint_count=0)
         if fp['state'] == 'reliable':
             tree = result['normalized']
             safe['structure_sha256'] = digest(tree)
             safe['hint_count'] = len(tree['hints'])
+            if request.get('project_v5'):
+                from sql_apm.diagnostics.normalization_v5_audit import project_v5
+                selected, _ = project_v5(tree, _ENGINE, join=False)
+                joined, _ = project_v5(selected, _ENGINE)
+                projected, _ = project_v5(tree, _ENGINE, sets=True, restore=True)
+                safe['select_projection_sha256'] = digest(selected)
+                safe['join_projection_sha256'] = digest(joined)
+                safe['v5_projection_sha256'] = digest(projected)
             if request.get('project_v4'):
                 projected, changes = project_v4(tree)
                 safe['v4_projection_sha256'] = digest(projected)
@@ -157,6 +171,8 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
     context = engine.context
     projection = (context['algorithm_version'] == 'sql-normalization/3'
                   and context['parser_version'] == 'mpp-adapter-probe/8')
+    projection_v5 = (context['algorithm_version'] == 'sql-normalization/4'
+                     and context['parser_version'] == 'mpp-adapter/9')
     before, sources = file_sha(source_path), code_hashes()
     output.parent.mkdir(parents=True, exist_ok=True)
     # Exclusive reservation; interruption leaves an explicitly incomplete snapshot.
@@ -164,7 +180,8 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
         pass
     started = last_progress = time.monotonic()
     done, states, pending = 0, Counter(), {}
-    pool = [ParserProcess(task=capture_worker, worker_options={'project_v4': projection})
+    task_timeout = 4 * TIMEOUT if projection_v5 else TIMEOUT
+    pool = [ParserProcess(task=capture_worker, timeout=task_timeout, worker_options={'project_v4': projection, 'project_v5': projection_v5})
             for _ in range(workers)]
     with readonly(source_path) as source, sqlite3.connect(str(output)) as target:
         target.executescript('''
@@ -172,17 +189,18 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
             CREATE TABLE records (input_id INTEGER PRIMARY KEY, sql_sha256 TEXT NOT NULL,
                 state TEXT NOT NULL, reason TEXT, fingerprint TEXT, structure_sha256 TEXT,
                 v4_projection_sha256 TEXT, in_lists INTEGER NOT NULL, hint_count INTEGER NOT NULL,
-                occurrences INTEGER NOT NULL);
+                occurrences INTEGER NOT NULL, v5_projection_sha256 TEXT,
+                select_projection_sha256 TEXT, join_projection_sha256 TEXT);
         ''')
         for key, value in dict(format=FORMAT, complete=False, context=context,
                 rule_snapshot=engine.rule_snapshot(), sources=sources, source_sha256=before,
-                python=platform.python_version(), project_v4=projection,
+                python=platform.python_version(), project_v4=projection, project_v5=projection_v5,
                 selection=dict(kind='ids' if ids is not None else 'markers' if markers else 'all',
                     marker_sha256=[hashlib.sha256(m).hexdigest() for m in markers],
                     ids_sha256=digest(sorted(ids)) if ids is not None else None,
                     ignore_ascii_case=ignore_case),
                 limits=dict(workers=workers, max_sql_bytes=MAX_BYTES,
-                    timeout_seconds=TIMEOUT, worker_address_space_bytes=MEMORY_BYTES)).items():
+                    timeout_seconds=task_timeout, worker_address_space_bytes=MEMORY_BYTES)).items():
             put_meta(target, key, value)
         target.commit()
         rows, exhausted = iter(selected_rows(source, markers, ids, ignore_case)), False
@@ -191,10 +209,11 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
             nonlocal done
             sha, count = pending.pop(uid)
             state = safe['state']
-            target.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?,?,?,?)',
+            target.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
                 (uid, sha, state, safe.get('reason') or (state if state != 'reliable' else None),
                  safe.get('fingerprint'), safe.get('structure_sha256'), safe.get('v4_projection_sha256'),
-                 safe.get('in_lists', 0), safe.get('hint_count', 0), count))
+                 safe.get('in_lists', 0), safe.get('hint_count', 0), count, safe.get('v5_projection_sha256'),
+                 safe.get('select_projection_sha256'), safe.get('join_projection_sha256')))
             done += 1
             states[state] += 1
 
@@ -238,7 +257,11 @@ def capture(source_path, output, workers=4, markers=(), ids=None, ignore_case=Fa
     return dict(records=done, states=dict(states), seconds=round(time.monotonic() - started, 3))
 
 
-def compare(before_path, after_path, require_v4=False, ids=None):
+def merge_category(select_groups, join_groups):
+    return 'select_list' if select_groups == 1 else 'join_on' if join_groups == 1 else 'set_branches'
+
+
+def compare(before_path, after_path, require_v4=False, ids=None, require_v5=False):
     with readonly(before_path) as before, readonly(after_path) as after:
         left_meta, right_meta = meta(before), meta(after)
         if any(m.get('format') != FORMAT or m.get('complete') is not True for m in (left_meta, right_meta)):
@@ -258,15 +281,30 @@ def compare(before_path, after_path, require_v4=False, ids=None):
                        'dictionary_digest', 'profile', 'parser_dependency')))
         if require_v4 and not audited:
             raise EvidenceError('v4_audit_context_mismatch')
+        audited_v5 = (left_meta.get('project_v5') is True
+                      and left_context['algorithm_version'] == 'sql-normalization/4'
+                      and right_context['algorithm_version'] == 'sql-normalization/5'
+                      and left_context['parser_version'] == right_context['parser_version'] == 'mpp-adapter/9'
+                      and all(left_context[k] == right_context[k] for k in (
+                          'dictionary_digest', 'profile', 'parser_dependency')))
+        if require_v5 and not audited_v5:
+            raise EvidenceError('v5_audit_context_mismatch')
+        if require_v4 and require_v5:
+            raise EvidenceError('conflicting_audit_versions')
         old_groups, new_groups = defaultdict(set), defaultdict(set)
         old_members, new_members = defaultdict(list), defaultdict(list)
         transitions, reasons = Counter(), Counter()
         examples, mismatches = [], []
         status_count = reason_count = mismatch_count = checked = total = 0
         occurrences, eligible, reliable = {}, [0, 0], [0, 0]
+        projections = {}
         query = 'SELECT input_id,sql_sha256,state,reason,fingerprint,structure_sha256,v4_projection_sha256,in_lists,occurrences FROM records ORDER BY input_id'
         def rows(db):
-            for row in db.execute(query):
+            selected_query = query
+            if audited_v5:
+                selected_query = query.replace('v4_projection_sha256', 'v5_projection_sha256').replace(
+                    ' FROM records', ',select_projection_sha256,join_projection_sha256 FROM records')
+            for row in db.execute(selected_query):
                 if ids is None or row[0] in ids:
                     yield row
 
@@ -296,7 +334,11 @@ def compare(before_path, after_path, require_v4=False, ids=None):
             if left[2] == right[2] == 'reliable':
                 old_groups[left[4]].add(right[4])
                 new_groups[right[4]].add(left[4])
-                if audited:
+                if audited_v5:
+                    if not all(left[9:11]):
+                        raise EvidenceError('missing_v5_stage_projection')
+                    projections[uid] = left[9:11]
+                if audited or audited_v5:
                     checked += 1
                     if not left[6] or left[6] != right[5]:
                         mismatch_count += 1
@@ -306,6 +348,14 @@ def compare(before_path, after_path, require_v4=False, ids=None):
             raise EvidenceError('selected_ids_missing')
         merges = [key for key, groups in new_groups.items() if len(groups) > 1]
         splits = [key for key, groups in old_groups.items() if len(groups) > 1]
+        categories = Counter()
+        if audited_v5:
+            for key in merges:
+                members = new_members[key]
+                category = ('unverified_status_change' if any(i not in projections for i in members) else
+                            merge_category(len({projections[i][0] for i in members}),
+                                           len({projections[i][1] for i in members})))
+                categories[category] += 1
         affected = [uid for key in merges for uid in new_members[key]]
         result = dict(format=FORMAT, context_changed=left_context != right_context,
             comparison_tool_sha256=file_sha(Path(__file__)),
@@ -321,12 +371,18 @@ def compare(before_path, after_path, require_v4=False, ids=None):
             status_changes=status_count, status_transitions=dict(transitions),
             reason_changes=reason_count, reason_transitions=dict(reasons),
             status_change_examples=examples, merged_groups=len(merges), split_groups=len(splits),
+            merge_categories=dict(categories),
+            category_basis='exclusive final groups: SELECT alone, else SELECT+JOIN, else branch restoration; ordered attribution',
             merged_inputs=len(affected), merged_input_occurrences=sum(occurrences[i] for i in affected),
             merge_examples=[new_members[key][:10] for key in merges[:10]],
             split_examples=[old_members[key][:10] for key in splits[:10]],
-            v4_audit=dict(applied=audited, checked=checked, mismatches=mismatch_count,
-                          mismatch_examples=mismatches))
+            v4_audit=dict(applied=audited, checked=checked if audited else 0,
+                          mismatches=mismatch_count if audited else 0, mismatch_examples=mismatches if audited else []),
+            v5_audit=dict(applied=audited_v5, checked=checked if audited_v5 else 0,
+                          mismatches=mismatch_count if audited_v5 else 0, mismatch_examples=mismatches if audited_v5 else []))
         result['v4_acceptance_passed'] = (audited and checked == reliable[0] == reliable[1]
+            and mismatch_count == status_count == reason_count == len(splits) == 0)
+        result['v5_acceptance_passed'] = (audited_v5 and checked == reliable[0] == reliable[1]
             and mismatch_count == status_count == reason_count == len(splits) == 0)
         return result
 
@@ -348,6 +404,7 @@ def main():
     comp.add_argument('--output', type=Path)
     comp.add_argument('--ids', type=Path, help='compare only these IDs; every ID must exist in both complete snapshots')
     comp.add_argument('--require-v4', action='store_true', help='fail unless every v3-to-v4 change is explained')
+    comp.add_argument('--require-v5', action='store_true', help='fail unless every v4-to-v5 change is explained')
     comp.add_argument('--text', action='store_true', help='print a compact text summary instead of JSON')
     args = ap.parse_args()
     try:
@@ -364,7 +421,7 @@ def main():
                              tuple(m.encode('utf-8') for m in (args.marker or [])), ids,
                              args.ignore_ascii_case)
         else:
-            result = compare(args.before, args.after, args.require_v4, ids)
+            result = compare(args.before, args.after, args.require_v4, ids, args.require_v5)
             if args.output:
                 args.output.parent.mkdir(parents=True, exist_ok=True)
                 with args.output.open('x') as stream:
@@ -372,10 +429,12 @@ def main():
             if args.text:
                 print('inputs={inputs}; contexts_differ={context_changed}; '
                       'merges={merged_groups}; splits={split_groups}; '
-                      'status_changes={status_changes}; v4_passed={v4_acceptance_passed}'.format(**result))
-                return int(args.require_v4 and not result['v4_acceptance_passed'])
+                      'status_changes={status_changes}; v4_passed={v4_acceptance_passed}; v5_passed={v5_acceptance_passed}'.format(**result))
+                return int(args.require_v4 and not result['v4_acceptance_passed'] or
+                           args.require_v5 and not result['v5_acceptance_passed'])
         print(json.dumps(result, sort_keys=True))
-        return int(args.command == 'compare' and args.require_v4 and not result['v4_acceptance_passed'])
+        return int(args.command == 'compare' and (args.require_v4 and not result['v4_acceptance_passed'] or
+                   args.require_v5 and not result['v5_acceptance_passed']))
     except EvidenceError as error:
         print(json.dumps({'error': str(error)}))
     except Exception:

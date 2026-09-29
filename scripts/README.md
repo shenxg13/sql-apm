@@ -83,7 +83,7 @@ MPP 解析适配位于 `sql_apm/sql/mpp_parser.py`；共用词法检查及PG语�
 | `python -m sql_apm.diagnostics.mpp_full_repair` | 固定原文库的版本修复重放与完整结构摘要对照 |
 | `python -m sql_apm.diagnostics.normalize_sql` | 可靠结构归一化、结构指纹及独立近似结果的文本／文件入口 |
 | `python -m sql_apm.diagnostics.normalization_replay` | 固定样本的归组、结构守恒及稳定性验证 |
-| `python -m sql_apm.diagnostics.normalization_diff` | 原文选择集的脱敏快照、分组／状态差分及 v4 自动核对 |
+| `python -m sql_apm.diagnostics.normalization_diff` | 原文选择集的脱敏快照、分组／状态差分及 v4／v5 自动核对 |
 
 在仓库根目录运行上述模块命令，解释器使用 `.venv/bin/python`；解析实验依赖仍需通过
 `PYTHONPATH=var/parser-probe/site-packages` 指定。
@@ -110,8 +110,15 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 `python -m sql_apm.diagnostics.log_supplement` 提供扩展清单、类别对照和实际日期汇总；
 `python -m sql_apm.diagnostics.threshold_coverage` 在带 `--record-dates` 的完整原文索引上，
-按集群比较现行 v4、候选位置／函数归一及 TiDB 式词法对照的 30／200／1,000 次、7 日覆盖。
+按集群比较实际算法基准（当前方案名 `v5`）、候选位置／函数归一及 TiDB 式词法对照的 30／200／1,000 次、7 日覆盖。
 使用与上文一致的解释器及解析依赖路径，原文／缓存保留在忽略目录。
 [操作说明](../docs/runbooks/log-supplement.md)定义方案、分母、参数、失败与恢复；
 [补充报告](../docs/reports/cluster-log-supplement-2026-09-28.md)记录本轮证据。
-这些计数不等同执行样本、训练资格或基线可用率。
+这些计数不等同执行样本、训练资格或基线可用率；#13 的 v4 结果须在冻结 checkout 复现。
+
+## 耗时离散诊断
+
+`python -m sql_apm.diagnostics.duration_dispersion extract` 只读提取带 SQL 的 duration 记录，
+`report` 对已审计的 v4／v5 快照计算真实维度的门槛覆盖和新增合并子组的中位数倍数分布。
+命令、分母、脱敏及恢复规则见[耗时诊断说明](../docs/runbooks/duration-dispersion.md)。
+原文、索引和耗时缓存均留在本地忽略目录。

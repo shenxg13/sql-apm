@@ -1,6 +1,6 @@
 # SQL 归一化与结构指纹接口
 
-当前 `sql-normalization/4` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
+当前 `sql-normalization/5` 实现完整输入的解析、上下文归一化、确定性结构编码和结构指纹，
 并接入独立的[观察用近似路径](sql-approximate.md)。核心位于
 [normalization.py](../../sql_apm/sql/normalization.py)，业务边界由
 [SQL 指纹契约](../../.project-wiki/contracts/sql-fingerprints.md)定义。
@@ -46,7 +46,7 @@ snapshot = engine.rule_snapshot()  # 调用方保存，用 context.rules_ref 核
 | `normalized` | 完整有类型结构与 Hint；可靠时非空，不是可执行 SQL，也不能替代原文 |
 | `fingerprint.kind` | 固定 structural，和 approximate 明确分开 |
 | `fingerprint.state` | reliable／unsupported_syntax／normalization_failed |
-| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/4:` 加 SHA-256 |
+| `fingerprint.value` | 仅 reliable 非空，格式为 `struct:sql-normalization/5:` 加 SHA-256 |
 | `fingerprint.reason` | reliable 时 null，否则固定诊断，不包含解析器错误原文 |
 | `approximate` | 只在解析明确拒绝时尝试；结构异常、归一化异常、配置和资源错误不回退 |
 | `diagnostics` | 替换节点数、IN 分桶列表数、函数选择原因计数；不含对象名、参数值或异常原文 |
@@ -75,7 +75,7 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 | 位置 | 行为 |
 | --- | --- |
 | SELECT／UPDATE／DELETE 的 WHERE | 数字、字符串、原生 `$n` 使用统一标记；NULL／布尔保留 |
-| WHERE 的 IN／NOT IN 列表 | 全部元素归一化为裸业务值标记时，以 1／2–10／11–100／>100 桶代替元素序列；Hint anchor 仍可能区分同桶长度 |
+| WHERE、SELECT 列表及 JOIN ON 的 IN／NOT IN 列表 | 全部元素归一化为裸业务值标记时，以 1／2–10／11–100／>100 桶代替元素序列；Hint anchor 仍可能区分同桶长度 |
 | 聚合 FILTER | 保持 v3 业务值替换与列表长度，不对 FILTER 条件分桶；可遍历子查询的独立 WHERE 按自身上下文处理 |
 | ON CONFLICT 的两种 WHERE | DO UPDATE WHERE 按更新条件分桶；冲突目标的推断谓词整体保护 |
 | INSERT 的直接 VALUES、UPDATE 的直接 SET（含多列赋值） | 数字、字符串、原生 `$n` 使用业务值标记；算术表达式中的常量保留 |
@@ -83,15 +83,18 @@ TypeError。不完整文本的观察结果遵守独立近似契约，不填入�
 | 控制参数、未知／歧义／停用／待核实函数 | 整个受保护子树保留，外层 WHERE 或内层已知函数不能绕过 |
 | 显式转换 | 保留转换节点与类型修饰；只有已确认标量类型允许深入，bool／oid／reg*／JSON／数组／未知类型等整体保护 |
 | SQL 特殊函数、命名参数、VARIADIC | 整体保留；不把 EXTRACT、TRIM、COALESCE、NULLIF 等当成普通同名函数 |
-| SELECT 普通常量、CASE 结果、HAVING、JOIN 条件 | 未确认的非函数常量保留；不扩大 WHERE 规则 |
+| SELECT 目标列表、JOIN ON | 与 WHERE 相同，包含算术表达式常量和 IN 分桶；USING 列表保留 |
+| CASE 结果、HAVING、ORDER／GROUP BY、DISTINCT ON | 沿用 v4；非函数字面量保留，函数仍按字典 |
 | SET 配置、LIMIT／OFFSET、数组下标、窗口定义 | 整个控制子树保留，包括里面的函数及子查询 |
-| CTE、子查询、COPY 查询、CTAS／VIEW 查询、完整批次 | 进入各自查询上下文；WHERE 不泄漏到内层投影或控制位置；语句顺序保留 |
+| CTE、子查询、COPY 查询、CTAS／VIEW 查询、完整批次 | 进入各自查询上下文；保护子树不被外层上下文绕过；语句顺序保留 |
+| UNION／INTERSECT／EXCEPT 分支 | 每个未包装的 SelectStmt 分支使用独立 SELECT 规则；包括 WHERE、函数及 FILTER；集合分支中的 VALUES 是查询 VALUES，不作为 INSERT 直接值 |
 | DDL 定义、存储／外表选项、MPP 扩展 | 保留完整结构和参数；不将对象名、分区边界、配置当业务值 |
 
 IN 分桶在已有业务值归一化后执行，编码为 `{"SQLAPMInBucket":"2-10"}` 等四种标记；
 IN／NOT IN 运算符、左侧表达式和其余结构继续保留。列、NULL／布尔、表达式、函数或
 显式转换节点均不是裸业务值标记，混合列表保留原有长度及元素结构，仍执行既有常量规则。
-CTE／子查询各自的 WHERE 适用同一规则；投影、JOIN／HAVING、函数参数、聚合 FILTER 及受保护子树不扩展。
+CTE／子查询及集合运算各分支的 WHERE、SELECT 列表和 JOIN ON 适用同一规则；
+HAVING、函数参数、聚合 FILTER 及受保护子树不扩大。
 FILTER 继承冻结 v3 的业务值替换能力，但保留 IN 元素序列；进入内部子查询时重新建立查询上下文。
 `INSERT … ON CONFLICT … DO UPDATE … WHERE` 属更新条件；冲突目标的 `ON CONFLICT (…) WHERE`
 属于受保护的推断谓词，不因 WHERE 关键字相同就纳入分桶。
@@ -154,7 +157,10 @@ Hint 恰好位于被折叠负号之后时，规范间隙无法区分该负号前
 这三项由构造不一致内部数据的辅助函数测试验证，仍明确拒绝而不猜定锚点；有效输入由
 定向、广覆盖及历史回放验证。证据见[收敛整改报告](../reports/sql-normalization-adj-remediation-2026-09-28.md)。
 上述版本3／适配器版本8的负号规则由版本4保留；本次新增 IN 分桶并移除全局 gap，
-升级为 `sql-normalization/4`／`mpp-adapter/9`。规则摘要及快照随之改变，不能将新旧指纹值直接比较。
+当时升级为 `sql-normalization/4`／`mpp-adapter/9`。
+当前 v5 继承上述 Hint 编码，新增 SELECT 列表、JOIN ON 和集合分支恢复。
+v4 与 v5 的规则摘要、快照及全部指纹身份不同，不能直接比较指纹字符串；
+当前没有持久化基线，不执行历史基线迁移。
 
 `anchor.kind=statement` 表示 Hint 位于语句开始前、内部或终止分号前。
 位于空语句间或最后一个分号后的 Hint 使用 `batch_boundary`，记录下一非空语句序号
@@ -223,7 +229,9 @@ checkout 的 Normalizer 处理输入，`compare` 比较输入 ID 对应的分组
 不跨上下文直接比较指纹字符串。两份快照必须来自同一原文索引，ID、原文摘要和出现次数
 逐条一致，否则明确失败。规则上下文即使不同也会在报告中完整标注。
 
-从仓库根目录运行（已有固定依赖时使用以下 PYTHONPATH）：
+下面保留 v3→v4 的历史选择集复现命令，应在对应冻结 v4 checkout 中运行。
+当前 v5 的全量差分命令见本节末尾；输出文件名不会切换算法版本。
+从对应 checkout 根目录运行（已有固定依赖时使用以下 PYTHONPATH）：
 
 ```bash
 # 默认全部输入；重复 --marker 表示字节 OR，不是 SQL 语法过滤。
@@ -320,3 +328,61 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
   var/parser-probe/v3-in.sqlite var/parser-probe/v4-in.sqlite \
   --ids var/parser-probe/in-contract-ids.json --require-v4 --text
 ```
+
+### v4→v5 全量审计与分类
+
+v5 快照写明两个新增位置、集合分支恢复和全部保护边界。
+`compare --require-v5` 要求冻结 v4／当前 v5 均使用 `mpp-adapter/9`，
+字典、profile、pglast 一致；逐条实际 v5 结构须等于冻结 v4 的预期结构。
+任何状态／原因变化、拆分、未解释结构变化或缺少阶段摘要均使验收失败。
+
+独立验证由 `normalization_v5_audit.py` 完成，不调用 v5 walker 或 `_fields`。
+它在冻结 v4 结果副本上依照明确的可遍历字段及保护边界替换 SELECT／JOIN 值；
+共享未改变的字典选择和转换分类。集合分支仅接受版本为 v4 的引擎：
+把未包装的分支包装为独立 SelectStmt，调用冻结 v4 walker 恢复旧规则，
+再应用独立位置投影。嵌套分支逐层处理；扩展结构、Hint 和所有其他字段保持。
+
+冻结快照同时保存“仅 SELECT”和“SELECT＋JOIN”的完整结构摘要。
+对每个最终 v5 合并组，若所有成员的仅 SELECT 摘要一致，归入 `select_list`；
+否则若 SELECT＋JOIN 摘要一致，归入 `join_on`；其余经最终投影核验的归入
+`set_branches`。这是固定顺序的互斥归因，混合原因归入最后所需步骤；
+不是三个相互独立的反事实实验。三类组数相加等于最终合并组数。
+耗时诊断在实际五维分组内重新执行同样归因，避免跨数据库／用户的合并影响分类。
+
+`V5_COMMIT` 设为本次交付的固定提交；在新 checkout 中只复制两份诊断模块，
+产品核心、字典和解析器保持冻结原样。示例输出路径须尚不存在：
+
+```bash
+base_dir="$PWD"
+git worktree add --detach var/parser-probe/issue15-v4 9a0f9f507a4e068f32c8704da28c761d6e65ca14
+git show "${V5_COMMIT}:sql_apm/diagnostics/normalization_diff.py" \
+  > var/parser-probe/issue15-v4/sql_apm/diagnostics/normalization_diff.py
+git show "${V5_COMMIT}:sql_apm/diagnostics/normalization_v5_audit.py" \
+  > var/parser-probe/issue15-v4/sql_apm/diagnostics/normalization_v5_audit.py
+(
+  cd var/parser-probe/issue15-v4
+  PYTHONPATH="$base_dir/var/parser-probe/site-packages" "$base_dir/.venv/bin/python" \
+    -m sql_apm.diagnostics.normalization_diff capture \
+    --source "$base_dir/var/parser-probe/issue13/full-scan.sqlite" \
+    --output var/v4.sqlite --workers 8
+)
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff capture \
+  --source var/parser-probe/issue13/full-scan.sqlite \
+  --output var/parser-probe/issue15/v5.sqlite --workers 4
+PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
+  -m sql_apm.diagnostics.normalization_diff compare \
+  var/parser-probe/issue15-v4/var/v4.sqlite var/parser-probe/issue15/v5.sqlite \
+  --require-v5 --output var/parser-probe/issue15/full-diff.json --text
+```
+
+全量使用 #13 的完整七天索引，不按关键词缩小分母。v4 每输入含归一化及三个投影，
+隔离任务总预算为 20 秒；v5 单次采集仍为 5 秒，输入／内存上限保持 512 KiB／512 MiB。
+这不是将组合任务时间称为产品单次耗时。两侧同时运行时本轮冻结 v4 用 8 个、v5 用 4 个进程（本机 12 核／24 GiB）；
+前者增加了独立投影工作，单进程内存上限保持不变。
+源码摘要含审计模块，运行前后核验；所有快照必须完整，不能混用修改前后结果。
+
+合成冻结证据位于 `tests/parser_probe/fixtures/normalization-v4.json`；
+记录固定 v4 提交、上下文、输入、原结构和仅恢复集合分支后的 v4 结构，
+仅含人工 SQL。专项测试核对结构摘要、独立投影及当前 v5，旧 Hint 回归全部保留。
+真实耗时命令、参照分母及分类解释见[Duration 诊断说明](../runbooks/duration-dispersion.md)。

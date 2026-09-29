@@ -115,6 +115,21 @@ class NormalizationV4Tests(unittest.TestCase):
         fixture = json.loads((Path(__file__).parent / 'fixtures/normalization-v3-preserved.json').read_text())
         self.assertEqual(fixture['commit'], 'bd62856921aa806e109490c199482d099d560557')
         for case, sql in preservation_cases():
+            # Issue #15 explicitly replaces these old preservation expectations:
+            # nested SELECT constants, SELECT IN and JOIN ON IN.
+            if int(case.split('-')[0]) in (6, 7, 8):
+                result = self.result(sql)
+                index, variant = (int(v) for v in case.split('-'))
+                self.assertNotEqual(hashlib.sha256(dumps(result['normalized']).encode('ascii')).hexdigest(),
+                                    fixture['structure_sha256'][case])
+                if index in (7, 8):
+                    self.assertEqual(result['diagnostics']['in_lists_bucketed'], 1)
+                    self.assertEqual(self.fp(sql), self.fp(PRESERVED[index].format(v='7,8')))
+                else:
+                    self.assertEqual(result['diagnostics'].get('in_lists_bucketed', 0), 0)
+                    values = '7,8,9' if variant == 1 else '7,8'
+                    self.assertEqual(self.fp(sql), self.fp(PRESERVED[index].format(v=values)))
+                continue
             with self.subTest(case=case):
                 result = self.result(sql)
                 self.assertEqual(hashlib.sha256(dumps(result['normalized']).encode('ascii')).hexdigest(),
@@ -192,7 +207,7 @@ class NormalizationV4Tests(unittest.TestCase):
 
     def test_snapshot_records_new_rules_and_formal_versions(self):
         context = self.engine.context
-        self.assertEqual(context['algorithm_version'], 'sql-normalization/4')
+        self.assertEqual(context['algorithm_version'], 'sql-normalization/5')
         self.assertEqual(context['parser_version'], 'mpp-adapter/9')
         rules = self.engine.rule_snapshot()['normalization']
         self.assertEqual(rules['where_in']['buckets'], ['1', '2-10', '11-100', '>100'])

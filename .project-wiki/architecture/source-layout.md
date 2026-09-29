@@ -9,8 +9,10 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-28
+updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/15
+    status: current
   - path: docs/reports/sql-normalization-v4-2026-09-28.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/1#issuecomment-5834054457
@@ -207,6 +209,10 @@ Normalizer 与规则快照；`FunctionDictionary.snapshot()` 提供独立规则�
 `diagnostics/normalization_diff.py` 在本地原文索引上选择全部、字节标记或 ID 集合，
 生成脱敏 SQLite 快照，并比较分组、状态及原因。它复用 `mpp_full_scan.ParserProcess`
 的隔离与资源限制，独立的 v3→v4 结构投影仅用于验证，不参与产品归一化。
+v4→v5 投影位于 `diagnostics/normalization_v5_audit.py`；两类新位置独立投影，
+集合分支只调用版本检查后的冻结 v4 walker，再投影 v5 新位置，不调用被测 v5 walker。
+`diagnostics/duration_dispersion.py` 负责只读提取及脱敏耗时证据，
+复用完整快照和分阶段摘要计算五维覆盖与三类合并的离散分布；不实现训练或存储服务。
 诊断侧上下文检查同时供投影与固定回放守恒审计使用，区分 FILTER、独立查询 WHERE 和冲突更新条件；
 业务边界见[指纹契约](../contracts/sql-fingerprints.md#已确认的-where-in-列表粗分桶与-hint-编码清理)。
 快照和生产中间结果保留忽略的 `var/`；报告只提交计数、摘要、版本及 ID 示例。

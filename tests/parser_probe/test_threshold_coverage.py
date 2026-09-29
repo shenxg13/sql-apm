@@ -23,16 +23,16 @@ class ThresholdCoverageTests(unittest.TestCase):
         self.assertIsNotNone(b['fingerprint'])
         return a['fingerprint'] == b['fingerprint']
 
-    def test_v4_is_exact_product_result_and_candidates_do_not_mutate_it(self):
+    def test_v5_is_exact_product_result_and_candidates_do_not_mutate_it(self):
         sql = "SELECT 1 FROM secret_table_583 WHERE a=9"
         before = Normalizer().normalize(sql)
         result = coverage.coverage_worker(dict(sql=sql, schemes=coverage.SCHEMES))
-        self.assertEqual(result['schemes']['v4']['fingerprint'], before['fingerprint']['value'])
+        self.assertEqual(result['schemes']['v5']['fingerprint'], before['fingerprint']['value'])
         self.assertEqual(Normalizer().normalize(sql), before)
         self.assertNotIn('secret_table_583', json.dumps(result))
         self.assertEqual(set(result['schemes']), set(coverage.SCHEMES))
 
-    def test_positions_join_select_and_case_are_isolated_from_v4(self):
+    def test_positions_join_select_and_case_are_isolated_from_v5(self):
         pairs = [
             ('SELECT 1 FROM t', 'SELECT 2 FROM t'),
             ('SELECT a.x FROM a JOIN b ON a.x=b.x AND b.y=1',
@@ -42,13 +42,13 @@ class ThresholdCoverageTests(unittest.TestCase):
         ]
         for a, b in pairs:
             with self.subTest(a=a):
-                self.assertFalse(self.compare(a, b, 'v4'))
+                self.assertEqual(self.compare(a, b, 'v5'), 'CASE' not in a)
                 self.assertTrue(self.compare(a, b, 'positions'))
                 self.assertTrue(self.compare(a, b, 'positions_functions'))
 
     def test_unknown_function_controls_are_explicit_counterfactual_only(self):
         a, b = "SELECT custom_func('one')", "SELECT custom_func('two')"
-        self.assertFalse(self.compare(a, b, 'v4'))
+        self.assertFalse(self.compare(a, b, 'v5'))
         self.assertFalse(self.compare(a, b, 'positions'))
         self.assertTrue(self.compare(a, b, 'unqualified_functions'))
         self.assertFalse(self.compare(a.replace('custom_func', 'app.custom_func'),
@@ -169,12 +169,12 @@ class ThresholdCoverageTests(unittest.TestCase):
             self.source(source)
             before = coverage.file_sha(source)
             with contextlib.redirect_stdout(io.StringIO()):
-                result = coverage.capture(source, output, cache, ('v4', 'positions'), workers=2)
+                result = coverage.capture(source, output, cache, ('v5', 'positions'), workers=2)
             self.assertEqual(before, coverage.file_sha(source))
             a, b = result['clusters']['119'], result['clusters']['120']
             self.assertEqual(a['input_occurrences'], 1449)
-            v4 = a['schemes']['v4']['thresholds']
-            self.assertEqual([v4[str(n)]['groups'] for n in coverage.THRESHOLDS], [2, 1, 1])
+            v5 = a['schemes']['v5']['thresholds']
+            self.assertEqual([v5[str(n)]['groups'] for n in coverage.THRESHOLDS], [1, 1, 1])
             merged = a['schemes']['positions']['thresholds']
             self.assertEqual([merged[str(n)]['groups'] for n in coverage.THRESHOLDS], [1, 1, 1])
             self.assertAlmostEqual(merged['1000']['fraction_all_input_occurrences'], 1435/1449)
@@ -184,7 +184,7 @@ class ThresholdCoverageTests(unittest.TestCase):
                 text = '\n'.join(db.iterdump()) + output.read_text()
             for secret in ('SELECT', 'private_cut', 'bytes_base64'):
                 self.assertNotIn(secret, text)
-            self.assertEqual(set(a['schemes']), {'v4', 'positions'})
+            self.assertEqual(set(a['schemes']), {'v5', 'positions'})
             with self.assertRaisesRegex(ValueError, 'output_exists'):
                 coverage.capture(source, output, cache, workers=1)
 
@@ -213,7 +213,7 @@ class ThresholdCoverageTests(unittest.TestCase):
             self.assertNotIn('SELECT', (root/'audit.json').read_text())
             self.assertNotIn('private_cut', (root/'audit.json').read_text())
             with sqlite3.connect(str(root/'baseline')) as db:
-                db.execute("UPDATE records SET fingerprint='unexpected' WHERE scheme='v4' AND input_id=2")
+                db.execute("UPDATE records SET fingerprint='unexpected' WHERE scheme='v5' AND input_id=2")
             with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'unexpected_replay_change'):
                 audit(root/'source', root/'baseline', root/'baseline.json', root/'failed.json', root/'retry')
             self.assertFalse((root/'failed.json').exists())
@@ -226,7 +226,7 @@ class ThresholdCoverageTests(unittest.TestCase):
             source.execute('INSERT INTO files VALUES (?,?)', (key, '{}'))
             cache.execute('CREATE TABLE records(input_id,scheme,state,reason,fingerprint)')
             for uid, total in enumerate((29, 30, 199, 200, 999, 1000), 1):
-                cache.execute('INSERT INTO records VALUES (?,?,?,?,?)', (uid, 'v4', 'reliable', None, str(uid)))
+                cache.execute('INSERT INTO records VALUES (?,?,?,?,?)', (uid, 'v5', 'reliable', None, str(uid)))
                 source.execute('INSERT INTO occurrences VALUES (?,?,?,?)', (uid, key, 'sql', total))
                 for day in range(1, 8):
                     source.execute('INSERT INTO occurrence_dates VALUES (?,?,?,?,?)',
@@ -236,8 +236,8 @@ class ThresholdCoverageTests(unittest.TestCase):
                 for field in ('sql', 'internal'):
                     source.execute('INSERT INTO occurrence_dates VALUES (?,?,?,?,?)', (uid, key, day, field, 1000))
             source.execute('INSERT INTO occurrences VALUES (?,?,?,?)', (7, key, 'sql', 4000))
-            cache.execute('INSERT INTO records VALUES (7,\'v4\',\'reliable\',NULL,\'7\')')
-            result = coverage.summarize(source, cache, ('v4',))['119']['schemes']['v4']['thresholds']
+            cache.execute('INSERT INTO records VALUES (7,\'v5\',\'reliable\',NULL,\'7\')')
+            result = coverage.summarize(source, cache, ('v5',))['119']['schemes']['v5']['thresholds']
             self.assertEqual([result[str(n)]['groups'] for n in coverage.THRESHOLDS], [5, 3, 1])
 
     def test_worker_errors_do_not_export_exception_text_or_fallback(self):
@@ -253,7 +253,7 @@ class ThresholdCoverageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.source(root/'source')
-            for schemes in ((), ('unknown',), ('v4', 'v4')):
+            for schemes in ((), ('unknown',), ('v5', 'v5')):
                 with self.assertRaisesRegex(ValueError, 'invalid_schemes'):
                     coverage.capture(root/'source', root/'out', root/'cache', schemes)
             with sqlite3.connect(str(root/'source')) as db:

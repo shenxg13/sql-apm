@@ -1,0 +1,188 @@
+{
+  "category_basis": "exclusive final groups: SELECT alone, else SELECT+JOIN, else branch restoration; ordered attribution",
+  "comparison_tool_sha256": "ed0a23c9372a6452eea3d614054b7f4dd3b89ca44023ca23744351317a1dd237",
+  "context_changed": true,
+  "contexts": {
+    "after": {
+      "algorithm_version": "sql-normalization/5",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter/9",
+      "profile": "hashdata-pg94",
+      "rules_digest": "00a3d088002566d01a3bbf9aff64619452116c7a8dcf32a6ae4b489342c46a58",
+      "rules_ref": "sha256:cb1e23a966095b526c9c337b2125f65d3521692c473796b179fb038f4f400528"
+    },
+    "before": {
+      "algorithm_version": "sql-normalization/4",
+      "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+      "dictionary_rules_version": "1.0.1",
+      "dictionary_schema_version": 1,
+      "parser_dependency": "pglast/7.18",
+      "parser_version": "mpp-adapter/9",
+      "profile": "hashdata-pg94",
+      "rules_digest": "ff864d482a90684f5a6dda98f921392d002c37106c2c6565adfc61699fcd97a3",
+      "rules_ref": "sha256:b7e9266a3a391253ffb977bab2686d7928537b9651c90f366d6b9f152e2c9007"
+    }
+  },
+  "eligible_in_inputs": {
+    "after": 114156,
+    "before": 92474
+  },
+  "format": "normalization-diff/1",
+  "groups": {
+    "after": 743244,
+    "before": 902678,
+    "delta": -159434
+  },
+  "inputs": 1497418,
+  "merge_categories": {
+    "join_on": 3939,
+    "select_list": 6752,
+    "set_branches": 609
+  },
+  "merge_examples": [
+    [
+      14,
+      259920
+    ],
+    [
+      15,
+      259921
+    ],
+    [
+      89,
+      279,
+      842,
+      1299,
+      1741,
+      1846,
+      1943,
+      2081,
+      2163,
+      2185
+    ],
+    [
+      97,
+      10521,
+      18922,
+      26485,
+      37288,
+      46306,
+      55887,
+      65032,
+      73911,
+      81996
+    ],
+    [
+      124,
+      310,
+      888,
+      1307,
+      1745,
+      1855,
+      1993,
+      2082,
+      2164,
+      2186
+    ],
+    [
+      190,
+      10535,
+      18936,
+      26494,
+      37301,
+      46319,
+      55900,
+      65046,
+      73925,
+      82014
+    ],
+    [
+      265,
+      10614,
+      18981,
+      26595,
+      37344,
+      46362,
+      55956,
+      65093,
+      73964,
+      82061
+    ],
+    [
+      288,
+      10623,
+      18995,
+      26604,
+      37359,
+      46404,
+      55965,
+      65102,
+      73982,
+      82074
+    ],
+    [
+      302,
+      10627,
+      19001,
+      26606,
+      37365,
+      46416,
+      55978,
+      65104,
+      73987,
+      82079
+    ],
+    [
+      306,
+      10630,
+      19003,
+      26613,
+      37367,
+      46418,
+      55980,
+      65116,
+      74002,
+      82090
+    ]
+  ],
+  "merged_groups": 11300,
+  "merged_input_occurrences": 941722,
+  "merged_inputs": 243849,
+  "reason_changes": 0,
+  "reason_transitions": {},
+  "reliable_inputs": {
+    "after": 1486516,
+    "before": 1486516
+  },
+  "selection": {
+    "ids_sha256": null,
+    "kind": "all_snapshot_records"
+  },
+  "snapshot_sha256": {
+    "after": "4575082173187e3e69a099f3fc322969c0ae092da503f279495fc2c5df28fed3",
+    "before": "cf868b0141790759765ec92af2331a0fd6468df5e09f7cd2b61120d65b0f3255"
+  },
+  "source_sha256": "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2",
+  "split_examples": [],
+  "split_groups": 0,
+  "status_change_examples": [],
+  "status_changes": 0,
+  "status_transitions": {},
+  "v4_acceptance_passed": false,
+  "v4_audit": {
+    "applied": false,
+    "checked": 0,
+    "mismatch_examples": [],
+    "mismatches": 0
+  },
+  "v5_acceptance_passed": true,
+  "v5_audit": {
+    "applied": true,
+    "checked": 1486516,
+    "mismatch_examples": [],
+    "mismatches": 0
+  }
+}

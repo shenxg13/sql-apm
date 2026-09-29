@@ -74,9 +74,12 @@ class SignedHintTests(unittest.TestCase):
                 with self.subTest(left=left, right=right):
                     self.assertNotEqual(self.value(left.format(h=hint)), self.value(right.format(h=hint)))
 
+    def test_v5_select_values_keep_signed_hint_identity(self):
+        self.assertEqual(self.value('SELECT 1 /*+ H */'), self.value('SELECT -1 /*+ H */'))
+
     def test_protected_values_remain_different(self):
         for template in (
-            'SELECT {v} /*+ H */', 'SELECT * FROM t LIMIT {v} /*+ H */',
+            'SELECT * FROM t LIMIT {v} /*+ H */',
             'SELECT * FROM t WHERE custom({v}) /*+ H */',
             'SELECT * FROM t WHERE x=({v})::boolean /*+ H */',
             'CREATE TABLE t(a int DEFAULT {v}) /*+ H */ DISTRIBUTED RANDOMLY',

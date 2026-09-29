@@ -57,6 +57,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [数据库初始化与恢复](runbooks/database-initialization.md) | 操作说明 | 单账号引导、认证、参数、兼容重跑、MPP 版本升级及失败恢复。 |
@@ -69,6 +70,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [结构指纹 v5 验证](reports/sql-normalization-v5-2026-09-29.md) | 实施验证报告 | SELECT／JOIN 常量与集合分支恢复、149 万原文独立差分及 745 万耗时记录的覆盖／离散。 |
 | [七天日志门槛 R1 整改验证](reports/log-supplement-r1-remediation-2026-09-28.md) | 整改验证报告 | 美元引号非法编码／NUL 统一拒绝、分母与活跃日回归、真实语料影响及新代码证据。 |
 | [120 七天日志补充分析](reports/cluster-log-supplement-2026-09-28.md) | 分析证据 | 55 文件覆盖、实际记录日期、七天类别对照与候选方案门槛覆盖。 |
 | [归一化 v4 R1 整改验证](reports/sql-normalization-v4-r1-remediation-2026-09-28.md) | 整改验证报告 | Hint 同桶例外确认、FILTER 边界修复及重新采集的冻结版本差分。 |

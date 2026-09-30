@@ -58,11 +58,14 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
   `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0，支持由中间版本开始。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
+- `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
+- `.venv/bin/python scripts/db/benchmark_statistics_sufficiency.py --output NEW_FILE`：有界合成门槛查询成本测量，
+  自动创建并清理私有 PG17；参数和实测边界见[统计操作说明](../docs/runbooks/baseline-statistics.md#查询门槛结果)。
 - `.venv/bin/python scripts/db/verify_approximate.py`：显式读取全量 v5 拒绝选择集，
   调用现有接口后在私有 PG17 逐条往返，输出脱敏计数／摘要；不是产品导入。
 
 完整参数、凭据、阶段恢复和检查方式见[数据库操作说明](../docs/runbooks/database-initialization.md)。
-SQL 资源位于 `sql_apm/storage/`，这些入口均不依赖业务数据库驱动。
+SQL 资源位于 `sql_apm/storage/`；初始化 Shell 入口使用 psql，Python 验证与成本测量使用已锁定的 psycopg2。
 
 ## 解析器结构保真探测
 

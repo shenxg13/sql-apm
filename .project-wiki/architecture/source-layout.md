@@ -251,7 +251,9 @@ Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statisti
 `cli/statistics.py` 提供薄命令；独立指标实现仅在 tests 与验收脚本，产品不依赖测试。
 训练判定继续复用②的唯一 SQL 函数，未新增永久 Decision 投影。完整门槛结果由
 `storage/schema.sql` 的 `mpp_statistic_sufficiency` 按构建封存配置推导；Python 指标核心不重复实现
-门槛规则，也不逐行保存派生 JSONB。发布与任务编排仍属④。
+门槛规则，也不逐行保存派生 JSONB。构建级批量标记查询位于
+`storage/statistics_sufficiency.sql`，复用该函数一次验证每层门槛，再作类型化比较；
+操作和成本见[统计手册](../../docs/runbooks/baseline-statistics.md#查询门槛结果)。发布与任务编排仍属④。
 
 ## Workflows
 

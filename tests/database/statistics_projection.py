@@ -58,3 +58,5 @@ def verify_sufficiency(v,store,config,snapshot,first_build):
         assert results[first_build]['basic']['required_count']==30 and not results[first_build]['basic']['met']
         assert results[next_build['build_id']]['basic']['required_count']==1 and results[next_build['build_id']]['basic']['met']
     v.require(True,'new snapshot thresholds do not alter historical build ThresholdResult')
+    from database.statistics_batch import verify_batch
+    verify_batch(v,store,config['thresholds'],[first_build,next_build['build_id']])

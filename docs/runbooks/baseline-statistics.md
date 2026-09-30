@@ -49,8 +49,44 @@ WHERE s.build_id = $1 AND s.group_id = $2;
 
 在选定项目 schema 的 search_path 下执行；不要用当前默认配置替换 c.thresholds 或版本。
 返回三项完整 ThresholdResult；未知公式版本明确报 unsupported_statistics_version。
-结果是样本条件标记，是否能用于异常判断仍受统计契约限制。大范围查询会逐行推导，
-优先按构建与分组选择所需统计。
+结果是样本条件标记，是否能用于异常判断仍受统计契约限制。
+
+全构建聚合使用[批量规范 SQL](../../sql_apm/storage/statistics_sufficiency.sql)。每次只绑定一个
+`build_id`；查询从该 Build 一次取封存配置，返回 partition_id、build_id、group_id、layer、
+bucket_date、bucket_number 和 basic_met／p95_met／p99_met。在项目 schema 的 search_path 下，
+例如已有 psycopg2 游标 `cur` 和所选 `build_id` 时：
+
+```python
+from pathlib import Path
+
+batch_sql = Path("sql_apm/storage/statistics_sufficiency.sql").read_text()
+cur.execute("""
+    SELECT layer, count(*), count(*) FILTER (WHERE basic_met),
+           count(*) FILTER (WHERE p95_met), count(*) FILTER (WHERE p99_met)
+    FROM (""" + batch_sql + """) result GROUP BY layer ORDER BY layer
+""", {"build_id": build_id})
+distribution = cur.fetchall()
+```
+
+在仓库根目录运行该示例；SQL 文本来自仓库固定资源，Build ID 始终通过驱动绑定。
+批量路径只返回三个达标标记；明细及不足原因仍用上面的完整函数。
+普通批量汇总无需先取回所有统计行到 Python。不存在的 Build 返回空集；空集本身不代表构建成功。
+
+成本测量命令只创建合成数据与私有 PG17，不连接现有服务；输出文件必须不存在：
+
+```bash
+.venv/bin/python scripts/db/benchmark_statistics_sufficiency.py \
+  --output var/statistics-query-cost.json
+```
+
+默认 60,000 组、五次交替重复测量，测前预热；逐行核对批量标记与完整函数，
+并测量 2,000 组明细查询。准备数据、并发、分区遍历不计入查询计时。
+原 `verify_statistics_full.py` 的聚合继续使用完整函数作为验收参考，成本高于这里的批量路径。
+本机热缓存 measured：834,999 行聚合，完整函数五次中位数 9,116.744 ms，
+批量路径 240.039 ms（约 38 倍）；单组完整结果查询的每轮均值中位数 0.349 ms。
+按相同行成本线性 modeled 至 120 的 5,850,925 行，分别约 63.9 秒与 1.68 秒；
+这些外推不包含生产 I/O、并发或数据分布变化。
+实测和外推边界见[R2 整改报告](../reports/baseline-statistics-r2-remediation-2026-10-01.md)。
 
 ## 失败与重新计算
 

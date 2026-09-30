@@ -76,6 +76,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [统计 R2 整改](reports/baseline-statistics-r2-remediation-2026-10-01.md) | 整改验证报告 | 批量门槛查询一致性、单组／聚合实测与统计容量接受同步。 |
 | [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
 | [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |
 | [类别别名验证](reports/training-category-aliases-2026-09-30.md) | 实施验证报告 | 三个别名、快照兼容及 55 文件执行级差分。 |

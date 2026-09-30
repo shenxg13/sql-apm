@@ -46,9 +46,24 @@ included_count bigint, active_dates date[], active_week_starts date[])` 返回 b
 未来新增版本须保留旧版本分支，以免历史构建被新规则重解释。
 [手册](../runbooks/baseline-statistics.md#查询门槛结果)提供规范关联示例。
 
-推导有查询 CPU 成本；按构建／分组过滤后仅投影需要的结果，全量分布验收每行调用一次。
-不另建永久缓存或物化视图。独立 Python oracle 只在 tests，验证全部字段和原因，
-包括新快照门槛变化后旧 Build 仍按原门槛解释。函数定义及属性进入 catalog 漂移检查。
+单组明细按构建／分组过滤后调用完整函数。全构建的 basic／P95／P99 达标分布使用
+[批量规范 SQL](../../sql_apm/storage/statistics_sufficiency.sql)，返回统计自然键与三个布尔 `met`。
+`selected_build` 物化一次 Build 的封存配置，`validated` 每层调用一次完整函数（五层共五次），
+复用相同的版本分派和门槛校验；`limits` 一次解出类型化门槛。随后按 Build ID 与 partition_id
+限定统计行，比较 included_count 与对应活跃日／周数量，不逐行构造完整 JSONB。
+门槛使用 numeric，保留配置允许的超出 bigint 范围的非负整数，不额外收窄覆盖参数的合法范围。
+
+这是只读查询，不新增表、数据库函数或结构版本。需要门槛详情和原因时继续调用完整函数；
+不另建永久缓存或物化视图。原全量验收脚本保留逐行完整函数作为参考路径，供旧验收证据复现；
+它不是面向聚合调用方的推荐路径。独立 Python oracle 只在 tests，验证全部字段和原因，
+包括新快照门槛变化后旧 Build 仍按原门槛解释；批量路径另逐行核对三个标记及边界。
+完整函数定义及属性继续进入 catalog 漂移检查。
+
+本机热缓存 measured：834,999 行聚合，完整函数五次中位数 9,116.744 ms，
+批量路径 240.039 ms（约 38 倍）；单组完整结果查询的每轮均值中位数 0.349 ms。
+按相同行成本线性 modeled 至 120 的 5,850,925 行，分别约 63.9 秒与 1.68 秒；
+这些外推不包含生产 I/O、并发或数据分布变化。
+两条路径的单组／全构建实测及规模外推见[R2 整改报告](../reports/baseline-statistics-r2-remediation-2026-10-01.md)。
 
 ## 分区与关联
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Synthetic snapshot/statistics acceptance in a disposable PostgreSQL 17."""
-from datetime import datetime,timedelta
 import json
 import os
 from pathlib import Path
@@ -19,7 +18,7 @@ from baseline.oracle import assert_metrics
 from sql_apm.ingestion.config import load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.training import TrainingStore
-from sql_apm.storage.statistics import StatisticsStore,StatisticsError,ResultWriter
+from sql_apm.storage.statistics import StatisticsStore,StatisticsError
 from sql_apm.training.config import validate
 
 

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Explicit 55-file statistics acceptance; local private PG17 and redacted report."""
 import argparse
-from collections import Counter,defaultdict
-from datetime import datetime,timedelta,timezone
+from collections import Counter
+from datetime import timedelta,timezone
 import hashlib
 import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import threading
 import time
 
@@ -20,7 +21,7 @@ from sql_apm.ingestion.config import canonical,identity,load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.training import TrainingStore
 from sql_apm.storage.statistics import StatisticsStore
-from sql_apm.training.config import validate as configuration
+from sql_apm.training.config import DECISION_VERSION, validate as configuration
 
 SEED='20260930'
 TZ=timezone(timedelta(hours=8))
@@ -207,7 +208,13 @@ def sizes(db):
 def validate(dsn,output):
     output.mkdir(parents=True,exist_ok=True)
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
-    report=dict(schema_version='1.4.0',method='measured; private PG17; all 55 files reimported',clusters={})
+    report=dict(schema_version='1.4.0',method='measured; private PG17; all 55 files reimported',clusters={},
+                source_head_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+                normalization_context=training.context,decision_version=DECISION_VERSION)
+    imported=json.loads((output/'import-report.json').read_text())
+    report['input_manifest_sha256']=imported['manifest_sha256']
+    report['import_seconds']=imported['import_seconds']
+    report['input_files']=sum(len(item['files']) for item in imported['first_runs'])
     report['code_sha256']={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted((ROOT/'sql_apm/baseline').glob('*.py'))+[ROOT/'sql_apm/storage/statistics.py',ROOT/'sql_apm/storage/schema.sql',Path(__file__),ROOT/'tests/baseline/oracle.py']}
     def save():
@@ -216,6 +223,7 @@ def validate(dsn,output):
         with store.db,store.db.cursor() as cur:
             cur.execute('SELECT count(*) FROM mpp_occurrence');assert cur.fetchone()[0]==7424804
             cur.execute('SELECT count(*) FROM source_file');assert cur.fetchone()[0]==55
+            cur.execute('SELECT version,script_sha256 FROM schema_version ORDER BY version');report['schema_receipts']=cur.fetchall()
         for scope,cutoff,day in [('119','2026-07-31','2026-07-23'),('120','2026-09-19','2026-09-19')]:
             doc=dict(version=1,clusters=['119','120'],window=dict(cutoff_date=cutoff),templates=[],
                 exclusions=[dict(id='acceptance-interval',cluster=scope,start=day+'T10:00:00+08:00',end=day+'T10:30:00+08:00',reason='temporary acceptance interval')])

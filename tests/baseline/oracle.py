@@ -1,6 +1,5 @@
 """Independent Decimal/reference-library oracle; no product statistics imports."""
 from decimal import Decimal, localcontext
-import math
 import statistics
 
 

@@ -71,3 +71,5 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 每表和每分区精确行数／总大小记录在报告；分区父表大小为所有叶分区总和，不能再与叶表相加。
 内存按一秒采样当前 Python 进程树与私有 PostgreSQL 进程树的 PSS，记录各自及合计峰值；
 它是有采样间隔的 measured 值，不含导入阶段峰值，不等同于进程 RSS 之和。
+
+本次完整实测与验证边界见[统计验证报告](../reports/baseline-statistics-2026-09-30.md)。

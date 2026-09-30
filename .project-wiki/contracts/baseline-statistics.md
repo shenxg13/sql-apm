@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/baseline-statistics.md
 updated: 2026-09-30
 sources:
+  - path: docs/reports/baseline-statistics-2026-09-30.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: .project-wiki/log.md
@@ -445,6 +447,7 @@ confidence: high
 
 ③已实现[统计计算](../../docs/design/baseline-statistics.md)和[快照计算命令](../../docs/runbooks/baseline-statistics.md)。
 数值精度、分区、事务与恢复由实现设计说明；本页的公式、单位、窗口、试行门槛和非自动异常判断边界保持不变。
+[统计验证报告](../../docs/reports/baseline-statistics-2026-09-30.md)记录合成、迁移和 55 文件重导验收；实测结论限于所列输入与环境。
 
 ## Workflows
 

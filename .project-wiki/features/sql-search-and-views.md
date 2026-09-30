@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/sql-search-and-views.md
 updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
     status: current
   - path: .project-wiki/log.md
@@ -158,6 +160,13 @@ confidence: high
   能可靠生成结构指纹的可按 SQL 身份查看历史，只进历史，不参与训练。
 - 不带 SQL 的 FATAL 等保留为批次问题，不构造 SQL 执行；解析器不支持语法不改变执行 outcome。
 - #18 已实现上述明细入库；历史查询服务、展示、训练判定及基线分组构建仍由后续任务交付。
+
+### 历史训练判定的复算边界（2026-09-29）
+
+[Issue #21](https://github.com/shenxg13/sql-apm/issues/21)确认不逐条持久化每次构建的 Decision。
+展示可通过快照、原文级结果和数据库函数取得当前支持规则的逐条结论；判定逻辑改版后，
+旧快照只承诺已保存计数，不承诺逐条复算。历史页面须区分已保存计数与可复算明细，
+不得以当前规则静默填充旧判定；本次仅更新展示约定，未实现界面。
 
 ## Workflows
 

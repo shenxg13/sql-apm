@@ -7,6 +7,8 @@ owners:
   - docs/design/offline-data-contract/
 updated: 2026-09-29
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/17
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/3
@@ -277,11 +279,22 @@ HashData 统计语义。来源改变必须另行确认 profile，不用任意标
 历史 Build 始终引用原解释及规则快照；更换指纹算法与契约格式升级是独立操作。
 当前函数规则 `1.0.1`、字典格式版本 `1` 与本契约 `1.0.0` 不可互相替代。
 
+### Decision 的首期物理实现（2026-09-29）
+
+[Issue #21](https://github.com/shenxg13/sql-apm/issues/21)确认方案 C：Decision 是逻辑结果，
+不要求逐条落库。②独立固定 InputSnapshot／ConfigSnapshot，无需先创建 Build；③／④再引用它们。
+现有 Decision 与 Build 的字段描述用于完整构建交接，不要求②伪造构建 ID。
+首期保存原文与规则版本唯一的类别／模板结果，使用数据库单一函数按需推导事件资格、
+全部原因、八项评估、分组与计数范围。既有 `mpp_decision` 系列表保留但不由②写入。
+判定规则版本变化后，旧快照只保证已保存计数，不保证历史逐条复算；规则和原文依据仍保留。
+这落实既有“派生关系可重建”的物理选择，不改四种状态、原因码、五项分组键或统计口径。
+具体映射见[判定设计](../../docs/design/training-decisions.md)。
+
 ## Workflows
 
 1. 导入阶段先验证来源与完整文件声明，保存清单、定位和尝试结果。
 2. 解释阶段提供可靠事件或问题记录；归一化失败也能如实交接，不能补造训练分组。
-3. 构建阶段固定输入和配置，为每个事件保存决策依据，生成五层完整结果并检查。
+3. ②固定输入和配置、保存原文级决策依据；③／④按需推导事件、生成五层结果并检查。
 4. 发布阶段只切换已检查且已保存的同集群整体版本；查询按版本引用数据。
 5. 后续实现以[字段字典](../../docs/design/offline-data-contract/fields.md)和
    [验证样例](../../docs/design/offline-data-contract/examples.json)作接口设计输入。

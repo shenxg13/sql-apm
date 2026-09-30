@@ -251,6 +251,12 @@ excluded／unresolved 至少一个原因，不删除已知事实；outside_windo
 黑名单有明确命中同时又存在可靠性问题时 state=excluded 仍可保留其他原因；
 仅有可靠性不足而没有明确业务／失败排除时用 unresolved；两者都不参与训练。
 
+首期物理实现由 [Issue #21](https://github.com/shenxg13/sql-apm/issues/21) 确认：
+②固定快照而不创建 Build，以上 Decision 为逻辑投影；build_id／decision_id 在完整构建交接时解释，
+②的数据库函数使用 input_id／config_id 和事件复合引用定位。原文级类别／模板结果按规则版本缓存，
+逐条 Decision 不永久写入。Group 可按五项键和归一化上下文推导不透明身份，③保存统计时再物化。
+判定规则版本变更后仅保证已保存计数，不承诺历史逐条复算；详见[判定设计](../training-decisions.md)。
+
 ### Problem
 
 | 字段 | 类型／条件 | 含义 |
@@ -288,6 +294,11 @@ excluded／unresolved 至少一个原因，不删除已知事实；outside_windo
 样本门槛默认值从[统计要求](../../../.project-wiki/contracts/baseline-statistics.md)引用：
 整体／跨天小时 30、200、1000 且 7 活跃日；逐天只检查数量；逐周加 3 活跃日；
 跨周星期加 4 个有该星期样本的自然周。它们可配置，不能按窗口不够自动降低。
+
+②的 ConfigSnapshot 另记录 `decision_version` 和完整归一化规则／字典内容；
+`blacklist.category_rules`／`template_rules` 的物理 JSON 保留完整边界与模板对象
+（示例 SQL、限定范围、说明及计算出的结构指纹），不只存可变文件路径。
+InputSnapshot 的物理 manifest 固定每文件唯一 Analysis、文件校验和与来源声明；不逐条复制事件。
 
 ### Build
 

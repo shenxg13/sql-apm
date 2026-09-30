@@ -170,3 +170,20 @@
 - 按 R2-F001 细化[导入异常实现](features/log-ingestion.md#首期导入实现issue-18)：
   单输入新进程重试一次，重复失败按记录隔离，启动／发送失败仍回滚文件。
 - 同步残余风险与[回放证据](../docs/reports/log-ingestion-r2-remediation-2026-09-29.md)，已确认范围未变。
+
+## 2026-09-29：训练样本判定与快照
+
+- [Issue #21](https://github.com/shenxg13/sql-apm/issues/21)确认模板结构匹配、五类计时适用、
+  ②的快照归属和方案 C；更新[训练资格](contracts/training-eligibility.md)、
+  [构建与版本](features/baseline-versions.md)及[逻辑契约](contracts/offline-data-contract.md)。
+- 同步训练资格主题中的实现状态，保留统计、展示及构建发布的后续边界。
+- 首期拆分与历史逐条复算边界纳入对应主题；结构 1.3.0、命令和实现边界见
+  [判定设计](../docs/design/training-decisions.md)和[操作说明](../docs/runbooks/training-decisions.md)。
+- 验证证据见[判定报告](../docs/reports/training-decisions-2026-09-29.md)；未改变原始需求、
+  归一化规则或已发布历史报告，统计与构建发布仍留在③／④。
+
+## 2026-09-30：训练判定 R1 整改
+
+- 同步已确认的[事务特征参数名暂缓边界](contracts/training-eligibility.md#事务特征设置的补充确认2026-09-30)及类别 v2，保留 2026-09-26 历史确认。
+- 记录用户接受模板变更后的缓存成本，见[操作说明](../docs/runbooks/training-decisions.md)；
+  [整改验证](../docs/reports/training-decisions-r1-remediation-2026-09-30.md)保留回归及真实输入影响证据。

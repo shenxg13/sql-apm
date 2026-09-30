@@ -1,0 +1,805 @@
+{
+  "clusters": {
+    "119": {
+      "complete_digest_equal": true,
+      "complete_first": {
+        "count": 2848835,
+        "hash_sums": [
+          "938742799269084196492",
+          "-3126760534648296785660",
+          "-9147497151494561972400",
+          "2221665057295326545399"
+        ],
+        "seconds": 246.795
+      },
+      "complete_repeat": {
+        "count": 2848835,
+        "hash_sums": [
+          "938742799269084196492",
+          "-3126760534648296785660",
+          "-9147497151494561972400",
+          "2221665057295326545399"
+        ],
+        "seconds": 243.973
+      },
+      "first": {
+        "categories": [
+          [
+            "ALTER TABLE",
+            "mixed",
+            2
+          ],
+          [
+            "ALTER TABLE",
+            "pure",
+            12376
+          ],
+          [
+            "ANALYZE",
+            "pure",
+            17233
+          ],
+          [
+            "BEGIN",
+            "mixed",
+            1200
+          ],
+          [
+            "BEGIN",
+            "pure",
+            62551
+          ],
+          [
+            "COMMIT",
+            "pure",
+            45604
+          ],
+          [
+            "SET",
+            "mixed",
+            29228
+          ],
+          [
+            "SET",
+            "pure",
+            702421
+          ],
+          [
+            "VACUUM",
+            "pure",
+            1722
+          ]
+        ],
+        "clusters": [
+          [
+            "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+            2848835
+          ]
+        ],
+        "config_id": "CS:cf5770cb1c8c49efbce2a977c5753eed",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            828725
+          ],
+          [
+            "group",
+            "included",
+            1888675
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "derive_seconds": 209.232,
+        "group_summary_rows": 71350,
+        "group_summary_sha256": "3d90890f6587b9ad6e5aab8e11e40982d9c8574647362c8c16131a83de162d81",
+        "input_id": "IS:aa10adcd5cb644baa15f16ca40e3ab0f",
+        "intervals": [
+          [
+            "rule:8ae27a4d1e7f324bd49fda77ff0679943a831f53cdd38aeba64c0cc66210e728",
+            2251
+          ]
+        ],
+        "reasons": [
+          [
+            "association_unreliable",
+            "unresolved",
+            1
+          ],
+          [
+            "blacklist_category",
+            "excluded",
+            827292
+          ],
+          [
+            "blacklist_category",
+            "outside_window",
+            14615
+          ],
+          [
+            "duration_unknown",
+            "excluded",
+            21973
+          ],
+          [
+            "excluded_interval",
+            "excluded",
+            2251
+          ],
+          [
+            "execution_cancelled",
+            "excluded",
+            36
+          ],
+          [
+            "execution_failed",
+            "excluded",
+            21893
+          ],
+          [
+            "execution_timed_out",
+            "excluded",
+            44
+          ],
+          [
+            "outside_window",
+            "outside_window",
+            55808
+          ],
+          [
+            "sql_incomplete",
+            "excluded",
+            4
+          ],
+          [
+            "sql_missing",
+            "excluded",
+            64
+          ],
+          [
+            "sql_missing",
+            "outside_window",
+            1282
+          ],
+          [
+            "sql_missing",
+            "unresolved",
+            31805
+          ],
+          [
+            "sql_uncertain",
+            "excluded",
+            27
+          ],
+          [
+            "sql_uncertain",
+            "outside_window",
+            690
+          ],
+          [
+            "sql_uncertain",
+            "unresolved",
+            21784
+          ],
+          [
+            "start_unknown",
+            "excluded",
+            21973
+          ],
+          [
+            "timing_unknown",
+            "excluded",
+            21973
+          ],
+          [
+            "timing_unknown",
+            "unresolved",
+            1
+          ]
+        ],
+        "states": [
+          [
+            "excluded",
+            850762
+          ],
+          [
+            "included",
+            1888675
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "templates": [],
+        "timings": [
+          [
+            "bind",
+            "excluded",
+            220714
+          ],
+          [
+            "bind",
+            "included",
+            425394
+          ],
+          [
+            "bind",
+            "outside_window",
+            12799
+          ],
+          [
+            "bind",
+            "unresolved",
+            22390
+          ],
+          [
+            "execute_fetch",
+            "excluded",
+            5
+          ],
+          [
+            "execute_fetch",
+            "included",
+            12403
+          ],
+          [
+            "execute_fetch",
+            "outside_window",
+            1329
+          ],
+          [
+            "execute_first",
+            "excluded",
+            220673
+          ],
+          [
+            "execute_first",
+            "included",
+            425339
+          ],
+          [
+            "execute_first",
+            "outside_window",
+            11715
+          ],
+          [
+            "parse",
+            "excluded",
+            211722
+          ],
+          [
+            "parse",
+            "included",
+            421753
+          ],
+          [
+            "parse",
+            "outside_window",
+            11633
+          ],
+          [
+            "parse",
+            "unresolved",
+            9415
+          ],
+          [
+            "request",
+            "excluded",
+            175675
+          ],
+          [
+            "request",
+            "included",
+            603786
+          ],
+          [
+            "request",
+            "outside_window",
+            18332
+          ],
+          [
+            "request",
+            "unresolved",
+            21784
+          ],
+          [
+            "unknown",
+            "excluded",
+            21973
+          ],
+          [
+            "unknown",
+            "unresolved",
+            1
+          ]
+        ],
+        "total_seconds": 214.898
+      },
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 228429,
+          "seconds": 66.601
+        },
+        "config_id": "CS:cf5770cb1c8c49efbce2a977c5753eed",
+        "input_id": "IS:aa10adcd5cb644baa15f16ca40e3ab0f",
+        "rule_id": "TR:1c2b3aed38cca9b07f3d0d96b02aff901bc5845f77948f663d773ee0b7665acd"
+      }
+    },
+    "120": {
+      "complete_digest_equal": true,
+      "complete_first": {
+        "count": 4575969,
+        "hash_sums": [
+          "16967921847464267232199",
+          "13704045166798472242880",
+          "17652399751177468685486",
+          "8886055758938089054922"
+        ],
+        "seconds": 378.572
+      },
+      "complete_repeat": {
+        "count": 4575969,
+        "hash_sums": [
+          "16967921847464267232199",
+          "13704045166798472242880",
+          "17652399751177468685486",
+          "8886055758938089054922"
+        ],
+        "seconds": 129.555
+      },
+      "first": {
+        "categories": [
+          [
+            "ALTER TABLE",
+            "mixed",
+            3087
+          ],
+          [
+            "ALTER TABLE",
+            "pure",
+            13500
+          ],
+          [
+            "ANALYZE",
+            "mixed",
+            1512
+          ],
+          [
+            "ANALYZE",
+            "pure",
+            38178
+          ],
+          [
+            "BEGIN",
+            "mixed",
+            3159
+          ],
+          [
+            "BEGIN",
+            "pure",
+            238748
+          ],
+          [
+            "COMMIT",
+            "mixed",
+            6963
+          ],
+          [
+            "COMMIT",
+            "pure",
+            160508
+          ],
+          [
+            "CREATE INDEX",
+            "pure",
+            14
+          ],
+          [
+            "SET",
+            "mixed",
+            69467
+          ],
+          [
+            "SET",
+            "pure",
+            410158
+          ],
+          [
+            "VACUUM",
+            "pure",
+            15215
+          ]
+        ],
+        "clusters": [
+          [
+            "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            4575969
+          ]
+        ],
+        "config_id": "CS:3f71b34a3b524ca4867642085a4a45a0",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            879895
+          ],
+          [
+            "group",
+            "included",
+            3561993
+          ]
+        ],
+        "derive_seconds": 356.058,
+        "group_summary_rows": 908736,
+        "group_summary_sha256": "08053975e7ff9e13912f56cc3537c8af1e5f023ecc9fd80cea5a854408f45fde",
+        "input_id": "IS:1d4fc4c1f6e14cb98e7323cda4913532",
+        "intervals": [
+          [
+            "rule:8ae27a4d1e7f324bd49fda77ff0679943a831f53cdd38aeba64c0cc66210e728",
+            5124
+          ]
+        ],
+        "reasons": [
+          [
+            "association_unreliable",
+            "unresolved",
+            245
+          ],
+          [
+            "blacklist_category",
+            "excluded",
+            876314
+          ],
+          [
+            "duration_unknown",
+            "excluded",
+            35466
+          ],
+          [
+            "excluded_interval",
+            "excluded",
+            5124
+          ],
+          [
+            "execution_cancelled",
+            "excluded",
+            54
+          ],
+          [
+            "execution_failed",
+            "excluded",
+            35392
+          ],
+          [
+            "execution_timed_out",
+            "excluded",
+            20
+          ],
+          [
+            "sql_encoding_invalid",
+            "unresolved",
+            20
+          ],
+          [
+            "sql_incomplete",
+            "excluded",
+            74
+          ],
+          [
+            "sql_incomplete",
+            "unresolved",
+            819
+          ],
+          [
+            "sql_missing",
+            "unresolved",
+            30204
+          ],
+          [
+            "sql_uncertain",
+            "excluded",
+            1169
+          ],
+          [
+            "sql_uncertain",
+            "unresolved",
+            67472
+          ],
+          [
+            "start_unknown",
+            "excluded",
+            35466
+          ],
+          [
+            "timing_unknown",
+            "excluded",
+            35466
+          ],
+          [
+            "timing_unknown",
+            "unresolved",
+            245
+          ]
+        ],
+        "states": [
+          [
+            "excluded",
+            915429
+          ],
+          [
+            "included",
+            3561993
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "templates": [],
+        "timings": [
+          [
+            "bind",
+            "excluded",
+            154787
+          ],
+          [
+            "bind",
+            "included",
+            621780
+          ],
+          [
+            "bind",
+            "unresolved",
+            27649
+          ],
+          [
+            "execute_fetch",
+            "included",
+            318
+          ],
+          [
+            "execute_first",
+            "excluded",
+            154787
+          ],
+          [
+            "execute_first",
+            "included",
+            621711
+          ],
+          [
+            "execute_first",
+            "unresolved",
+            40
+          ],
+          [
+            "parse",
+            "excluded",
+            106973
+          ],
+          [
+            "parse",
+            "included",
+            505734
+          ],
+          [
+            "parse",
+            "unresolved",
+            3061
+          ],
+          [
+            "request",
+            "excluded",
+            463416
+          ],
+          [
+            "request",
+            "included",
+            1812450
+          ],
+          [
+            "request",
+            "unresolved",
+            67552
+          ],
+          [
+            "unknown",
+            "excluded",
+            35466
+          ],
+          [
+            "unknown",
+            "unresolved",
+            245
+          ]
+        ],
+        "total_seconds": 369.386
+      },
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 1155798,
+          "seconds": 523.652
+        },
+        "config_id": "CS:3f71b34a3b524ca4867642085a4a45a0",
+        "input_id": "IS:1d4fc4c1f6e14cb98e7323cda4913532",
+        "rule_id": "TR:1c2b3aed38cca9b07f3d0d96b02aff901bc5845f77948f663d773ee0b7665acd"
+      }
+    }
+  },
+  "code_sha256": {
+    "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+    "sql_apm/storage/ingestion.py": "415754b8297c45ebeea286a0f69bc7036dcadd88f30ac66b5ff2939543d1b964",
+    "sql_apm/storage/schema.sql": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb",
+    "sql_apm/storage/training.py": "e6e8b87f132ede195214750f7885fb671ffcdb38072e5031a3b901c7de4c9f32",
+    "sql_apm/training/__init__.py": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+    "sql_apm/training/categories.py": "7c9bac6463b4d3327952d5df19b214fb86f88dbaf09de21346b8726988619926",
+    "sql_apm/training/config.py": "68047d0a0d7ff93c4a2c2e4f235215672e36f0ccacf11b28779b0f9113ca5817"
+  },
+  "complete": true,
+  "decision_version": "training-decision/1",
+  "import_batches": [
+    {
+      "added_occurrences": 2848835,
+      "added_records": 5728640,
+      "cluster": "119",
+      "file_count": 30,
+      "file_states": {
+        "succeeded": 30
+      },
+      "state": "complete"
+    },
+    {
+      "added_occurrences": 4575969,
+      "added_records": 10661506,
+      "cluster": "120",
+      "file_count": 25,
+      "file_states": {
+        "succeeded": 25
+      },
+      "state": "complete"
+    }
+  ],
+  "import_schema_version": "1.3.0",
+  "import_seconds": 3639.9,
+  "manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "method": "private PostgreSQL 17; product importer; original cache and SQL derivation; measured",
+  "normalization_context": {
+    "algorithm_version": "sql-normalization/5",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter/9",
+    "profile": "hashdata-pg94",
+    "rules_digest": "00a3d088002566d01a3bbf9aff64619452116c7a8dcf32a6ae4b489342c46a58",
+    "rules_ref": "sha256:cb1e23a966095b526c9c337b2125f65d3521692c473796b179fb038f4f400528"
+  },
+  "occurrences": [
+    [
+      7424804
+    ]
+  ],
+  "outcomes": [
+    [
+      "cancelled",
+      90
+    ],
+    [
+      "failed",
+      57285
+    ],
+    [
+      "success",
+      7367365
+    ],
+    [
+      "timed_out",
+      64
+    ]
+  ],
+  "persistent_counts": {
+    "builds": 0,
+    "decisions": 0,
+    "original_results": 1384227
+  },
+  "previous_sql_states": {
+    "complete": 7269390,
+    "incomplete": 897,
+    "invalid_encoding": 20,
+    "missing": 63355,
+    "uncertain": 91142
+  },
+  "prior_attempt": {
+    "import_seconds": 3600.925,
+    "occurrences": 7424804,
+    "reason": "stale_process_schema_1_2_0_connection_check_after_upgrade",
+    "result": "failed_before_training_validation",
+    "temporary_instance_removed": true
+  },
+  "reason_totals": {
+    "association_unreliable": 246,
+    "blacklist_category": 1718221,
+    "duration_unknown": 57439,
+    "excluded_interval": 7375,
+    "execution_cancelled": 90,
+    "execution_failed": 57285,
+    "execution_timed_out": 64,
+    "outside_window": 55808,
+    "sql_encoding_invalid": 20,
+    "sql_incomplete": 897,
+    "sql_missing": 63355,
+    "sql_uncertain": 91142,
+    "start_unknown": 57439,
+    "timing_unknown": 57685
+  },
+  "relation_bytes": {
+    "config_snapshot": 65536,
+    "input_file_analysis": 65536,
+    "input_manifest": 114688,
+    "input_snapshot": 49152,
+    "mpp_training_rule": 147456,
+    "mpp_training_sql": 719634432,
+    "training_config": 32768
+  },
+  "schema_version": "1.3.0",
+  "sql_states": [
+    [
+      "complete",
+      7269390
+    ],
+    [
+      "incomplete",
+      897
+    ],
+    [
+      "invalid_encoding",
+      20
+    ],
+    [
+      "missing",
+      63355
+    ],
+    [
+      "uncertain",
+      91142
+    ]
+  ],
+  "sql_texts": [
+    [
+      1385776
+    ]
+  ],
+  "verification_code_sha256": {
+    "scripts/db/verify_training.py": "845c2f7cd1351d3879d05154bd6373086a71f64124927422959cb967de2e2f19",
+    "scripts/db/verify_training_full.py": "e3344a70c9ccd2808818a197846dcdc05f67013b240ee422d0f40e7e81abd652"
+  }
+}

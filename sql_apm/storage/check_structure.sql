@@ -13,11 +13,9 @@ BEGIN
             RAISE EXCEPTION 'incompatible object: %, differing catalog fields: %', obj.object_name, mismatch;
         END IF;
     END LOOP;
-    IF EXISTS (SELECT FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-               WHERE n.nspname=current_setting('apm.schema'))
-        OR EXISTS (SELECT FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace
+    IF EXISTS (SELECT FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace
                    WHERE n.nspname=current_setting('apm.schema') AND t.typtype IN ('d','e','r','m')) THEN
-        RAISE EXCEPTION 'unexpected function or custom type in managed schema';
+        RAISE EXCEPTION 'unexpected custom type in managed schema';
     END IF;
     IF current_setting('apm.require_complete')='true' AND EXISTS (
         SELECT object_name FROM pg_temp.expected_structure

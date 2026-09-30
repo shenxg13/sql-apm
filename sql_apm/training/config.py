@@ -1,0 +1,95 @@
+"""Local JSON configuration, validated before database writes or SQL parsing."""
+from copy import deepcopy
+from datetime import date, datetime, time, timedelta, timezone
+import json
+from pathlib import Path
+
+from sql_apm.ingestion.config import required_string
+
+DECISION_VERSION = 'training-decision/1'
+TZ = timezone(timedelta(hours=8))
+THRESHOLDS = {layer: dict(basic_count=30, p95_count=200, p99_count=1000,
+                        coverage_kind=kind, coverage_min=minimum)
+              for layer, kind, minimum in [('overall', 'active_days', 7), ('day', 'none', 0),
+                                          ('week', 'active_days', 3), ('weekday', 'active_weeks', 4),
+                                          ('hour', 'active_days', 7)]}
+
+
+class TrainingError(ValueError):
+    """Fixed public code, never user configuration or driver exception text."""
+
+
+def unique(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise TrainingError('duplicate_config_key')
+        result[key] = value
+    return result
+
+
+def load_config(path, cluster):
+    try:
+        document = json.loads(Path(path).read_text(), object_pairs_hook=unique)
+        return validate(document, cluster)
+    except TrainingError:
+        raise
+    except (OSError, ValueError, TypeError, KeyError, OverflowError):
+        raise TrainingError('invalid_training_config') from None
+
+
+def validate(document, cluster):
+    try:
+        if type(document['version']) is not int or document['version'] != 1:
+            raise TrainingError('training_config_version')
+        if set(document) - {'version', 'clusters', 'window', 'templates', 'exclusions'}:
+            raise TrainingError('unknown_config_key')
+        clusters = document['clusters']
+        if not isinstance(clusters, list) or not clusters or not all(required_string(c) for c in clusters) or len(set(clusters)) != len(clusters):
+            raise TrainingError('invalid_cluster')
+        if cluster not in clusters:
+            raise TrainingError('unknown_cluster')
+        window = document['window']
+        cutoff = date.fromisoformat(window['cutoff_date'])
+        days = window.get('days', 30)
+        if set(window) - {'cutoff_date', 'days'} or cutoff.isoformat() != window['cutoff_date'] or type(days) is not int or days <= 0:
+            raise TrainingError('invalid_window')
+        start = datetime.combine(cutoff-timedelta(days=days-1), time(), TZ)
+        end = datetime.combine(cutoff+timedelta(days=1), time(), TZ)
+        templates, exclusions = document.get('templates', []), document.get('exclusions', [])
+        if not isinstance(templates, list) or not isinstance(exclusions, list):
+            raise TrainingError('invalid_rule_list')
+        ids = set()
+        for item in templates:
+            if set(item)-{'id', 'sql', 'cluster', 'database', 'execution_user', 'description'}:
+                raise TrainingError('unknown_template_key')
+            if not all(required_string(item[k]) for k in ('id', 'sql', 'description')):
+                raise TrainingError('invalid_template')
+            if any(not required_string(item[k]) for k in ('cluster', 'database', 'execution_user') if k in item):
+                raise TrainingError('invalid_template_scope')
+            if 'cluster' in item and item['cluster'] not in clusters:
+                raise TrainingError('unknown_cluster')
+            if item['id'] in ids:
+                raise TrainingError('duplicate_rule_id')
+            ids.add(item['id'])
+        intervals = []
+        for item in exclusions:
+            if set(item) != {'id', 'cluster', 'start', 'end', 'reason'} or not all(required_string(item[k]) for k in item):
+                raise TrainingError('invalid_exclusion')
+            if item['cluster'] not in clusters:
+                raise TrainingError('unknown_cluster')
+            a, b = datetime.fromisoformat(item['start']), datetime.fromisoformat(item['end'])
+            if a.utcoffset() != timedelta(hours=8) or b.utcoffset() != timedelta(hours=8) or a >= b:
+                raise TrainingError('invalid_exclusion_interval')
+            if item['id'] in ids:
+                raise TrainingError('duplicate_rule_id')
+            ids.add(item['id'])
+            intervals.append(dict(rule_id=item['id'], scope_id=item['cluster'], start=a.isoformat(),
+                                  end=b.isoformat(), reason=item['reason']))
+        return dict(scope_id=cluster, cutoff_date=cutoff.isoformat(), window_days=days,
+                    window_start=start.isoformat(), window_end=end.isoformat(), templates=deepcopy(templates),
+                    exclusions=intervals, thresholds=deepcopy(THRESHOLDS))
+    except TrainingError:
+        raise
+    except (ValueError, KeyError, TypeError, OverflowError):
+        raise TrainingError('invalid_training_config') from None

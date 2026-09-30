@@ -120,6 +120,8 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 两张新增表为 mpp_result_partition 和 mpp_build_group。Build 增加 partition_id 与 diagnostics，
 后者保存按状态、计数范围和原因的脱敏计数，包括无法归组的批次层面事实。
 [冻结的 1.3.0 DDL](../../sql_apm/storage/versions/1.3.0.sql)保留已发布字节。
+2026-09-30 范围变更取消物理 sufficiency；schema 及有效的 1.3.0→1.4.0 迁移同步使用新目标定义。
+当前没有生产部署且 1.4.0 尚未发布，版本号不再递增；早期验收实例不作为兼容升级起点。
 
 ## 训练判定结构 1.3.0
 
@@ -191,9 +193,11 @@ SQL 完整内容保存为 text，content_sha256 为 32 字节 SHA-256；CHECK �
 
 一行对应 Build × Group × Bucket，17 项指标各自为普通 numeric 列；
 空值原因在 metric_null_reasons 中，排除原因计数在 exclusions_by_reason 中。
-basic/P95/P99 三项门槛结果在 sufficiency 中，保存实际／要求数量、覆盖类型与数量、
-met 和 reasons。CHECK 校验必需字段、数量、覆盖、met 与当前统计一致；
-完整理由集合、配置对应及指标公式由业务计算器复核。
+basic/P95/P99 三项门槛结果为逻辑 sufficiency，不再逐行保存物理 JSONB，相关三个 CHECK 随列删除。
+`mpp_statistic_sufficiency` 按 Build 引用的封存 ConfigSnapshot 的 thresholds／statistics_version，
+以及当前行的层次、数量与覆盖数组，派生全部实际／要求数量、覆盖类型、met 和完整 reasons。
+函数显式识别公式版本，不以当前默认门槛解释旧构建；字段语义及查询示例见
+[统计设计](baseline-statistics.md#门槛结果的数据库派生)。指标公式仍由③计算器实现并独立复算。
 
 Bucket 使用 layer、bucket_date、bucket_number；overall 两键都 NULL，
 day/week 只用日期（week 要求周一），weekday/hour 只用整数（1–7／0–23）。
@@ -238,7 +242,7 @@ statistics_migration_requires_empty_results；没有任何自动清理或丢弃�
 | 完整 SQL 与 sql_id 同时存在、计时单位与类别、Execute 未配对不能标首取／续取 | SQL 完整性、结果成功证据、可靠配对，证据必需列表非空且归属正确 |
 | 数值有限且非负，未知量有原因，时间／状态的行内一致性 | 推算开始精确减法及精度接收、窗口归属、排除时段相交、黑名单与资格规则 |
 | 构建与配置／输入引用、决策原因同 code 去重、评估值枚举 | 快照和旧解释不可变；规则内容可解析；included 全部资格可靠且无排除原因 |
-| 统计桶合法、唯一，17 指标及空值原因、分位数顺序、门槛结果基本一致 | 17 公式、全窗口计算、活跃日期／周去重和正确归属、排除数量及完整理由集合 |
+| 统计桶合法、唯一，17 指标及空值原因、分位数顺序；函数按指定版本派生完整门槛结果 | 17 公式、全窗口计算、活跃日期／周去重和正确归属、排除数量；查询绑定原构建配置 |
 | 当前指针只引用匹配集群、版本、时间的成功发布记录 | 发布前检查全部结果完整保存、五类覆盖齐全、非空样本、失败保持旧指针；事务原子切换 |
 | 历史引用默认 NO ACTION，不级联删除业务记录 | 保留历史、同集群任务串行、忙时拒绝及崩溃恢复；暂不自动清理 |
 

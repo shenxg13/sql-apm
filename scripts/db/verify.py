@@ -144,8 +144,8 @@ class Verification:
         self.sql("INSERT INTO scope VALUES ('CL2','hashdata','hashdata-csv/1','1.0.0')")
         self.rejects("UPDATE mpp_decision SET scope_id='CL2'", "cross-cluster build references rejected")
 
-        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{basic,met}','true') WHERE layer='overall'", "false sufficiency claim rejected")
-        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{p95,actual_count}','99') WHERE layer='overall'", "threshold sample count must match mpp_statistic")
+        self.require(self.sql("SELECT count(*) FROM information_schema.columns WHERE table_schema='sql_apm' AND table_name='mpp_statistic' AND column_name='sufficiency'")=='0', "sufficiency is derived, not a physical column")
+        self.require(self.sql("SELECT (mpp_statistic_sufficiency(c.statistics_version,c.thresholds,s.layer,s.included_count,s.active_dates,s.active_week_starts)->'basic'->>'actual_count')::bigint=s.included_count FROM mpp_statistic s JOIN build b USING(build_id) JOIN config_snapshot c USING(config_id) WHERE layer='overall'")=='t', "derived threshold count uses statistic and build snapshot")
         self.rejects("UPDATE mpp_decision SET rule_evaluations=jsonb_set(rule_evaluations,'{window}','null')", "unknown rule evaluation rejected")
         self.rejects("UPDATE mpp_sql_text SET content_sha256=decode(repeat('00',32),'hex')", "SQL content checksum mismatch rejected")
         stat = json.loads(self.sql("SELECT row_to_json(s) FROM mpp_statistic s WHERE layer='day'"))
@@ -157,9 +157,6 @@ class Verification:
                     exclusions_by_reason={"duration_unknown": 1}, active_dates=[], active_week_starts=[],
                     first_sample_at=None, last_sample_at=None,
                     metric_null_reasons={m: "no_samples" for m in metric_names})
-        for result in stat["sufficiency"].values():
-            result["actual_count"] = 0
-            result["actual_coverage"] = 0
         payload = json.dumps(stat).replace("'", "''")
         self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT included_count=0 AND excluded_count=1 AND mean_ms IS NULL FROM mpp_statistic WHERE layer='day' AND bucket_date='2026-09-22'; ROLLBACK") == "t",
                      "zero samples with exclusions stored explicitly; all 17 metrics carry no_samples")
@@ -169,8 +166,6 @@ class Verification:
                     metric_null_reasons={m: "zero_denominator" for m in ("cv","p95_p50","p99_p50")})
         for metric in metric_names:
             stat[metric] = None if metric in stat["metric_null_reasons"] else 0
-        for result in stat["sufficiency"].values():
-            result["actual_count"] = 1
         payload = json.dumps(stat).replace("'", "''")
         self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT mean_ms=0 AND cv IS NULL FROM mpp_statistic WHERE layer='day' AND bucket_date='2026-09-22'; ROLLBACK") == "t",
                      "zero duration metrics and zero denominator reasons remain distinct")

@@ -18,7 +18,8 @@
 可指定 `--schema`；必须使用同集群的封存快照。未封存、跨集群、未知公式版本、
 缺少相应原文缓存的输入不能完成计算。命令不执行发布检查或切换当前版本。
 
-每次开始生成带北京时间日期前缀和随机部分的不透明 Build ID；自动创建该集群当前月份的
+每次开始从数据库时钟取得 started_at，据此生成带北京时间日期前缀和随机部分的不透明 Build ID；
+自动创建该集群对应月份的
 统计和覆盖分区，无需提前按月运维。月份由构建开始时间决定，不由日志日期或训练窗口决定。
 同一月份所有构建共享分区，层次与计时类别不拆表。空月无构建时不预建。
 
@@ -29,6 +30,27 @@ results_saved=true 表示提交成功。各层行数、计时类别计数、判�
 
 退出码：成功 0，配置／计算／保存失败 1，Ctrl-C 或 SIGTERM 130。
 单组不足仍保存全部可计算指标；有排除的空样本桶保存 NULL/no_samples；完全空桶进入 empty_keys。
+
+## 查询门槛结果
+
+门槛不作为物理 JSONB 列重复保存。使用 Build 的封存配置，示例中的参数由调用方绑定：
+
+```sql
+SELECT s.build_id, s.group_id, s.layer, s.bucket_date, s.bucket_number,
+       mpp_statistic_sufficiency(
+         c.statistics_version, c.thresholds, s.layer, s.included_count,
+         s.active_dates, s.active_week_starts
+       ) AS sufficiency
+FROM mpp_statistic s
+JOIN build b USING (build_id)
+JOIN config_snapshot c USING (config_id)
+WHERE s.build_id = $1 AND s.group_id = $2;
+```
+
+在选定项目 schema 的 search_path 下执行；不要用当前默认配置替换 c.thresholds 或版本。
+返回三项完整 ThresholdResult；未知公式版本明确报 unsupported_statistics_version。
+结果是样本条件标记，是否能用于异常判断仍受统计契约限制。大范围查询会逐行推导，
+优先按构建与分组选择所需统计。
 
 ## 失败与重新计算
 
@@ -72,4 +94,4 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 内存按一秒采样当前 Python 进程树与私有 PostgreSQL 进程树的 PSS，记录各自及合计峰值；
 它是有采样间隔的 measured 值，不含导入阶段峰值，不等同于进程 RSS 之和。
 
-本次完整实测与验证边界见[统计验证报告](../reports/baseline-statistics-2026-09-30.md)。
+范围变更前的完整实测与验证边界见[历史统计验证报告](../reports/baseline-statistics-2026-09-30.md)。

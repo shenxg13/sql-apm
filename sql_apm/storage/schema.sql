@@ -493,7 +493,6 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
     p95_p50 numeric CHECK (p95_p50 >= 0 AND p95_p50 NOT IN ('NaN','Infinity','-Infinity')),
     p99_p50 numeric CHECK (p99_p50 >= 0 AND p99_p50 NOT IN ('NaN','Infinity','-Infinity')),
     metric_null_reasons jsonb NOT NULL CHECK (jsonb_typeof(metric_null_reasons) = 'object'),
-    sufficiency jsonb NOT NULL CHECK (jsonb_typeof(sufficiency) = 'object' AND sufficiency ?& ARRAY['basic','p95','p99']),
     FOREIGN KEY (partition_id, build_id, group_id) REFERENCES mpp_build_group (partition_id, build_id, group_id),
     UNIQUE NULLS NOT DISTINCT (partition_id, build_id, group_id, layer, bucket_date, bucket_number),
     CHECK (range_start < range_end),
@@ -563,75 +562,6 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
             AND ((included_count = 0) = (metric_null_reasons->>'p99_p50' = 'no_samples')))),
     CHECK (min_ms <= p25_ms AND p25_ms <= p50_ms AND p50_ms <= p75_ms
         AND p75_ms <= p90_ms AND p90_ms <= p95_ms AND p95_ms <= p99_ms AND p99_ms <= max_ms),
-CONSTRAINT mpp_statistic_sufficiency_basic_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'basic') = 'object'
-    AND (sufficiency->'basic') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'basic'->'required_count') = 'number'
-    AND (sufficiency->'basic'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'basic'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'basic'->'actual_count') = 'number'
-    AND (sufficiency->'basic'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'basic'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'basic'->'required_coverage') = 'number'
-    AND (sufficiency->'basic'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'basic'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'basic'->'actual_coverage') = 'number'
-    AND (sufficiency->'basic'->>'actual_coverage')::numeric = CASE sufficiency->'basic'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'basic'->>'coverage_kind') <> 'none' OR (sufficiency->'basic'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'basic'->'met') = 'boolean'
-    AND (sufficiency->'basic'->>'met')::boolean = (
-        included_count >= (sufficiency->'basic'->>'required_count')::numeric
-        AND (sufficiency->'basic'->>'actual_coverage')::numeric >= (sufficiency->'basic'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'basic'->'reasons') = 'array'
-    AND ((sufficiency->'basic'->>'met')::boolean = (sufficiency->'basic'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p95_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'p95') = 'object'
-    AND (sufficiency->'p95') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'p95'->'required_count') = 'number'
-    AND (sufficiency->'p95'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'p95'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p95'->'actual_count') = 'number'
-    AND (sufficiency->'p95'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'p95'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'p95'->'required_coverage') = 'number'
-    AND (sufficiency->'p95'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'p95'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p95'->'actual_coverage') = 'number'
-    AND (sufficiency->'p95'->>'actual_coverage')::numeric = CASE sufficiency->'p95'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'p95'->>'coverage_kind') <> 'none' OR (sufficiency->'p95'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'p95'->'met') = 'boolean'
-    AND (sufficiency->'p95'->>'met')::boolean = (
-        included_count >= (sufficiency->'p95'->>'required_count')::numeric
-        AND (sufficiency->'p95'->>'actual_coverage')::numeric >= (sufficiency->'p95'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'p95'->'reasons') = 'array'
-    AND ((sufficiency->'p95'->>'met')::boolean = (sufficiency->'p95'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p99_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'p99') = 'object'
-    AND (sufficiency->'p99') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'p99'->'required_count') = 'number'
-    AND (sufficiency->'p99'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'p99'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p99'->'actual_count') = 'number'
-    AND (sufficiency->'p99'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'p99'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'p99'->'required_coverage') = 'number'
-    AND (sufficiency->'p99'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'p99'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p99'->'actual_coverage') = 'number'
-    AND (sufficiency->'p99'->>'actual_coverage')::numeric = CASE sufficiency->'p99'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'p99'->>'coverage_kind') <> 'none' OR (sufficiency->'p99'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'p99'->'met') = 'boolean'
-    AND (sufficiency->'p99'->>'met')::boolean = (
-        included_count >= (sufficiency->'p99'->>'required_count')::numeric
-        AND (sufficiency->'p99'->>'actual_coverage')::numeric >= (sufficiency->'p99'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'p99'->'reasons') = 'array'
-    AND ((sufficiency->'p99'->>'met')::boolean = (sufficiency->'p99'->'reasons' = '[]'::jsonb)), false)),
     CHECK (included_count = 0 OR ((mean_ms = 0) = (cv IS NULL))),
     CHECK (included_count = 0 OR ((p50_ms = 0) = (p95_p50 IS NULL))),
     CHECK (included_count = 0 OR ((p50_ms = 0) = (p99_p50 IS NULL))),
@@ -639,6 +569,72 @@ CONSTRAINT mpp_statistic_sufficiency_p99_check CHECK (coalesce(
     CHECK (mean_ms BETWEEN min_ms AND max_ms)
 ) PARTITION BY LIST (partition_id);
 CREATE INDEX IF NOT EXISTS mpp_statistic_group_build_idx ON mpp_statistic (group_id, build_id, layer);
+-- Pure projection: callers join the statistic's Build to its sealed ConfigSnapshot.
+-- Keep the version branch when a future statistics contract is added.
+CREATE OR REPLACE FUNCTION mpp_statistic_sufficiency(
+    p_statistics_version text, p_thresholds jsonb, p_layer text,
+    p_included_count bigint, p_active_dates date[], p_active_week_starts date[]
+) RETURNS jsonb LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS $function$
+DECLARE
+    threshold jsonb;
+    coverage_kind text;
+    required_coverage numeric;
+    actual_coverage integer;
+    required_count numeric;
+    label text;
+    reasons jsonb;
+    result jsonb := '{}';
+BEGIN
+    IF p_statistics_version IS DISTINCT FROM 'baseline-formulas/1' THEN
+        RAISE EXCEPTION 'unsupported_statistics_version';
+    END IF;
+    IF p_layer IS NULL OR p_layer NOT IN ('overall','day','week','weekday','hour')
+        OR p_included_count IS NULL OR p_included_count < 0
+        OR p_active_dates IS NULL OR p_active_week_starts IS NULL
+        OR array_position(p_active_dates,NULL) IS NOT NULL
+        OR array_position(p_active_week_starts,NULL) IS NOT NULL THEN
+        RAISE EXCEPTION 'invalid_statistic_coverage';
+    END IF;
+    threshold := p_thresholds->p_layer;
+    coverage_kind := CASE p_layer WHEN 'day' THEN 'none'
+        WHEN 'weekday' THEN 'active_weeks' ELSE 'active_days' END;
+    IF jsonb_typeof(threshold) IS DISTINCT FROM 'object'
+        OR (threshold->>'coverage_kind') IS DISTINCT FROM coverage_kind
+        OR jsonb_typeof(threshold->'coverage_min') IS DISTINCT FROM 'number' THEN
+        RAISE EXCEPTION 'invalid_statistics_thresholds';
+    END IF;
+    required_coverage := (threshold->>'coverage_min')::numeric;
+    IF required_coverage < 0 OR mod(required_coverage,1) <> 0
+        OR (coverage_kind='none' AND required_coverage<>0) THEN
+        RAISE EXCEPTION 'invalid_statistics_thresholds';
+    END IF;
+    actual_coverage := CASE coverage_kind WHEN 'none' THEN 0
+        WHEN 'active_days' THEN cardinality(p_active_dates)
+        ELSE cardinality(p_active_week_starts) END;
+    FOREACH label IN ARRAY ARRAY['basic','p95','p99'] LOOP
+        IF jsonb_typeof(threshold->(label||'_count')) IS DISTINCT FROM 'number' THEN
+            RAISE EXCEPTION 'invalid_statistics_thresholds';
+        END IF;
+        required_count := (threshold->>(label||'_count'))::numeric;
+        IF required_count < 0 OR mod(required_count,1) <> 0 THEN
+            RAISE EXCEPTION 'invalid_statistics_thresholds';
+        END IF;
+        reasons := '[]';
+        IF p_included_count < required_count THEN
+            reasons := reasons || jsonb_build_array('sample_count_below_min');
+        END IF;
+        IF actual_coverage < required_coverage THEN
+            reasons := reasons || jsonb_build_array(coverage_kind||'_below_min');
+        END IF;
+        result := result || jsonb_build_object(label,jsonb_build_object(
+            'required_count',required_count,'actual_count',p_included_count,
+            'coverage_kind',coverage_kind,'required_coverage',required_coverage,
+            'actual_coverage',actual_coverage,'met',reasons='[]'::jsonb,'reasons',reasons));
+    END LOOP;
+    RETURN result;
+END;
+$function$;
+
 CREATE OR REPLACE FUNCTION mpp_result_context_guard() RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
     IF TG_TABLE_NAME = 'build' THEN

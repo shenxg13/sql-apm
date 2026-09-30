@@ -16,7 +16,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
 from psycopg2 import sql
 from verify import instance,Verification
-from baseline.oracle import assert_metrics
+from baseline.oracle import assert_metrics,reference_sufficiency
 from sql_apm.ingestion.config import canonical,identity,load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.training import TrainingStore
@@ -135,10 +135,12 @@ def reconcile(db,snapshot,build):
         cur.execute('''SELECT count(*) FROM (SELECT group_id,count(*) n FROM mpp_build_coverage
             WHERE build_id=%s GROUP BY 1) x WHERE n<>5''',(build,))
         assert cur.fetchone()[0]==0,'five_coverages'
-        cur.execute('''SELECT layer,count(*),count(*) FILTER (WHERE (sufficiency->'basic'->>'met')::boolean),
-            count(*) FILTER (WHERE (sufficiency->'p95'->>'met')::boolean),
-            count(*) FILTER (WHERE (sufficiency->'p99'->>'met')::boolean)
-            FROM mpp_statistic WHERE build_id=%s GROUP BY 1 ORDER BY 1''',(build,))
+        cur.execute('''SELECT s.layer,count(*),count(*) FILTER (WHERE (q.basic->>'met')::boolean),
+            count(*) FILTER (WHERE (q.p95->>'met')::boolean),count(*) FILTER (WHERE (q.p99->>'met')::boolean)
+            FROM mpp_statistic s JOIN build b USING(build_id) JOIN config_snapshot c USING(config_id)
+            CROSS JOIN LATERAL jsonb_to_record(mpp_statistic_sufficiency(c.statistics_version,c.thresholds,
+                s.layer,s.included_count,s.active_dates,s.active_week_starts)) q(basic jsonb,p95 jsonb,p99 jsonb)
+            WHERE s.build_id=%s GROUP BY 1 ORDER BY 1''',(build,))
         distribution=cur.fetchall()
     return dict(layer_conservation=True,decisions_conserved=True,reasons_conserved=True,coverage_complete=True,
                 included=expected[0],excluded=expected[1],group_reasons=reasons,
@@ -148,6 +150,8 @@ def reconcile(db,snapshot,build):
 def sample_oracle(db,build):
     start=time.monotonic();metrics_checked=0;rows_checked=0
     with db,db.cursor() as cur:
+        cur.execute('SELECT c.thresholds FROM build b JOIN config_snapshot c USING(config_id) WHERE b.build_id=%s',(build,))
+        thresholds=cur.fetchone()[0]
         cur.execute("SELECT group_id FROM mpp_statistic WHERE build_id=%s AND layer='overall' ORDER BY md5(%s||group_id) LIMIT 1000",(build,SEED))
         groups={r[0] for r in cur}
         special={}
@@ -158,7 +162,10 @@ def sample_oracle(db,build):
         for gid in sorted(groups):
             cur.execute('SELECT estimated_start_at,duration_ms,state,reason_codes FROM acceptance_decisions WHERE group_id=%s AND count_scope=\'group\'',(gid,))
             events=cur.fetchall()
-            cur.execute('SELECT * FROM mpp_statistic WHERE build_id=%s AND group_id=%s',(build,gid))
+            cur.execute('''SELECT s.*,mpp_statistic_sufficiency(c.statistics_version,c.thresholds,s.layer,
+                s.included_count,s.active_dates,s.active_week_starts) AS sufficiency
+                FROM mpp_statistic s JOIN build b USING(build_id) JOIN config_snapshot c USING(config_id)
+                WHERE s.build_id=%s AND s.group_id=%s''',(build,gid))
             names=[col[0] for col in cur.description];statistics=[dict(zip(names,r)) for r in cur]
             for stored in statistics:
                 chosen=[]
@@ -178,16 +185,13 @@ def sample_oracle(db,build):
                 instants=[e[0] for e in included]
                 assert stored['first_sample_at']==(min(instants) if instants else None)
                 assert stored['last_sample_at']==(max(instants) if instants else None)
-                for threshold in stored['sufficiency'].values():
-                    coverage={'none':0,'active_days':len(dates),'active_weeks':len(weeks)}[threshold['coverage_kind']]
-                    assert threshold['actual_count']==len(included) and threshold['actual_coverage']==coverage
-                    assert threshold['met']==(len(included)>=threshold['required_count'] and coverage>=threshold['required_coverage'])
+                assert stored['sufficiency']==reference_sufficiency(thresholds[stored['layer']],len(included),dates,weeks)
                 metrics_checked+=assert_metrics(stored,[e[1] for e in included]);rows_checked+=1
             if rows_checked % 1000 < 30:
                 print(canonical(dict(phase='sample_progress',rows=rows_checked)),flush=True)
     assert len(groups)>=1000
     return dict(seed=SEED,method='seeded MD5 ordering plus largest/single/excluded strata; Decimal independent oracle',
-        groups=len(groups),group_selection_sha256=hashlib.sha256('\n'.join(sorted(groups)).encode()).hexdigest(),
+        groups=len(groups),threshold_results=rows_checked*3,group_selection_sha256=hashlib.sha256('\n'.join(sorted(groups)).encode()).hexdigest(),
         special=special,statistic_rows=rows_checked,metrics=metrics_checked,
         absolute_tolerance=1e-9,relative_tolerance=1e-10,seconds=round(time.monotonic()-start,3))
 
@@ -214,6 +218,7 @@ def validate(dsn,output):
     imported=json.loads((output/'import-report.json').read_text())
     report['input_manifest_sha256']=imported['manifest_sha256']
     report['import_seconds']=imported['import_seconds']
+    report['import_source_head_sha']=imported.get('import_source_head_sha',report['source_head_sha'])
     report['input_files']=sum(len(item['files']) for item in imported['first_runs'])
     report['code_sha256']={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted((ROOT/'sql_apm/baseline').glob('*.py'))+[ROOT/'sql_apm/storage/statistics.py',ROOT/'sql_apm/storage/schema.sql',Path(__file__),ROOT/'tests/baseline/oracle.py']}
@@ -221,6 +226,7 @@ def validate(dsn,output):
         (output/'statistics-report.json').write_text(json.dumps(report,indent=2,sort_keys=True,default=str)+'\n')
     try:
         with store.db,store.db.cursor() as cur:
+            cur.execute("SELECT count(*) FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='mpp_statistic' AND column_name='sufficiency'");assert cur.fetchone()[0]==0
             cur.execute('SELECT count(*) FROM mpp_occurrence');assert cur.fetchone()[0]==7424804
             cur.execute('SELECT count(*) FROM source_file');assert cur.fetchone()[0]==55
             cur.execute('SELECT version,script_sha256 FROM schema_version ORDER BY version');report['schema_receipts']=cur.fetchall()

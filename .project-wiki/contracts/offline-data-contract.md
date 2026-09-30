@@ -296,7 +296,9 @@ HashData 统计语义。来源改变必须另行确认 profile，不用任意标
 
 [#25](https://github.com/shenxg13/sql-apm/issues/25) 确认③创建 Build 并计算到已计算或失败／中断，
 ④执行发布检查与版本切换。Statistic 的逻辑身份在 1.4.0 映射为构建、分组、层次与桶的自然键；
-分区键由 Build 的集群和开始月份确定，物理不保存文本 statistic_id。
+分区键由 Build 的集群和数据库开始时间所属的北京时间月份确定，物理不保存文本 statistic_id。
+同日范围变更将 sufficiency 映射为按原构建封存配置与公式版本派生的逻辑结果，物理不重复保存；
+完整字段及原因语义保留，见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。
 [字段字典](../../docs/design/offline-data-contract/fields.md#statisticbucket-与门槛结果)保留逻辑交接表达与物理映射。
 
 ## Workflows

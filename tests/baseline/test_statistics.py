@@ -1,9 +1,8 @@
-from copy import deepcopy
 from datetime import datetime,timedelta
 import random
 import unittest
 
-from sql_apm.baseline.statistics import calculate_group,metrics,sufficiency,window_keys
+from sql_apm.baseline.statistics import calculate_group,metrics,window_keys
 from sql_apm.training.config import THRESHOLDS,TZ,validate,TrainingError
 from baseline.oracle import assert_metrics
 
@@ -25,7 +24,7 @@ class StatisticsTests(unittest.TestCase):
         rows=[(start,0,True,[]),(start+timedelta(days=1),1.5,True,[]),
               (start+timedelta(days=1,microseconds=-1),2,True,[]),
               (start+timedelta(days=3,hours=23),None,False,['a','a','b'])]
-        stats,covers=calculate_group(rows,start,end,THRESHOLDS)
+        stats,covers=calculate_group(rows,start,end)
         for layer in THRESHOLDS:
             buckets=[s for s in stats if s['layer']==layer]
             self.assertEqual(sum(s['included_count'] for s in buckets),3)
@@ -43,11 +42,11 @@ class StatisticsTests(unittest.TestCase):
         self.assertEqual(excluded['metric_null_reasons']['mean_ms'],'no_samples')
         self.assertEqual({s['bucket_number'] for s in stats if s['layer']=='hour'},{0,23})
         self.assertEqual({s['bucket_number'] for s in stats if s['layer']=='weekday'},{1,3,7})
-        with self.assertRaises(ValueError):calculate_group([(end,1,True,[])],start,end,THRESHOLDS)
+        with self.assertRaises(ValueError):calculate_group([(end,1,True,[])],start,end)
 
     def test_trailing_partial_week(self):
         start=datetime(2026,9,20,tzinfo=TZ);end=start+timedelta(days=9)
-        stats,_=calculate_group([(end-timedelta(microseconds=1),0,True,[])],start,end,THRESHOLDS)
+        stats,_=calculate_group([(end-timedelta(microseconds=1),0,True,[])],start,end)
         week=next(s for s in stats if s['layer']=='week')
         self.assertTrue(week['partial_week'])
         self.assertEqual(week['bucket_date'].isoformat(),'2026-09-28')
@@ -62,17 +61,6 @@ class StatisticsTests(unittest.TestCase):
         for bad in [dict(day=dict(coverage_min=7)),dict(week=dict(basic_count=True)),
                     dict(week=dict(coverage_kind='none')),dict(week=dict(p95_count=-1))]:
             with self.assertRaises(TrainingError):validate(dict(doc,thresholds=bad),'test')
-
-    def test_every_threshold_boundary(self):
-        for layer,config in THRESHOLDS.items():
-            for label in ('basic','p95','p99'):
-                minimum=config[label+'_count'];coverage=config['coverage_min']
-                for n in (minimum-1,minimum,minimum+1):
-                    for c in {max(0,coverage-1),coverage,coverage+1}:
-                        got=sufficiency(config,n,list(range(c)),list(range(c)))[label]
-                        self.assertEqual(got['met'],n>=minimum and c>=coverage,(layer,label,n,c))
-        altered=deepcopy(THRESHOLDS['week']);altered['basic_count']=2;altered['coverage_min']=1
-        self.assertTrue(sufficiency(altered,2,[1],[1])['basic']['met'])
 
 
 if __name__=='__main__':unittest.main()

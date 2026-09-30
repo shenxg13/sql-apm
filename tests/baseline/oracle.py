@@ -38,3 +38,18 @@ def assert_metrics(actual, samples):
         else:
             assert found is not None and abs(float(found)-value) <= 1e-9 + 1e-10*abs(value), key
     return len(expected)
+
+
+def reference_sufficiency(threshold, count, dates, weeks):
+    """Independent logical ThresholdResult, including exact failure reasons."""
+    coverage = len(dates) if threshold['coverage_kind']=='active_days' else len(weeks) if threshold['coverage_kind']=='active_weeks' else 0
+    def result(name):
+        minimum = threshold[name+'_count']
+        passed_count, passed_coverage = count >= minimum, coverage >= threshold['coverage_min']
+        failures = [('sample_count_below_min', passed_count),
+                    (threshold['coverage_kind']+'_below_min', passed_coverage)]
+        return dict(required_count=minimum, actual_count=count,
+                    coverage_kind=threshold['coverage_kind'], required_coverage=threshold['coverage_min'],
+                    actual_coverage=coverage, met=passed_count and passed_coverage,
+                    reasons=[reason for reason,passed in failures if not passed])
+    return {name: result(name) for name in ('basic','p95','p99')}

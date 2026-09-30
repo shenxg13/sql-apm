@@ -7,7 +7,8 @@
 
 1. 保存冻结的 1.3.0 DDL，新增 1.4.0 分区、自然键及迁移；用空表升级、非空拒绝、
    连续升级、重跑及跨月份写入验证。
-2. 实现独立于数据库的五层计算；逐项以独立公式核对指标、时间边界、空值、门槛和多原因计数。
+2. 实现独立于数据库的五层指标计算；逐项独立核对指标、时间边界、空值和多原因计数。
+   门槛由数据库派生，独立 oracle 核对五层数量／覆盖边界、完整原因及历史快照隔离。
 3. 引用封存快照创建构建，临时推导一次判定，流式逐组计算并批量写入；验证成功、失败、
    中断和重新计算。CLI 仅输出原因码、计数和不透明标识。
 4. 在私有 PG17 重导 55 文件，按两个截止日创建快照；验证逐层守恒、与判定对账、
@@ -25,16 +26,37 @@ outside_window 不计入，无法归组的计数保留构建诊断。
 不会把全部分组载入 Python。临时表和数据库排序可能使用磁盘。全量扫描与排序用于保证
 完整统计，已由 D5 明确要求；避免五层重复推导是更低成本的执行方式。
 结果在一个事务内保存并置 calculated，失败整体回滚。构建登记单独提交，故失败可保留
-原因。SIGINT／SIGTERM 转入中断；强杀或连接丢失由独立监护连接检测工作进程退出后记录
+原因。started_at 来自数据库 `clock_timestamp()`，Build ID 日期前缀和分区月份均由该时间
+转换到北京时间生成；finished_at 也使用数据库时钟，避免客户端时钟领先导致终态约束失败。
+SIGINT／SIGTERM 转入中断；强杀或连接丢失由独立监护连接检测工作进程退出后记录
 中断，恢复不续用半成品。任务串行、发布检查和版本切换由④交付。
+
+## 门槛结果的数据库派生
+
+`sufficiency` 是逻辑结果，物理统计行仅保存数量、覆盖数组及指标，不保存重复 JSONB。
+调用 `mpp_statistic_sufficiency(statistics_version text, thresholds jsonb, layer text,
+included_count bigint, active_dates date[], active_week_starts date[])` 返回 basic／p95／p99，
+每项包含 required_count、actual_count、coverage_kind、required_coverage、actual_coverage、met、reasons。
+数量不足原因在前，覆盖不足原因在后；同时不足时两项都返回。day 不检查覆盖，weekday 用活跃周，
+其余层用活跃日；空样本仍按相同规则产生完整结果。
+
+查询将统计行关联到 Build 及其封存 ConfigSnapshot，传入该快照的门槛和版本；
+不读取当前全局默认值，也不由函数逐行重复查配置。函数为 immutable／parallel safe，
+仅显式支持 baseline-formulas/1，未知版本报固定原因 unsupported_statistics_version；
+未来新增版本须保留旧版本分支，以免历史构建被新规则重解释。
+[手册](../runbooks/baseline-statistics.md#查询门槛结果)提供规范关联示例。
+
+推导有查询 CPU 成本；按构建／分组过滤后仅投影需要的结果，全量分布验收每行调用一次。
+不另建永久缓存或物化视图。独立 Python oracle 只在 tests，验证全部字段和原因，
+包括新快照门槛变化后旧 Build 仍按原门槛解释。函数定义及属性进入 catalog 漂移检查。
 
 ## 分区与关联
 
 每个集群和北京时间构建开始月份在 `mpp_result_partition` 登记一个 bigint 分区编号，
 由组合内容 SHA-256 的前 60 位导出；检测到身份冲突时报错。`mpp_ensure_result_partition`
 在开始构建前创建两张父表相应 LIST 分区，短暂 advisory 事务锁仅保护该月份的 DDL。
-这不实现同集群任务互斥。首次创建月分区需要父表 DDL 锁，可能等待其他构建写事务；
-跨集群并发能力由④评估。统计和覆盖均保留单表，层次仍为键的一部分。
+这不实现同集群任务互斥。首次创建月分区需要父表 DDL 锁，会与已有读写事务互相等待，
+等待中的 DDL 也可能排住后续普通查询；advisory 锁不消除这一成本。跨集群并发和月分区预建由④评估。统计和覆盖均保留单表，层次仍为键的一部分。
 
 `mpp_build_group` 每构建每组一行，集中检查 Build／Group 集群、规则和 profile 相符；
 统计与覆盖通过其复合外键引用，避免逐指标行保存三个重复文本。父对象已有结果关联后

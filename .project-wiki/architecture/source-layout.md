@@ -249,7 +249,9 @@ Issue #21 新增 `training/categories.py` 和 `training/config.py`，分别负�
 Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statistics.py` 组织快照引用、
 临时判定、分组读取和事务写入；`baseline/watchdog.py` 是进程退出监护入口，状态落库委托存储层。
 `cli/statistics.py` 提供薄命令；独立指标实现仅在 tests 与验收脚本，产品不依赖测试。
-训练判定继续复用②的唯一 SQL 函数，未新增永久 Decision 投影。发布与任务编排仍属④。
+训练判定继续复用②的唯一 SQL 函数，未新增永久 Decision 投影。完整门槛结果由
+`storage/schema.sql` 的 `mpp_statistic_sufficiency` 按构建封存配置推导；Python 指标核心不重复实现
+门槛规则，也不逐行保存派生 JSONB。发布与任务编排仍属④。
 
 ## Workflows
 

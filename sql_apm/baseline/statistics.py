@@ -61,24 +61,7 @@ def window_keys(start, end):
                 weekday=list(range(1, 8)), hour=list(range(24)))
 
 
-def sufficiency(threshold, count, dates, weeks):
-    kind = threshold['coverage_kind']
-    actual = {'none': 0, 'active_days': len(dates), 'active_weeks': len(weeks)}[kind]
-    result = {}
-    for name in ('basic', 'p95', 'p99'):
-        required = threshold[name + '_count']
-        reasons = []
-        if count < required:
-            reasons.append('sample_count_below_min')
-        if actual < threshold['coverage_min']:
-            reasons.append(kind + '_below_min')
-        result[name] = dict(required_count=required, actual_count=count, coverage_kind=kind,
-                            required_coverage=threshold['coverage_min'], actual_coverage=actual,
-                            met=not reasons, reasons=reasons)
-    return result
-
-
-def calculate_group(rows, start, end, thresholds):
+def calculate_group(rows, start, end):
     """Rows: (start instant, duration or None, included bool, unique reason codes).
 
     Caller supplies exactly one row per countable execution; unresolved samples
@@ -123,7 +106,6 @@ def calculate_group(rows, start, end, thresholds):
                 exclusions_by_reason=dict(reasons), active_dates=dates, active_week_starts=weeks,
                 first_sample_at=min(instants) if instants else None,
                 last_sample_at=max(instants) if instants else None,
-                **values, metric_null_reasons=nulls,
-                sufficiency=sufficiency(thresholds[layer], len(included), dates, weeks)))
+                **values, metric_null_reasons=nulls))
         coverage.append(dict(layer=layer, computed_keys=computed, empty_keys=empty))
     return statistics, coverage

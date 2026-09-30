@@ -51,6 +51,11 @@ def verify_statistics_migration(v, root, runner):
         v.require(True,schema+': mismatched construction month is rejected')
 
         v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='2',schema+': two partitioned parents, no layer tables')
+        v.require(sql("SELECT count(*) FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid WHERE c.relnamespace=current_schema()::regnamespace AND c.relname LIKE 'mpp_statistic%' AND a.attname='sufficiency' AND NOT a.attisdropped")=='0',schema+': parent and leaves omit sufficiency')
+        sql('ALTER FUNCTION mpp_statistic_sufficiency(text,jsonb,text,bigint,date[],date[]) STABLE')
+        drift=v.init('check',names=names,ok=False).stderr
+        v.require('incompatible object' in drift and 'mpp_statistic_sufficiency' in drift,schema+': derived sufficiency function drift detected')
+        sql('ALTER FUNCTION mpp_statistic_sufficiency(text,jsonb,text,bigint,date[],date[]) IMMUTABLE')
         for mode in ['all','check','upgrade']:v.init(mode,names=names)
         child=sql('SELECT tableoid::regclass::text FROM mpp_build_coverage LIMIT 1')
         sql('ALTER TABLE '+child+' ADD COLUMN drift integer',ok=False)

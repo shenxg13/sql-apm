@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Synthetic snapshot/statistics acceptance in a disposable PostgreSQL 17."""
+from datetime import datetime,timedelta
 import json
 import os
 from pathlib import Path
@@ -19,7 +20,7 @@ from sql_apm.ingestion.config import load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.training import TrainingStore
 from sql_apm.storage.statistics import StatisticsStore,StatisticsError
-from sql_apm.training.config import validate
+from sql_apm.training.config import validate,TZ
 
 
 def verify():
@@ -66,6 +67,34 @@ def verify():
                 repeat=store.calculate('C1',snap['input_id'],snap['config_id'])
                 second=json.loads(v.sql("SELECT jsonb_agg(to_jsonb(s)-'build_id' ORDER BY group_id,layer,bucket_date,bucket_number) FROM mpp_statistic s WHERE build_id='"+repeat['build_id']+"'"))
                 v.require(first==second,'same snapshot repeats exactly')
+                from database.statistics_projection import verify_sufficiency
+                verify_sufficiency(v,store,config,snap,bid)
+                # R1-F001: exercise the real success/failure writes with a local
+                # clock ahead of both the watchdog window and a month boundary.
+                for lead in (timedelta(seconds=90),timedelta(days=40)):
+                    class Ahead(datetime):
+                        @classmethod
+                        def now(cls,tz=None):
+                            return datetime.now(tz)+lead
+                    with store.db,store.db.cursor() as cur:
+                        cur.execute('SELECT clock_timestamp()');before=cur.fetchone()[0]
+                    with patch('sql_apm.storage.statistics.datetime',Ahead,create=True):
+                        success=store.calculate('C1',snap['input_id'],snap['config_id'])
+                        with patch('sql_apm.storage.statistics.calculate_group',side_effect=ValueError('synthetic clock failure')):
+                            try:store.calculate('C1',snap['input_id'],snap['config_id'])
+                            except StatisticsError:pass
+                            else:raise AssertionError('injected clock failure accepted')
+                    with store.db,store.db.cursor() as cur:
+                        cur.execute("SELECT b.build_id,b.state,b.results_saved,b.started_at,b.finished_at,p.build_month,clock_timestamp() FROM build b JOIN mpp_result_partition p USING(partition_id) WHERE b.started_at >= %s ORDER BY b.started_at",(before,))
+                        timed=cur.fetchall();assert len(timed)==2
+                        assert [(r[1],r[2]) for r in timed]==[('calculated',True),('failed',False)]
+                        for build_id,state,saved,start,finish,month,after in timed:
+                            assert before<=start<=finish<=after
+                            assert build_id.startswith('B:'+start.astimezone(TZ).strftime('%Y%m%dT%H%M%S')+':')
+                            assert month==start.astimezone(TZ).date().replace(day=1)
+                        cur.execute('SELECT code FROM problem WHERE build_id=%s',(timed[-1][0],))
+                        assert cur.fetchall()==[('statistics_calculation_failed',)]
+                    v.require(True,'database clock controls success, immediate failure and partition month with local lead '+str(lead))
                 for label,effect in [('compute',ValueError('private SQL')),('save',RuntimeError('private SQL')),('interrupt',KeyboardInterrupt())]:
                     target='sql_apm.storage.statistics.calculate_group' if label!='save' else 'sql_apm.storage.statistics.ResultWriter.flush'
                     with patch(target,side_effect=effect):

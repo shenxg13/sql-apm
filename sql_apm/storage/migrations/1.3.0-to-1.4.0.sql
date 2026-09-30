@@ -1,3 +1,4 @@
+-- Unpublished 1.4.0 target derives logical sufficiency; no per-row JSONB copy.
 -- Empty result tables are a precondition; no implicit data loss.
 SELECT set_config('search_path',quote_ident(current_setting('apm.schema'))||',pg_catalog',true);
 LOCK TABLE mpp_statistic,mpp_build_coverage IN ACCESS EXCLUSIVE MODE;

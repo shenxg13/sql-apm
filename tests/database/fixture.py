@@ -32,7 +32,7 @@ def statements(legacy=False, results=True):
             if not results:
                 return
             if not legacy:
-                values = {k:v for k,v in values.items() if k not in ('statistic_id','scope_id','normalization_id','profile')}
+                values = {k:v for k,v in values.items() if k not in ('statistic_id','scope_id','normalization_id','profile','sufficiency')}
                 # The partition ID is deterministic, derived by the same public
                 # partition provisioner used for writes (no SQL input data).
                 sql.append('INSERT INTO "'+table+'" ('+
@@ -99,6 +99,7 @@ def statements(legacy=False, results=True):
             add("mpp_input_occurrence", dict(ref, input_id=o["input_id"], scope_id="CL1"))
     for o in b["config_snapshots"].values():
         add("config_snapshot", fields(o, ("window",), profile=doc["profile"],
+            statistics_version=o["statistics_version"] if legacy else "baseline-formulas/1",
             cutoff_date=o["window"]["cutoff_date"], window_days=o["window"]["days"],
             window_start=o["window"]["start"], window_end=o["window"]["end"]))
     for o in b["builds"].values():

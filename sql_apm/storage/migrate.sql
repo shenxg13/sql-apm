@@ -12,7 +12,7 @@ DO $block$
 DECLARE valid boolean;
 BEGIN
     IF to_regclass(format('%I.schema_version',current_setting('apm.schema'))) IS NULL THEN
-        RAISE EXCEPTION 'migration requires an initialized 1.0.0, 1.1.0, 1.2.0 1.3.0 or 1.4.0 schema';
+        RAISE EXCEPTION 'migration requires an initialized 1.0.0, 1.1.0, 1.2.0, 1.3.0 or 1.4.0 schema';
     END IF;
     EXECUTE format('SELECT count(*)>0 AND bool_and((version=%L AND script_sha256=%L) OR (version=%L AND script_sha256=%L) OR (version=%L AND script_sha256=%L) OR (version=%L AND script_sha256=%L) OR (version=%L AND script_sha256=%L)) FROM %I.schema_version',
         '1.0.0',current_setting('apm.legacy_sha256'),'1.1.0',current_setting('apm.v110_sha256'),

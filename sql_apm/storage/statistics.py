@@ -1,7 +1,6 @@
 """Snapshot-bound builds, TEMP decisions, bounded result writes and atomic finish."""
 from collections import Counter
 import csv
-from datetime import datetime
 import io
 import itertools
 import json
@@ -20,7 +19,7 @@ from sql_apm.training.config import TZ
 TIMINGS = ('request', 'execute_first', 'execute_fetch', 'parse', 'bind')
 STAT_COLUMNS = ('build_id', 'group_id', 'partition_id', 'layer', 'bucket_date', 'bucket_number',
     'range_start', 'range_end', 'partial_week', 'included_count', 'excluded_count',
-    'exclusions_by_reason', 'active_dates', 'active_week_starts', 'first_sample_at', 'last_sample_at') + METRICS + ('metric_null_reasons', 'sufficiency')
+    'exclusions_by_reason', 'active_dates', 'active_week_starts', 'first_sample_at', 'last_sample_at') + METRICS + ('metric_null_reasons',)
 COVER_COLUMNS = ('build_id', 'group_id', 'partition_id', 'layer', 'computed_keys', 'empty_keys')
 
 
@@ -76,7 +75,7 @@ class StatisticsStore:
 
     def _create(self, scope, input_id, config_id, retry_of):
         with self.db, self.db.cursor() as cur:
-            cur.execute('''SELECT c.normalization_id,c.profile,c.window_start,c.window_end,c.thresholds,
+            cur.execute('''SELECT c.normalization_id,c.profile,c.window_start,c.window_end,
                        c.statistics_version,training_version(t.decision_version)
                 FROM input_snapshot i JOIN input_manifest m USING(input_id)
                 JOIN config_snapshot c USING(scope_id) JOIN training_config t USING(config_id)
@@ -86,7 +85,7 @@ class StatisticsStore:
             row = cur.fetchone()
             if not row:
                 raise StatisticsError('sealed_snapshot_pair_required')
-            normalization, profile, start, end, thresholds, version, _ = row
+            normalization, profile, start, end, version, _ = row
             if profile != 'hashdata-csv/1' or version != 'baseline-formulas/1':
                 raise StatisticsError('unsupported_statistics_context')
             if retry_of:
@@ -94,7 +93,8 @@ class StatisticsStore:
                 previous = cur.fetchone()
                 if not previous or previous[0] not in ('failed', 'interrupted') or previous[1:] != (scope, input_id, config_id):
                     raise StatisticsError('invalid_retry_reference')
-            now = datetime.now(TZ)
+            cur.execute('SELECT clock_timestamp()')
+            now = cur.fetchone()[0].astimezone(TZ)
             build_id = 'B:' + now.strftime('%Y%m%dT%H%M%S') + ':' + uuid.uuid4().hex
             cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope, now.date().replace(day=1)))
             partition = cur.fetchone()[0]
@@ -102,7 +102,7 @@ class StatisticsStore:
                 retry_of,state,started_at,results_saved,partition_id)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,'running',%s,false,%s)''',
                 (build_id,scope,input_id,config_id,normalization,profile,retry_of,now,partition))
-        return build_id, partition, start, end, thresholds
+        return build_id, partition, start, end
 
     def _failure(self, build_id, state, reason):
         self.db.rollback()
@@ -115,7 +115,7 @@ class StatisticsStore:
 
     def calculate(self, scope, input_id, config_id, retry_of=None, progress=None):
         started = time.monotonic()
-        build_id, partition, start, end, thresholds = self._create(scope,input_id,config_id,retry_of)
+        build_id, partition, start, end = self._create(scope,input_id,config_id,retry_of)
         # EOF is detected even on SIGKILL/os._exit. This independent connection
         # never reads SQL text and only changes a still-running, unsaved build.
         env = dict(os.environ, SQL_APM_DSN=self.dsn)
@@ -168,7 +168,7 @@ class StatisticsStore:
                     for gid, items in itertools.groupby(stream, key=lambda row: row[0]):
                         events = list(items)
                         timing = events[0][1]
-                        computed, coverage = calculate_group((row[2:] for row in events),start,end,thresholds)
+                        computed, coverage = calculate_group((row[2:] for row in events),start,end)
                         context = dict(build_id=build_id,group_id=gid,partition_id=partition)
                         for row in computed:
                             stats.add(dict(row,**context))

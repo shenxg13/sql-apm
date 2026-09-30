@@ -330,6 +330,10 @@ bucket_number)` 的 `UNIQUE NULLS NOT DISTINCT` 确定唯一行。partition_id �
 北京时间开始月份确定的 bigint 分区编号；同一 Build 只属于一个分区，所以业务自然键仍为
 构建、分组、层次和桶。overall 的空桶键同样唯一。上下文通过 mpp_build_group 集中校验，
 每行不再重复 scope_id／normalization_id／profile。旧合成逻辑 ID 仍可通过该元组映射。
+同日范围变更后，sufficiency 也是逻辑字段，物理表不保存该 JSONB。查询从 Statistic 关联 Build，
+再关联其封存 ConfigSnapshot，以原 thresholds／statistics_version 和统计行的 layer、included_count、
+active_dates、active_week_starts 调用 `mpp_statistic_sufficiency`，派生下述完整三项结果。
+新快照或默认门槛变更不改写历史解释；未知公式版本报错。调用示例见[运行手册](../../runbooks/baseline-statistics.md#查询门槛结果)。
 
 | 字段 | 类型／条件 | 含义 |
 | --- | --- | --- |

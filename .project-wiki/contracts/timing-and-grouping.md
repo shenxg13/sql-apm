@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/timing-and-grouping.md
-updated: 2026-09-27
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: .project-wiki/log.md
     status: historical
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
@@ -43,7 +45,7 @@ confidence: high
 - 确认日期：2026-09-22。
 - 来源：在“计算集群＋数据库＋SQL 结构指纹”的分组建议基础上，用户明确要求
   “执行的用户不同也进行拆分”。
-- 来源状态：current；已确认基本分组维度，尚未实现聚合逻辑。
+- 来源状态：current；已确认基本分组维度，③已实现按五项维度独立聚合。
 - SQL 身份的基本分组为 **计算集群＋数据库＋执行用户＋SQL 结构指纹**。
 - 用户于 2026-09-24 在此基础上确认加入计时类别进行统计聚合，逻辑 GROUP BY
   为 **计算集群＋数据库＋执行用户＋SQL 结构指纹＋计时类别**，具体类别见下文。
@@ -65,7 +67,7 @@ confidence: high
 - 来源：在列明五项 GROUP BY 为集群、数据库、执行用户、SQL 结构指纹和
   计时类别后，用户明确提出“把parse和bind也加入进来吧，也可以直接契合
   这五项吧，样本可能较少，如果样本量不够，就只观测也可以”。
-- 来源状态：current；已纳入首期需求；指纹及 #18 计时配对已实现，统计尚未交付。
+- 来源状态：current；已纳入首期需求；指纹及 #18 计时配对、③五类计时统计均已实现。
 - Parse 和 Bind 是第五项 `timing_type` 的两个新增取值，不新增第六、第七
   个基础分组字段。逻辑字段名仅为示意，不在本次固定物理表结构。
 
@@ -111,7 +113,7 @@ confidence: high
 - 来源：在告知两集群五类对应位置的 duration 覆盖率合计为 97.99%，以及
   未覆盖来源、9 条未候选配对 Execute 和训练资格边界后，用户表示“这个覆盖率
   我觉得可以了”。
-- 来源状态：current；这是首期范围的确认；#18 已实现分类器，基线统计尚未交付。
+- 来源状态：current；这是首期范围的确认；#18 已实现分类器，③已实现上述五类的基线统计。
 - 首期按上述五类计时推进。当前 46 文件的观察覆盖率为 119 的 99.02%、
   120 的 96.99%、合计 97.99%；扣除 9 条未候选配对 Execute 后，合计保留
   两位小数仍为 97.99%。详见[覆盖率证据](../../docs/reports/hashdata-duration-source-mapping-2026-09-24.md#已确认五类计时的日志覆盖率)。
@@ -131,7 +133,7 @@ confidence: high
   和结束时间，2764 判断首次或续取；可靠配对后分别统计，无法可靠配对标为
   类型未知；不要求还原首次到全部续取的完整执行链”的建议后，用户回复
   “确认这种处理方式”，并要求梳理当前统计分类维度。
-- 来源状态：current；这是已确认的处理范围；#18 已实现单文件配对，统计尚未交付。
+- 来源状态：current；这是已确认的处理范围；#18 已实现单文件配对，③已实现按调用类别分别统计。
   日志证据及已知限制见[专项核查报告](../../docs/reports/hashdata-duration-source-mapping-2026-09-24.md)。
 - 针对已核查的构建，使用 `postgres.c:2843` 的独立 SQL 字段、duration 和
   日志时间戳作为调用数据；通过同一次调用的 `postgres.c:2764` 消息获得

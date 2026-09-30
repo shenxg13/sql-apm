@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
@@ -112,7 +112,8 @@ confidence: high
 逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
 见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。统计结构仍为未发布的 1.4.0。
 上述已接受的导入明细／规则缓存增长不包含本次统计结果新增占用；旧验收统计容量和 R1 年增长推算
-均为观察／外推，不是用户接受的容量预算。新结构容量须重新完整验收，亦不自动成为已接受年增长。
+均为观察／外推，不是用户接受的容量预算。[新结构全量验收](../../docs/reports/baseline-statistics-2026-10-01.md)
+已重新测量容量并与原结果对比，亦不自动成为已接受年增长。
 
 ## Workflows
 

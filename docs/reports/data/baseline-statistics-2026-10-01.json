@@ -1,0 +1,1349 @@
+{
+  "build_states": [
+    [
+      "calculated",
+      4
+    ]
+  ],
+  "clusters": {
+    "119": {
+      "first": {
+        "build_id": "B:20261001T004015:08611eb428784d9b868b005b905c545c",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            849886
+          ],
+          [
+            "group",
+            "included",
+            1867514
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "groups": 53786,
+        "layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            1
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            64
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            36
+          ],
+          [
+            "batch",
+            "execution_failed",
+            21893
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            44
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "batch",
+            "sql_missing",
+            31869
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            21811
+          ],
+          [
+            "batch",
+            "start_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            21974
+          ],
+          [
+            "group",
+            "blacklist_category",
+            848453
+          ],
+          [
+            "group",
+            "excluded_interval",
+            2187
+          ],
+          [
+            "none",
+            "blacklist_category",
+            15480
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ],
+          [
+            "none",
+            "sql_missing",
+            1282
+          ],
+          [
+            "none",
+            "sql_uncertain",
+            690
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 281.162,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            871923
+          ],
+          [
+            "included",
+            1867514
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "timings": {
+          "bind": [
+            425394,
+            220672
+          ],
+          "execute_fetch": [
+            12403,
+            5
+          ],
+          "execute_first": [
+            425339,
+            220673
+          ],
+          "parse": [
+            421753,
+            211700
+          ],
+          "request": [
+            582625,
+            196836
+          ]
+        }
+      },
+      "first_digest": {
+        "mpp_build_coverage": {
+          "rows": 268930,
+          "sha256_limb_sums": [
+            "4593466131985457113413",
+            "-3280810361703482323699",
+            "-1601130370392796632733",
+            "-2881240570976166329655"
+          ]
+        },
+        "mpp_build_timing_coverage": {
+          "rows": 5,
+          "sha256_limb_sums": [
+            "-12517321887582795538",
+            "-7613290773218124294",
+            "15848589102790841643",
+            "-18068646529292786182"
+          ]
+        },
+        "mpp_statistic": {
+          "rows": 537198,
+          "sha256_limb_sums": [
+            "-6335530557495922935696",
+            "4365866150010596475525",
+            "6505524219118945898048",
+            "922206995561882574674"
+          ]
+        }
+      },
+      "memory_first": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 217403392,
+          "python": 154587136,
+          "total": 371941376
+        },
+        "samples": 276
+      },
+      "memory_repeat": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 228760576,
+          "python": 157886464,
+          "total": 386365440
+        },
+        "samples": 260
+      },
+      "oracle": {
+        "absolute_tolerance": 1e-09,
+        "group_selection_sha256": "fd25aee56e017abd3308b1af77ea05da472ca8f384f6bc490c0b67f36953e00c",
+        "groups": 1003,
+        "method": "seeded MD5 ordering plus largest/single/excluded strata; Decimal independent oracle",
+        "metrics": 168708,
+        "relative_tolerance": 1e-10,
+        "seconds": 16.757,
+        "seed": "20260930",
+        "special": {
+          "excluded": "G:1e0b7203991b7f9082d7344142238f0a8b0c89792e60ae94ae616ca68973b193",
+          "largest": "G:30a738cfcbc0ef08b795a5d51e97b2885bd51c7133181cc6189b78c0fcbb77dd",
+          "single": "G:0000393aa9510cd6d1ddceb452c06cfea72ee7c0c5bbbb34bc7a9c672a5e5a8f"
+        },
+        "statistic_rows": 9924,
+        "threshold_results": 29772
+      },
+      "reconciliation": {
+        "coverage_complete": true,
+        "decisions_conserved": true,
+        "excluded": 849886,
+        "group_reasons": [
+          [
+            "blacklist_category",
+            848453
+          ],
+          [
+            "excluded_interval",
+            2187
+          ]
+        ],
+        "included": 1867514,
+        "layer_conservation": true,
+        "layers_and_basic_p95_p99": [
+          [
+            "day",
+            235223,
+            5120,
+            691,
+            504
+          ],
+          [
+            "hour",
+            69471,
+            3259,
+            873,
+            417
+          ],
+          [
+            "overall",
+            53786,
+            1250,
+            435,
+            117
+          ],
+          [
+            "week",
+            82356,
+            2299,
+            651,
+            161
+          ],
+          [
+            "weekday",
+            96362,
+            2771,
+            630,
+            141
+          ]
+        ],
+        "reasons_conserved": true,
+        "seconds": 197.066
+      },
+      "repeat": {
+        "build_id": "B:20261001T004837:f36dec54378d47ccb427873da3c01918",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            849886
+          ],
+          [
+            "group",
+            "included",
+            1867514
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "groups": 53786,
+        "layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            1
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            64
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            36
+          ],
+          [
+            "batch",
+            "execution_failed",
+            21893
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            44
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "batch",
+            "sql_missing",
+            31869
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            21811
+          ],
+          [
+            "batch",
+            "start_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            21974
+          ],
+          [
+            "group",
+            "blacklist_category",
+            848453
+          ],
+          [
+            "group",
+            "excluded_interval",
+            2187
+          ],
+          [
+            "none",
+            "blacklist_category",
+            15480
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ],
+          [
+            "none",
+            "sql_missing",
+            1282
+          ],
+          [
+            "none",
+            "sql_uncertain",
+            690
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 264.769,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            871923
+          ],
+          [
+            "included",
+            1867514
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "timings": {
+          "bind": [
+            425394,
+            220672
+          ],
+          "execute_fetch": [
+            12403,
+            5
+          ],
+          "execute_first": [
+            425339,
+            220673
+          ],
+          "parse": [
+            421753,
+            211700
+          ],
+          "request": [
+            582625,
+            196836
+          ]
+        }
+      },
+      "repeat_digest": {
+        "mpp_build_coverage": {
+          "rows": 268930,
+          "sha256_limb_sums": [
+            "4593466131985457113413",
+            "-3280810361703482323699",
+            "-1601130370392796632733",
+            "-2881240570976166329655"
+          ]
+        },
+        "mpp_build_timing_coverage": {
+          "rows": 5,
+          "sha256_limb_sums": [
+            "-12517321887582795538",
+            "-7613290773218124294",
+            "15848589102790841643",
+            "-18068646529292786182"
+          ]
+        },
+        "mpp_statistic": {
+          "rows": 537198,
+          "sha256_limb_sums": [
+            "-6335530557495922935696",
+            "4365866150010596475525",
+            "6505524219118945898048",
+            "922206995561882574674"
+          ]
+        }
+      },
+      "repeat_equal": true,
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 228429,
+          "seconds": 65.523
+        },
+        "config_id": "CS:403e3541b75344b9828bc7da913d5d78",
+        "input_id": "IS:2f30e873adb9429e8aec33698411a659",
+        "rule_id": "TR:505541016ee24094488c9f48544781f4bd8f7f2143a06039829b65535578df5d"
+      }
+    },
+    "120": {
+      "first": {
+        "build_id": "B:20261001T010119:53060ece890f486aae3e358d60b7b887",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            929817
+          ],
+          [
+            "group",
+            "included",
+            3512071
+          ]
+        ],
+        "groups": 873957,
+        "layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            245
+          ],
+          [
+            "batch",
+            "blacklist_category",
+            7
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            68
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            54
+          ],
+          [
+            "batch",
+            "execution_failed",
+            35392
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            20
+          ],
+          [
+            "batch",
+            "sql_encoding_invalid",
+            20
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            893
+          ],
+          [
+            "batch",
+            "sql_missing",
+            30204
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            68641
+          ],
+          [
+            "batch",
+            "start_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            35711
+          ],
+          [
+            "group",
+            "blacklist_category",
+            926293
+          ],
+          [
+            "group",
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 841.955,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            965351
+          ],
+          [
+            "included",
+            3512071
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "timings": {
+          "bind": [
+            621780,
+            154787
+          ],
+          "execute_fetch": [
+            318,
+            0
+          ],
+          "execute_first": [
+            621711,
+            154787
+          ],
+          "parse": [
+            505734,
+            106973
+          ],
+          "request": [
+            1762528,
+            513270
+          ]
+        }
+      },
+      "first_digest": {
+        "mpp_build_coverage": {
+          "rows": 4369785,
+          "sha256_limb_sums": [
+            "-18468324946784223502152",
+            "-8004645033512625813016",
+            "-6278063316536787076499",
+            "3542595119574361718300"
+          ]
+        },
+        "mpp_build_timing_coverage": {
+          "rows": 5,
+          "sha256_limb_sums": [
+            "-3170903074833178329",
+            "11596220502796098824",
+            "8233197690805706671",
+            "1273910333807337670"
+          ]
+        },
+        "mpp_statistic": {
+          "rows": 5850925,
+          "sha256_limb_sums": [
+            "14708041910982601713121",
+            "-20237129072062467669396",
+            "12340950966594593337917",
+            "-921482278950778802406"
+          ]
+        }
+      },
+      "memory_first": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 238116864,
+          "python": 78431232,
+          "total": 316187648
+        },
+        "samples": 827
+      },
+      "memory_repeat": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 272757760,
+          "python": 95522816,
+          "total": 364910592
+        },
+        "samples": 489
+      },
+      "oracle": {
+        "absolute_tolerance": 1e-09,
+        "group_selection_sha256": "07f00e755b2176d1edea10481557ab81ed6e5bffb858be607963907bf632360d",
+        "groups": 1003,
+        "method": "seeded MD5 ordering plus largest/single/excluded strata; Decimal independent oracle",
+        "metrics": 112897,
+        "relative_tolerance": 1e-10,
+        "seconds": 7.662,
+        "seed": "20260930",
+        "special": {
+          "excluded": "G:18f1903e83be3f4e6980902cad33935890e26e16dacf340966698a17b04df6d3",
+          "largest": "G:1a5348c6f2f772b9f3dd4ddac2ae525526656def92425436ad11a3249b8c05fa",
+          "single": "G:000005f07bca1381937ffce189ffae8536ebd840f979e8cfc0c5cdc59f48df09"
+        },
+        "statistic_rows": 6641,
+        "threshold_results": 19923
+      },
+      "reconciliation": {
+        "coverage_complete": true,
+        "decisions_conserved": true,
+        "excluded": 929817,
+        "group_reasons": [
+          [
+            "blacklist_category",
+            926293
+          ],
+          [
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "included": 3512071,
+        "layer_conservation": true,
+        "layers_and_basic_p95_p99": [
+          [
+            "day",
+            1513777,
+            7690,
+            1326,
+            511
+          ],
+          [
+            "hour",
+            971941,
+            3654,
+            1136,
+            173
+          ],
+          [
+            "overall",
+            873957,
+            2903,
+            1101,
+            232
+          ],
+          [
+            "week",
+            977473,
+            3501,
+            976,
+            215
+          ],
+          [
+            "weekday",
+            1513777,
+            0,
+            0,
+            0
+          ]
+        ],
+        "reasons_conserved": true,
+        "seconds": 187.25
+      },
+      "repeat": {
+        "build_id": "B:20261001T012000:39abcf48d212498a92bdaa39beed51fb",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            929817
+          ],
+          [
+            "group",
+            "included",
+            3512071
+          ]
+        ],
+        "groups": 873957,
+        "layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            245
+          ],
+          [
+            "batch",
+            "blacklist_category",
+            7
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            68
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            54
+          ],
+          [
+            "batch",
+            "execution_failed",
+            35392
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            20
+          ],
+          [
+            "batch",
+            "sql_encoding_invalid",
+            20
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            893
+          ],
+          [
+            "batch",
+            "sql_missing",
+            30204
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            68641
+          ],
+          [
+            "batch",
+            "start_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            35711
+          ],
+          [
+            "group",
+            "blacklist_category",
+            926293
+          ],
+          [
+            "group",
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 502.323,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            965351
+          ],
+          [
+            "included",
+            3512071
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "timings": {
+          "bind": [
+            621780,
+            154787
+          ],
+          "execute_fetch": [
+            318,
+            0
+          ],
+          "execute_first": [
+            621711,
+            154787
+          ],
+          "parse": [
+            505734,
+            106973
+          ],
+          "request": [
+            1762528,
+            513270
+          ]
+        }
+      },
+      "repeat_digest": {
+        "mpp_build_coverage": {
+          "rows": 4369785,
+          "sha256_limb_sums": [
+            "-18468324946784223502152",
+            "-8004645033512625813016",
+            "-6278063316536787076499",
+            "3542595119574361718300"
+          ]
+        },
+        "mpp_build_timing_coverage": {
+          "rows": 5,
+          "sha256_limb_sums": [
+            "-3170903074833178329",
+            "11596220502796098824",
+            "8233197690805706671",
+            "1273910333807337670"
+          ]
+        },
+        "mpp_statistic": {
+          "rows": 5850925,
+          "sha256_limb_sums": [
+            "14708041910982601713121",
+            "-20237129072062467669396",
+            "12340950966594593337917",
+            "-921482278950778802406"
+          ]
+        }
+      },
+      "repeat_equal": true,
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 1155798,
+          "seconds": 490.044
+        },
+        "config_id": "CS:1b40e491066646d68d4b08a43bbf28bf",
+        "input_id": "IS:a2c829cff9a6451ab23ff90148750a62",
+        "rule_id": "TR:505541016ee24094488c9f48544781f4bd8f7f2143a06039829b65535578df5d"
+      }
+    }
+  },
+  "code_sha256": {
+    "scripts/db/verify_statistics_full.py": "0c963dc0091bebf86360079bfbfb0266bfe9cf3cf1f15a76539b032b88e2fc71",
+    "sql_apm/baseline/__init__.py": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+    "sql_apm/baseline/statistics.py": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+    "sql_apm/baseline/watchdog.py": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+    "sql_apm/storage/schema.sql": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61",
+    "sql_apm/storage/statistics.py": "b0457ed125826750a8103a9e9c0e52f9f4e977f1000de2cd613bf05888f944d0",
+    "tests/baseline/oracle.py": "7a7059566d8116d4e6f6842d9b1310f5c7991f7c6cbcd92182ee015b2d7d6254"
+  },
+  "complete": true,
+  "decision_version": "training-decision/1",
+  "import_seconds": 3550.138,
+  "import_source_head_sha": "5cdf43b7097a014b8910ff6f91bddd9f7eaef2e7",
+  "input_files": 55,
+  "input_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "method": "measured; private PG17; all 55 files reimported",
+  "normalization_context": {
+    "algorithm_version": "sql-normalization/5",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter/9",
+    "profile": "hashdata-pg94",
+    "rules_digest": "00a3d088002566d01a3bbf9aff64619452116c7a8dcf32a6ae4b489342c46a58",
+    "rules_ref": "sha256:cb1e23a966095b526c9c337b2125f65d3521692c473796b179fb038f4f400528"
+  },
+  "relation_sizes": [
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "analysis",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "analysis_file",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "attempt_problem",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 36,
+      "table": "batch_date",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "batch_entry",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 4,
+      "table": "build",
+      "total_bytes": 131072
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "build_check",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "config_snapshot",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "current_version",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 16390146,
+      "table": "evidence_record",
+      "total_bytes": 18327388160
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "import_attempt",
+      "total_bytes": 114688
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "import_batch",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_analysis",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_batch",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "input_file",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "input_file_analysis",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_manifest",
+      "total_bytes": 114688
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_snapshot",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 104362,
+      "table": "mpp_approximate_evidence",
+      "total_bytes": 48996352
+    },
+    {
+      "partition": false,
+      "rows": 10517,
+      "table": "mpp_approximate_input",
+      "total_bytes": 18178048
+    },
+    {
+      "partition": false,
+      "rows": 10517,
+      "table": "mpp_approximate_result",
+      "total_bytes": 31170560
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_approximate_rule",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 927743,
+      "table": "mpp_baseline_group",
+      "total_bytes": 1621819392
+    },
+    {
+      "partition": false,
+      "rows": 9277430,
+      "table": "mpp_build_coverage",
+      "total_bytes": 7250755584
+    },
+    {
+      "partition": true,
+      "rows": 537860,
+      "table": "mpp_build_coverage_p594693963537055769",
+      "total_bytes": 420388864
+    },
+    {
+      "partition": true,
+      "rows": 8739570,
+      "table": "mpp_build_coverage_p974329813721629853",
+      "total_bytes": 6830366720
+    },
+    {
+      "partition": false,
+      "rows": 1855486,
+      "table": "mpp_build_group",
+      "total_bytes": 685301760
+    },
+    {
+      "partition": false,
+      "rows": 20,
+      "table": "mpp_build_timing_coverage",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision_reason",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision_reason_evidence",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 1385776,
+      "table": "mpp_fingerprint",
+      "total_bytes": 2383413248
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_input_occurrence",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_normalization",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 7424804,
+      "table": "mpp_occurrence",
+      "total_bytes": 11606786048
+    },
+    {
+      "partition": false,
+      "rows": 92059,
+      "table": "mpp_occurrence_approximate",
+      "total_bytes": 83763200
+    },
+    {
+      "partition": false,
+      "rows": 1448320,
+      "table": "mpp_occurrence_evidence",
+      "total_bytes": 1112236032
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "mpp_result_partition",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 1385776,
+      "table": "mpp_sql_text",
+      "total_bytes": 1053990912
+    },
+    {
+      "partition": false,
+      "rows": 7407688,
+      "table": "mpp_sql_text_evidence",
+      "total_bytes": 2677121024
+    },
+    {
+      "partition": false,
+      "rows": 12776246,
+      "table": "mpp_statistic",
+      "total_bytes": 10126827520
+    },
+    {
+      "partition": true,
+      "rows": 1074396,
+      "table": "mpp_statistic_p594693963537055769",
+      "total_bytes": 804192256
+    },
+    {
+      "partition": true,
+      "rows": 11701850,
+      "table": "mpp_statistic_p974329813721629853",
+      "total_bytes": 9322635264
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_training_rule",
+      "total_bytes": 147456
+    },
+    {
+      "partition": false,
+      "rows": 1384227,
+      "table": "mpp_training_sql",
+      "total_bytes": 719486976
+    },
+    {
+      "partition": false,
+      "rows": 517900,
+      "table": "problem",
+      "total_bytes": 257941504
+    },
+    {
+      "partition": false,
+      "rows": 517900,
+      "table": "problem_evidence",
+      "total_bytes": 211320832
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "publication",
+      "total_bytes": 40960
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "schema_version",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "scope",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "source",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "source_file",
+      "total_bytes": 507904
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "task",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "task_batch",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "task_build",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "task_publication",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "training_config",
+      "total_bytes": 32768
+    }
+  ],
+  "schema_receipts": [
+    [
+      "1.3.0",
+      "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb"
+    ],
+    [
+      "1.4.0",
+      "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61"
+    ]
+  ],
+  "schema_version": "1.4.0",
+  "source_head_sha": "0cf04122065539768725083dd16c9616cdc6b12a"
+}

@@ -76,7 +76,8 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
-| [统计计算验证](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |
+| [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
+| [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |
 | [类别别名验证](reports/training-category-aliases-2026-09-30.md) | 实施验证报告 | 三个别名、快照兼容及 55 文件执行级差分。 |
 | [训练判定 R1 整改验证](reports/training-decisions-r1-remediation-2026-09-30.md) | 整改验证报告 | 事务 SET 暂缓边界、规则缓存版本和真实输入影响核对。 |
 | [训练样本判定验证](reports/training-decisions-2026-09-29.md) | 实施验证报告 | 合成规则、结构迁移、55 文件判定守恒及实测耗时。 |

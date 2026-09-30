@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/training-eligibility.md
 updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/23
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21#issuecomment-5903270047
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -66,7 +68,7 @@ confidence: high
 其余异常筛选策略另行确认。
 
 具体配置与识别已由②实现，见[操作说明](../../docs/runbooks/training-decisions.md)。
-首版类别、别名／变体按下述 Issue #2 的确认边界；具体 SQL 模板条目仍由用户
+首版类别、别名／变体按下述 Issue #2 边界及 Issue #23 的补充确认；具体 SQL 模板条目仍由用户
 在后续生产运行中调整。
 
 关联条款：[已确认的首期留存与自动清理边界](sql-storage.md#已确认的首期留存与自动清理边界)；[已确认的阶段与调用样本门槛](baseline-statistics.md#已确认的阶段与调用样本门槛)。
@@ -111,6 +113,7 @@ confidence: high
 - 来源：用户确认 Issue #2 实施计划并要求“日志核查尽量全面，名单要稍微保守一些，
   不确定的不要放入黑名单”。本节据此细化已有七项的边界，未新增排除类别。
 - 来源状态：current；Issue #2 交付业务规则和诊断证据；②的产品识别器沿用本节边界。
+  下表已纳入 2026-09-30 的三个别名补充确认；原 2026-09-26 暂缓决定保留在下文历史说明。
 - [全量核查报告](../../docs/reports/statement-category-census-2026-09-26.md)记录
   119／120 全部 46 个文件的观察、候选、来源与限制；观察频率不是排除依据。
 - 以下规则适用于能可靠识别的**顶层完整语句**。大小写、普通空白和注释不改变
@@ -120,10 +123,10 @@ confidence: high
 | 已确认类别 | 业务解释与排除理由 | 同一语句的覆盖边界 | 不据此扩大排除 |
 | --- | --- | --- | --- |
 | `SET` | 调整运行参数，作为会话／事务执行上下文，不单独训练其参数设置耗时 | 普通运行参数的 `SET`、`SET SESSION`、`SET LOCAL`，以及运行参数写法 `SET TIME ZONE`、`SET NAMES`、`SET SCHEMA`、`SET SEED` | `RESET`、`SELECT set_config(...)`、`UPDATE pg_settings`；身份、约束及事务特征设置见下述暂缓边界 |
-| `BEGIN` | 开始事务，单独作为控制步骤排除 | `BEGIN`、`BEGIN WORK`、`BEGIN TRANSACTION` 及该命令的事务模式选项 | `START TRANSACTION` 尚不自动折叠；过程体中的 `BEGIN` 不作为独立控制语句 |
-| `COMMIT` | 提交事务，单独作为控制步骤排除，不以耗时短为前提 | `COMMIT`、`COMMIT WORK`、`COMMIT TRANSACTION` | `END`、`COMMIT PREPARED` 另列候选；不按 `COMMIT` 前缀覆盖所有事务命令 |
+| `BEGIN` | 开始事务，单独作为控制步骤排除 | `BEGIN`、`BEGIN WORK`、`BEGIN TRANSACTION`、`START TRANSACTION` 及事务模式选项 | 过程体中的 `BEGIN` 不作为独立控制语句 |
+| `COMMIT` | 提交事务，单独作为控制步骤排除，不以耗时短为前提 | `COMMIT`、`COMMIT WORK`、`COMMIT TRANSACTION`、`END`、`END WORK`、`END TRANSACTION` | `COMMIT PREPARED` 暂缓；不按 `COMMIT` 前缀覆盖所有事务命令 |
 | `VACUUM` | 空间回收／维护，其单条维护耗时按已确认决定排除 | 确认属于 `VACUUM` 的 `FULL`、`FREEZE`、`VERBOSE`、`ANALYZE` 选项和合法目标范围 | `REINDEX`、`CLUSTER`、`CHECKPOINT`；不把所有维护任务或维护时段内的 SQL 当成此类别 |
-| `ANALYZE` | 收集优化器统计信息，其单条维护耗时排除 | `ANALYZE`、`ANALYZE VERBOSE`，合法表／列目标；方言专有选项须能可靠确认仍属该命令 | 英式拼写 `ANALYSE` 暂缓自动折叠；`EXPLAIN ANALYZE` 属于 `EXPLAIN` |
+| `ANALYZE` | 收集优化器统计信息，其单条维护耗时排除 | `ANALYZE`／`ANALYSE`、可选 `VERBOSE` 及合法表／列目标；方言专有选项须能可靠确认仍属该命令 | `EXPLAIN ANALYZE`／`EXPLAIN ANALYSE` 属于 `EXPLAIN`；`VACUUM ANALYSE` 仍属 `VACUUM` |
 | `CREATE INDEX` | 创建索引，为指定的结构维护类别 | `CREATE INDEX` 与 `CREATE UNIQUE INDEX`；其他选项以目标方言有效且确属建索引为前提 | `ALTER INDEX`、`REINDEX`、`CREATE TABLE` 及 `CREATE TABLE AS SELECT` |
 | `ALTER TABLE` | 修改表定义，为已确认的指定 DDL 类别；不按具体子动作耗时决定排除 | 明确属于 `ALTER TABLE` 的加／删列、改名、设置及分区等合法子动作，含 `IF EXISTS`、`ONLY` 等修饰 | `ALTER INDEX`、`ALTER VIEW`、`ALTER DATABASE`；不能扩大为全部 `ALTER` 或全部 DDL |
 
@@ -140,7 +143,6 @@ confidence: high
 
 | 候选／边界 | 调查结论与当前决定 | 重新评估条件 |
 | --- | --- | --- |
-| `END`、`START TRANSACTION`、`ANALYSE` | 上游语法证实与已有命令存在别名／等效关系；业务覆盖尚未逐项确认，暂缓自动折叠 | 用户确认相应别名覆盖及目标方言识别范围 |
 | `SET ROLE`、`SET SESSION AUTHORIZATION`、`SET TRANSACTION`、`SET SESSION CHARACTERISTICS AS TRANSACTION`、`SET CONSTRAINTS` | 具有身份、事务或约束语义，不能仅靠首词 `SET` 合并为普通运行参数设置；保守暂缓 | 明确哪些设置作为独立训练对象排除，以及混合批次预期 |
 | `ROLLBACK`／`ABORT`、保存点命令、两阶段事务命令 | 控制用途是候选理由，但单条控制耗时及回滚归属可能有分析价值；暂缓 | 用户确认控制类别的完整范围；与执行失败资格分别解释 |
 | `RESET`、`DISCARD`、`SHOW`、预备语句／游标管理命令 | 可能属于连接初始化、清理或客户端调用；暂缓，不统一排除 | 区分管理命令与实际执行／取数，不能丢掉 `EXECUTE`／`FETCH` 业务耗时 |
@@ -166,6 +168,24 @@ confidence: high
   [整改验证](../../docs/reports/training-decisions-r1-remediation-2026-09-30.md)记录两条解析路径、
   五类计时及缓存版本验证。
 
+#### 三个纯别名的补充确认（2026-09-30）
+
+- 来源：[Issue #23 的用户确认](https://github.com/shenxg13/sql-apm/issues/23#issuecomment-5902218778)；current。
+  七个类别不变，`END`、`START TRANSACTION`、`ANALYSE` 分别归入 `COMMIT`、`BEGIN`、`ANALYZE`。
+  覆盖范围与对应命令对称，仍要求完整语法识别；合法变体见上表。
+- 历史确认：2026-09-26 的 Issue #2 因业务覆盖未逐项确认，将这三个别名暂缓自动折叠；
+  上游语法已证实等效关系，当时的 C15 不排除、C25 不是纯黑名单批次。
+  本次逐项确认取代这三个暂缓决定，其他候选及事务特征 SET 边界保持原义。
+- 单条别名及全部由黑名单语句／别名组成的批次整批排除；含业务语句的批次仍按整体判断，
+  例如 `START TRANSACTION; INSERT INTO t VALUES (1); END` 和 `BEGIN; SELECT 1; END`
+  不因类别排除，不拆分或扣除子语句耗时。
+- `START TRANSACTION` 也纳入；当前生产日志未观察到它的 duration 记录，方言支持依据仅为上游语法。
+  `END` 和 `ANALYSE` 已有成功 duration 观察；出现次数不等于新增排除执行数。
+- 产品类别版本 `statement-categories/3` 在完整解析／可靠指纹路径上使用同一别名归并规则。
+  输出与原因继续使用原七类和 `blacklist_category`；共享词法器保留诊断拼写。
+  新快照生成新的原文级结果，旧快照仍引用原结果；判定规则 `training-decision/1` 与数据库函数不变。
+  执行级影响、耗时与存储见[别名验证报告](../../docs/reports/training-category-aliases-2026-09-30.md)。
+
 #### 类别判定验收样例
 
 下列 SQL 均为人工合成，仅走查规则，不执行数据库操作。“不因类别排除”不
@@ -187,7 +207,7 @@ confidence: high
 | C12 | `EXPLAIN ANALYZE SELECT 1;` | 不因类别排除；不能因内含 `ANALYZE` 命中维护类别 |
 | C13 | `SELECT 'SET; COMMIT', $$ALTER TABLE demo$$;` | 不因类别排除；字符串内关键字与分号不是子语句 |
 | C14 | `/* SELECT */ sEt work_mem = '16MB'; -- INSERT` | 排除；普通注释不改变实际 `SET` 类别 |
-| C15 | `END;` / `START TRANSACTION;` / `ANALYSE demo;` | 三个独立别名案例均不因当前类别规则排除，覆盖暂缓 |
+| C15 | `END;` / `START TRANSACTION;` / `ANALYSE demo;` | 三个独立别名分别按 `COMMIT`、`BEGIN`、`ANALYZE` 排除（2026-09-30 补充确认） |
 | C16 | `COMMIT PREPARED 'demo_tx';` | 不因类别排除；与普通 `COMMIT` 分开 |
 | C17 | `RESET ALL;` / `SET ROLE NONE;` / `SET TRANSACTION READ ONLY;` | 三个独立案例均不因当前类别规则排除，扩展暂缓 |
 | C18 | `SELECT set_config('work_mem', '16MB', false);` | 不因类别排除；函数效果不把 `SELECT` 变为 `SET` |
@@ -197,7 +217,7 @@ confidence: high
 | C22 | `DO $$BEGIN PERFORM 1; END$$;` | 不因类别排除；过程体不是独立 `BEGIN`／`END` 批次 |
 | C23 | `ROLLBACK;` / `SHOW work_mem;` / `DEALLOCATE ALL;` / `LOCK TABLE demo IN ACCESS SHARE MODE;` | 四个独立新增候选案例均暂缓，不因类别排除 |
 | C24 | `SET work_mem = '16MB'; SELECT 1;` | 不因首条 `SET` 排除整批 |
-| C25 | `SET work_mem = '16MB'; END;` | `END` 暂缓，不能认定为纯黑名单批次；其他资格仍独立检查 |
+| C25 | `SET work_mem = '16MB'; END;` | 纯黑名单批次，整批按类别排除；其他资格仍独立检查（2026-09-30 补充确认） |
 
 类别判断与其他规则的关系继续遵守本页单条／批次和基本资格条款：
 
@@ -356,7 +376,7 @@ confidence: high
   结构指纹一致即命中，可限定集群、数据库或执行用户。无法可靠归一化的模板报错，
   不回退文本匹配。归一化规则升级后自动按新规则重算示例，用户无需重填。
 - 类别与模板黑名单均作用于请求整体、Execute 首次、Execute 续取、Parse、Bind。
-  类别仍严格按七类、暂缓别名和纯／混合批次边界；不因阶段身份豁免命中。
+  类别仍严格按七类、已确认别名、其余暂缓项和纯／混合批次边界；不因阶段身份豁免命中。
 - 产品实现位于 `sql_apm/training/` 与 `storage/training.py`，数据库函数是逐条资格
   的唯一实现，诊断工具保持独立；[设计与验证](../../docs/design/training-decisions.md)
   说明实现和证据；③统计、④构建发布及执行历史界面仍分别交付。
@@ -383,5 +403,5 @@ confidence: high
 
 ## Open Questions
 
-类别新增、别名及特殊 SET 覆盖按上述保守边界暂缓；模板细则及具体实现仍按各条款分别落实。自动“高波动／
+尚未确认的类别新增、别名及特殊 SET 覆盖按上述保守边界暂缓；模板细则及具体实现仍按各条款分别落实。自动“高波动／
 疑似离群”标签及其阈值已明确后续结合实际数据另行确定。各节已有待定说明继续有效。

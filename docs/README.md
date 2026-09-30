@@ -74,6 +74,7 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [类别别名验证](reports/training-category-aliases-2026-09-30.md) | 实施验证报告 | 三个别名、快照兼容及 55 文件执行级差分。 |
 | [训练判定 R1 整改验证](reports/training-decisions-r1-remediation-2026-09-30.md) | 整改验证报告 | 事务 SET 暂缓边界、规则缓存版本和真实输入影响核对。 |
 | [训练样本判定验证](reports/training-decisions-2026-09-29.md) | 实施验证报告 | 合成规则、结构迁移、55 文件判定守恒及实测耗时。 |
 | [结构指纹 v5 验证](reports/sql-normalization-v5-2026-09-29.md) | 实施验证报告 | SELECT／JOIN 常量与集合分支恢复、149 万原文独立差分及 745 万耗时记录的覆盖／离散。 |

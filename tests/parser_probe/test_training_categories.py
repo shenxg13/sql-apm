@@ -23,7 +23,7 @@ class TrainingCategoryTests(unittest.TestCase):
                         self.assertEqual([category],result['categories'])
 
     def test_deferred_and_non_categories(self):
-        for text in ['END','START TRANSACTION','ANALYSE t',"COMMIT PREPARED 'tx'",'SET ROLE NONE',
+        for text in ["COMMIT PREPARED 'tx'",'SET ROLE NONE',
                      'SET SESSION AUTHORIZATION DEFAULT',"SET \"role\" TO 'example'",
                      "SET \"session_authorization\" TO 'example'",'SET TRANSACTION READ ONLY',
                      'SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY','SET CONSTRAINTS ALL DEFERRED',
@@ -40,7 +40,7 @@ class TrainingCategoryTests(unittest.TestCase):
     def test_whole_batches_and_incomplete_grammar(self):
         for text,kind in [("SET work_mem='16MB'; BEGIN; COMMIT",'pure'),
                           ("SET work_mem='16MB'; BEGIN; INSERT INTO t VALUES(1); COMMIT",'mixed'),
-                          ("SET work_mem='16MB'; END",'mixed'),
+                          ("SET work_mem='16MB'; END",'pure'),
                           ("/* SELECT */ sEt work_mem='16MB'; -- INSERT",'pure'),
                           ("SET work_mem='16MB'; SELECT 'cut",'unknown'),
                           ('; /* comment */ ;','unknown'),('SET broken','unknown'),
@@ -87,3 +87,49 @@ class TrainingCategoryTests(unittest.TestCase):
             for fast in (False,True):
                 with self.subTest(text=text,grammar_verified=fast):
                     self.assertEqual(dict(kind=kind,categories=categories),classify(text,grammar_verified=fast))
+
+    def test_confirmed_aliases_on_both_paths(self):
+        from sql_apm.sql.normalization import Normalizer
+        engine = Normalizer()
+        variants = {
+            'COMMIT': ['END', 'END WORK', 'END TRANSACTION', '/* before */ eNd /* after */ WORK;'],
+            'BEGIN': ['START TRANSACTION', 'start /* mode */ transaction READ ONLY',
+                      'START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ WRITE, DEFERRABLE'],
+            'ANALYZE': ['ANALYSE', 'ANALYSE VERBOSE t(col)',
+                        'analyse /* target */ "schema"."table"("column")'],
+        }
+        for category, texts in variants.items():
+            for text in texts:
+                with self.subTest(text=text):
+                    self.assertEqual('reliable', engine.normalize(text)['fingerprint']['state'])
+                    expected = dict(kind='pure', categories=[category])
+                    self.assertEqual(expected, classify(text))
+                    self.assertEqual(expected, classify(text, grammar_verified=True))
+
+    def test_alias_negative_boundaries_and_batches(self):
+        from sql_apm.sql.normalization import Normalizer
+        engine = Normalizer()
+        cases = [
+            ('EXPLAIN ANALYSE SELECT 1', 'none', []),
+            ('VACUUM ANALYSE t', 'pure', ['VACUUM']),
+            ('DO $$BEGIN PERFORM 1; END$$', 'none', []),
+            ("SELECT 'END; START TRANSACTION; ANALYSE'", 'none', []),
+            ('SELECT "END", "ANALYSE", "START TRANSACTION" FROM t', 'none', []),
+            ("SET work_mem='16MB'; END", 'pure', ['COMMIT', 'SET']),
+            ('START TRANSACTION; INSERT INTO t VALUES (1); END', 'mixed', ['BEGIN', 'COMMIT']),
+            ('BEGIN; SELECT 1; END', 'mixed', ['BEGIN', 'COMMIT']),
+            ('START TRANSACTION; ANALYSE t; END WORK', 'pure', ['ANALYZE', 'BEGIN', 'COMMIT']),
+            ("SET transaction_read_only=on; END", 'mixed', ['COMMIT']),
+        ]
+        for text, kind, categories in cases:
+            with self.subTest(text=text):
+                self.assertEqual('reliable', engine.normalize(text)['fingerprint']['state'])
+                expected = dict(kind=kind, categories=categories)
+                self.assertEqual(expected, classify(text))
+                self.assertEqual(expected, classify(text, grammar_verified=True))
+        # Invalid text cannot enter the trusted fast path: normalization must refuse it.
+        for text in ['END nonsense', 'START', 'START TRANSACTION ISOLATION LEVEL',
+                     'ANALYSE VERBOSE t(', 'END; SELECT FROM', "ANALYSE 'unfinished"]:
+            with self.subTest(text=text):
+                self.assertNotEqual('reliable', engine.normalize(text)['fingerprint']['state'])
+                self.assertEqual(dict(kind='unknown', categories=[]), classify(text))

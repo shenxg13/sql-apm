@@ -9,6 +9,8 @@
 
 JSON 存放于被忽略的 `var/training/`；不执行配置或 `.env`。下面均为合成示例。
 类别固定为已确认的七类；首期模板默认空列表，用户运行时维护。
+类别 v3 将三个别名归入已有类别，覆盖边界见[训练资格](../../.project-wiki/contracts/training-eligibility.md#三个纯别名的补充确认2026-09-30)。
+升级代码后首次创建快照会准备新缓存，旧快照继续使用原有结果；无需数据库结构迁移。
 
 ```json
 {
@@ -115,3 +117,18 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m unittest discover 
 真实结果见[原验证报告](../reports/training-decisions-2026-09-29.md)。
 类别 v2 的合成回归和原 55 文件索引的有界影响核对见
 [整改验证](../reports/training-decisions-r1-remediation-2026-09-30.md)；旧实测仍归属其记录的源码版本。
+
+Issue #23 的执行级比较追加 `--compare-aliases`，在同一私有实例使用冻结 v2 实现准备旧规则，
+再生成 v3 快照。两个集群按相同截止日和临时时段与 #21 合并时保留的最终计数逐项核对；
+临时完整执行投影证明其他 Decision 字段及非类别原因不变，另列新增类别命中、真正状态转为
+excluded 的数量和混合转纯黑名单批次。单条含多个别名时，每别名分项有重叠，去重合计另列。
+
+```bash
+.venv/bin/python scripts/db/verify_training_full.py \
+  --root raw/inbox/hashdata \
+  --output var/training/aliases-replay --compare-aliases
+```
+
+冻结 v2 文件来自 #21 合并提交并校验字节摘要，仅用于验收，不是产品历史规则执行入口。
+额外准备一版缓存和临时比较投影增加验收成本；结果与证据边界见
+[别名验证报告](../reports/training-category-aliases-2026-09-30.md)。

@@ -98,7 +98,7 @@
 | 2026-09-25 | 用户说明生产为 Kylin V10 SP2、完全离线，明确当前先以可联网 Alma 环境开发，后续通过专门 Issue 实施 Kylin 离线安装方案，不作为当前工作前置条件。只读核对本机为 AlmaLinux 9.8、x86_64，生产架构未提供，未进行下载、安装或兼容验收。同步[开发环境与生产部署安排](decisions/runtime-and-components.md#已确认的当前开发环境与生产部署安排)、Agent 入口、README 和开发说明；Python 3.9.5 与 PostgreSQL 17 要求不变，本次未创建 Kylin 专项 Issue |
 | 2026-09-25 | 用户明确目前不需要确认实施细节；当前沟通继续集中业务需求及范围，任务拆分、具体技术方案和实现级验收用例留待对应 Issue。停止推进此前尚未确认的五部分实施任务划分，不将其提升为项目决定；既有业务规则、技术栈及交付顺序保持有效。同步[资料状态与使用约定](decisions/project-scope.md#资料状态与使用约定)和 Agent 入口，未开展产品实施或创建新 Issue |
 | 2026-09-25 | 用户确认[其余非函数参数常量保留规则](contracts/sql-fingerprints.md#已确认的其余非函数参数常量保留规则)：已明确归一化范围之外的非函数参数常量保留具体值，值不同则指纹不同，例如 SELECT 计算系数和此前未约定的 CASE 结果值；既有业务值归一化、特殊值保留及原生参数边界继续适用。函数参数的逐项、匹配及默认规则仍由既有字典 Issue 确定。同步 Agent 入口与开发说明，清理相关待定表述；原文不变，入库与检索复用同一规则，未开展实现或扩大 Issue 范围 |
-| 2026-09-25 | 按用户明确要求创建并回读 [Issue #2：梳理首版 SQL 黑名单及适用范围](https://github.com/shenxg13/sql-apm/issues/2)，承接已确认名单、候选项与理由、类别变体、是否支持模板排除及批次正反例。初始标签为 status:triage，完整契约确认项未勾选；新增排除项及按 SQL 分组排除五类计时的方案继续待确认。同步[后续梳理入口](contracts/training-eligibility.md#首版黑名单规则的后续梳理)、Agent 入口和开发说明；仅建立需求入口，未开展实现或改动既有业务规则 |
+| 2026-09-25 | 按用户明确要求创建并回读 [Issue #2：梳理首版 SQL 黑名单及适用范围](https://github.com/shenxg13/sql-apm/issues/2)，承接已确认名单、候选项与理由、类别变体、是否支持模板排除及批次正反例。初始标签为 status:triage，完整契约确认项未勾选；新增排除项及按 SQL 分组排除五类计时的方案继续待确认。同步[后续梳理入口](contracts/training-eligibility.md#首版黑名单规则的维护入口)、Agent 入口和开发说明；仅建立需求入口，未开展实现或改动既有业务规则 |
 | 2026-09-25 | 用户确认统一黑名单支持语句类别与具体 SQL 模板两类规则，并将 [Issue #2](https://github.com/shenxg13/sql-apm/issues/2) 收窄为只梳理语句类别清单及适用范围；模板条目由用户后续在生产运行中调整，不由该 Issue 预设，也不作为其验收或前置条件。已记录范围变更评论、更新标题与正文并回读核对，保持需求梳理状态及完整契约未确认。同步[能力与维护分工](contracts/training-eligibility.md#已确认的黑名单能力与维护分工)、Agent 入口和开发说明；未新增具体排除条目或实施功能 |
 | 2026-09-25 | 按用户授权将详细需求完整迁入主题页，精简 Agent 入口和索引，并改为按任务阅读与单处维护；保留确认来源和未决边界。见[维护方法](methods/knowledge-maintenance.md)及[迁移核对](../docs/reports/knowledge-reorganization-2026-09-25.md)，未改变产品需求或实施 Issue 状态 |
 | 2026-09-25 | 用户要求首期面向 HashData，同时在设计中保留其他数据库与跑批系统等非数据库来源的基线接入空间。记录[多类型系统接入扩展约束](decisions/project-scope.md#已确认的多类型系统接入扩展约束)，接入、计时与指纹主题仅增加引用；首期业务规则和交付范围保持原约定，具体扩展机制及未来适配对象仍待落实 |
@@ -187,3 +187,12 @@
 - 同步已确认的[事务特征参数名暂缓边界](contracts/training-eligibility.md#事务特征设置的补充确认2026-09-30)及类别 v2，保留 2026-09-26 历史确认。
 - 记录用户接受模板变更后的缓存成本，见[操作说明](../docs/runbooks/training-decisions.md)；
   [整改验证](../docs/reports/training-decisions-r1-remediation-2026-09-30.md)保留回归及真实输入影响证据。
+
+## 2026-09-30：三个类别别名归并
+
+- 按 [Issue #23](https://github.com/shenxg13/sql-apm/issues/23) 的用户确认，将 `END`、
+  `START TRANSACTION`、`ANALYSE` 归入已有类别，更新 C15／C25；保留 2026-09-26 历史确认，
+  详见[训练资格](contracts/training-eligibility.md#三个纯别名的补充确认2026-09-30)。
+- 类别规则升为 v3，新旧快照分别引用原文结果；判定函数和七类名单不变。
+  [别名验证](../docs/reports/training-category-aliases-2026-09-30.md)记录合成与全量执行级差分。
+- 修正 2026-09-25 日志条目的维护入口锚点，保留日志文字与历史报告。

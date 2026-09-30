@@ -33,6 +33,9 @@ def verify():
                 for prefix in ('','default_'):
                     parameter=prefix+'transaction_'+stem
                     deferred.append((parameter,'SET '+parameter+' TO '+value))
+            aliases=[('alias_end','END WORK'),('alias_start','START TRANSACTION READ ONLY'),
+                     ('alias_analyse','ANALYSE VERBOSE t(col)'),
+                     ('alias_pure',"SET work_mem='16MB'; END")]
             cases=[]
             def add(label,text='SELECT 1',message='duration: 1000 ms',line='1946',**fields):
                 cases.append((label,row(line,message,text,**fields)))
@@ -46,12 +49,18 @@ def verify():
             for timing,line in [('request','1946'),('parse','2219'),('bind','2603')]:
                 add('template_'+timing,'SELECT * FROM t WHERE id=22',line=line)
                 add('category_'+timing,'BEGIN',line=line)
-                for name,text in deferred:
+                for name,text in deferred+aliases:
                     add(name+'_'+timing,text,line=line)
             for timing,prefix in [('execute_first','execute'),('execute_fetch','execute fetch from')]:
-                for name,text in [('template','SELECT * FROM t WHERE id=22'),('category','BEGIN')]+deferred:
+                for name,text in [('template','SELECT * FROM t WHERE id=22'),('category','BEGIN')]+deferred+aliases:
                     add('anchor_'+name+timing,text,line='2764',message=prefix+' p: '+text)
                     add(name+'_'+timing,text,line='2843')
+            add('alias_business','START TRANSACTION; INSERT INTO t VALUES(1); END')
+            add('alias_select','BEGIN; SELECT 1; END')
+            add('alias_multiple','START TRANSACTION; ANALYSE t; END')
+            add('alias_failed','END',line='1',message='error',**{'16':'ERROR'})
+            add('alias_outside','END',message='duration: 0 ms',**{'0':'2026-08-01 00:00:00 CST'})
+            add('alias_unresolved','END',**{'0':'invalid timestamp'})
             add('transaction_mixed',"SET LOCAL SESSION CHARACTERISTICS AS TRANSACTION READ ONLY; COMMIT")
             add('parameter_mixed',"SET default_transaction_read_only=on; SET work_mem='16MB'")
             add('template_structure_miss','SELECT * FROM t WHERE name=22')
@@ -97,6 +106,12 @@ def verify():
                   "UPDATE mpp_occurrence SET sql_state='complete',sql_id='FAILED_SQL' WHERE anchor_ref IN (SELECT record_id FROM evidence_record WHERE record_no="+str(target)+")")
             store=TrainingStore(dsn)
             try:
+                from verify_training_aliases import old_snapshot, compare, category_v2
+                from verify_training_full import decision_digest
+                old_alias=old_snapshot(store,doc,'C1',['B1'])
+                old_digest=decision_digest(store,old_alias)
+                old_summary=store.summary(old_alias['input_id'],old_alias['config_id'])
+                function_before=v.sql("SELECT pg_get_functiondef('mpp_training_decisions(text,text,text,text)'::regprocedure)")
                 snap=store.snapshot(validate(doc,'C1'),['B1'])
                 def decisions(snapshot):
                     with store.db,store.db.cursor() as cur:
@@ -104,6 +119,20 @@ def verify():
                         cols=[d[0] for d in cur.description]
                         return {cases[r[0]-1][0]:dict(zip(cols,r)) for r in cur}
                 got=decisions(snap)
+                v.require(old_alias['rule_id']!=snap['rule_id'] and snap['cache']['added_sql_results']>0,
+                          'frozen v2 and current v3 create distinct rule results')
+                for name,text in aliases:
+                    for timing in ['request','parse','bind','execute_first','execute_fetch']:
+                        label=name+'_'+timing
+                        v.require(got[label]['state']=='excluded' and got[label]['reason_codes']==['blacklist_category'],
+                                  'confirmed alias excluded: '+label)
+                for name in ['alias_business','alias_select']:
+                    v.require(got[name]['state']=='included','business alias batch stays included: '+name)
+                preserved_digest=decision_digest(store,old_alias)
+                v.require(old_digest['count']==preserved_digest['count'] and old_digest['hash_sums']==preserved_digest['hash_sums'],
+                          'complete v2 Decision digest unchanged after v3 cache generation')
+                v.require(function_before==v.sql("SELECT pg_get_functiondef('mpp_training_decisions(text,text,text,text)'::regprocedure)"),
+                          'database decision function unchanged across category upgrade')
                 v.require(got['included']['state']=='included' and got['mixed']['state']=='included','default inclusion and mixed whole batch')
                 v.require(got['batch_template']['reason_codes']==['blacklist_template'],'whole batch template matches normalized business constants')
                 v.require(got['start_unknown']['reason_codes']==['start_unknown'] and got['start_unknown']['rule_evaluations']['window']=='not_evaluated','known duration with unknown start')
@@ -135,7 +164,12 @@ def verify():
                     v.require(direct['reason_codes']==item['reason_codes'] and direct['state']==item['state'],'record query agrees: '+name)
                 groups=[];summary=store.summary(snap['input_id'],snap['config_id'],group_sink=groups.append)
                 v.require(dict(summary['states'])==dict(Counter(x['state'] for x in got.values())) and sum(g['count'] for g in groups if g['reason'] is None)==len(got),'summary and per-record conservation')
-                from verify_training_full import decision_digest
+                delta=compare(store,old_alias,snap,json.loads(json.dumps(old_summary)),summary)
+                v.require(delta['new_category_hits']==24 and delta['new_exclusions']==22 and delta['mixed_to_pure']==5,
+                          'full comparison proves alias-only transitions, five timings and single/batch counts')
+                v.require(len(delta['by_alias'])==23 and sum(row[3] for row in delta['by_alias'])==26
+                          and delta['invariant_violations']==0,
+                          'alias detail includes all five timing categories without invariant changes')
                 digest1,digest2=decision_digest(store,snap),decision_digest(store,snap)
                 v.require(digest1['count']==len(got) and digest1['hash_sums']==digest2['hash_sums'],'complete Decision fields repeat with identical per-row hash sums')
 
@@ -171,11 +205,11 @@ def verify():
                     v.require('blacklist_template' in item['reason_codes'] and decision['state']=='included','changed dictionary semantics recompute both example and original; old result retained')
                 finally:versioned.close()
                 from unittest.mock import patch
-                from sql_apm.training.categories import RULES
                 # Reproduce the pre-fix rule snapshot: v1 misses prefixed SESSION
                 # CHARACTERISTICS and all six transaction parameter names. The
                 # parsed-name branch uses this rule data in both versions.
-                legacy=deepcopy(RULES)
+                with category_v2() as frozen_v2:
+                    legacy=deepcopy(frozen_v2.RULES)
                 legacy['version']='statement-categories/1'
                 legacy['deferred'].remove('SET SESSION CHARACTERISTICS AS TRANSACTION')
                 legacy['deferred_parameter_names']=['role','session_authorization','authorization']
@@ -183,7 +217,7 @@ def verify():
                     previous=store.snapshot(validate(doc,'C1'),['B1'])
                 previous_got=decisions(previous)
                 v.require(previous['rule_id']!=snap['rule_id'] and previous['cache']['added_sql_results']>0,
-                          'real v1/v2 category snapshots have distinct rule IDs and cache rows')
+                          'real v1/v3 category snapshots have distinct rule IDs and cache rows')
                 for name in deferred_labels:
                     v.require(previous_got[name]['reason_codes']==['blacklist_category'],
                               'v1 reproduces over-exclusion: '+name)
@@ -193,7 +227,7 @@ def verify():
                 with patch('sql_apm.storage.training.classify',side_effect=AssertionError('unexpected reclassification')):
                     upgraded=store.snapshot(validate(doc,'C1'),['B1'])
                 v.require(upgraded['rule_id']==snap['rule_id'] and upgraded['cache']['added_sql_results']==0,
-                          'v2 cache is reused independently of retained v1 rows')
+                          'v3 cache is reused independently of retained v1 rows')
                 v.require(decisions(previous)==previous_got and decisions(snap)==got,
                           'old and new snapshots retain their respective transaction decisions')
                 upgraded_got=decisions(upgraded)
@@ -204,7 +238,7 @@ def verify():
                         prefix=upgraded['config_id']+'/'
                         if reason['rule_ref'].startswith(prefix):
                             reason['rule_ref']=snap['config_id']+'/'+reason['rule_ref'][len(prefix):]
-                v.require(upgraded_got==got,'same v2 configuration has identical decisions apart from its new config ID')
+                v.require(upgraded_got==got,'same v3 configuration has identical decisions apart from its new config ID')
                 # Cluster scoping remains effective for the same SQL and identities.
                 scoped=deepcopy(doc);scoped['templates'][0]['cluster']='C2'
                 alt=store.snapshot(validate(scoped,'C1'),['B1'])

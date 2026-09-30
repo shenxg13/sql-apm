@@ -35,7 +35,7 @@ def decision_digest(store, frozen):
     return dict(count=int(values[0]),hash_sums=values[1:],seconds=round(time.monotonic()-start,3))
 
 
-def validate(dsn, output):
+def validate(dsn, output, compare_aliases=False):
     store=TrainingStore(dsn)
     report=dict(clusters={}, method='private PostgreSQL 17; product importer; original cache and SQL derivation; measured',
                 normalization_context=store.context, decision_version=DECISION_VERSION, schema_version='1.3.0')
@@ -61,6 +61,9 @@ def validate(dsn, output):
         for scope,cutoff,day in [('119','2026-07-31','2026-07-23'),('120','2026-09-19','2026-09-19')]:
             doc=dict(version=1,clusters=['119','120'],window=dict(cutoff_date=cutoff),templates=[],
                 exclusions=[dict(id='acceptance-interval',cluster=scope,start=day+'T10:00:00+08:00',end=day+'T10:30:00+08:00',reason='temporary acceptance interval')])
+            if compare_aliases:
+                from verify_training_aliases import old_snapshot, compare
+                previous=old_snapshot(store,doc,scope,['full-import-'+scope])
             frozen=store.snapshot(configuration(doc,scope),['full-import-'+scope])
             # Hash streamed per-group counters, not all rows in memory or permanent Decisions.
             def summarize():
@@ -81,6 +84,9 @@ def validate(dsn, output):
             for reason,state,n in first['reasons']:totals[reason]+=n
             report['clusters'][scope]=dict(snapshot=frozen,first=first,
                 complete_first=complete_first,complete_repeat=complete_repeat,complete_digest_equal=True)
+            if compare_aliases:
+                baseline=json.loads((ROOT/'docs/reports/data/training-decisions-2026-09-29.json').read_text())
+                report['clusters'][scope]['alias_comparison']=compare(store,previous,frozen,baseline['clusters'][scope]['first'],first)
             (output/'decision-report.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
             print(canonical(dict(phase='cluster_verified',scope='scope:'+identity(scope),count=expected,cache_seconds=frozen['cache']['seconds'],derive_seconds=first['derive_seconds'])),flush=True)
         for outcome,reason in [('failed','execution_failed'),('cancelled','execution_cancelled'),('timed_out','execution_timed_out')]:
@@ -95,6 +101,9 @@ def validate(dsn, output):
             report['persistent_counts']=dict(decisions=decisions,builds=builds,original_results=cached)
             cur.execute("SELECT relname,pg_total_relation_size(relid) FROM pg_stat_user_tables WHERE relname IN ('mpp_training_rule','mpp_training_sql','input_snapshot','input_manifest','input_file_analysis','config_snapshot','training_config') ORDER BY 1")
             report['relation_bytes']=dict(cur.fetchall())
+            cur.execute('''SELECT r.category_rules->>'version',count(*),sum(pg_column_size(s))
+                FROM mpp_training_sql s JOIN mpp_training_rule r USING(rule_id) GROUP BY 1 ORDER BY 1''')
+            report['cache_rows_and_payload_bytes_by_version']=cur.fetchall()
         report.update(reason_totals=dict(totals),complete=True)
         (output/'decision-report.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
     finally:store.close()
@@ -126,7 +135,7 @@ def main(args):
         finally:importer.close()
         report['import_seconds']=round(time.monotonic()-started,3)
         (args.output/'import-report.json').write_text(canonical(report))
-        validate(dsn,args.output)
+        validate(dsn,args.output,args.compare_aliases)
         v.init('check')
     print(canonical(dict(complete=True)))
 
@@ -136,5 +145,6 @@ if __name__=='__main__':
     parser.add_argument('--manifest',type=Path,default=ROOT/'docs/reports/data/log-supplement-manifest-2026-09-28.json')
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
+    parser.add_argument('--compare-aliases',action='store_true',help='compare frozen category v2 and current rules against the merged Issue #21 counts')
     parser.add_argument('--workers',type=int,choices=range(1,9),default=4)
     main(parser.parse_args())

@@ -3,6 +3,9 @@ CREATE FUNCTION pg_temp.structure(ns text)
 RETURNS TABLE (object_name text, definition jsonb)
 LANGUAGE sql AS $function$
     SELECT c.relname::text, jsonb_build_object(
+        'partition_key', pg_get_partkeydef(c.oid),
+        'partition_bound', pg_get_expr(c.relpartbound,c.oid),
+        'parents', (SELECT jsonb_agg(p.relname ORDER BY p.relname) FROM pg_inherits h JOIN pg_class p ON p.oid=h.inhparent WHERE h.inhrelid=c.oid),
         'kind', c.relkind, 'owner', pg_get_userbyid(c.relowner),
         'persistence', c.relpersistence, 'rls', c.relrowsecurity,
         'force_rls', c.relforcerowsecurity, 'acl', c.relacl::text,

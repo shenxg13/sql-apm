@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
@@ -89,7 +91,7 @@ confidence: high
 [Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 提供 `python -m sql_apm import`，
 JSON 本地配置、显式 `--source`／`--batch` 和计数／原因码输出。
 参数、身份冻结、文件冲突和重试操作见[导入操作说明](../../docs/runbooks/log-ingestion.md)。
-当前只实现导入，尚未交付完整流程、重新构建、发布和版本切换命令。
+此命令只实现导入，尚未交付完整流程、重新构建、发布和版本切换命令。
 
 ### 已实现的训练快照与诊断入口（2026-09-29）
 
@@ -97,8 +99,15 @@ JSON 本地配置、显式 `--source`／`--batch` 和计数／原因码输出。
 `python -m sql_apm training snapshot`／`training summary`。模板示例、可选身份限定、
 北京时间半开时段及窗口参数的格式、固定快照 ID 和脱敏输出见
 [操作说明](../../docs/runbooks/training-decisions.md)。
-此入口固定输入／配置、复用原文缓存及汇总数据库按需判定；完整构建、重新构建、统计和发布
-命令仍由③／④实施。用户维护具体模板条目，初始为空；本次不提供类别增删入口。
+此入口固定输入／配置、复用原文缓存及汇总数据库按需判定；统计由③的 statistics 命令交付；完整构建、重新构建和发布
+命令仍由④实施。用户维护具体模板条目，初始为空；本次不提供类别增删入口。
+
+## 已实现的统计命令
+
+Issue #25 提供 `python -m sql_apm statistics --cluster ... --input ... --config-id ...`，
+对②已封存快照创建构建并保存五层结果；输出仅含计数、固定原因和不透明标识。
+可引用同快照失败尝试的 `--retry-of`，从头计算；这不交付④的完整重建流程。
+参数、恢复和退出码见[操作说明](../../docs/runbooks/baseline-statistics.md)。
 
 ## Workflows
 

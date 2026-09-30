@@ -23,11 +23,23 @@ def insert(table, values):
     ) + ") VALUES (" + ",".join(literal(v) for v in values.values()) + ");"
 
 
-def statements():
+def statements(legacy=False, results=True):
     doc = json.loads((ROOT / "docs/design/offline-data-contract/examples.json").read_text())
     b = doc["base"]
     sql = []
     def add(table, values):
+        if table in ('mpp_statistic','mpp_build_coverage'):
+            if not results:
+                return
+            if not legacy:
+                values = {k:v for k,v in values.items() if k not in ('statistic_id','scope_id','normalization_id','profile')}
+                # The partition ID is deterministic, derived by the same public
+                # partition provisioner used for writes (no SQL input data).
+                sql.append('INSERT INTO "'+table+'" ('+
+                           ','.join('"'+key+'"' for key in values)+',partition_id) SELECT '+
+                           ','.join(literal(value) for value in values.values())+
+                           ',partition_id FROM build WHERE build_id='+literal(values['build_id'])+';')
+                return
         sql.append(insert(table, values))
     def fields(obj, omitted=(), **extra):
         return dict({k: v for k, v in obj.items() if k not in omitted}, **extra)
@@ -90,8 +102,13 @@ def statements():
             cutoff_date=o["window"]["cutoff_date"], window_days=o["window"]["days"],
             window_start=o["window"]["start"], window_end=o["window"]["end"]))
     for o in b["builds"].values():
+        if not legacy:
+            sql.append("SELECT mpp_ensure_result_partition('CL1','2026-10-01');")
         add("build", fields(o, ("checks", "timing_coverage", "statistic_ids", "coverage_index", "problem_ids"),
             normalization_id="N1", profile=doc["profile"]))
+        if not legacy:
+            sql.append("UPDATE build SET partition_id=(SELECT partition_id FROM mpp_result_partition WHERE scope_id='CL1') WHERE build_id='V1';")
+            sql.append("INSERT INTO mpp_build_group SELECT partition_id,build_id,'G1' FROM build WHERE build_id='V1';")
         for name, check in o["checks"].items():
             add("build_check", dict(check, build_id=o["build_id"], name=name))
         for timing, counts in o["timing_coverage"].items():

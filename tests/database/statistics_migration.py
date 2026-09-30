@@ -1,0 +1,49 @@
+"""1.3 -> 1.4 precondition, partition routing and current catalog protection."""
+import hashlib
+from database.fixture import statements
+
+
+def verify_statistics_migration(v, root, runner):
+    legacy=(root/'sql_apm/storage/versions/1.3.0.sql').read_bytes()
+    for names in [('sql_apm',)*3,('stats_db','stats_store','stats_role')]:
+        database,schema,role=names
+        def sql(statement,ok=True):
+            return runner([v.pg_bin/'psql','-X','-w','-Atq','-v','ON_ERROR_STOP=1',
+                '-h',v.directory/'socket','-p','55473','-U',role,'-d',database],v.env,
+                'SET search_path="'+schema+'",pg_catalog;\n'+statement,ok=ok).stdout.strip()
+        v.init('bootstrap',names=names)
+        sql('CREATE SCHEMA "'+schema+'";'+legacy.decode()+
+            "INSERT INTO schema_version VALUES ('1.3.0','"+hashlib.sha256(legacy).hexdigest()+"',current_timestamp);"+statements(legacy=True))
+        before=sql('SELECT jsonb_agg(s) FROM mpp_statistic s; SELECT jsonb_agg(c) FROM mpp_build_coverage c; SELECT jsonb_agg(v) FROM schema_version v')
+        v.require('statistics_migration_requires_empty_results' in v.init('upgrade',names=names,ok=False).stderr,
+                  schema+': populated statistics and coverage reject migration')
+        v.require(sql('SELECT jsonb_agg(s) FROM mpp_statistic s; SELECT jsonb_agg(c) FROM mpp_build_coverage c; SELECT jsonb_agg(v) FROM schema_version v')==before,
+                  schema+': refused migration preserves rows and version')
+        # Explicit synthetic fixture cleanup belongs to this test, never migration.
+        sql('DELETE FROM mpp_statistic')
+        v.require('statistics_migration_requires_empty_results' in v.init('upgrade',names=names,ok=False).stderr,
+                  schema+': coverage alone also blocks migration')
+        sql('DELETE FROM mpp_build_coverage')
+        original=sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')
+        v.init('upgrade',names=names);v.init('check',names=names)
+        v.require(sql('SELECT max(version) FROM schema_version')=='1.4.0' and
+                  sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')==original,
+                  schema+': direct upgrade retains execution and SQL evidence')
+        for month,bid in [('2026-10-01','V1'),('2026-11-01','V2')]:
+            sql("SELECT mpp_ensure_result_partition('CL1','"+month+"')")
+            if bid=='V1':
+                sql("UPDATE build SET partition_id=(SELECT partition_id FROM mpp_result_partition WHERE build_month='"+month+"') WHERE build_id='V1'")
+            else:
+                sql("INSERT INTO build SELECT 'V2',scope_id,input_id,config_id,normalization_id,profile,NULL,'running','2026-11-01',NULL,false,(SELECT partition_id FROM mpp_result_partition WHERE build_month='"+month+"'),'{}' FROM build WHERE build_id='V1'")
+            sql("INSERT INTO mpp_build_group SELECT partition_id,build_id,'G1' FROM build WHERE build_id='"+bid+"'; "
+                "INSERT INTO mpp_build_coverage SELECT build_id,'G1',partition_id,'overall','[]','[null]' FROM build WHERE build_id='"+bid+"'")
+        v.require(sql('SELECT count(DISTINCT tableoid) FROM mpp_build_coverage')=='2',schema+': new month routes to separate provisioned leaf')
+        v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='2',schema+': two partitioned parents, no layer tables')
+        for mode in ['all','check','upgrade']:v.init(mode,names=names)
+        child=sql('SELECT tableoid::regclass::text FROM mpp_build_coverage LIMIT 1')
+        sql('ALTER TABLE '+child+' ADD COLUMN drift integer',ok=False)
+        # Parent and leaves are included in catalog validation (not wildcard ignored).
+        sql('ALTER TABLE '+child+' SET (fillfactor=80)')
+        v.require('incompatible object' in v.init('check',names=names,ok=False).stderr,schema+': leaf drift detected')
+        sql('ALTER TABLE '+child+' RESET (fillfactor)')
+        v.init('check',names=names)

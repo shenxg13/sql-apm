@@ -9,8 +9,10 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/15
@@ -241,6 +243,13 @@ Issue #21 新增 `training/categories.py` 和 `training/config.py`，分别负�
 产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎，也未实施③统计／④编排。
 [判定设计](../../docs/design/training-decisions.md)与[操作说明](../../docs/runbooks/training-decisions.md)
 记录接口、临时汇总和持久化边界。
+
+## 已实现的统计计算边界
+
+Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statistics.py` 组织快照引用、
+临时判定、分组读取和事务写入；`baseline/watchdog.py` 是进程退出监护入口，状态落库委托存储层。
+`cli/statistics.py` 提供薄命令；独立指标实现仅在 tests 与验收脚本，产品不依赖测试。
+训练判定继续复用②的唯一 SQL 函数，未新增永久 Decision 投影。发布与任务编排仍属④。
 
 ## Workflows
 

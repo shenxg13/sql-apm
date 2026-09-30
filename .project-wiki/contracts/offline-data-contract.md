@@ -5,8 +5,10 @@ status: active
 owners:
   - .project-wiki/contracts/offline-data-contract.md
   - docs/design/offline-data-contract/
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/17
@@ -289,6 +291,13 @@ HashData 统计语义。来源改变必须另行确认 profile，不用任意标
 判定规则版本变化后，旧快照只保证已保存计数，不保证历史逐条复算；规则和原文依据仍保留。
 这落实既有“派生关系可重建”的物理选择，不改四种状态、原因码、五项分组键或统计口径。
 具体映射见[判定设计](../../docs/design/training-decisions.md)。
+
+### 统计物理身份与构建边界补充（2026-09-30）
+
+[#25](https://github.com/shenxg13/sql-apm/issues/25) 确认③创建 Build 并计算到已计算或失败／中断，
+④执行发布检查与版本切换。Statistic 的逻辑身份在 1.4.0 映射为构建、分组、层次与桶的自然键；
+分区键由 Build 的集群和开始月份确定，物理不保存文本 statistic_id。
+[字段字典](../../docs/design/offline-data-contract/fields.md#statisticbucket-与门槛结果)保留逻辑交接表达与物理映射。
 
 ## Workflows
 

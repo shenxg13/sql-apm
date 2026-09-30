@@ -21,6 +21,7 @@ from database.approximate import verify_approximate  # noqa: E402
 from database.approximate_migration import verify_approximate_migration  # noqa: E402
 from database.migration import verify_migration  # noqa: E402
 from database.training_migration import verify_training_migration
+from database.statistics_migration import verify_statistics_migration
 from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
 
@@ -131,10 +132,10 @@ class Verification:
         self.rejects("UPDATE mpp_occurrence SET association_state='unpaired',association_reason='unknown',unit='call',timing_type='execute_first' WHERE occurrence_id='O1'", "unpaired execute classification rejected")
         self.rejects("UPDATE evidence_record SET record_no=1 WHERE record_id='R2'", "file logical record uniqueness")
         self.rejects("UPDATE mpp_statistic SET bucket_number=24 WHERE layer='hour'", "invalid hour bucket rejected")
-        self.rejects("UPDATE mpp_statistic SET p95_ms=NULL WHERE statistic_id='ST1'", "missing metric without reason rejected")
-        self.rejects("UPDATE mpp_statistic SET cv=NULL,metric_null_reasons='{\"cv\":\"zero_denominator\"}' WHERE statistic_id='ST1'", "zero denominator reason must match actual denominator")
-        self.rejects("UPDATE mpp_statistic SET p95_ms=1 WHERE statistic_id='ST1'", "quantile ordering rejected")
-        self.rejects("INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,to_jsonb(s)||'{\"statistic_id\":\"duplicate\"}'::jsonb)).* FROM mpp_statistic s WHERE statistic_id='ST1'", "overall NULL bucket uniqueness")
+        self.rejects("UPDATE mpp_statistic SET p95_ms=NULL WHERE layer='overall'", "missing metric without reason rejected")
+        self.rejects("UPDATE mpp_statistic SET cv=NULL,metric_null_reasons='{\"cv\":\"zero_denominator\"}' WHERE layer='overall'", "zero denominator reason must match actual denominator")
+        self.rejects("UPDATE mpp_statistic SET p95_ms=1 WHERE layer='overall'", "quantile ordering rejected")
+        self.rejects("INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,to_jsonb(s)||'{}'::jsonb)).* FROM mpp_statistic s WHERE layer='overall'", "overall NULL bucket uniqueness")
         self.rejects("DELETE FROM mpp_normalization WHERE normalization_id='N1'", "historical rule references prevent deletion")
         self.rejects("UPDATE current_version SET last_success_at=last_success_at+interval '1 second'", "current pointer must match successful publication time")
         self.sql("INSERT INTO publication VALUES ('PUB_FAIL','CL1','V1','V1','publish_failed','synthetic failure','2026-10-02 00:00:00+08')")
@@ -143,15 +144,15 @@ class Verification:
         self.sql("INSERT INTO scope VALUES ('CL2','hashdata','hashdata-csv/1','1.0.0')")
         self.rejects("UPDATE mpp_decision SET scope_id='CL2'", "cross-cluster build references rejected")
 
-        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{basic,met}','true') WHERE statistic_id='ST1'", "false sufficiency claim rejected")
-        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{p95,actual_count}','99') WHERE statistic_id='ST1'", "threshold sample count must match mpp_statistic")
+        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{basic,met}','true') WHERE layer='overall'", "false sufficiency claim rejected")
+        self.rejects("UPDATE mpp_statistic SET sufficiency=jsonb_set(sufficiency,'{p95,actual_count}','99') WHERE layer='overall'", "threshold sample count must match mpp_statistic")
         self.rejects("UPDATE mpp_decision SET rule_evaluations=jsonb_set(rule_evaluations,'{window}','null')", "unknown rule evaluation rejected")
         self.rejects("UPDATE mpp_sql_text SET content_sha256=decode(repeat('00',32),'hex')", "SQL content checksum mismatch rejected")
-        stat = json.loads(self.sql("SELECT row_to_json(s) FROM mpp_statistic s WHERE statistic_id='ST2'"))
+        stat = json.loads(self.sql("SELECT row_to_json(s) FROM mpp_statistic s WHERE layer='day'"))
         metric_names = list(json.loads((ROOT / "docs/design/offline-data-contract/examples.json").read_text())["metric_names"])
         for metric in metric_names:
             stat[metric] = None
-        stat.update(statistic_id="EMPTY", bucket_date="2026-09-22", range_start="2026-09-22T00:00:00+08:00",
+        stat.update(bucket_date="2026-09-22", range_start="2026-09-22T00:00:00+08:00",
                     range_end="2026-09-23T00:00:00+08:00", included_count=0, excluded_count=1,
                     exclusions_by_reason={"duration_unknown": 1}, active_dates=[], active_week_starts=[],
                     first_sample_at=None, last_sample_at=None,
@@ -160,9 +161,9 @@ class Verification:
             result["actual_count"] = 0
             result["actual_coverage"] = 0
         payload = json.dumps(stat).replace("'", "''")
-        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT included_count=0 AND excluded_count=1 AND mean_ms IS NULL FROM mpp_statistic WHERE statistic_id='EMPTY'; ROLLBACK") == "t",
+        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT included_count=0 AND excluded_count=1 AND mean_ms IS NULL FROM mpp_statistic WHERE layer='day' AND bucket_date='2026-09-22'; ROLLBACK") == "t",
                      "zero samples with exclusions stored explicitly; all 17 metrics carry no_samples")
-        stat.update(statistic_id="ZERO", included_count=1, excluded_count=0, exclusions_by_reason={},
+        stat.update(included_count=1, excluded_count=0, exclusions_by_reason={},
                     active_dates=["2026-09-22"], active_week_starts=["2026-09-21"],
                     first_sample_at="2026-09-22T08:00:00+08:00", last_sample_at="2026-09-22T08:00:00+08:00",
                     metric_null_reasons={m: "zero_denominator" for m in ("cv","p95_p50","p99_p50")})
@@ -171,7 +172,7 @@ class Verification:
         for result in stat["sufficiency"].values():
             result["actual_count"] = 1
         payload = json.dumps(stat).replace("'", "''")
-        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT mean_ms=0 AND cv IS NULL FROM mpp_statistic WHERE statistic_id='ZERO'; ROLLBACK") == "t",
+        self.require(self.sql("BEGIN; INSERT INTO mpp_statistic SELECT (jsonb_populate_record(NULL::mpp_statistic,'" + payload + "'::jsonb)).*; SELECT mean_ms=0 AND cv IS NULL FROM mpp_statistic WHERE layer='day' AND bucket_date='2026-09-22'; ROLLBACK") == "t",
                      "zero duration metrics and zero denominator reasons remain distinct")
         self.sql("INSERT INTO mpp_normalization SELECT 'N2',algorithm_version,parser_version,dictionary_schema_version,'synthetic-next',dictionary_digest_algorithm,'synthetic-next',rules_ref FROM mpp_normalization WHERE normalization_id='N1'")
         self.rejects("UPDATE mpp_decision SET normalization_id='N2'", "cross-mpp_normalization build/mpp_decision reference rejected")
@@ -295,6 +296,8 @@ def main():
         verify_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     with instance(args.pg_bin) as (directory, env):
         verify_approximate_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+    with instance(args.pg_bin) as (directory, env):
+        verify_statistics_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

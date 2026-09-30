@@ -42,7 +42,7 @@ def validate(document, cluster):
     try:
         if type(document['version']) is not int or document['version'] != 1:
             raise TrainingError('training_config_version')
-        if set(document) - {'version', 'clusters', 'window', 'templates', 'exclusions'}:
+        if set(document) - {'version', 'clusters', 'window', 'templates', 'exclusions', 'thresholds'}:
             raise TrainingError('unknown_config_key')
         clusters = document['clusters']
         if not isinstance(clusters, list) or not clusters or not all(required_string(c) for c in clusters) or len(set(clusters)) != len(clusters):
@@ -86,9 +86,21 @@ def validate(document, cluster):
             ids.add(item['id'])
             intervals.append(dict(rule_id=item['id'], scope_id=item['cluster'], start=a.isoformat(),
                                   end=b.isoformat(), reason=item['reason']))
+        thresholds = deepcopy(THRESHOLDS)
+        overrides = document.get('thresholds', {})
+        if not isinstance(overrides, dict) or set(overrides)-set(THRESHOLDS):
+            raise TrainingError('invalid_thresholds')
+        for layer, values in overrides.items():
+            if not isinstance(values, dict) or set(values)-{'basic_count','p95_count','p99_count','coverage_min'}:
+                raise TrainingError('invalid_thresholds')
+            if any(type(value) is not int or value < 0 for value in values.values()):
+                raise TrainingError('invalid_thresholds')
+            thresholds[layer].update(values)
+            if layer == 'day' and thresholds[layer]['coverage_min'] != 0:
+                raise TrainingError('invalid_thresholds')
         return dict(scope_id=cluster, cutoff_date=cutoff.isoformat(), window_days=days,
                     window_start=start.isoformat(), window_end=end.isoformat(), templates=deepcopy(templates),
-                    exclusions=intervals, thresholds=deepcopy(THRESHOLDS))
+                    exclusions=intervals, thresholds=thresholds)
     except TrainingError:
         raise
     except (ValueError, KeyError, TypeError, OverflowError):

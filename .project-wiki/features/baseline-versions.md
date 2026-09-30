@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: .project-wiki/log.md
@@ -289,9 +291,12 @@ confidence: high
 - 来源：[Issue #21 需求确认](https://github.com/shenxg13/sql-apm/issues/21)；current。
 - 首期按 ⓪ 近似结果结构（#17）→ ① 导入（#18）→ ② 样本判定（#21）→
   ③ 统计计算 → ④ 构建编排、发布检查与版本切换 顺序交付。② 与④合称“训练投影控制面”。
-  这个称谓不改变各步骤交付范围，③／④仍是后续工作。
-- 输入和配置快照由②固定记录，②不创建 Build；④引用快照并负责构建生命周期和发布。
-  ③负责五层统计及计数持久化，④负责同集群任务串行和版本切换。
+  这个称谓不改变各步骤交付范围；③由 #25 交付，④仍是后续工作。
+- 输入和配置快照由②固定记录，②不创建 Build。2026-09-30 用户在
+  [#25](https://github.com/shenxg13/sql-apm/issues/25) 修订③／④边界：③引用快照创建 Build，
+  计算并完整保存五层统计、覆盖与计数，推进至 calculated 或 failed／interrupted；失败重算从头开始。
+  ④负责任务串行、build_check 发布检查、发布记录、版本切换以及完整流程和重新构建命令。
+  这替代原“④负责构建生命周期”的宽泛表述。
 - 判定采用用户确认的方案 C：只保存不可变快照，类别与模板候选结果按去重原文和规则版本
   各保存一份；逐条结论按原文结果、事件字段和快照即时推导，不为每次构建永久复制 Decision。
   规则升级生成新缓存版本，旧结果保留；执行明细和原文仍复用。
@@ -300,6 +305,12 @@ confidence: high
 - 选择依据：#18 实测输入量和行大小下，逐条存储的每日 6.5～13 GiB、仅存未纳入仍约
   0.5～1 TiB／年的量级属于 modeled，不是本实现实测。首期暂缓自动清理，故按需推导；
   实际缓存和全量推导性能见[验证报告](../../docs/reports/training-decisions-2026-09-29.md)。
+
+### 已实现的快照计算
+
+[统计设计](../../docs/design/baseline-statistics.md)记录③的原子保存、失败诊断、进程监护和资源边界。
+`statistics` 命令创建一次尝试；`retry_of` 只关联相同快照的失败／中断尝试，不复用半成品。
+③不写 build_check、Publication、CurrentVersion 或 Task；calculated 不表示已发布。
 
 ## Workflows
 

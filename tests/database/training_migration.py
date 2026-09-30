@@ -12,18 +12,18 @@ def verify_training_migration(v, root, runner):
             return runner([v.pg_bin/'psql','-X','-w','-Atq','-v','ON_ERROR_STOP=1','-h',v.directory/'socket','-p','55473','-U',role,'-d',database],v.env,
                 'SET search_path="'+schema+'",pg_catalog;\n'+statement,ok=ok).stdout.strip()
         v.init('bootstrap',names=names)
-        sql('CREATE SCHEMA "'+schema+'";\n'+old.decode()+"INSERT INTO schema_version VALUES('1.2.0','"+hashlib.sha256(old).hexdigest()+"',current_timestamp);"+statements())
-        tables=sql("SELECT relname FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='r' ORDER BY relname").splitlines()
-        oids=sql("SELECT string_agg(oid::text,',') FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace")
+        sql('CREATE SCHEMA "'+schema+'";\n'+old.decode()+"INSERT INTO schema_version VALUES('1.2.0','"+hashlib.sha256(old).hexdigest()+"',current_timestamp);"+statements(legacy=True, results=False))
+        tables=sql("SELECT relname FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname").splitlines()
+        oids=sql("SELECT string_agg(c.oid::text,',') FROM pg_class c WHERE c.relname NOT IN ('mpp_statistic','mpp_build_coverage') AND c.oid NOT IN (SELECT indexrelid FROM pg_index WHERE indrelid IN ('mpp_statistic'::regclass,'mpp_build_coverage'::regclass)) AND relnamespace='"+schema+"'::regnamespace")
         def state():
-            return ({t:sql('SELECT coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text),\'[]\') FROM "'+t+'" t') for t in tables if t!='schema_version'},
+            return ({t:sql('SELECT coalesce(jsonb_agg((to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\']) ORDER BY (to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\'])::text),\'[]\') FROM "'+t+'" t') for t in tables if t not in ('schema_version','mpp_statistic','mpp_build_coverage')},
                     sql('SELECT oid,relfilenode FROM pg_class WHERE oid IN ('+oids+') ORDER BY oid'))
         before=state()
         v.init('schema',names=names,ok=False)
         v.init('upgrade',names=names)
         v.require(state()==before,schema+': direct 1.2.0 migration preserves all original rows and relation files')
         receipts=sql('SELECT jsonb_object_agg(version,to_jsonb(s)) FROM schema_version s')
-        v.require(set(json.loads(receipts))=={'1.2.0','1.3.0'},schema+': both receipts retained')
+        v.require(set(json.loads(receipts))=={'1.2.0','1.3.0','1.4.0'},schema+': both receipts retained')
         for mode in ['all','schema','check','upgrade']:v.init(mode,names=names)
         v.require(state()==before and sql('SELECT jsonb_object_agg(version,to_jsonb(s)) FROM schema_version s')==receipts,schema+': all repeat modes preserve data and receipts')
         definition=sql("SELECT pg_get_functiondef('training_version(text)'::regprocedure)")

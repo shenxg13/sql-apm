@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.3.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.4.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.3.0；#21 的[判定接口](training-decisions.md)复用导入事实，统计引擎尚未交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.4.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -21,11 +21,11 @@
   HashData 窗口使用显式 UTC+8 转换，不依赖操作系统、数据库或会话的默认时区。
   调用方传入带偏移时间；若未来来源超出微秒精度，先扩展精度策略，不能静默舍入后声称无损。
 - 耗时和 17 个统计指标使用不指定 scale 的 `numeric`，存储层不再次取整或量化；
-  拒绝负值、NaN、正负 Infinity。标准差／对数的计算精度由后续公式实现版本声明。
+  拒绝负值、NaN、正负 Infinity。标准差／对数的计算精度见③的公式实现设计。
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  升级保留原始历史记录并登记经过的版本，新库只记录 1.3.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留原始历史记录并登记经过的版本，新库只记录 1.4.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -55,7 +55,7 @@
 | Decision | 首期由 `mpp_training_decisions` 按快照推导，不逐条永久保存；`mpp_decision` 保留历史结构，不由②写入。 |
 | Decision.reasons | 函数返回原因数组、规则引用与锚点证据，按事件／原因去重；既有 reason／evidence 表保留。 |
 | Problem | `problem` + `problem_evidence`；批次、文件、构建、事件定位；尝试的问题关系为 `attempt_problem`，其余 problem_ids 通过定位查询。 |
-| Statistic | `mpp_statistic`，见下一节；Build/Group 上下文通过复合外键保持一致。 |
+| Statistic | `mpp_statistic`，见下一节；Build/Group 上下文通过 mpp_build_group 集中校验并用复合外键引用。 |
 | Publication | `publication`；结果、前一构建、时间、原因分别保存，失败尝试不丢弃。 |
 | CurrentVersion | `current_version` 每 scope 一行，引用成功 Publication 的构建及时间；空版本三字段同时 NULL。 |
 | Task | `task`；关联结果用 `task_batch`、`task_build`、`task_publication`，同集群引用。 |
@@ -99,11 +99,11 @@ MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.proje
 
 [冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
 [冻结的 1.1.0 DDL](../../sql_apm/storage/versions/1.1.0.sql)同样保持已发布字节；
-[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0，也允许从任一已发布中间版本开始。
+[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0，也允许从任一已发布中间版本开始。
 入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
 验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
 约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
-每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.3.0 的库只核验，不重复登记。
+每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.4.0 的库只核验，不重复登记。
 
 这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
 DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据，1.2.0 新增
@@ -111,7 +111,15 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 小规模验证核对逐表内容、关系 OID／relfilenode 和约束 OID 保留，
 不以此声称生产升级耗时或吞吐已经验证。独立统计表也不代表共享实例的资源隔离。
 原名 SQL 调用需随版本切换，没有保留旧名兼容视图；精确操作和恢复见
-[升级说明](../runbooks/database-initialization.md#升级到-130)。
+[升级说明](../runbooks/database-initialization.md#升级到-140)。
+
+## 统计结构 1.4.0
+
+[#25](https://github.com/shenxg13/sql-apm/issues/25)确认统计完整保存与分区瘦身。
+1.4.0 共 53 张普通／父表，其中 23 张 MPP 专属表（动态叶分区另计）；
+两张新增表为 mpp_result_partition 和 mpp_build_group。Build 增加 partition_id 与 diagnostics，
+后者保存按状态、计数范围和原因的脱敏计数，包括无法归组的批次层面事实。
+[冻结的 1.3.0 DDL](../../sql_apm/storage/versions/1.3.0.sql)保留已发布字节。
 
 ## 训练判定结构 1.3.0
 
@@ -198,14 +206,28 @@ range 为半开区间，week 额外保留 partial_week。
 一次真实执行，却分别产生整体、天、周、星期、小时五行结果。
 
 零有效且零排除的桶可只出现在 empty_keys；有排除数的桶必须显式保存 Statistic。
-后续构建器检查每个已知组五层键完整、两集合无交集，查询层展开空桶。
+③构建器保存每个已知组五层完整覆盖，验收核对键完整、两集合无交集，查询层展开空桶。
 没有实际观察到的分组不预造空组。默认 30 天窗口通常为 67～68 个逻辑桶／分组／构建，
 分组已含计时类别；各层样本数不能跨层相加当执行总数。
 
-首版普通表；按构建／分组／桶的唯一索引支持版本查询，group/build/layer 索引支持组历史。
-真实容量、分组数和留存期限尚未测量／确认。每日版本持续增长，首次实际入库后评估
-每版行数、表／索引占用及查询计划；若需要分区，优先评估按构建月份，而非混合语义的桶日期。
-后续分区需要显式迁移及主外键、查询调整，不声称可零成本切换。
+1.4.0 的 mpp_statistic、mpp_build_coverage 均为 LIST 分区父表，按“集群＋构建月份”
+创建叶表；每个集群每月每父表一个，保持层次为键，不按构建、层次或计时类别拆表。
+两集群全年有构建时约 24 个叶分区／父表。构建月份按 started_at 的北京时间月份确定。
+新增 mpp_result_partition 登记紧凑 bigint 分区编号，Build 引用它并校验集群／月份；
+新增 mpp_build_group 每构建每组一行，集中保证集群、规则与 profile 一致，结果表复合外键引用。
+两张父表因此移除 scope_id、normalization_id、profile 三个重复文本列。
+
+Statistic 去掉 statistic_id 文本代理主键，自然键为
+`(partition_id,build_id,group_id,layer,bucket_date,bucket_number)`，使用
+`UNIQUE NULLS NOT DISTINCT`。同一 Build 只能属于一个分区；业务身份仍是构建、分组、层次与桶。
+Coverage 主键为 `(partition_id,build_id,group_id,layer)`。自然键支持构建内读取；两表均保留
+`(group_id,build_id,layer)` 索引支持按组查历史。查询版本时可从 Build 取得分区编号并用于裁剪。
+
+分区函数在每次构建前按需建立当月分区，短锁仅保护本月 DDL；相同月份多次构建不增加分区。
+结构检查在预期空 schema 中重建已登记分区，再完整比较边界、父子关系、叶表和索引。
+1.3.0→1.4.0 先锁定并确认旧两表都为空，否则整体回滚并报
+statistics_migration_requires_empty_results；没有任何自动清理或丢弃旧结果路径。
+新增列与两张空表重建之外，原文、执行、快照、Build 和发布数据保留。
 
 ## 数据库与应用责任
 
@@ -228,11 +250,11 @@ range 为半开区间，week 额外保留 partial_week。
 主键／唯一约束自动建立的索引用于身份和引用；额外索引只覆盖：
 来源文件摘要候选、文件尝试、集群／SQL 的执行开始时间、规则下指纹值、
 集群构建时间、构建分组决策、组历史统计、集群发布时间。
-不为所有 JSONB 建 GIN，不对完整 SQL 文本建 B-tree，不进行真实日志全量入库。
+不为所有 JSONB 建 GIN，不对完整 SQL 文本建 B-tree。③全量验收的资源实测见统计验证报告。
 
-资源证据为 qualitative：普通表及明确索引减少首版维护分支；text ID、numeric、
-重复的复合引用列及版本化 Decision 有存储成本。执行原文／明细不按构建复制，
-但本版本选择显式保存每个 Build 的 Decision，实际规模后再评估可重放压缩表示。
+初版普通表资源选择为 qualitative；1.4.0 统计分区与完整保存由 #25 确认，
+计算资源和容量在该任务真实数据验收中实测。执行原文／明细不按构建复制，
+Decision 由②按需推导；③仅在计算期间 TEMP 物化，随事务结束删除。
 初始化用无业务数据的临时预期 schema 比较 catalog，代价是重复创建小型空结构；
 不扫描业务数据来验证结构，也不在每行写入时运行 catalog 检查。
 外键内部触发器在引用表、被引用表两侧均检查非默认启用模式；D／R／A 明确拒绝。

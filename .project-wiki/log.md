@@ -147,6 +147,15 @@
 | 2026-09-29 | 按 [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 及方案 A 确认修订 [SQL 指纹契约](contracts/sql-fingerprints.md)：v5 纳入 SELECT 列表／JOIN ON 常量，并恢复集合分支独立查询上下文；同步冻结版本审计及[耗时诊断说明](../docs/runbooks/duration-dispersion.md)，实测见[v5 验证报告](../docs/reports/sql-normalization-v5-2026-09-29.md)。验收与合并状态由在线 Issue 记录。 |
 | 2026-09-29 | 按 #17 已确认范围交付[近似观察字段](../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)和[结构 1.2.0](architecture/postgresql-storage.md)，冻结旧 DDL 并验证连续升级、复用与可靠路径隔离；[全量往返](../docs/reports/approximate-storage-2026-09-29.md)覆盖10,902条 v5 拒绝原文。实际写入由 #18 同次导入，观察统计另行处理；未改变算法及训练资格。 |
 
+## 2026-09-30：统计完整保存、分区与③④边界
+
+[Issue #25](https://github.com/shenxg13/sql-apm/issues/25)落实五层统计和构建结果保存。
+同步[完整统计与指标边界](contracts/baseline-statistics.md#统计完整保存与首期边界2026-09-30)、
+[③④职责](features/baseline-versions.md#首期拆分快照归属与判定存储2026-09-29)、
+[存储增长接受与分区](contracts/sql-storage.md#已接受的增长与统计分区2026-09-30)，
+以及[1.4.0 物理结构](architecture/postgresql-storage.md)与逻辑自然键映射。
+具体实现和验证由统计设计、操作说明及本次验证报告承接；发布编排继续留给④。
+
 ## 2026-09-29：首期导入与计时配对（Issue #18）
 
 - 将用户于当日确认的[duration 成功证据](contracts/training-eligibility.md#已确认的请求调用成功证据2026-09-29)

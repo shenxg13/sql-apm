@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/training-eligibility.md
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/21#issuecomment-5903270047
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
@@ -146,6 +148,23 @@ confidence: high
 | `CREATE/DROP TABLE`、外部表、视图、序列、权限及注释命令 | 可以是正常业务批次的一部分，未采纳“一并排除 DDL／管理语句”的扩展 | 如有新增排除需求，逐项确认，不依名称扩大 |
 | `SELECT`、`WITH`、DML、`COPY`、过程或函数调用 | 未采纳按整个类别排除；监控查询、特定函数或短／长耗时不改变此结论 | 特定业务 SQL 的排除由用户后续维护模板条目 |
 | 未识别、截断、编码异常或分句不可靠文本 | 不推断为黑名单；也不把“未命中”误当成可训练 | 按既有训练资格处理可靠性，明确原因，无法归属时留在批次层面 |
+
+#### 事务特征设置的补充确认（2026-09-30）
+
+- 来源：[Issue #21 评审阶段的用户确认](https://github.com/shenxg13/sql-apm/issues/21#issuecomment-5903270047)；current。
+  本节补充上述 2026-09-26 保守边界，不改变其历史确认日期。
+- `SET SESSION CHARACTERISTICS AS TRANSACTION` 的 `SET LOCAL`／`SET SESSION`
+  前缀形式同样暂缓，不能仅因词法标签为 `SET` 就排除。
+- 参数名形式的 `transaction_isolation`、`transaction_read_only`、`transaction_deferrable`
+  及对应的三个 `default_transaction_*` 同样暂缓；覆盖 `SET`、`SET SESSION`、`SET LOCAL`，
+  `TO`／`=`，普通或带引号参数名，参数名不区分大小写。
+- 含这些暂缓写法和已确认黑名单语句的批次属于混合批次，例如
+  `BEGIN; SET transaction_isolation = 'serializable'; COMMIT` 不因类别排除；
+  只含暂缓写法时不含黑名单类别。仍须满足成功、关联、计时等其他资格，模板规则也独立适用。
+- 普通运行参数（如 `SET work_mem = '16MB'`）继续命中 `SET`；七类及其他别名边界不变。
+  产品类别版本 `statement-categories/2` 按解析后的参数名识别，诊断工具和共享词法器不变；
+  [整改验证](../../docs/reports/training-decisions-r1-remediation-2026-09-30.md)记录两条解析路径、
+  五类计时及缓存版本验证。
 
 #### 类别判定验收样例
 

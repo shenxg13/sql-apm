@@ -141,5 +141,8 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 - `python -m sql_apm training snapshot`／`training summary`：本地配置、固定快照与脱敏诊断；
   [参数与范围](../docs/runbooks/training-decisions.md)。
 - `.venv/bin/python scripts/db/verify_training.py`：私有 PG17 合成资格、快照与原文缓存验收。
+- `.venv/bin/python scripts/db/verify_training_category_delta.py --output var/training/category-delta.json`：
+  只读复用固定 SHA-256 的 55 文件原文索引，对类别 v1／v2 做有界差分；
+  [输入与证据边界](../docs/reports/training-decisions-r1-remediation-2026-09-30.md)。
 - `.venv/bin/python scripts/db/verify_training_full.py`：显式重导 55 文件、两集群快照、全量推导与计数对账；
   高成本检查不自动加入日常 Harness，输入／输出保留本地忽略目录。

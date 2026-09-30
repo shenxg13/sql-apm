@@ -31,7 +31,10 @@
 ## 物理接口
 
 - 类别以完整语法为前提，保留原始命令拼写以免自动折叠暂缓别名；SET 另核对解析后的参数名，
-  带引号的身份设置同样暂缓，普通带引号参数仍可命中。
+  类别版本 `statement-categories/2` 将带引号身份参数、事务特征参数和带前缀的
+  `SESSION CHARACTERISTICS` 同样暂缓，普通带引号参数仍可命中。
+  [确认边界](../../.project-wiki/contracts/training-eligibility.md#事务特征设置的补充确认2026-09-30)
+  与诊断词法标签分开维护；修复生成新规则身份及缓存，旧快照继续引用原缓存。
 - `mpp_training_rule` 固定类别完整边界、模板原文与结构指纹、完整归一化规则／字典快照。
   `rule_id` 是上述规范内容的 SHA-256 身份。`mpp_training_sql` 按 `(sql_id, rule_id)`
   保存一次类别结论、类别集合、模板候选 ID 及 Fingerprint 引用；范围限定在逐条推导时应用。

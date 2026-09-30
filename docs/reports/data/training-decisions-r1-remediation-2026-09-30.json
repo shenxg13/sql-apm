@@ -1,0 +1,72 @@
+{
+  "baseline_head": "b0cc66a495e27b071d25a171c9f517f095841658",
+  "before_category_sha256": "7c9bac6463b4d3327952d5df19b214fb86f88dbaf09de21346b8726988619926",
+  "category_versions": [
+    "statement-categories/1",
+    "statement-categories/2"
+  ],
+  "changed_originals": 0,
+  "changed_raw_field_occurrences": {},
+  "checks": {
+    "initialize_help": "1.0.0/1.1.0/1.2.0 to 1.3.0",
+    "offline_harness": "passed",
+    "parser": 189,
+    "training_database": 247,
+    "unit": 61
+  },
+  "code_sha256": {
+    "scripts/db/verify_training_category_delta.py": "5bb97a4228ba3825c9998cad9f6992bff553ee6d920676c9af271964dfb3ca67",
+    "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+    "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+    "sql_apm/training/categories.py": "3a57eadbd9a740a1dae217d79475b4b5160ef28632349bcb71ab2f912d2efff7"
+  },
+  "complete": true,
+  "current_code_sha256": {
+    "scripts/db/initialize.sh": "719ab0391698d51156ae99ae7bde06504cbfdc75f270caa92234a0c2d82f1e27",
+    "scripts/db/verify_training.py": "86fee2340d4183e096c2b46c886c0eb968bf1e378f158cd0e25de4ff0c333e6c",
+    "scripts/db/verify_training_category_delta.py": "5bb97a4228ba3825c9998cad9f6992bff553ee6d920676c9af271964dfb3ca67",
+    "scripts/db/verify_training_full.py": "e3344a70c9ccd2808818a197846dcdc05f67013b240ee422d0f40e7e81abd652",
+    "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+    "sql_apm/storage/ingestion.py": "415754b8297c45ebeea286a0f69bc7036dcadd88f30ac66b5ff2939543d1b964",
+    "sql_apm/storage/schema.sql": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb",
+    "sql_apm/storage/training.py": "e6e8b87f132ede195214750f7885fb671ffcdb38072e5031a3b901c7de4c9f32",
+    "sql_apm/training/__init__.py": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+    "sql_apm/training/categories.py": "3a57eadbd9a740a1dae217d79475b4b5160ef28632349bcb71ab2f912d2efff7",
+    "sql_apm/training/config.py": "68047d0a0d7ff93c4a2c2e4f235215672e36f0ccacf11b28779b0f9113ca5817",
+    "tests/parser_probe/test_training_categories.py": "083be06864329ed64617f81e4c1f38f026db5185a9c1ca690e668bececf9c31b"
+  },
+  "files": 55,
+  "historical_code_differences": {
+    "scripts/db/verify_training.py": {
+      "after": "86fee2340d4183e096c2b46c886c0eb968bf1e378f158cd0e25de4ff0c333e6c",
+      "before": "845c2f7cd1351d3879d05154bd6373086a71f64124927422959cb967de2e2f19"
+    },
+    "sql_apm/training/categories.py": {
+      "after": "3a57eadbd9a740a1dae217d79475b4b5160ef28632349bcb71ab2f912d2efff7",
+      "before": "7c9bac6463b4d3327952d5df19b214fb86f88dbaf09de21346b8726988619926"
+    }
+  },
+  "historical_evidence_sha256": {
+    "docs/reports/data/log-ingestion-full-2026-09-29.json": "8bf996ced59a88ecff3fb67c39746154cb9c7334b9a825d0de6475b1f1ea270d",
+    "docs/reports/data/log-ingestion-reconciliation-2026-09-29.json": "c66b29d3a1b714527af703d19191421a90410932ce0a0290e876d653b19f3a9a",
+    "docs/reports/data/training-decisions-2026-09-29.json": "e15849db6d87e1ab8e43c96ee75de79c0aa8ca40c1c946d28864aa99929560ca",
+    "docs/reports/training-decisions-2026-09-29.md": "cee7800fa102b245a49df9b6c4bff79ef5acb88c289b77fc186647152bb4213f"
+  },
+  "historical_reports_unchanged": true,
+  "index_sha256": "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2",
+  "interpretation": {
+    "category_results_unchanged": true,
+    "full_pg_reimport_this_remediation": false,
+    "new_rule_id_requires_new_cache": true,
+    "old_full_decision_hashes_and_timings_are_historical": true
+  },
+  "issue_contract_sha256": "7093c3fbb87b693eace1656239c34393ca3bc1bee4036923a9a6ebeef4598e89",
+  "legacy_fixture_matches_baseline": true,
+  "manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "originals": 1497418,
+  "parsed_set_originals": 160,
+  "prefilter": "SET and (transaction or session or ampersand); ASCII case-insensitive",
+  "seconds": 6.373,
+  "substring_candidates": 3106,
+  "transitions": []
+}

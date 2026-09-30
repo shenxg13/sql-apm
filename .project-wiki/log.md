@@ -181,3 +181,9 @@
   [判定设计](../docs/design/training-decisions.md)和[操作说明](../docs/runbooks/training-decisions.md)。
 - 验证证据见[判定报告](../docs/reports/training-decisions-2026-09-29.md)；未改变原始需求、
   归一化规则或已发布历史报告，统计与构建发布仍留在③／④。
+
+## 2026-09-30：训练判定 R1 整改
+
+- 同步已确认的[事务特征参数名暂缓边界](contracts/training-eligibility.md#事务特征设置的补充确认2026-09-30)及类别 v2，保留 2026-09-26 历史确认。
+- 记录用户接受模板变更后的缓存成本，见[操作说明](../docs/runbooks/training-decisions.md)；
+  [整改验证](../docs/reports/training-decisions-r1-remediation-2026-09-30.md)保留回归及真实输入影响证据。

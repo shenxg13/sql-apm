@@ -25,6 +25,14 @@ def verify():
         dsn='host='+str(directory/'socket')+' port=55473 dbname=sql_apm user=sql_apm'
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);path=root/'a.csv';cfg=root/'import.json'
+            deferred=[
+                ('transaction_local','SET LOCAL SESSION CHARACTERISTICS AS TRANSACTION READ ONLY'),
+                ('transaction_session','SET SESSION SESSION CHARACTERISTICS AS TRANSACTION READ ONLY'),
+            ]
+            for stem,value in [('isolation',"'serializable'"),('read_only','on'),('deferrable','on')]:
+                for prefix in ('','default_'):
+                    parameter=prefix+'transaction_'+stem
+                    deferred.append((parameter,'SET '+parameter+' TO '+value))
             cases=[]
             def add(label,text='SELECT 1',message='duration: 1000 ms',line='1946',**fields):
                 cases.append((label,row(line,message,text,**fields)))
@@ -38,10 +46,14 @@ def verify():
             for timing,line in [('request','1946'),('parse','2219'),('bind','2603')]:
                 add('template_'+timing,'SELECT * FROM t WHERE id=22',line=line)
                 add('category_'+timing,'BEGIN',line=line)
+                for name,text in deferred:
+                    add(name+'_'+timing,text,line=line)
             for timing,prefix in [('execute_first','execute'),('execute_fetch','execute fetch from')]:
-                for name,text in [('template','SELECT * FROM t WHERE id=22'),('category','BEGIN')]:
+                for name,text in [('template','SELECT * FROM t WHERE id=22'),('category','BEGIN')]+deferred:
                     add('anchor_'+name+timing,text,line='2764',message=prefix+' p: '+text)
                     add(name+'_'+timing,text,line='2843')
+            add('transaction_mixed',"SET LOCAL SESSION CHARACTERISTICS AS TRANSACTION READ ONLY; COMMIT")
+            add('parameter_mixed',"SET default_transaction_read_only=on; SET work_mem='16MB'")
             add('template_structure_miss','SELECT * FROM t WHERE name=22')
             add('template_db_miss','SELECT * FROM t WHERE id=22',**{'2':'other'})
             add('template_user_miss','SELECT * FROM t WHERE id=22',**{'1':'other'})
@@ -98,6 +110,12 @@ def verify():
                 v.require(got['pure']['reason_codes']==['blacklist_category'],'pure batch excluded once')
                 for timing in ['request','parse','bind','execute_first','execute_fetch']:
                     v.require(got['template_'+timing]['reason_codes']==['blacklist_template'] and got['category_'+timing]['reason_codes']==['blacklist_category'],'both blacklist kinds: '+timing)
+                deferred_labels=[name+'_'+timing for name,text in deferred
+                                 for timing in ['request','parse','bind','execute_first','execute_fetch']]
+                deferred_labels+=['transaction_mixed','parameter_mixed']
+                for name in deferred_labels:
+                    v.require(got[name]['state']=='included' and got[name]['reason_codes']==[],
+                              'deferred transaction form remains eligible: '+name)
                 for name in ['template_structure_miss','template_db_miss','template_user_miss','touch_start','touch_end','zero_end','first','last','long_success','batch_template_order','batch_template_single']:
                     v.require(got[name]['state']=='included','negative/boundary: '+name)
                 for name in ['overlap','zero_start']:
@@ -154,10 +172,39 @@ def verify():
                 finally:versioned.close()
                 from unittest.mock import patch
                 from sql_apm.training.categories import RULES
-                rules=dict(RULES,version='statement-categories/test-version')
-                with patch('sql_apm.storage.training.RULES',rules):
-                    alt=store.snapshot(validate(doc,'C1'),['B1'])
-                v.require(alt['rule_id']!=snap['rule_id'] and alt['cache']['added_sql_results']>0,'category version creates new cache rows')
+                # Reproduce the pre-fix rule snapshot: v1 misses prefixed SESSION
+                # CHARACTERISTICS and all six transaction parameter names. The
+                # parsed-name branch uses this rule data in both versions.
+                legacy=deepcopy(RULES)
+                legacy['version']='statement-categories/1'
+                legacy['deferred'].remove('SET SESSION CHARACTERISTICS AS TRANSACTION')
+                legacy['deferred_parameter_names']=['role','session_authorization','authorization']
+                with patch('sql_apm.training.categories.RULES',legacy), patch('sql_apm.storage.training.RULES',legacy):
+                    previous=store.snapshot(validate(doc,'C1'),['B1'])
+                previous_got=decisions(previous)
+                v.require(previous['rule_id']!=snap['rule_id'] and previous['cache']['added_sql_results']>0,
+                          'real v1/v2 category snapshots have distinct rule IDs and cache rows')
+                for name in deferred_labels:
+                    v.require(previous_got[name]['reason_codes']==['blacklist_category'],
+                              'v1 reproduces over-exclusion: '+name)
+                v.require(previous_got['pure']['reason_codes']==got['pure']['reason_codes'] and
+                          previous_got['mixed']['state']==got['mixed']['state'],
+                          'ordinary SET and original mixed batch retain their behavior')
+                with patch('sql_apm.storage.training.classify',side_effect=AssertionError('unexpected reclassification')):
+                    upgraded=store.snapshot(validate(doc,'C1'),['B1'])
+                v.require(upgraded['rule_id']==snap['rule_id'] and upgraded['cache']['added_sql_results']==0,
+                          'v2 cache is reused independently of retained v1 rows')
+                v.require(decisions(previous)==previous_got and decisions(snap)==got,
+                          'old and new snapshots retain their respective transaction decisions')
+                upgraded_got=decisions(upgraded)
+                # New configurations carry their own template/interval/window
+                # references even when every rule and business result agrees.
+                for item in upgraded_got.values():
+                    for reason in item['reasons']:
+                        prefix=upgraded['config_id']+'/'
+                        if reason['rule_ref'].startswith(prefix):
+                            reason['rule_ref']=snap['config_id']+'/'+reason['rule_ref'][len(prefix):]
+                v.require(upgraded_got==got,'same v2 configuration has identical decisions apart from its new config ID')
                 # Cluster scoping remains effective for the same SQL and identities.
                 scoped=deepcopy(doc);scoped['templates'][0]['cluster']='C2'
                 alt=store.snapshot(validate(scoped,'C1'),['B1'])

@@ -16,10 +16,11 @@ class TrainingCategoryTests(unittest.TestCase):
                            'ALTER TABLE IF EXISTS t RENAME TO t2','ALTER TABLE t TRUNCATE PARTITION p']}
         for category,texts in examples.items():
             for text in texts:
-                with self.subTest(text=text):
-                    result=classify(text)
-                    self.assertEqual('pure',result['kind'])
-                    self.assertEqual([category],result['categories'])
+                for fast in (False,True):
+                    with self.subTest(text=text,grammar_verified=fast):
+                        result=classify(text,grammar_verified=fast)
+                        self.assertEqual('pure',result['kind'])
+                        self.assertEqual([category],result['categories'])
 
     def test_deferred_and_non_categories(self):
         for text in ['END','START TRANSACTION','ANALYSE t',"COMMIT PREPARED 'tx'",'SET ROLE NONE',
@@ -32,7 +33,9 @@ class TrainingCategoryTests(unittest.TestCase):
                      'CLUSTER t','CHECKPOINT','CREATE TABLE t AS SELECT 1','DROP TABLE t',
                      "SELECT set_config('work_mem','16MB',false)",'ALTER INDEX i RENAME TO j',
                      'ALTER VIEW v RENAME TO v2',"SELECT 'SET; COMMIT', $$ALTER TABLE t$$",'DO $$BEGIN PERFORM 1; END$$']:
-            with self.subTest(text=text):self.assertNotEqual('pure',classify(text)['kind'])
+            for fast in (False,True):
+                with self.subTest(text=text,grammar_verified=fast):
+                    self.assertNotEqual('pure',classify(text,grammar_verified=fast)['kind'])
 
     def test_whole_batches_and_incomplete_grammar(self):
         for text,kind in [("SET work_mem='16MB'; BEGIN; COMMIT",'pure'),
@@ -43,3 +46,44 @@ class TrainingCategoryTests(unittest.TestCase):
                           ('; /* comment */ ;','unknown'),('SET broken','unknown'),
                           ('COMMIT gibberish','unknown'),('ALTER TABLE','unknown')]:
             with self.subTest(text=text):self.assertEqual(kind,classify(text)['kind'])
+
+    def test_prefixed_transaction_special_forms(self):
+        for prefix in ('', 'LOCAL ', 'SESSION '):
+            for mode in ('READ ONLY', 'READ WRITE', 'ISOLATION LEVEL SERIALIZABLE', 'DEFERRABLE'):
+                text='SET '+prefix+'SESSION CHARACTERISTICS AS TRANSACTION '+mode
+                for fast in (False,True):
+                    with self.subTest(text=text,grammar_verified=fast):
+                        self.assertEqual(dict(kind='none',categories=[]),classify(text,grammar_verified=fast))
+        for text in ['SET LOCAL TRANSACTION READ ONLY','SET SESSION TRANSACTION READ ONLY',
+                     "SET TRANSACTION SNAPSHOT '00000001-1'",'SET LOCAL SESSION AUTHORIZATION DEFAULT',
+                     'SET SESSION ROLE NONE','SET LOCAL ROLE NONE',
+                     r'SET U&"\0074ransaction_read_only" TO on',
+                     'SET LOCAL U&"!0074ransaction_read_only" UESCAPE \'!\' = on']:
+            for fast in (False,True):
+                with self.subTest(text=text,grammar_verified=fast):
+                    self.assertEqual(dict(kind='none',categories=[]),classify(text,grammar_verified=fast))
+
+    def test_transaction_parameter_spellings(self):
+        for stem,value in [('isolation',"'serializable'"),('read_only','on'),('deferrable','on')]:
+            for default in ('','default_'):
+                parameter=default+'transaction_'+stem
+                for name in (parameter,parameter.upper(),'"'+parameter.upper()+'"'):
+                    for prefix in ('','SESSION ','LOCAL '):
+                        for assignment in ('TO','='):
+                            text='SET '+prefix+name+' '+assignment+' '+value
+                            for fast in (False,True):
+                                with self.subTest(text=text,grammar_verified=fast):
+                                    self.assertEqual(dict(kind='none',categories=[]),classify(text,grammar_verified=fast))
+
+    def test_transaction_batches_and_keyword_literals(self):
+        cases=[
+            ("BEGIN; SET transaction_isolation TO 'serializable'; COMMIT", 'mixed', ['BEGIN', 'COMMIT']),
+            ('SET LOCAL SESSION CHARACTERISTICS AS TRANSACTION READ ONLY; COMMIT', 'mixed', ['COMMIT']),
+            ("SET default_transaction_read_only=on; SET work_mem='16MB'", 'mixed', ['SET']),
+            ("/* transaction_isolation */ SET work_mem='16MB'", 'pure', ['SET']),
+            ("SET application_name='transaction_read_only; SESSION CHARACTERISTICS'", 'pure', ['SET']),
+        ]
+        for text,kind,categories in cases:
+            for fast in (False,True):
+                with self.subTest(text=text,grammar_verified=fast):
+                    self.assertEqual(dict(kind=kind,categories=categories),classify(text,grammar_verified=fast))

@@ -10,7 +10,7 @@ Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates verified 1.0.0/1.1.0 schemas to 1.3.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0 schemas to 1.3.0; stop writers first.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.

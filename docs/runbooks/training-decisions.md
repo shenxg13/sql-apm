@@ -57,6 +57,15 @@ JSON 存放于被忽略的 `var/training/`；不执行配置或 `.env`。下面�
 同规则的缓存准备并发返回 `training_rule_busy`，待原会话退出后重试。
 这不是④的同集群任务调度或重建命令。
 
+模板的任何修改（包括只改说明，或修改其他集群的模板）都会生成新的 `rule_id`。
+随后首次为相应输入创建快照会重新计算原文缓存，旧结果保留。建议积累数条模板修改后
+一次性提交配置，再创建快照。类别或归一化规则变更也会生成新缓存。
+[原实测](../reports/training-decisions-2026-09-29.md)在两个集群共约 138 万条去重原文上，
+一版缓存约 720 MB、准备约 10 分钟；这是该输入和本机环境的 measured 数据，
+不是每次改模板的固定成本或生产容量保证。
+[2026-09-30 用户确认](https://github.com/shenxg13/sql-apm/issues/21#issuecomment-5903278085)
+接受这一成本并维持现有设计；自动清理继续暂缓。
+
 ## 汇总和逐条查询
 
 ```bash
@@ -103,4 +112,6 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m unittest discover 
 ```
 
 实例在完成或异常时停止并删除；脱敏报告保留在指定忽略目录。
-真实结果见[验证报告](../reports/training-decisions-2026-09-29.md)。
+真实结果见[原验证报告](../reports/training-decisions-2026-09-29.md)。
+类别 v2 的合成回归和原 55 文件索引的有界影响核对见
+[整改验证](../reports/training-decisions-r1-remediation-2026-09-30.md)；旧实测仍归属其记录的源码版本。

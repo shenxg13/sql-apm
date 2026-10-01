@@ -319,9 +319,21 @@ InputSnapshot 的物理 manifest 固定每文件唯一 Analysis、文件校验�
 整体所需键为 null；逐天为窗口每个日期；逐周为与窗口相交各周一；星期 1–7；小时 0–23。
 empty_keys 仅表示已完成计算、零有效且零排除的桶；有排除数即必须有显式 Statistic。
 无已知 Group 时 coverage_index 可以为空，timing_coverage 仍保留五类零值与诊断原因。
-calculated 但 results_saved=false 允许表达保存失败，此时对应检查失败并禁止发布。
+历史逻辑格式可表达 calculated 且 results_saved=false；#25 的③写入器进一步保证保存失败时为
+failed 且 results_saved=false，只有全部结果事务提交后才同时成为 calculated／true。④负责 checks。
 
 ### Statistic、Bucket 与门槛结果
+
+1.4.0 物理映射（[#25](https://github.com/shenxg13/sql-apm/issues/25)）：下表 statistic_id 仅为
+逻辑交接标识，物理不保存该文本列；以 `(partition_id, build_id, group_id, layer, bucket_date,
+bucket_number)` 的 `UNIQUE NULLS NOT DISTINCT` 确定唯一行。partition_id 是由 Build 集群与
+北京时间开始月份确定的 bigint 分区编号；同一 Build 只属于一个分区，所以业务自然键仍为
+构建、分组、层次和桶。overall 的空桶键同样唯一。上下文通过 mpp_build_group 集中校验，
+每行不再重复 scope_id／normalization_id／profile。旧合成逻辑 ID 仍可通过该元组映射。
+同日范围变更后，sufficiency 也是逻辑字段，物理表不保存该 JSONB。查询从 Statistic 关联 Build，
+再关联其封存 ConfigSnapshot，以原 thresholds／statistics_version 和统计行的 layer、included_count、
+active_dates、active_week_starts 调用 `mpp_statistic_sufficiency`，派生下述完整三项结果。
+新快照或默认门槛变更不改写历史解释；未知公式版本报错。调用示例见[运行手册](../../runbooks/baseline-statistics.md#查询门槛结果)。
 
 | 字段 | 类型／条件 | 含义 |
 | --- | --- | --- |

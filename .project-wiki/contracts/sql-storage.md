@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-09-29
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/17
     status: current
   - path: .project-wiki/log.md
@@ -79,7 +81,7 @@ confidence: high
 - 来源：用户对“首期暂缓自动清理，执行／调用明细、去重原文和历史基线暂不
   自动删除，原始 CSV 人工管理；实际入库测量后再确定期限和清理方案”的建议
   回复“确认”。
-- 来源状态：current；首期留存边界已确认，数据库导入、容量测量和清理尚未实施。
+- 来源状态：current；首期留存边界已确认；导入与容量测量已由 #18 实施，清理仍未实施。
 - 首期暂缓自动清理；程序暂不自动删除执行／调用明细、去重 SQL 原文和历史
   基线版本。原始 CSV 由人工管理，首期不建立程序自动删除原始日志的任务。
 - 默认 30 天仍仅作为可调整的训练窗口，不作为自动删除界限。窗口之外已保留
@@ -88,9 +90,42 @@ confidence: high
   分别确定原始日志、明细、SQL 原文和基线版本的保留期限及清理方案。具体
   天数和后续清理实现未在本次固定，不把暂缓清理解释为永久留存承诺。
 - 已有日志／文本字节和压缩测量不等于数据库实测容量；首轮实际入库及相应
-  容量观察仍属后续工作，不能据此宣称已验证长期容量。
+  容量观察见 #18 验证，不能据此宣称已验证长期容量。
 - 既有原文精确去重、按集群管理版本、正常训练筛选和历史查看规则继续适用。
   问题记录的具体存储留存、后续清理时的引用处理与压缩归档仍待落实。
+
+### 已接受的增长与统计分区（2026-09-30）
+
+来源：[Issue #21 R1 用户确认](https://github.com/shenxg13/sql-apm/issues/21#issuecomment-5903278085)，
+由 [Issue #25](https://github.com/shenxg13/sql-apm/issues/25) 明确要求同步。
+用户接受生产环境两集群导入明细约 1.3 GiB／天（约 470 GiB／年），以及每次模板或规则变更约
+0.7 GB 的增长；留存和清理设计暂不急。这是依据既有入库与缓存观察接受的运行量级，
+年增长为外推，不是完整一年实测，也不表示永久留存承诺。
+
+用户同时确认统计结果全部完整保存；mpp_statistic、mpp_build_coverage 按“集群＋构建月份”
+分区，一年约 24 个分区／表（两集群），不按每次构建、时间层次或计时类别拆表。
+瘦身移除 statistic_id 文本代理主键及重复 scope_id／normalization_id／profile；
+保留构建优先和分组历史查询索引。1.4.0 的自然键与关联校验见[物理设计](../../docs/design/postgresql-storage.md)。
+导入侧大表仍不分区，首期自动清理继续暂缓。
+
+2026-09-30 [后续范围确认](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5914482826)进一步移除
+逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
+见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。统计结构仍为未发布的 1.4.0。
+
+### 统计存储量级接受（2026-10-01）
+
+用户[确认接受统计结果的存储量级](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5917051665)：
+总存储在 4–5 TB 以内没有压力，后续通过调整历史版本保留周期控制总量。
+这是新增的统计容量接受决定；上节导入明细／规则缓存的增长观察继续保留。
+
+确认依据中，[新结构全量验收](../../docs/reports/baseline-statistics-2026-10-01.md)的 measured 值为：
+120 集群七天数据单次构建约 7.8 GiB（统计约 4.3、覆盖约 3.2、构建分组约 0.3 GiB），
+119 单次约 1.0 GiB。120 三十天窗口单次约 29 GiB 是 modeled 外推，依据样本缓存观察到的
+每天约 12 万新增分组、约 21.6 万活跃分组；约 85% 分组只执行一次。
+容量接受不把这些外推改为完整三十天或全年实测，也不承诺永久保存每个历史版本。
+
+保留周期与清理设计仍为后续工作。`mpp_build_group` 不分区，不能随月分区一起删除；
+届时须单独协调构建分组关联的清理及引用处理。
 
 ## Workflows
 

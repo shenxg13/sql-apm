@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
     status: current
   - path: .project-wiki/log.md
@@ -130,7 +132,7 @@ confidence: high
 - 确认日期：2026-09-23。
 - 来源：用户对“人工确认文件齐全，程序核对处理完成”的首期批次完整性方案
   回复“确认”。
-- 来源状态：current；已确认判定原则；#18 已实现入口、冻结清单与批次完成核对，构建发布尚未交付。
+- 来源状态：current；已确认判定原则；#18 已实现入口、冻结清单与批次完成核对，③已实现快照统计构建；发布仍由④交付。
 - 每次手动导入时，由用户指定日志来源、覆盖日期及本批次文件，并确认所需
   文件已拷齐；文件仍须满足已结束写入且复制完成的既有要求。导入批次及相应
   构建、发布按计算集群独立管理，见下述已确认的版本范围。

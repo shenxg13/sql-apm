@@ -295,6 +295,13 @@ CREATE TABLE IF NOT EXISTS config_snapshot (
     UNIQUE (config_id, scope_id, profile),
     UNIQUE (config_id, scope_id, normalization_id, profile)
 );
+CREATE TABLE IF NOT EXISTS mpp_result_partition (
+    partition_id bigint PRIMARY KEY,
+    scope_id text NOT NULL REFERENCES scope,
+    build_month date NOT NULL CHECK (extract(day FROM build_month) = 1),
+    UNIQUE (scope_id, build_month),
+    UNIQUE (partition_id, scope_id)
+);
 CREATE TABLE IF NOT EXISTS build (
     build_id text PRIMARY KEY CHECK (build_id <> ''),
     scope_id text NOT NULL,
@@ -316,7 +323,11 @@ CREATE TABLE IF NOT EXISTS build (
     FOREIGN KEY (retry_of, scope_id) REFERENCES build (build_id, scope_id),
     CHECK (retry_of IS DISTINCT FROM build_id),
     CHECK ((state = 'running') = (finished_at IS NULL)),
-    CHECK (finished_at >= started_at)
+    CHECK (finished_at >= started_at),
+    partition_id bigint,
+    FOREIGN KEY (partition_id, scope_id) REFERENCES mpp_result_partition (partition_id, scope_id),
+    UNIQUE (partition_id, build_id),
+    diagnostics jsonb NOT NULL DEFAULT '{}' CHECK (jsonb_typeof(diagnostics) = 'object')
 );
 CREATE INDEX IF NOT EXISTS build_scope_time_idx ON build (scope_id, started_at);
 CREATE TABLE IF NOT EXISTS mpp_decision (
@@ -410,27 +421,47 @@ CREATE TABLE IF NOT EXISTS mpp_build_timing_coverage (
     excluded_count bigint NOT NULL CHECK (excluded_count >= 0),
     PRIMARY KEY (build_id, timing_type)
 );
+CREATE TABLE IF NOT EXISTS mpp_build_group (
+    partition_id bigint NOT NULL,
+    build_id text NOT NULL,
+    group_id text NOT NULL REFERENCES mpp_baseline_group,
+    PRIMARY KEY (partition_id, build_id, group_id),
+    FOREIGN KEY (partition_id, build_id) REFERENCES build (partition_id, build_id)
+);
+CREATE OR REPLACE FUNCTION mpp_check_build_groups() RETURNS trigger LANGUAGE plpgsql AS $function$
+BEGIN
+    IF EXISTS (SELECT FROM added_groups a JOIN build b USING(build_id)
+        JOIN mpp_baseline_group g USING(group_id)
+        WHERE (b.scope_id,b.normalization_id,b.profile) IS DISTINCT FROM
+              (g.scope_id,g.normalization_id,g.profile)) THEN
+        RAISE EXCEPTION 'build_group_context_mismatch';
+    END IF;
+    RETURN NULL;
+END $function$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_build_group'::regclass AND tgname='mpp_build_group_context') THEN
+        CREATE TRIGGER mpp_build_group_context AFTER INSERT ON mpp_build_group
+            REFERENCING NEW TABLE AS added_groups FOR EACH STATEMENT EXECUTE FUNCTION mpp_check_build_groups();
+        CREATE TRIGGER mpp_build_group_context_update AFTER UPDATE ON mpp_build_group
+            REFERENCING NEW TABLE AS added_groups FOR EACH STATEMENT EXECUTE FUNCTION mpp_check_build_groups();
+    END IF;
+END $block$;
 CREATE TABLE IF NOT EXISTS mpp_build_coverage (
     build_id text NOT NULL,
     group_id text NOT NULL,
-    scope_id text NOT NULL,
-    normalization_id text NOT NULL,
-    profile text NOT NULL,
+    partition_id bigint NOT NULL,
     layer text NOT NULL CHECK (layer IN ('overall','day','week','weekday','hour')),
     computed_keys jsonb NOT NULL CHECK (jsonb_typeof(computed_keys) = 'array'),
     empty_keys jsonb NOT NULL CHECK (jsonb_typeof(empty_keys) = 'array'),
-    PRIMARY KEY (build_id, group_id, layer),
-    FOREIGN KEY (build_id, scope_id, normalization_id, profile) REFERENCES build (build_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES mpp_baseline_group (group_id, scope_id, normalization_id, profile)
-);
+    PRIMARY KEY (partition_id, build_id, group_id, layer),
+    FOREIGN KEY (partition_id, build_id, group_id) REFERENCES mpp_build_group (partition_id, build_id, group_id)
+) PARTITION BY LIST (partition_id);
 
 CREATE TABLE IF NOT EXISTS mpp_statistic (
-    statistic_id text PRIMARY KEY CHECK (statistic_id <> ''),
     build_id text NOT NULL,
     group_id text NOT NULL,
-    scope_id text NOT NULL,
-    normalization_id text NOT NULL,
-    profile text NOT NULL,
+    partition_id bigint NOT NULL,
     layer text NOT NULL CHECK (layer IN ('overall','day','week','weekday','hour')),
     bucket_date date,
     bucket_number smallint,
@@ -462,10 +493,8 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
     p95_p50 numeric CHECK (p95_p50 >= 0 AND p95_p50 NOT IN ('NaN','Infinity','-Infinity')),
     p99_p50 numeric CHECK (p99_p50 >= 0 AND p99_p50 NOT IN ('NaN','Infinity','-Infinity')),
     metric_null_reasons jsonb NOT NULL CHECK (jsonb_typeof(metric_null_reasons) = 'object'),
-    sufficiency jsonb NOT NULL CHECK (jsonb_typeof(sufficiency) = 'object' AND sufficiency ?& ARRAY['basic','p95','p99']),
-    FOREIGN KEY (build_id, scope_id, normalization_id, profile) REFERENCES build (build_id, scope_id, normalization_id, profile),
-    FOREIGN KEY (group_id, scope_id, normalization_id, profile) REFERENCES mpp_baseline_group (group_id, scope_id, normalization_id, profile),
-    UNIQUE NULLS NOT DISTINCT (build_id, group_id, layer, bucket_date, bucket_number),
+    FOREIGN KEY (partition_id, build_id, group_id) REFERENCES mpp_build_group (partition_id, build_id, group_id),
+    UNIQUE NULLS NOT DISTINCT (partition_id, build_id, group_id, layer, bucket_date, bucket_number),
     CHECK (range_start < range_end),
     CHECK (
         (layer = 'overall' AND bucket_date IS NULL AND bucket_number IS NULL)
@@ -533,82 +562,131 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
             AND ((included_count = 0) = (metric_null_reasons->>'p99_p50' = 'no_samples')))),
     CHECK (min_ms <= p25_ms AND p25_ms <= p50_ms AND p50_ms <= p75_ms
         AND p75_ms <= p90_ms AND p90_ms <= p95_ms AND p95_ms <= p99_ms AND p99_ms <= max_ms),
-CONSTRAINT mpp_statistic_sufficiency_basic_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'basic') = 'object'
-    AND (sufficiency->'basic') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'basic'->'required_count') = 'number'
-    AND (sufficiency->'basic'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'basic'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'basic'->'actual_count') = 'number'
-    AND (sufficiency->'basic'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'basic'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'basic'->'required_coverage') = 'number'
-    AND (sufficiency->'basic'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'basic'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'basic'->'actual_coverage') = 'number'
-    AND (sufficiency->'basic'->>'actual_coverage')::numeric = CASE sufficiency->'basic'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'basic'->>'coverage_kind') <> 'none' OR (sufficiency->'basic'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'basic'->'met') = 'boolean'
-    AND (sufficiency->'basic'->>'met')::boolean = (
-        included_count >= (sufficiency->'basic'->>'required_count')::numeric
-        AND (sufficiency->'basic'->>'actual_coverage')::numeric >= (sufficiency->'basic'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'basic'->'reasons') = 'array'
-    AND ((sufficiency->'basic'->>'met')::boolean = (sufficiency->'basic'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p95_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'p95') = 'object'
-    AND (sufficiency->'p95') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'p95'->'required_count') = 'number'
-    AND (sufficiency->'p95'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'p95'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p95'->'actual_count') = 'number'
-    AND (sufficiency->'p95'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'p95'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'p95'->'required_coverage') = 'number'
-    AND (sufficiency->'p95'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'p95'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p95'->'actual_coverage') = 'number'
-    AND (sufficiency->'p95'->>'actual_coverage')::numeric = CASE sufficiency->'p95'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'p95'->>'coverage_kind') <> 'none' OR (sufficiency->'p95'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'p95'->'met') = 'boolean'
-    AND (sufficiency->'p95'->>'met')::boolean = (
-        included_count >= (sufficiency->'p95'->>'required_count')::numeric
-        AND (sufficiency->'p95'->>'actual_coverage')::numeric >= (sufficiency->'p95'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'p95'->'reasons') = 'array'
-    AND ((sufficiency->'p95'->>'met')::boolean = (sufficiency->'p95'->'reasons' = '[]'::jsonb)), false)),
-CONSTRAINT mpp_statistic_sufficiency_p99_check CHECK (coalesce(
-    jsonb_typeof(sufficiency->'p99') = 'object'
-    AND (sufficiency->'p99') ?& ARRAY['required_count','actual_count','coverage_kind','required_coverage','actual_coverage','met','reasons']
-    AND jsonb_typeof(sufficiency->'p99'->'required_count') = 'number'
-    AND (sufficiency->'p99'->>'required_count')::numeric >= 0
-    AND mod((sufficiency->'p99'->>'required_count')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p99'->'actual_count') = 'number'
-    AND (sufficiency->'p99'->>'actual_count')::numeric = included_count
-    AND (sufficiency->'p99'->>'coverage_kind') IN ('none','active_days','active_weeks')
-    AND jsonb_typeof(sufficiency->'p99'->'required_coverage') = 'number'
-    AND (sufficiency->'p99'->>'required_coverage')::numeric >= 0
-    AND mod((sufficiency->'p99'->>'required_coverage')::numeric,1) = 0
-    AND jsonb_typeof(sufficiency->'p99'->'actual_coverage') = 'number'
-    AND (sufficiency->'p99'->>'actual_coverage')::numeric = CASE sufficiency->'p99'->>'coverage_kind'
-        WHEN 'none' THEN 0 WHEN 'active_days' THEN cardinality(active_dates)
-        WHEN 'active_weeks' THEN cardinality(active_week_starts) END
-    AND ((sufficiency->'p99'->>'coverage_kind') <> 'none' OR (sufficiency->'p99'->>'required_coverage')::numeric = 0)
-    AND jsonb_typeof(sufficiency->'p99'->'met') = 'boolean'
-    AND (sufficiency->'p99'->>'met')::boolean = (
-        included_count >= (sufficiency->'p99'->>'required_count')::numeric
-        AND (sufficiency->'p99'->>'actual_coverage')::numeric >= (sufficiency->'p99'->>'required_coverage')::numeric)
-    AND jsonb_typeof(sufficiency->'p99'->'reasons') = 'array'
-    AND ((sufficiency->'p99'->>'met')::boolean = (sufficiency->'p99'->'reasons' = '[]'::jsonb)), false)),
     CHECK (included_count = 0 OR ((mean_ms = 0) = (cv IS NULL))),
     CHECK (included_count = 0 OR ((p50_ms = 0) = (p95_p50 IS NULL))),
     CHECK (included_count = 0 OR ((p50_ms = 0) = (p99_p50 IS NULL))),
     CHECK (cardinality(active_dates) <= included_count AND cardinality(active_week_starts) <= included_count),
     CHECK (mean_ms BETWEEN min_ms AND max_ms)
-);
+) PARTITION BY LIST (partition_id);
 CREATE INDEX IF NOT EXISTS mpp_statistic_group_build_idx ON mpp_statistic (group_id, build_id, layer);
+-- Pure projection: callers join the statistic's Build to its sealed ConfigSnapshot.
+-- Keep the version branch when a future statistics contract is added.
+CREATE OR REPLACE FUNCTION mpp_statistic_sufficiency(
+    p_statistics_version text, p_thresholds jsonb, p_layer text,
+    p_included_count bigint, p_active_dates date[], p_active_week_starts date[]
+) RETURNS jsonb LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS $function$
+DECLARE
+    threshold jsonb;
+    coverage_kind text;
+    required_coverage numeric;
+    actual_coverage integer;
+    required_count numeric;
+    label text;
+    reasons jsonb;
+    result jsonb := '{}';
+BEGIN
+    IF p_statistics_version IS DISTINCT FROM 'baseline-formulas/1' THEN
+        RAISE EXCEPTION 'unsupported_statistics_version';
+    END IF;
+    IF p_layer IS NULL OR p_layer NOT IN ('overall','day','week','weekday','hour')
+        OR p_included_count IS NULL OR p_included_count < 0
+        OR p_active_dates IS NULL OR p_active_week_starts IS NULL
+        OR array_position(p_active_dates,NULL) IS NOT NULL
+        OR array_position(p_active_week_starts,NULL) IS NOT NULL THEN
+        RAISE EXCEPTION 'invalid_statistic_coverage';
+    END IF;
+    threshold := p_thresholds->p_layer;
+    coverage_kind := CASE p_layer WHEN 'day' THEN 'none'
+        WHEN 'weekday' THEN 'active_weeks' ELSE 'active_days' END;
+    IF jsonb_typeof(threshold) IS DISTINCT FROM 'object'
+        OR (threshold->>'coverage_kind') IS DISTINCT FROM coverage_kind
+        OR jsonb_typeof(threshold->'coverage_min') IS DISTINCT FROM 'number' THEN
+        RAISE EXCEPTION 'invalid_statistics_thresholds';
+    END IF;
+    required_coverage := (threshold->>'coverage_min')::numeric;
+    IF required_coverage < 0 OR mod(required_coverage,1) <> 0
+        OR (coverage_kind='none' AND required_coverage<>0) THEN
+        RAISE EXCEPTION 'invalid_statistics_thresholds';
+    END IF;
+    actual_coverage := CASE coverage_kind WHEN 'none' THEN 0
+        WHEN 'active_days' THEN cardinality(p_active_dates)
+        ELSE cardinality(p_active_week_starts) END;
+    FOREACH label IN ARRAY ARRAY['basic','p95','p99'] LOOP
+        IF jsonb_typeof(threshold->(label||'_count')) IS DISTINCT FROM 'number' THEN
+            RAISE EXCEPTION 'invalid_statistics_thresholds';
+        END IF;
+        required_count := (threshold->>(label||'_count'))::numeric;
+        IF required_count < 0 OR mod(required_count,1) <> 0 THEN
+            RAISE EXCEPTION 'invalid_statistics_thresholds';
+        END IF;
+        reasons := '[]';
+        IF p_included_count < required_count THEN
+            reasons := reasons || jsonb_build_array('sample_count_below_min');
+        END IF;
+        IF actual_coverage < required_coverage THEN
+            reasons := reasons || jsonb_build_array(coverage_kind||'_below_min');
+        END IF;
+        result := result || jsonb_build_object(label,jsonb_build_object(
+            'required_count',required_count,'actual_count',p_included_count,
+            'coverage_kind',coverage_kind,'required_coverage',required_coverage,
+            'actual_coverage',actual_coverage,'met',reasons='[]'::jsonb,'reasons',reasons));
+    END LOOP;
+    RETURN result;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION mpp_result_context_guard() RETURNS trigger LANGUAGE plpgsql AS $function$
+BEGIN
+    IF TG_TABLE_NAME = 'build' THEN
+        IF NEW.partition_id IS NOT NULL AND NOT EXISTS (
+            SELECT FROM mpp_result_partition WHERE partition_id=NEW.partition_id
+                AND scope_id=NEW.scope_id
+                AND build_month=date_trunc('month',NEW.started_at AT TIME ZONE 'Asia/Shanghai')::date) THEN
+            RAISE EXCEPTION 'build_partition_month_mismatch';
+        END IF;
+        IF TG_OP = 'UPDATE' AND (NEW.scope_id,NEW.normalization_id,NEW.profile) IS DISTINCT FROM
+            (OLD.scope_id,OLD.normalization_id,OLD.profile)
+            AND EXISTS (SELECT FROM mpp_build_group WHERE build_id=OLD.build_id) THEN
+            RAISE EXCEPTION 'build_result_context_immutable';
+        END IF;
+    ELSIF (NEW.scope_id,NEW.normalization_id,NEW.profile) IS DISTINCT FROM
+            (OLD.scope_id,OLD.normalization_id,OLD.profile)
+            AND EXISTS (SELECT FROM mpp_build_group WHERE group_id=OLD.group_id) THEN
+        RAISE EXCEPTION 'group_result_context_immutable';
+    END IF;
+    RETURN NEW;
+END $function$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='build'::regclass AND tgname='mpp_result_context') THEN
+        CREATE TRIGGER mpp_result_context BEFORE INSERT OR UPDATE ON build
+            FOR EACH ROW EXECUTE FUNCTION mpp_result_context_guard();
+        CREATE TRIGGER mpp_result_context BEFORE UPDATE ON mpp_baseline_group
+            FOR EACH ROW EXECUTE FUNCTION mpp_result_context_guard();
+    END IF;
+END $block$;
+CREATE INDEX IF NOT EXISTS mpp_build_coverage_group_build_idx ON mpp_build_coverage (group_id,build_id,layer);
+CREATE OR REPLACE FUNCTION mpp_ensure_result_partition(selected_scope text, selected_month date)
+RETURNS bigint LANGUAGE plpgsql AS $function$
+DECLARE pid bigint; table_name text; child_name text;
+BEGIN
+    IF extract(day FROM selected_month) <> 1 THEN RAISE EXCEPTION 'invalid_build_month'; END IF;
+    pid := ('x'||substr(encode(sha256(convert_to(jsonb_build_array(selected_scope,selected_month)::text,'UTF8')),'hex'),1,15))::bit(60)::bigint;
+    -- A brief transaction lock only coordinates DDL for this cluster/month.
+    PERFORM pg_advisory_xact_lock(pid);
+    INSERT INTO mpp_result_partition VALUES (pid,selected_scope,selected_month) ON CONFLICT DO NOTHING;
+    IF NOT EXISTS (SELECT FROM mpp_result_partition WHERE partition_id=pid AND scope_id=selected_scope AND build_month=selected_month) THEN
+        RAISE EXCEPTION 'partition_identity_collision';
+    END IF;
+    FOREACH table_name IN ARRAY ARRAY['mpp_statistic','mpp_build_coverage'] LOOP
+        child_name := table_name||'_p'||pid;
+        IF to_regclass(child_name) IS NULL THEN
+            EXECUTE format('CREATE TABLE %I PARTITION OF %I FOR VALUES IN (%s)',child_name,table_name,pid);
+        END IF;
+    END LOOP;
+    RETURN pid;
+END $function$;
+
 CREATE TABLE IF NOT EXISTS publication (
     publication_id text PRIMARY KEY CHECK (publication_id <> ''),
     scope_id text NOT NULL,

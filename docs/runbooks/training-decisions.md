@@ -1,6 +1,6 @@
 # 训练快照与判定诊断
 
-先按[初始化说明](database-initialization.md)升级到 1.3.0，并通过
+先按[初始化说明](database-initialization.md)升级到 1.4.0，并通过
 [导入命令](log-ingestion.md)完成批次。本入口交付②，业务范围见
 [训练资格](../../.project-wiki/contracts/training-eligibility.md)和
 [判定设计](../design/training-decisions.md)，不创建构建或统计版本。
@@ -33,7 +33,11 @@ JSON 存放于被忽略的 `var/training/`；不执行配置或 `.env`。下面�
 起止必须明确使用 `+08:00`，且 start 小于 end；模板与时段 ID 不重复。
 集群须列于本地 clusters；目标集群还须已在存储库登记并有已完成批次。
 窗口 days 为正整数，省略时取 30，截止日必须有效。重复 JSON 键、未知字段、空限定值被拒绝。
-五层样本门槛在本版按已确认默认值完整记录，不用门槛删样本。
+五层样本门槛默认按已确认值完整记录，不用门槛删样本。#25 增加可选顶层 thresholds：
+例如 `{"week":{"basic_count":30,"p95_count":200,"p99_count":1000,"coverage_min":3}}`。
+只覆盖明确填写的非负整数，其余使用默认值；层名为 overall/day/week/weekday/hour。
+各层 coverage_kind 固定，day 的 coverage_min 只能为 0，不能借配置改变五层覆盖语义。
+门槛实际内容封存在配置快照中，由[③统计计算](baseline-statistics.md)使用。
 
 ## 创建快照
 

@@ -9,8 +9,10 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-29
+updated: 2026-09-30
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/25
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/15
@@ -71,7 +73,7 @@ sql-apm/
 ├── sql_apm/
 │   ├── __init__.py
 │   ├── __main__.py             # 已有：python -m sql_apm 的薄入口
-│   ├── cli/                    # 已有：只导入参数、输出和流程调用
+│   ├── cli/                    # 已有：导入、训练快照、统计参数和薄调用
 │   ├── contracts/              # 后续：跨模块数据对象与约束
 │   ├── ingestion/              # 已有：批次、来源追踪、异常处理
 │   │   └── hashdata/           # 已有：来源日志解析与计时解释
@@ -85,7 +87,7 @@ sql-apm/
 │   │   ├── pg_ast.py           # 已有：PG语法树位置字段处理
 │   │   ├── structure.py        # 已有：无递归深度依赖的结构编码
 │   │   └── normalization.py    # 已有：可靠归一化、结构指纹及规则快照
-│   ├── baseline/               # 后续：训练筛选、窗口、统计、构建、版本
+│   ├── baseline/               # 已有：五层统计核心和进程监护；发布待④
 │   ├── storage/                # 已有：DDL／迁移、SQL 元数据及批量导入写入
 │   └── diagnostics/
 │       ├── __init__.py
@@ -138,7 +140,7 @@ sql-apm/
 | `sql_apm/function_dictionary.py` | [sql_apm/sql/function_dictionary.py](../../sql_apm/sql/function_dictionary.py) | 字典校验、摘要、规则选择、结构化预览及现有模块命令 |
 | `sql_apm/function_probe.py` | [sql_apm/diagnostics/function_probe.py](../../sql_apm/diagnostics/function_probe.py) | 有界词法候选诊断 |
 
-当前已有 `sql/`、`diagnostics/`、`storage/` 三个子包。解析专项测试放在
+该迁移阶段已有 `sql/`、`diagnostics/`、`storage/` 三个子包；后续新增职责见本页已实现边界。解析专项测试放在
 `tests/parser_probe/`，既有测试继续保留原路径。现有模块命令入口随文件迁移保留；统一 CLI 实施时再
 将参数解析委托给 `cli/`，本次不提前新增 `__main__.py`。
 
@@ -231,16 +233,27 @@ Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/no
 `storage/ingestion.py` 负责 PostgreSQL 连接、COPY、精确原文和近似写入；
 `cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
 [设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)
-说明恢复、配对和证据边界。训练、统计与发布子包仍待对应任务实现。
+说明恢复、配对和证据边界。训练快照和统计分别见下述②③边界；发布仍待④实现。
 
 ## 已实现的训练判定边界
 
 Issue #21 新增 `training/categories.py` 和 `training/config.py`，分别负责保守产品类别及本地配置；
 `storage/training.py` 管理快照、缓存和数据库查询，`cli/training.py` 是薄命令。
 `storage/schema.sql` 的 `mpp_training_decisions` 是唯一资格推导，逐条查询和诊断共用；
-产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎，也未实施③统计／④编排。
+产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎；③统计见下节，④编排仍未实施。
 [判定设计](../../docs/design/training-decisions.md)与[操作说明](../../docs/runbooks/training-decisions.md)
 记录接口、临时汇总和持久化边界。
+
+## 已实现的统计计算边界
+
+Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statistics.py` 组织快照引用、
+临时判定、分组读取和事务写入；`baseline/watchdog.py` 是进程退出监护入口，状态落库委托存储层。
+`cli/statistics.py` 提供薄命令；独立指标实现仅在 tests 与验收脚本，产品不依赖测试。
+训练判定继续复用②的唯一 SQL 函数，未新增永久 Decision 投影。完整门槛结果由
+`storage/schema.sql` 的 `mpp_statistic_sufficiency` 按构建封存配置推导；Python 指标核心不重复实现
+门槛规则，也不逐行保存派生 JSONB。构建级批量标记查询位于
+`storage/statistics_sufficiency.sql`，复用该函数一次验证每层门槛，再作类型化比较；
+操作和成本见[统计手册](../../docs/runbooks/baseline-statistics.md#查询门槛结果)。发布与任务编排仍属④。
 
 ## Workflows
 

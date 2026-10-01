@@ -196,7 +196,8 @@ sql-apm/
 原型；`diagnostics/approximate_sql.py` 为文本／文件薄入口，`mpp_approximate_replay.py`
 复用全量工具的隔离进程，仅诊断层读取本地索引。生产近似规则不反向依赖诊断模块，
 没有新增 scripts 包装或数据库结构；[接口说明](../../docs/design/sql-approximate.md)记录
-近似范围；后续可靠结构归一化已由下述模块交付，观察统计仍待实施。
+近似范围；后续可靠结构归一化已由下述模块交付，#27 的 `storage/observations.py`
+已提供随构建保存的五层观察统计，详见下述统计模块职责；展示和④完整构建编排仍待交付。
 
 ### 可靠归一化与依赖（2026-09-27）
 

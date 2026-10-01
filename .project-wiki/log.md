@@ -230,3 +230,8 @@
   [统计原子性与无门槛规则](contracts/baseline-statistics.md#已确认的五层观察统计)。
 - 同步逻辑字段、1.5.0 结构和命令说明；原始快照、规则与旧报告保持不变。
 - 合成、迁移、55 文件全量及近似可用性核对见[观察统计验证报告](../docs/reports/observation-statistics-2026-10-01.md)。
+
+## 2026-10-01：观察统计 R1 整改
+
+- 按 [R1-F001](https://github.com/shenxg13/sql-apm/pull/28#issuecomment-5928377850) 修正导入、源码布局与存储设计中的过时状态：观察统计已随构建保存，1.4.0 已冻结，当前结构为 1.5.0；展示与④仍待交付。
+- 用户确认失败执行在耗时和开始时间未知时继续只进入构建级诊断，见[观察统计口径](contracts/baseline-statistics.md#已确认的五层观察统计)。

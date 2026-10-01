@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/baseline-statistics.md
 updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5929262162
+    status: current
   - path: docs/reports/observation-statistics-2026-10-01.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -476,6 +478,10 @@ confidence: high
 各非 SQL 可靠性原因分别计一次；不把本来允许观察的 SQL 可靠性原因算成观察排除。
 只对能够定位的分组和桶计数；未知时间／身份、不具备可用近似或无 SQL 的数量留在构建汇总。
 窗口外不计入桶。类别和模板黑名单在此路径为未评估，不排除观察样本。
+
+2026-10-01 用户在 [R1 整改确认](https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5929262162)
+中明确保持既有口径：失败执行若耗时和推算开始时间未知，只在构建级诊断按原原因计数，
+不进入观察分组或时间桶，也不借用结束时间分桶；继续与正式统计一致。
 
 观察统计不使用样本门槛、没有充足性结论；门槛查询与发布检查只读取正式统计。
 表、分组与可靠结果分开，不能引用可靠 Group 或用近似 Group 写正式 Statistic。

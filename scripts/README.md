@@ -55,7 +55,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0，支持由中间版本开始。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0，支持由中间版本开始。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
@@ -166,3 +166,11 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `.venv/bin/python scripts/db/verify_observations.py` 验证合成筛选、指标、隔离及原子回滚；
 `verify_observations_full.py` 显式重导 55 文件、全部观察组复算、正式结果逐行对照与资源测量。
 参数、统计表与计数边界见[统计操作说明](../docs/runbooks/baseline-statistics.md#观察统计与全量验收)。
+
+## 完整流程与版本发布
+
+`python -m sql_apm full`／`rebuild` 串联导入、快照、计算、检查和原子发布；
+`status`／`history` 查询当前版本、任务和历史，参数见[操作说明](../docs/runbooks/build-publication.md)。
+`verify_publication.py` 验证失败、恢复与并发，`verify_publication_full.py` 显式重导 55 文件，
+按两个集群首批＋逐日场景运行九次任务；`verify_coverage_migration_full.py` 对指定私有旧实例
+先验证覆盖逐行一致再升级。真实输入、私有连接和详细输出均保留本地忽略目录。

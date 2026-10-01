@@ -6,7 +6,7 @@
 
 ## 前提与调用
 
-先按[初始化说明](database-initialization.md#升级到-150)升级到 1.5.0，完成导入，
+先按[初始化说明](database-initialization.md#升级到-160)升级到 1.6.0，完成导入，
 使用[训练快照命令](training-decisions.md)得到 input_id 与 config_id。
 继续使用相同 libpq 环境或 SQL_APM_DSN，不把密码写入命令或提交配置。
 
@@ -20,7 +20,7 @@
 
 每次开始从数据库时钟取得 started_at，据此生成带北京时间日期前缀和随机部分的不透明 Build ID；
 自动创建该集群对应月份的
-统计和覆盖分区，无需提前按月运维。月份由构建开始时间决定，不由日志日期或训练窗口决定。
+正式和观察统计的当月／次月分区，无需提前按月运维。月份由构建开始时间决定，不由日志日期或训练窗口决定。
 同一月份所有构建共享分区，层次与计时类别不拆表。空月无构建时不预建。
 
 输出为 JSON 行：build_created、decisions_derived、statistics_progress、observations_written、results_written 和最终
@@ -93,7 +93,7 @@ distribution = cur.fetchall()
 失败／中断的计算事务回滚；已登记 Build 与原因保留，results_saved=false。
 主进程正常捕获错误记录固定码；异常退出时监护进程使用独立连接记录 worker_disconnected。
 同机 SIGTERM／SIGKILL 路径有合成验收。整机或数据库不可用时，不能即时更新状态，
-遗留 running／false 也不能解释为完整结果；整体任务恢复和忙时管理属于④。
+遗留 running／false 也不能解释为完整结果；整体任务恢复和忙时管理见[完整流程操作](build-publication.md)。
 
 ```bash
 .venv/bin/python -m sql_apm statistics \
@@ -103,7 +103,7 @@ distribution = cur.fetchall()
 
 retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；新尝试重新计算全部窗口，
 不续写失败半成品。修改输入或配置时先另建快照，以新快照发起计算。
-这只是一次统计尝试的引用参数；完整流程、重新构建编排、同集群串行和发布由④交付。
+这只是一次统计尝试的引用参数；完整流程、重新构建、同集群串行和发布见[操作说明](build-publication.md)。
 
 ## 验证与成本
 
@@ -155,7 +155,7 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 第二条显式重新导入 55 文件，在私有 PG17 以 119 截止 2026-07-31、120 截止 2026-09-19
 各构建并重复。沿用 #25 的固定验收排除时段；复算全部观察组的每个桶和 17 指标。
 用冻结 main 基线 `f038932fe0d5453450b91a59d5239c95bacb0078` 的统计实现生成正式对照，
-通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.5.0 结构。
+通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.6.0 结构；只移除冻结计算器的旧覆盖物理写入，保留原计算。
 `--dsn` 仅供已重导私有实例的分阶段验收；输出目录、原文、实例和中间结果保持本地忽略。
 
 计算用时、观察阶段用时及进程树 PSS 峰值分别记录；基线与新构建按顺序运行，受缓存和系统
@@ -163,3 +163,9 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 不代表纯新增分配。表和分区实测单独列出，父表大小已含叶表，避免重复相加。
 
 本次完整数据、近似可用性差异与测量边界见[观察统计验证报告](../reports/observation-statistics-2026-10-01.md)。
+
+## 覆盖推导
+
+1.6.0 不再保存 mpp_build_coverage；以 `mpp_coverage(build_id, false, group_id)` 查询正式覆盖，
+第二参数 true 查询观察覆盖，第三参数 NULL 返回全部组。构建层计数在
+`mpp_build_layer_count`，用于核对结果是否丢行。日常查询优先限定单组，避免展开整个构建。

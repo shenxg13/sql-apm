@@ -7,6 +7,8 @@ owners:
   - docs/design/offline-data-contract/
 updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -312,6 +314,19 @@ HashData 统计语义。来源改变必须另行确认 profile，不用任意标
 样本数表示观察样本，不带 sufficiency。逻辑字段见[字段字典](../../docs/design/offline-data-contract/fields.md#observationgroup-与-observationstatistic)。
 构建只有两类结果同时完整保存才 calculated；不改变正常训练、发布检查或 CurrentVersion。
 物理结构独立升级到 1.5.0，不改原始 v1 契约样例字节。
+
+### 覆盖推导与任务物理映射（2026-10-01）
+
+[Issue #29](https://github.com/shenxg13/sql-apm/issues/29)确认覆盖改为方案 C，删除物理
+`mpp_build_coverage`。逻辑 coverage_index 保持原语义：封存窗口产生所有应有键，
+Statistic 中存在的键是 computed_keys，其余是 empty_keys；排除数非零仍必须存在统计行。
+数据库函数同时支持正式和观察结果，构建级保存各层行数与分组数用于发布时核对。
+
+Task 增补独立 snapshot／statistics 模式、snapshot／check 阶段、起止时间及阶段耗时。
+异常退出依据会话锁恢复，失败重建创建新快照并可引用同集群失败构建。
+完整流程默认截止日及重新构建显式截止日采用[命令要求](../features/operator-cli.md#完整流程与版本查询2026-10-01)。
+这些是 1.6.0 物理实现扩展，不改原始 1.0.0 合成载荷；新枚举的消费者须明确支持，
+字段与物理映射见[字段字典](../../docs/design/offline-data-contract/fields.md#publicationcurrentversion-与-task)。
 
 ## Workflows
 

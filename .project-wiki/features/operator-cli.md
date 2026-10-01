@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -48,7 +50,7 @@ confidence: high
 - 来源：用户对日志导入、基线构建、任务状态及诊断结果查询统一提供命令行入口，
   来源映射、批次文件清单、黑名单及排除时段使用本地配置文件维护，Grafana
   继续承担既有 SQL 检索与展示范围的建议，选择“命令行与本地配置文件”。
-- 来源状态：current；已确认操作方式；#18 已交付导入命令及 JSON 配置，②训练快照／判定和③统计计算命令已交付；完整任务编排、发布和界面仍待后续实现。
+- 来源状态：current；#18 已交付导入命令及 JSON 配置，②训练快照／判定和③统计命令已交付；#29 实现完整编排、发布与版本查询，界面仍待后续实现。
 - 首期为日志导入、基线构建、任务状态和诊断结果查询提供命令行入口。
   日志来源映射、导入批次文件清单、黑名单和故障／维护排除时段通过本地配置
   文件维护；具体文件格式、字段及目录在实施时确定。
@@ -58,7 +60,7 @@ confidence: high
 - Grafana 继续承担 SQL 检索、基线与执行历史展示；不增加导入、构建、黑名单
   和排除时段的网页管理要求。任务管理 API 不作为本次确认的首期必要入口；
   SQL 检索服务接口与 Grafana 具体插件仍按原范围另行选型。
-- 具体命令名、参数、输出格式，以及配置与构建记录的关联实现仍待落实。
+- 命令、参数、输出格式及配置关联见本页各实施节和对应操作说明。
   完整流程与分步使用的业务范围已按下述规则确认；本次不创建可执行命令、
   实际配置项或定时任务，后续 SCP 及其触发方式仍按既定阶段另行实施。
 
@@ -84,7 +86,7 @@ confidence: high
 - 样本不足不单独阻止生效；整窗五类计时均无有效样本时仍保留当前版本，不能
   因命令流程完成而覆盖原有发布限制。
 - 这里的自动生效属于用户显式发起的本次命令流程，不新增定时调度、自动重试
-  或排队要求。具体命令名、参数及阶段状态实现留待实施。
+  或排队要求。具体命令、参数及阶段状态见[操作说明](../../docs/runbooks/build-publication.md)。
 
 关联条款：[首期导入批次的完整性判定](log-ingestion.md#首期导入批次的完整性判定)；[已确认的同集群任务串行与忙时处理](baseline-versions.md#已确认的同集群任务串行与忙时处理)；[已确认的基线计算失败重试范围](baseline-versions.md#已确认的基线计算失败重试范围)；[已确认的五类计时统一版本与发布边界](baseline-versions.md#已确认的五类计时统一版本与发布边界)。
 
@@ -93,7 +95,7 @@ confidence: high
 [Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 提供 `python -m sql_apm import`，
 JSON 本地配置、显式 `--source`／`--batch` 和计数／原因码输出。
 参数、身份冻结、文件冲突和重试操作见[导入操作说明](../../docs/runbooks/log-ingestion.md)。
-此命令只实现导入，尚未交付完整流程、重新构建、发布和版本切换命令。
+此命令只执行导入；完整流程、重新构建及发布由 #29 的独立命令提供。
 
 ### 已实现的训练快照与诊断入口（2026-09-29）
 
@@ -102,7 +104,7 @@ JSON 本地配置、显式 `--source`／`--batch` 和计数／原因码输出。
 北京时间半开时段及窗口参数的格式、固定快照 ID 和脱敏输出见
 [操作说明](../../docs/runbooks/training-decisions.md)。
 此入口固定输入／配置、复用原文缓存及汇总数据库按需判定；统计由③的 statistics 命令交付；完整构建、重新构建和发布
-命令仍由④实施。用户维护具体模板条目，初始为空；本次不提供类别增删入口。
+由 #29 的④命令实现。用户维护具体模板条目，初始为空；本次不提供类别增删入口。
 
 ## 已实现的统计命令
 
@@ -114,6 +116,19 @@ Issue #25 提供 `python -m sql_apm statistics --cluster ... --input ... --confi
 Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `observations` 计数及原因汇总，
 参数保持不变。观察结果不带充足性结论，失败与正式结果一起回滚；
 [观察操作说明](../../docs/runbooks/baseline-statistics.md#观察统计与全量验收)解释归属及规则间计数边界。
+
+### 完整流程与版本查询（2026-10-01）
+
+来源：[Issue #29](https://github.com/shenxg13/sql-apm/issues/29) 的已确认操作边界。
+`full` 依次导入、封存快照、计算、检查和有条件发布；默认截止日取本批声明覆盖日期的最后一天，
+`--cutoff-date` 可覆盖。`rebuild` 复用成功导入的数据并重新封存，必须显式给出 `--cutoff-date`。
+`status` 显示当前版本、最近任务及最近未发布原因，`history` 显示历史成功版本。
+
+五种写入入口共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
+忙时返回 `cluster_busy` 并保存 busy_rejected 任务；不会排队或中断持有者。
+任务保留模式、阶段、产物、时间和原因，查询仅输出标识、时间、计数及原因码。
+参数及 JSON 示例由[操作说明](../../docs/runbooks/build-publication.md)维护；
+失败／零样本发布行为继续由[版本要求](baseline-versions.md)维护。
 
 ## Workflows
 
@@ -136,4 +151,5 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 
 ## Open Questions
 
-具体命令、参数、输出和配置格式尚待实现；未增加自动调度或网页管理。各节已有待定说明继续有效。
+完整流程、重新构建和查询参数见上述操作说明；未增加自动调度或网页管理。
+SQL 检索与 Grafana 展示继续按后续交付安排落实。

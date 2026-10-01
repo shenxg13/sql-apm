@@ -322,6 +322,12 @@ empty_keys 仅表示已完成计算、零有效且零排除的桶；有排除数
 历史逻辑格式可表达 calculated 且 results_saved=false；#25 的③写入器进一步保证保存失败时为
 failed 且 results_saved=false，只有全部结果事务提交后才同时成为 calculated／true。④负责 checks。
 
+1.6.0 物理扩展（[#29](https://github.com/shenxg13/sql-apm/issues/29)）：coverage_index 不再逐组落表，
+由 `mpp_coverage(build_id text, observation boolean DEFAULT false, group_id text DEFAULT NULL)`
+返回 group_id／layer／computed_keys／empty_keys；该函数对正式和观察结果使用相同窗口语义。
+`mpp_build_layer_count` 保存每个 Build 的 kind／layer／row_count／group_count；正式层计数供发布核对，
+观察层计数只作诊断。中断或失败构建不能仅因可推导出桶就被视为发布合格。
+
 ### Statistic、Bucket 与门槛结果
 
 1.4.0 物理映射（[#25](https://github.com/shenxg13/sql-apm/issues/25)）：下表 statistic_id 仅为
@@ -389,15 +395,17 @@ stddev/MAD/IQR/log_MAD 为 0，其他指标按各自分母处理。数值不因�
 | CurrentVersion.last_success_at | instant? | 与该次 published 时间一致；失败／空结果不能刷新 |
 | CurrentVersion.publication_id | ref(Publication)? | 当前指针对应成功发布；无版本时为空，失败尝试从历史独立查询 |
 | Task.task_id、scope_id | id 各一 | 一次显式操作和集群 |
-| Task.mode | full/import_only/rebuild | 完整流程、只导入、复用已导入输入重建 |
+| Task.mode | full/import_only/rebuild/snapshot/statistics | 完整流程、只导入、复用已导入输入重建、单独快照、单独计算 |
 | Task.state | running/succeeded/failed/interrupted/busy_rejected | 忙时拒绝不修改既有任务；不自动排队 |
-| Task.stage | import/build/publish/none | 当前或最后阶段；忙时为 none |
+| Task.stage | import/snapshot/build/check/publish/none | 当前或最后阶段；忙时为 none |
 | Task.batch_ids、build_ids、publication_ids | 对应 ref[] 各一 | 实际产生的结果，未进入阶段为空 |
-| Task.busy_task_id | ref(Task)? | 仅 busy_rejected 必填，同集群运行中任务 |
+| Task.busy_task_id | ref(Task)? | busy_rejected 可引用同集群运行中任务；持锁者尚未提交任务登记的入场竞态可为空 |
 | Task.reason | text? | failed/interrupted/busy_rejected 必填 |
+| Task.started_at、finished_at | instant、instant? | 新任务记录数据库开始和结束时间；迁移前任务缺少历史时间，新增开始值为迁移时间 |
+| Task.stage_seconds | map(阶段 → 秒数) | 已完成阶段及终态最后阶段的实测耗时；强杀未能提交的阶段不伪造时长 |
 
 Task.succeeded 仅表示本次操作流程完成，仍须查看 Publication：只导入可无发布，
-零样本流程可正常完成但不切换。中断占用恢复机制留待实现，不能凭时间到期假定可并发接管。
+零样本流程可正常完成但不切换。占用恢复依据数据库会话锁，不能凭时间到期假定可并发接管。
 CurrentVersion 更新必须原子可见整个版本；任何发布失败都保持原三个引用／时间值。
 
 ## ObservationGroup 与 ObservationStatistic

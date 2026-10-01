@@ -47,6 +47,15 @@ def verify():
             assert count==v.sql('SELECT count(*) FROM import_attempt')
             assert len(version_status(db,'C1',history=True)['versions'])==2
             v.require(True,'first publication, subsequent switch and rebuild without reimport')
+            for command in ('status','history'):
+                query=subprocess.run([sys.executable,'-m','sql_apm',command,'--cluster','C1'],
+                    cwd=ROOT,env=dict(os.environ,SQL_APM_DSN=dsn),capture_output=True,text=True,timeout=20)
+                assert query.returncode==0
+                payload=json.loads(query.stdout)
+                assert not any(secret in query.stdout for secret in ('synthetic_db','synthetic_user','SELECT'))
+                if command=='status':assert payload['current']['build_id']==again['build']['build_id']
+                else:assert len(payload['versions'])==2
+            v.require(True,'status and history public commands return published versions without source identities')
             frozen=value['snapshot']
             def fresh():
                 store=StatisticsStore(dsn)
@@ -74,6 +83,12 @@ def verify():
                 assert version_status(db,'C1')['current']['build_id']==current
                 if restore:v.sql(restore)
                 v.require(True,'publication rejects '+name+' and preserves current')
+            bid=fresh()
+            v.sql("DELETE FROM mpp_statistic WHERE build_id='"+bid+"' AND layer='week'")
+            checks,result=check_publish(bid)
+            assert checks['results_complete']['state']=='failed' and result['result']=='check_failed'
+            assert version_status(db,'C1')['current']['build_id']==current
+            v.require(True,'publication rejects a missing whole layer as well as a single missing bucket')
             bid=fresh()
             constraint=v.sql("SELECT conname FROM pg_constraint WHERE conrelid='mpp_statistic'::regclass AND contype='c' AND pg_get_constraintdef(oid) LIKE '%min_ms <= p25_ms%'")
             definition=v.sql("SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid='mpp_statistic'::regclass AND conname='"+constraint+"'")
@@ -107,6 +122,9 @@ def verify():
             call_config=validate(dict(version=1,clusters=['C2'],window=dict(cutoff_date='2026-07-31')),'C2')
             calls=run(dsn,'sql_apm',call_config,load_config(call_cfg,'S2','CALLS'),workers=1)
             assert calls['publication']['result']=='published' and calls['build']['timings']['request'][0]==0
+            call_db=connect(dsn,'sql_apm')
+            assert version_status(call_db,'C2')['current']['request_baseline_missing'] is True
+            call_db.close()
             v.require(True,'call-only samples publish despite insufficient counts and absent request baseline')
             # Every exceptional stage stops before writing downstream products.
             for target,stage in [('sql_apm.ingestion.importer.Importer._run','import'),

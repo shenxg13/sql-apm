@@ -116,7 +116,7 @@ def verify():
                 else:raise AssertionError('late save failure accepted')
                 late=json.loads(v.sql('SELECT row_to_json(b) FROM build b ORDER BY started_at DESC LIMIT 1'))
                 assert late['state']=='failed'
-                for table in ('mpp_statistic','mpp_build_coverage','mpp_build_timing_coverage','mpp_build_group'):
+                for table in ('mpp_statistic','mpp_build_layer_count','mpp_build_timing_coverage','mpp_build_group'):
                     assert v.sql("SELECT count(*) FROM "+table+" WHERE build_id='"+late['build_id']+"'")=='0'
                 v.require(True,'failure after every result write rolls back all four result relations')
                 with patch('sql_apm.storage.statistics.subprocess.Popen',side_effect=OSError('synthetic')):

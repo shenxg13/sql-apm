@@ -23,6 +23,7 @@ from database.migration import verify_migration  # noqa: E402
 from database.training_migration import verify_training_migration
 from database.statistics_migration import verify_statistics_migration
 from database.observation_migration import verify_observation_migration
+from database.publication_migration import verify_publication_migration
 from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
 
@@ -109,7 +110,7 @@ class Verification:
         self.require(True, "project account DDL and read/write access")
         self.sql("BEGIN;\n" + statements() + "\nCOMMIT;")
         self.require(self.sql("SELECT count(*) FROM mpp_statistic") == "5", "Issue #3 base fixture, five layers and 17 metric columns stored")
-        self.require(self.sql("SELECT sum(jsonb_array_length(computed_keys)+jsonb_array_length(empty_keys)) FROM mpp_build_coverage") == "67", "sparse coverage expands to 67 logical buckets")
+        self.require(self.sql("SELECT sum(jsonb_array_length(computed_keys)+jsonb_array_length(empty_keys)) FROM mpp_coverage('V1')") == "67", "sparse coverage expands to 67 logical buckets")
         self.require(self.sql("SELECT sum(included_count) FROM mpp_build_timing_coverage") == "1", "five timing summaries preserve one actual request")
         # A second actual event reuses the same complete original SQL.
         self.sql("INSERT INTO evidence_record SELECT 'R2',file_id,source_id,scope_id,2,3,3,decode_state,observed FROM evidence_record WHERE record_id='R1'; "
@@ -296,6 +297,8 @@ def main():
         verify_statistics_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     with instance(args.pg_bin) as (directory, env):
         verify_observation_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+    with instance(args.pg_bin) as (directory, env):
+        verify_publication_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

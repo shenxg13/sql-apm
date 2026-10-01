@@ -136,6 +136,8 @@ def verify(pg_bin):
             owner = Importer(dsn, workers=1, progress=lambda **kw: None)
             competitor = Importer(dsn, workers=1, progress=lambda **kw: None)
             try:
+                from sql_apm.storage.tasks import Task
+                owner.task = Task(owner.db, locked_config['scope_id'], 'import_only').__enter__()
                 owner.register(locked_config)
                 try:
                     competitor.run(locked_config)
@@ -143,7 +145,7 @@ def verify(pg_bin):
                     v.require(str(error) == 'cluster_busy', 'same cluster immediately rejects concurrent owner')
                 else:
                     raise AssertionError('concurrent owner admitted')
-                v.require(v.sql("SELECT state FROM task WHERE task_id='" + owner.task_id + "'") == 'running', 'busy rejection preserves active owner')
+                v.require(v.sql("SELECT state FROM task WHERE task_id='" + owner.task.task_id + "'") == 'running', 'busy rejection preserves active owner')
             finally:
                 competitor.close()
                 owner.close()
@@ -361,7 +363,7 @@ def verify(pg_bin):
                 try:
                     ingest([path], 'B1')
                 except IngestionError as error:
-                    v.require(str(error) == 'analysis_version_mismatch' and v.sql('SELECT count(*) FROM task') == tasks_before and
+                    v.require(str(error) == 'analysis_version_mismatch' and int(v.sql('SELECT count(*) FROM task')) == int(tasks_before)+1 and
                               v.sql("SELECT " + column + " FROM analysis WHERE analysis_id='" + analysis_id + "'") == 'synthetic-drift', column + ' mismatch rejects without rewriting old analysis')
                 else:
                     raise AssertionError('analysis version drift admitted')
@@ -403,7 +405,7 @@ def verify(pg_bin):
             upgraded = Importer(migrated_dsn, schema='ingest_upgrade', workers=1, progress=lambda **kw: None)
             cfg.write_text(json.dumps(configuration(cfg, [path], 'UPGRADED')))
             try:
-                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.5.0 migration')
+                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.6.0 migration')
             finally:
                 upgraded.close()
             upgrade_sql("INSERT INTO schema_version(version,script_sha256) VALUES ('9.0.0',repeat('0',64))")
@@ -411,7 +413,7 @@ def verify(pg_bin):
             try:
                 connection = connect(migrated_dsn, 'ingest_upgrade')
             except IngestionError as error:
-                v.require(str(error) == 'schema_1_5_0_required', 'unknown future receipt rejected')
+                v.require(str(error) == 'schema_1_6_0_required', 'unknown future receipt rejected')
             else:
                 connection.close()
                 raise AssertionError('unknown version admitted')

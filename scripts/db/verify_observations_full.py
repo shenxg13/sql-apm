@@ -28,7 +28,11 @@ BASELINE_REF='f038932fe0d5453450b91a59d5239c95bacb0078'
 def frozen_store():
     source=subprocess.check_output(['git','show',BASELINE_REF+':sql_apm/storage/statistics.py'],cwd=ROOT)
     module=types.ModuleType('frozen_formal_statistics')
-    exec(compile(source,'frozen_formal_statistics.py','exec'),module.__dict__)
+    # The frozen computation remains the reference. 1.6.0 replaces only its
+    # obsolete physical coverage sink; coverage itself is checked independently.
+    adapted=source.decode().replace("covers = ResultWriter(self.db,'mpp_build_coverage',COVER_COLUMNS)",
+        "covers = type('DiscardCoverage',(),{'add':lambda self,row:None,'flush':lambda self:None})()")
+    exec(compile(adapted,'frozen_formal_statistics.py','exec'),module.__dict__)
     return module.StatisticsStore,hashlib.sha256(source).hexdigest()
 
 
@@ -136,7 +140,7 @@ def validate(dsn,output):
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
     Baseline,baseline_sha=frozen_store();baseline=Baseline(dsn)
     imported=json.loads((output/'import-report.json').read_text())
-    report=dict(schema_version='1.5.0',method='measured; private PG17; 55-file fresh import',clusters={},
+    report=dict(schema_version='1.6.0',method='measured; private PG17; 55-file fresh import',clusters={},
         input_manifest_sha256=imported['manifest_sha256'],input_files=sum(len(r['files']) for r in imported['first_runs']),
         import_seconds=imported['import_seconds'],baseline_ref=BASELINE_REF,baseline_statistics_sha256=baseline_sha,
         decision_version=DECISION_VERSION,normalization_context=training.context)
@@ -173,7 +177,7 @@ def validate(dsn,output):
                 first=store.calculate(scope,snapshot['input_id'],snapshot['config_id'],progress=observe)
             entry.update(first=first,first_memory=memory.report(),observation_memory=observation_memory[0],observation_seconds=observation_seconds[0],
                          total_seconds_delta=round(first['seconds']-original['seconds'],3));save()
-            formal_tables=('mpp_statistic','mpp_build_coverage','mpp_build_timing_coverage','mpp_build_group')
+            formal_tables=('mpp_statistic','mpp_build_timing_coverage','mpp_build_group')
             entry['formal_equal_rows']=rows_equal(store.db,original['build_id'],first['build_id'],formal_tables);save()
             entry['oracle']=reconcile_and_oracle(store.db,snapshot,first['build_id']);save()
             with formal.Memory(store.db) as memory:

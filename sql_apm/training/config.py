@@ -28,9 +28,13 @@ def unique(pairs):
     return result
 
 
-def load_config(path, cluster):
+def load_config(path, cluster, *, cutoff_date=None, window_days=None):
     try:
         document = json.loads(Path(path).read_text(), object_pairs_hook=unique)
+        if cutoff_date is not None:
+            document.setdefault('window', {})['cutoff_date'] = cutoff_date
+        if window_days is not None:
+            document.setdefault('window', {})['days'] = window_days
         return validate(document, cluster)
     except TrainingError:
         raise

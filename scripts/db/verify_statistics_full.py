@@ -29,9 +29,10 @@ TZ=timezone(timedelta(hours=8))
 
 class Memory:
     """Sample proportional memory for this Python tree and the private PG tree."""
-    def __init__(self, db):
+    def __init__(self, db, root_pid=None):
         host=Path(db.get_dsn_parameters()['host'])
         self.pg=int((host.parent/'data/postmaster.pid').read_text().splitlines()[0])
+        self.root_pid=root_pid or os.getpid()
         self.peaks=Counter();self.stop=threading.Event();self.samples=0
         self.thread=threading.Thread(target=self.run,daemon=True)
 
@@ -41,7 +42,7 @@ class Memory:
             for path in Path('/proc').glob('[0-9]*/stat'):
                 try:parents[int(path.parent.name)]=int(path.read_text().rsplit(')',1)[1].split()[1])
                 except (OSError,ValueError,IndexError):pass
-            selected={os.getpid():'python',self.pg:'postgres'}
+            selected={self.root_pid:'python',self.pg:'postgres'}
             for _ in range(8):
                 added={pid:selected[parent] for pid,parent in parents.items() if parent in selected and pid not in selected}
                 if not added:break
@@ -71,7 +72,7 @@ def digest(db,build):
     """Four independent 64-bit sums of SHA-256 rows, independent of row order."""
     output={}
     with db,db.cursor() as cur:
-        for table in ('mpp_statistic','mpp_build_coverage','mpp_build_timing_coverage'):
+        for table in ('mpp_statistic','mpp_build_layer_count','mpp_build_timing_coverage'):
             cur.execute(sql.SQL('''WITH hashes AS MATERIALIZED (
                 SELECT encode(sha256(convert_to((to_jsonb(t)-'build_id'-'partition_id')::text,'UTF8')),'hex') h
                 FROM {} t WHERE build_id=%s)
@@ -119,21 +120,20 @@ def reconcile(db,snapshot,build):
             UNION SELECT 'week',to_jsonb(date_trunc('week',sample_day)::date) FROM days
             UNION ALL SELECT 'weekday',to_jsonb(i) FROM generate_series(1,7) i
             UNION ALL SELECT 'hour',to_jsonb(i) FROM generate_series(0,23) i''',(snapshot['config_id'],))
-        cur.execute('''SELECT count(*) FROM mpp_build_coverage c WHERE build_id=%s AND (
+        cur.execute('''SELECT count(*) FROM mpp_coverage(%s) c WHERE true AND (
             jsonb_array_length(computed_keys)+jsonb_array_length(empty_keys) <>
                 (SELECT count(*) FROM acceptance_keys k WHERE k.layer=c.layer)
             OR EXISTS (SELECT k.key FROM acceptance_keys k WHERE k.layer=c.layer
                        EXCEPT SELECT jsonb_array_elements(c.computed_keys||c.empty_keys)))''',(build,))
         assert cur.fetchone()[0]==0,'coverage_partition'
         cur.execute('''WITH computed AS (
-            SELECT group_id,layer,jsonb_array_elements(computed_keys) key FROM mpp_build_coverage WHERE build_id=%s),
+            SELECT group_id,layer,jsonb_array_elements(computed_keys) key FROM mpp_coverage(%s)),
             actual AS (SELECT group_id,layer,coalesce(to_jsonb(bucket_date),to_jsonb(bucket_number),'null'::jsonb) key
                 FROM mpp_statistic WHERE build_id=%s)
             SELECT count(*) FROM ((SELECT * FROM computed EXCEPT SELECT * FROM actual)
                 UNION ALL (SELECT * FROM actual EXCEPT SELECT * FROM computed)) mismatch''',(build,build))
         assert cur.fetchone()[0]==0,'computed_keys_match_rows'
-        cur.execute('''SELECT count(*) FROM (SELECT group_id,count(*) n FROM mpp_build_coverage
-            WHERE build_id=%s GROUP BY 1) x WHERE n<>5''',(build,))
+        cur.execute('''SELECT count(*) FROM (SELECT group_id,count(*) n FROM mpp_coverage(%s) GROUP BY 1) x WHERE n<>5''',(build,))
         assert cur.fetchone()[0]==0,'five_coverages'
         cur.execute('''SELECT s.layer,count(*),count(*) FILTER (WHERE (q.basic->>'met')::boolean),
             count(*) FILTER (WHERE (q.p95->>'met')::boolean),count(*) FILTER (WHERE (q.p99->>'met')::boolean)
@@ -212,7 +212,7 @@ def sizes(db):
 def validate(dsn,output):
     output.mkdir(parents=True,exist_ok=True)
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
-    report=dict(schema_version='1.5.0',method='measured; private PG17; all 55 files reimported',clusters={},
+    report=dict(schema_version='1.6.0',method='measured; private PG17; all 55 files reimported',clusters={},
                 source_head_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                 normalization_context=training.context,decision_version=DECISION_VERSION)
     imported=json.loads((output/'import-report.json').read_text())

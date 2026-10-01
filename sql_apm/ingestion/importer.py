@@ -1,4 +1,4 @@
-"""Complete manifests and atomic file imports into the 1.2.0 storage contract."""
+"""Complete manifests and atomic file imports under a shared cluster task."""
 from collections import Counter
 import hashlib
 import json
@@ -11,6 +11,7 @@ from sql_apm.ingestion.hashdata.reader import Records, Interpreter, record_metri
 from sql_apm.ingestion.hashdata.persistence import write_records
 from sql_apm.ingestion.normalizing import NormalizingPool
 from sql_apm.storage.ingestion import connect, SqlWriter
+from sql_apm.storage.tasks import task_context
 
 PROFILE = 'hashdata-csv/1'
 MAPPING = 'hashdata-3.13.13/1'
@@ -36,8 +37,9 @@ def emit(**values):
 
 
 class Importer:
-    def __init__(self, dsn, schema='sql_apm', workers=4, progress=emit, fault=None):
-        self.db = connect(dsn, schema)
+    def __init__(self, dsn, schema='sql_apm', workers=4, progress=emit, fault=None, db=None):
+        self.owns_db = db is None
+        self.db = db if db is not None else connect(dsn, schema)
         self.sql_db = connect(dsn, schema)
         self.pool = NormalizingPool(workers)
         self.writer = SqlWriter(self.sql_db, self.pool)
@@ -45,7 +47,8 @@ class Importer:
         self.config = None
 
     def close(self):
-        self.db.close()
+        if self.owns_db:
+            self.db.close()
         self.sql_db.close()
         self.pool.close()
 
@@ -64,11 +67,7 @@ class Importer:
     def register(self, config):
         self.config = config
         self.analysis_id = 'A:' + identity(config['batch_id'])
-        self.task_id = 'T:' + uuid.uuid4().hex
         with self.db, self.db.cursor() as cur:
-            cur.execute('SELECT pg_try_advisory_lock(hashtextextended(%s,1835101))', (config['scope_id'],))
-            if not cur.fetchone()[0]:
-                raise IngestionError('cluster_busy')
             source = config['source']
             scope_values = (config['scope_id'], 'hashdata', PROFILE, '1.0.0')
             cur.execute('INSERT INTO scope VALUES (%s,%s,%s,%s) ON CONFLICT DO NOTHING', scope_values)
@@ -101,14 +100,19 @@ class Importer:
             self.successful_members = {row[0] for row in cur}
             for day in config['dates']:
                 cur.execute('INSERT INTO batch_date VALUES (%s,%s) ON CONFLICT DO NOTHING', (config['batch_id'], day))
-            # Lock admission proves prior task/attempt owner has exited, including SIGKILL.
-            cur.execute("UPDATE task SET state='interrupted',reason='owner_exited' WHERE scope_id=%s AND state='running'", (config['scope_id'],))
-            cur.execute("UPDATE import_attempt SET state='interrupted',finished_at=clock_timestamp() WHERE scope_id=%s AND state='running'", (config['scope_id'],))
-            cur.execute("INSERT INTO task VALUES (%s,%s,'import_only','running','import',NULL,NULL)", (self.task_id, config['scope_id']))
-            cur.execute('INSERT INTO task_batch VALUES (%s,%s,%s)', (self.task_id, config['batch_id'], config['scope_id']))
+            self.task.link(cur, 'batch', config['batch_id'])
             cur.execute("UPDATE import_batch SET state='processing' WHERE batch_id=%s", (config['batch_id'],))
 
-    def run(self, config):
+    def run(self, config, task=None):
+        with task_context(self.db, config['scope_id'], 'import_only', task) as active:
+            self.task = active
+            active.set_stage('import')
+            result = self._run(config)
+            if result['state'] != 'complete':
+                active.failure = 'batch_incomplete'
+            return dict(result, task_id=active.task_id)
+
+    def _run(self, config):
         started = time.monotonic()
         registered = False
         try:
@@ -141,24 +145,15 @@ class Importer:
                 if cur.fetchone()[0] and state == 'complete':
                     state = 'failed'
                 cur.execute('UPDATE import_batch SET state=%s WHERE batch_id=%s', (state, config['batch_id']))
-                cur.execute('UPDATE task SET state=%s,reason=%s WHERE task_id=%s',
-                            ('succeeded' if state == 'complete' else 'failed', None if state == 'complete' else 'batch_incomplete', self.task_id))
             return dict(state=state, files=results, seconds=round(time.monotonic()-started, 3),
                         added_records=sum(r.get('added_records', 0) for r in results),
                         added_occurrences=sum(r.get('added_occurrences', 0) for r in results))
-        except BaseException as error:
+        except BaseException:
             self.db.rollback()
             if registered:
                 with self.db, self.db.cursor() as cur:
                     cur.execute("UPDATE import_batch SET state='failed' WHERE batch_id=%s", (config['batch_id'],))
-                    cur.execute('UPDATE task SET state=%s,reason=%s WHERE task_id=%s',
-                                ('interrupted' if isinstance(error, (KeyboardInterrupt, SystemExit)) else 'failed',
-                                 'import_interrupted' if isinstance(error, (KeyboardInterrupt, SystemExit)) else 'import_failed', self.task_id))
             raise
-        finally:
-            with self.db.cursor() as cur:
-                cur.execute('SELECT pg_advisory_unlock_all()')
-            self.db.commit()
 
     @staticmethod
     def observe(entry):

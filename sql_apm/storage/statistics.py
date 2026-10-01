@@ -1,5 +1,6 @@
 """Snapshot-bound builds, TEMP decisions, bounded result writes and atomic finish."""
 from collections import Counter
+from datetime import timedelta
 import csv
 import io
 import itertools
@@ -12,8 +13,9 @@ import uuid
 
 from psycopg2.extras import Json
 
-from sql_apm.baseline.statistics import METRICS, calculate_group
+from sql_apm.baseline.statistics import METRICS, LAYERS, calculate_group
 from sql_apm.storage.ingestion import connect
+from sql_apm.storage.tasks import task_context
 from sql_apm.storage.observations import calculate_observations
 from sql_apm.training.config import TZ
 
@@ -21,7 +23,6 @@ TIMINGS = ('request', 'execute_first', 'execute_fetch', 'parse', 'bind')
 STAT_COLUMNS = ('build_id', 'group_id', 'partition_id', 'layer', 'bucket_date', 'bucket_number',
     'range_start', 'range_end', 'partial_week', 'included_count', 'excluded_count',
     'exclusions_by_reason', 'active_dates', 'active_week_starts', 'first_sample_at', 'last_sample_at') + METRICS + ('metric_null_reasons',)
-COVER_COLUMNS = ('build_id', 'group_id', 'partition_id', 'layer', 'computed_keys', 'empty_keys')
 
 
 class StatisticsError(ValueError):
@@ -67,12 +68,14 @@ class ResultWriter:
 
 
 class StatisticsStore:
-    def __init__(self, dsn='', schema='sql_apm'):
+    def __init__(self, dsn='', schema='sql_apm', db=None):
         self.dsn, self.schema = dsn, schema
-        self.db = connect(dsn, schema)
+        self.owns_db = db is None
+        self.db = db if db is not None else connect(dsn, schema)
 
     def close(self):
-        self.db.close()
+        if self.owns_db:
+            self.db.close()
 
     def _create(self, scope, input_id, config_id, retry_of):
         with self.db, self.db.cursor() as cur:
@@ -92,17 +95,23 @@ class StatisticsStore:
             if retry_of:
                 cur.execute('SELECT state,scope_id,input_id,config_id FROM build WHERE build_id=%s', (retry_of,))
                 previous = cur.fetchone()
-                if not previous or previous[0] not in ('failed', 'interrupted') or previous[1:] != (scope, input_id, config_id):
+                if not previous or previous[0] not in ('failed', 'interrupted') or previous[1] != scope or (self.task.mode != 'rebuild' and previous[2:] != (input_id, config_id)):
                     raise StatisticsError('invalid_retry_reference')
             cur.execute('SELECT clock_timestamp()')
             now = cur.fetchone()[0].astimezone(TZ)
             build_id = 'B:' + now.strftime('%Y%m%dT%H%M%S') + ':' + uuid.uuid4().hex
             cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope, now.date().replace(day=1)))
             partition = cur.fetchone()[0]
+            next_month = (now.date().replace(day=28) + timedelta(days=4)).replace(day=1)
+            cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope,next_month))
             cur.execute('''INSERT INTO build (build_id,scope_id,input_id,config_id,normalization_id,profile,
                 retry_of,state,started_at,results_saved,partition_id)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,'running',%s,false,%s)''',
                 (build_id,scope,input_id,config_id,normalization,profile,retry_of,now,partition))
+            self.task.link(cur, 'build', build_id)
+            cur.execute('''INSERT INTO build_check SELECT %s,name,'not_run','check_not_started'
+                FROM unnest(ARRAY['batch_complete','rules_consistent','results_complete','results_saved',
+                    'counts_consistent','values_consistent']) name''',(build_id,))
         return build_id, partition, start, end
 
     def _failure(self, build_id, state, reason):
@@ -114,7 +123,13 @@ class StatisticsStore:
                     VALUES (%s,'build',%s,%s,%s,'block_publication','problem',1,'open')''',
                     ('P:'+uuid.uuid4().hex,build_id,reason,reason))
 
-    def calculate(self, scope, input_id, config_id, retry_of=None, progress=None):
+    def calculate(self, scope, input_id, config_id, retry_of=None, progress=None, task=None):
+        with task_context(self.db, scope, 'statistics', task) as active:
+            self.task = active
+            active.set_stage('build')
+            return dict(self._calculate(scope, input_id, config_id, retry_of, progress), task_id=active.task_id)
+
+    def _calculate(self, scope, input_id, config_id, retry_of, progress):
         started = time.monotonic()
         build_id, partition, start, end = self._create(scope,input_id,config_id,retry_of)
         # EOF is detected even on SIGKILL/os._exit. This independent connection
@@ -158,7 +173,6 @@ class StatisticsStore:
                     progress(dict(phase='decisions_derived',build_id=build_id,groups=groups,
                                   seconds=round(time.monotonic()-started,3)))
                 stats = ResultWriter(self.db,'mpp_statistic',STAT_COLUMNS)
-                covers = ResultWriter(self.db,'mpp_build_coverage',COVER_COLUMNS)
                 layer_counts, timing_counts = Counter(), {t:[0,0] for t in TIMINGS}
                 processed = 0
                 with self.db.cursor(name='statistics_groups') as stream:
@@ -169,7 +183,7 @@ class StatisticsStore:
                     for gid, items in itertools.groupby(stream, key=lambda row: row[0]):
                         events = list(items)
                         timing = events[0][1]
-                        computed, coverage = calculate_group((row[2:] for row in events),start,end)
+                        computed, _ = calculate_group((row[2:] for row in events),start,end)
                         context = dict(build_id=build_id,group_id=gid,partition_id=partition)
                         for row in computed:
                             stats.add(dict(row,**context))
@@ -177,14 +191,11 @@ class StatisticsStore:
                             if row['layer'] == 'overall':
                                 timing_counts[timing][0] += row['included_count']
                                 timing_counts[timing][1] += row['excluded_count']
-                        for row in coverage:
-                            covers.add(dict(row,**context))
                         processed += 1
                         if progress and processed % 10000 == 0:
                             progress(dict(phase='statistics_progress',build_id=build_id,
                                           groups=processed,total_groups=groups))
                 stats.flush()
-                covers.flush()
                 for timing,(included,excluded) in timing_counts.items():
                     cur.execute('INSERT INTO mpp_build_timing_coverage VALUES (%s,%s,%s,%s)',
                                 (build_id,timing,included,excluded))
@@ -195,6 +206,11 @@ class StatisticsStore:
                     progress(dict(phase='observations_written',build_id=build_id,
                                   groups=summary['observations']['groups'],
                                   seconds=round(time.monotonic()-observation_started,3)))
+                for kind, counts, count in [('formal',layer_counts,groups),
+                    ('observation',summary['observations']['layers'],summary['observations']['groups'])]:
+                    for layer in LAYERS:
+                        cur.execute('INSERT INTO mpp_build_layer_count VALUES (%s,%s,%s,%s,%s)',
+                                    (build_id,kind,layer,counts.get(layer,0),count))
                 summary.update(groups=groups,layers=dict(layer_counts),timings=timing_counts)
                 cur.execute('UPDATE build SET diagnostics=%s WHERE build_id=%s',(Json(summary),build_id))
                 if progress:

@@ -133,7 +133,7 @@ def verify():
                         else:raise AssertionError('observation failure did not fail build')
                     failed=json.loads(v.sql('SELECT row_to_json(b) FROM build b ORDER BY started_at DESC LIMIT 1'))
                     assert failed['state']=='failed' and not failed['results_saved']
-                    for table in ('mpp_statistic','mpp_build_group','mpp_build_coverage','mpp_build_timing_coverage','mpp_observation_statistic','mpp_build_observation_group'):
+                    for table in ('mpp_statistic','mpp_build_group','mpp_build_layer_count','mpp_build_timing_coverage','mpp_observation_statistic','mpp_build_observation_group'):
                         assert v.sql("SELECT count(*) FROM "+table+" WHERE build_id='"+failed['build_id']+"'")=='0'
                 repeat=store.calculate('C1',snap['input_id'],snap['config_id'],failed['build_id'])
                 assert repeat['observations']==obs
@@ -150,7 +150,7 @@ def verify():
                 try:original=base.calculate('C1',snap['input_id'],snap['config_id'])
                 finally:base.close()
                 assert rows_equal(store.db,original['build_id'],bid,
-                    ('mpp_statistic','mpp_build_coverage','mpp_build_timing_coverage','mpp_build_group'))
+                    ('mpp_statistic','mpp_build_timing_coverage','mpp_build_group'))
                 assert reconcile_and_oracle(store.db,snap,bid)['groups']==8
                 assert rows_equal(store.db,bid,repeat['build_id'],('mpp_observation_statistic','mpp_build_observation_group'))
                 v.require(True,'D6 validator self-check: independent population, all-group oracle, exact formal and repeat row comparison')

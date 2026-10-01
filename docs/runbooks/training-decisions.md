@@ -1,6 +1,6 @@
 # 训练快照与判定诊断
 
-先按[初始化说明](database-initialization.md)升级到 1.4.0，并通过
+先按[初始化说明](database-initialization.md)升级到 1.5.0，并通过
 [导入命令](log-ingestion.md)完成批次。本入口交付②，业务范围见
 [训练资格](../../.project-wiki/contracts/training-eligibility.md)和
 [判定设计](../design/training-decisions.md)，不创建构建或统计版本。

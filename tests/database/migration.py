@@ -23,7 +23,7 @@ def verify_migration(v, root, runner):
     legacy = (storage / "versions/1.0.0.sql").read_text()
     v.require(hashlib.sha256(legacy.encode()).hexdigest() == LEGACY_SHA,
               "published 1.0.0 DDL is byte-for-byte preserved")
-    new_tables = {"mpp_approximate_rule", "mpp_approximate_input", "mpp_approximate_result",
+    new_tables = {"mpp_observation_group", "mpp_build_observation_group", "mpp_observation_statistic", "mpp_approximate_rule", "mpp_approximate_input", "mpp_approximate_result",
                   "mpp_approximate_evidence", "mpp_occurrence_approximate",
                   "mpp_result_partition", "mpp_build_group", "mpp_training_rule", "mpp_training_sql", "training_config", "input_manifest", "input_file_analysis"}
     fixture = statements(legacy=True, results=False)
@@ -133,10 +133,10 @@ def verify_migration(v, root, runner):
         v.init("check", names=names)
         v.require(state() == before, "upgrade preserves every business row, relation OID/file and constraint OID: " + schema)
         after = versions()
-        v.require(set(after) == {"1.0.0", "1.1.0", "1.2.0", "1.3.0", "1.4.0"} and after["1.0.0"] == receipt["1.0.0"],
+        v.require(set(after) == {"1.0.0", "1.1.0", "1.2.0", "1.3.0", "1.4.0", "1.5.0"} and after["1.0.0"] == receipt["1.0.0"],
                   "upgrade retains original receipt and adds all sequential receipts: " + schema)
-        v.require(len(tables()) == 53 and {t for t in tables() if t.startswith("mpp_")} == ({"mpp_" + n for n in MPP_TABLES} | {n for n in new_tables if n.startswith("mpp_")})
-                  and not set(tables()).intersection(MPP_TABLES), "exact 23 MPP names, 30 common tables and no legacy names: " + schema)
+        v.require(len(tables()) == 56 and {t for t in tables() if t.startswith("mpp_")} == ({"mpp_" + n for n in MPP_TABLES} | {n for n in new_tables if n.startswith("mpp_")})
+                  and not set(tables()).intersection(MPP_TABLES), "exact 26 MPP names, 30 common tables and no legacy names: " + schema)
         v.require(sql("SELECT count(*) FROM pg_constraint k JOIN pg_class t ON t.oid=k.conrelid WHERE t.relnamespace='" + schema +
                       "'::regnamespace AND t.relname LIKE 'mpp\\_%' ESCAPE '\\' AND k.conname NOT LIKE 'mpp\\_%' ESCAPE '\\'") == "0",
                   "MPP constraint names consistently prefixed: " + schema)

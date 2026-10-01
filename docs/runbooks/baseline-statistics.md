@@ -6,7 +6,7 @@
 
 ## 前提与调用
 
-先按[初始化说明](database-initialization.md#升级到-140)升级到 1.4.0，完成导入，
+先按[初始化说明](database-initialization.md#升级到-150)升级到 1.5.0，完成导入，
 使用[训练快照命令](training-decisions.md)得到 input_id 与 config_id。
 继续使用相同 libpq 环境或 SQL_APM_DSN，不把密码写入命令或提交配置。
 
@@ -23,7 +23,7 @@
 统计和覆盖分区，无需提前按月运维。月份由构建开始时间决定，不由日志日期或训练窗口决定。
 同一月份所有构建共享分区，层次与计时类别不拆表。空月无构建时不预建。
 
-输出为 JSON 行：build_created、decisions_derived、statistics_progress、results_written 和最终
+输出为 JSON 行：build_created、decisions_derived、statistics_progress、observations_written、results_written 和最终
 statistics 汇总。中间 results_written 表示已完成事务内写入；只有最终 state=calculated 且
 results_saved=true 表示提交成功。各层行数、计时类别计数、判定状态、计数范围和原因可核对；
 五类与五层的数量不相加作为真实执行总数。输出不包含 SQL、数据库名、执行用户或驱动错误文本。
@@ -133,3 +133,33 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 范围变更前的完整实测与验证边界见[历史统计验证报告](../reports/baseline-statistics-2026-09-30.md)。
 
 范围变更后的完整重导、SQL 门槛复算及新容量见[整改验收报告](../reports/baseline-statistics-2026-10-01.md)。
+
+## 观察统计与全量验收
+
+每次 `statistics` 同时保存独立观察结果，最终 JSON 的 `observations` 包含 observation_only=true、
+观察组数、五层行数、候选 SQL 状态数量（不可靠、缺失或指纹失败记录）、去重执行的归属数量、无法归组原因及各近似规则的
+样本／排除／原因计数。SQL 可靠性原因表示进入观察的依据，不是观察排除原因。
+不同规则可能引用同一执行，各规则计数不能相加解释为独立执行总量。
+无 SQL、近似不可用、身份／推算开始时间未知仅出现在构建诊断，窗口外不进入统计。
+
+结果在 `mpp_observation_statistic`，同一 Build 下查询；没有充足性结论。
+不对该表调用门槛函数，正式批量门槛查询不读取观察表。没有事件的桶由窗口和已有行推导。
+观察失败会使本次全部统计回滚，CLI 返回固定失败码；retry-of 同样从头计算两类结果。
+
+```bash
+.venv/bin/python scripts/db/verify_observations.py
+.venv/bin/python scripts/db/verify_observations_full.py \
+  --root raw/inbox/hashdata --output var/observation-acceptance/new-run
+```
+
+第二条显式重新导入 55 文件，在私有 PG17 以 119 截止 2026-07-31、120 截止 2026-09-19
+各构建并重复。沿用 #25 的固定验收排除时段；复算全部观察组的每个桶和 17 指标。
+用冻结 main 基线 `f038932fe0d5453450b91a59d5239c95bacb0078` 的统计实现生成正式对照，
+通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.5.0 结构。
+`--dsn` 仅供已重导私有实例的分阶段验收；输出目录、原文、实例和中间结果保持本地忽略。
+
+计算用时、观察阶段用时及进程树 PSS 峰值分别记录；基线与新构建按顺序运行，受缓存和系统
+负载影响，用时／峰值差值不能归因于观察代码本身。观察阶段峰值包含现存 PostgreSQL 缓存，
+不代表纯新增分配。表和分区实测单独列出，父表大小已含叶表，避免重复相加。
+
+本次完整数据、近似可用性差异与测量边界见[观察统计验证报告](../reports/observation-statistics-2026-10-01.md)。

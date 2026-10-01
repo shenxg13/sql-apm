@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -311,6 +313,14 @@ confidence: high
 [统计设计](../../docs/design/baseline-statistics.md)记录③的原子保存、失败诊断、进程监护和资源边界。
 `statistics` 命令创建一次尝试；`retry_of` 只关联相同快照的失败／中断尝试，不复用半成品。
 ③不写 build_check、Publication、CurrentVersion 或 Task；calculated 不表示已发布。
+
+### 观察结果与构建原子性（2026-10-01）
+
+来源：[Issue #27](https://github.com/shenxg13/sql-apm/issues/27)，current。
+在③之后、④之前新增观察统计；与正式统计使用同一快照和窗口，随每次构建一并计算与保存。
+只有两类结果都保存成功才进入 calculated；观察失败也导致整次计算回滚，重试从头开始。
+观察结果不参加发布检查或整窗有效训练样本判断；仅有观察样本仍不能据此替换正式当前版本。
+筛选与五层结果遵守[观察统计契约](../contracts/baseline-statistics.md#已确认的五层观察统计)。
 
 ## Workflows
 

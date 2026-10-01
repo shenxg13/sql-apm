@@ -22,6 +22,7 @@ from database.approximate_migration import verify_approximate_migration  # noqa:
 from database.migration import verify_migration  # noqa: E402
 from database.training_migration import verify_training_migration
 from database.statistics_migration import verify_statistics_migration
+from database.observation_migration import verify_observation_migration
 from database.trigger_compatibility import verify_current_triggers  # noqa: E402
 
 
@@ -293,6 +294,8 @@ def main():
         verify_approximate_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     with instance(args.pg_bin) as (directory, env):
         verify_statistics_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+    with instance(args.pg_bin) as (directory, env):
+        verify_observation_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

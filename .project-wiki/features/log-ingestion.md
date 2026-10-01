@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
@@ -182,14 +184,15 @@ confidence: high
 - 来源：用户对无法可靠生成结构指纹时暂不训练、不自动降级为原文哈希或简单
   文本指纹、批次不截取可解析部分使用整批耗时，以及继续按问题影响范围处理
   的建议回复“确认”。
-- 来源状态：current；回退边界已确认，结构与近似指纹接口及 #18 导入已有实现，样本筛选尚未交付。
+- 来源状态：current；回退边界已确认，结构与近似指纹接口、#18 导入及②[训练判定](../../docs/design/training-decisions.md)均已有实现。
 - 首期依据已确认的归一化规则生成结构指纹；若最终无法可靠生成，不自动改用
   原文哈希、简单去空格后的文本标识或其他简单文本指纹继续建立正常基线。
 - 2026-09-27 用户追加确认[观察用近似指纹](../contracts/sql-fingerprints.md#已确认的观察用近似指纹)：
   可对边界能确定的已记录内容生成单独近似结果，保留原文、诊断和不完整标记，
   用于观察统计；不再尝试补取完整 SQL，不进入正常基线训练或自动异常判断。
   这是对原失败输出范围的扩展，不把结构失败改为成功；近似接口已有独立实现，
-  近似结果已由 #18 入库，观察统计仍未交付，见[近似接口说明](../../docs/design/sql-approximate.md)。
+  近似结果已由 #18 入库，观察统计已由 #27 随构建计算和保存，见[统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)。
+  [近似接口](../../docs/design/sql-approximate.md)继续保留独立边界；展示和④完整构建编排仍待交付。
   后续已提供[可靠归一化入口](../../docs/design/sql-normalization.md)，继续保留失败状态与结果隔离。
 - SQL 文本缺失或不完整，无法可靠生成结构指纹时，相关样本暂不进入基线；
   文本完整但解析器暂不支持其语法时，同样暂不训练，单独标明解析支持不足。

@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/sql-storage.md
 updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/17
@@ -61,7 +63,8 @@ confidence: high
   既有诊断规则处理，不因能存文本就进入基线。
 - 2026-09-27 确认的[近似观察](sql-fingerprints.md#已确认的观察用近似指纹)保留已记录
   原文／字节与来源证据；不完整片段不冒充完整 SqlText，不再补取完整 SQL。
-  用户于 2026-09-29 确认先交付近似存储，再由 #18 同次导入可靠与近似结果，观察统计另行处理。
+  用户于 2026-09-29 确认先交付近似存储，再由 #18 同次导入可靠与近似结果；
+  2026-10-01 又确认由 #27 在④之前实现随构建保存的[五层观察统计](baseline-statistics.md#已确认的五层观察统计)。
   [结构 1.2.0](../../docs/design/postgresql-storage.md#近似观察结构-120)已实现原字节、规则、结果及
   证据／事件引用表；不改变本节完整原文精确去重语义。原字节按完整内容复用，结果再区分
   规则和结构失败原因；每次执行／调用仍各自保留，不依赖重新读取 CSV 回填。
@@ -110,7 +113,7 @@ confidence: high
 
 2026-09-30 [后续范围确认](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5914482826)进一步移除
 逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
-见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。统计结构仍为未发布的 1.4.0。
+见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，当前结构 1.5.0 另增独立观察结果，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
 
 ### 统计存储量级接受（2026-10-01）
 

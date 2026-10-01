@@ -1,0 +1,2195 @@
+{
+  "baseline_ref": "f038932fe0d5453450b91a59d5239c95bacb0078",
+  "baseline_statistics_sha256": "b0457ed125826750a8103a9e9c0e52f9f4e977f1000de2cd613bf05888f944d0",
+  "build_states": [
+    [
+      "calculated",
+      6
+    ]
+  ],
+  "clusters": {
+    "119": {
+      "baseline": {
+        "build_id": "B:20261001T131320:ec4d0f36a1b44c319c2f6a1b8c9115dd",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            849886
+          ],
+          [
+            "group",
+            "included",
+            1867514
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "groups": 53786,
+        "layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            1
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            64
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            36
+          ],
+          [
+            "batch",
+            "execution_failed",
+            21893
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            44
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "batch",
+            "sql_missing",
+            31869
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            21811
+          ],
+          [
+            "batch",
+            "start_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            21974
+          ],
+          [
+            "group",
+            "blacklist_category",
+            848453
+          ],
+          [
+            "group",
+            "excluded_interval",
+            2187
+          ],
+          [
+            "none",
+            "blacklist_category",
+            15480
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ],
+          [
+            "none",
+            "sql_missing",
+            1282
+          ],
+          [
+            "none",
+            "sql_uncertain",
+            690
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 295.187,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            871923
+          ],
+          [
+            "included",
+            1867514
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "timings": {
+          "bind": [
+            425394,
+            220672
+          ],
+          "execute_fetch": [
+            12403,
+            5
+          ],
+          "execute_first": [
+            425339,
+            220673
+          ],
+          "parse": [
+            421753,
+            211700
+          ],
+          "request": [
+            582625,
+            196836
+          ]
+        }
+      },
+      "baseline_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 219492352,
+          "python": 165710848,
+          "total": 385203200
+        },
+        "samples": 290
+      },
+      "first": {
+        "build_id": "B:20261001T131815:a3bee3bb4fb74deba868b2f1d7ee74fb",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            849886
+          ],
+          [
+            "group",
+            "included",
+            1867514
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "groups": 53786,
+        "layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observations": {
+          "groups": 30,
+          "layers": {
+            "day": 46,
+            "hour": 32,
+            "overall": 30,
+            "week": 36,
+            "weekday": 36
+          },
+          "observation_only": true,
+          "rules": {
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+              "excluded": 0,
+              "groups": 30,
+              "included": 46,
+              "reasons": {}
+            }
+          },
+          "scopes": [
+            [
+              "approximate_unavailable",
+              21739
+            ],
+            [
+              "group",
+              46
+            ],
+            [
+              "outside_window",
+              1972
+            ],
+            [
+              "sql_missing",
+              31869
+            ],
+            [
+              "start_unknown",
+              30
+            ]
+          ],
+          "sql_states": [
+            [
+              "incomplete",
+              4
+            ],
+            [
+              "missing",
+              33151
+            ],
+            [
+              "uncertain",
+              22501
+            ]
+          ],
+          "ungrouped_reasons": [
+            [
+              "approximate_unavailable",
+              "duration_unknown",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "execution_failed",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "sql_uncertain",
+              21739
+            ],
+            [
+              "approximate_unavailable",
+              "start_unknown",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "timing_unknown",
+              1
+            ],
+            [
+              "sql_missing",
+              "excluded_interval",
+              64
+            ],
+            [
+              "sql_missing",
+              "sql_missing",
+              31869
+            ],
+            [
+              "start_unknown",
+              "duration_unknown",
+              30
+            ],
+            [
+              "start_unknown",
+              "execution_failed",
+              30
+            ],
+            [
+              "start_unknown",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "start_unknown",
+              "sql_uncertain",
+              26
+            ],
+            [
+              "start_unknown",
+              "start_unknown",
+              30
+            ],
+            [
+              "start_unknown",
+              "timing_unknown",
+              30
+            ]
+          ]
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            1
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            64
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            36
+          ],
+          [
+            "batch",
+            "execution_failed",
+            21893
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            44
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "batch",
+            "sql_missing",
+            31869
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            21811
+          ],
+          [
+            "batch",
+            "start_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            21974
+          ],
+          [
+            "group",
+            "blacklist_category",
+            848453
+          ],
+          [
+            "group",
+            "excluded_interval",
+            2187
+          ],
+          [
+            "none",
+            "blacklist_category",
+            15480
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ],
+          [
+            "none",
+            "sql_missing",
+            1282
+          ],
+          [
+            "none",
+            "sql_uncertain",
+            690
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 269.525,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            871923
+          ],
+          [
+            "included",
+            1867514
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "timings": {
+          "bind": [
+            425394,
+            220672
+          ],
+          "execute_fetch": [
+            12403,
+            5
+          ],
+          "execute_first": [
+            425339,
+            220673
+          ],
+          "parse": [
+            421753,
+            211700
+          ],
+          "request": [
+            582625,
+            196836
+          ]
+        }
+      },
+      "first_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 261892096,
+          "python": 151523328,
+          "total": 396935168
+        },
+        "samples": 264
+      },
+      "formal_equal_rows": {
+        "mpp_build_coverage": 268930,
+        "mpp_build_group": 53786,
+        "mpp_build_timing_coverage": 5,
+        "mpp_statistic": 537198
+      },
+      "observation_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 255967232,
+          "python": 77602816,
+          "total": 333312000
+        },
+        "samples": 2
+      },
+      "observation_seconds": 1.589,
+      "oracle": {
+        "absolute_tolerance": 1e-09,
+        "counts_by_rule": [
+          [
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556",
+            46,
+            0
+          ]
+        ],
+        "disposition": [
+          [
+            "incomplete",
+            "start_unknown",
+            4
+          ],
+          [
+            "missing",
+            "outside_window",
+            1282
+          ],
+          [
+            "missing",
+            "sql_missing",
+            31869
+          ],
+          [
+            "uncertain",
+            "approximate_unavailable",
+            21739
+          ],
+          [
+            "uncertain",
+            "observed",
+            46
+          ],
+          [
+            "uncertain",
+            "outside_window",
+            690
+          ],
+          [
+            "uncertain",
+            "start_unknown",
+            26
+          ]
+        ],
+        "groups": 30,
+        "layer_conservation": true,
+        "method": "all groups; independent bucket/Decimal metrics oracle and independent eligibility projection",
+        "metrics": 3060,
+        "population_equal": true,
+        "reason_conservation": true,
+        "reasons_by_rule": [],
+        "relative_tolerance": 1e-10,
+        "seconds": 200.853,
+        "sql_states": [
+          [
+            "incomplete",
+            4
+          ],
+          [
+            "missing",
+            33151
+          ],
+          [
+            "uncertain",
+            22501
+          ]
+        ],
+        "statistic_rows": 180
+      },
+      "repeat": {
+        "build_id": "B:20261001T132609:c6f9ad37fa84415490b0e26ee9d26754",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            22037
+          ],
+          [
+            "batch",
+            "unresolved",
+            53590
+          ],
+          [
+            "group",
+            "excluded",
+            849886
+          ],
+          [
+            "group",
+            "included",
+            1867514
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ]
+        ],
+        "groups": 53786,
+        "layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observations": {
+          "groups": 30,
+          "layers": {
+            "day": 46,
+            "hour": 32,
+            "overall": 30,
+            "week": 36,
+            "weekday": 36
+          },
+          "observation_only": true,
+          "rules": {
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+              "excluded": 0,
+              "groups": 30,
+              "included": 46,
+              "reasons": {}
+            }
+          },
+          "scopes": [
+            [
+              "approximate_unavailable",
+              21739
+            ],
+            [
+              "group",
+              46
+            ],
+            [
+              "outside_window",
+              1972
+            ],
+            [
+              "sql_missing",
+              31869
+            ],
+            [
+              "start_unknown",
+              30
+            ]
+          ],
+          "sql_states": [
+            [
+              "incomplete",
+              4
+            ],
+            [
+              "missing",
+              33151
+            ],
+            [
+              "uncertain",
+              22501
+            ]
+          ],
+          "ungrouped_reasons": [
+            [
+              "approximate_unavailable",
+              "duration_unknown",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "execution_failed",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "sql_uncertain",
+              21739
+            ],
+            [
+              "approximate_unavailable",
+              "start_unknown",
+              1
+            ],
+            [
+              "approximate_unavailable",
+              "timing_unknown",
+              1
+            ],
+            [
+              "sql_missing",
+              "excluded_interval",
+              64
+            ],
+            [
+              "sql_missing",
+              "sql_missing",
+              31869
+            ],
+            [
+              "start_unknown",
+              "duration_unknown",
+              30
+            ],
+            [
+              "start_unknown",
+              "execution_failed",
+              30
+            ],
+            [
+              "start_unknown",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "start_unknown",
+              "sql_uncertain",
+              26
+            ],
+            [
+              "start_unknown",
+              "start_unknown",
+              30
+            ],
+            [
+              "start_unknown",
+              "timing_unknown",
+              30
+            ]
+          ]
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            1
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            64
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            36
+          ],
+          [
+            "batch",
+            "execution_failed",
+            21893
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            44
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "batch",
+            "sql_missing",
+            31869
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            21811
+          ],
+          [
+            "batch",
+            "start_unknown",
+            21973
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            21974
+          ],
+          [
+            "group",
+            "blacklist_category",
+            848453
+          ],
+          [
+            "group",
+            "excluded_interval",
+            2187
+          ],
+          [
+            "none",
+            "blacklist_category",
+            15480
+          ],
+          [
+            "none",
+            "outside_window",
+            55808
+          ],
+          [
+            "none",
+            "sql_missing",
+            1282
+          ],
+          [
+            "none",
+            "sql_uncertain",
+            690
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 264.6,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            871923
+          ],
+          [
+            "included",
+            1867514
+          ],
+          [
+            "outside_window",
+            55808
+          ],
+          [
+            "unresolved",
+            53590
+          ]
+        ],
+        "timings": {
+          "bind": [
+            425394,
+            220672
+          ],
+          "execute_fetch": [
+            12403,
+            5
+          ],
+          "execute_first": [
+            425339,
+            220673
+          ],
+          "parse": [
+            421753,
+            211700
+          ],
+          "request": [
+            582625,
+            196836
+          ]
+        }
+      },
+      "repeat_equal": true,
+      "repeat_equal_rows": {
+        "mpp_build_coverage": 268930,
+        "mpp_build_group": 53786,
+        "mpp_build_observation_group": 30,
+        "mpp_build_timing_coverage": 5,
+        "mpp_observation_statistic": 180,
+        "mpp_statistic": 537198
+      },
+      "repeat_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 270138368,
+          "python": 153929728,
+          "total": 408564736
+        },
+        "samples": 260
+      },
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 228429,
+          "seconds": 63.214
+        },
+        "config_id": "CS:136e278f7cc040f6b84242ba922859f5",
+        "input_id": "IS:4ef0175a65b3433da51eccec9a2cddde",
+        "rule_id": "TR:505541016ee24094488c9f48544781f4bd8f7f2143a06039829b65535578df5d"
+      },
+      "total_seconds_delta": -25.662
+    },
+    "120": {
+      "baseline": {
+        "build_id": "B:20261001T133838:d9bbf36140a6457898506a6c6fc8ed1d",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            929817
+          ],
+          [
+            "group",
+            "included",
+            3512071
+          ]
+        ],
+        "groups": 873957,
+        "layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            245
+          ],
+          [
+            "batch",
+            "blacklist_category",
+            7
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            68
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            54
+          ],
+          [
+            "batch",
+            "execution_failed",
+            35392
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            20
+          ],
+          [
+            "batch",
+            "sql_encoding_invalid",
+            20
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            893
+          ],
+          [
+            "batch",
+            "sql_missing",
+            30204
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            68641
+          ],
+          [
+            "batch",
+            "start_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            35711
+          ],
+          [
+            "group",
+            "blacklist_category",
+            926293
+          ],
+          [
+            "group",
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 827.846,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            965351
+          ],
+          [
+            "included",
+            3512071
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "timings": {
+          "bind": [
+            621780,
+            154787
+          ],
+          "execute_fetch": [
+            318,
+            0
+          ],
+          "execute_first": [
+            621711,
+            154787
+          ],
+          "parse": [
+            505734,
+            106973
+          ],
+          "request": [
+            1762528,
+            513270
+          ]
+        }
+      },
+      "baseline_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 267198464,
+          "python": 91534336,
+          "total": 343090176
+        },
+        "samples": 812
+      },
+      "first": {
+        "build_id": "B:20261001T135226:9142e0ba59c2493eac6324e5505148f4",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            929817
+          ],
+          [
+            "group",
+            "included",
+            3512071
+          ]
+        ],
+        "groups": 873957,
+        "layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "observations": {
+          "groups": 1043,
+          "layers": {
+            "day": 1707,
+            "hour": 1140,
+            "overall": 1043,
+            "week": 1151,
+            "weekday": 1707
+          },
+          "observation_only": true,
+          "rules": {
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+              "excluded": 214,
+              "groups": 1043,
+              "included": 2068,
+              "reasons": {
+                "association_unreliable": 213,
+                "excluded_interval": 1,
+                "timing_unknown": 213
+              }
+            }
+          },
+          "scopes": [
+            [
+              "approximate_unavailable",
+              66106
+            ],
+            [
+              "group",
+              2282
+            ],
+            [
+              "sql_missing",
+              30204
+            ],
+            [
+              "start_unknown",
+              1166
+            ]
+          ],
+          "sql_states": [
+            [
+              "incomplete",
+              893
+            ],
+            [
+              "invalid_encoding",
+              20
+            ],
+            [
+              "missing",
+              30204
+            ],
+            [
+              "uncertain",
+              68641
+            ]
+          ],
+          "ungrouped_reasons": [
+            [
+              "approximate_unavailable",
+              "duration_unknown",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "excluded_interval",
+              67
+            ],
+            [
+              "approximate_unavailable",
+              "execution_failed",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "sql_uncertain",
+              66106
+            ],
+            [
+              "approximate_unavailable",
+              "start_unknown",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "timing_unknown",
+              9
+            ],
+            [
+              "sql_missing",
+              "sql_missing",
+              30204
+            ],
+            [
+              "start_unknown",
+              "duration_unknown",
+              1166
+            ],
+            [
+              "start_unknown",
+              "execution_failed",
+              1166
+            ],
+            [
+              "start_unknown",
+              "sql_incomplete",
+              74
+            ],
+            [
+              "start_unknown",
+              "sql_uncertain",
+              1092
+            ],
+            [
+              "start_unknown",
+              "start_unknown",
+              1166
+            ],
+            [
+              "start_unknown",
+              "timing_unknown",
+              1166
+            ]
+          ]
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            245
+          ],
+          [
+            "batch",
+            "blacklist_category",
+            7
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            68
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            54
+          ],
+          [
+            "batch",
+            "execution_failed",
+            35392
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            20
+          ],
+          [
+            "batch",
+            "sql_encoding_invalid",
+            20
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            893
+          ],
+          [
+            "batch",
+            "sql_missing",
+            30204
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            68641
+          ],
+          [
+            "batch",
+            "start_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            35711
+          ],
+          [
+            "group",
+            "blacklist_category",
+            926293
+          ],
+          [
+            "group",
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 485.534,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            965351
+          ],
+          [
+            "included",
+            3512071
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "timings": {
+          "bind": [
+            621780,
+            154787
+          ],
+          "execute_fetch": [
+            318,
+            0
+          ],
+          "execute_first": [
+            621711,
+            154787
+          ],
+          "parse": [
+            505734,
+            106973
+          ],
+          "request": [
+            1762528,
+            513270
+          ]
+        }
+      },
+      "first_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 288102400,
+          "python": 86486016,
+          "total": 368412672
+        },
+        "samples": 472
+      },
+      "formal_equal_rows": {
+        "mpp_build_coverage": 4369785,
+        "mpp_build_group": 873957,
+        "mpp_build_timing_coverage": 5,
+        "mpp_statistic": 5850925
+      },
+      "observation_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 266597376,
+          "python": 78553088,
+          "total": 345146368
+        },
+        "samples": 4
+      },
+      "observation_seconds": 3.638,
+      "oracle": {
+        "absolute_tolerance": 1e-09,
+        "counts_by_rule": [
+          [
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556",
+            2068,
+            214
+          ]
+        ],
+        "disposition": [
+          [
+            "incomplete",
+            "excluded",
+            212
+          ],
+          [
+            "incomplete",
+            "observed",
+            607
+          ],
+          [
+            "incomplete",
+            "start_unknown",
+            74
+          ],
+          [
+            "invalid_encoding",
+            "excluded",
+            1
+          ],
+          [
+            "invalid_encoding",
+            "observed",
+            19
+          ],
+          [
+            "missing",
+            "sql_missing",
+            30204
+          ],
+          [
+            "uncertain",
+            "approximate_unavailable",
+            66106
+          ],
+          [
+            "uncertain",
+            "excluded",
+            1
+          ],
+          [
+            "uncertain",
+            "observed",
+            1442
+          ],
+          [
+            "uncertain",
+            "start_unknown",
+            1092
+          ]
+        ],
+        "groups": 1043,
+        "layer_conservation": true,
+        "method": "all groups; independent bucket/Decimal metrics oracle and independent eligibility projection",
+        "metrics": 114716,
+        "population_equal": true,
+        "reason_conservation": true,
+        "reasons_by_rule": [
+          [
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556",
+            "association_unreliable",
+            213
+          ],
+          [
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556",
+            "excluded_interval",
+            1
+          ],
+          [
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556",
+            "timing_unknown",
+            213
+          ]
+        ],
+        "relative_tolerance": 1e-10,
+        "seconds": 57.254,
+        "sql_states": [
+          [
+            "incomplete",
+            893
+          ],
+          [
+            "invalid_encoding",
+            20
+          ],
+          [
+            "missing",
+            30204
+          ],
+          [
+            "uncertain",
+            68641
+          ]
+        ],
+        "statistic_rows": 6748
+      },
+      "repeat": {
+        "build_id": "B:20261001T140212:57d5c4d837af413aaf55311c9d94a954",
+        "count_scopes": [
+          [
+            "batch",
+            "excluded",
+            35534
+          ],
+          [
+            "batch",
+            "unresolved",
+            98547
+          ],
+          [
+            "group",
+            "excluded",
+            929817
+          ],
+          [
+            "group",
+            "included",
+            3512071
+          ]
+        ],
+        "groups": 873957,
+        "layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "observations": {
+          "groups": 1043,
+          "layers": {
+            "day": 1707,
+            "hour": 1140,
+            "overall": 1043,
+            "week": 1151,
+            "weekday": 1707
+          },
+          "observation_only": true,
+          "rules": {
+            "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+              "excluded": 214,
+              "groups": 1043,
+              "included": 2068,
+              "reasons": {
+                "association_unreliable": 213,
+                "excluded_interval": 1,
+                "timing_unknown": 213
+              }
+            }
+          },
+          "scopes": [
+            [
+              "approximate_unavailable",
+              66106
+            ],
+            [
+              "group",
+              2282
+            ],
+            [
+              "sql_missing",
+              30204
+            ],
+            [
+              "start_unknown",
+              1166
+            ]
+          ],
+          "sql_states": [
+            [
+              "incomplete",
+              893
+            ],
+            [
+              "invalid_encoding",
+              20
+            ],
+            [
+              "missing",
+              30204
+            ],
+            [
+              "uncertain",
+              68641
+            ]
+          ],
+          "ungrouped_reasons": [
+            [
+              "approximate_unavailable",
+              "duration_unknown",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "excluded_interval",
+              67
+            ],
+            [
+              "approximate_unavailable",
+              "execution_failed",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "sql_uncertain",
+              66106
+            ],
+            [
+              "approximate_unavailable",
+              "start_unknown",
+              9
+            ],
+            [
+              "approximate_unavailable",
+              "timing_unknown",
+              9
+            ],
+            [
+              "sql_missing",
+              "sql_missing",
+              30204
+            ],
+            [
+              "start_unknown",
+              "duration_unknown",
+              1166
+            ],
+            [
+              "start_unknown",
+              "execution_failed",
+              1166
+            ],
+            [
+              "start_unknown",
+              "sql_incomplete",
+              74
+            ],
+            [
+              "start_unknown",
+              "sql_uncertain",
+              1092
+            ],
+            [
+              "start_unknown",
+              "start_unknown",
+              1166
+            ],
+            [
+              "start_unknown",
+              "timing_unknown",
+              1166
+            ]
+          ]
+        },
+        "reasons": [
+          [
+            "batch",
+            "association_unreliable",
+            245
+          ],
+          [
+            "batch",
+            "blacklist_category",
+            7
+          ],
+          [
+            "batch",
+            "duration_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "excluded_interval",
+            68
+          ],
+          [
+            "batch",
+            "execution_cancelled",
+            54
+          ],
+          [
+            "batch",
+            "execution_failed",
+            35392
+          ],
+          [
+            "batch",
+            "execution_timed_out",
+            20
+          ],
+          [
+            "batch",
+            "sql_encoding_invalid",
+            20
+          ],
+          [
+            "batch",
+            "sql_incomplete",
+            893
+          ],
+          [
+            "batch",
+            "sql_missing",
+            30204
+          ],
+          [
+            "batch",
+            "sql_uncertain",
+            68641
+          ],
+          [
+            "batch",
+            "start_unknown",
+            35466
+          ],
+          [
+            "batch",
+            "timing_unknown",
+            35711
+          ],
+          [
+            "group",
+            "blacklist_category",
+            926293
+          ],
+          [
+            "group",
+            "excluded_interval",
+            5056
+          ]
+        ],
+        "results_saved": true,
+        "seconds": 513.036,
+        "state": "calculated",
+        "states": [
+          [
+            "excluded",
+            965351
+          ],
+          [
+            "included",
+            3512071
+          ],
+          [
+            "unresolved",
+            98547
+          ]
+        ],
+        "timings": {
+          "bind": [
+            621780,
+            154787
+          ],
+          "execute_fetch": [
+            318,
+            0
+          ],
+          "execute_first": [
+            621711,
+            154787
+          ],
+          "parse": [
+            505734,
+            106973
+          ],
+          "request": [
+            1762528,
+            513270
+          ]
+        }
+      },
+      "repeat_equal": true,
+      "repeat_equal_rows": {
+        "mpp_build_coverage": 4369785,
+        "mpp_build_group": 873957,
+        "mpp_build_observation_group": 1043,
+        "mpp_build_timing_coverage": 5,
+        "mpp_observation_statistic": 6748,
+        "mpp_statistic": 5850925
+      },
+      "repeat_memory": {
+        "method": "1-second /proc smaps_rollup PSS sampling; process trees; bytes",
+        "peak_bytes": {
+          "postgres": 294376448,
+          "python": 89251840,
+          "total": 372182016
+        },
+        "samples": 500
+      },
+      "snapshot": {
+        "cache": {
+          "added_sql_results": 1155798,
+          "seconds": 481.067
+        },
+        "config_id": "CS:9d8c479c24174687a639fa3e440a7c93",
+        "input_id": "IS:422ce566a02d4343b68af571d0b74647",
+        "rule_id": "TR:505541016ee24094488c9f48544781f4bd8f7f2143a06039829b65535578df5d"
+      },
+      "total_seconds_delta": -342.312
+    }
+  },
+  "code_sha256": {
+    "scripts/db/verify_observations_full.py": "dcf17431ba1c777098956b9030ecf4e9c7ef22a2dc60e186a49933f7a24834c3",
+    "sql_apm/baseline/__init__.py": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+    "sql_apm/baseline/statistics.py": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+    "sql_apm/baseline/watchdog.py": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+    "sql_apm/storage/observations.py": "cbf7cb7d3356d2ba60225b422a6837e4cdd95f64f5e323268a0bd11750f5764a",
+    "sql_apm/storage/schema.sql": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743",
+    "sql_apm/storage/statistics.py": "8c4e3c36e689a8b57e5d35d1a36820ff32b07cd499e1a7a5009ee2bff1663f6c",
+    "tests/baseline/oracle.py": "7a7059566d8116d4e6f6842d9b1310f5c7991f7c6cbcd92182ee015b2d7d6254",
+    "tests/database/observations.py": "16815c3d19038c3c41f1128135201427a2dd1af94365a716d0868aa174daa279"
+  },
+  "complete": true,
+  "decision_version": "training-decision/1",
+  "import_seconds": 3560.017,
+  "import_sql_states": [
+    [
+      "complete",
+      7269390
+    ],
+    [
+      "incomplete",
+      897
+    ],
+    [
+      "invalid_encoding",
+      20
+    ],
+    [
+      "missing",
+      63355
+    ],
+    [
+      "uncertain",
+      91142
+    ]
+  ],
+  "input_files": 55,
+  "input_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "method": "measured; private PG17; 55-file fresh import",
+  "normalization_context": {
+    "algorithm_version": "sql-normalization/5",
+    "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+    "dictionary_rules_version": "1.0.1",
+    "dictionary_schema_version": 1,
+    "parser_dependency": "pglast/7.18",
+    "parser_version": "mpp-adapter/9",
+    "profile": "hashdata-pg94",
+    "rules_digest": "00a3d088002566d01a3bbf9aff64619452116c7a8dcf32a6ae4b489342c46a58",
+    "rules_ref": "sha256:cb1e23a966095b526c9c337b2125f65d3521692c473796b179fb038f4f400528"
+  },
+  "relation_sizes": [
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "analysis",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "analysis_file",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "attempt_problem",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 36,
+      "table": "batch_date",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "batch_entry",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 6,
+      "table": "build",
+      "total_bytes": 131072
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "build_check",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "config_snapshot",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "current_version",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 16390146,
+      "table": "evidence_record",
+      "total_bytes": 18327478272
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "import_attempt",
+      "total_bytes": 114688
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "import_batch",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_analysis",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_batch",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "input_file",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "input_file_analysis",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_manifest",
+      "total_bytes": 114688
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "input_snapshot",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 104362,
+      "table": "mpp_approximate_evidence",
+      "total_bytes": 49045504
+    },
+    {
+      "partition": false,
+      "rows": 10517,
+      "table": "mpp_approximate_input",
+      "total_bytes": 18178048
+    },
+    {
+      "partition": false,
+      "rows": 10517,
+      "table": "mpp_approximate_result",
+      "total_bytes": 35217408
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_approximate_rule",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 927743,
+      "table": "mpp_baseline_group",
+      "total_bytes": 1621819392
+    },
+    {
+      "partition": false,
+      "rows": 13916145,
+      "table": "mpp_build_coverage",
+      "total_bytes": 10472775680
+    },
+    {
+      "partition": true,
+      "rows": 806790,
+      "table": "mpp_build_coverage_p594693963537055769",
+      "total_bytes": 607232000
+    },
+    {
+      "partition": true,
+      "rows": 13109355,
+      "table": "mpp_build_coverage_p974329813721629853",
+      "total_bytes": 9865543680
+    },
+    {
+      "partition": false,
+      "rows": 2783229,
+      "table": "mpp_build_group",
+      "total_bytes": 1027694592
+    },
+    {
+      "partition": false,
+      "rows": 2146,
+      "table": "mpp_build_observation_group",
+      "total_bytes": 843776
+    },
+    {
+      "partition": false,
+      "rows": 30,
+      "table": "mpp_build_timing_coverage",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision_reason",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_decision_reason_evidence",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 1385776,
+      "table": "mpp_fingerprint",
+      "total_bytes": 2383642624
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "mpp_input_occurrence",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_normalization",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 1073,
+      "table": "mpp_observation_group",
+      "total_bytes": 1032192
+    },
+    {
+      "partition": false,
+      "rows": 13856,
+      "table": "mpp_observation_statistic",
+      "total_bytes": 11919360
+    },
+    {
+      "partition": true,
+      "rows": 360,
+      "table": "mpp_observation_statistic_p594693963537055769",
+      "total_bytes": 376832
+    },
+    {
+      "partition": true,
+      "rows": 13496,
+      "table": "mpp_observation_statistic_p974329813721629853",
+      "total_bytes": 11542528
+    },
+    {
+      "partition": false,
+      "rows": 7424804,
+      "table": "mpp_occurrence",
+      "total_bytes": 11607064576
+    },
+    {
+      "partition": false,
+      "rows": 92059,
+      "table": "mpp_occurrence_approximate",
+      "total_bytes": 83795968
+    },
+    {
+      "partition": false,
+      "rows": 1448320,
+      "table": "mpp_occurrence_evidence",
+      "total_bytes": 1112227840
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "mpp_result_partition",
+      "total_bytes": 65536
+    },
+    {
+      "partition": false,
+      "rows": 1385776,
+      "table": "mpp_sql_text",
+      "total_bytes": 1055580160
+    },
+    {
+      "partition": false,
+      "rows": 7407688,
+      "table": "mpp_sql_text_evidence",
+      "total_bytes": 2676293632
+    },
+    {
+      "partition": false,
+      "rows": 19164369,
+      "table": "mpp_statistic",
+      "total_bytes": 14899191808
+    },
+    {
+      "partition": true,
+      "rows": 1611594,
+      "table": "mpp_statistic_p594693963537055769",
+      "total_bytes": 1208418304
+    },
+    {
+      "partition": true,
+      "rows": 17552775,
+      "table": "mpp_statistic_p974329813721629853",
+      "total_bytes": 13690773504
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "mpp_training_rule",
+      "total_bytes": 147456
+    },
+    {
+      "partition": false,
+      "rows": 1384227,
+      "table": "mpp_training_sql",
+      "total_bytes": 719749120
+    },
+    {
+      "partition": false,
+      "rows": 517900,
+      "table": "problem",
+      "total_bytes": 257949696
+    },
+    {
+      "partition": false,
+      "rows": 517900,
+      "table": "problem_evidence",
+      "total_bytes": 211320832
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "publication",
+      "total_bytes": 40960
+    },
+    {
+      "partition": false,
+      "rows": 1,
+      "table": "schema_version",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "scope",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "source",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 55,
+      "table": "source_file",
+      "total_bytes": 507904
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "task",
+      "total_bytes": 49152
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "task_batch",
+      "total_bytes": 32768
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "task_build",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 0,
+      "table": "task_publication",
+      "total_bytes": 16384
+    },
+    {
+      "partition": false,
+      "rows": 2,
+      "table": "training_config",
+      "total_bytes": 32768
+    }
+  ],
+  "schema_receipts": [
+    [
+      "1.5.0",
+      "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743"
+    ]
+  ],
+  "schema_version": "1.5.0"
+}

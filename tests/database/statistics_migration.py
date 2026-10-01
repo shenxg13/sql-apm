@@ -26,7 +26,7 @@ def verify_statistics_migration(v, root, runner):
         sql('DELETE FROM mpp_build_coverage')
         original=sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')
         v.init('upgrade',names=names);v.init('check',names=names)
-        v.require(sql('SELECT max(version) FROM schema_version')=='1.4.0' and
+        v.require(sql('SELECT max(version) FROM schema_version')=='1.5.0' and
                   sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')==original,
                   schema+': direct upgrade retains execution and SQL evidence')
         for month,bid in [('2026-10-01','V1'),('2026-11-01','V2')]:
@@ -50,7 +50,7 @@ def verify_statistics_migration(v, root, runner):
         sql("INSERT INTO build SELECT 'BAD_MONTH',scope_id,input_id,config_id,normalization_id,profile,NULL,'running','2026-12-01',NULL,false,partition_id,'{}' FROM build WHERE build_id='V1'",ok=False)
         v.require(True,schema+': mismatched construction month is rejected')
 
-        v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='2',schema+': two partitioned parents, no layer tables')
+        v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='3',schema+': three partitioned parents, no layer tables')
         v.require(sql("SELECT count(*) FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid WHERE c.relnamespace=current_schema()::regnamespace AND c.relname LIKE 'mpp_statistic%' AND a.attname='sufficiency' AND NOT a.attisdropped")=='0',schema+': parent and leaves omit sufficiency')
         sql('ALTER FUNCTION mpp_statistic_sufficiency(text,jsonb,text,bigint,date[],date[]) STABLE')
         drift=v.init('check',names=names,ok=False).stderr

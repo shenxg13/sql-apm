@@ -4,7 +4,7 @@
 版本为 `sql-approximate/2`，只提供观察分组身份，不代表完整 SQL、可靠结构指纹或正常基线。
 不执行 SQL，不读数据库，不尝试从其他记录补取完整 SQL，不补括号／引号或恢复绑定值。
 完整结构归一化已由[Normalizer](sql-normalization.md)提供；近似持久化结构已由 [#17](https://github.com/shenxg13/sql-apm/issues/17) 补齐至 1.2.0；
-生产日志导入由 #18 实施，观察统计另行处理。
+生产日志导入由 #18 实施，观察统计由 #27 在同一构建中计算，见[统计设计](baseline-statistics.md#观察统计实施计划与边界)。
 
 ## 可调用接口
 

@@ -6,6 +6,12 @@ owners:
   - .project-wiki/contracts/baseline-statistics.md
 updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5929262162
+    status: current
+  - path: docs/reports/observation-statistics-2026-10-01.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: docs/reports/baseline-statistics-2026-10-01.md
     status: current
   - path: docs/reports/baseline-statistics-2026-09-30.md
@@ -458,6 +464,33 @@ confidence: high
 [新结构与整改验收](../../docs/reports/baseline-statistics-2026-10-01.md)记录派生门槛独立复算、时钟回归及
 新结构 55 文件重新导入验收；[原报告](../../docs/reports/baseline-statistics-2026-09-30.md)保留范围变更前证据。
 两份实测结论均限于所列输入与环境。
+
+### 已确认的五层观察统计
+
+确认日期 2026-10-01；来源为 [Issue #27 的需求确认](https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5924342787)，current。
+用户确认：在④构建编排之前实施观察统计；随每次构建计算和保存；计算整体、逐天、逐周、
+跨周星期、跨天小时全部五层，复用正式统计的全部 17 指标、公式、毫秒单位、空值原因、
+推算开始时间归属及自然周边界。每桶保留观察样本数、活跃日期／周和首末样本时间。
+
+样本界定以[指纹契约](sql-fingerprints.md#随构建计算的观察统计2026-10-01)为准：
+仅因 SQL 可靠性原因暂不训练、近似 available 且其余资格满足，才进入观察耗时样本。
+失败、取消、超时、未知耗时、关联不可靠、计时未知或排除时段等按执行去重统计排除总数，
+各非 SQL 可靠性原因分别计一次；不把本来允许观察的 SQL 可靠性原因算成观察排除。
+只对能够定位的分组和桶计数；未知时间／身份、不具备可用近似或无 SQL 的数量留在构建汇总。
+窗口外不计入桶。类别和模板黑名单在此路径为未评估，不排除观察样本。
+
+2026-10-01 用户在 [R1 整改确认](https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5929262162)
+中明确保持既有口径：失败执行若耗时和推算开始时间未知，只在构建级诊断按原原因计数，
+不进入观察分组或时间桶，也不借用结束时间分桶；继续与正式统计一致。
+
+观察统计不使用样本门槛、没有充足性结论；门槛查询与发布检查只读取正式统计。
+表、分组与可靠结果分开，不能引用可靠 Group 或用近似 Group 写正式 Statistic。
+观察与正式结果同一事务保存，两者都成功才 calculated；任一失败全部回滚，重算从头开始。
+没有可归组观察记录时观察结果为空，构建仍可成功；仅排除的已知桶保留计数和 NULL/no_samples。
+不另存观察覆盖索引，空桶从窗口和实际统计行推导，覆盖表的后续设计留给④。
+
+实现见[观察统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)；
+本次合成与 55 文件全量检查、近似可用性差异及资源边界记录在[观察统计验证报告](../../docs/reports/observation-statistics-2026-10-01.md)。
 
 ## Workflows
 

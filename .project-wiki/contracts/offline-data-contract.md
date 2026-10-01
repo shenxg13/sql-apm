@@ -5,8 +5,10 @@ status: active
 owners:
   - .project-wiki/contracts/offline-data-contract.md
   - docs/design/offline-data-contract/
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -175,7 +177,7 @@ Fingerprint 针对 `(sql_id, normalization_id, profile)` 返回可靠结果或�
 或形成正常 Group，不改变上述结构失败语义。观察结果不参与正常基线训练及自动异常
 判断，不计入有效训练样本；字段接口由 Issue #9 落实，后续交付范围见下条。
 这是契约增补；#17 已交付[近似字段及关联](../../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)与结构 1.2.0，
-原有 v1 样例不代表近似验收，日志导入由 #18 实施、观察统计另行处理；完整边界由
+原有 v1 样例不代表近似验收，日志导入由 #18 实施、观察统计由 #27 实施；完整边界由
 [指纹主题](sql-fingerprints.md#已确认的观察用近似指纹)维护。
 
 HashData Group 的逻辑键仍为
@@ -300,6 +302,16 @@ HashData 统计语义。来源改变必须另行确认 profile，不用任意标
 同日范围变更将 sufficiency 映射为按原构建封存配置与公式版本派生的逻辑结果，物理不重复保存；
 完整字段及原因语义保留，见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。
 [字段字典](../../docs/design/offline-data-contract/fields.md#statisticbucket-与门槛结果)保留逻辑交接表达与物理映射。
+
+### 独立观察分组与统计（2026-10-01）
+
+[Issue #27](https://github.com/shenxg13/sql-apm/issues/27)新增 `ObservationGroup` 与 `ObservationStatistic`，
+其归属规则、样本及观察限制分别由[指纹](sql-fingerprints.md#随构建计算的观察统计2026-10-01)与
+[统计](baseline-statistics.md#已确认的五层观察统计)契约维护。
+对象引用已有 ApproximateResult／ApproximateRule 和同一 Build；五层指标复用 Statistic 数值定义，
+样本数表示观察样本，不带 sufficiency。逻辑字段见[字段字典](../../docs/design/offline-data-contract/fields.md#observationgroup-与-observationstatistic)。
+构建只有两类结果同时完整保存才 calculated；不改变正常训练、发布检查或 CurrentVersion。
+物理结构独立升级到 1.5.0，不改原始 v1 契约样例字节。
 
 ## Workflows
 

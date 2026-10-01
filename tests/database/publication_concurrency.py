@@ -121,7 +121,9 @@ with Task(db,'C1','statistics') as task:
     try:
         assert select.select([child.stdout],[],[],30)[0]
         evidence=json.loads(child.stdout.readline())
-        v.sql('SELECT pg_terminate_backend('+str(evidence['backend'])+')',admin=True,database='sql_apm')
+        # Wait for backend exit, not just delivery of its termination signal.
+        assert v.sql('SELECT pg_terminate_backend('+str(evidence['backend'])+',5000)',
+                     admin=True,database='sql_apm')=='t'
         assert child.poll() is None
         with Task(db,'C1','snapshot'):
             child.communicate('\n',timeout=15)

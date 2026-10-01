@@ -1,9 +1,9 @@
 # SQL APM
 
-SQL APM 项目当前处于需求沟通阶段，已基于 agent-harness 建立本地开发仓库。
+SQL APM 使用 Python 和 PostgreSQL 构建离线 SQL 基线；当前交付边界见[项目范围](.project-wiki/decisions/project-scope.md)。
 [SQL Baseline 原始资料](.project-wiki/raw/sql-baseline.md)是后续讨论的输入；
-已确认使用 Python 3.9.5，后续在项目 `.venv/` 中建立环境，
-Baseline 存储采用 PostgreSQL 17，Grafana 直接查询该库展示基线和 SQL 执行历史。
+运行环境为 Python 3.9.5 和项目 `.venv/`，
+Baseline 存储采用 PostgreSQL 17，后续 Grafana 按已确认范围直接查询该库展示基线和 SQL 执行历史。
 首期不引入 Prometheus，复用 HashData 已有监控，平台状态先通过任务记录和日志保留。
 日志首期手动拷贝至基线服务器，不引入流式读取组件；后续通过定时 SCP 每天传输一次。
 SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名单见[训练资格与黑名单](.project-wiki/contracts/training-eligibility.md#已确认的-sql-纳入与排除策略)。
@@ -21,6 +21,7 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 - 从[项目知识索引](.project-wiki/index.md)按任务选择主题，查看完整需求、来源及确认边界。
 - Agent 从 [AGENTS.md](AGENTS.md) 进入 [Harness](.harness/index.md)。
 - 本地开发与检查见[开发说明](docs/runbooks/local-development.md)。
+- 完整离线流程、重新构建和版本查询见[操作说明](docs/runbooks/build-publication.md)。
 - 本次初始化范围见[初始化计划](.harness/plans/local-bootstrap.md)。
 
 ## 目录职责
@@ -49,7 +50,7 @@ scripts/quality/check.sh
 ```
 
 如使用本次初始化安装的仓库本地工具，命令见[开发说明](docs/runbooks/local-development.md)。
-检查覆盖 Harness、文档和离线流程回归，业务检查将在具体需求确认后定义。
+检查覆盖 Harness、文档和开发流程回归；业务检查按具体 Issue 契约执行，命令见[脚本导航](scripts/README.md)。
 
 ## 来源与维护
 

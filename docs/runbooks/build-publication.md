@@ -31,7 +31,7 @@ rebuild 必须给出该参数，可用 `--retry-of BUILD_ID` 引用同集群失�
 任一异常停止后续步骤。通过检查且有正式有效样本时切换；合法样本不足仍可发布。
 五类全零时 result=no_samples，退出码 0 表示流程完成，本次未更新；查询保留原发布时间，
 无旧版本为 baseline_state=no_baseline。仅阶段／调用样本可发布，查询带 request_baseline_missing=true。
-检查失败、发布失败或其他执行失败返回 1；参数缺失／非法返回 2；捕获人工中断返回 130。
+配置校验、检查、发布或其他执行失败返回 1；命令行语法错误（如缺失必填参数）返回 2；捕获人工中断返回 130。
 
 ## 占用与恢复
 
@@ -85,3 +85,14 @@ computed_keys 对应统计中存在的桶，其余窗口键为 empty_keys；不�
 全部正式覆盖，再迁移，核对正式／观察统计摘要及重跑。`--legacy` 指定本地验收描述，
 含私有连接、固定基线提交和两个构建标识；该文件及原始输入必须留在忽略目录。
 它不接管生产服务，不替代常规初始化命令。
+
+描述文件必需字段为 `dsn`、`baseline_sha` 和 `builds`，后者按集群保存
+`result.build_id`。先用冻结旧版在私有实例完成导入和统计，保持实例存活，再执行：
+
+```bash
+.venv/bin/python scripts/db/verify_coverage_migration_full.py \
+  --legacy var/legacy-validation/ready.json --output var/coverage-migration.json
+```
+
+该命令检查连接确实指向 `/tmp/sql-apm-pg-*/socket` 且版本为 1.5.0，
+先比较覆盖，再升级并核对统计；输出文件须不存在。旧实例拥有者负责最后停止和清理。

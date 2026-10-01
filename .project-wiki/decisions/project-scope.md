@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/project-scope.md
 updated: 2026-10-01
 sources:
+  - path: docs/reports/build-publication-2026-10-01.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
   - path: .project-wiki/log.md
@@ -105,6 +107,15 @@ confidence: high
 - 实时 activity 对比及定时 SCP 继续按此前的后续阶段安排；本次不提前引入。
 - 具体实施任务、依赖选型、接口和验收用例在对应 Issue 中落实；本次确认
   交付顺序，不代表单项 Issue 的完整实施契约已经确认。
+
+### 首期离线流程交付（2026-10-01）
+
+[Issue #29](https://github.com/shenxg13/sql-apm/issues/29)把既有导入、快照和统计连接到发布检查、
+当前版本切换及任务／版本查询，首期离线链路已完整实现；实际命令见[操作说明](../../docs/runbooks/build-publication.md)。
+实施验收与资源实测由[验证报告](../../docs/reports/build-publication-2026-10-01.md)保存，评审及合并状态以在线 Issue／PR 为准。
+
+本地 120 只有七天日志，生产首批三十天成本尚未实测；不把本地验证等同于生产部署。
+版本保留与清理单独处理，SQL 检索和 Grafana 展示继续属于首期后续交付，定时 SCP 与 activity 安排不变。
 
 ### 已确认的数据契约设计范围
 

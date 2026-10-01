@@ -19,7 +19,7 @@ from sql_apm.ingestion.config import load_config
 from sql_apm.ingestion.importer import Importer
 from sql_apm.training.config import validate
 from sql_apm.storage.training import TrainingStore
-from sql_apm.storage.statistics import StatisticsStore
+from sql_apm.storage.statistics import StatisticsStore,StatisticsError
 from sql_apm.storage.ingestion import connect
 from sql_apm.storage.tasks import Task
 from sql_apm.storage.publication import PublicationStore,version_status,CHECKS
@@ -144,6 +144,26 @@ def verify():
             assert diagnostic['last_unpublished']['reason']=='build_failed'
             assert not any(secret in json.dumps(diagnostic,default=str) for secret in ('synthetic_db','synthetic_user','SELECT'))
             v.require(True,'import, snapshot, calculation and check exceptions stop publication; diagnostics show latest failure without source identities')
+            # A rebuild retry reuses imported data, but freezes fresh snapshots.
+            attempts=v.sql('SELECT count(*) FROM import_attempt')
+            for error,expected in [(RuntimeError,'failed'),(KeyboardInterrupt,'interrupted')]:
+                failed={}
+                def fail_after_creation(**event):
+                    if event['phase']=='build_created':
+                        failed['build_id']=event['build_id']
+                        raise error('synthetic')
+                try:run(dsn,'sql_apm',config,progress=fail_after_creation)
+                except (StatisticsError,KeyboardInterrupt):pass
+                else:raise AssertionError('retry_fixture_did_not_fail')
+                previous=v.sql("SELECT state||':'||input_id||':'||config_id FROM build WHERE build_id='"+failed['build_id']+"'")
+                assert previous.startswith(expected+':')
+                retried=run(dsn,'sql_apm',config,retry_of=failed['build_id'])
+                assert retried['publication']['result']=='published'
+                assert retried['snapshot']['input_id'] not in previous
+                assert retried['snapshot']['config_id'] not in previous
+                assert v.sql("SELECT retry_of FROM build WHERE build_id='"+retried['build']['build_id']+"'")==failed['build_id']
+                assert v.sql('SELECT count(*) FROM import_attempt')==attempts
+            v.require(True,'rebuild references failed and interrupted builds with fresh snapshots and no reimport')
             from database.publication_concurrency import verify_concurrency
             verify_concurrency(v,dsn,root,cfg,config,frozen)
         v.init('check');v.init('upgrade')

@@ -98,6 +98,10 @@ def cluster(dsn,args,scope):
             before=after
             print(canonical(dict(phase='full_task_verified',scope='scope:'+identity(scope),index=index,seconds=records[-1]['seconds'])),flush=True)
         assert len(version_status(db,scope,True)['versions'])==len(records)
+        with db,db.cursor() as cur:
+            cur.execute('SELECT build_id,publication_id FROM current_version WHERE scope_id=%s',(scope,))
+            assert cur.fetchone()==(records[-1]['result']['build']['build_id'],
+                                    records[-1]['result']['publication']['publication_id'])
         return records
     finally:db.close()
 

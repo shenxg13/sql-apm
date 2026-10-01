@@ -241,3 +241,4 @@
 - [#29 用户确认](https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5931020732)的默认截止日、异常占用恢复、覆盖推导方案 C 和清理另立任务，分别同步到[构建与版本](features/baseline-versions.md#构建编排补充确认2026-10-01)、[命令行](features/operator-cli.md#完整流程与版本查询2026-10-01)及[存储主题](architecture/postgresql-storage.md#编排结构-1602026-10-01)。
 - 交付共享任务连接、六项检查与原子切换，见[设计](../docs/design/build-publication.md)和[操作说明](../docs/runbooks/build-publication.md)；逻辑覆盖语义不变，结构升级到 1.6.0。
 - [项目范围](decisions/project-scope.md)将早期需求阶段说明归于原会话，按已确认 Issue 的实际交付解释当前状态；原始需求、规则和旧报告保持原样。
+- 首期离线链路的真实逐日运行、覆盖迁移、独立复算与资源证据见[验证报告](../docs/reports/build-publication-2026-10-01.md)；120 的生产首批三十天成本仍未实测。

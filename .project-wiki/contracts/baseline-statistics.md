@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/baseline-statistics.md
 updated: 2026-10-01
 sources:
+  - path: docs/reports/observation-statistics-2026-10-01.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: docs/reports/baseline-statistics-2026-10-01.md
@@ -480,6 +482,9 @@ confidence: high
 观察与正式结果同一事务保存，两者都成功才 calculated；任一失败全部回滚，重算从头开始。
 没有可归组观察记录时观察结果为空，构建仍可成功；仅排除的已知桶保留计数和 NULL/no_samples。
 不另存观察覆盖索引，空桶从窗口和实际统计行推导，覆盖表的后续设计留给④。
+
+实现见[观察统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)；
+本次合成与 55 文件全量检查、近似可用性差异及资源边界记录在[观察统计验证报告](../../docs/reports/observation-statistics-2026-10-01.md)。
 
 ## Workflows
 

@@ -9,8 +9,10 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -254,6 +256,10 @@ Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statisti
 门槛规则，也不逐行保存派生 JSONB。构建级批量标记查询位于
 `storage/statistics_sufficiency.sql`，复用该函数一次验证每层门槛，再作类型化比较；
 操作和成本见[统计手册](../../docs/runbooks/baseline-statistics.md#查询门槛结果)。发布与任务编排仍属④。
+
+Issue #27 新增 `storage/observations.py`：从同一构建的临时判定投影观察资格和分组，
+复用 `baseline/statistics.py` 五层指标以及 `storage/statistics.py` 的批量写入与事务；
+没有第二套训练判定函数、指标公式或门槛路径。独立全分组 oracle 留在 tests 与显式验收脚本。
 
 ## Workflows
 

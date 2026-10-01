@@ -208,8 +208,8 @@ normalized/value 为 null、replacements 为 0，不伪称接口返回过可用�
 不要求回填或重读 CSV。多个事件可引用一个结果，次数不合并。残片、空输入或非法编码只进入
 ApproximateInput／证据；不补造完整 SqlText，可靠完整文本若解析拒绝也可以另有近似记录。
 
-近似结果不能作为 Fingerprint、Group、Decision 的指纹引用，不进入有效样本或自动异常判断。
-Decision 仍可记录原事件的排除／未知原因，但不引用 ApproximateResult。观察统计另行处理；
+近似结果不能作为 Fingerprint、Group、Decision 的指纹引用，不进入有效训练样本或自动异常判断。
+Decision 仍可记录原事件的排除／未知原因，但不引用 ApproximateResult。观察统计采用下述[独立对象](#observationgroup-与-observationstatistic)；
 本次测试写入路径只验证结构，不是产品导入器。
 
 ### Group

@@ -222,4 +222,11 @@
 - 将用户对总存储 4–5 TB 以内无压力的接受写入[存储主题](contracts/sql-storage.md#统计存储量级接受2026-10-01)，保留留存／清理的后续边界及非分区构建分组关联的清理提示。
 - 补充[构建级门槛查询](../docs/design/baseline-statistics.md#门槛结果的数据库派生)：每构建一次读取封存配置，五层验证后逐行类型化比较；单组继续返回完整 ThresholdResult。
 - 两路径一致性及单组／全构建查询的有界实测见[整改报告](../docs/reports/baseline-statistics-r2-remediation-2026-10-01.md)。历史报告与日志条目保持原样。
-| 2026-10-01 | [#27](https://github.com/shenxg13/sql-apm/issues/27) 确认在④之前随构建保存五层观察统计；补齐[观察样本与隔离边界](contracts/sql-fingerprints.md#随构建计算的观察统计2026-10-01)及[统计原子性与无门槛规则](contracts/baseline-statistics.md#已确认的五层观察统计)，同步逻辑字段、1.5.0 结构和命令说明；真实验收证据另见报告。 |
+
+## 2026-10-01：随构建计算观察统计
+
+- [#27](https://github.com/shenxg13/sql-apm/issues/27) 确认在④之前随构建保存五层观察统计；
+  补齐[观察样本与隔离边界](contracts/sql-fingerprints.md#随构建计算的观察统计2026-10-01)及
+  [统计原子性与无门槛规则](contracts/baseline-statistics.md#已确认的五层观察统计)。
+- 同步逻辑字段、1.5.0 结构和命令说明；原始快照、规则与旧报告保持不变。
+- 合成、迁移、55 文件全量及近似可用性核对见[观察统计验证报告](../docs/reports/observation-statistics-2026-10-01.md)。

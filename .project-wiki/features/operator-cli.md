@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-09-30
+updated: 2026-10-01
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/27
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -108,6 +110,10 @@ Issue #25 提供 `python -m sql_apm statistics --cluster ... --input ... --confi
 对②已封存快照创建构建并保存五层结果；输出仅含计数、固定原因和不透明标识。
 可引用同快照失败尝试的 `--retry-of`，从头计算；这不交付④的完整重建流程。
 参数、恢复和退出码见[操作说明](../../docs/runbooks/baseline-statistics.md)。
+
+Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `observations` 计数及原因汇总，
+参数保持不变。观察结果不带充足性结论，失败与正式结果一起回滚；
+[观察操作说明](../../docs/runbooks/baseline-statistics.md#观察统计与全量验收)解释归属及规则间计数边界。
 
 ## Workflows
 

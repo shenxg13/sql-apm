@@ -111,7 +111,7 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 小规模验证核对逐表内容、关系 OID／relfilenode 和约束 OID 保留，
 不以此声称生产升级耗时或吞吐已经验证。独立统计表也不代表共享实例的资源隔离。
 原名 SQL 调用需随版本切换，没有保留旧名兼容视图；精确操作和恢复见
-[升级说明](../runbooks/database-initialization.md#升级到-140)。
+[升级说明](../runbooks/database-initialization.md#升级到-150)。
 
 ## 统计结构 1.4.0
 

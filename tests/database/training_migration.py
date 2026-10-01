@@ -23,7 +23,7 @@ def verify_training_migration(v, root, runner):
         v.init('upgrade',names=names)
         v.require(state()==before,schema+': direct 1.2.0 migration preserves all original rows and relation files')
         receipts=sql('SELECT jsonb_object_agg(version,to_jsonb(s)) FROM schema_version s')
-        v.require(set(json.loads(receipts))=={'1.2.0','1.3.0','1.4.0'},schema+': both receipts retained')
+        v.require(set(json.loads(receipts))=={'1.2.0','1.3.0','1.4.0','1.5.0'},schema+': both receipts retained')
         for mode in ['all','schema','check','upgrade']:v.init(mode,names=names)
         v.require(state()==before and sql('SELECT jsonb_object_agg(version,to_jsonb(s)) FROM schema_version s')==receipts,schema+': all repeat modes preserve data and receipts')
         definition=sql("SELECT pg_get_functiondef('training_version(text)'::regprocedure)")

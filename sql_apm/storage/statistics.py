@@ -14,6 +14,7 @@ from psycopg2.extras import Json
 
 from sql_apm.baseline.statistics import METRICS, calculate_group
 from sql_apm.storage.ingestion import connect
+from sql_apm.storage.observations import calculate_observations
 from sql_apm.training.config import TZ
 
 TIMINGS = ('request', 'execute_first', 'execute_fetch', 'parse', 'bind')
@@ -129,7 +130,7 @@ class StatisticsStore:
             with self.db, self.db.cursor() as cur:
                 cur.execute('''CREATE TEMP TABLE statistics_decisions ON COMMIT DROP AS
                     SELECT analysis_id,occurrence_id,group_id,fingerprint_id,timing_type,state,count_scope,
-                           reason_codes,estimated_start_at,duration_ms
+                           reason_codes,estimated_start_at,duration_ms,in_window
                     FROM mpp_training_decisions(%s,%s)''', (input_id,config_id))
                 cur.execute('ANALYZE statistics_decisions')
                 summary = {}
@@ -187,6 +188,13 @@ class StatisticsStore:
                 for timing,(included,excluded) in timing_counts.items():
                     cur.execute('INSERT INTO mpp_build_timing_coverage VALUES (%s,%s,%s,%s)',
                                 (build_id,timing,included,excluded))
+                observation_started = time.monotonic()
+                summary['observations'] = calculate_observations(
+                    self.db, build_id, partition, start, end, ResultWriter, STAT_COLUMNS)
+                if progress:
+                    progress(dict(phase='observations_written',build_id=build_id,
+                                  groups=summary['observations']['groups'],
+                                  seconds=round(time.monotonic()-observation_started,3)))
                 summary.update(groups=groups,layers=dict(layer_counts),timings=timing_counts)
                 cur.execute('UPDATE build SET diagnostics=%s WHERE build_id=%s',(Json(summary),build_id))
                 if progress:

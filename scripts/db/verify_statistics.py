@@ -52,6 +52,8 @@ def verify():
                 result=store.calculate('C1',snap['input_id'],snap['config_id'])
                 bid=result['build_id']
                 assert result['state']=='calculated' and result['results_saved']
+                assert result['observations']['groups']==0 and result['observations']['layers']=={}
+                assert v.sql('SELECT count(*) FROM mpp_observation_statistic')=='0'
                 v.require(v.sql("SELECT results_saved AND state='calculated' FROM build WHERE build_id='"+bid+"'")=='t','successful build and complete result commit')
                 allrows=json.loads(v.sql("SELECT jsonb_agg(to_jsonb(s)) FROM mpp_statistic s WHERE build_id='"+bid+"' AND layer='overall'"))
                 main=next(s for s in allrows if s['included_count']==7)

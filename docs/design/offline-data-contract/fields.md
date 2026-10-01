@@ -399,3 +399,25 @@ stddev/MAD/IQR/log_MAD 为 0，其他指标按各自分母处理。数值不因�
 Task.succeeded 仅表示本次操作流程完成，仍须查看 Publication：只导入可无发布，
 零样本流程可正常完成但不切换。中断占用恢复机制留待实现，不能凭时间到期假定可并发接管。
 CurrentVersion 更新必须原子可见整个版本；任何发布失败都保持原三个引用／时间值。
+
+## ObservationGroup 与 ObservationStatistic
+
+2026-10-01 [#27](https://github.com/shenxg13/sql-apm/issues/27) 确认的独立观察扩展，
+与正常 Group／Statistic 的引用类型不同，不产生训练资格、门槛结果或异常结论。
+
+| 字段 | 类型 | 约束 |
+| --- | --- | --- |
+| ObservationGroup.group_id | id | 不透明观察身份，物理使用 OG: 前缀 |
+| scope_id、profile | ref(Scope)、text | 所属计算集群与来源规则 |
+| database、execution_user | text 各一 | 五维身份；缺失时不分组，仅构建汇总 |
+| rule_id、result_id | ref(ApproximateRule)、ref(ApproximateResult) | 代表结果须 available，版本不同不混组 |
+| approximate_value | text | 必须与所引近似结果一致，不作为可靠 Fingerprint |
+| timing_type | 五类计时或 unknown | unknown 只容纳排除计数，不是可靠计时类别 |
+| ObservationStatistic.build_id、group_id | ref(Build)、ref(ObservationGroup) | 同集群、同 profile；与正式统计同事务保存 |
+| layer、bucket_date、bucket_number、range_start、range_end、partial_week | 同 Statistic | 五层、窗口、北京时间及周边界一致 |
+| included_count、excluded_count、exclusions_by_reason | count、count、原因计数映射 | included 是观察样本；排除剔除 SQL 可靠性原因，每执行及每原因去重 |
+| active_dates、active_week_starts、first_sample_at、last_sample_at | 同 Statistic | 基于实际观察耗时样本，无样本为空数组及 NULL |
+| 17 指标、metric_null_reasons | 同 Statistic | 相同单位、公式和空值口径；没有 sufficiency 字段 |
+
+没有事件的桶从 Build 窗口和已有观察行推导，不新增观察覆盖表；无法确定开始时间或身份、
+无文本、近似不可用的事件只在 Build.diagnostics.observations 中汇总。各规则版本单独计数。

@@ -75,7 +75,7 @@ def verify_approximate_migration(v, root, runner):
         v.init('upgrade', names=names)
         v.init('check', names=names)
         after = versions()
-        v.require(state() == before and set(after) == {'1.1.0','1.2.0','1.3.0','1.4.0'} and after['1.1.0'] == receipt['1.1.0'], schema + ': direct upgrade preserves all 1.1.0 rows/OIDs and receipt')
+        v.require(state() == before and set(after) == {'1.1.0','1.2.0','1.3.0','1.4.0','1.5.0'} and after['1.1.0'] == receipt['1.1.0'], schema + ': direct upgrade preserves all 1.1.0 rows/OIDs and receipt')
         for mode in ('upgrade', 'schema', 'all'):
             v.init(mode, names=names)
         v.require(state() == before and versions() == after, schema + ': 1.4.0 reruns preserve all data and timestamps')

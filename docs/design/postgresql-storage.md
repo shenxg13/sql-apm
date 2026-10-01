@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.4.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.5.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.4.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.5.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -25,7 +25,7 @@
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  升级保留原始历史记录并登记经过的版本，新库只记录 1.4.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留原始历史记录并登记经过的版本，新库只记录 1.5.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -99,11 +99,11 @@ MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.proje
 
 [冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
 [冻结的 1.1.0 DDL](../../sql_apm/storage/versions/1.1.0.sql)同样保持已发布字节；
-[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0，也允许从任一已发布中间版本开始。
+[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0，也允许从任一已发布中间版本开始。
 入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
 验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
 约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
-每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.4.0 的库只核验，不重复登记。
+每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.5.0 的库只核验，不重复登记。
 
 这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
 DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据，1.2.0 新增
@@ -173,8 +173,7 @@ observation_only=true、completeness=unverified。rule_id/value 索引只供观�
 同一结果可供多个事件引用，实际事件计数和训练资格不受复用影响。
 
 导入时先在同一事务写入原字节、规则／结果及证据，再写已可靠识别的事件与引用；事件来源和
-证据支持关系由导入器验证，无法识别事件则只保存记录级事实。此流程由 #18 实施，观察统计
-另行处理；本次仅提供[临时实例验证](../runbooks/database-initialization.md#近似结果全量往返验证)。
+证据支持关系由导入器验证，无法识别事件则只保存记录级事实。此流程由 #18 实施，观察统计由 #27 在下述独立结构保存；本次仅提供[临时实例验证](../runbooks/database-initialization.md#近似结果全量往返验证)。
 
 ## 原文身份及证据
 
@@ -268,3 +267,21 @@ Decision 由②按需推导；③仅在计算期间 TEMP 物化，随事务结�
 
 初始化及恢复操作见[操作说明](../runbooks/database-initialization.md)，实测边界见
 [验证记录](../reports/postgresql-storage-2026-09-26.md)。
+
+## 观察统计结构 1.5.0
+
+[#27](https://github.com/shenxg13/sql-apm/issues/27) 新增三张表，共 56 张普通／父表，26 张 MPP 专属表。
+`mpp_observation_group` 保存五维及近似规则身份，代表 result_id 与 rule_id/value 的非空复合外键
+保证只能引用 available 近似结果；不同规则不会合并。未知计时使用 unknown，仅存排除。
+`mpp_build_observation_group` 关联 Build、分区和观察组，批量触发器拒绝跨集群／profile；
+被引用观察组不得修改身份，Build 也不能改变其集群／profile 上下文。
+
+`mpp_observation_statistic` 的自然键、17 numeric 指标、计数／覆盖数组与空值约束与正式统计一致，
+其外键只指向观察关系表。可靠指纹前缀检查及正式分组／结果外键保持不变。
+不保存 sufficiency 或观察覆盖表；正式门槛函数和批量 SQL 不读取观察表。
+所有统计仍由应用保证执行去重、真实维度和计时依据，数据库不重新运行资格判断。
+
+`mpp_ensure_result_partition` 同时维护三张父表的集群／构建月份叶分区。
+迁移先验证冻结 1.4.0 的完整 catalog（包括已登记动态分区），再增加近似结果复合唯一索引、
+观察表及已有月份的空观察叶分区。新增索引读取近似结果；已有正式分区和数据不重写。
+仍需维护窗口，失败全事务回滚；新库、升级和重跑共用完整结构检查。

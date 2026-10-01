@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -342,6 +344,16 @@ confidence: high
 本次已完整实现首期离线链路，full 将导入、快照、统计、六项检查和原子切换串联；
 rebuild 复用完整导入数据并创建新快照，status／history 查询各集群独立版本。
 真实数据、故障恢复、迁移和资源证据见[验证报告](../../docs/reports/build-publication-2026-10-01.md)。
+
+### 发布输入与补导确认（2026-10-02）
+
+来源：[R1 观察 O1、O2 的用户确认](https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169)，current；这是既有口径的确认，不新增发布门槛。
+失败或冲突未解决的批次只阻止该批次自身发布；后续日批 full 和 rebuild 只选择已完成批次，
+六项检查中的批次完整性只针对本次输入快照引用的批次。窗口内缺少未完成批次的日期不阻止发布，
+也不要求在当前版本上另加缺天提示；失败任务仍保留诊断。
+
+full 默认截止日仍取本批声明的最后日期。对较早批次执行 full，当前版本的窗口可以回到该日期；
+补导时由操作者显式指定 `--cutoff-date`，不增加窗口倒退拒绝或自动保护逻辑。
 
 ## Workflows
 

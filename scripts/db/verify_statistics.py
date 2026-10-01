@@ -43,6 +43,9 @@ def verify():
             snap=training.snapshot(config,['B1']);training.close()
             store=StatisticsStore(dsn)
             v.sql("INSERT INTO input_snapshot VALUES ('UNSEALED','C1','explicit',NULL,current_timestamp)")
+            # Cross-cluster snapshot rejection needs an already registered peer;
+            # unknown-cluster admission is covered separately by publication CLI tests.
+            v.sql("INSERT INTO scope VALUES ('C2','hashdata','hashdata-csv/1','1.0.0')")
             try:
                 for scope,inp,cfgid in [('C2',snap['input_id'],snap['config_id']),('C1','missing',snap['config_id']),('C1','UNSEALED',snap['config_id'])]:
                     try:store.calculate(scope,inp,cfgid)

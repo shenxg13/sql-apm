@@ -101,7 +101,7 @@ def verify():
             assert checks['values_consistent']['state']=='failed'
             v.sql("UPDATE mpp_statistic SET p95_ms=p90_ms WHERE build_id='"+bid+"' AND layer='overall'")
             v.sql('ALTER TABLE mpp_statistic VALIDATE CONSTRAINT '+constraint)
-            v.require(True,'saved invalid quantile order rejected independently of catalog enforcement')
+            v.require(True,'saved invalid quantile order rechecked using present NOT VALID constraint definitions')
             bid=fresh()
             checks,result=check_publish(bid,lambda:(_ for _ in ()).throw(RuntimeError('synthetic')))
             assert result['result']=='publish_failed'
@@ -166,6 +166,9 @@ def verify():
             v.require(True,'rebuild references failed and interrupted builds with fresh snapshots and no reimport')
             from database.publication_concurrency import verify_concurrency
             verify_concurrency(v,dsn,root,cfg,config,frozen)
+            from database.publication_repair import verify_admission,verify_month_preparation
+            verify_admission(v,dsn,root)
+            verify_month_preparation(v,dsn,root,calls['snapshot'])
         v.init('check');v.init('upgrade')
         print('PUBLICATION CHECKS:',v.completed)
 

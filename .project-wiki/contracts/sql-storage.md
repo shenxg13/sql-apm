@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
@@ -115,7 +115,7 @@ confidence: high
 
 2026-09-30 [后续范围确认](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5914482826)进一步移除
 逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
-见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，当前结构 1.5.0 另增独立观察结果，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
+见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，1.5.0 增加独立观察结果，当前 1.6.0 保留这些结果并将覆盖改为推导，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
 
 ### 统计存储量级接受（2026-10-01）
 

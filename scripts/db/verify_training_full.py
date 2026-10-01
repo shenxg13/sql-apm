@@ -38,7 +38,7 @@ def decision_digest(store, frozen):
 def validate(dsn, output, compare_aliases=False):
     store=TrainingStore(dsn)
     report=dict(clusters={}, method='private PostgreSQL 17; product importer; original cache and SQL derivation; measured',
-                normalization_context=store.context, decision_version=DECISION_VERSION, schema_version='1.5.0')
+                normalization_context=store.context, decision_version=DECISION_VERSION, schema_version='1.6.0')
     report['code_sha256']={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted((ROOT/'sql_apm/training').glob('*.py'))+sorted((ROOT/'sql_apm/storage').glob('*.py'))+[ROOT/'sql_apm/storage/schema.sql']}
     try:

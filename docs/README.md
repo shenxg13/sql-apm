@@ -81,6 +81,7 @@
 | [近似分组观察统计验证](reports/observation-statistics-2026-10-01.md) | 实施验证报告 | 55 文件重导、全部观察组复算、正式结果逐行对照、重复一致与资源实测。 |
 | [统计 R2 整改](reports/baseline-statistics-r2-remediation-2026-10-01.md) | 整改验证报告 | 批量门槛查询一致性、单组／聚合实测与统计容量接受同步。 |
 | [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
+| [构建编排 R1 整改](reports/build-publication-r1-remediation-2026-10-02.md) | 整改验证报告 | 次月预建并发、未登记集群拒绝、知识同步与 R1 退出条件。 |
 | [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
 | [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |
 | [类别别名验证](reports/training-category-aliases-2026-09-30.md) | 实施验证报告 | 三个别名、快照兼容及 55 文件执行级差分。 |

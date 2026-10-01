@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -119,6 +121,9 @@ confidence: high
 - 冲突未解决时，该集群本批次不发布新基线，保留原生效版本；受影响文件不能
   当作导入成功或有效重复跳过来满足批次完整性。其他集群仍按自身批次和检查
   结果独立处理。
+- 2026-10-02 用户确认失败／冲突只阻止当批：后续 full／rebuild 只选择已完成批次，
+  缺少未完成批次的日期不阻止发布，也不另加当前版本缺天提示；完整口径与来源见
+  [发布输入确认](baseline-versions.md#发布输入与补导确认2026-10-02)。
 - 同一来源下内容完全相同、且此前已经成功导入的文件仍按既定规则跳过；原文件
   内容未变化的失败或中断重试继续安全支持，不因重试本身视为变更或重叠冲突。
 - 文件名相同、日志时间范围相交或 SQL 文本相同，本身不足以判定文件变更或
@@ -134,7 +139,7 @@ confidence: high
 - 确认日期：2026-09-23。
 - 来源：用户对“人工确认文件齐全，程序核对处理完成”的首期批次完整性方案
   回复“确认”。
-- 来源状态：current；已确认判定原则；#18 已实现入口、冻结清单与批次完成核对，③已实现快照统计构建；发布仍由④交付。
+- 来源状态：current；已确认判定原则；#18 已实现入口、冻结清单与批次完成核对，③已实现快照统计构建；#29 已实现④发布检查与版本切换，见[构建与版本](baseline-versions.md)。
 - 每次手动导入时，由用户指定日志来源、覆盖日期及本批次文件，并确认所需
   文件已拷齐；文件仍须满足已结束写入且复制完成的既有要求。导入批次及相应
   构建、发布按计算集群独立管理，见下述已确认的版本范围。

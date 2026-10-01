@@ -12,6 +12,7 @@ import time
 import uuid
 
 from psycopg2.extras import Json
+from psycopg2.errors import LockNotAvailable
 
 from sql_apm.baseline.statistics import METRICS, LAYERS, calculate_group
 from sql_apm.storage.ingestion import connect
@@ -77,6 +78,23 @@ class StatisticsStore:
         if self.owns_db:
             self.db.close()
 
+    def _prebuild_next_month(self, cur, scope, month):
+        cur.execute('SELECT 1 FROM mpp_result_partition WHERE scope_id=%s AND build_month=%s', (scope,month))
+        if cur.fetchone():
+            return
+        # ATTACH creates foreign keys to shared group tables. Do not wait for
+        # another cluster's result transaction just to prepare an optional month.
+        cur.execute('SAVEPOINT next_month_partition')
+        try:
+            # Match ATTACH's parent-before-referenced-table ordering. ONLY avoids
+            # locking existing leaves; concurrent partition DDL also defers us.
+            cur.execute('LOCK TABLE ONLY mpp_statistic,ONLY mpp_observation_statistic IN SHARE UPDATE EXCLUSIVE MODE NOWAIT')
+            cur.execute('LOCK TABLE mpp_build_group,mpp_build_observation_group IN SHARE ROW EXCLUSIVE MODE NOWAIT')
+            cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope,month))
+        except LockNotAvailable:
+            cur.execute('ROLLBACK TO SAVEPOINT next_month_partition')
+        cur.execute('RELEASE SAVEPOINT next_month_partition')
+
     def _create(self, scope, input_id, config_id, retry_of):
         with self.db, self.db.cursor() as cur:
             cur.execute('''SELECT c.normalization_id,c.profile,c.window_start,c.window_end,
@@ -103,7 +121,7 @@ class StatisticsStore:
             cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope, now.date().replace(day=1)))
             partition = cur.fetchone()[0]
             next_month = (now.date().replace(day=28) + timedelta(days=4)).replace(day=1)
-            cur.execute('SELECT mpp_ensure_result_partition(%s,%s)', (scope,next_month))
+            self._prebuild_next_month(cur,scope,next_month)
             cur.execute('''INSERT INTO build (build_id,scope_id,input_id,config_id,normalization_id,profile,
                 retry_of,state,started_at,results_saved,partition_id)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,'running',%s,false,%s)''',

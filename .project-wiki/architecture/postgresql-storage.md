@@ -7,7 +7,7 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
@@ -115,7 +115,9 @@ Task 增加时间、阶段耗时、snapshot／statistics 模式及 snapshot／ch
 共用会话锁及原子发布由[编排设计](../../docs/design/build-publication.md)负责。
 
 新月份以独立空表加 ATTACH 创建叶分区，普通读取无需等待父表 ACCESS EXCLUSIVE 锁；
-构建前准备当月和次月，分区 DDL 单独提交。正式／观察两个分区父表继续按集群及构建月份分区。
+构建前确保当月，次月预建遇共享分组表锁忙时跳过，后续构建再试；分区 DDL 单独提交。
+当月首次创建仍可能等待另一集群构建事务结束，锁及发生时机见[编排设计](../../docs/design/build-publication.md#覆盖分区与成本)。
+正式／观察两个分区父表继续按集群及构建月份分区。
 迁移保留统计行，按旧结果回填构建层计数；在当前无生产部署的边界内删除覆盖表。
 历史任务的新增开始时间只能表示迁移时间，结束时间保持未知，不伪造旧任务阶段耗时。
 

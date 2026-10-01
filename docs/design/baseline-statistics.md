@@ -69,9 +69,10 @@ included_count bigint, active_dates date[], active_week_starts date[])` 返回 b
 
 每个集群和北京时间构建开始月份在 `mpp_result_partition` 登记一个 bigint 分区编号，
 由组合内容 SHA-256 的前 60 位导出；检测到身份冲突时报错。1.6.0 的
-`mpp_ensure_result_partition` 独立建空表后 ATTACH，构建前准备正式／观察统计当月及次月分区。
+`mpp_ensure_result_partition` 独立建空表后 ATTACH，构建前确保正式／观察统计当月分区，次月按需尝试预建。
 DDL 单独提交，不把分区锁持有到结果保存完成。普通读取与 ATTACH 的父表锁相容，
-其他 DDL 仍可能等待；同集群任务互斥由[④任务上下文](build-publication.md)负责。
+次月预建遇共享分组表的外键锁忙时跳过，后续构建再试；当月首次创建仍可能等另一集群构建事务结束。
+其他 DDL 也可能等待；具体锁、发生时机和恢复见[④编排设计](build-publication.md#覆盖分区与成本)，同集群任务由④互斥。
 1.4.0／1.5.0 的 CREATE TABLE PARTITION OF 历史实现保留在冻结 DDL 中。
 
 `mpp_build_group` 每构建每组一行，集中检查 Build／Group 集群、规则和 profile 相符；

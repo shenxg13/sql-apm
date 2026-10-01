@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -122,10 +124,13 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 来源：[Issue #29](https://github.com/shenxg13/sql-apm/issues/29) 的已确认操作边界。
 `full` 依次导入、封存快照、计算、检查和有条件发布；默认截止日取本批声明覆盖日期的最后一天，
 `--cutoff-date` 可覆盖。`rebuild` 复用成功导入的数据并重新封存，必须显式给出 `--cutoff-date`。
+对较早批次执行 full 会使窗口回到该批日期；补导时由操作者显式指定截止日，用户已于 2026-10-02 确认，
+详见[发布输入与补导规则](baseline-versions.md#发布输入与补导确认2026-10-02)。
 `status` 显示当前版本、最近任务及最近未发布原因，`history` 显示历史成功版本。
 
 五种写入入口共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
 忙时返回 `cluster_busy` 并保存 busy_rejected 任务；不会排队或中断持有者。
+只有 import／full 首次登记集群；另外三个写入入口对未登记集群返回 unknown_cluster，不新增集群或任务。
 任务保留模式、阶段、产物、时间和原因，查询仅输出标识、时间、计数及原因码。
 参数及 JSON 示例由[操作说明](../../docs/runbooks/build-publication.md)维护；
 失败／零样本发布行为继续由[版本要求](baseline-versions.md)维护。

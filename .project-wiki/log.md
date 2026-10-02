@@ -152,6 +152,8 @@
 Issue #31 补充确认 `v0.1.0` 预发布、GitHub／内网制品边界、离线 HTML、独立验收目录及
 SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-components.md)，
 实现布局见[源码职责](architecture/source-layout.md)；目标机新试跑及人工确认仍待执行。
+[开发机准备验证](../docs/reports/slim-release-preparation-2026-10-03.md)记录精简制品、
+逐文件继承、隔离自检和自动 HTML 检查；未执行目标机操作或发布。
 
 ## 2026-09-30：统计完整保存、分区与③④边界
 

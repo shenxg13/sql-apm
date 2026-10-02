@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-03
 sources:
+  - path: docs/reports/slim-release-preparation-2026-10-03.md
+    status: current
   - path: docs/reports/kylin-offline-deployment-2026-10-02.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/31
@@ -97,6 +99,8 @@ SSD 上四进程首批专门记录超时、分组、基准和资源；零超时�
 实现入口见[程序发布操作说明](../../docs/runbooks/program-release.md)。
 目标机候选包试跑前须先获用户明确确认；打标签和发布在评审合并后另获用户确认。
 上述是已确认交付与验证边界；本轮开发机检查不能代替新的 Kylin 试跑和人工验收。
+[开发机准备记录](../../docs/reports/slim-release-preparation-2026-10-03.md)保存候选包、
+66 个产品文件等值、独立验收与 HTML 自动检查证据，以及试跑前暂停点。
 
 ### 已确认的当前开发环境与生产部署安排
 

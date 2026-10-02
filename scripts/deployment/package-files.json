@@ -1,0 +1,23 @@
+{
+  "program": [
+    "sql_apm/__init__.py", "sql_apm/__main__.py",
+    "sql_apm/baseline/*.py", "sql_apm/cli/*.py", "sql_apm/ingestion/*.py",
+    "sql_apm/sql/*.py", "sql_apm/storage/*.py", "sql_apm/storage/*.sql",
+    "sql_apm/training/*.py", "sql_apm/diagnostics/__init__.py",
+    "sql_apm/diagnostics/normalize_sql.py", "sql_apm/diagnostics/approximate_sql.py",
+    "rules/functions/v1.0.1.json", "rules/functions/POSTGRESQL-LICENSE.txt",
+    "requirements.txt", "scripts/db/initialize.sh",
+    "scripts/deployment/check_environment.py", "scripts/deployment/create_password.py",
+    "scripts/deployment/verify_package.py"
+  ],
+  "verification": [
+    "tests/test_*.py", "tests/database/*.py", "tests/ingestion/*.py",
+    "scripts/db/verify.py", "scripts/db/verify_publication.py",
+    "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
+    "scripts/functions/*.py", "rules/functions/*.json", "rules/functions/POSTGRESQL-LICENSE.txt",
+    "docs/design/offline-data-contract/examples.json",
+    "docs/reports/data/kylin-alma-baseline-2026-10-02.json",
+    "docs/reports/data/log-supplement-manifest-2026-09-28.json"
+  ],
+  "verification_probes": ["function_probe", "statement_census", "log_supplement"]
+}

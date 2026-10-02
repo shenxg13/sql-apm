@@ -2,12 +2,21 @@
 
 [Issue #31](https://github.com/shenxg13/sql-apm/issues/31) 的演练手册，目标是 Kylin V10 SP2
 x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、PostgreSQL 17.10，
-程序基准为包含 #29 的 main 提交 `6451d140d44f4e06cc34862c3e5aff7593d7afeb`。
-程序归档之外的辅助文件有独立摘要；覆盖已有文件仅限获准增加 `--pg-bin` 的
-`scripts/db/verify_publication.py`。产品代码和规则保持基准提交内容。
+应用版本为 `v0.1.0`，以预发布形式交付，不用于生产。#33 将修改落库标识，下一版需要
+全新数据库；0.x 预发布版本之间不保证数据库兼容。产品基准为包含 #29 的 main
+`6451d140d44f4e06cc34862c3e5aff7593d7afeb`；候选包的实施提交见 `PROGRAM_COMMIT`，
+文件摘要、产品基准和候选／发布类型见 `RELEASE.json`。应用版本不等于数据库结构版本。
+
+精简程序包只包含运行所需代码、规则与 PostgreSQL 许可证、SQL／迁移资源、必要工具和
+本 HTML 手册；测试和历史探针在独立验收目录。GitHub Releases 仅提供程序包及其校验文件，
+完整离线包（Python、PG、wheel、RPM、程序和验收资源）继续内网交付。
+只下载程序包不能完成裸机离线安装，须另备内网依赖包。正式发布在评审合并后，
+经用户明确确认才打标签并发布；本手册不执行发布动作。
 
 实施试跑与用户独立执行分别保存[记录模板](kylin-validation-record.md)。
-试跑前创建虚拟机快照；试跑完成后用户恢复该快照，独立从头执行本手册。
+候选包由实施方重走前，用户先恢复初始快照，并明确确认可以开始目标机试跑。
+实施方完成第 1–9 节及第 10.1 节的 119 首批后，用户再次恢复快照，独立从头执行本手册的九任务。
+此前原包九任务证据只有在候选产品文件逐项摘要相同时才能继承，不能替代新包部署验证。
 两次合计须验证 yum 源与离线 RPM 两种系统包安装路径，并在随后完成两项源码编译。
 试跑选择离线 RPM，用户重跑选择 yum 源。其余项目制品两次都离线安装。
 
@@ -28,6 +37,8 @@ export APM_ROOT=/data/sql-apm
 export APM_PYTHON="$APM_ROOT/python-3.9.5/bin/python3.9"
 export APM_PG_BIN="$APM_ROOT/postgresql-17.10/bin"
 export APM_APP="$APM_ROOT/app"
+export APM_VERIFY="$APM_ROOT/verification"
+export SQL_APM_APP_ROOT="$APM_APP"
 export APM_SOCKET="$APM_ROOT/socket"
 export APM_PORT=5432
 export APM_SERVER='填写目标机的LAN地址'
@@ -122,26 +133,57 @@ tar --version
 ## 3. 在开发机生成并传输离线包
 
 将收集目录用 scp 取回开发机被忽略的 `var/issue31/rpm-collection`。
-开发机可联网；脚本下载 PG 官方源码和校验文件，核对两个 wheel 的 PyPI 来源与锁定摘要。
+开发机可联网；首次准备时脚本下载 PG 官方源码和校验文件，核对两个 wheel 的 PyPI 来源与锁定摘要。
 Python 官方源码沿用已保存的固定摘要；所有二进制和来源证据留在忽略目录。
 
+开发机先用独立构建环境安装锁定的 Markdown 工具及 Python 3.9 所需的传递依赖；
+该环境仅生成 HTML，不进入应用 `.venv` 或运行依赖。工具来源和摘要见
+`scripts/deployment/build-requirements.txt`，版本为 Python-Markdown 3.8.2。
+
 ```bash
-mkdir -p var/issue31
-scp -r -P "$APM_SSH_PORT" "$APM_SSH_TARGET:/data/sql-apm/rpm-collection" var/issue31/
-.venv/bin/python scripts/deployment/build_bundle.py \
-  --output var/issue31/offline-bundle \
-  --rpm-collection var/issue31/rpm-collection \
-  --python-source var/python-build/Python-3.9.5.tgz \
-  --wheel-dir var/parser-probe/wheels --wheel-dir var/ingestion/wheels
-scp -P "$APM_SSH_PORT" var/issue31/offline-bundle.tar.gz var/issue31/offline-bundle.tar.gz.sha256 \
-  "$APM_SSH_TARGET:/data/sql-apm/"
+.venv/bin/python -m venv var/issue31/build-venv
+var/issue31/build-venv/bin/python -m pip --isolated --disable-pip-version-check \
+  download --require-hashes --only-binary=:all: \
+  -r scripts/deployment/build-requirements.txt -d var/issue31/build-wheels
+var/issue31/build-venv/bin/python -m pip --isolated --disable-pip-version-check \
+  install --no-index --find-links var/issue31/build-wheels --require-hashes \
+  -r scripts/deployment/build-requirements.txt
+var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
+  --commit HEAD --version v0.1.0 --kind candidate \
+  --output var/issue31/release-candidate \
+  --previous-program var/issue31/offline-bundle/program.tar.gz
 ```
 
-用户独立部署已有交付包时，只执行上述最后一条 scp；不重新收集或生成制品。
+预期：代码和制包工具已提交，输出目录原先不存在；产生精简 `app/`、独立 `verification/`、
+两个压缩包及摘要、`build-result.json` 和 `product-files-comparison.json`。
+逐文件产品比较 `all_equal=true` 才能继承原九任务证据。任何不同都需说明和补验，
+不能修改原基准来通过。`app/INSTALL.html` 是单文件手册；浏览器人工体验仍需记录。
 
-预期：生成目录、`.tar.gz` 和同名 `.sha256`；`manifest.json` 逐项记录来源、版本和摘要。
-输出目录必须不存在；失败目录不能当作成功离线包。修正来源后用新目录重建，
-交付时同步手册中的包名。将压缩包及外部摘要传到目标机 `$APM_ROOT`。
+组装完整离线包时复用已校验且保存在开发机的源码、wheel、RPM 和来源清单：
+
+```bash
+.venv/bin/python scripts/deployment/build_bundle.py \
+  --output var/issue31/slim-candidate/offline-bundle \
+  --release-dir var/issue31/release-candidate \
+  --rpm-collection var/issue31/rpm-collection \
+  --python-source var/issue31/offline-bundle/sources/Python-3.9.5.tgz \
+  --postgres-source var/issue31/offline-bundle/sources/postgresql-17.10.tar.gz \
+  --wheel-dir var/issue31/offline-bundle/wheels \
+  --source-manifest var/issue31/offline-bundle/manifest.json
+```
+
+`--source-manifest` 复用原包记录的官方来源，输入仍逐个检查固定源码／wheel 摘要和 RPM
+原签名记录与摘要；不访问网络。首次收集新材料时省略此参数，并按实际输入填写路径。
+失败目录不能当作成功离线包，修正后使用新目录。旧包和已有试跑证据保留，不覆盖。
+
+**以下从开发机传输开始属于目标机试跑；实施方必须先取得用户明确确认。**
+用户独立部署复用交付包时，从传输开始，不重复收集、生成或发布制品：
+
+```bash
+scp -P "$APM_SSH_PORT" var/issue31/slim-candidate/offline-bundle.tar.gz \
+  var/issue31/slim-candidate/offline-bundle.tar.gz.sha256 "$APM_SSH_TARGET:/data/sql-apm/"
+```
+
 目标机先验证压缩包，再解包并核对每个文件：
 
 ```bash
@@ -154,8 +196,8 @@ sha256sum -c SHA256SUMS
 cat PROGRAM_COMMIT
 ```
 
-预期：全部 OK，提交标识与本手册一致。失败：停止安装，重新传输或核对来源；
-不能修改校验清单使损坏输入通过。程序、日志及凭据均不从公网获取。
+预期全部 OK，`PROGRAM_COMMIT` 与交付记录一致；根目录 `INSTALL.html` 与程序包内手册相同。
+失败停止安装，核对来源或重传，不修改摘要绕过。程序、业务日志及凭据不在目标机上联网获取。
 
 ## 4. 安装系统编译依赖
 
@@ -163,7 +205,7 @@ cat PROGRAM_COMMIT
 两条路径只执行其中一条；命令与完整输出保存到本次记录。
 
 ```bash
-mapfile -t APM_COMPILE_PACKAGES < "$APM_BUNDLE/support/scripts/deployment/compile-packages.txt"
+mapfile -t APM_COMPILE_PACKAGES < "$APM_BUNDLE/support/compile-packages.txt"
 # 正常路径：用户恢复快照后的独立执行使用。
 sudo yum install -y "${APM_COMPILE_PACKAGES[@]}"
 ```
@@ -191,8 +233,10 @@ sudo yum --disablerepo='*' \
 cd "$APM_ROOT"
 test ! -e "$APM_APP"
 tar -xzf "$APM_BUNDLE/program.tar.gz"
-cp -a "$APM_BUNDLE/support/." "$APM_APP/"
-cp "$APM_BUNDLE/PROGRAM_COMMIT" "$APM_APP/PROGRAM_COMMIT"
+test ! -e "$APM_VERIFY"
+tar -xzf "$APM_BUNDLE/verification.tar.gz"
+(cd "$APM_APP" && sha256sum -c SHA256SUMS)
+(cd "$APM_VERIFY" && sha256sum -c SHA256SUMS)
 mkdir -p "$APM_ROOT/build" "$APM_ROOT/records"
 cd "$APM_ROOT/build"
 tar -xzf "$APM_BUNDLE/sources/Python-3.9.5.tgz"
@@ -208,6 +252,7 @@ PIP_CONFIG_FILE=/dev/null .venv/bin/python -m pip --isolated --disable-pip-versi
   install --no-index --find-links "$APM_BUNDLE/wheels" --require-hashes -r requirements.txt
 .venv/bin/python -m pip check
 .venv/bin/python scripts/deployment/check_environment.py
+.venv/bin/python scripts/deployment/verify_package.py --installed
 ```
 
 预期：精确 Python 3.9.5，pip 由源码内 ensurepip 提供，两个锁定 wheel 安装成功，
@@ -227,14 +272,17 @@ make -j4 > "$APM_ROOT/records/pg-make.log" 2>&1
 make install > "$APM_ROOT/records/pg-install.log" 2>&1
 "$APM_PG_BIN/psql" --version
 cd "$APM_APP"
-.venv/bin/python -m unittest discover -s tests -v > "$APM_ROOT/records/unittest.log" 2>&1
-.venv/bin/python scripts/db/verify.py --pg-bin "$APM_PG_BIN" > "$APM_ROOT/records/verify.log" 2>&1
-.venv/bin/python scripts/db/verify_publication.py --pg-bin "$APM_PG_BIN" \
-  > "$APM_ROOT/records/verify-publication.log" 2>&1
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  unit > "$APM_ROOT/records/unittest.log" 2>&1
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  --pg-bin "$APM_PG_BIN" database > "$APM_ROOT/records/verify.log" 2>&1
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
 ```
 
 预期：PG17.10；普通测试 66 项、verify.py 共 266 个 PASS、发布检查 31 项。
-三个命令均退出 0；记录实际项数，不以文件存在代替通过。后两项自己创建私有临时实例，
+三个命令均退出 0，开头 `APPLICATION` 指向 `$APM_APP`；记录实际项数，不以文件存在代替通过。
+验收目录保存原合成测试及其探针，核心模块从精简 `app` 加载；不把测试或探针复制回 `app`。后两项自己创建私有临时实例，
 禁用 TCP 并最终停止清理，不连接下面的演练实例。其合成测试中的 trust 仅限私有临时实例，
 不复制到演练实例的认证规则。不运行 `*_full`、`tests/parser_probe` 或 Kylin 上的 Harness。
 失败：保留原输出，核对二进制路径和链接库；不能因测试失败修改产品行为绕过。
@@ -357,7 +405,7 @@ scp -r -P "$APM_SSH_PORT" raw/inbox/hashdata/119 raw/inbox/hashdata/120 \
 
 ```bash
 cd "$APM_APP"
-.venv/bin/python scripts/deployment/rehearsal.py prepare \
+.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
   --logs "$APM_ROOT/logs" --output "$APM_ROOT/config"
 cd "$APM_ROOT/logs"
 sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
@@ -370,11 +418,18 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 
 ## 10. 串行完整流程、版本查询与 Alma 比对
 
+本节九任务用于用户独立执行，默认保持单解析进程。实施方候选包重走时使用第 10.1 节，
+只运行 119 首批四进程验证，不执行下面两个九任务循环。
+
 下面的辅助工具逐次调用真实 `python -m sql_apm full/rebuild`，每次再调用 status 和 history，
 保存日志、查询 JSON、阶段耗时、数据库大小和 /data 磁盘占用。它不会调用任何 `*_full`。
+每次导入后读取结果中的 `normalization_timeouts`，须为 0；非零会使辅助工具拒绝通过。
 每条任务结束后立即与[Alma 基准](../reports/data/kylin-alma-baseline-2026-10-02.json)比对，
 不匹配退出非零。基准源于 #29 R2 最终 head 实测，与程序包产品代码摘要逐文件一致。
 基准与已合并报告的九版计数一致；不能用含合成排除时段的旧统计报告替代。
+归一化超时意味着部分执行缺少可靠指纹，六项发布检查通过也不能说明数据齐全。
+已成功导入的文件不会自动重新解析；修改并发后直接重跑或 rebuild 不能修复这些记录，
+须保留证据并在确认重置后从干净数据库重新导入。不要将出现超时的版本当作有效基线。
 
 部署辅助工具默认使用一个解析进程（`--workers 1`）。本机四进程首批曾出现归一化超时，
 八条样本单进程均通过、四进程均超时，见[试跑报告](../reports/kylin-offline-deployment-2026-10-02.md)。
@@ -393,11 +448,11 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 ```bash
 cd "$APM_APP"
 for step in 0 1 2 3 4; do
-  .venv/bin/python scripts/deployment/rehearsal.py run --cluster 119 --step "$step" \
+  .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 119 --step "$step" \
     --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT"
 done
 for step in 0 1 2 3; do
-  .venv/bin/python scripts/deployment/rehearsal.py run --cluster 120 --step "$step" \
+  .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 120 --step "$step" \
     --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT"
 done
 ```
@@ -438,6 +493,27 @@ done
 未知 ID 或新增中断都拒绝通过。成功导入次数仍与原基准比较，总尝试次数和历史中断
 单独保留在 `import_attempt_audit` 中；正式／观察统计、文件计数和版本链的比对不变。
 恢复日志使用新文件，旧 `.log` 先保留到单独的中断证据目录，不覆盖或删除数据库审计记录。
+
+### 10.1 实施方 SSD 四进程首批验证
+
+此步骤只在用户恢复初始快照、明确确认开始目标机试跑，且第 1–9 节通过之后执行。
+首次部署使用独立记录目录；不要先执行单进程九任务，否则不再是四进程首批验证。
+
+```bash
+cd "$APM_APP"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run \
+  --cluster 119 --step 0 --workers 4 --config "$APM_ROOT/config" \
+  --records "$APM_ROOT/records/ssd-workers4" --data-root "$APM_ROOT"
+```
+
+工具记录四进程、超时计数、正式分组、全部 Alma 比较、耗时和版本链。
+预期零超时且与基准一致；该结果用于实测判断，不预先认定磁盘是原因。
+若一致，记录结论，存储较慢主机仍建议单进程；九任务手册参数不改。
+若退出非零，先判断 CLI／环境失败还是业务计数差异，保留全部日志和 JSON，
+不得为了继续而修改基准。对超时或计数差异，先保存失败数据库和记录，
+再按第 11 节重置项目并从第 7–9 节恢复，使用新的记录目录、`--workers 1`
+重跑 119 首批。单进程必须通过，产品问题经用户确认后另建 Issue；本 Issue 不修复。
+完成后先汇报结果，再由用户恢复快照并独立执行单进程九任务。
 
 ## 11. 可选并行与重置
 

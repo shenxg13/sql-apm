@@ -11,9 +11,10 @@ import sys
 import time
 from datetime import datetime
 
-ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / 'docs/reports/data/log-supplement-manifest-2026-09-28.json'
-BASELINE = ROOT / 'docs/reports/data/kylin-alma-baseline-2026-10-02.json'
+RESOURCE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(RESOURCE_ROOT))).resolve()
+MANIFEST = RESOURCE_ROOT / 'docs/reports/data/log-supplement-manifest-2026-09-28.json'
+BASELINE = RESOURCE_ROOT / 'docs/reports/data/kylin-alma-baseline-2026-10-02.json'
 CUTOFFS = {'119': ['2026-07-28', '2026-07-29', '2026-07-30', '2026-07-31'],
            '120': ['2026-09-16', '2026-09-17', '2026-09-18', '2026-09-19']}
 
@@ -92,7 +93,12 @@ def run_task(args):
     import psycopg2
     baseline = json.loads(BASELINE.read_text())
     # Reject code drift before an expensive replay.
+    release_path = ROOT / 'RELEASE.json'
+    release_files = json.loads(release_path.read_text())['files'] if release_path.exists() else None
     for path, expected in baseline['provenance']['product_code_sha256'].items():
+        # Non-runtime probes are deliberately omitted from the slim program.
+        if release_files is not None and path.startswith('sql_apm/diagnostics/') and path not in release_files:
+            continue
         if sha256(ROOT / path) != expected:
             raise ValueError('product_code_changed: ' + path)
     cluster, step = args.cluster, args.step
@@ -164,7 +170,10 @@ def run_task(args):
                     and len(queries['history']['versions']) == step + 1)
         comparable = dict(observed, import_attempts=after_attempts['succeeded'])
         baseline_equal = comparable == expected
-        passed = baseline_equal and chain_ok and (step < 4 or before_attempts == after_attempts)
+        normalization_timeouts = sum(file.get('counts', {}).get('problem:fingerprint_normalization_timeout', 0)
+                                     for file in payload.get('import', {}).get('files', []))
+        passed = (baseline_equal and chain_ok and normalization_timeouts == 0
+                  and (step < 4 or before_attempts == after_attempts))
         record = dict(cluster=cluster, step=step, parser_workers=args.workers if step < 4 else None,
                       cutoff_date=payload['cutoff_date'], build_id=bid,
                       publication=payload['publication'], stages=stages,
@@ -174,9 +183,11 @@ def run_task(args):
                       import_attempt_audit=dict(before=before_attempts, after=after_attempts,
                                                 allowed_interrupted=args.interrupted_attempt,
                                                 baseline_successful=expected['import_attempts']),
+                      normalization_timeouts=normalization_timeouts,
                       passed=passed, baseline_sha256=sha256(BASELINE))
         save(args.records / (stem + '.json'), record)
-        print(json.dumps(dict(cluster=cluster, step=step, passed=passed, seconds=record['seconds'])))
+        print(json.dumps(dict(cluster=cluster, step=step, passed=passed, seconds=record['seconds'],
+                              normalization_timeouts=normalization_timeouts)))
         if not passed:
             raise ValueError('baseline_or_version_check_failed; compare record with baseline')
     finally:

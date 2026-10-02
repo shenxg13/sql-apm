@@ -147,6 +147,12 @@
 | 2026-09-29 | 按 [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 及方案 A 确认修订 [SQL 指纹契约](contracts/sql-fingerprints.md)：v5 纳入 SELECT 列表／JOIN ON 常量，并恢复集合分支独立查询上下文；同步冻结版本审计及[耗时诊断说明](../docs/runbooks/duration-dispersion.md)，实测见[v5 验证报告](../docs/reports/sql-normalization-v5-2026-09-29.md)。验收与合并状态由在线 Issue 记录。 |
 | 2026-09-29 | 按 #17 已确认范围交付[近似观察字段](../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)和[结构 1.2.0](architecture/postgresql-storage.md)，冻结旧 DDL 并验证连续升级、复用与可靠路径隔离；[全量往返](../docs/reports/approximate-storage-2026-09-29.md)覆盖10,902条 v5 拒绝原文。实际写入由 #18 同次导入，观察统计另行处理；未改变算法及训练资格。 |
 
+## 2026-10-03 精简预发布与离线 HTML 手册
+
+Issue #31 补充确认 `v0.1.0` 预发布、GitHub／内网制品边界、离线 HTML、独立验收目录及
+SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-components.md)，
+实现布局见[源码职责](architecture/source-layout.md)；目标机新试跑及人工确认仍待执行。
+
 ## 2026-09-30：统计完整保存、分区与③④边界
 
 [Issue #25](https://github.com/shenxg13/sql-apm/issues/25)落实五层统计和构建结果保存。

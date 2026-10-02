@@ -12,8 +12,9 @@ import threading
 import time
 from unittest.mock import patch
 
-ROOT=Path(__file__).resolve().parents[2]
-sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
+RESOURCE_ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(os.environ.get('SQL_APM_APP_ROOT',str(RESOURCE_ROOT))).resolve()
+sys.path[:0]=[str(ROOT),str(RESOURCE_ROOT/'tests')]
 from verify import instance,Verification
 from ingestion.test_reader import row,write_csv,configuration
 from sql_apm.ingestion.config import load_config

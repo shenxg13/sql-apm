@@ -13,9 +13,10 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = Path(__file__).resolve().parents[2]
+RESOURCE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(RESOURCE_ROOT))).resolve()
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "tests"))
+sys.path.insert(0, str(RESOURCE_ROOT / "tests"))
 from database.fixture import statements  # noqa: E402
 from database.approximate import verify_approximate  # noqa: E402
 from database.approximate_migration import verify_approximate_migration  # noqa: E402
@@ -151,7 +152,7 @@ class Verification:
         self.rejects("UPDATE mpp_decision SET rule_evaluations=jsonb_set(rule_evaluations,'{window}','null')", "unknown rule evaluation rejected")
         self.rejects("UPDATE mpp_sql_text SET content_sha256=decode(repeat('00',32),'hex')", "SQL content checksum mismatch rejected")
         stat = json.loads(self.sql("SELECT row_to_json(s) FROM mpp_statistic s WHERE layer='day'"))
-        metric_names = list(json.loads((ROOT / "docs/design/offline-data-contract/examples.json").read_text())["metric_names"])
+        metric_names = list(json.loads((RESOURCE_ROOT / "docs/design/offline-data-contract/examples.json").read_text())["metric_names"])
         for metric in metric_names:
             stat[metric] = None
         stat.update(bucket_date="2026-09-22", range_start="2026-09-22T00:00:00+08:00",

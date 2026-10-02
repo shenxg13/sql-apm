@@ -64,6 +64,7 @@
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [Kylin 离线部署与九任务验证](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线包、项目自带解释器、PG17.10、SCRAM、日志传输及 Alma 比对。 |
+| [精简程序包与预发布交付](runbooks/program-release.md) | 操作说明 | 必要文件打包、离线 HTML、独立验收及用户确认后发布。 |
 | [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 快照恢复后的独立执行、DBA 查询、每步实际输出与结论。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |

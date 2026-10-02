@@ -105,3 +105,9 @@ GitHub 目标为公开仓库 shenxg13/sql-apm。
 首次发布及其验证按[本地初始化流程](../../.harness/workflows/local-bootstrap.md)完成交接；
 接入后的新需求按 [GitHub 工作流](../../.harness/workflows/github-planning.md)推进。
 后续确认的需求与决策另行记录，保留原文供追溯；许可证选择仍待讨论。
+
+## 精简交付的本地验证
+
+[程序发布说明](program-release.md)定义独立构建环境、精简包与独立验收目录的检查方式。
+构建期 Markdown 工具不进入应用依赖。新包在开发机隔离目录验证通过后，仍须在用户
+明确确认并恢复快照后开展 Kylin 重走；开发机通过不等同于目标机验证完成。

@@ -11,7 +11,7 @@
     "scripts/deployment/verify_package.py"
   ],
   "verification": [
-    "tests/test_*.py", "tests/database/*.py", "tests/ingestion/*.py",
+    "tests/test_*.py", "tests/baseline/*.py", "tests/database/*.py", "tests/ingestion/*.py",
     "scripts/db/verify.py", "scripts/db/verify_publication.py",
     "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
     "scripts/functions/*.py", "rules/functions/*.json", "rules/functions/POSTGRESQL-LICENSE.txt",

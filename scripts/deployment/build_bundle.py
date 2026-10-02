@@ -43,6 +43,8 @@ def main():
     parser.add_argument('--source-manifest', type=Path,
                         help='Reuse verified source URLs from a prior bundle without network access')
     args = parser.parse_args()
+    if args.source_manifest and args.postgres_source is None:
+        parser.error('--source-manifest requires --postgres-source for offline input reuse')
     out = args.output.resolve()
     if out.exists():
         parser.error('fresh output required')

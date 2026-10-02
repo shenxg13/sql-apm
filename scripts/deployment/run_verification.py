@@ -47,6 +47,8 @@ def unit():
             sys.modules[qualified] = module
             spec.loader.exec_module(module)
     suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'))
+    if suite.countTestCases() != 66:
+        raise ValueError('v0.1.0 verification kit must retain all 66 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     return 0 if result.wasSuccessful() else 1
 
@@ -67,7 +69,7 @@ def smoke(app, pg_bin):
         calls = [
             ['full', '--config', str(config), '--source', 'S1', '--batch', 'B1',
              '--training-config', str(training), '--workers', '1'],
-            ['rebuild', '--cluster', 'C1', '--training-config', str(training)],
+            ['rebuild', '--cluster', 'C1', '--training-config', str(training), '--cutoff-date', '2026-07-31'],
             ['status', '--cluster', 'C1'], ['history', '--cluster', 'C1'],
         ]
         results = []

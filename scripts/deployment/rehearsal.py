@@ -153,7 +153,8 @@ def run_task(args):
                     and version_matches(queries['history']['versions'][0])
                     and len(queries['history']['versions']) == step + 1)
         passed = observed == expected and chain_ok and (step < 4 or before_attempts == observed['import_attempts'])
-        record = dict(cluster=cluster, step=step, cutoff_date=payload['cutoff_date'], build_id=bid,
+        record = dict(cluster=cluster, step=step, parser_workers=args.workers if step < 4 else None,
+                      cutoff_date=payload['cutoff_date'], build_id=bid,
                       publication=payload['publication'], stages=stages,
                       seconds=round(time.monotonic() - started, 3), before=before,
                       after=footprint(db, args.data_root), observed=observed,
@@ -179,7 +180,7 @@ def main():
     task.add_argument('--config', type=Path, required=True)
     task.add_argument('--records', type=Path, required=True)
     task.add_argument('--data-root', type=Path, required=True)
-    task.add_argument('--workers', type=int, choices=range(1, 9), default=4)
+    task.add_argument('--workers', type=int, choices=range(1, 9), default=1)
     args = parser.parse_args()
     if args.command == 'prepare':
         prepare(args)

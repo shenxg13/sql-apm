@@ -9,8 +9,11 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-10-01
+  - scripts/deployment/
+updated: 2026-10-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/31
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -270,6 +273,15 @@ Issue #29 新增 `baseline/workflow.py` 连接导入、快照、统计及发布�
 原有三个写入模块接受同一任务连接，单独调用时也创建任务；不反向依赖诊断或测试。
 覆盖函数和构建层计数由存储层维护，命令、原子性及恢复边界见
 [编排设计](../../docs/design/build-publication.md)。
+
+## 已实现的部署与演练辅助工具
+
+Issue #31 的 `scripts/deployment/` 保存离线制品收集／打包、解释器自检、凭据初始化、
+固定演练配置和结果核对。程序包是 main 提交的 Git 归档，部署辅助文件有独立摘要；
+这不引入 Python 安装包、src 布局或新的产品入口。
+演练通过已有 CLI 执行 full/rebuild/status/history，仅用计数查询核对结果，
+不复制产品导入、资格或统计实现；产品模块不反向依赖这些脚本。
+目录内脚本的操作契约由[部署手册](../../docs/runbooks/kylin-offline-deployment.md)维护。
 
 ## Workflows
 

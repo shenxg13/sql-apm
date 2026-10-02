@@ -76,7 +76,7 @@
     "upgraded_count": 28
   },
   "bundle": {
-    "sha256": "1b052837dd38d838ebc62b9cab1efc6c8805d60ffae9270ebd30d33520155379",
+    "sha256": "cbfe7bee2b47075268b4c56994e57495cd497ffb802de561acf5bfd57f4145c7",
     "files": 422
   },
   "log_input": {
@@ -91,14 +91,14 @@
     "local_project_scram_passed": true,
     "hba_has_trust": false,
     "tcp_wrong_password_rejected": true,
-    "tcp_correct_password_verified": false,
-    "user_dba_tool_verified": false
+    "tcp_correct_password_verified": true,
+    "user_dba_tool_verified": false,
+    "temporary_credential_export_explicitly_authorized": true,
+    "temporary_credential_copy_removed": true
   },
   "local_default_publication_checks": 31,
-  "tasks": [],
   "pending": [
-    "nine-task replay currently running",
-    "cross-host correct-password authentication",
+    "single-worker nine-task replay currently running; full Alma equality unverified",
     "yum-source dependency path followed by both source builds",
     "user snapshot restoration and independent execution",
     "user DBA tool read-only query"
@@ -110,5 +110,123 @@
     "120 cluster 30-day first-batch cost not measured",
     "aarch64 not covered",
     "optional parallel rebuild not performed"
-  ]
+  ],
+  "trial_failure": {
+    "cluster": "119",
+    "step": 0,
+    "publication_succeeded": true,
+    "publication_checks_passed": 6,
+    "runner_exit_code": 1,
+    "remaining_tasks_executed": 0,
+    "reason": "Alma baseline counts differ after first publication",
+    "observed_counts": {
+      "added_records": 5124686,
+      "added_occurrences": 2547876,
+      "formal_groups": 51143,
+      "observation_groups": 28,
+      "fingerprint_normalization_timeout": 891,
+      "fingerprint_normalization_worker_failed": 0,
+      "fingerprint_base_parser_rejected": 197
+    },
+    "alma_counts": {
+      "added_records": 5124686,
+      "added_occurrences": 2547876,
+      "formal_groups": 51266,
+      "observation_groups": 28,
+      "fingerprint_normalization_timeout": 0,
+      "fingerprint_normalization_worker_failed": 0,
+      "fingerprint_base_parser_rejected": 197
+    },
+    "root_cause_confirmed": false,
+    "original_timeout_seconds": 5,
+    "initial_workers": 4
+  },
+  "failed_trial_tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 469.495,
+        "check": 2.162,
+        "import": 1855.321,
+        "publish": 0.003,
+        "snapshot": 108.45
+      },
+      "seconds": 2436.168,
+      "before": {
+        "database_bytes": 12785331,
+        "filesystem_used_bytes": 20107210752,
+        "filesystem_free_bytes": 183804121088
+      },
+      "after": {
+        "database_bytes": 12454287027,
+        "filesystem_used_bytes": 35015069696,
+        "filesystem_free_bytes": 168896262144
+      },
+      "passed": false,
+      "baseline_equal": false,
+      "version_chain_verified": true
+    }
+  ],
+  "tasks": [],
+  "timeout_replay": [
+    {
+      "distinct": 297,
+      "event": "input_summary",
+      "max_bytes": 53440,
+      "min_bytes": 53379,
+      "records": 891
+    },
+    {
+      "byte_sizes": [
+        53379,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53440
+      ],
+      "elapsed_seconds": 25.714,
+      "event": "replay",
+      "other": 0,
+      "reliable": 8,
+      "samples": 8,
+      "timeouts": 0,
+      "worker_failed": 0,
+      "workers": 1
+    },
+    {
+      "byte_sizes": [
+        53379,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53440
+      ],
+      "elapsed_seconds": 21.628,
+      "event": "replay",
+      "other": 0,
+      "reliable": 0,
+      "samples": 8,
+      "timeouts": 8,
+      "worker_failed": 0,
+      "workers": 4
+    }
+  ],
+  "recovery": {
+    "failed_database_preserved": true,
+    "failed_task_records_preserved": true,
+    "fresh_instance_initialized": true,
+    "credential_reused_on_host": true,
+    "workers": 1,
+    "product_code_changed": false,
+    "timeout_seconds": 5,
+    "full_replay_complete": false
+  }
 }

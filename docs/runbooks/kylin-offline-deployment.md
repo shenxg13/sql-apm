@@ -358,12 +358,16 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 不匹配退出非零。基准源于 #29 R2 最终 head 实测，与程序包产品代码摘要逐文件一致。
 基准与已合并报告的九版计数一致；不能用含合成排除时段的旧统计报告替代。
 
+部署辅助工具默认使用一个解析进程（`--workers 1`）。本机四进程首批曾出现归一化超时，
+八条样本单进程均通过、四进程均超时，见[试跑报告](../reports/kylin-offline-deployment-2026-10-02.md)。
+产品自身的默认并发和 5 秒限制没有修改；增加并发前须重新验证计数，不根据 vCPU 数直接推定。
+
 例如 119/0 实际调用如下 full 命令，119/4 调用下列 rebuild。使用辅助工具执行后，
 不要再重复执行这些等价命令，否则会生成额外版本：
 
 ```bash
 .venv/bin/python -m sql_apm full --config "$APM_ROOT/config/import-119.json" \
-  --source daily-119 --batch 119-0 --training-config "$APM_ROOT/config/training-119.json" --workers 4
+  --source daily-119 --batch 119-0 --training-config "$APM_ROOT/config/training-119.json" --workers 1
 .venv/bin/python -m sql_apm rebuild --cluster 119 \
   --training-config "$APM_ROOT/config/training-119.json" --cutoff-date 2026-07-31
 ```

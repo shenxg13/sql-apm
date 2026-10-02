@@ -151,7 +151,12 @@ def render(root, commit, version):
         fragment = re.sub(r'href="([^"]+)"', rewrite, fragment)
         title = source.splitlines()[0].lstrip('# ')
         contents.append('<li><a href="#' + prefix + '">' + escape(title) + '</a></li>')
-        sections.append('<section id="' + prefix + '">' + converter.toc + fragment + '</section>')
+        context = ('' if path in PAGES[:2] else
+                   '<p><strong>通用模块参考：</strong>以下保留模块原稿供查询配置、恢复和升级。'
+                   '其中标明的开发验收、性能探针、tests 和 *_full 命令仅供开发仓库使用，'
+                   '不属于精简包的目标机操作；Kylin 安装与自检请按本手册第一部分执行。'
+                   '示例 var 路径须替换为实际配置路径，九任务保持 --workers 1。</p>')
+        sections.append('<section id="' + prefix + '">' + context + converter.toc + fragment + '</section>')
     document = ('<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8">'
                 '<meta name="viewport" content="width=device-width,initial-scale=1">'
                 '<title>SQL APM 安装与操作手册</title><style>' + CSS + '</style></head><body>'

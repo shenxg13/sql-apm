@@ -2,7 +2,7 @@
   "evidence_kind": "measured",
   "target_platform": "Kylin V10 SP2 Build09 x86_64",
   "program_commit": "6451d140d44f4e06cc34862c3e5aff7593d7afeb",
-  "implementation_trial_complete": false,
+  "implementation_trial_complete": true,
   "user_independent_run_complete": false,
   "environment": {
     "environment": {
@@ -102,7 +102,6 @@
   },
   "local_default_publication_checks": 31,
   "pending": [
-    "single-worker nine-task replay paused at 6/9 by user for SSD migration; resume from 120-1",
     "yum-source dependency path followed by both source builds",
     "user snapshot restoration and independent execution"
   ],
@@ -142,7 +141,10 @@
     },
     "root_cause_confirmed": false,
     "original_timeout_seconds": 5,
-    "initial_workers": 4
+    "initial_workers": 4,
+    "concurrency_effect_observed": true,
+    "root_cause_note": "Concurrency affects timeout outcome in bounded replay; underlying resource-contention mechanism not independently established.",
+    "resolution": "single parser worker; original product code and 5-second timeout unchanged; nine-task business counts and successful import counts equal Alma; one user-requested interrupted attempt audited separately"
   },
   "failed_trial_tasks": [
     {
@@ -456,6 +458,156 @@
       "passed": true,
       "baseline_equal": true,
       "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 1,
+      "cutoff_date": "2026-09-17",
+      "stages": {
+        "build": 378.364,
+        "check": 23.777,
+        "import": 698.662,
+        "publish": 0.004,
+        "snapshot": 63.167
+      },
+      "seconds": 1164.477,
+      "counts": {
+        "formal_groups": 607309,
+        "formal_layers": {
+          "day": 1032579,
+          "hour": 692996,
+          "overall": 607309,
+          "week": 710707,
+          "weekday": 1032579
+        },
+        "observation_groups": 773,
+        "observation_layers": {
+          "day": 1219,
+          "hour": 861,
+          "overall": 773,
+          "week": 881,
+          "weekday": 1219
+        },
+        "import_attempts": 18,
+        "successful_import_attempts": 17,
+        "interrupted_import_attempts": 1,
+        "added_records": 2022404,
+        "added_occurrences": 842659,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 31688373939,
+        "filesystem_used_bytes": 67841515520,
+        "filesystem_free_bytes": 136069816320
+      },
+      "after": {
+        "database_bytes": 39986288307,
+        "filesystem_used_bytes": 77139890176,
+        "filesystem_free_bytes": 126771441664
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 2,
+      "cutoff_date": "2026-09-18",
+      "stages": {
+        "build": 548.566,
+        "check": 29.418,
+        "import": 522.232,
+        "publish": 0.006,
+        "snapshot": 54.983
+      },
+      "seconds": 1155.711,
+      "counts": {
+        "formal_groups": 676989,
+        "formal_layers": {
+          "day": 1210431,
+          "hour": 769124,
+          "overall": 676989,
+          "week": 780401,
+          "weekday": 1210431
+        },
+        "observation_groups": 921,
+        "observation_layers": {
+          "day": 1476,
+          "hour": 1016,
+          "overall": 921,
+          "week": 1029,
+          "weekday": 1476
+        },
+        "import_attempts": 22,
+        "successful_import_attempts": 21,
+        "interrupted_import_attempts": 1,
+        "added_records": 1499944,
+        "added_occurrences": 641729,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 39986288307,
+        "filesystem_used_bytes": 77139927040,
+        "filesystem_free_bytes": 126771404800
+      },
+      "after": {
+        "database_bytes": 47249176243,
+        "filesystem_used_bytes": 84831387648,
+        "filesystem_free_bytes": 119079944192
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 3,
+      "cutoff_date": "2026-09-19",
+      "stages": {
+        "build": 709.558,
+        "check": 38.815,
+        "import": 583.887,
+        "publish": 0.003,
+        "snapshot": 69.354
+      },
+      "seconds": 1402.148,
+      "counts": {
+        "formal_groups": 873957,
+        "formal_layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "observation_groups": 1043,
+        "observation_layers": {
+          "day": 1707,
+          "hour": 1140,
+          "overall": 1043,
+          "week": 1151,
+          "weekday": 1707
+        },
+        "import_attempts": 26,
+        "successful_import_attempts": 25,
+        "interrupted_import_attempts": 1,
+        "added_records": 1598215,
+        "added_occurrences": 705998,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 47249176243,
+        "filesystem_used_bytes": 84831424512,
+        "filesystem_free_bytes": 119079907328
+      },
+      "after": {
+        "database_bytes": 56530884275,
+        "filesystem_used_bytes": 94125678592,
+        "filesystem_free_bytes": 109785653248
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
     }
   ],
   "timeout_replay": [
@@ -515,7 +667,7 @@
     "workers": 1,
     "product_code_changed": false,
     "timeout_seconds": 5,
-    "full_replay_complete": false
+    "full_replay_complete": true
   },
   "migration_pause": {
     "reason": "User requested safe stop before migrating VM from mechanical disk to SSD",
@@ -576,5 +728,152 @@
       }
     },
     "interpretation": "Sample supports storage read latency as the current import bottleneck; SSD improvement remains unverified."
+  },
+  "ssd_resume": {
+    "storage_medium": "SSD, user-reported",
+    "same_product_code_hashes_verified": 69,
+    "parser_workers": 1,
+    "database_parameters_unchanged": true,
+    "hdd_interrupted_import_seconds": 1802.929,
+    "hdd_last_reported_records_in_first_file": 94000,
+    "hdd_last_reported_occurrences_in_first_file": 34471,
+    "ssd_resource_samples": [
+      {
+        "sample_seconds": 20.04,
+        "cpu_percent": {
+          "user": 6.28,
+          "nice": 0.0,
+          "system": 6.78,
+          "idle": 85.25,
+          "iowait": 1.06,
+          "irq": 0.51,
+          "softirq": 0.12,
+          "steal": 0.0
+        },
+        "process_cpu_percent_one_core_100": {
+          "postgres": 25.9,
+          "python": 28.44
+        },
+        "activity_samples": {
+          "other|IO|WalSync": 1,
+          "insert_fingerprint|None|None": 1,
+          "insert_fingerprint|IO|DataFileRead": 3,
+          "other|Client|ClientRead": 1,
+          "other|None|None": 1
+        },
+        "data_disk": {
+          "read_iops": 1853.72,
+          "read_MiB_per_sec": 35.69,
+          "mean_read_ms": 0.158,
+          "write_iops": 2186.91,
+          "mean_write_ms": 0.11,
+          "busy_percent": 24.99
+        }
+      },
+      {
+        "sample_seconds": 20.038,
+        "cpu_percent": {
+          "user": 8.13,
+          "nice": 0.0,
+          "system": 4.36,
+          "idle": 87.08,
+          "iowait": 0.2,
+          "irq": 0.18,
+          "softirq": 0.04,
+          "steal": 0.0
+        },
+        "process_cpu_percent_one_core_100": {
+          "postgres": 22.81,
+          "python": 32.14
+        },
+        "activity_samples": {
+          "other|None|None": 5,
+          "insert_fingerprint|None|None": 1
+        },
+        "data_disk": {
+          "read_iops": 99.81,
+          "read_MiB_per_sec": 2.718,
+          "mean_read_ms": 0.606,
+          "write_iops": 810.36,
+          "mean_write_ms": 0.173,
+          "busy_percent": 6.17
+        }
+      }
+    ],
+    "comparison_limits": [
+      "20-second observational samples during the same daily batch, not a controlled hardware benchmark",
+      "VM restart changed memory cache state; normalization cache persisted from the interrupted attempt",
+      "HDD daily batch did not complete, so no measured whole-batch speedup ratio is available"
+    ],
+    "first_file_comparison": {
+      "same_file_verified": true,
+      "hdd": {
+        "state": "interrupted",
+        "seconds": 1780.568
+      },
+      "ssd": {
+        "state": "succeeded",
+        "records": 688482,
+        "seconds": 234.879,
+        "records_per_second": 2931.22
+      }
+    },
+    "completed": true,
+    "final_state": {
+      "verified_at": "2026-10-03 00:03:04.423294+08",
+      "logical_cpu_count": 8,
+      "published_versions": [
+        [
+          "119",
+          5
+        ],
+        [
+          "120",
+          4
+        ]
+      ],
+      "task_states": [
+        [
+          "119",
+          "succeeded",
+          5
+        ],
+        [
+          "120",
+          "interrupted",
+          1
+        ],
+        [
+          "120",
+          "succeeded",
+          4
+        ]
+      ],
+      "import_attempt_states": [
+        [
+          "119",
+          "succeeded",
+          30
+        ],
+        [
+          "120",
+          "interrupted",
+          1
+        ],
+        [
+          "120",
+          "succeeded",
+          25
+        ]
+      ],
+      "running_task_count": 0
+    },
+    "final_record_backup": {
+      "files": 63,
+      "archive_sha256": "e66fc7b4290947d0d013756b6fe33d32eea4d82c7ce9775f9b505c2fd3f8f677",
+      "git_ignored": true,
+      "parent_directory_mode": "0700"
+    },
+    "daily_tasks_total_seconds": 3722.336
   }
 }

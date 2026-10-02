@@ -77,6 +77,17 @@ def footprint(db, root):
     return dict(database_bytes=size, filesystem_used_bytes=disk.used, filesystem_free_bytes=disk.free)
 
 
+def attempt_counts(cur, cluster, allowed_interrupted):
+    cur.execute('SELECT attempt_id,state FROM import_attempt WHERE scope_id=%s', (cluster,))
+    rows = cur.fetchall()
+    interrupted = {aid for aid, state in rows if state == 'interrupted'}
+    if (interrupted != set(allowed_interrupted)
+            or any(state not in ('succeeded', 'interrupted') for _, state in rows)):
+        raise ValueError('unexpected_import_attempt_state')
+    return dict(total=len(rows), succeeded=len(rows) - len(interrupted),
+                interrupted=len(interrupted))
+
+
 def run_task(args):
     import psycopg2
     baseline = json.loads(BASELINE.read_text())
@@ -99,8 +110,7 @@ def run_task(args):
             cur.execute('SELECT count(*) FROM publication WHERE scope_id=%s AND result=\'published\'', (cluster,))
             if cur.fetchone()[0] != step:
                 raise ValueError('unexpected_publication_sequence')
-            cur.execute('SELECT count(*) FROM import_attempt WHERE scope_id=%s', (cluster,))
-            before_attempts = cur.fetchone()[0]
+            before_attempts = attempt_counts(cur, cluster, args.interrupted_attempt)
         before = footprint(db, args.data_root)
         command = [sys.executable, '-m', 'sql_apm']
         training = str(args.config / ('training-' + cluster + '.json'))
@@ -130,8 +140,8 @@ def run_task(args):
             cur.execute('SELECT kind,layer,row_count,group_count FROM mpp_build_layer_count '
                         'WHERE build_id=%s ORDER BY kind,layer', (bid,))
             observed['layers'] = [list(row) for row in cur.fetchall()]
-            cur.execute('SELECT count(*) FROM import_attempt WHERE scope_id=%s', (cluster,))
-            observed['import_attempts'] = cur.fetchone()[0]
+            after_attempts = attempt_counts(cur, cluster, args.interrupted_attempt)
+            observed['import_attempts'] = after_attempts['total']
             cur.execute('SELECT stage_seconds FROM task WHERE task_id=%s', (payload['task_id'],))
             stages = cur.fetchone()[0]
         queries = {}
@@ -152,13 +162,18 @@ def run_task(args):
                     and version_matches(queries['status']['current'])
                     and version_matches(queries['history']['versions'][0])
                     and len(queries['history']['versions']) == step + 1)
-        passed = observed == expected and chain_ok and (step < 4 or before_attempts == observed['import_attempts'])
+        comparable = dict(observed, import_attempts=after_attempts['succeeded'])
+        baseline_equal = comparable == expected
+        passed = baseline_equal and chain_ok and (step < 4 or before_attempts == after_attempts)
         record = dict(cluster=cluster, step=step, parser_workers=args.workers if step < 4 else None,
                       cutoff_date=payload['cutoff_date'], build_id=bid,
                       publication=payload['publication'], stages=stages,
                       seconds=round(time.monotonic() - started, 3), before=before,
                       after=footprint(db, args.data_root), observed=observed,
-                      baseline_equal=observed == expected, version_chain_verified=chain_ok,
+                      baseline_equal=baseline_equal, version_chain_verified=chain_ok,
+                      import_attempt_audit=dict(before=before_attempts, after=after_attempts,
+                                                allowed_interrupted=args.interrupted_attempt,
+                                                baseline_successful=expected['import_attempts']),
                       passed=passed, baseline_sha256=sha256(BASELINE))
         save(args.records / (stem + '.json'), record)
         print(json.dumps(dict(cluster=cluster, step=step, passed=passed, seconds=record['seconds'])))
@@ -181,6 +196,8 @@ def main():
     task.add_argument('--records', type=Path, required=True)
     task.add_argument('--data-root', type=Path, required=True)
     task.add_argument('--workers', type=int, choices=range(1, 9), default=1)
+    task.add_argument('--interrupted-attempt', action='append', default=[],
+                      help='Explicitly audited historical interruption ID; other non-success attempts fail')
     args = parser.parse_args()
     if args.command == 'prepare':
         prepare(args)

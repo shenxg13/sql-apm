@@ -253,3 +253,8 @@
 
 - Issue #31 落实项目自带 Python 与离线演练的确认边界，新增部署手册、记录模板和辅助工具，职责同步到[源码布局](architecture/source-layout.md#已实现的部署与演练辅助工具)。
 - 部署决定与验证限制由[运行环境主题](decisions/runtime-and-components.md#已确认的-kylin-演练与项目自带解释器2026-10-02)维护；首批超时差异、有界回放和单进程恢复见[实施报告](../docs/reports/kylin-offline-deployment-2026-10-02.md)，不把环境自检通过等同于全部验收完成。
+- 补录机械盘至 SSD 的运行对比及人工中断恢复；[部署手册](../docs/runbooks/kylin-offline-deployment.md)明确成功导入计数和历史中断审计分别核对，保留原始记录，不改变产品业务规则。
+
+## 2026-10-03：Kylin 九任务试跑完成
+
+- 实施方九任务业务计数、成功导入次数与版本链全部通过，补齐三个 SSD 日批的阶段耗时和资源记录；当前事实见[运行环境主题](decisions/runtime-and-components.md#已确认的-kylin-演练与项目自带解释器2026-10-02)。用户恢复快照后的 yum 源路径及独立执行仍待完成。

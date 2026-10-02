@@ -89,7 +89,7 @@ sql-apm/
 │   │   ├── pg_ast.py           # 已有：PG语法树位置字段处理
 │   │   ├── structure.py        # 已有：无递归深度依赖的结构编码
 │   │   └── normalization.py    # 已有：可靠归一化、结构指纹及规则快照
-│   ├── baseline/               # 已有：五层统计核心和进程监护；发布待④
+│   ├── baseline/               # 已有：五层统计核心、进程监护及完整任务编排
 │   ├── storage/                # 已有：DDL／迁移、SQL 元数据及批量导入写入
 │   └── diagnostics/
 │       ├── __init__.py
@@ -197,7 +197,7 @@ sql-apm/
 复用全量工具的隔离进程，仅诊断层读取本地索引。生产近似规则不反向依赖诊断模块，
 没有新增 scripts 包装或数据库结构；[接口说明](../../docs/design/sql-approximate.md)记录
 近似范围；后续可靠结构归一化已由下述模块交付，#27 的 `storage/observations.py`
-已提供随构建保存的五层观察统计，详见下述统计模块职责；展示和④完整构建编排仍待交付。
+已提供随构建保存的五层观察统计，详见下述统计模块职责；展示待交付，④完整构建编排见下节。
 
 ### 可靠归一化与依赖（2026-09-27）
 
@@ -236,14 +236,14 @@ Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/no
 `storage/ingestion.py` 负责 PostgreSQL 连接、COPY、精确原文和近似写入；
 `cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
 [设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)
-说明恢复、配对和证据边界。训练快照和统计分别见下述②③边界；发布仍待④实现。
+说明恢复、配对和证据边界。训练快照和统计分别见下述②③边界；发布由下述④实现。
 
 ## 已实现的训练判定边界
 
 Issue #21 新增 `training/categories.py` 和 `training/config.py`，分别负责保守产品类别及本地配置；
 `storage/training.py` 管理快照、缓存和数据库查询，`cli/training.py` 是薄命令。
 `storage/schema.sql` 的 `mpp_training_decisions` 是唯一资格推导，逐条查询和诊断共用；
-产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎；③统计见下节，④编排仍未实施。
+产品代码不导入 diagnostics 或 tests。没有另立 Python 资格引擎；③统计见下节，④编排见下节。
 [判定设计](../../docs/design/training-decisions.md)与[操作说明](../../docs/runbooks/training-decisions.md)
 记录接口、临时汇总和持久化边界。
 
@@ -256,11 +256,20 @@ Issue #25 新增 `baseline/statistics.py` 的纯计算核心，`storage/statisti
 `storage/schema.sql` 的 `mpp_statistic_sufficiency` 按构建封存配置推导；Python 指标核心不重复实现
 门槛规则，也不逐行保存派生 JSONB。构建级批量标记查询位于
 `storage/statistics_sufficiency.sql`，复用该函数一次验证每层门槛，再作类型化比较；
-操作和成本见[统计手册](../../docs/runbooks/baseline-statistics.md#查询门槛结果)。发布与任务编排仍属④。
+操作和成本见[统计手册](../../docs/runbooks/baseline-statistics.md#查询门槛结果)。发布与任务编排由下述④实现。
 
 Issue #27 新增 `storage/observations.py`：从同一构建的临时判定投影观察资格和分组，
 复用 `baseline/statistics.py` 五层指标以及 `storage/statistics.py` 的批量写入与事务；
 没有第二套训练判定函数、指标公式或门槛路径。独立全分组 oracle 留在 tests 与显式验收脚本。
+
+## 已实现的构建编排边界
+
+Issue #29 新增 `baseline/workflow.py` 连接导入、快照、统计及发布步骤，`storage/tasks.py`
+管理同集群会话锁与残留任务恢复，`storage/publication.py` 保存六项检查和原子版本切换。
+`cli/workflow.py` 提供 full、rebuild、status、history 薄入口。
+原有三个写入模块接受同一任务连接，单独调用时也创建任务；不反向依赖诊断或测试。
+覆盖函数和构建层计数由存储层维护，命令、原子性及恢复边界见
+[编排设计](../../docs/design/build-publication.md)。
 
 ## Workflows
 

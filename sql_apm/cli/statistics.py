@@ -1,9 +1,10 @@
-"""Calculate a specified sealed snapshot; no publication or task orchestration."""
+"""Calculate a sealed snapshot under the shared cluster task lease."""
 import argparse
 import os
 import signal
 
 from sql_apm.ingestion.importer import emit
+from sql_apm.ingestion.config import IngestionError
 from sql_apm.storage.statistics import StatisticsStore, StatisticsError
 
 
@@ -27,7 +28,7 @@ def main(argv=None):
                                  progress=lambda row: emit(**row))
         emit(phase='statistics',**result)
         return 0
-    except StatisticsError as error:
+    except (StatisticsError, IngestionError) as error:
         emit(state='failed',reason=str(error))
         return 1
     except KeyboardInterrupt:

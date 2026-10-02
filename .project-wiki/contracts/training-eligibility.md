@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/training-eligibility.md
-updated: 2026-09-30
+updated: 2026-10-02
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
@@ -107,7 +107,7 @@ confidence: high
   Issue #2 交付。用户运行中维护条目的安排，不改变既有语句类别名单。
 - 这里只记录已确认分工与任务入口。实时正文、评论及交付状态以 GitHub 为准，
   后续 Issue 工作前回读，不在本地维护其正文或状态镜像。Issue #2 只交付规则与
-  诊断证据；②已实现黑名单和配置，③已实现基线统计构建；发布仍由④实施。
+  诊断证据；②已实现黑名单和配置，③已实现基线统计构建；#29 已实现④发布检查与切换，见[构建与版本](../features/baseline-versions.md)。
 
 ### 首版类别边界与保守维护规则
 
@@ -381,7 +381,7 @@ confidence: high
   类别仍严格按七类、已确认别名、其余暂缓项和纯／混合批次边界；不因阶段身份豁免命中。
 - 产品实现位于 `sql_apm/training/` 与 `storage/training.py`，数据库函数是逐条资格
   的唯一实现，诊断工具保持独立；[设计与验证](../../docs/design/training-decisions.md)
-  说明实现和证据；③统计、④构建发布及执行历史界面仍分别交付。
+  说明实现和证据；③统计已由 #25 交付，#29 已实现④构建发布，执行历史界面仍待交付。
 
 ## Workflows
 

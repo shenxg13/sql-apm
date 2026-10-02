@@ -6,20 +6,23 @@ from psycopg2.extras import Json, execute_values
 
 from sql_apm.ingestion.config import identity
 from sql_apm.storage.ingestion import connect
+from sql_apm.storage.tasks import task_context
 from sql_apm.sql.normalization import Normalizer
 from sql_apm.training.categories import RULES, classify
 from sql_apm.training.config import DECISION_VERSION, TrainingError
 
 
 class TrainingStore:
-    def __init__(self, dsn='', schema='sql_apm', normalizer=None):
+    def __init__(self, dsn='', schema='sql_apm', normalizer=None, db=None):
         self.engine = normalizer or Normalizer()
-        self.db = connect(dsn, schema)
+        self.owns_db = db is None
+        self.db = db if db is not None else connect(dsn, schema)
         self.context = self.engine.context
         self.normalization_id = 'N:' + identity(self.context)
 
     def close(self):
-        self.db.close()
+        if self.owns_db:
+            self.db.close()
 
     def _select(self, scope, batches, analyses):
         if not batches or len(set(batches)) != len(batches) or len(set(analyses)) != len(analyses):
@@ -83,9 +86,9 @@ class TrainingStore:
         return rule_id,templates
 
     def _prepare(self, manifest, rule_id, templates):
-        """One rule owner; short commits, bounded batches and restartable cache."""
+        """Per-cluster rule owner; short ordered writes to the shared text cache."""
         started, added = time.monotonic(), 0
-        lock = int(identity(rule_id)[:15],16)
+        lock = int(identity(rule_id, manifest['scope_id'])[:15],16)
         with self.db, self.db.cursor() as cur:
             cur.execute('SELECT pg_try_advisory_lock(%s)', (lock,))
             if not cur.fetchone()[0]:
@@ -135,7 +138,12 @@ class TrainingStore:
                 cur.execute('DROP TABLE IF EXISTS pg_temp.training_needed,pg_temp.training_selection')
                 cur.execute('SELECT pg_advisory_unlock(%s)',(lock,))
 
-    def snapshot(self, config, batches, analyses=()):
+    def snapshot(self, config, batches, analyses=(), task=None):
+        with task_context(self.db, config['scope_id'], 'snapshot', task) as active:
+            active.set_stage('snapshot')
+            return dict(self._snapshot(config, batches, analyses), task_id=active.task_id)
+
+    def _snapshot(self, config, batches, analyses):
         manifest = self._select(config['scope_id'],list(batches),list(analyses))
         rule_id, templates = self._rule(config)
         cache = self._prepare(manifest,rule_id,templates)

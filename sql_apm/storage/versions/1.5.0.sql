@@ -447,6 +447,17 @@ BEGIN
             REFERENCING NEW TABLE AS added_groups FOR EACH STATEMENT EXECUTE FUNCTION mpp_check_build_groups();
     END IF;
 END $block$;
+CREATE TABLE IF NOT EXISTS mpp_build_coverage (
+    build_id text NOT NULL,
+    group_id text NOT NULL,
+    partition_id bigint NOT NULL,
+    layer text NOT NULL CHECK (layer IN ('overall','day','week','weekday','hour')),
+    computed_keys jsonb NOT NULL CHECK (jsonb_typeof(computed_keys) = 'array'),
+    empty_keys jsonb NOT NULL CHECK (jsonb_typeof(empty_keys) = 'array'),
+    PRIMARY KEY (partition_id, build_id, group_id, layer),
+    FOREIGN KEY (partition_id, build_id, group_id) REFERENCES mpp_build_group (partition_id, build_id, group_id)
+) PARTITION BY LIST (partition_id);
+
 CREATE TABLE IF NOT EXISTS mpp_statistic (
     build_id text NOT NULL,
     group_id text NOT NULL,
@@ -654,6 +665,7 @@ BEGIN
             FOR EACH ROW EXECUTE FUNCTION mpp_result_context_guard();
     END IF;
 END $block$;
+CREATE INDEX IF NOT EXISTS mpp_build_coverage_group_build_idx ON mpp_build_coverage (group_id,build_id,layer);
 CREATE OR REPLACE FUNCTION mpp_ensure_result_partition(selected_scope text, selected_month date)
 RETURNS bigint LANGUAGE plpgsql AS $function$
 DECLARE pid bigint; table_name text; child_name text;
@@ -666,11 +678,10 @@ BEGIN
     IF NOT EXISTS (SELECT FROM mpp_result_partition WHERE partition_id=pid AND scope_id=selected_scope AND build_month=selected_month) THEN
         RAISE EXCEPTION 'partition_identity_collision';
     END IF;
-    FOREACH table_name IN ARRAY ARRAY['mpp_statistic','mpp_observation_statistic'] LOOP
+    FOREACH table_name IN ARRAY ARRAY['mpp_statistic','mpp_build_coverage','mpp_observation_statistic'] LOOP
         child_name := table_name||'_p'||pid;
         IF to_regclass(child_name) IS NULL THEN
-            EXECUTE format('CREATE TABLE %I (LIKE %I INCLUDING ALL)',child_name,table_name);
-            EXECUTE format('ALTER TABLE %I ATTACH PARTITION %I FOR VALUES IN (%s)',table_name,child_name,pid);
+            EXECUTE format('CREATE TABLE %I PARTITION OF %I FOR VALUES IN (%s)',child_name,table_name,pid);
         END IF;
     END LOOP;
     RETURN pid;
@@ -706,18 +717,15 @@ CREATE TABLE IF NOT EXISTS current_version (
 CREATE TABLE IF NOT EXISTS task (
     task_id text PRIMARY KEY CHECK (task_id <> ''),
     scope_id text NOT NULL REFERENCES scope,
-    mode text NOT NULL CHECK (mode IN ('full','import_only','rebuild','snapshot','statistics')),
+    mode text NOT NULL CHECK (mode IN ('full','import_only','rebuild')),
     state text NOT NULL CHECK (state IN ('running','succeeded','failed','interrupted','busy_rejected')),
-    stage text NOT NULL CHECK (stage IN ('import','snapshot','build','check','publish','none')),
+    stage text NOT NULL CHECK (stage IN ('import','build','publish','none')),
     busy_task_id text,
     reason text CHECK (reason <> ''),
-    started_at timestamptz NOT NULL DEFAULT current_timestamp,
-    finished_at timestamptz,
-    stage_seconds jsonb NOT NULL DEFAULT '{}' CHECK (jsonb_typeof(stage_seconds)='object'),
     UNIQUE (task_id, scope_id),
     FOREIGN KEY (busy_task_id, scope_id) REFERENCES task (task_id, scope_id),
     CHECK (busy_task_id IS DISTINCT FROM task_id),
-    CHECK (busy_task_id IS NULL OR state = 'busy_rejected'),
+    CHECK ((state = 'busy_rejected') = (busy_task_id IS NOT NULL)),
     CHECK (state <> 'busy_rejected' OR stage = 'none'),
     CHECK (state NOT IN ('failed','interrupted','busy_rejected') OR reason IS NOT NULL)
 );
@@ -1185,49 +1193,3 @@ CREATE TABLE IF NOT EXISTS mpp_observation_statistic (
     CHECK (mean_ms BETWEEN min_ms AND max_ms)
 ) PARTITION BY LIST (partition_id);
 CREATE INDEX IF NOT EXISTS mpp_observation_statistic_group_build_idx ON mpp_observation_statistic (group_id, build_id, layer);
-
--- Ten compact receipts per build; observation receipts are informational only.
-CREATE TABLE IF NOT EXISTS mpp_build_layer_count (
-    build_id text NOT NULL REFERENCES build,
-    kind text NOT NULL CHECK (kind IN ('formal','observation')),
-    layer text NOT NULL CHECK (layer IN ('overall','day','week','weekday','hour')),
-    row_count bigint NOT NULL CHECK (row_count>=0),
-    group_count bigint NOT NULL CHECK (group_count>=0 AND group_count<=row_count),
-    PRIMARY KEY (build_id,kind,layer)
-);
-CREATE INDEX IF NOT EXISTS task_scope_time_idx ON task (scope_id,started_at);
-CREATE OR REPLACE FUNCTION mpp_coverage(selected_build text, observation boolean DEFAULT false,
-    selected_group text DEFAULT NULL)
-RETURNS TABLE (group_id text,layer text,computed_keys jsonb,empty_keys jsonb)
-LANGUAGE plpgsql STABLE AS $function$
-DECLARE group_table text; statistic_table text;
-BEGIN
-    group_table := CASE WHEN observation THEN 'mpp_build_observation_group' ELSE 'mpp_build_group' END;
-    statistic_table := CASE WHEN observation THEN 'mpp_observation_statistic' ELSE 'mpp_statistic' END;
-    RETURN QUERY EXECUTE format($query$
-        WITH context AS MATERIALIZED (
-            SELECT b.partition_id,c.window_start,c.window_end FROM build b
-            JOIN config_snapshot c USING(config_id) WHERE b.build_id=$1),
-        days AS (SELECT d::date AS sample_day FROM context CROSS JOIN LATERAL generate_series(
-            window_start AT TIME ZONE 'Asia/Shanghai',
-            (window_end AT TIME ZONE 'Asia/Shanghai')-interval '1 day',interval '1 day') d),
-        keys AS MATERIALIZED (
-            SELECT 'overall'::text layer,'null'::jsonb key
-            UNION ALL SELECT 'day',to_jsonb(sample_day) FROM days
-            UNION SELECT 'week',to_jsonb(date_trunc('week',sample_day)::date) FROM days
-            UNION ALL SELECT 'weekday',to_jsonb(i) FROM generate_series(1,7) i
-            UNION ALL SELECT 'hour',to_jsonb(i) FROM generate_series(0,23) i),
-        expected AS (SELECT layer,jsonb_agg(key ORDER BY key) keys FROM keys GROUP BY layer),
-        actual AS (
-            SELECT s.group_id,s.layer,jsonb_agg(coalesce(to_jsonb(bucket_date),to_jsonb(bucket_number),'null'::jsonb)
-                ORDER BY bucket_date,bucket_number) computed
-            FROM %I s JOIN context c USING(partition_id)
-            WHERE s.build_id=$1 AND ($2 IS NULL OR s.group_id=$2) GROUP BY s.group_id,s.layer)
-        SELECT g.group_id,k.layer,coalesce(a.computed,'[]'::jsonb),
-            coalesce((SELECT jsonb_agg(key ORDER BY key) FROM jsonb_array_elements(k.keys) key
-                      WHERE NOT coalesce(a.computed,'[]'::jsonb) @> jsonb_build_array(key)),'[]'::jsonb)
-        FROM %I g JOIN context c USING(partition_id) CROSS JOIN expected k
-        LEFT JOIN actual a ON a.group_id=g.group_id AND a.layer=k.layer
-        WHERE g.build_id=$1 AND ($2 IS NULL OR g.group_id=$2)
-    $query$,statistic_table,group_table) USING selected_build,selected_group;
-END $function$;

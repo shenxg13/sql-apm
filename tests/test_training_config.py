@@ -49,3 +49,15 @@ class TrainingConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             p=Path(tmp)/'config.json';p.write_text('{"version":1,"version":1}')
             with self.assertRaisesRegex(TrainingError,'duplicate_config_key'):load_config(p,'C1')
+
+    def test_explicit_window_override_keeps_file_unchanged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp)/'config.json'
+            document=config();document['window']={'days':30}
+            p.write_text(json.dumps(document));original=p.read_bytes()
+            result=load_config(p,'C1',cutoff_date='2024-02-29',window_days=1)
+            self.assertEqual('2024-02-29T00:00:00+08:00',result['window_start'])
+            self.assertEqual('2024-03-01T00:00:00+08:00',result['window_end'])
+            self.assertEqual(original,p.read_bytes())
+            with self.assertRaises(TrainingError):load_config(p,'C1')
+            with self.assertRaises(TrainingError):load_config(p,'C1',cutoff_date='2024-02-30')

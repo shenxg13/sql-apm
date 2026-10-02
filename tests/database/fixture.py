@@ -23,11 +23,13 @@ def insert(table, values):
     ) + ") VALUES (" + ",".join(literal(v) for v in values.values()) + ");"
 
 
-def statements(legacy=False, results=True):
+def statements(legacy=False, results=True, include_coverage=False):
     doc = json.loads((ROOT / "docs/design/offline-data-contract/examples.json").read_text())
     b = doc["base"]
     sql = []
     def add(table, values):
+        if table == 'mpp_build_coverage' and not (legacy or include_coverage):
+            return
         if table in ('mpp_statistic','mpp_build_coverage'):
             if not results:
                 return

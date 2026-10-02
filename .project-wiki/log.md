@@ -235,3 +235,16 @@
 
 - 按 [R1-F001](https://github.com/shenxg13/sql-apm/pull/28#issuecomment-5928377850) 修正导入、源码布局与存储设计中的过时状态：观察统计已随构建保存，1.4.0 已冻结，当前结构为 1.5.0；展示与④仍待交付。
 - 用户确认失败执行在耗时和开始时间未知时继续只进入构建级诊断，见[观察统计口径](contracts/baseline-statistics.md#已确认的五层观察统计)。
+
+## 2026-10-01：构建编排与原子发布
+
+- [#29 用户确认](https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5931020732)的默认截止日、异常占用恢复、覆盖推导方案 C 和清理另立任务，分别同步到[构建与版本](features/baseline-versions.md#构建编排补充确认2026-10-01)、[命令行](features/operator-cli.md#完整流程与版本查询2026-10-01)及[存储主题](architecture/postgresql-storage.md#编排结构-1602026-10-01)。
+- 交付共享任务连接、六项检查与原子切换，见[设计](../docs/design/build-publication.md)和[操作说明](../docs/runbooks/build-publication.md)；逻辑覆盖语义不变，结构升级到 1.6.0。
+- [项目范围](decisions/project-scope.md)将早期需求阶段说明归于原会话，按已确认 Issue 的实际交付解释当前状态；原始需求、规则和旧报告保持原样。
+- 首期离线链路的真实逐日运行、覆盖迁移、独立复算与资源证据见[验证报告](../docs/reports/build-publication-2026-10-01.md)；120 的生产首批三十天成本仍未实测。
+
+## 2026-10-02：Issue #29 R1 整改与观察确认
+
+- 按 [R1 台账](https://github.com/shenxg13/sql-apm/pull/30#issuecomment-5937040961) 同步当前 1.6.0、任务锁和④交付状态；次月可选预建遇共享分组表锁忙时跳过，后续再试；未登记集群仅允许导入入口登记。见[编排设计](../docs/design/build-publication.md)与[操作主题](features/operator-cli.md)。
+- 将用户已确认的 O1“失败／冲突只阻止当批”和 O2“较早批次 full 可以使窗口倒退”写入[版本正文](features/baseline-versions.md#发布输入与补导确认2026-10-02)，保留确认来源；不新增发布门槛或保护逻辑。
+- 三项整改、并发实测与回归证据见[R1 整改报告](../docs/reports/build-publication-r1-remediation-2026-10-02.md)；独立 R2 结论由在线评审记录。

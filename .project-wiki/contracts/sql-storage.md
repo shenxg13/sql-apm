@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/29
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -113,7 +115,7 @@ confidence: high
 
 2026-09-30 [后续范围确认](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5914482826)进一步移除
 逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
-见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，当前结构 1.5.0 另增独立观察结果，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
+见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，1.5.0 增加独立观察结果，当前 1.6.0 保留这些结果并将覆盖改为推导，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
 
 ### 统计存储量级接受（2026-10-01）
 
@@ -129,6 +131,17 @@ confidence: high
 
 保留周期与清理设计仍为后续工作。`mpp_build_group` 不分区，不能随月分区一起删除；
 届时须单独协调构建分组关联的清理及引用处理。
+
+### 覆盖推导与清理边界补充（2026-10-01）
+
+[Issue #29](https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5931020732)确认方案 C：
+删除 `mpp_build_coverage`，由封存窗口和实际统计行按需推导覆盖，正式与观察结果均适用；
+各层行数与分组数在构建级保存用于核对。现存正式、观察统计和原文／执行事实保持原值。
+此决定替代上节覆盖表的物理保存选择，不取消已确认的逻辑空桶和漏行检查要求。
+
+版本保留周期与清理紧接 #29 单独建 Issue，未授权本次删除历史版本或原始日志。
+120 本地仅七天日志，生产首批三十天的耗时与存储仍须在首次生产运行测量；
+既有 modeled 容量不能转称本轮 measured。当前映射见[存储主题](../architecture/postgresql-storage.md)。
 
 ## Workflows
 

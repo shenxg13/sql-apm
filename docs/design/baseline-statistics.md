@@ -29,7 +29,7 @@ outside_window 不计入，无法归组的计数保留构建诊断。
 原因。started_at 来自数据库 `clock_timestamp()`，Build ID 日期前缀和分区月份均由该时间
 转换到北京时间生成；finished_at 也使用数据库时钟，避免客户端时钟领先导致终态约束失败。
 SIGINT／SIGTERM 转入中断；强杀或连接丢失由独立监护连接检测工作进程退出后记录
-中断，恢复不续用半成品。任务串行、发布检查和版本切换由④交付。
+中断，恢复不续用半成品。任务串行、发布检查和版本切换见[④编排](build-publication.md)。
 
 ## 门槛结果的数据库派生
 
@@ -68,13 +68,15 @@ included_count bigint, active_dates date[], active_week_starts date[])` 返回 b
 ## 分区与关联
 
 每个集群和北京时间构建开始月份在 `mpp_result_partition` 登记一个 bigint 分区编号，
-由组合内容 SHA-256 的前 60 位导出；检测到身份冲突时报错。`mpp_ensure_result_partition`
-在开始构建前创建正式统计、正式覆盖及观察统计三张父表相应 LIST 分区，短暂 advisory 事务锁仅保护该月份的 DDL。
-这不实现同集群任务互斥。首次创建月分区需要父表 DDL 锁，会与已有读写事务互相等待，
-等待中的 DDL 也可能排住后续普通查询；advisory 锁不消除这一成本。跨集群并发和月分区预建由④评估。统计和覆盖均保留单表，层次仍为键的一部分。
+由组合内容 SHA-256 的前 60 位导出；检测到身份冲突时报错。1.6.0 的
+`mpp_ensure_result_partition` 独立建空表后 ATTACH，构建前确保正式／观察统计当月分区，次月按需尝试预建。
+DDL 单独提交，不把分区锁持有到结果保存完成。普通读取与 ATTACH 的父表锁相容，
+次月预建遇共享分组表的外键锁忙时跳过，后续构建再试；当月首次创建仍可能等另一集群构建事务结束。
+其他 DDL 也可能等待；具体锁、发生时机和恢复见[④编排设计](build-publication.md#覆盖分区与成本)，同集群任务由④互斥。
+1.4.0／1.5.0 的 CREATE TABLE PARTITION OF 历史实现保留在冻结 DDL 中。
 
 `mpp_build_group` 每构建每组一行，集中检查 Build／Group 集群、规则和 profile 相符；
-统计与覆盖通过其复合外键引用，避免逐指标行保存三个重复文本。父对象已有结果关联后
+统计通过其复合外键引用，避免逐指标行保存三个重复文本。父对象已有结果关联后
 不能改变上下文。Build 分区所属月份必须与 started_at 一致。统计自然键支持构建读取，
 group/build/layer 索引支持历史查询；已知组含仅排除的组，未知归属不创建分组。
 
@@ -88,7 +90,7 @@ group/build/layer 索引支持历史查询；已知组含仅排除的组，未�
 单独提交的 running 构建始终 results_saved=false。监护子进程通过父进程管道 EOF 检测退出，
 仅更新仍为 running 的该次构建，并记录 worker_disconnected；正常异常由主连接先记录具体固定码。
 数据库连接失败时监护有限重连。整机宕机、监护同时被杀或数据库持续不可用无法即时写入终态；
-此时记录仍为 running／false，不会作为完整结果。④后续负责整体任务恢复和占用管理。
+此时记录仍为 running／false，不会作为完整结果。④在下次获取集群会话锁时恢复残留任务和构建，见[编排设计](build-publication.md)。
 
 ## 观察统计实施计划与边界
 
@@ -116,3 +118,11 @@ group/build/layer 索引支持历史查询；已知组含仅排除的组，未�
 
 合成、迁移和真实全量证据见[观察统计验证报告](../reports/observation-statistics-2026-10-01.md)；
 实际操作与复现入口见[统计手册](../runbooks/baseline-statistics.md#观察统计与全量验收)。
+
+## 1.6.0 覆盖推导与任务接入
+
+[#29](https://github.com/shenxg13/sql-apm/issues/29)停止写入并删除 mpp_build_coverage。
+五层计算器的统计输出、公式和门槛不变；每次构建另存正式／观察每层统计行数与分组数，
+`mpp_coverage` 从窗口和保存行推导计算键／空键。迁移回填已有构建计数，不改统计值。
+statistics 单独运行也参与同集群互斥，并保存 Task 和 Build 关联；与完整流程共用同一主连接。
+Build 创建时保存六个 not_run 检查项，完整流程随后核验与发布；独立 statistics 仍只计算。

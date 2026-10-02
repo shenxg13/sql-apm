@@ -26,7 +26,7 @@ def verify_statistics_migration(v, root, runner):
         sql('DELETE FROM mpp_build_coverage')
         original=sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')
         v.init('upgrade',names=names);v.init('check',names=names)
-        v.require(sql('SELECT max(version) FROM schema_version')=='1.5.0' and
+        v.require(sql('SELECT max(version) FROM schema_version')=='1.6.0' and
                   sql('SELECT jsonb_agg(o) FROM mpp_occurrence o; SELECT jsonb_agg(s) FROM mpp_sql_text s')==original,
                   schema+': direct upgrade retains execution and SQL evidence')
         for month,bid in [('2026-10-01','V1'),('2026-11-01','V2')]:
@@ -36,8 +36,9 @@ def verify_statistics_migration(v, root, runner):
             else:
                 sql("INSERT INTO build SELECT 'V2',scope_id,input_id,config_id,normalization_id,profile,NULL,'running','2026-11-01',NULL,false,(SELECT partition_id FROM mpp_result_partition WHERE build_month='"+month+"'),'{}' FROM build WHERE build_id='V1'")
             sql("INSERT INTO mpp_build_group SELECT partition_id,build_id,'G1' FROM build WHERE build_id='"+bid+"'; "
-                "INSERT INTO mpp_build_coverage SELECT build_id,'G1',partition_id,'overall','[]','[null]' FROM build WHERE build_id='"+bid+"'")
-        v.require(sql('SELECT count(DISTINCT tableoid) FROM mpp_build_coverage')=='2',schema+': new month routes to separate provisioned leaf')
+                "INSERT INTO mpp_statistic (build_id,group_id,partition_id,layer,range_start,range_end,included_count,excluded_count,exclusions_by_reason,active_dates,active_week_starts,metric_null_reasons) SELECT build_id,'G1',partition_id,'overall','2026-09-01','2026-10-01',0,1,'{}','{}','{}',"+
+                "(SELECT jsonb_object_agg(x,'no_samples') FROM unnest(ARRAY['min_ms','max_ms','mean_ms','p25_ms','p50_ms','p75_ms','p90_ms','p95_ms','p99_ms','stddev_ms','cv','mad_ms','iqr_ms','log_median','log_mad','p95_p50','p99_p50']) x) FROM build WHERE build_id='"+bid+"'")
+        v.require(sql('SELECT count(DISTINCT tableoid) FROM mpp_statistic')=='2',schema+': new month routes to separate provisioned leaf')
         sql("INSERT INTO mpp_normalization SELECT 'N2',algorithm_version,parser_version,dictionary_schema_version,'synthetic-next',dictionary_digest_algorithm,'synthetic-next',rules_ref FROM mpp_normalization WHERE normalization_id='N1'; "
             "INSERT INTO mpp_fingerprint SELECT 'F2',sql_id,'N2',profile,state,value,reason FROM mpp_fingerprint WHERE fingerprint_id=(SELECT fingerprint_id FROM mpp_baseline_group WHERE group_id='G1'); "
             "INSERT INTO mpp_baseline_group SELECT 'G2',scope_id,profile,'N2',database,execution_user,'F2',fingerprint_value,timing_type FROM mpp_baseline_group WHERE group_id='G1'")
@@ -50,14 +51,14 @@ def verify_statistics_migration(v, root, runner):
         sql("INSERT INTO build SELECT 'BAD_MONTH',scope_id,input_id,config_id,normalization_id,profile,NULL,'running','2026-12-01',NULL,false,partition_id,'{}' FROM build WHERE build_id='V1'",ok=False)
         v.require(True,schema+': mismatched construction month is rejected')
 
-        v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='3',schema+': three partitioned parents, no layer tables')
+        v.require(sql("SELECT count(*) FROM pg_class WHERE relnamespace='"+schema+"'::regnamespace AND relkind='p'")=='2',schema+': two partitioned parents, no layer tables')
         v.require(sql("SELECT count(*) FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid WHERE c.relnamespace=current_schema()::regnamespace AND c.relname LIKE 'mpp_statistic%' AND a.attname='sufficiency' AND NOT a.attisdropped")=='0',schema+': parent and leaves omit sufficiency')
         sql('ALTER FUNCTION mpp_statistic_sufficiency(text,jsonb,text,bigint,date[],date[]) STABLE')
         drift=v.init('check',names=names,ok=False).stderr
         v.require('incompatible object' in drift and 'mpp_statistic_sufficiency' in drift,schema+': derived sufficiency function drift detected')
         sql('ALTER FUNCTION mpp_statistic_sufficiency(text,jsonb,text,bigint,date[],date[]) IMMUTABLE')
         for mode in ['all','check','upgrade']:v.init(mode,names=names)
-        child=sql('SELECT tableoid::regclass::text FROM mpp_build_coverage LIMIT 1')
+        child=sql('SELECT tableoid::regclass::text FROM mpp_statistic LIMIT 1')
         sql('ALTER TABLE '+child+' ADD COLUMN drift integer',ok=False)
         # Parent and leaves are included in catalog validation (not wildcard ignored).
         sql('ALTER TABLE '+child+' SET (fillfactor=80)')

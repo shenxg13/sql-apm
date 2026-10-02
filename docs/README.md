@@ -47,6 +47,7 @@
 | [契约字段字典](design/offline-data-contract/fields.md) | 设计说明 | 字段类型、必填与空值、枚举、引用和全部统计指标。 |
 | [HashData 来源映射](design/offline-data-contract/hashdata-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
 | [契约样例与需求对应](design/offline-data-contract/README.md) | 设计说明 | 需求到设计条款及正反样例的对应、合成数据与核对方法。 |
+| [构建编排与发布](design/build-publication.md) | 设计／已实现接口 | 集群任务、恢复、六项检查、覆盖推导和原子发布。 |
 | [统计计算设计](design/baseline-statistics.md) | 设计／已实现接口 | 正式及观察五层统计、分区自然键、原子保存与失败恢复。 |
 | [训练样本判定设计](design/training-decisions.md) | 设计／已实现接口 | 不可变快照、原文缓存、数据库统一推导及物理边界。 |
 | [日志导入设计](design/log-ingestion.md) | 设计说明 | 文件事务、Execute 单次配对、原文和近似入库、恢复与冲突检测边界。 |
@@ -63,6 +64,7 @@
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
+| [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |
 | [统计计算操作](runbooks/baseline-statistics.md) | 操作说明 | 快照计算、观察诊断、重试引用、分区维护和真实验收。 |
 | [训练快照与判定诊断](runbooks/training-decisions.md) | 操作说明 | 本地配置、快照／汇总命令、逐条查询和私有全量验收。 |
 | [完整日志批次导入](runbooks/log-ingestion.md) | 操作说明 | 来源／清单 JSON、只导入命令、幂等重试和私有实例验收。 |
@@ -78,6 +80,8 @@
 | --- | --- | --- |
 | [近似分组观察统计验证](reports/observation-statistics-2026-10-01.md) | 实施验证报告 | 55 文件重导、全部观察组复算、正式结果逐行对照、重复一致与资源实测。 |
 | [统计 R2 整改](reports/baseline-statistics-r2-remediation-2026-10-01.md) | 整改验证报告 | 批量门槛查询一致性、单组／聚合实测与统计容量接受同步。 |
+| [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
+| [构建编排 R1 整改](reports/build-publication-r1-remediation-2026-10-02.md) | 整改验证报告 | 次月预建并发、未登记集群拒绝、知识同步与 R1 退出条件。 |
 | [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
 | [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |
 | [类别别名验证](reports/training-category-aliases-2026-09-30.md) | 实施验证报告 | 三个别名、快照兼容及 55 文件执行级差分。 |

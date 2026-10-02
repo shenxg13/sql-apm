@@ -26,10 +26,10 @@ def verify_approximate_migration(v, root, runner):
             "INSERT INTO schema_version(version,script_sha256) VALUES ('1.1.0','" + V110_SHA + "');\n" + statements(legacy=True, results=False))
         old_tables = sql("SELECT relname FROM pg_class WHERE relnamespace='" + schema + "'::regnamespace AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname").splitlines()
         old_oids = sql("SELECT string_agg(c.oid::text,',') FROM pg_class c WHERE c.relname NOT IN ('mpp_statistic','mpp_build_coverage') AND c.oid NOT IN (SELECT indexrelid FROM pg_index WHERE indrelid IN ('mpp_statistic'::regclass,'mpp_build_coverage'::regclass)) AND relnamespace='" + schema + "'::regnamespace")
-        constraint_oids = sql("SELECT string_agg(oid::text,',') FROM pg_constraint WHERE conrelid NOT IN ('mpp_statistic'::regclass,'mpp_build_coverage'::regclass) AND connamespace='" + schema + "'::regnamespace")
+        constraint_oids = sql("SELECT string_agg(oid::text,',') FROM pg_constraint WHERE conrelid NOT IN ('mpp_statistic'::regclass,'mpp_build_coverage'::regclass) AND NOT (conrelid='task'::regclass AND conname IN ('task_mode_check','task_stage_check','task_check1')) AND connamespace='" + schema + "'::regnamespace")
 
         def state():
-            rows = {t: sql('SELECT coalesce(jsonb_agg((to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\']) ORDER BY (to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\'])::text),\'[]\') FROM "' + t + '" t')
+            rows = {t: sql('SELECT coalesce(jsonb_agg((to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\',\'stage_seconds\']-CASE WHEN to_jsonb(t) ? \'task_id\' AND to_jsonb(t) ? \'mode\' THEN ARRAY[\'started_at\',\'finished_at\'] ELSE ARRAY[]::text[] END) ORDER BY (to_jsonb(t)-ARRAY[\'partition_id\',\'diagnostics\',\'stage_seconds\']-CASE WHEN to_jsonb(t) ? \'task_id\' AND to_jsonb(t) ? \'mode\' THEN ARRAY[\'started_at\',\'finished_at\'] ELSE ARRAY[]::text[] END)::text),\'[]\') FROM "' + t + '" t')
                     for t in old_tables if t not in ('schema_version','mpp_statistic','mpp_build_coverage')}
             objects = sql('SELECT oid,relfilenode FROM pg_class WHERE oid IN (' + old_oids + ') ORDER BY oid')
             constraints = sql('SELECT oid,conname FROM pg_constraint WHERE oid IN (' + constraint_oids + ') ORDER BY oid')
@@ -75,9 +75,9 @@ def verify_approximate_migration(v, root, runner):
         v.init('upgrade', names=names)
         v.init('check', names=names)
         after = versions()
-        v.require(state() == before and set(after) == {'1.1.0','1.2.0','1.3.0','1.4.0','1.5.0'} and after['1.1.0'] == receipt['1.1.0'], schema + ': direct upgrade preserves all 1.1.0 rows/OIDs and receipt')
+        v.require(state() == before and set(after) == {'1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0'} and after['1.1.0'] == receipt['1.1.0'], schema + ': direct upgrade preserves all 1.1.0 rows/OIDs and receipt')
         for mode in ('upgrade', 'schema', 'all'):
             v.init(mode, names=names)
-        v.require(state() == before and versions() == after, schema + ': 1.5.0 reruns preserve all data and timestamps')
+        v.require(state() == before and versions() == after, schema + ': 1.6.0 reruns preserve all data and timestamps')
         v.require(sql("SELECT count(*) FROM pg_namespace WHERE nspname LIKE '_apm_%'") == '0', schema + ': no scratch schemas remain')
     print('RESULT: ' + str(v.completed) + ' direct approximate migration checks passed', flush=True)

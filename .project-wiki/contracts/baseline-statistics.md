@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/baseline-statistics.md
-updated: 2026-10-01
+updated: 2026-10-02
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/27#issuecomment-5929262162
     status: current
@@ -216,7 +216,7 @@ confidence: high
   首尾不足整周时“保留窗口内样本，标明不足整周，不补取窗口外数据”。
 - 用户随后询问是否需要增加其他层次，对首期保持五层、其他层次按实际需求
   后续评估的建议回复“好的”（2026-09-25）。
-- 来源状态：current；首期五个时间层次及周边界已确认，③已实现构建、五层计算和存储；发布仍由④交付。
+- 来源状态：current；首期五个时间层次及周边界已确认，③已实现构建、五层计算和存储；#29 已实现④发布检查与切换，见[构建与版本](../features/baseline-versions.md)。
 - 对每个“计算集群＋数据库＋执行用户＋SQL 结构指纹＋计时类别”分组，在本次
   构建的训练窗口内分别保留以下五层统计，继续使用北京时间的推算开始时间归属。
 
@@ -487,7 +487,8 @@ confidence: high
 表、分组与可靠结果分开，不能引用可靠 Group 或用近似 Group 写正式 Statistic。
 观察与正式结果同一事务保存，两者都成功才 calculated；任一失败全部回滚，重算从头开始。
 没有可归组观察记录时观察结果为空，构建仍可成功；仅排除的已知桶保留计数和 NULL/no_samples。
-不另存观察覆盖索引，空桶从窗口和实际统计行推导，覆盖表的后续设计留给④。
+不另存观察覆盖索引，空桶从窗口和实际统计行推导；#29 的④已按方案 C 删除正式覆盖表，
+正式及观察覆盖统一使用 `mpp_coverage` 推导，另存每层行数供核对，见[存储实现](../architecture/postgresql-storage.md#编排结构-1602026-10-01)。
 
 实现见[观察统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)；
 本次合成与 55 文件全量检查、近似可用性差异及资源边界记录在[观察统计验证报告](../../docs/reports/observation-statistics-2026-10-01.md)。

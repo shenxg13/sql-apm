@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.5.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.6.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.5.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.6.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -25,7 +25,7 @@
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  升级保留原始历史记录并登记经过的版本，新库只记录 1.5.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留原始历史记录并登记经过的版本，新库只记录 1.6.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -51,7 +51,7 @@
 | Build | `build`；同集群输入及配置、重试、状态、结果保存标志；配置／归一化上下文有复合外键。 |
 | Build.checks | `build_check`，按构建和六类检查名唯一，保存 passed/failed/not_run 及原因。 |
 | Build.timing_coverage | `mpp_build_timing_coverage`，五类计数分别保存；group_ids 从同构建覆盖记录关联 Group 得到。 |
-| Build.coverage_index | `mpp_build_coverage`，每组每层一行，computed_keys/empty_keys 为 JSONB 数组；statistic_ids 从结果表得到。 |
+| Build.coverage_index | `mpp_coverage` 从封存窗口与统计行推导；`mpp_build_layer_count` 保存每层行数和分组数供核对；statistic_ids 从结果表得到。 |
 | Decision | 首期由 `mpp_training_decisions` 按快照推导，不逐条永久保存；`mpp_decision` 保留历史结构，不由②写入。 |
 | Decision.reasons | 函数返回原因数组、规则引用与锚点证据，按事件／原因去重；既有 reason／evidence 表保留。 |
 | Problem | `problem` + `problem_evidence`；批次、文件、构建、事件定位；尝试的问题关系为 `attempt_problem`，其余 problem_ids 通过定位查询。 |
@@ -99,11 +99,11 @@ MPP 是生产 HashData 系统的内部专名，详见[系统称谓](../../.proje
 
 [冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
 [冻结的 1.1.0 DDL](../../sql_apm/storage/versions/1.1.0.sql)同样保持已发布字节；
-[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0，也允许从任一已发布中间版本开始。
+[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0，也允许从任一已发布中间版本开始。
 入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
 验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
 约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
-每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.5.0 的库只核验，不重复登记。
+每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.6.0 的库只核验，不重复登记。
 
 这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
 DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据，1.2.0 新增
@@ -111,7 +111,7 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 小规模验证核对逐表内容、关系 OID／relfilenode 和约束 OID 保留，
 不以此声称生产升级耗时或吞吐已经验证。独立统计表也不代表共享实例的资源隔离。
 原名 SQL 调用需随版本切换，没有保留旧名兼容视图；精确操作和恢复见
-[升级说明](../runbooks/database-initialization.md#升级到-150)。
+[升级说明](../runbooks/database-initialization.md#升级到-160)。
 
 ## 统计结构 1.4.0
 
@@ -123,7 +123,7 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 2026-09-30 范围变更取消物理 sufficiency；schema 及有效的 1.3.0→1.4.0 迁移同步使用新目标定义。
 该调整发生于 1.4.0 交付前，当时没有生产部署，因此未另增版本号；早期验收实例不作为兼容升级起点。
 Issue #27 已将最终 [1.4.0 DDL](../../sql_apm/storage/versions/1.4.0.sql)冻结为迁移与结构检查基线；
-当前结构为下述 1.5.0，随构建保存独立观察统计。
+当前结构为下述 1.6.0，随构建保存独立观察统计，并按需推导覆盖。
 
 ## 训练判定结构 1.3.0
 
@@ -287,3 +287,15 @@ Decision 由②按需推导；③仅在计算期间 TEMP 物化，随事务结�
 迁移先验证冻结 1.4.0 的完整 catalog（包括已登记动态分区），再增加近似结果复合唯一索引、
 观察表及已有月份的空观察叶分区。新增索引读取近似结果；已有正式分区和数据不重写。
 仍需维护窗口，失败全事务回滚；新库、升级和重跑共用完整结构检查。
+
+## 编排与覆盖结构 1.6.0
+
+[#29](https://github.com/shenxg13/sql-apm/issues/29)以方案 C 替代物理覆盖表，
+保留冻结的 1.5.0 DDL；迁移删除 mpp_build_coverage 并回填 `mpp_build_layer_count`。
+逻辑覆盖通过 `mpp_coverage` 按封存窗口推导，正式、观察结果均适用。
+父表／普通表总数仍为 56，MPP 专属表仍为 26；覆盖表移除、构建层计数表新增。
+Task 新增模式、阶段、数据库时间及阶段耗时，既有任务新增时间不代表历史执行实测。
+
+主要业务写入共用持有集群锁的连接，发布记录与当前指针同事务提交；六项检查核对正式结果，
+观察结果不影响发布门槛。新月份独立建表再 ATTACH，构建前确保当月，次月预建遇共享分组表锁忙时跳过并留待后续构建；
+旧月份结果和索引继续保留。连接失效、任务恢复及控制成本见[编排设计](build-publication.md)。

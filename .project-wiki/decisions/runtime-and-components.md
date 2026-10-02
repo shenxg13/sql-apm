@@ -4,8 +4,12 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-09-29
+updated: 2026-10-02
 sources:
+  - path: docs/reports/kylin-offline-deployment-2026-10-02.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/31
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/18
     status: current
   - path: .project-wiki/log.md
@@ -38,6 +42,29 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 已确认的 Kylin 演练与项目自带解释器（2026-10-02）
+
+来源：[Issue #31](https://github.com/shenxg13/sql-apm/issues/31) 的已确认契约及范围变更评论。
+Python 3.9.5 解释器属于正式部署流程，从离线源码包构建并安装在项目目录，
+不依赖主机已有的 Python，也不使用 Alma 构建目录作为可搬运发行包。
+若将来希望改用生产已有解释器路径，另开 follow-up Issue，不恢复此前的路径假设。
+
+本轮先在 Kylin V10 SP2 x86_64 演练机执行：Python、PostgreSQL 17.10、程序、日志和
+离线包均位于 `/data/sql-apm/`；PG 实例使用专用 postgres 系统用户及 pg_ctl，
+项目账号经本机 socket/SCRAM 登录，DBA 工具使用同一项目账号和受限客户端网段。
+实例不做 systemd 托管、不启用 TLS，凭据仅放程序目录外的 0600 文件。
+编译依赖根包及完整依赖由演练机初始状态的 yum 源收集、检查 RPM 签名并交付离线包；
+正常手册先尝试已有 yum 源，不可用时禁用网络源，仅启用 file:// 离线仓库。
+
+上述为已确认部署决定；实际操作、验证进展和适用限制见
+[部署手册](../../docs/runbooks/kylin-offline-deployment.md)和
+[验证报告](../../docs/reports/kylin-offline-deployment-2026-10-02.md)。
+演练已验证该平台能在项目目录离线构建 Python 3.9.5、PostgreSQL 17.10，并通过
+66 项普通测试、266 项数据库检查和 31 项发布检查；该事实不等同于全部演练验收已完成。
+用户在实施试跑后恢复快照并独立从头执行，DBA 工具验证须由用户完成。
+这不核实生产内网源、不同初始系统上的 RPM 完整性、120 三十天首批成本或 aarch64。
+本节更新后，早期条款中“Kylin 留待专项”的表述仅指当时阶段，不覆盖本轮已确认安排。
 
 ### 已确认的当前开发环境与生产部署安排
 

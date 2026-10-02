@@ -248,3 +248,4 @@
 - 按 [R1 台账](https://github.com/shenxg13/sql-apm/pull/30#issuecomment-5937040961) 同步当前 1.6.0、任务锁和④交付状态；次月可选预建遇共享分组表锁忙时跳过，后续再试；未登记集群仅允许导入入口登记。见[编排设计](../docs/design/build-publication.md)与[操作主题](features/operator-cli.md)。
 - 将用户已确认的 O1“失败／冲突只阻止当批”和 O2“较早批次 full 可以使窗口倒退”写入[版本正文](features/baseline-versions.md#发布输入与补导确认2026-10-02)，保留确认来源；不新增发布门槛或保护逻辑。
 - 三项整改、并发实测与回归证据见[R1 整改报告](../docs/reports/build-publication-r1-remediation-2026-10-02.md)；独立 R2 结论由在线评审记录。
+| 2026-10-02 | Issue #31 落实项目自带 Python 与 Kylin 离线演练的确认边界，新增部署手册、记录模板和辅助工具；决定与限制由[运行环境主题](decisions/runtime-and-components.md#已确认的-kylin-演练与项目自带解释器2026-10-02)维护，实际验收以实施报告和在线 Issue 为准。 |

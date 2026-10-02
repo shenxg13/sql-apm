@@ -1,0 +1,17 @@
+gcc
+gcc-c++
+make
+perl
+bison
+flex
+pkgconf
+zlib-devel
+libffi-devel
+readline-devel
+openssl-devel
+bzip2-devel
+xz-devel
+sqlite-devel
+util-linux-devel
+ncurses-devel
+libicu-devel

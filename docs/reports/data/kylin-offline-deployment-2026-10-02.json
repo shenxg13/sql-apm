@@ -1,0 +1,114 @@
+{
+  "evidence_kind": "measured",
+  "target_platform": "Kylin V10 SP2 Build09 x86_64",
+  "program_commit": "6451d140d44f4e06cc34862c3e5aff7593d7afeb",
+  "implementation_trial_complete": false,
+  "user_independent_run_complete": false,
+  "environment": {
+    "environment": {
+      "passed": true,
+      "python": "3.9.5",
+      "executable": "/data/sql-apm/app/.venv/bin/python",
+      "base_prefix": "/data/sql-apm/python-3.9.5",
+      "modules": [
+        "ssl",
+        "_ssl",
+        "hashlib",
+        "_hashlib",
+        "bz2",
+        "lzma",
+        "zlib",
+        "sqlite3",
+        "ctypes",
+        "readline",
+        "decimal",
+        "uuid",
+        "zoneinfo",
+        "multiprocessing",
+        "pglast",
+        "psycopg2"
+      ],
+      "openssl": "OpenSSL 1.1.1f  31 Mar 2020",
+      "sqlite": "3.32.3",
+      "network_checks": false
+    },
+    "phase_seconds": {
+      "python-build": 120,
+      "postgres-build": 147,
+      "unittest": 2,
+      "verify": 142,
+      "verify-publication": 12
+    },
+    "unittest": {
+      "count": 66,
+      "passed": true
+    },
+    "verify_pass_count": 266,
+    "publication_pass_count": 31,
+    "passfile_mode": "0o600"
+  },
+  "offline_packages": {
+    "signed_rpm_count": 391,
+    "initial_installed_packages_unchanged": true,
+    "initial_installed_packages_sha256": "2be5e16b49ee920ac1be1ef72aaecd935d4d8de85aa977f4d1f8059f401cdbb0",
+    "compile_roots": [
+      "gcc",
+      "gcc-c++",
+      "make",
+      "perl",
+      "bison",
+      "flex",
+      "pkgconf",
+      "zlib-devel",
+      "libffi-devel",
+      "readline-devel",
+      "openssl-devel",
+      "bzip2-devel",
+      "xz-devel",
+      "sqlite-devel",
+      "util-linux-devel",
+      "ncurses-devel",
+      "libicu-devel"
+    ],
+    "installation_method": "all network repositories disabled; only file:// local repository; gpgcheck=1",
+    "installation_seconds": 66,
+    "installed_count": 18,
+    "upgraded_count": 28
+  },
+  "bundle": {
+    "sha256": "1b052837dd38d838ebc62b9cab1efc6c8805d60ffae9270ebd30d33520155379",
+    "files": 422
+  },
+  "log_input": {
+    "files": 55,
+    "bytes": 15816193813,
+    "sha256_all_equal": true
+  },
+  "database": {
+    "version": "17.10",
+    "schema_version": "1.6.0",
+    "bootstrap_schema_check_passed": true,
+    "local_project_scram_passed": true,
+    "hba_has_trust": false,
+    "tcp_wrong_password_rejected": true,
+    "tcp_correct_password_verified": false,
+    "user_dba_tool_verified": false
+  },
+  "local_default_publication_checks": 31,
+  "tasks": [],
+  "pending": [
+    "nine-task replay currently running",
+    "cross-host correct-password authentication",
+    "yum-source dependency path followed by both source builds",
+    "user snapshot restoration and independent execution",
+    "user DBA tool read-only query"
+  ],
+  "boundaries": [
+    "not a production deployment",
+    "production yum contents not checked",
+    "RPM closure not verified for different initial systems",
+    "120 cluster 30-day first-batch cost not measured",
+    "aarch64 not covered",
+    "optional parallel rebuild not performed"
+  ]
+}

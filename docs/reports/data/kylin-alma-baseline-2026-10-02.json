@@ -1,0 +1,5429 @@
+{
+  "provenance": {
+    "kind": "measured",
+    "source": "https://github.com/shenxg13/sql-apm/pull/30#issuecomment-5939592275",
+    "source_report_sha256": "4780895d629769d6502465d74d8f0a0ac40671e500167b57d719f4933b1bc6f8",
+    "reviewed_commit": "559c080b1815e5db16e0f3325015dd6c657368e2",
+    "program_commit": "6451d140d44f4e06cc34862c3e5aff7593d7afeb",
+    "product_code_sha256": {
+      "sql_apm/__init__.py": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600",
+      "sql_apm/__main__.py": "0428e67ad1c41d4a143c9c28a2a766a63749fdc15513d22d5a54a786a6564ad1",
+      "sql_apm/baseline/__init__.py": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+      "sql_apm/baseline/statistics.py": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+      "sql_apm/baseline/watchdog.py": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+      "sql_apm/baseline/workflow.py": "6a61b8187397674ddd864c29ff60ddf66e42521e69381ea2e2617eed8abf060c",
+      "sql_apm/cli/__init__.py": "8d73b8fd493df706cf6cbd185801cf2870dc84ba3dcdcf19d7a148248b927e50",
+      "sql_apm/cli/ingest.py": "4ec76149a39595296f630fbddc76903117ccb16a402cce5ee1fc7a9f67db71e5",
+      "sql_apm/cli/statistics.py": "eff4ec673fd776f7f000b34bc236a4cb17546a0c9b278ae2dd1da1fdbbd9cdcd",
+      "sql_apm/cli/training.py": "7d193d0044280f23ffc16918a7f2282bd88f1145222499693fd57f4f6de0d4b4",
+      "sql_apm/cli/workflow.py": "b7a462550fa221f8123a3bfb1470f644310de4ad8c2b8a430cc7aa19c1cab522",
+      "sql_apm/diagnostics/__init__.py": "f53216dadbfcf5bfd3c1670ec768a821977d7ea09a9715a5fb0872f24c9833a9",
+      "sql_apm/diagnostics/approximate_sql.py": "2c1dedf512f017942747f5d49fcdc6cd515056cd95fe10a346f88b6ba4e15acf",
+      "sql_apm/diagnostics/duration_dispersion.py": "be9f4de7b8eac4717cc5f96cb8707afadc03f83d0512fba7558d5409c5d36bfd",
+      "sql_apm/diagnostics/function_probe.py": "1f0b76dd46dc7e023097c802094800c61efabe405ddfb6958771bd380e435e72",
+      "sql_apm/diagnostics/log_supplement.py": "95e19cd82ef6ea803e11167aca174cf866c11e7750652358111c9b6d05f5d43e",
+      "sql_apm/diagnostics/mpp_adapter_probe.py": "bc1f54b59ca6ebf9b0b7af5e536b7246cb9392386c917fac159cc3a3cde1af78",
+      "sql_apm/diagnostics/mpp_approximate_replay.py": "123b29859f5f489fce89d2bee95b81e2b17d49b4b94dbda6d568ab233f01dd87",
+      "sql_apm/diagnostics/mpp_broad_matrix.py": "c28b0406bceda5662cd7b561f27a6acf3a1d06bc747543f909143169cfa29692",
+      "sql_apm/diagnostics/mpp_broad_replay.py": "ec6ffe23929ac125f5dfea1fcf6f600c6ec1a0cd20feaa9ccfcd5e2b2a88995d",
+      "sql_apm/diagnostics/mpp_expansion_matrix.py": "7d024dd010672d902a6b289261ff04a52bd6fdf7801f941d46cfef115beb4e6b",
+      "sql_apm/diagnostics/mpp_expansion_probe.py": "6b4356f3aa31d24c327d4d62461aec3c0fec2b78f6b9ba065c31d5176adca8b2",
+      "sql_apm/diagnostics/mpp_full_audit.py": "94fe9515ebe0dec23e28b897618bee8da7f230e314fa05223650bbf330d11cdf",
+      "sql_apm/diagnostics/mpp_full_repair.py": "f361f5a39016dcc638cc76f3b54666064915b192601c56c38e22eef2ed5d1361",
+      "sql_apm/diagnostics/mpp_full_scan.py": "d503647e9dae3c38b5884830fab338c5a3444b9dd10f1ae9643c45cb4ae5c8d0",
+      "sql_apm/diagnostics/normalization_diff.py": "ed0a23c9372a6452eea3d614054b7f4dd3b89ca44023ca23744351317a1dd237",
+      "sql_apm/diagnostics/normalization_replay.py": "d2a4b79f4f1fa3736984a8de441997f2ec803cd8e95806137b6d15cd25700711",
+      "sql_apm/diagnostics/normalization_v5_audit.py": "a7554401c4c4aa74d9b211def5e265ce465ec42ccbffd7b66723a3fa68e1bd31",
+      "sql_apm/diagnostics/normalize_sql.py": "b5a11ca85e9a4f8d019c992549503a15e3362ec456c89d905bbeeaf58a9bc375",
+      "sql_apm/diagnostics/parser_fidelity.py": "20bf5ceed64d930f6d172bb35370220504cfa7f2ba143f9c53fda82442eb344a",
+      "sql_apm/diagnostics/statement_census.py": "b07ccfab71613af518832b9280da8ef49b9b420e97da57c301f72409cbee38cf",
+      "sql_apm/diagnostics/threshold_coverage.py": "9a3a11faff07ad29f1a9da1a430d6bc8c991e095c9b41eca836947a602cf4996",
+      "sql_apm/diagnostics/threshold_encoding_audit.py": "045e68ad3fad175ebba7e4952620856c36297d70777559517f951df96091fa9e",
+      "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+      "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+      "sql_apm/ingestion/hashdata/__init__.py": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+      "sql_apm/ingestion/hashdata/persistence.py": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+      "sql_apm/ingestion/hashdata/reader.py": "0ae7a99f6c73b8c471e790ba6f358e12b9effcf922d5e3f30f495a35de9eb96c",
+      "sql_apm/ingestion/importer.py": "53c284bea5007568190762f58785cd088b4f3fdf47cd83b02e2394db50d8783d",
+      "sql_apm/ingestion/normalizing.py": "e8abdde6189258092322d36fee620699c4c44a27d69c4a820c651bf574ff1f3c",
+      "sql_apm/sql/__init__.py": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+      "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+      "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+      "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+      "sql_apm/sql/mpp_parser.py": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+      "sql_apm/sql/normalization.py": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0",
+      "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+      "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+      "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c",
+      "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+      "sql_apm/storage/ingestion.py": "85479cac69c59b18d38cf50e8177f6185eac3408b7520064a596b1eb52b78299",
+      "sql_apm/storage/observations.py": "cbf7cb7d3356d2ba60225b422a6837e4cdd95f64f5e323268a0bd11750f5764a",
+      "sql_apm/storage/publication.py": "ff87ac4ad59b0a94f8884b551e8ab05751305ba1deed039142d6b9a0952313f2",
+      "sql_apm/storage/statistics.py": "4960ddb0f5bc3c4fee0ae13b3a8a3f26d9072cd52e3cfe85d8665d369e39880a",
+      "sql_apm/storage/tasks.py": "a73a640737afb7a35b86da82e9e98ca0c839edd560d1d3f94d7255c916233b5d",
+      "sql_apm/storage/training.py": "df8dd3e77bf64fcf779dfd3697b97a2c3b8d937c2fe01d77109cec3f7cc9961d",
+      "sql_apm/training/__init__.py": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+      "sql_apm/training/categories.py": "b6d4aae0d340dcbd8d4f9ff26b3bc671461af84703e3c23034fc3bd88ee7ab6c",
+      "sql_apm/training/config.py": "030255dd409446fe5893f4f7f14bddefece2e324d4f6cf833e40fa506b3aeda1",
+      "sql_apm/storage/bootstrap.sql": "2fe4650226796cb0af4c19be5072604571407ea205125b4ae247068b0ab5edb0",
+      "sql_apm/storage/catalog.sql": "3c14e98be3c228337a710316e6f360957602cc7fe68698296485ecf47308aaba",
+      "sql_apm/storage/check_structure.sql": "3aa26610645b351cc4eab703da94be3fdfeebfb7286185cc68e3c95f68ce813d",
+      "sql_apm/storage/check_version.sql": "0d29103c38996cc79a44c5636b735ad305b8c93e7c2068152b683e004c86c424",
+      "sql_apm/storage/expected_partitions.sql": "ee1ce5e3b0c0f88470f2b92b7885837d2c0ddca4ddd635f27d4b61eb0f0b2170",
+      "sql_apm/storage/initialize.sql": "5193a9d281852222b7c6541166cf7fcd99ad8869ab0b77a16c3bcb184d81df73",
+      "sql_apm/storage/migrate.sql": "e8bb84fd36265aeaac0bcd7274be2391897f244bd4142611af74b7e01b3bccc4",
+      "sql_apm/storage/prepare.sql": "e324d86dd99465596ae082723b43366f81a274b1a014a498119e6b98bdac20f7",
+      "sql_apm/storage/schema.sql": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f",
+      "sql_apm/storage/statistics_sufficiency.sql": "b7d1c29c7a6d32cd2248c569a0156354bf1019a3095d59f0d22edd601cb3d9ca"
+    },
+    "input_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+    "environment": "AlmaLinux 9.8 x86_64, Python 3.9.5, PostgreSQL 17.10; R2 final-head replay; unchanged product tree at main merge"
+  },
+  "clusters": {
+    "119": [
+      {
+        "cutoff_date": "2026-07-28",
+        "build": {
+          "groups": 51266,
+          "layers": {
+            "day": 217566,
+            "hour": 67265,
+            "overall": 51266,
+            "week": 80067,
+            "weekday": 93602
+          },
+          "timings": {
+            "bind": [
+              388617,
+              199627
+            ],
+            "execute_fetch": [
+              12348,
+              0
+            ],
+            "execute_first": [
+              388567,
+              199626
+            ],
+            "parse": [
+              385305,
+              191529
+            ],
+            "request": [
+              532517,
+              181063
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              791517
+            ],
+            [
+              "included",
+              1707354
+            ],
+            [
+              "unresolved",
+              49005
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              19672
+            ],
+            [
+              "batch",
+              "unresolved",
+              49005
+            ],
+            [
+              "group",
+              "excluded",
+              771845
+            ],
+            [
+              "group",
+              "included",
+              1707354
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              1
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              19672
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              31
+            ],
+            [
+              "batch",
+              "execution_failed",
+              19600
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              41
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "batch",
+              "sql_missing",
+              28904
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              20127
+            ],
+            [
+              "batch",
+              "start_unknown",
+              19672
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              19673
+            ],
+            [
+              "group",
+              "blacklist_category",
+              771845
+            ]
+          ],
+          "observations": {
+            "groups": 28,
+            "layers": {
+              "day": 40,
+              "hour": 30,
+              "overall": 28,
+              "week": 34,
+              "weekday": 32
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 0,
+                "groups": 28,
+                "included": 40,
+                "reasons": {}
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                20061
+              ],
+              [
+                "group",
+                40
+              ],
+              [
+                "sql_missing",
+                28904
+              ],
+              [
+                "start_unknown",
+                30
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                4
+              ],
+              [
+                "missing",
+                28904
+              ],
+              [
+                "uncertain",
+                20127
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                20061
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                1
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                28904
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                30
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                26
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                30
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            217566,
+            51266
+          ],
+          [
+            "formal",
+            "hour",
+            67265,
+            51266
+          ],
+          [
+            "formal",
+            "overall",
+            51266,
+            51266
+          ],
+          [
+            "formal",
+            "week",
+            80067,
+            51266
+          ],
+          [
+            "formal",
+            "weekday",
+            93602,
+            51266
+          ],
+          [
+            "observation",
+            "day",
+            40,
+            28
+          ],
+          [
+            "observation",
+            "hour",
+            30,
+            28
+          ],
+          [
+            "observation",
+            "overall",
+            28,
+            28
+          ],
+          [
+            "observation",
+            "week",
+            34,
+            28
+          ],
+          [
+            "observation",
+            "weekday",
+            32,
+            28
+          ]
+        ],
+        "import_attempts": 26,
+        "import": {
+          "added_occurrences": 2547876,
+          "added_records": 5124686,
+          "files": [
+            {
+              "added_occurrences": 56439,
+              "added_records": 117152,
+              "counts": {
+                "duration:autostats.c:334": 241,
+                "duration:postgres.c:1455": 397,
+                "duration:postgres.c:1946": 18332,
+                "duration:postgres.c:2219": 11633,
+                "duration:postgres.c:2603": 12799,
+                "duration:postgres.c:2843": 13044,
+                "duration_with_sql": 55164,
+                "duration_without_sql": 1282,
+                "occurrences": 56439,
+                "outcome:failed": 628,
+                "outcome:success": 55808,
+                "outcome:timed_out": 3,
+                "problem:duration_ms_unknown": 631,
+                "problem:error_without_execution": 724,
+                "problem:estimated_start_at_unknown": 631,
+                "problem:fingerprint_base_parser_rejected": 9,
+                "problem:fingerprint_invalid_encoding": 3,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 86,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 17,
+                "problem:fingerprint_sql_missing_or_empty": 689,
+                "problem:record_encoding_invalid": 6,
+                "problem:sql_missing": 1282,
+                "problem:timing_out_of_scope": 638,
+                "records": 117152,
+                "timing:bind": 12799,
+                "timing:execute_fetch": 1329,
+                "timing:execute_first": 11715,
+                "timing:parse": 11633,
+                "timing:request": 18332,
+                "timing:unknown": 631
+              },
+              "file_id": "I:dd0a67872c9cd1360bd6b1f395beca741aae428920a9d9dfd64207e83c095f24",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 92261,
+              "added_records": 189535,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 588,
+                "duration:postgres.c:1946": 28391,
+                "duration:postgres.c:2219": 20815,
+                "duration:postgres.c:2224": 1,
+                "duration:postgres.c:2603": 21180,
+                "duration:postgres.c:2843": 21118,
+                "duration_with_sql": 92229,
+                "duration_without_sql": 183,
+                "occurrences": 92261,
+                "outcome:failed": 754,
+                "outcome:success": 91505,
+                "outcome:timed_out": 2,
+                "problem:duration_ms_unknown": 756,
+                "problem:error_without_execution": 1791,
+                "problem:estimated_start_at_unknown": 756,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 57,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 8,
+                "problem:fingerprint_sql_missing_or_empty": 777,
+                "problem:sql_missing": 183,
+                "problem:timing_out_of_scope": 907,
+                "records": 189535,
+                "timing:bind": 21180,
+                "timing:execute_fetch": 47,
+                "timing:execute_first": 21071,
+                "timing:parse": 20816,
+                "timing:request": 28391,
+                "timing:unknown": 756
+              },
+              "file_id": "I:b6e23d679f3a4864732c858cf3dfc985ffd2c6293c3a7edd4d32760872762e5f",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 91669,
+              "added_records": 188238,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 585,
+                "duration:postgres.c:1946": 28259,
+                "duration:postgres.c:2219": 20727,
+                "duration:postgres.c:2603": 21000,
+                "duration:postgres.c:2843": 20943,
+                "duration_with_sql": 91714,
+                "duration_without_sql": 119,
+                "occurrences": 91669,
+                "outcome:failed": 738,
+                "outcome:success": 90929,
+                "outcome:timed_out": 2,
+                "problem:duration_ms_unknown": 740,
+                "problem:error_without_execution": 1764,
+                "problem:estimated_start_at_unknown": 740,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 55,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 7,
+                "problem:fingerprint_sql_missing_or_empty": 755,
+                "problem:sql_missing": 119,
+                "problem:timing_out_of_scope": 904,
+                "records": 188238,
+                "timing:bind": 21000,
+                "timing:execute_fetch": 8,
+                "timing:execute_first": 20935,
+                "timing:parse": 20727,
+                "timing:request": 28259,
+                "timing:unknown": 740
+              },
+              "file_id": "I:076fb67c2554196ba51ee9567ce279b42bd86f075faba69c819e9627652aaa55",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 110612,
+              "added_records": 215732,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 861,
+                "duration:postgres.c:1946": 28643,
+                "duration:postgres.c:2219": 26260,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 27887,
+                "duration:postgres.c:2843": 27071,
+                "duration_with_sql": 108809,
+                "duration_without_sql": 2238,
+                "occurrences": 110612,
+                "outcome:cancelled": 3,
+                "outcome:failed": 736,
+                "outcome:success": 109867,
+                "outcome:timed_out": 6,
+                "problem:duration_ms_unknown": 745,
+                "problem:error_without_execution": 2008,
+                "problem:estimated_start_at_unknown": 745,
+                "problem:fingerprint_base_parser_rejected": 15,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 167,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 26,
+                "problem:fingerprint_sql_missing_or_empty": 753,
+                "problem:sql_missing": 2238,
+                "problem:timing_out_of_scope": 1180,
+                "records": 215732,
+                "timing:bind": 27887,
+                "timing:execute_fetch": 820,
+                "timing:execute_first": 26251,
+                "timing:parse": 26266,
+                "timing:request": 28643,
+                "timing:unknown": 745
+              },
+              "file_id": "I:d576608ac3b65719294b92b19bc21a50f554ce3474df9ff16d94287a13b8adf4",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 100884,
+              "added_records": 202277,
+              "counts": {
+                "duration:autostats.c:334": 321,
+                "duration:postgres.c:1455": 718,
+                "duration:postgres.c:1946": 28696,
+                "duration:postgres.c:2219": 23285,
+                "duration:postgres.c:2603": 24342,
+                "duration:postgres.c:2843": 23800,
+                "duration_with_sql": 99724,
+                "duration_without_sql": 1438,
+                "occurrences": 100884,
+                "outcome:failed": 754,
+                "outcome:success": 100123,
+                "outcome:timed_out": 7,
+                "problem:duration_ms_unknown": 761,
+                "problem:error_without_execution": 1949,
+                "problem:estimated_start_at_unknown": 761,
+                "problem:fingerprint_base_parser_rejected": 11,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 109,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 11,
+                "problem:fingerprint_sql_missing_or_empty": 777,
+                "problem:sql_missing": 1438,
+                "problem:timing_out_of_scope": 1039,
+                "records": 202277,
+                "timing:bind": 24342,
+                "timing:execute_fetch": 475,
+                "timing:execute_first": 23325,
+                "timing:parse": 23285,
+                "timing:request": 28696,
+                "timing:unknown": 761
+              },
+              "file_id": "I:3f98a1029ac3f6fbc063e357c785b5a6b04a09e0a9d9ac047800b1eec5d3599a",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 103663,
+              "added_records": 206678,
+              "counts": {
+                "duration:autostats.c:334": 363,
+                "duration:postgres.c:1455": 678,
+                "duration:postgres.c:1946": 28619,
+                "duration:postgres.c:2219": 24002,
+                "duration:postgres.c:2224": 1,
+                "duration:postgres.c:2603": 25165,
+                "duration:postgres.c:2843": 25080,
+                "duration_with_sql": 102248,
+                "duration_without_sql": 1660,
+                "occurrences": 103663,
+                "outcome:failed": 795,
+                "outcome:success": 102867,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 796,
+                "problem:error_without_execution": 1941,
+                "problem:estimated_start_at_unknown": 796,
+                "problem:fingerprint_base_parser_rejected": 10,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 83,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 19,
+                "problem:fingerprint_sql_missing_or_empty": 799,
+                "problem:sql_missing": 1660,
+                "problem:timing_out_of_scope": 1041,
+                "records": 206678,
+                "timing:bind": 25165,
+                "timing:execute_fetch": 1100,
+                "timing:execute_first": 23980,
+                "timing:parse": 24003,
+                "timing:request": 28619,
+                "timing:unknown": 796
+              },
+              "file_id": "I:216f9d8438611b65a85c3ac1f56bf2210038212068df84f14a879b69d688f557",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 102017,
+              "added_records": 205229,
+              "counts": {
+                "duration:autostats.c:334": 340,
+                "duration:postgres.c:1455": 673,
+                "duration:postgres.c:1946": 28596,
+                "duration:postgres.c:2219": 23440,
+                "duration:postgres.c:2224": 3,
+                "duration:postgres.c:2603": 24501,
+                "duration:postgres.c:2843": 24711,
+                "duration_with_sql": 100807,
+                "duration_without_sql": 1457,
+                "occurrences": 102017,
+                "outcome:cancelled": 3,
+                "outcome:failed": 762,
+                "outcome:success": 101251,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 766,
+                "problem:error_without_execution": 1984,
+                "problem:estimated_start_at_unknown": 766,
+                "problem:fingerprint_base_parser_rejected": 9,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 93,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 24,
+                "problem:fingerprint_sql_missing_or_empty": 783,
+                "problem:sql_missing": 1457,
+                "problem:timing_out_of_scope": 1013,
+                "records": 205229,
+                "timing:bind": 24501,
+                "timing:execute_fetch": 1240,
+                "timing:execute_first": 23471,
+                "timing:parse": 23443,
+                "timing:request": 28596,
+                "timing:unknown": 766
+              },
+              "file_id": "I:95ee5d3f292b1d0efcccf8d63b12bfb468db1bb7f31173d0128380632328a8e9",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 101257,
+              "added_records": 203152,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 639,
+                "duration:postgres.c:1946": 28587,
+                "duration:postgres.c:2219": 23276,
+                "duration:postgres.c:2224": 5,
+                "duration:postgres.c:2603": 24139,
+                "duration:postgres.c:2843": 24488,
+                "duration_with_sql": 100118,
+                "duration_without_sql": 1335,
+                "occurrences": 101257,
+                "outcome:failed": 761,
+                "outcome:success": 100495,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 762,
+                "problem:error_without_execution": 2001,
+                "problem:estimated_start_at_unknown": 762,
+                "problem:fingerprint_base_parser_rejected": 8,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 59,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 11,
+                "problem:fingerprint_sql_missing_or_empty": 783,
+                "problem:sql_missing": 1335,
+                "problem:timing_out_of_scope": 958,
+                "records": 203152,
+                "timing:bind": 24139,
+                "timing:execute_fetch": 1208,
+                "timing:execute_first": 23280,
+                "timing:parse": 23281,
+                "timing:request": 28587,
+                "timing:unknown": 762
+              },
+              "file_id": "I:8be0447c5a5256d2d558ea039f423b5e44d8dee213ad8eb2bcea0da5defabb0f",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 94886,
+              "added_records": 192913,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 574,
+                "duration:postgres.c:1946": 28309,
+                "duration:postgres.c:2219": 21719,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 22065,
+                "duration:postgres.c:2843": 22025,
+                "duration_with_sql": 94937,
+                "duration_without_sql": 80,
+                "occurrences": 94886,
+                "outcome:failed": 761,
+                "outcome:success": 94124,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 762,
+                "problem:error_without_execution": 1760,
+                "problem:estimated_start_at_unknown": 762,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 52,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 8,
+                "problem:fingerprint_sql_missing_or_empty": 785,
+                "problem:sql_missing": 80,
+                "problem:timing_out_of_scope": 893,
+                "records": 192913,
+                "timing:bind": 22065,
+                "timing:execute_fetch": 3,
+                "timing:execute_first": 22022,
+                "timing:parse": 21725,
+                "timing:request": 28309,
+                "timing:unknown": 762
+              },
+              "file_id": "I:ae4cdf2f9574587ec7e31496f3de449979e2f94b2e1de513dcf3418a9fe27c21",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 93643,
+              "added_records": 190601,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 585,
+                "duration:postgres.c:1946": 28136,
+                "duration:postgres.c:2219": 21389,
+                "duration:postgres.c:2224": 1,
+                "duration:postgres.c:2603": 21725,
+                "duration:postgres.c:2843": 21661,
+                "duration_with_sql": 93697,
+                "duration_without_sql": 119,
+                "occurrences": 93643,
+                "outcome:failed": 730,
+                "outcome:success": 92912,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 731,
+                "problem:error_without_execution": 1756,
+                "problem:estimated_start_at_unknown": 731,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 56,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 7,
+                "problem:fingerprint_sql_missing_or_empty": 747,
+                "problem:sql_missing": 119,
+                "problem:timing_out_of_scope": 904,
+                "records": 190601,
+                "timing:bind": 21725,
+                "timing:execute_first": 21661,
+                "timing:parse": 21390,
+                "timing:request": 28136,
+                "timing:unknown": 731
+              },
+              "file_id": "I:7c6b25fbf09669d3a0db52685a960bca35a0d9ce6e9f363fe85ca41fe39e7047",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 102509,
+              "added_records": 204155,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 728,
+                "duration:postgres.c:1946": 28504,
+                "duration:postgres.c:2219": 23650,
+                "duration:postgres.c:2224": 3,
+                "duration:postgres.c:2603": 25067,
+                "duration:postgres.c:2843": 24552,
+                "duration_with_sql": 101078,
+                "duration_without_sql": 1745,
+                "occurrences": 102509,
+                "outcome:failed": 732,
+                "outcome:success": 101776,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 733,
+                "problem:error_without_execution": 1973,
+                "problem:estimated_start_at_unknown": 733,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 165,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 20,
+                "problem:fingerprint_sql_missing_or_empty": 749,
+                "problem:sql_missing": 1745,
+                "problem:timing_out_of_scope": 1047,
+                "records": 204155,
+                "timing:bind": 25067,
+                "timing:execute_fetch": 791,
+                "timing:execute_first": 23761,
+                "timing:parse": 23653,
+                "timing:request": 28504,
+                "timing:unknown": 733
+              },
+              "file_id": "I:95aa0114f156977d7b24ffba6ddcb7c1f16f95af6c132283c40fa7162b558293",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 99418,
+              "added_records": 199881,
+              "counts": {
+                "duration:autostats.c:334": 327,
+                "duration:postgres.c:1455": 625,
+                "duration:postgres.c:1946": 28631,
+                "duration:postgres.c:2219": 22893,
+                "duration:postgres.c:2224": 5,
+                "duration:postgres.c:2603": 23830,
+                "duration:postgres.c:2843": 23298,
+                "duration_with_sql": 98306,
+                "duration_without_sql": 1303,
+                "occurrences": 99418,
+                "outcome:failed": 760,
+                "outcome:success": 98657,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 761,
+                "problem:error_without_execution": 1943,
+                "problem:estimated_start_at_unknown": 761,
+                "problem:fingerprint_base_parser_rejected": 8,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 54,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 9,
+                "problem:fingerprint_sql_missing_or_empty": 783,
+                "problem:sql_missing": 1303,
+                "problem:timing_out_of_scope": 952,
+                "records": 199881,
+                "timing:bind": 23830,
+                "timing:execute_fetch": 364,
+                "timing:execute_first": 22934,
+                "timing:parse": 22898,
+                "timing:request": 28631,
+                "timing:unknown": 761
+              },
+              "file_id": "I:cad30bb5894fe9aff4b8c5a22f0fecacbba756d15a8420f4b78d1e0c2715445c",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 100577,
+              "added_records": 201547,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 668,
+                "duration:postgres.c:1946": 28623,
+                "duration:postgres.c:2219": 23252,
+                "duration:postgres.c:2224": 2,
+                "duration:postgres.c:2603": 24361,
+                "duration:postgres.c:2843": 23578,
+                "duration_with_sql": 99396,
+                "duration_without_sql": 1407,
+                "occurrences": 100577,
+                "outcome:failed": 760,
+                "outcome:success": 99816,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 761,
+                "problem:error_without_execution": 1962,
+                "problem:estimated_start_at_unknown": 761,
+                "problem:fingerprint_base_parser_rejected": 10,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 71,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 20,
+                "problem:fingerprint_sql_missing_or_empty": 781,
+                "problem:sql_missing": 1407,
+                "problem:timing_out_of_scope": 987,
+                "records": 201547,
+                "timing:bind": 24361,
+                "timing:execute_fetch": 219,
+                "timing:execute_first": 23359,
+                "timing:parse": 23254,
+                "timing:request": 28623,
+                "timing:unknown": 761
+              },
+              "file_id": "I:dc932a6c6fccc06508ce73fd59c4bd45e8b896199c66978ddbeaa744ed9ad799",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 104359,
+              "added_records": 207207,
+              "counts": {
+                "duration:autostats.c:334": 320,
+                "duration:postgres.c:1455": 633,
+                "duration:postgres.c:1946": 29124,
+                "duration:postgres.c:2219": 24384,
+                "duration:postgres.c:2224": 5,
+                "duration:postgres.c:2603": 25318,
+                "duration:postgres.c:2843": 24740,
+                "duration_with_sql": 103193,
+                "duration_without_sql": 1331,
+                "occurrences": 104359,
+                "outcome:cancelled": 5,
+                "outcome:failed": 782,
+                "outcome:success": 103571,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 788,
+                "problem:error_without_execution": 1991,
+                "problem:estimated_start_at_unknown": 788,
+                "problem:fingerprint_base_parser_rejected": 10,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 58,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 8,
+                "problem:fingerprint_sql_missing_or_empty": 789,
+                "problem:sql_missing": 1331,
+                "problem:timing_out_of_scope": 953,
+                "records": 207207,
+                "timing:bind": 25318,
+                "timing:execute_fetch": 337,
+                "timing:execute_first": 24403,
+                "timing:parse": 24389,
+                "timing:request": 29124,
+                "timing:unknown": 788
+              },
+              "file_id": "I:60daa8c0a7aa66d93b47bd15986fd4ff4aa92d1fbe1c69f57d0f54b109bc1263",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 102578,
+              "added_records": 204907,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 599,
+                "duration:postgres.c:1946": 29240,
+                "duration:postgres.c:2219": 23635,
+                "duration:postgres.c:2224": 5,
+                "duration:postgres.c:2603": 24668,
+                "duration:postgres.c:2843": 24232,
+                "duration_with_sql": 101247,
+                "duration_without_sql": 1451,
+                "occurrences": 102578,
+                "outcome:cancelled": 3,
+                "outcome:failed": 794,
+                "outcome:success": 101780,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 798,
+                "problem:error_without_execution": 2001,
+                "problem:estimated_start_at_unknown": 798,
+                "problem:fingerprint_base_parser_rejected": 13,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 53,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 11,
+                "problem:fingerprint_sql_missing_or_empty": 785,
+                "problem:sql_missing": 1451,
+                "problem:timing_out_of_scope": 918,
+                "records": 204907,
+                "timing:bind": 24668,
+                "timing:execute_fetch": 577,
+                "timing:execute_first": 23655,
+                "timing:parse": 23640,
+                "timing:request": 29240,
+                "timing:unknown": 798
+              },
+              "file_id": "I:31c16070f77842186dab55eba1f51164d2e8945ceef8182bebadfca94f8af8d7",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 90759,
+              "added_records": 187224,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 569,
+                "duration:postgres.c:1946": 28272,
+                "duration:postgres.c:2219": 20367,
+                "duration:postgres.c:2224": 4,
+                "duration:postgres.c:2603": 20696,
+                "duration:postgres.c:2843": 20661,
+                "duration_with_sql": 90821,
+                "duration_without_sql": 67,
+                "occurrences": 90759,
+                "outcome:failed": 758,
+                "outcome:success": 90000,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 759,
+                "problem:error_without_execution": 1750,
+                "problem:estimated_start_at_unknown": 759,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 50,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 8,
+                "problem:fingerprint_sql_missing_or_empty": 781,
+                "problem:sql_missing": 67,
+                "problem:timing_out_of_scope": 888,
+                "records": 187224,
+                "timing:bind": 20696,
+                "timing:execute_fetch": 2,
+                "timing:execute_first": 20659,
+                "timing:parse": 20371,
+                "timing:request": 28272,
+                "timing:unknown": 759
+              },
+              "file_id": "I:3de1e2ee8bc0dd3d6c1bc8470a02378174865582ec85ef6b78ce172aa01e11ae",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 91533,
+              "added_records": 187752,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 576,
+                "duration:postgres.c:1946": 28151,
+                "duration:postgres.c:2219": 20687,
+                "duration:postgres.c:2603": 21039,
+                "duration:postgres.c:2843": 20925,
+                "duration_with_sql": 91516,
+                "duration_without_sql": 181,
+                "occurrences": 91533,
+                "outcome:failed": 730,
+                "outcome:success": 90802,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 731,
+                "problem:error_without_execution": 1769,
+                "problem:estimated_start_at_unknown": 731,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 53,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 7,
+                "problem:fingerprint_sql_missing_or_empty": 747,
+                "problem:sql_missing": 181,
+                "problem:timing_out_of_scope": 895,
+                "records": 187752,
+                "timing:bind": 21039,
+                "timing:execute_first": 20925,
+                "timing:parse": 20687,
+                "timing:request": 28151,
+                "timing:unknown": 731
+              },
+              "file_id": "I:1447e7f2a2ee6718974b92eea9a102e7b3bb59744633a661ab6c2087fd3f84a5",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 103957,
+              "added_records": 206209,
+              "counts": {
+                "duration:autostats.c:334": 325,
+                "duration:postgres.c:1455": 669,
+                "duration:postgres.c:1946": 28646,
+                "duration:postgres.c:2219": 24041,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 25587,
+                "duration:postgres.c:2843": 24918,
+                "duration_with_sql": 102230,
+                "duration_without_sql": 1962,
+                "occurrences": 103957,
+                "outcome:cancelled": 5,
+                "outcome:failed": 753,
+                "outcome:success": 103198,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 759,
+                "problem:error_without_execution": 1987,
+                "problem:estimated_start_at_unknown": 759,
+                "problem:fingerprint_base_parser_rejected": 7,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 65,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 9,
+                "problem:fingerprint_sql_missing_or_empty": 755,
+                "problem:sql_missing": 1962,
+                "problem:timing_out_of_scope": 994,
+                "records": 206209,
+                "timing:bind": 25587,
+                "timing:execute_fetch": 804,
+                "timing:execute_first": 24114,
+                "timing:parse": 24047,
+                "timing:request": 28646,
+                "timing:unknown": 759
+              },
+              "file_id": "I:90f5af5142df84142b8474851daa36bde115f850cc3d4931505c77a8759865b4",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 104105,
+              "added_records": 207074,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 628,
+                "duration:postgres.c:1946": 28981,
+                "duration:postgres.c:2219": 24171,
+                "duration:postgres.c:2224": 3,
+                "duration:postgres.c:2603": 25365,
+                "duration:postgres.c:2843": 24800,
+                "duration_with_sql": 102750,
+                "duration_without_sql": 1517,
+                "occurrences": 104105,
+                "outcome:cancelled": 4,
+                "outcome:failed": 780,
+                "outcome:success": 103320,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 785,
+                "problem:error_without_execution": 2023,
+                "problem:estimated_start_at_unknown": 785,
+                "problem:fingerprint_base_parser_rejected": 9,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 66,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 9,
+                "problem:fingerprint_sql_missing_or_empty": 793,
+                "problem:sql_missing": 1517,
+                "problem:timing_out_of_scope": 947,
+                "records": 207074,
+                "timing:bind": 25365,
+                "timing:execute_fetch": 518,
+                "timing:execute_first": 24282,
+                "timing:parse": 24174,
+                "timing:request": 28981,
+                "timing:unknown": 785
+              },
+              "file_id": "I:34b185fd4aff642d270830c2133b9a8398cd1296c61ff6fb6b86d6070f5e731e",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 108379,
+              "added_records": 212876,
+              "counts": {
+                "duration:autostats.c:334": 336,
+                "duration:postgres.c:1455": 641,
+                "duration:postgres.c:1946": 29202,
+                "duration:postgres.c:2219": 25547,
+                "duration:postgres.c:2224": 5,
+                "duration:postgres.c:2603": 26626,
+                "duration:postgres.c:2843": 26224,
+                "duration_with_sql": 107021,
+                "duration_without_sql": 1560,
+                "occurrences": 108379,
+                "outcome:cancelled": 1,
+                "outcome:failed": 773,
+                "outcome:success": 107604,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 775,
+                "problem:error_without_execution": 2015,
+                "problem:estimated_start_at_unknown": 775,
+                "problem:fingerprint_base_parser_rejected": 10,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 73,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 11,
+                "problem:fingerprint_sql_missing_or_empty": 779,
+                "problem:sql_missing": 1560,
+                "problem:timing_out_of_scope": 977,
+                "records": 212876,
+                "timing:bind": 26626,
+                "timing:execute_fetch": 672,
+                "timing:execute_first": 25552,
+                "timing:parse": 25552,
+                "timing:request": 29202,
+                "timing:unknown": 775
+              },
+              "file_id": "I:e3ced2fd204ea527b7c7f87d018aecd663020099ca925574d56c23af2a46dbba",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 100512,
+              "added_records": 201436,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 663,
+                "duration:postgres.c:1946": 28567,
+                "duration:postgres.c:2219": 23202,
+                "duration:postgres.c:2224": 10,
+                "duration:postgres.c:2603": 24311,
+                "duration:postgres.c:2843": 23660,
+                "duration_with_sql": 99412,
+                "duration_without_sql": 1320,
+                "occurrences": 100512,
+                "outcome:failed": 761,
+                "outcome:success": 99750,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 762,
+                "problem:error_without_execution": 1949,
+                "problem:estimated_start_at_unknown": 762,
+                "problem:fingerprint_base_parser_rejected": 5,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 88,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 12,
+                "problem:fingerprint_sql_missing_or_empty": 783,
+                "problem:sql_missing": 1320,
+                "problem:timing_out_of_scope": 982,
+                "records": 201436,
+                "timing:bind": 24311,
+                "timing:execute_fetch": 309,
+                "timing:execute_first": 23351,
+                "timing:parse": 23212,
+                "timing:request": 28567,
+                "timing:unknown": 762
+              },
+              "file_id": "I:23be9a0a14ed56a49397ac55f2083e6119f2ca958112a2a591d5b78382d2d411",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 99843,
+              "added_records": 200927,
+              "counts": {
+                "duration:autostats.c:334": 320,
+                "duration:postgres.c:1455": 796,
+                "duration:postgres.c:1946": 28561,
+                "duration:postgres.c:2219": 23077,
+                "duration:postgres.c:2224": 3,
+                "duration:postgres.c:2603": 24054,
+                "duration:postgres.c:2843": 23382,
+                "duration_with_sql": 98888,
+                "duration_without_sql": 1305,
+                "occurrences": 99843,
+                "outcome:failed": 765,
+                "outcome:success": 99077,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 766,
+                "problem:error_without_execution": 1942,
+                "problem:estimated_start_at_unknown": 766,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 230,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 10,
+                "problem:fingerprint_sql_missing_or_empty": 787,
+                "problem:sql_missing": 1305,
+                "problem:timing_out_of_scope": 1116,
+                "records": 200927,
+                "timing:bind": 24054,
+                "timing:execute_fetch": 245,
+                "timing:execute_first": 23137,
+                "timing:parse": 23080,
+                "timing:request": 28561,
+                "timing:unknown": 766
+              },
+              "file_id": "I:371331e3b3fce6add1cbdd98c407d9bb39c7bfe4752103850b3df7a05c41b2fb",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 93731,
+              "added_records": 191289,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 570,
+                "duration:postgres.c:1946": 28284,
+                "duration:postgres.c:2219": 21315,
+                "duration:postgres.c:2224": 3,
+                "duration:postgres.c:2603": 21700,
+                "duration:postgres.c:2843": 21669,
+                "duration_with_sql": 93799,
+                "duration_without_sql": 61,
+                "occurrences": 93731,
+                "outcome:failed": 759,
+                "outcome:success": 92971,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 760,
+                "problem:error_without_execution": 1748,
+                "problem:estimated_start_at_unknown": 760,
+                "problem:fingerprint_base_parser_rejected": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 50,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 8,
+                "problem:fingerprint_sql_missing_or_empty": 783,
+                "problem:sql_missing": 61,
+                "problem:timing_out_of_scope": 889,
+                "records": 191289,
+                "timing:bind": 21700,
+                "timing:execute_fetch": 3,
+                "timing:execute_first": 21666,
+                "timing:parse": 21318,
+                "timing:request": 28284,
+                "timing:unknown": 760
+              },
+              "file_id": "I:a539b3478cb781a758d217e04267fe4d3bb5c506d4579f08afd1fab2e1173f7c",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 90954,
+              "added_records": 187195,
+              "counts": {
+                "duration:autostats.c:334": 319,
+                "duration:postgres.c:1455": 583,
+                "duration:postgres.c:1946": 28152,
+                "duration:postgres.c:2219": 20482,
+                "duration:postgres.c:2603": 20814,
+                "duration:postgres.c:2843": 20767,
+                "duration_with_sql": 91027,
+                "duration_without_sql": 90,
+                "occurrences": 90954,
+                "outcome:failed": 738,
+                "outcome:success": 90215,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 739,
+                "problem:error_without_execution": 1757,
+                "problem:estimated_start_at_unknown": 739,
+                "problem:fingerprint_base_parser_rejected": 7,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 54,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 7,
+                "problem:fingerprint_sql_missing_or_empty": 755,
+                "problem:sql_missing": 90,
+                "problem:timing_out_of_scope": 902,
+                "records": 187195,
+                "timing:bind": 20814,
+                "timing:execute_fetch": 5,
+                "timing:execute_first": 20762,
+                "timing:parse": 20482,
+                "timing:request": 28152,
+                "timing:unknown": 739
+              },
+              "file_id": "I:9f6a2d7f452cd28ac211271fe8e470135436dd87a6024c8ce26f7d7369c95bea",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 103744,
+              "added_records": 207270,
+              "counts": {
+                "duration:autostats.c:334": 327,
+                "duration:postgres.c:1455": 778,
+                "duration:postgres.c:1946": 29352,
+                "duration:postgres.c:2219": 23787,
+                "duration:postgres.c:2224": 9,
+                "duration:postgres.c:2603": 25294,
+                "duration:postgres.c:2843": 24521,
+                "duration_with_sql": 102023,
+                "duration_without_sql": 2045,
+                "occurrences": 103744,
+                "outcome:cancelled": 7,
+                "outcome:failed": 773,
+                "outcome:success": 102963,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 781,
+                "problem:error_without_execution": 2046,
+                "problem:estimated_start_at_unknown": 781,
+                "problem:fingerprint_base_parser_rejected": 8,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 144,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 23,
+                "problem:fingerprint_sql_missing_or_empty": 775,
+                "problem:fingerprint_unsupported_distribution_statement": 2,
+                "problem:sql_missing": 2045,
+                "problem:timing_out_of_scope": 1105,
+                "records": 207270,
+                "timing:bind": 25294,
+                "timing:execute_fetch": 707,
+                "timing:execute_first": 23814,
+                "timing:parse": 23796,
+                "timing:request": 29352,
+                "timing:unknown": 781
+              },
+              "file_id": "I:e151231f1c66b21d9e180c310ce6c99599f94135e7901762828d4c3d4c91f955",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 103587,
+              "added_records": 206230,
+              "counts": {
+                "duration:autostats.c:334": 323,
+                "duration:postgres.c:1455": 700,
+                "duration:postgres.c:1946": 28822,
+                "duration:postgres.c:2219": 24076,
+                "duration:postgres.c:2224": 4,
+                "duration:postgres.c:2603": 25247,
+                "duration:postgres.c:2843": 24674,
+                "duration_with_sql": 102198,
+                "duration_without_sql": 1648,
+                "occurrences": 103587,
+                "outcome:failed": 763,
+                "outcome:success": 102823,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 764,
+                "problem:error_without_execution": 1993,
+                "problem:estimated_start_at_unknown": 764,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 96,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 19,
+                "problem:fingerprint_sql_missing_or_empty": 787,
+                "problem:sql_missing": 1648,
+                "problem:timing_out_of_scope": 1023,
+                "records": 206230,
+                "timing:bind": 25247,
+                "timing:execute_fetch": 565,
+                "timing:execute_first": 24108,
+                "timing:parse": 24080,
+                "timing:request": 28822,
+                "timing:unknown": 765
+              },
+              "file_id": "I:70277ba7202207e2e975088e75c2b856274510c27c5bf769f9a7cb76c0ba3518",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-06-29T00:00:00+08:00",
+        "window_end": "2026-07-29T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-07-29",
+        "build": {
+          "groups": 52897,
+          "layers": {
+            "day": 226043,
+            "hour": 69013,
+            "overall": 52897,
+            "week": 81792,
+            "weekday": 95329
+          },
+          "timings": {
+            "bind": [
+              403550,
+              207556
+            ],
+            "execute_fetch": [
+              12646,
+              0
+            ],
+            "execute_first": [
+              403497,
+              207555
+            ],
+            "parse": [
+              400116,
+              199115
+            ],
+            "request": [
+              553117,
+              188107
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              822771
+            ],
+            [
+              "included",
+              1772926
+            ],
+            [
+              "unresolved",
+              51128
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              20438
+            ],
+            [
+              "batch",
+              "unresolved",
+              51128
+            ],
+            [
+              "group",
+              "excluded",
+              802333
+            ],
+            [
+              "group",
+              "included",
+              1772926
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              1
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              20438
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              33
+            ],
+            [
+              "batch",
+              "execution_failed",
+              20363
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              42
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "batch",
+              "sql_missing",
+              30237
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              20917
+            ],
+            [
+              "batch",
+              "start_unknown",
+              20438
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              20439
+            ],
+            [
+              "group",
+              "blacklist_category",
+              802333
+            ]
+          ],
+          "observations": {
+            "groups": 29,
+            "layers": {
+              "day": 41,
+              "hour": 31,
+              "overall": 29,
+              "week": 35,
+              "weekday": 33
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 0,
+                "groups": 29,
+                "included": 41,
+                "reasons": {}
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                20850
+              ],
+              [
+                "group",
+                41
+              ],
+              [
+                "sql_missing",
+                30237
+              ],
+              [
+                "start_unknown",
+                30
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                4
+              ],
+              [
+                "missing",
+                30237
+              ],
+              [
+                "uncertain",
+                20917
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                20850
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                1
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                30237
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                30
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                26
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                30
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            226043,
+            52897
+          ],
+          [
+            "formal",
+            "hour",
+            69013,
+            52897
+          ],
+          [
+            "formal",
+            "overall",
+            52897,
+            52897
+          ],
+          [
+            "formal",
+            "week",
+            81792,
+            52897
+          ],
+          [
+            "formal",
+            "weekday",
+            95329,
+            52897
+          ],
+          [
+            "observation",
+            "day",
+            41,
+            29
+          ],
+          [
+            "observation",
+            "hour",
+            31,
+            29
+          ],
+          [
+            "observation",
+            "overall",
+            29,
+            29
+          ],
+          [
+            "observation",
+            "week",
+            35,
+            29
+          ],
+          [
+            "observation",
+            "weekday",
+            33,
+            29
+          ]
+        ],
+        "import_attempts": 28,
+        "import": {
+          "added_occurrences": 98949,
+          "added_records": 199164,
+          "files": [
+            {
+              "added_occurrences": 79051,
+              "added_records": 157799,
+              "counts": {
+                "duration:autostats.c:334": 304,
+                "duration:postgres.c:1455": 527,
+                "duration:postgres.c:1946": 21886,
+                "duration:postgres.c:2219": 18357,
+                "duration:postgres.c:2224": 1,
+                "duration:postgres.c:2603": 19373,
+                "duration:postgres.c:2843": 18743,
+                "duration_with_sql": 77913,
+                "duration_without_sql": 1278,
+                "occurrences": 79051,
+                "outcome:cancelled": 2,
+                "outcome:failed": 688,
+                "outcome:success": 78360,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 691,
+                "problem:error_without_execution": 1283,
+                "problem:estimated_start_at_unknown": 691,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_invalid_encoding": 4,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 1,
+                "problem:fingerprint_lexical_unbalanced_bracket": 98,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 10,
+                "problem:fingerprint_sql_missing_or_empty": 728,
+                "problem:record_encoding_invalid": 8,
+                "problem:sql_missing": 1278,
+                "problem:timing_out_of_scope": 831,
+                "records": 157799,
+                "timing:bind": 19373,
+                "timing:execute_fetch": 289,
+                "timing:execute_first": 18454,
+                "timing:parse": 18358,
+                "timing:request": 21886,
+                "timing:unknown": 691
+              },
+              "file_id": "I:56a566b0c2bdadc0fd945c87a8b489583eaa8272bf4ec7bd30a7f5684b049a14",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 19898,
+              "added_records": 41365,
+              "counts": {
+                "duration:autostats.c:334": 20,
+                "duration:postgres.c:1455": 157,
+                "duration:postgres.c:1946": 6548,
+                "duration:postgres.c:2219": 4428,
+                "duration:postgres.c:2603": 4433,
+                "duration:postgres.c:2843": 4414,
+                "duration_with_sql": 19945,
+                "duration_without_sql": 55,
+                "occurrences": 19898,
+                "outcome:failed": 75,
+                "outcome:success": 19823,
+                "problem:duration_ms_unknown": 75,
+                "problem:error_without_execution": 580,
+                "problem:estimated_start_at_unknown": 75,
+                "problem:fingerprint_lexical_unbalanced_bracket": 4,
+                "problem:fingerprint_sql_missing_or_empty": 61,
+                "problem:sql_missing": 55,
+                "problem:timing_out_of_scope": 177,
+                "records": 41365,
+                "timing:bind": 4433,
+                "timing:execute_fetch": 9,
+                "timing:execute_first": 4405,
+                "timing:parse": 4428,
+                "timing:request": 6548,
+                "timing:unknown": 75
+              },
+              "file_id": "I:96fa02f119430fdf77c953574e3bf094c5f4191f2b923fe71026c49f74ab678d",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-06-30T00:00:00+08:00",
+        "window_end": "2026-07-30T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-07-30",
+        "build": {
+          "groups": 54577,
+          "layers": {
+            "day": 234613,
+            "hour": 71118,
+            "overall": 54577,
+            "week": 83503,
+            "weekday": 97167
+          },
+          "timings": {
+            "bind": [
+              419060,
+              215633
+            ],
+            "execute_fetch": [
+              13003,
+              0
+            ],
+            "execute_first": [
+              419005,
+              215632
+            ],
+            "parse": [
+              415489,
+              206858
+            ],
+            "request": [
+              573980,
+              195156
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              854483
+            ],
+            [
+              "included",
+              1840537
+            ],
+            [
+              "unresolved",
+              53404
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              21204
+            ],
+            [
+              "batch",
+              "unresolved",
+              53404
+            ],
+            [
+              "group",
+              "excluded",
+              833279
+            ],
+            [
+              "group",
+              "included",
+              1840537
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              1
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              21204
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              36
+            ],
+            [
+              "batch",
+              "execution_failed",
+              21125
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              43
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "batch",
+              "sql_missing",
+              31723
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              21707
+            ],
+            [
+              "batch",
+              "start_unknown",
+              21204
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              21205
+            ],
+            [
+              "group",
+              "blacklist_category",
+              833279
+            ]
+          ],
+          "observations": {
+            "groups": 30,
+            "layers": {
+              "day": 44,
+              "hour": 32,
+              "overall": 30,
+              "week": 36,
+              "weekday": 36
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 0,
+                "groups": 30,
+                "included": 44,
+                "reasons": {}
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                21637
+              ],
+              [
+                "group",
+                44
+              ],
+              [
+                "sql_missing",
+                31723
+              ],
+              [
+                "start_unknown",
+                30
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                4
+              ],
+              [
+                "missing",
+                31723
+              ],
+              [
+                "uncertain",
+                21707
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                21637
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                1
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                31723
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                30
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                26
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                30
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            234613,
+            54577
+          ],
+          [
+            "formal",
+            "hour",
+            71118,
+            54577
+          ],
+          [
+            "formal",
+            "overall",
+            54577,
+            54577
+          ],
+          [
+            "formal",
+            "week",
+            83503,
+            54577
+          ],
+          [
+            "formal",
+            "weekday",
+            97167,
+            54577
+          ],
+          [
+            "observation",
+            "day",
+            44,
+            30
+          ],
+          [
+            "observation",
+            "hour",
+            32,
+            30
+          ],
+          [
+            "observation",
+            "overall",
+            30,
+            30
+          ],
+          [
+            "observation",
+            "week",
+            36,
+            30
+          ],
+          [
+            "observation",
+            "weekday",
+            36,
+            30
+          ]
+        ],
+        "import_attempts": 29,
+        "import": {
+          "added_occurrences": 101599,
+          "added_records": 203063,
+          "files": [
+            {
+              "added_occurrences": 101599,
+              "added_records": 203063,
+              "counts": {
+                "duration:autostats.c:334": 323,
+                "duration:postgres.c:1455": 629,
+                "duration:postgres.c:1946": 28702,
+                "duration:postgres.c:2219": 23544,
+                "duration:postgres.c:2224": 12,
+                "duration:postgres.c:2603": 24633,
+                "duration:postgres.c:2843": 23942,
+                "duration_with_sql": 100299,
+                "duration_without_sql": 1486,
+                "occurrences": 101599,
+                "outcome:cancelled": 3,
+                "outcome:failed": 762,
+                "outcome:success": 100833,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 766,
+                "problem:error_without_execution": 1970,
+                "problem:estimated_start_at_unknown": 766,
+                "problem:fingerprint_base_parser_rejected": 5,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 71,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 9,
+                "problem:fingerprint_sql_missing_or_empty": 787,
+                "problem:sql_missing": 1486,
+                "problem:timing_out_of_scope": 952,
+                "records": 203063,
+                "timing:bind": 24633,
+                "timing:execute_fetch": 357,
+                "timing:execute_first": 23585,
+                "timing:parse": 23556,
+                "timing:request": 28702,
+                "timing:unknown": 766
+              },
+              "file_id": "I:8bb87df0314edcf0637833e0f853755353e716b3fcc2948f6feffd3f9cc81c8c",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-07-01T00:00:00+08:00",
+        "window_end": "2026-07-31T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-07-31",
+        "build": {
+          "groups": 53786,
+          "layers": {
+            "day": 235223,
+            "hour": 69471,
+            "overall": 53786,
+            "week": 82356,
+            "weekday": 96362
+          },
+          "timings": {
+            "bind": [
+              425764,
+              220302
+            ],
+            "execute_fetch": [
+              12408,
+              0
+            ],
+            "execute_first": [
+              425710,
+              220302
+            ],
+            "parse": [
+              422115,
+              211338
+            ],
+            "request": [
+              582950,
+              196511
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              870426
+            ],
+            [
+              "included",
+              1868947
+            ],
+            [
+              "outside_window",
+              55808
+            ],
+            [
+              "unresolved",
+              53654
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              21973
+            ],
+            [
+              "batch",
+              "unresolved",
+              53654
+            ],
+            [
+              "group",
+              "excluded",
+              848453
+            ],
+            [
+              "group",
+              "included",
+              1868947
+            ],
+            [
+              "none",
+              "outside_window",
+              55808
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              1
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              21973
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              36
+            ],
+            [
+              "batch",
+              "execution_failed",
+              21893
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              44
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "batch",
+              "sql_missing",
+              31869
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              21811
+            ],
+            [
+              "batch",
+              "start_unknown",
+              21973
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              21974
+            ],
+            [
+              "group",
+              "blacklist_category",
+              848453
+            ],
+            [
+              "none",
+              "blacklist_category",
+              15480
+            ],
+            [
+              "none",
+              "outside_window",
+              55808
+            ],
+            [
+              "none",
+              "sql_missing",
+              1282
+            ],
+            [
+              "none",
+              "sql_uncertain",
+              690
+            ]
+          ],
+          "observations": {
+            "groups": 30,
+            "layers": {
+              "day": 46,
+              "hour": 32,
+              "overall": 30,
+              "week": 36,
+              "weekday": 36
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 0,
+                "groups": 30,
+                "included": 46,
+                "reasons": {}
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                21739
+              ],
+              [
+                "group",
+                46
+              ],
+              [
+                "outside_window",
+                1972
+              ],
+              [
+                "sql_missing",
+                31869
+              ],
+              [
+                "start_unknown",
+                30
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                4
+              ],
+              [
+                "missing",
+                33151
+              ],
+              [
+                "uncertain",
+                22501
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                21739
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                1
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                31869
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                30
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                26
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                30
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            235223,
+            53786
+          ],
+          [
+            "formal",
+            "hour",
+            69471,
+            53786
+          ],
+          [
+            "formal",
+            "overall",
+            53786,
+            53786
+          ],
+          [
+            "formal",
+            "week",
+            82356,
+            53786
+          ],
+          [
+            "formal",
+            "weekday",
+            96362,
+            53786
+          ],
+          [
+            "observation",
+            "day",
+            46,
+            30
+          ],
+          [
+            "observation",
+            "hour",
+            32,
+            30
+          ],
+          [
+            "observation",
+            "overall",
+            30,
+            30
+          ],
+          [
+            "observation",
+            "week",
+            36,
+            30
+          ],
+          [
+            "observation",
+            "weekday",
+            36,
+            30
+          ]
+        ],
+        "import_attempts": 30,
+        "import": {
+          "added_occurrences": 100411,
+          "added_records": 201727,
+          "files": [
+            {
+              "added_occurrences": 100411,
+              "added_records": 201727,
+              "counts": {
+                "duration:autostats.c:334": 321,
+                "duration:postgres.c:1455": 626,
+                "duration:postgres.c:1946": 28761,
+                "duration:postgres.c:2219": 22973,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 24078,
+                "duration:postgres.c:2843": 23824,
+                "duration_with_sql": 99161,
+                "duration_without_sql": 1428,
+                "occurrences": 100411,
+                "outcome:failed": 768,
+                "outcome:success": 99642,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 769,
+                "problem:error_without_execution": 1929,
+                "problem:estimated_start_at_unknown": 769,
+                "problem:fingerprint_base_parser_rejected": 6,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 3,
+                "problem:fingerprint_lexical_unbalanced_bracket": 63,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 12,
+                "problem:fingerprint_sql_missing_or_empty": 791,
+                "problem:sql_missing": 1428,
+                "problem:timing_out_of_scope": 947,
+                "records": 201727,
+                "timing:bind": 24078,
+                "timing:execute_fetch": 734,
+                "timing:execute_first": 23090,
+                "timing:parse": 22979,
+                "timing:request": 28761,
+                "timing:unknown": 769
+              },
+              "file_id": "I:c68712a5d501d41e43627dc36283210bed391a9865fa3a9a3e62d83cec56b3ec",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-07-02T00:00:00+08:00",
+        "window_end": "2026-08-01T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-07-31",
+        "build": {
+          "groups": 53786,
+          "layers": {
+            "day": 235223,
+            "hour": 69471,
+            "overall": 53786,
+            "week": 82356,
+            "weekday": 96362
+          },
+          "timings": {
+            "bind": [
+              425764,
+              220302
+            ],
+            "execute_fetch": [
+              12408,
+              0
+            ],
+            "execute_first": [
+              425710,
+              220302
+            ],
+            "parse": [
+              422115,
+              211338
+            ],
+            "request": [
+              582950,
+              196511
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              870426
+            ],
+            [
+              "included",
+              1868947
+            ],
+            [
+              "outside_window",
+              55808
+            ],
+            [
+              "unresolved",
+              53654
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              21973
+            ],
+            [
+              "batch",
+              "unresolved",
+              53654
+            ],
+            [
+              "group",
+              "excluded",
+              848453
+            ],
+            [
+              "group",
+              "included",
+              1868947
+            ],
+            [
+              "none",
+              "outside_window",
+              55808
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              1
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              21973
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              36
+            ],
+            [
+              "batch",
+              "execution_failed",
+              21893
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              44
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              4
+            ],
+            [
+              "batch",
+              "sql_missing",
+              31869
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              21811
+            ],
+            [
+              "batch",
+              "start_unknown",
+              21973
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              21974
+            ],
+            [
+              "group",
+              "blacklist_category",
+              848453
+            ],
+            [
+              "none",
+              "blacklist_category",
+              15480
+            ],
+            [
+              "none",
+              "outside_window",
+              55808
+            ],
+            [
+              "none",
+              "sql_missing",
+              1282
+            ],
+            [
+              "none",
+              "sql_uncertain",
+              690
+            ]
+          ],
+          "observations": {
+            "groups": 30,
+            "layers": {
+              "day": 46,
+              "hour": 32,
+              "overall": 30,
+              "week": 36,
+              "weekday": 36
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 0,
+                "groups": 30,
+                "included": 46,
+                "reasons": {}
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                21739
+              ],
+              [
+                "group",
+                46
+              ],
+              [
+                "outside_window",
+                1972
+              ],
+              [
+                "sql_missing",
+                31869
+              ],
+              [
+                "start_unknown",
+                30
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                4
+              ],
+              [
+                "missing",
+                33151
+              ],
+              [
+                "uncertain",
+                22501
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                21739
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                1
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                1
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                31869
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                30
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                26
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                30
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                30
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            235223,
+            53786
+          ],
+          [
+            "formal",
+            "hour",
+            69471,
+            53786
+          ],
+          [
+            "formal",
+            "overall",
+            53786,
+            53786
+          ],
+          [
+            "formal",
+            "week",
+            82356,
+            53786
+          ],
+          [
+            "formal",
+            "weekday",
+            96362,
+            53786
+          ],
+          [
+            "observation",
+            "day",
+            46,
+            30
+          ],
+          [
+            "observation",
+            "hour",
+            32,
+            30
+          ],
+          [
+            "observation",
+            "overall",
+            30,
+            30
+          ],
+          [
+            "observation",
+            "week",
+            36,
+            30
+          ],
+          [
+            "observation",
+            "weekday",
+            36,
+            30
+          ]
+        ],
+        "import_attempts": 30,
+        "window_start": "2026-07-02T00:00:00+08:00",
+        "window_end": "2026-08-01T00:00:00+08:00"
+      }
+    ],
+    "120": [
+      {
+        "cutoff_date": "2026-09-16",
+        "build": {
+          "groups": 404794,
+          "layers": {
+            "day": 719306,
+            "hour": 468434,
+            "overall": 404794,
+            "week": 508149,
+            "weekday": 719306
+          },
+          "timings": {
+            "bind": [
+              350020,
+              81902
+            ],
+            "execute_fetch": [
+              294,
+              0
+            ],
+            "execute_first": [
+              349995,
+              81902
+            ],
+            "parse": [
+              283657,
+              60983
+            ],
+            "request": [
+              824739,
+              277484
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              521920
+            ],
+            [
+              "included",
+              1808705
+            ],
+            [
+              "unresolved",
+              54958
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              19649
+            ],
+            [
+              "batch",
+              "unresolved",
+              54958
+            ],
+            [
+              "group",
+              "excluded",
+              502271
+            ],
+            [
+              "group",
+              "included",
+              1808705
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              136
+            ],
+            [
+              "batch",
+              "blacklist_category",
+              3
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              19649
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              27
+            ],
+            [
+              "batch",
+              "execution_failed",
+              19621
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              1
+            ],
+            [
+              "batch",
+              "sql_encoding_invalid",
+              14
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              500
+            ],
+            [
+              "batch",
+              "sql_missing",
+              16290
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              38367
+            ],
+            [
+              "batch",
+              "start_unknown",
+              19649
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              19785
+            ],
+            [
+              "group",
+              "blacklist_category",
+              502271
+            ]
+          ],
+          "observations": {
+            "groups": 645,
+            "layers": {
+              "day": 972,
+              "hour": 698,
+              "overall": 645,
+              "week": 753,
+              "weekday": 972
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 122,
+                "groups": 645,
+                "included": 1170,
+                "reasons": {
+                  "association_unreliable": 122,
+                  "timing_unknown": 122
+                }
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                37366
+              ],
+              [
+                "group",
+                1292
+              ],
+              [
+                "sql_missing",
+                16290
+              ],
+              [
+                "start_unknown",
+                223
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                500
+              ],
+              [
+                "invalid_encoding",
+                14
+              ],
+              [
+                "missing",
+                16290
+              ],
+              [
+                "uncertain",
+                38367
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                4
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                4
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                37366
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                4
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                4
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                16290
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                223
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                223
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                39
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                184
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                223
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                223
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            719306,
+            404794
+          ],
+          [
+            "formal",
+            "hour",
+            468434,
+            404794
+          ],
+          [
+            "formal",
+            "overall",
+            404794,
+            404794
+          ],
+          [
+            "formal",
+            "week",
+            508149,
+            404794
+          ],
+          [
+            "formal",
+            "weekday",
+            719306,
+            404794
+          ],
+          [
+            "observation",
+            "day",
+            972,
+            645
+          ],
+          [
+            "observation",
+            "hour",
+            698,
+            645
+          ],
+          [
+            "observation",
+            "overall",
+            645,
+            645
+          ],
+          [
+            "observation",
+            "week",
+            753,
+            645
+          ],
+          [
+            "observation",
+            "weekday",
+            972,
+            645
+          ]
+        ],
+        "import_attempts": 13,
+        "import": {
+          "added_occurrences": 2385583,
+          "added_records": 5540943,
+          "files": [
+            {
+              "added_occurrences": 283303,
+              "added_records": 668674,
+              "counts": {
+                "duration:autostats.c:334": 8079,
+                "duration:postgres.c:1455": 2388,
+                "duration:postgres.c:1946": 149869,
+                "duration:postgres.c:2219": 29296,
+                "duration:postgres.c:2603": 52153,
+                "duration:postgres.c:2608": 2,
+                "duration:postgres.c:2843": 48864,
+                "duration_with_sql": 286666,
+                "duration_without_sql": 3985,
+                "occurrences": 283303,
+                "outcome:cancelled": 10,
+                "outcome:failed": 3109,
+                "outcome:success": 280184,
+                "problem:duration_ms_unknown": 3119,
+                "problem:error_without_execution": 2826,
+                "problem:estimated_start_at_unknown": 3119,
+                "problem:execute_start_missing": 5,
+                "problem:fingerprint_base_parser_rejected": 102,
+                "problem:fingerprint_invalid_encoding": 31,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 43,
+                "problem:fingerprint_lexical_unbalanced_bracket": 734,
+                "problem:fingerprint_lexical_unclosed_comment": 5,
+                "problem:fingerprint_lexical_unclosed_string": 182,
+                "problem:fingerprint_scanner_rejected": 9,
+                "problem:fingerprint_sql_missing_or_empty": 3550,
+                "problem:record_encoding_invalid": 85,
+                "problem:sql_missing": 3985,
+                "problem:timing_out_of_scope": 10467,
+                "records": 668674,
+                "timing:bind": 52155,
+                "timing:execute_fetch": 253,
+                "timing:execute_first": 48606,
+                "timing:parse": 29296,
+                "timing:request": 149869,
+                "timing:unknown": 3124
+              },
+              "file_id": "I:966076a42de6be43fcd79ec4b57bba2dec813e843aa20c0b4a7d7e187c59136f",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 62064,
+              "added_records": 183401,
+              "counts": {
+                "duration:autostats.c:334": 662,
+                "duration:postgres.c:1455": 343,
+                "duration:postgres.c:1946": 45500,
+                "duration:postgres.c:2219": 5195,
+                "duration:postgres.c:2603": 5525,
+                "duration:postgres.c:2843": 5522,
+                "duration_with_sql": 62747,
+                "occurrences": 62064,
+                "outcome:failed": 322,
+                "outcome:success": 61742,
+                "problem:duration_ms_unknown": 322,
+                "problem:error_without_execution": 349,
+                "problem:estimated_start_at_unknown": 322,
+                "problem:execute_start_missing": 2,
+                "problem:fingerprint_base_parser_rejected": 22,
+                "problem:fingerprint_invalid_encoding": 19,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 35,
+                "problem:fingerprint_lexical_unbalanced_bracket": 100,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 15,
+                "problem:fingerprint_sql_missing_or_empty": 379,
+                "problem:record_encoding_invalid": 38,
+                "problem:timing_out_of_scope": 1005,
+                "records": 183401,
+                "timing:bind": 5525,
+                "timing:execute_first": 5520,
+                "timing:parse": 5195,
+                "timing:request": 45500,
+                "timing:unknown": 324
+              },
+              "file_id": "I:3c2be0893db3dfb177a59dcb33f3aa18ac91a92b0355c3751740299603fd80a4",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 255407,
+              "added_records": 594218,
+              "counts": {
+                "duration:autostats.c:334": 3428,
+                "duration:postgres.c:1455": 2084,
+                "duration:postgres.c:1946": 118917,
+                "duration:postgres.c:2219": 43560,
+                "duration:postgres.c:2603": 45211,
+                "duration:postgres.c:2608": 15,
+                "duration:postgres.c:2843": 45229,
+                "duration_with_sql": 258444,
+                "occurrences": 255407,
+                "outcome:failed": 2475,
+                "outcome:success": 252932,
+                "problem:duration_ms_unknown": 2475,
+                "problem:error_without_execution": 750,
+                "problem:estimated_start_at_unknown": 2475,
+                "problem:execute_context_mismatch": 30,
+                "problem:execute_start_missing": 5,
+                "problem:fingerprint_base_parser_rejected": 16,
+                "problem:fingerprint_invalid_encoding": 21,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 15,
+                "problem:fingerprint_lexical_unbalanced_bracket": 70,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 169,
+                "problem:fingerprint_sql_missing_or_empty": 4111,
+                "problem:record_encoding_invalid": 44,
+                "problem:timing_out_of_scope": 5512,
+                "records": 594218,
+                "timing:bind": 45226,
+                "timing:execute_first": 45194,
+                "timing:parse": 43560,
+                "timing:request": 118917,
+                "timing:unknown": 2510
+              },
+              "file_id": "I:cc7ad3cfe1b21c423848fd855f00e35939bd866b28a9e15b79f4147cac29c1ac",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 72967,
+              "added_records": 163273,
+              "counts": {
+                "duration:autostats.c:334": 3261,
+                "duration:postgres.c:1455": 289,
+                "duration:postgres.c:1946": 34563,
+                "duration:postgres.c:2219": 12228,
+                "duration:postgres.c:2603": 12711,
+                "duration:postgres.c:2843": 12712,
+                "duration_with_sql": 75764,
+                "occurrences": 72967,
+                "outcome:failed": 753,
+                "outcome:success": 72214,
+                "problem:duration_ms_unknown": 753,
+                "problem:error_without_execution": 374,
+                "problem:estimated_start_at_unknown": 753,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 189,
+                "problem:fingerprint_lexical_unbalanced_bracket": 123,
+                "problem:fingerprint_lexical_unclosed_comment": 1,
+                "problem:fingerprint_lexical_unclosed_string": 40,
+                "problem:fingerprint_sql_missing_or_empty": 1294,
+                "problem:timing_out_of_scope": 3550,
+                "records": 163273,
+                "timing:bind": 12711,
+                "timing:execute_first": 12711,
+                "timing:parse": 12228,
+                "timing:request": 34563,
+                "timing:unknown": 754
+              },
+              "file_id": "I:17c66153626307da0631fb9daf3ea6a997f314348748c2c94c356930a6cf0967",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 223329,
+              "added_records": 477828,
+              "counts": {
+                "duration:autostats.c:334": 2564,
+                "duration:postgres.c:1455": 1154,
+                "duration:postgres.c:1946": 85878,
+                "duration:postgres.c:2219": 34258,
+                "duration:postgres.c:2603": 52461,
+                "duration:postgres.c:2608": 1,
+                "duration:postgres.c:2843": 49251,
+                "duration_with_sql": 222183,
+                "duration_without_sql": 3384,
+                "occurrences": 223329,
+                "outcome:failed": 1480,
+                "outcome:success": 221849,
+                "problem:duration_ms_unknown": 1480,
+                "problem:error_without_execution": 2502,
+                "problem:estimated_start_at_unknown": 1480,
+                "problem:fingerprint_base_parser_rejected": 33,
+                "problem:fingerprint_invalid_encoding": 7,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 199,
+                "problem:fingerprint_lexical_unbalanced_bracket": 222,
+                "problem:fingerprint_lexical_unclosed_comment": 5,
+                "problem:fingerprint_lexical_unclosed_string": 58,
+                "problem:fingerprint_scanner_rejected": 6,
+                "problem:fingerprint_sql_missing_or_empty": 5278,
+                "problem:record_encoding_invalid": 17,
+                "problem:sql_missing": 3384,
+                "problem:timing_out_of_scope": 3718,
+                "records": 477828,
+                "timing:bind": 52462,
+                "timing:execute_first": 49251,
+                "timing:parse": 34258,
+                "timing:request": 85878,
+                "timing:unknown": 1480
+              },
+              "file_id": "I:2f6c148d03d1763b9b7079ffdf9346f2db12d116e370f837c653e1ebf897489a",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 62223,
+              "added_records": 172718,
+              "counts": {
+                "duration:autostats.c:334": 608,
+                "duration:postgres.c:1455": 472,
+                "duration:postgres.c:1946": 41840,
+                "duration:postgres.c:2219": 6393,
+                "duration:postgres.c:2603": 6859,
+                "duration:postgres.c:2843": 6857,
+                "duration_with_sql": 63029,
+                "occurrences": 62223,
+                "outcome:failed": 274,
+                "outcome:success": 61949,
+                "problem:duration_ms_unknown": 274,
+                "problem:error_without_execution": 331,
+                "problem:estimated_start_at_unknown": 274,
+                "problem:fingerprint_base_parser_rejected": 22,
+                "problem:fingerprint_invalid_encoding": 16,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 26,
+                "problem:fingerprint_lexical_unbalanced_bracket": 91,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 13,
+                "problem:fingerprint_sql_missing_or_empty": 322,
+                "problem:record_encoding_invalid": 50,
+                "problem:timing_out_of_scope": 1080,
+                "records": 172718,
+                "timing:bind": 6859,
+                "timing:execute_first": 6857,
+                "timing:parse": 6393,
+                "timing:request": 41840,
+                "timing:unknown": 274
+              },
+              "file_id": "I:2ab285e7d0ec51195ae6e2defb18e4775f49e83ca1e5d42ad9a45e22399c92c5",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 243103,
+              "added_records": 572926,
+              "counts": {
+                "duration:autostats.c:334": 3234,
+                "duration:postgres.c:1455": 2139,
+                "duration:postgres.c:1946": 115829,
+                "duration:postgres.c:2219": 40702,
+                "duration:postgres.c:2603": 42141,
+                "duration:postgres.c:2608": 7,
+                "duration:postgres.c:2843": 42148,
+                "duration_with_sql": 246200,
+                "occurrences": 243103,
+                "outcome:failed": 2276,
+                "outcome:success": 240827,
+                "problem:duration_ms_unknown": 2276,
+                "problem:error_without_execution": 875,
+                "problem:estimated_start_at_unknown": 2276,
+                "problem:execute_context_mismatch": 30,
+                "problem:fingerprint_base_parser_rejected": 16,
+                "problem:fingerprint_invalid_encoding": 24,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 23,
+                "problem:fingerprint_lexical_unbalanced_bracket": 76,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 177,
+                "problem:fingerprint_sql_missing_or_empty": 3711,
+                "problem:record_encoding_invalid": 50,
+                "problem:timing_out_of_scope": 5373,
+                "records": 572926,
+                "timing:bind": 42148,
+                "timing:execute_first": 42118,
+                "timing:parse": 40702,
+                "timing:request": 115829,
+                "timing:unknown": 2306
+              },
+              "file_id": "I:5fe1202c6d9277ec3741733ef90189c2be36f46c0543586165b836cb7b6ba8c3",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 279406,
+              "added_records": 585845,
+              "counts": {
+                "duration:autostats.c:334": 2988,
+                "duration:postgres.c:1455": 1519,
+                "duration:postgres.c:1946": 111912,
+                "duration:postgres.c:2219": 39389,
+                "duration:postgres.c:2603": 65113,
+                "duration:postgres.c:2608": 1,
+                "duration:postgres.c:2843": 61140,
+                "duration_with_sql": 277623,
+                "duration_without_sql": 4439,
+                "occurrences": 279406,
+                "outcome:cancelled": 6,
+                "outcome:failed": 1845,
+                "outcome:success": 277555,
+                "problem:duration_ms_unknown": 1851,
+                "problem:error_without_execution": 3118,
+                "problem:estimated_start_at_unknown": 1851,
+                "problem:execute_context_mismatch": 2,
+                "problem:fingerprint_base_parser_rejected": 87,
+                "problem:fingerprint_invalid_encoding": 36,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 237,
+                "problem:fingerprint_lexical_unbalanced_bracket": 382,
+                "problem:fingerprint_lexical_unclosed_comment": 5,
+                "problem:fingerprint_lexical_unclosed_string": 75,
+                "problem:fingerprint_scanner_rejected": 8,
+                "problem:fingerprint_sql_missing_or_empty": 5251,
+                "problem:record_encoding_invalid": 92,
+                "problem:sql_missing": 4439,
+                "problem:timing_out_of_scope": 4507,
+                "records": 585845,
+                "timing:bind": 65114,
+                "timing:execute_fetch": 2,
+                "timing:execute_first": 61136,
+                "timing:parse": 39389,
+                "timing:request": 111912,
+                "timing:unknown": 1853
+              },
+              "file_id": "I:7b959a0148cdda248d347c1f428ad461be63de593a656840a30202966748c166",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 77798,
+              "added_records": 219815,
+              "counts": {
+                "duration:autostats.c:334": 712,
+                "duration:postgres.c:1455": 459,
+                "duration:postgres.c:1946": 53929,
+                "duration:postgres.c:2219": 7485,
+                "duration:postgres.c:2603": 8027,
+                "duration:postgres.c:2843": 8026,
+                "duration_with_sql": 78638,
+                "occurrences": 77798,
+                "outcome:failed": 331,
+                "outcome:success": 77467,
+                "problem:duration_ms_unknown": 331,
+                "problem:error_without_execution": 502,
+                "problem:estimated_start_at_unknown": 331,
+                "problem:fingerprint_base_parser_rejected": 18,
+                "problem:fingerprint_invalid_encoding": 25,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 35,
+                "problem:fingerprint_lexical_unbalanced_bracket": 108,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 19,
+                "problem:fingerprint_sql_missing_or_empty": 410,
+                "problem:record_encoding_invalid": 68,
+                "problem:timing_out_of_scope": 1171,
+                "records": 219815,
+                "timing:bind": 8027,
+                "timing:execute_first": 8026,
+                "timing:parse": 7485,
+                "timing:request": 53929,
+                "timing:unknown": 331
+              },
+              "file_id": "I:4e70e77e0ec8bdff196b6ca2645081b67503c7a4cef8e10ceeab0d442c8a770a",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 220911,
+              "added_records": 513403,
+              "counts": {
+                "duration:autostats.c:334": 3035,
+                "duration:postgres.c:1455": 2060,
+                "duration:postgres.c:1946": 101611,
+                "duration:postgres.c:2219": 38151,
+                "duration:postgres.c:2603": 39506,
+                "duration:postgres.c:2608": 7,
+                "duration:postgres.c:2843": 39513,
+                "duration_with_sql": 223883,
+                "occurrences": 220911,
+                "outcome:failed": 2123,
+                "outcome:success": 218788,
+                "problem:duration_ms_unknown": 2123,
+                "problem:error_without_execution": 701,
+                "problem:estimated_start_at_unknown": 2123,
+                "problem:execute_context_mismatch": 30,
+                "problem:fingerprint_base_parser_rejected": 15,
+                "problem:fingerprint_invalid_encoding": 15,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 14,
+                "problem:fingerprint_lexical_unbalanced_bracket": 62,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 171,
+                "problem:fingerprint_sql_missing_or_empty": 3446,
+                "problem:record_encoding_invalid": 32,
+                "problem:timing_out_of_scope": 5095,
+                "records": 513403,
+                "timing:bind": 39513,
+                "timing:execute_first": 39483,
+                "timing:parse": 38151,
+                "timing:request": 101611,
+                "timing:unknown": 2153
+              },
+              "file_id": "I:9fce2e3f581a6ba510fdc71cac35f691393f287305082fbb438dfe27977f8b18",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 278998,
+              "added_records": 594390,
+              "counts": {
+                "duration:autostats.c:334": 4163,
+                "duration:postgres.c:1455": 2576,
+                "duration:postgres.c:1946": 113295,
+                "duration:postgres.c:2219": 39129,
+                "duration:postgres.c:2603": 64347,
+                "duration:postgres.c:2608": 1,
+                "duration:postgres.c:2843": 60384,
+                "duration_with_sql": 279413,
+                "duration_without_sql": 4482,
+                "occurrences": 278998,
+                "outcome:cancelled": 11,
+                "outcome:failed": 1830,
+                "outcome:success": 277156,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 1842,
+                "problem:error_without_execution": 3202,
+                "problem:estimated_start_at_unknown": 1842,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 87,
+                "problem:fingerprint_invalid_encoding": 99,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 206,
+                "problem:fingerprint_lexical_unbalanced_bracket": 485,
+                "problem:fingerprint_lexical_unclosed_comment": 5,
+                "problem:fingerprint_lexical_unclosed_string": 93,
+                "problem:fingerprint_scanner_rejected": 8,
+                "problem:fingerprint_sql_missing_or_empty": 5103,
+                "problem:record_encoding_invalid": 205,
+                "problem:sql_missing": 4482,
+                "problem:timing_out_of_scope": 6739,
+                "records": 594390,
+                "timing:bind": 64348,
+                "timing:execute_fetch": 39,
+                "timing:execute_first": 60344,
+                "timing:parse": 39129,
+                "timing:request": 113295,
+                "timing:unknown": 1843
+              },
+              "file_id": "I:a6b442beb96abc15484be6226759ed337c59d52026adcc2c4e7762c3eb20c35a",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 80421,
+              "added_records": 226034,
+              "counts": {
+                "duration:autostats.c:334": 745,
+                "duration:postgres.c:1455": 533,
+                "duration:postgres.c:1946": 55180,
+                "duration:postgres.c:2219": 7939,
+                "duration:postgres.c:2603": 8470,
+                "duration:postgres.c:2843": 8469,
+                "duration_with_sql": 81336,
+                "occurrences": 80421,
+                "outcome:failed": 363,
+                "outcome:success": 80058,
+                "problem:duration_ms_unknown": 363,
+                "problem:error_without_execution": 457,
+                "problem:estimated_start_at_unknown": 363,
+                "problem:fingerprint_base_parser_rejected": 23,
+                "problem:fingerprint_invalid_encoding": 18,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 26,
+                "problem:fingerprint_lexical_unbalanced_bracket": 114,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 15,
+                "problem:fingerprint_sql_missing_or_empty": 460,
+                "problem:record_encoding_invalid": 54,
+                "problem:timing_out_of_scope": 1278,
+                "records": 226034,
+                "timing:bind": 8470,
+                "timing:execute_first": 8469,
+                "timing:parse": 7939,
+                "timing:request": 55180,
+                "timing:unknown": 363
+              },
+              "file_id": "I:2182f5310eb0c443736128dcd11e180290557caa611bafddcf5c23e092de2013",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 245653,
+              "added_records": 568418,
+              "counts": {
+                "duration:autostats.c:334": 3374,
+                "duration:postgres.c:1455": 2082,
+                "duration:postgres.c:1946": 112104,
+                "duration:postgres.c:2219": 42623,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 44226,
+                "duration:postgres.c:2608": 14,
+                "duration:postgres.c:2843": 44240,
+                "duration_with_sql": 248669,
+                "occurrences": 245653,
+                "outcome:failed": 2440,
+                "outcome:success": 243213,
+                "problem:duration_ms_unknown": 2440,
+                "problem:error_without_execution": 731,
+                "problem:estimated_start_at_unknown": 2440,
+                "problem:execute_context_mismatch": 30,
+                "problem:fingerprint_base_parser_rejected": 16,
+                "problem:fingerprint_invalid_encoding": 22,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 23,
+                "problem:fingerprint_lexical_unbalanced_bracket": 87,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 155,
+                "problem:fingerprint_sql_missing_or_empty": 4047,
+                "problem:record_encoding_invalid": 46,
+                "problem:timing_out_of_scope": 5456,
+                "records": 568418,
+                "timing:bind": 44240,
+                "timing:execute_first": 44210,
+                "timing:parse": 42629,
+                "timing:request": 112104,
+                "timing:unknown": 2470
+              },
+              "file_id": "I:51900ffa46d7e194cf80b970fc2cd743840b3cb5a7bdfd308c95ea114de52f6a",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-08-18T00:00:00+08:00",
+        "window_end": "2026-09-17T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-09-17",
+        "build": {
+          "groups": 607309,
+          "layers": {
+            "day": 1032579,
+            "hour": 692996,
+            "overall": 607309,
+            "week": 710707,
+            "weekday": 1032579
+          },
+          "timings": {
+            "bind": [
+              442189,
+              118416
+            ],
+            "execute_fetch": [
+              314,
+              0
+            ],
+            "execute_first": [
+              442134,
+              118416
+            ],
+            "parse": [
+              359521,
+              76594
+            ],
+            "request": [
+              1218498,
+              357441
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              695972
+            ],
+            [
+              "included",
+              2462656
+            ],
+            [
+              "unresolved",
+              69614
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              25105
+            ],
+            [
+              "batch",
+              "unresolved",
+              69614
+            ],
+            [
+              "group",
+              "excluded",
+              670867
+            ],
+            [
+              "group",
+              "included",
+              2462656
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              172
+            ],
+            [
+              "batch",
+              "blacklist_category",
+              5
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              25105
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              43
+            ],
+            [
+              "batch",
+              "execution_failed",
+              25048
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              14
+            ],
+            [
+              "batch",
+              "sql_encoding_invalid",
+              16
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              627
+            ],
+            [
+              "batch",
+              "sql_missing",
+              21350
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              47887
+            ],
+            [
+              "batch",
+              "start_unknown",
+              25105
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              25277
+            ],
+            [
+              "group",
+              "blacklist_category",
+              670867
+            ]
+          ],
+          "observations": {
+            "groups": 773,
+            "layers": {
+              "day": 1219,
+              "hour": 861,
+              "overall": 773,
+              "week": 881,
+              "weekday": 1219
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 152,
+                "groups": 773,
+                "included": 1478,
+                "reasons": {
+                  "association_unreliable": 152,
+                  "timing_unknown": 152
+                }
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                46622
+              ],
+              [
+                "group",
+                1630
+              ],
+              [
+                "sql_missing",
+                21350
+              ],
+              [
+                "start_unknown",
+                278
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                627
+              ],
+              [
+                "invalid_encoding",
+                16
+              ],
+              [
+                "missing",
+                21350
+              ],
+              [
+                "uncertain",
+                47887
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                8
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                8
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                46622
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                8
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                8
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                21350
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                278
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                278
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                53
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                225
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                278
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                278
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            1032579,
+            607309
+          ],
+          [
+            "formal",
+            "hour",
+            692996,
+            607309
+          ],
+          [
+            "formal",
+            "overall",
+            607309,
+            607309
+          ],
+          [
+            "formal",
+            "week",
+            710707,
+            607309
+          ],
+          [
+            "formal",
+            "weekday",
+            1032579,
+            607309
+          ],
+          [
+            "observation",
+            "day",
+            1219,
+            773
+          ],
+          [
+            "observation",
+            "hour",
+            861,
+            773
+          ],
+          [
+            "observation",
+            "overall",
+            773,
+            773
+          ],
+          [
+            "observation",
+            "week",
+            881,
+            773
+          ],
+          [
+            "observation",
+            "weekday",
+            1219,
+            773
+          ]
+        ],
+        "import_attempts": 17,
+        "import": {
+          "added_occurrences": 842659,
+          "added_records": 2022404,
+          "files": [
+            {
+              "added_occurrences": 286969,
+              "added_records": 688482,
+              "counts": {
+                "duration:autostats.c:334": 3928,
+                "duration:postgres.c:1455": 2335,
+                "duration:postgres.c:1946": 172600,
+                "duration:postgres.c:2219": 19520,
+                "duration:postgres.c:2603": 48924,
+                "duration:postgres.c:2608": 1,
+                "duration:postgres.c:2843": 44784,
+                "duration_with_sql": 287568,
+                "duration_without_sql": 4524,
+                "occurrences": 286969,
+                "outcome:cancelled": 12,
+                "outcome:failed": 1123,
+                "outcome:success": 285829,
+                "outcome:timed_out": 5,
+                "problem:duration_ms_unknown": 1140,
+                "problem:error_without_execution": 1340,
+                "problem:estimated_start_at_unknown": 1140,
+                "problem:fingerprint_base_parser_rejected": 66,
+                "problem:fingerprint_invalid_encoding": 9,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 49,
+                "problem:fingerprint_lexical_unbalanced_bracket": 340,
+                "problem:fingerprint_lexical_unclosed_comment": 13,
+                "problem:fingerprint_lexical_unclosed_string": 96,
+                "problem:fingerprint_sql_missing_or_empty": 749,
+                "problem:record_encoding_invalid": 41,
+                "problem:sql_missing": 4524,
+                "problem:timing_out_of_scope": 6263,
+                "records": 688482,
+                "timing:bind": 48925,
+                "timing:execute_fetch": 10,
+                "timing:execute_first": 44774,
+                "timing:parse": 19520,
+                "timing:request": 172600,
+                "timing:unknown": 1140
+              },
+              "file_id": "I:2d98067b074b212dd7250cf5073d63d7c80e56ca218025ce842a4aaff947e39b",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 62909,
+              "added_records": 196968,
+              "counts": {
+                "duration:autostats.c:334": 1067,
+                "duration:postgres.c:1455": 555,
+                "duration:postgres.c:1946": 52803,
+                "duration:postgres.c:2219": 3137,
+                "duration:postgres.c:2603": 3255,
+                "duration:postgres.c:2843": 3259,
+                "duration_with_sql": 64076,
+                "occurrences": 62909,
+                "outcome:failed": 455,
+                "outcome:success": 62454,
+                "problem:duration_ms_unknown": 455,
+                "problem:error_without_execution": 360,
+                "problem:estimated_start_at_unknown": 455,
+                "problem:execute_start_missing": 5,
+                "problem:fingerprint_base_parser_rejected": 12,
+                "problem:fingerprint_invalid_encoding": 13,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 37,
+                "problem:fingerprint_lexical_unbalanced_bracket": 109,
+                "problem:fingerprint_lexical_unclosed_comment": 8,
+                "problem:fingerprint_lexical_unclosed_string": 21,
+                "problem:fingerprint_sql_missing_or_empty": 343,
+                "problem:record_encoding_invalid": 26,
+                "problem:timing_out_of_scope": 1622,
+                "records": 196968,
+                "timing:bind": 3255,
+                "timing:execute_first": 3254,
+                "timing:parse": 3137,
+                "timing:request": 52803,
+                "timing:unknown": 460
+              },
+              "file_id": "I:1c5db4731629a9d7ab4ffdbb58f8eb611fa756310303464248b792985ff4d308",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 265958,
+              "added_records": 619381,
+              "counts": {
+                "duration:autostats.c:334": 5543,
+                "duration:postgres.c:1455": 2020,
+                "duration:postgres.c:1946": 130518,
+                "duration:postgres.c:2219": 43112,
+                "duration:postgres.c:2224": 6,
+                "duration:postgres.c:2603": 44887,
+                "duration:postgres.c:2608": 5,
+                "duration:postgres.c:2843": 44887,
+                "duration_with_sql": 270978,
+                "occurrences": 265958,
+                "outcome:failed": 2542,
+                "outcome:success": 263415,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 2543,
+                "problem:error_without_execution": 768,
+                "problem:estimated_start_at_unknown": 2543,
+                "problem:execute_context_mismatch": 30,
+                "problem:fingerprint_base_parser_rejected": 16,
+                "problem:fingerprint_invalid_encoding": 21,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 11,
+                "problem:fingerprint_lexical_unbalanced_bracket": 196,
+                "problem:fingerprint_lexical_unclosed_comment": 13,
+                "problem:fingerprint_lexical_unclosed_string": 212,
+                "problem:fingerprint_sql_missing_or_empty": 4030,
+                "problem:record_encoding_invalid": 44,
+                "problem:timing_out_of_scope": 7563,
+                "records": 619381,
+                "timing:bind": 44892,
+                "timing:execute_first": 44857,
+                "timing:parse": 43118,
+                "timing:request": 130518,
+                "timing:unknown": 2573
+              },
+              "file_id": "I:b14e51023eb03ff3b87105a8cc55580882a3e93fa003b739a6cb2aae9c8687a6",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 226823,
+              "added_records": 517573,
+              "counts": {
+                "duration:autostats.c:334": 9969,
+                "duration:postgres.c:1455": 1311,
+                "duration:postgres.c:1946": 127283,
+                "duration:postgres.c:2219": 26320,
+                "duration:postgres.c:2603": 36119,
+                "duration:postgres.c:2843": 35783,
+                "duration_with_sql": 236249,
+                "duration_without_sql": 536,
+                "occurrences": 226823,
+                "outcome:cancelled": 4,
+                "outcome:failed": 1307,
+                "outcome:success": 225505,
+                "outcome:timed_out": 7,
+                "problem:duration_ms_unknown": 1318,
+                "problem:error_without_execution": 1859,
+                "problem:estimated_start_at_unknown": 1318,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 31,
+                "problem:fingerprint_invalid_encoding": 5,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 196,
+                "problem:fingerprint_lexical_unbalanced_bracket": 624,
+                "problem:fingerprint_lexical_unclosed_comment": 2,
+                "problem:fingerprint_lexical_unclosed_string": 184,
+                "problem:fingerprint_scanner_rejected": 6,
+                "problem:fingerprint_sql_missing_or_empty": 4130,
+                "problem:record_encoding_invalid": 10,
+                "problem:sql_missing": 536,
+                "problem:timing_out_of_scope": 11280,
+                "records": 517573,
+                "timing:bind": 36119,
+                "timing:execute_fetch": 10,
+                "timing:execute_first": 35772,
+                "timing:parse": 26320,
+                "timing:request": 127283,
+                "timing:unknown": 1319
+              },
+              "file_id": "I:fc80ee2c9be03bb507349d9bcbcc7baa52371116b0effd5a8d9c021f21a83f9a",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-08-19T00:00:00+08:00",
+        "window_end": "2026-09-18T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-09-18",
+        "build": {
+          "groups": 676989,
+          "layers": {
+            "day": 1210431,
+            "hour": 769124,
+            "overall": 676989,
+            "week": 780401,
+            "weekday": 1210431
+          },
+          "timings": {
+            "bind": [
+              534373,
+              137658
+            ],
+            "execute_fetch": [
+              318,
+              0
+            ],
+            "execute_first": [
+              534310,
+              137658
+            ],
+            "parse": [
+              435303,
+              91868
+            ],
+            "request": [
+              1443728,
+              440116
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              837086
+            ],
+            [
+              "included",
+              2948032
+            ],
+            [
+              "unresolved",
+              84853
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              29786
+            ],
+            [
+              "batch",
+              "unresolved",
+              84853
+            ],
+            [
+              "group",
+              "excluded",
+              807300
+            ],
+            [
+              "group",
+              "included",
+              2948032
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              208
+            ],
+            [
+              "batch",
+              "blacklist_category",
+              5
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              29786
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              54
+            ],
+            [
+              "batch",
+              "execution_failed",
+              29717
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              15
+            ],
+            [
+              "batch",
+              "sql_encoding_invalid",
+              18
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              781
+            ],
+            [
+              "batch",
+              "sql_missing",
+              26225
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              58153
+            ],
+            [
+              "batch",
+              "start_unknown",
+              29786
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              29994
+            ],
+            [
+              "group",
+              "blacklist_category",
+              807300
+            ]
+          ],
+          "observations": {
+            "groups": 921,
+            "layers": {
+              "day": 1476,
+              "hour": 1016,
+              "overall": 921,
+              "week": 1029,
+              "weekday": 1476
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 183,
+                "groups": 921,
+                "included": 1794,
+                "reasons": {
+                  "association_unreliable": 183,
+                  "timing_unknown": 183
+                }
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                56635
+              ],
+              [
+                "group",
+                1977
+              ],
+              [
+                "sql_missing",
+                26225
+              ],
+              [
+                "start_unknown",
+                340
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                781
+              ],
+              [
+                "invalid_encoding",
+                18
+              ],
+              [
+                "missing",
+                26225
+              ],
+              [
+                "uncertain",
+                58153
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                56635
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                9
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                26225
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                340
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                340
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                74
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                266
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                340
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                340
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            1210431,
+            676989
+          ],
+          [
+            "formal",
+            "hour",
+            769124,
+            676989
+          ],
+          [
+            "formal",
+            "overall",
+            676989,
+            676989
+          ],
+          [
+            "formal",
+            "week",
+            780401,
+            676989
+          ],
+          [
+            "formal",
+            "weekday",
+            1210431,
+            676989
+          ],
+          [
+            "observation",
+            "day",
+            1476,
+            921
+          ],
+          [
+            "observation",
+            "hour",
+            1016,
+            921
+          ],
+          [
+            "observation",
+            "overall",
+            921,
+            921
+          ],
+          [
+            "observation",
+            "week",
+            1029,
+            921
+          ],
+          [
+            "observation",
+            "weekday",
+            1476,
+            921
+          ]
+        ],
+        "import_attempts": 21,
+        "import": {
+          "added_occurrences": 641729,
+          "added_records": 1499944,
+          "files": [
+            {
+              "added_occurrences": 231874,
+              "added_records": 519178,
+              "counts": {
+                "duration:autostats.c:334": 9528,
+                "duration:postgres.c:1455": 2381,
+                "duration:postgres.c:1946": 110843,
+                "duration:postgres.c:2219": 27081,
+                "duration:postgres.c:2603": 48677,
+                "duration:postgres.c:2608": 6,
+                "duration:postgres.c:2843": 44309,
+                "duration_with_sql": 237950,
+                "duration_without_sql": 4875,
+                "occurrences": 231874,
+                "outcome:cancelled": 11,
+                "outcome:failed": 946,
+                "outcome:success": 230916,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 958,
+                "problem:error_without_execution": 2549,
+                "problem:estimated_start_at_unknown": 958,
+                "problem:execute_context_mismatch": 1,
+                "problem:execute_start_missing": 2,
+                "problem:fingerprint_base_parser_rejected": 83,
+                "problem:fingerprint_invalid_encoding": 17,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 34,
+                "problem:fingerprint_lexical_unbalanced_bracket": 900,
+                "problem:fingerprint_lexical_unclosed_comment": 10,
+                "problem:fingerprint_lexical_unclosed_string": 249,
+                "problem:fingerprint_scanner_rejected": 7,
+                "problem:fingerprint_sql_missing_or_empty": 3887,
+                "problem:record_encoding_invalid": 65,
+                "problem:sql_missing": 4875,
+                "problem:timing_out_of_scope": 11909,
+                "records": 519178,
+                "timing:bind": 48683,
+                "timing:execute_fetch": 4,
+                "timing:execute_first": 44302,
+                "timing:parse": 27081,
+                "timing:request": 110843,
+                "timing:unknown": 961
+              },
+              "file_id": "I:252e83e5d1614caba0a767ac867b64a5d0536ee60a87a097349597de3bf0f7f3",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 58993,
+              "added_records": 178287,
+              "counts": {
+                "duration:autostats.c:334": 1403,
+                "duration:postgres.c:1455": 385,
+                "duration:postgres.c:1946": 43859,
+                "duration:postgres.c:2219": 4833,
+                "duration:postgres.c:2603": 5007,
+                "duration:postgres.c:2843": 5006,
+                "duration_with_sql": 60493,
+                "occurrences": 58993,
+                "outcome:failed": 288,
+                "outcome:success": 58705,
+                "problem:duration_ms_unknown": 288,
+                "problem:error_without_execution": 379,
+                "problem:estimated_start_at_unknown": 288,
+                "problem:execute_start_missing": 2,
+                "problem:fingerprint_base_parser_rejected": 21,
+                "problem:fingerprint_invalid_encoding": 13,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 37,
+                "problem:fingerprint_lexical_unbalanced_bracket": 127,
+                "problem:fingerprint_lexical_unclosed_comment": 9,
+                "problem:fingerprint_lexical_unclosed_string": 27,
+                "problem:fingerprint_sql_missing_or_empty": 355,
+                "problem:record_encoding_invalid": 26,
+                "problem:timing_out_of_scope": 1788,
+                "records": 178287,
+                "timing:bind": 5007,
+                "timing:execute_first": 5004,
+                "timing:parse": 4833,
+                "timing:request": 43859,
+                "timing:unknown": 290
+              },
+              "file_id": "I:1269f22ef09510781e726a135bba0b6f1bea99e028a42798ee5f29709d86b9d0",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 254634,
+              "added_records": 587981,
+              "counts": {
+                "duration:autostats.c:334": 5526,
+                "duration:postgres.c:1455": 2281,
+                "duration:postgres.c:1946": 118310,
+                "duration:postgres.c:2219": 43413,
+                "duration:postgres.c:2224": 12,
+                "duration:postgres.c:2603": 45205,
+                "duration:postgres.c:2608": 20,
+                "duration:postgres.c:2843": 45224,
+                "duration_with_sql": 259991,
+                "occurrences": 254634,
+                "outcome:failed": 2450,
+                "outcome:success": 252184,
+                "problem:duration_ms_unknown": 2450,
+                "problem:error_without_execution": 780,
+                "problem:estimated_start_at_unknown": 2450,
+                "problem:execute_context_mismatch": 30,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 16,
+                "problem:fingerprint_invalid_encoding": 21,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 12,
+                "problem:fingerprint_lexical_unbalanced_bracket": 204,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 198,
+                "problem:fingerprint_sql_missing_or_empty": 4080,
+                "problem:record_encoding_invalid": 44,
+                "problem:timing_out_of_scope": 7807,
+                "records": 587981,
+                "timing:bind": 45225,
+                "timing:execute_first": 45193,
+                "timing:parse": 43425,
+                "timing:request": 118310,
+                "timing:unknown": 2481
+              },
+              "file_id": "I:daa50c48a17e485beffc4ccb6287063ef4e9c137c73b8f98c3288329525f00ad",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 96228,
+              "added_records": 214498,
+              "counts": {
+                "duration:autostats.c:334": 4283,
+                "duration:postgres.c:1455": 377,
+                "duration:postgres.c:1946": 45147,
+                "duration:postgres.c:2219": 16249,
+                "duration:postgres.c:2603": 16924,
+                "duration:postgres.c:2843": 16923,
+                "duration_with_sql": 99903,
+                "occurrences": 96228,
+                "outcome:failed": 985,
+                "outcome:success": 95243,
+                "problem:duration_ms_unknown": 985,
+                "problem:error_without_execution": 541,
+                "problem:estimated_start_at_unknown": 985,
+                "problem:fingerprint_base_parser_rejected": 1,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 189,
+                "problem:fingerprint_lexical_unbalanced_bracket": 162,
+                "problem:fingerprint_lexical_unclosed_comment": 1,
+                "problem:fingerprint_lexical_unclosed_string": 53,
+                "problem:fingerprint_sql_missing_or_empty": 1690,
+                "problem:timing_out_of_scope": 4660,
+                "records": 214498,
+                "timing:bind": 16924,
+                "timing:execute_first": 16923,
+                "timing:parse": 16249,
+                "timing:request": 45147,
+                "timing:unknown": 985
+              },
+              "file_id": "I:0c09a6a9e17d4f51b074aa0b3906c8d7a9d53ddd6fc7d656b5d6e2195ac48bd5",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-08-20T00:00:00+08:00",
+        "window_end": "2026-09-19T00:00:00+08:00"
+      },
+      {
+        "cutoff_date": "2026-09-19",
+        "build": {
+          "groups": 873957,
+          "layers": {
+            "day": 1513777,
+            "hour": 971941,
+            "overall": 873957,
+            "week": 977473,
+            "weekday": 1513777
+          },
+          "timings": {
+            "bind": [
+              622188,
+              154379
+            ],
+            "execute_fetch": [
+              318,
+              0
+            ],
+            "execute_first": [
+              622119,
+              154379
+            ],
+            "parse": [
+              506110,
+              106597
+            ],
+            "request": [
+              1764860,
+              510938
+            ]
+          },
+          "states": [
+            [
+              "excluded",
+              961759
+            ],
+            [
+              "included",
+              3515595
+            ],
+            [
+              "unresolved",
+              98615
+            ]
+          ],
+          "count_scopes": [
+            [
+              "batch",
+              "excluded",
+              35466
+            ],
+            [
+              "batch",
+              "unresolved",
+              98615
+            ],
+            [
+              "group",
+              "excluded",
+              926293
+            ],
+            [
+              "group",
+              "included",
+              3515595
+            ]
+          ],
+          "reasons": [
+            [
+              "batch",
+              "association_unreliable",
+              245
+            ],
+            [
+              "batch",
+              "blacklist_category",
+              7
+            ],
+            [
+              "batch",
+              "duration_unknown",
+              35466
+            ],
+            [
+              "batch",
+              "execution_cancelled",
+              54
+            ],
+            [
+              "batch",
+              "execution_failed",
+              35392
+            ],
+            [
+              "batch",
+              "execution_timed_out",
+              20
+            ],
+            [
+              "batch",
+              "sql_encoding_invalid",
+              20
+            ],
+            [
+              "batch",
+              "sql_incomplete",
+              893
+            ],
+            [
+              "batch",
+              "sql_missing",
+              30204
+            ],
+            [
+              "batch",
+              "sql_uncertain",
+              68641
+            ],
+            [
+              "batch",
+              "start_unknown",
+              35466
+            ],
+            [
+              "batch",
+              "timing_unknown",
+              35711
+            ],
+            [
+              "group",
+              "blacklist_category",
+              926293
+            ]
+          ],
+          "observations": {
+            "groups": 1043,
+            "layers": {
+              "day": 1707,
+              "hour": 1140,
+              "overall": 1043,
+              "week": 1151,
+              "weekday": 1707
+            },
+            "observation_only": true,
+            "rules": {
+              "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                "excluded": 213,
+                "groups": 1043,
+                "included": 2069,
+                "reasons": {
+                  "association_unreliable": 213,
+                  "timing_unknown": 213
+                }
+              }
+            },
+            "scopes": [
+              [
+                "approximate_unavailable",
+                66106
+              ],
+              [
+                "group",
+                2282
+              ],
+              [
+                "sql_missing",
+                30204
+              ],
+              [
+                "start_unknown",
+                1166
+              ]
+            ],
+            "sql_states": [
+              [
+                "incomplete",
+                893
+              ],
+              [
+                "invalid_encoding",
+                20
+              ],
+              [
+                "missing",
+                30204
+              ],
+              [
+                "uncertain",
+                68641
+              ]
+            ],
+            "ungrouped_reasons": [
+              [
+                "approximate_unavailable",
+                "duration_unknown",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "execution_failed",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "sql_uncertain",
+                66106
+              ],
+              [
+                "approximate_unavailable",
+                "start_unknown",
+                9
+              ],
+              [
+                "approximate_unavailable",
+                "timing_unknown",
+                9
+              ],
+              [
+                "sql_missing",
+                "sql_missing",
+                30204
+              ],
+              [
+                "start_unknown",
+                "duration_unknown",
+                1166
+              ],
+              [
+                "start_unknown",
+                "execution_failed",
+                1166
+              ],
+              [
+                "start_unknown",
+                "sql_incomplete",
+                74
+              ],
+              [
+                "start_unknown",
+                "sql_uncertain",
+                1092
+              ],
+              [
+                "start_unknown",
+                "start_unknown",
+                1166
+              ],
+              [
+                "start_unknown",
+                "timing_unknown",
+                1166
+              ]
+            ]
+          },
+          "results_saved": true,
+          "state": "calculated"
+        },
+        "checks": {
+          "batch_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "counts_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_complete": {
+            "reason": null,
+            "state": "passed"
+          },
+          "results_saved": {
+            "reason": null,
+            "state": "passed"
+          },
+          "rules_consistent": {
+            "reason": null,
+            "state": "passed"
+          },
+          "values_consistent": {
+            "reason": null,
+            "state": "passed"
+          }
+        },
+        "layers": [
+          [
+            "formal",
+            "day",
+            1513777,
+            873957
+          ],
+          [
+            "formal",
+            "hour",
+            971941,
+            873957
+          ],
+          [
+            "formal",
+            "overall",
+            873957,
+            873957
+          ],
+          [
+            "formal",
+            "week",
+            977473,
+            873957
+          ],
+          [
+            "formal",
+            "weekday",
+            1513777,
+            873957
+          ],
+          [
+            "observation",
+            "day",
+            1707,
+            1043
+          ],
+          [
+            "observation",
+            "hour",
+            1140,
+            1043
+          ],
+          [
+            "observation",
+            "overall",
+            1043,
+            1043
+          ],
+          [
+            "observation",
+            "week",
+            1151,
+            1043
+          ],
+          [
+            "observation",
+            "weekday",
+            1707,
+            1043
+          ]
+        ],
+        "import_attempts": 25,
+        "import": {
+          "added_occurrences": 705998,
+          "added_records": 1598215,
+          "files": [
+            {
+              "added_occurrences": 375347,
+              "added_records": 790132,
+              "counts": {
+                "duration:autostats.c:334": 4076,
+                "duration:postgres.c:1455": 1302,
+                "duration:postgres.c:1946": 229961,
+                "duration:postgres.c:2219": 35014,
+                "duration:postgres.c:2603": 55650,
+                "duration:postgres.c:2608": 1,
+                "duration:postgres.c:2843": 51836,
+                "duration_with_sql": 373861,
+                "duration_without_sql": 3979,
+                "occurrences": 375347,
+                "outcome:failed": 2882,
+                "outcome:success": 372462,
+                "outcome:timed_out": 3,
+                "problem:duration_ms_unknown": 2885,
+                "problem:error_without_execution": 2381,
+                "problem:estimated_start_at_unknown": 2885,
+                "problem:execute_start_missing": 4,
+                "problem:fingerprint_base_parser_rejected": 853,
+                "problem:fingerprint_invalid_encoding": 7,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 12,
+                "problem:fingerprint_lexical_unbalanced_bracket": 310,
+                "problem:fingerprint_lexical_unclosed_comment": 7,
+                "problem:fingerprint_lexical_unclosed_string": 86,
+                "problem:fingerprint_scanner_rejected": 6,
+                "problem:fingerprint_sql_missing_or_empty": 4981,
+                "problem:record_encoding_invalid": 16,
+                "problem:sql_missing": 3979,
+                "problem:timing_out_of_scope": 5378,
+                "records": 790132,
+                "timing:bind": 55651,
+                "timing:execute_first": 51832,
+                "timing:parse": 35014,
+                "timing:request": 229961,
+                "timing:unknown": 2889
+              },
+              "file_id": "I:8eccbab660335004f09af7113c4c4c281757c907ee0eb3287e8c9b1b624c67af",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 84742,
+              "added_records": 237515,
+              "counts": {
+                "duration:autostats.c:334": 1332,
+                "duration:postgres.c:1455": 561,
+                "duration:postgres.c:1946": 57344,
+                "duration:postgres.c:2219": 8798,
+                "duration:postgres.c:2603": 9122,
+                "duration:postgres.c:2843": 9119,
+                "duration_with_sql": 86276,
+                "occurrences": 84742,
+                "outcome:failed": 358,
+                "outcome:success": 84383,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 359,
+                "problem:error_without_execution": 438,
+                "problem:estimated_start_at_unknown": 359,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 21,
+                "problem:fingerprint_invalid_encoding": 19,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 36,
+                "problem:fingerprint_lexical_unbalanced_bracket": 130,
+                "problem:fingerprint_lexical_unclosed_comment": 13,
+                "problem:fingerprint_lexical_unclosed_string": 25,
+                "problem:fingerprint_sql_missing_or_empty": 433,
+                "problem:record_encoding_invalid": 56,
+                "problem:timing_out_of_scope": 1893,
+                "records": 237515,
+                "timing:bind": 9122,
+                "timing:execute_first": 9118,
+                "timing:parse": 8798,
+                "timing:request": 57344,
+                "timing:unknown": 360
+              },
+              "file_id": "I:fc1571f2fa35afafa5d38e0f658f500ec474cc674fd6cd822485457ceb5cd198",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 242063,
+              "added_records": 560928,
+              "counts": {
+                "duration:autostats.c:334": 5163,
+                "duration:postgres.c:1455": 2269,
+                "duration:postgres.c:1946": 112287,
+                "duration:postgres.c:2219": 41331,
+                "duration:postgres.c:2603": 43010,
+                "duration:postgres.c:2608": 4,
+                "duration:postgres.c:2843": 43014,
+                "duration_with_sql": 247078,
+                "occurrences": 242063,
+                "outcome:failed": 2416,
+                "outcome:success": 239646,
+                "outcome:timed_out": 1,
+                "problem:duration_ms_unknown": 2417,
+                "problem:error_without_execution": 819,
+                "problem:estimated_start_at_unknown": 2417,
+                "problem:execute_context_mismatch": 30,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_base_parser_rejected": 18,
+                "problem:fingerprint_invalid_encoding": 21,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 14,
+                "problem:fingerprint_lexical_unbalanced_bracket": 171,
+                "problem:fingerprint_lexical_unclosed_comment": 15,
+                "problem:fingerprint_lexical_unclosed_string": 209,
+                "problem:fingerprint_sql_missing_or_empty": 4026,
+                "problem:record_encoding_invalid": 44,
+                "problem:timing_out_of_scope": 7432,
+                "records": 560928,
+                "timing:bind": 43014,
+                "timing:execute_first": 42983,
+                "timing:parse": 41331,
+                "timing:request": 112287,
+                "timing:unknown": 2448
+              },
+              "file_id": "I:eebf83fde4be664481189f6ae69496dba47ff6b715dc5162f9515dc9c670c999",
+              "state": "succeeded"
+            },
+            {
+              "added_occurrences": 3846,
+              "added_records": 9640,
+              "counts": {
+                "duration:autostats.c:334": 90,
+                "duration:postgres.c:1455": 6,
+                "duration:postgres.c:1946": 2036,
+                "duration:postgres.c:2219": 588,
+                "duration:postgres.c:2603": 601,
+                "duration:postgres.c:2843": 602,
+                "duration_with_sql": 3923,
+                "occurrences": 3846,
+                "outcome:failed": 19,
+                "outcome:success": 3827,
+                "problem:duration_ms_unknown": 19,
+                "problem:error_without_execution": 70,
+                "problem:estimated_start_at_unknown": 19,
+                "problem:execute_start_missing": 1,
+                "problem:fingerprint_lexical_ambiguous_string_escape": 189,
+                "problem:fingerprint_sql_missing_or_empty": 31,
+                "problem:timing_out_of_scope": 96,
+                "records": 9640,
+                "timing:bind": 601,
+                "timing:execute_first": 601,
+                "timing:parse": 588,
+                "timing:request": 2036,
+                "timing:unknown": 20
+              },
+              "file_id": "I:7de784ac5cccc75a6f45da151decb34c552c228c7c71141170f2737c48adf4ff",
+              "state": "succeeded"
+            }
+          ],
+          "state": "complete"
+        },
+        "window_start": "2026-08-21T00:00:00+08:00",
+        "window_end": "2026-09-20T00:00:00+08:00"
+      }
+    ]
+  }
+}

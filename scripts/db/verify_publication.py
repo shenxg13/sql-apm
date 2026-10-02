@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Private PG17 orchestration, fault injection, publication and concurrency checks."""
+import argparse
 import json
 import os
 from pathlib import Path
@@ -26,9 +27,9 @@ from sql_apm.storage.publication import PublicationStore,version_status,CHECKS
 from sql_apm.baseline.workflow import run
 
 
-def verify():
-    with instance(Path('/usr/pgsql-17/bin')) as (directory,env):
-        v=Verification(Path('/usr/pgsql-17/bin'),directory,env);v.init()
+def verify(pg_bin):
+    with instance(pg_bin) as (directory,env):
+        v=Verification(pg_bin,directory,env);v.init()
         dsn='host='+str(directory/'socket')+' port=55473 dbname=sql_apm user=sql_apm'
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);path=root/'input.csv';cfg=root/'import.json'
@@ -173,4 +174,11 @@ def verify():
         print('PUBLICATION CHECKS:',v.completed)
 
 
-if __name__=='__main__':verify()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
+    args=parser.parse_args()
+    for name in ('initdb','pg_ctl','psql'):
+        if not (args.pg_bin/name).is_file():
+            parser.error('missing PostgreSQL executable: '+name)
+    verify(args.pg_bin)

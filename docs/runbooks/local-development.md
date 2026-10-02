@@ -3,7 +3,9 @@
 本页维护实际环境说明及检查命令。产品需求、阶段与待定事项分别见
 [交付范围](../../.project-wiki/decisions/project-scope.md)、
 [运行环境与组件](../../.project-wiki/decisions/runtime-and-components.md)。
-当前以可联网 Alma 环境开展开发；Kylin 离线安装沿用后续专项工作的安排。
+当前以可联网 Alma 环境开展开发；Kylin V10 SP2 演练使用
+[离线部署与验证手册](kylin-offline-deployment.md)，用户独立执行使用
+[记录模板](kylin-validation-record.md)。演练结论不能替代生产部署验收。
 
 ## 相关操作契约
 
@@ -15,7 +17,8 @@
 | SQL 原文、明细和历史清理 | [存储与留存](../../.project-wiki/contracts/sql-storage.md) |
 | SQL 输入与 Grafana 展示 | [检索及历史查看](../../.project-wiki/features/sql-search-and-views.md) |
 
-业务 CLI 和展示功能尚未交付；数据库初始化／物理结构见下文，下列质量命令用于仓库 Harness。
+离线业务 CLI 已交付，展示功能另行实施；数据库初始化／物理结构见下文，
+下列质量命令用于仓库 Harness。
 开发日志样本位于本地忽略目录 `raw/inbox/hashdata/`，不是既定生产接收目录。
 
 ## Python 项目环境
@@ -25,8 +28,9 @@
 虚拟环境实际版本已核对为 3.9.5，不包含系统 site-packages；系统 Python 保持 3.9.25。
 两个本地目录均由 Git 忽略。
 
-当前仅安装 pip 26.0.1、setuptools 82.0.1、wheel 0.48.0、packaging 26.0。
-业务依赖仍须兼容 Python 3.9.5，并在实施时验证和锁定。
+Alma 环境引导工具为 pip 26.0.1、setuptools 82.0.1、wheel 0.48.0、packaging 26.0。
+业务依赖 pglast 7.18 和 psycopg2-binary 2.9.10 已在根 requirements.txt 锁定版本与 wheel 摘要。
+Kylin 使用源码内 ensurepip 引导，不要求与 Alma 的包工具版本相同。
 
 在仓库根目录使用：
 
@@ -44,7 +48,8 @@ python -m pip check
 bz2、lzma、sqlite3、SSL、时区和多进程等本机功能验证已通过。
 构建依赖、引导工具版本、重建方法及未构建的可选模块见
 [Python 环境验证记录](../reports/python-environment-2026-09-25.md)。
-本机验证不代表 Kylin 离线部署或全部业务兼容验证。
+上述记录属于 Alma 本机；Kylin 的独立源码构建、自检及真实流程按部署手册另行记录。
+正式部署的解释器随项目安装到项目目录，不依赖主机已有的 Python；不得搬运 Alma 的解释器目录。
 
 ## PostgreSQL 项目环境
 
@@ -56,10 +61,11 @@ Baseline 存储采用 **PostgreSQL 17**，保存执行记录、SQL 指纹和基�
 查询状态、开始时间和锁等待等基础接口。GP/HashData 特有字段需结合现场字段定义
 和脱敏样本验证，再补充真实环境联调；普通 PostgreSQL 测试不代表完整兼容验证。
 
-数据库驱动须兼容 Python 3.9.5 及对应数据库版本，实际依赖需验证并锁定。
+数据库驱动使用已锁定的 psycopg2-binary 2.9.10，兼容 Python 3.9.5。
 本机 PG17.10 工具位于 /usr/pgsql-17/bin；已有[项目初始化、版本升级与临时实例验证入口](database-initialization.md)，
 初版业务物理结构随之交付。验证使用自动停止／清理的私有临时实例，未部署生产项目实例；
-生产部署方式、补丁版本和业务驱动选择仍由后续工作落实。
+Kylin 演练从源码离线构建同一 17.10 补丁版本，使用项目目录中的工具路径、专用 postgres
+系统用户和 pg_ctl；正式生产部署仍由后续工作落实。
 
 ## 质量工具
 

@@ -120,6 +120,8 @@ def main():
     helpers = list((ROOT / 'scripts/deployment').glob('*'))
     helpers += [ROOT / 'scripts/db/verify_publication.py',
                 ROOT / 'docs/reports/data/kylin-alma-baseline-2026-10-02.json',
+                ROOT / 'docs/reports/kylin-offline-deployment-2026-10-02.md',
+                ROOT / 'docs/reports/data/kylin-offline-deployment-2026-10-02.json',
                 ROOT / 'docs/runbooks/kylin-offline-deployment.md',
                 ROOT / 'docs/runbooks/kylin-validation-record.md']
     for file in sorted(helpers):

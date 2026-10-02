@@ -76,8 +76,9 @@
     "upgraded_count": 28
   },
   "bundle": {
-    "sha256": "cbfe7bee2b47075268b4c56994e57495cd497ffb802de561acf5bfd57f4145c7",
-    "files": 422
+    "checksum_file": "offline-bundle.tar.gz.sha256",
+    "manifest_file": "offline-bundle/manifest.json",
+    "note": "Archive SHA-256 is external because this report is included in the archive; the PR records the delivered archive checksum."
   },
   "log_input": {
     "files": 55,
@@ -92,16 +93,18 @@
     "hba_has_trust": false,
     "tcp_wrong_password_rejected": true,
     "tcp_correct_password_verified": true,
-    "user_dba_tool_verified": false,
+    "user_dba_tool_verified": true,
     "temporary_credential_export_explicitly_authorized": true,
-    "temporary_credential_copy_removed": true
+    "temporary_credential_copy_removed": true,
+    "user_dba_tool": "pgAdmin",
+    "user_dba_tool_status": "user reported successful pgAdmin connection and read-only verification",
+    "user_dba_tool_evidence_kind": "user_reported"
   },
   "local_default_publication_checks": 31,
   "pending": [
     "single-worker nine-task replay currently running; full Alma equality unverified",
     "yum-source dependency path followed by both source builds",
-    "user snapshot restoration and independent execution",
-    "user DBA tool read-only query"
+    "user snapshot restoration and independent execution"
   ],
   "boundaries": [
     "not a production deployment",
@@ -169,7 +172,244 @@
       "version_chain_verified": true
     }
   ],
-  "tasks": [],
+  "tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 475.889,
+        "check": 2.161,
+        "import": 2450.628,
+        "publish": 0.003,
+        "snapshot": 131.765
+      },
+      "seconds": 3060.858,
+      "counts": {
+        "formal_groups": 51266,
+        "formal_layers": {
+          "day": 217566,
+          "hour": 67265,
+          "overall": 51266,
+          "week": 80067,
+          "weekday": 93602
+        },
+        "observation_groups": 28,
+        "observation_layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "import_attempts": 26,
+        "added_records": 5124686,
+        "added_occurrences": 2547876,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 13653683,
+        "filesystem_used_bytes": 34701172736,
+        "filesystem_free_bytes": 169210159104
+      },
+      "after": {
+        "database_bytes": 12444022451,
+        "filesystem_used_bytes": 49344573440,
+        "filesystem_free_bytes": 154566758400
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 1,
+      "cutoff_date": "2026-07-29",
+      "stages": {
+        "build": 224.961,
+        "check": 2.202,
+        "import": 96.232,
+        "publish": 0.002,
+        "snapshot": 6.648
+      },
+      "seconds": 330.848,
+      "counts": {
+        "formal_groups": 52897,
+        "formal_layers": {
+          "day": 226043,
+          "hour": 69013,
+          "overall": 52897,
+          "week": 81792,
+          "weekday": 95329
+        },
+        "observation_groups": 29,
+        "observation_layers": {
+          "day": 41,
+          "hour": 31,
+          "overall": 29,
+          "week": 35,
+          "weekday": 33
+        },
+        "import_attempts": 28,
+        "added_records": 199164,
+        "added_occurrences": 98949,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 12444022451,
+        "filesystem_used_bytes": 49344647168,
+        "filesystem_free_bytes": 154566684672
+      },
+      "after": {
+        "database_bytes": 13336737459,
+        "filesystem_used_bytes": 50393481216,
+        "filesystem_free_bytes": 153517850624
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 2,
+      "cutoff_date": "2026-07-30",
+      "stages": {
+        "build": 112.466,
+        "check": 2.349,
+        "import": 103.611,
+        "publish": 0.002,
+        "snapshot": 4.13
+      },
+      "seconds": 223.017,
+      "counts": {
+        "formal_groups": 54577,
+        "formal_layers": {
+          "day": 234613,
+          "hour": 71118,
+          "overall": 54577,
+          "week": 83503,
+          "weekday": 97167
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 44,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 29,
+        "added_records": 203063,
+        "added_occurrences": 101599,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 13336737459,
+        "filesystem_used_bytes": 50393513984,
+        "filesystem_free_bytes": 153517817856
+      },
+      "after": {
+        "database_bytes": 14243534515,
+        "filesystem_used_bytes": 51820728320,
+        "filesystem_free_bytes": 152090603520
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 3,
+      "cutoff_date": "2026-07-31",
+      "stages": {
+        "build": 106.821,
+        "check": 2.336,
+        "import": 121.2,
+        "publish": 0.002,
+        "snapshot": 4.391
+      },
+      "seconds": 235.365,
+      "counts": {
+        "formal_groups": 53786,
+        "formal_layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 46,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 30,
+        "added_records": 201727,
+        "added_occurrences": 100411,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 14243534515,
+        "filesystem_used_bytes": 51820761088,
+        "filesystem_free_bytes": 152090570752
+      },
+      "after": {
+        "database_bytes": 15171188403,
+        "filesystem_used_bytes": 52920733696,
+        "filesystem_free_bytes": 150990598144
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 4,
+      "cutoff_date": "2026-07-31",
+      "stages": {
+        "build": 103.6,
+        "check": 2.36,
+        "publish": 0.002,
+        "snapshot": 1.874
+      },
+      "seconds": 108.635,
+      "counts": {
+        "formal_groups": 53786,
+        "formal_layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 46,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 30
+      },
+      "before": {
+        "database_bytes": 15171188403,
+        "filesystem_used_bytes": 52920770560,
+        "filesystem_free_bytes": 150990561280
+      },
+      "after": {
+        "database_bytes": 15577159347,
+        "filesystem_used_bytes": 53457846272,
+        "filesystem_free_bytes": 150453485568
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    }
+  ],
   "timeout_replay": [
     {
       "distinct": 297,

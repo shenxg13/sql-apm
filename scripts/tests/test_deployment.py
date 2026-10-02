@@ -2,6 +2,8 @@
 """Bounded release regressions; run with the locked build Python environment."""
 import json
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -84,6 +86,21 @@ class PackageTests(unittest.TestCase):
         self.assertFalse((target / 'secret').exists())
         with self.assertRaisesRegex(ValueError, 'matched no files'):
             select(source, target, ['missing/*.sql'])
+
+    def test_verification_rejects_mismatched_program_commit(self):
+        kit = self.root / 'verification'
+        (kit / 'scripts/deployment').mkdir(parents=True)
+        runner = kit / 'scripts/deployment/run_verification.py'
+        shutil.copy2(ROOT / 'scripts/deployment/run_verification.py', runner)
+        (kit / 'PROGRAM_COMMIT').write_text('different-commit\n')
+        for name in ('sql_apm/__init__.py', 'scripts/db/initialize.sh', 'rules/functions/v1.0.1.json'):
+            path = self.app / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('')
+        result = subprocess.run([sys.executable, str(runner), '--app-root', str(self.app), 'unit'],
+                                capture_output=True, text=True, cwd=self.root)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('different commits', result.stderr)
 
 
 class HtmlTests(unittest.TestCase):

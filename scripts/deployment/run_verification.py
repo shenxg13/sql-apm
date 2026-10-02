@@ -27,6 +27,9 @@ def setup(app):
     if Path(sql_apm.__file__).resolve() != app / 'sql_apm/__init__.py':
         raise ValueError('verification imported a different application')
     if (app / 'RELEASE.json').exists():
+        if ((RESOURCES / 'PROGRAM_COMMIT').exists()
+                and (RESOURCES / 'PROGRAM_COMMIT').read_text() != (app / 'PROGRAM_COMMIT').read_text()):
+            raise ValueError('verification kit and program come from different commits')
         spec = importlib.util.spec_from_file_location('delivered_package', app / 'scripts/deployment/verify_package.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)

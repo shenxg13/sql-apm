@@ -86,7 +86,7 @@ def main():
     add(pg, 'sources/postgresql-17.10.tar.gz', '17.10', PG_URL, PG_SHA)
     if args.postgres_source is None:
         pg.unlink()
-    locked = [line.split() for line in (ROOT / 'requirements.txt').read_text().splitlines()
+    locked = [line.split() for line in (args.release_dir / 'app/requirements.txt').read_text().splitlines()
               if line and not line.startswith('#')]
     for requirement, sha_arg in locked:
         name, version = requirement.split('==')

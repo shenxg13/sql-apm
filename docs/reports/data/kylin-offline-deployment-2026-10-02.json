@@ -102,7 +102,7 @@
   },
   "local_default_publication_checks": 31,
   "pending": [
-    "single-worker nine-task replay currently running; full Alma equality unverified",
+    "single-worker nine-task replay paused at 6/9 by user for SSD migration; resume from 120-1",
     "yum-source dependency path followed by both source builds",
     "user snapshot restoration and independent execution"
   ],
@@ -408,6 +408,54 @@
       "passed": true,
       "baseline_equal": true,
       "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 0,
+      "cutoff_date": "2026-09-16",
+      "stages": {
+        "build": 1109.569,
+        "check": 132.03,
+        "import": 3462.279,
+        "publish": 0.338,
+        "snapshot": 1527.621
+      },
+      "seconds": 6239.992,
+      "counts": {
+        "formal_groups": 404794,
+        "formal_layers": {
+          "day": 719306,
+          "hour": 468434,
+          "overall": 404794,
+          "week": 508149,
+          "weekday": 719306
+        },
+        "observation_groups": 645,
+        "observation_layers": {
+          "day": 972,
+          "hour": 698,
+          "overall": 645,
+          "week": 753,
+          "weekday": 972
+        },
+        "import_attempts": 13,
+        "added_records": 5540943,
+        "added_occurrences": 2385583,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 15577159347,
+        "filesystem_used_bytes": 53457874944,
+        "filesystem_free_bytes": 150453456896
+      },
+      "after": {
+        "database_bytes": 31471425203,
+        "filesystem_used_bytes": 68560941056,
+        "filesystem_free_bytes": 135350390784
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
     }
   ],
   "timeout_replay": [
@@ -468,5 +516,65 @@
     "product_code_changed": false,
     "timeout_seconds": 5,
     "full_replay_complete": false
+  },
+  "migration_pause": {
+    "reason": "User requested safe stop before migrating VM from mechanical disk to SSD",
+    "stopped_at_utc": "2026-10-02T14:27:36.064507+00:00",
+    "passed_tasks": 6,
+    "published_versions": {
+      "119": 5,
+      "120": 1
+    },
+    "interrupted_task": {
+      "cluster": "120",
+      "step": 1,
+      "stage": "import",
+      "reason": "operator_interrupt"
+    },
+    "120_import_attempts": {
+      "succeeded": 13,
+      "interrupted": 1
+    },
+    "next_step": "Resume from 120-1 after migration; preserve interruption evidence and account for the additional interrupted import attempt in acceptance comparison.",
+    "product_code_changed": false,
+    "parser_workers": 1,
+    "storage_medium": "mechanical disk, user-reported",
+    "postgres_control_state": "shut down",
+    "remaining_project_processes": 0,
+    "local_record_backup_files": 48,
+    "local_record_backup_sha256": "98f135bcff08dde58fcff973e5b098a90a37a5a24c14dcd83a8a7f5d3c29599d",
+    "resource_sample": {
+      "sample_seconds": 20.098,
+      "cpu_percent": {
+        "user": 0.49,
+        "nice": 0.0,
+        "system": 0.69,
+        "idle": 87.91,
+        "iowait": 10.71,
+        "irq": 0.11,
+        "softirq": 0.08,
+        "steal": 0.0
+      },
+      "process_cpu_percent_one_core_100": {
+        "postgres": 5.22,
+        "python": 3.83
+      },
+      "activity_samples": {
+        "insert_fingerprint|IO|DataFileRead": 7,
+        "copy_sql_evidence|IO|DataFileRead": 7,
+        "copy_occurrences|IO|DataFileRead": 4,
+        "other|IO|DataFileRead": 1,
+        "fingerprint_cache_lookup|IO|DataFileRead": 1
+      },
+      "data_disk": {
+        "read_iops": 45.08,
+        "read_MiB_per_sec": 0.501,
+        "mean_read_ms": 41.842,
+        "write_iops": 67.37,
+        "mean_write_ms": 0.444,
+        "busy_percent": 93.54
+      }
+    },
+    "interpretation": "Sample supports storage read latency as the current import bottleneck; SSD improvement remains unverified."
   }
 }

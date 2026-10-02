@@ -11,6 +11,12 @@ x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、Pos
 两次合计须验证 yum 源与离线 RPM 两种系统包安装路径，并在随后完成两项源码编译。
 试跑选择离线 RPM，用户重跑选择 yum 源。其余项目制品两次都离线安装。
 
+用户恢复快照前，将已交付的离线包、外部摘要和试跑记录保留在开发机。
+恢复后从第 1 节开始；第 2 节的依赖收集和第 3 节的制包属于一次性的制品准备，
+独立部署复用已交付制品，按第 2 节末尾说明准备目录和 tar，执行第 3 节的传输、
+解包及校验，再从第 4 节的 yum 源路径继续完成全部构建、自检、初始化和九任务。
+不要在开发机已有的输出目录上重新执行制包命令。
+
 ## 1. 参数与前置检查
 
 以下在目标机以具备免密 sudo 的执行账号运行；每个新终端先重新填写本节变量。
@@ -103,6 +109,16 @@ createrepo_c "$APM_ROOT/rpm-collection/rpms"
 不要把 Alma 的 RPM 搬到 Kylin；工具准备未通过就不解包。用户恢复快照重跑时，
 离线包已包含 repodata，只需要 tar；这两个工具不纳入编译依赖离线包。
 
+用户恢复快照后复用离线包时，先在目标机准备目录和解包工具，不重复收集 RPM：
+
+```bash
+sudo install -d -m 0755 -o "$(id -un)" -g "$(id -gn)" "$APM_ROOT" "$APM_ROOT/setup"
+sudo yum install -y tar
+tar --version
+```
+
+预期：目录可写且 tar 可调用；工具安装失败先处理 yum 源，不继续解包。
+
 ## 3. 在开发机生成并传输离线包
 
 将收集目录用 scp 取回开发机被忽略的 `var/issue31/rpm-collection`。
@@ -120,6 +136,8 @@ scp -r -P "$APM_SSH_PORT" "$APM_SSH_TARGET:/data/sql-apm/rpm-collection" var/iss
 scp -P "$APM_SSH_PORT" var/issue31/offline-bundle.tar.gz var/issue31/offline-bundle.tar.gz.sha256 \
   "$APM_SSH_TARGET:/data/sql-apm/"
 ```
+
+用户独立部署已有交付包时，只执行上述最后一条 scp；不重新收集或生成制品。
 
 预期：生成目录、`.tar.gz` 和同名 `.sha256`；`manifest.json` 逐项记录来源、版本和摘要。
 输出目录必须不存在；失败目录不能当作成功离线包。修正来源后用新目录重建，

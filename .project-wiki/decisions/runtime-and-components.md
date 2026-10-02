@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-03
 sources:
+  - path: docs/reports/slim-release-kylin-trial-2026-10-03.md
+    status: current
   - path: docs/reports/slim-release-preparation-2026-10-03.md
     status: current
   - path: docs/reports/kylin-offline-deployment-2026-10-02.md
@@ -94,13 +96,22 @@ Markdown 是手册唯一维护原稿，构建期生成单文件离线 HTML 随�
 SSD 上四进程首批专门记录超时、分组、基准和资源；零超时且等值才支持成功结论，
 否则保留现场，重置后单进程重跑并经用户确认创建后续 Issue，本 Issue 不修改默认并发或超时。
 无论试验结果如何，手册九任务保持单进程且每次导入核对超时计数为 0。
-当前证据不足以确认磁盘是四进程超时原因。
+恢复快照后的精简候选包试跑在用户报告的 SSD 环境仍出现四进程超时：882 次，
+正式分组 51,152，比 Alma 少 114 个；六项发布检查和版本链仍通过。
+全程 CPU I/O 等待仅 0.067%，不能把换 SSD 或发布成功当作归一化完整性的保证。
+这些是运行观察，不足以确认全部根因；单进程复跑和性能对照由
+[候选包试跑报告](../../docs/reports/slim-release-kylin-trial-2026-10-03.md)保存。
 
 实现入口见[程序发布操作说明](../../docs/runbooks/program-release.md)。
 目标机候选包试跑前须先获用户明确确认；打标签和发布在评审合并后另获用户确认。
-上述是已确认交付与验证边界；本轮开发机检查不能代替新的 Kylin 试跑和人工验收。
+上述是已确认交付与验证边界；开发机检查不能代替 Kylin 试跑和人工验收。
 [开发机准备记录](../../docs/reports/slim-release-preparation-2026-10-03.md)保存候选包、
 66 个产品文件等值、独立验收与 HTML 自动检查证据，以及试跑前暂停点。
+用户随后确认恢复快照并允许试跑；候选包已实际重走离线系统包、两项源码编译、
+独立目录的 66／266／31 项自检、初始化及受限 TCP 验证，55 文件摘要一致。
+用户回复 Chrome 离线人工检查正常。保留四进程失败现场后，新实例单进程首批零超时，
+正式分组 51,266，全部 Alma 计数和版本链相同；全流程从原机械盘 51.0 分钟降到 44.6 分钟，
+改善主要来自数据库快照和统计构建。用户独立九任务及正常 yum 源路径仍须另行完成。
 
 ### 已确认的当前开发环境与生产部署安排
 

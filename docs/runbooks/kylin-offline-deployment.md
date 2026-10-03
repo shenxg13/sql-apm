@@ -74,6 +74,7 @@ sudo -n ss -ltnp
 开发机传输命令另定义 SSH 目标（用交接提供的执行账号与地址填写），本次端口为 22：
 
 ```bash
+set -euo pipefail
 export APM_SSH_TARGET='执行账号@目标机地址'
 export APM_SSH_PORT=22
 ```
@@ -192,6 +193,7 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 
 ```bash
 # 在开发机填写本次交付记录中的值；复用现成包不使用当前仓库 HEAD 推断。
+set -euo pipefail
 APM_EXPECTED_COMMIT='填写交付记录中的40位程序提交'
 APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
 APM_DELIVERY_DIR="$PWD/var/issue31/deliveries/$APM_EXPECTED_COMMIT"
@@ -207,6 +209,7 @@ scp -P "$APM_SSH_PORT" "$APM_DELIVERY_DIR/offline-bundle.tar.gz" \
 
 ```bash
 cd "$APM_ROOT"
+set -euo pipefail
 [[ "$APM_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
 [[ "$APM_EXPECTED_BUNDLE_SHA256" =~ ^[0-9a-f]{64}$ ]]
 printf '%s  %s\n' "$APM_EXPECTED_BUNDLE_SHA256" offline-bundle.tar.gz | sha256sum -c -

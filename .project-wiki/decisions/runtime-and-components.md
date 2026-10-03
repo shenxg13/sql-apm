@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-04
 sources:
+  - path: docs/reports/kylin-read-access-2026-10-04.md
+    status: current
   - path: docs/reports/kylin-manual-validation-2026-10-04.md
     status: current
   - path: docs/reports/slim-release-kylin-trial-2026-10-03.md
@@ -78,6 +80,22 @@ Python 3.9.5 解释器属于正式部署流程，从离线源码包构建并安�
 用户在实施试跑后恢复快照并独立从头执行，DBA 工具验证须由用户完成。
 这不核实生产内网源、不同初始系统上的 RPM 完整性、120 三十天首批成本或 aarch64。
 本节更新后，早期条款中“Kylin 留待专项”的表述仅指当时阶段，不覆盖本轮已确认安排。
+
+### 已确认的执行账号读取权限（2026-10-04）
+
+来源：用户明确要求“sfmon用户需要能够至少只读APM_ROOT下所有的目录和文件，包括private目录”，
+已同步至 [Issue #31](https://github.com/shenxg13/sql-apm/issues/31) 的范围和 K6b。
+sfmon 无需 sudo 即可列出、进入 APM_ROOT 下所有目录并读取全部普通文件，包含 private、
+pgdata；已有属主写权限保留。private／pgpass 由 sfmon 拥有，仍为 0700／0600。
+postgres 数据保持原属主，以命名读取 ACL、默认 ACL 和 PG 组读取模式支持后续新数据文件，
+不增加 sfmon 对 PGDATA 的写权限。socket 目录不可写，通过 sfmon 组继承支持锁文件读取，
+不设置只读默认 ACL，以免阻断 socket 连接；连接继续执行既有数据库认证。
+
+目标机已验证全部目录和普通文件可读、PG 新文件继承、重启后 socket／TCP 正常，
+原九个发布版本保持不变。实际计数、socket ACL 失败及修正见
+[权限修正报告](../../docs/reports/kylin-read-access-2026-10-04.md)，操作方法见
+[部署手册](../../docs/runbooks/kylin-offline-deployment.md#71-已有部署补齐读取权限)。
+外部工具显式收紧权限或移入文件后需复查，不以默认 ACL 保证任意外部操作后的可读性。
 
 ### 已确认的精简预发布与离线手册（2026-10-03）
 

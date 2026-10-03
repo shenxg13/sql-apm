@@ -34,6 +34,9 @@ x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、Pos
 ```bash
 set -euo pipefail
 export APM_ROOT=/data/sql-apm
+export APM_RUN_USER=sfmon
+export APM_RUN_GROUP="$(id -gn "$APM_RUN_USER")"
+test "$(id -un)" = "$APM_RUN_USER"
 export APM_PYTHON="$APM_ROOT/python-3.9.5/bin/python3.9"
 export APM_PG_BIN="$APM_ROOT/postgresql-17.10/bin"
 export APM_APP="$APM_ROOT/app"
@@ -293,14 +296,28 @@ cd "$APM_APP"
 if ! getent passwd postgres >/dev/null; then
   sudo useradd --system --user-group --home-dir "$APM_ROOT/postgres-home" --shell /sbin/nologin postgres
 fi
-sudo install -d -m 0700 -o postgres -g postgres "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home"
-sudo install -d -m 0755 -o postgres -g postgres "$APM_SOCKET"
+command -v setfacl getfacl
+sudo install -d -m 0750 -o postgres -g postgres "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home"
+sudo install -d -m 2755 -o postgres -g "$APM_RUN_GROUP" "$APM_SOCKET"
 sudo -u postgres "$APM_PG_BIN/initdb" -D "$APM_ROOT/pgdata" -U postgres \
-  --auth-local=peer --auth-host=scram-sha-256 --encoding=UTF8 --locale=C
+  --allow-group-access --auth-local=peer --auth-host=scram-sha-256 --encoding=UTF8 --locale=C
+sudo find "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home" -type d \
+  -exec setfacl -m "u:$APM_RUN_USER:r-x,d:u:$APM_RUN_USER:r-x" {} +
+sudo find "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home" -type f \
+  -exec setfacl -m "u:$APM_RUN_USER:r--" {} +
 ```
 
 预期：专用 postgres 系统用户无需登录密码，空实例初始化成功。
 若用户或 PGDATA 已存在，先核对属主及来源，不接管未知用户／数据目录，不重复 initdb。
+`setfacl`／`getfacl` 在本次目标机已具备；缺失时由用户从已配置源安装 `acl`，
+不将其加入编译依赖清单。sfmon 须无需 sudo 即可遍历 APM_ROOT 全部目录并读取普通文件，
+包括 private 和 pgdata；其原有写权限保留，postgres 文件只增加 sfmon 的读权限。
+PGDATA 保持 postgres 属主；命名 ACL 及默认 ACL 配合
+[`--allow-group-access`](https://www.postgresql.org/docs/17/app-initdb.html)，
+使 PG 创建目录／文件时采用 0750／0640，并继承 sfmon 的读取权限。
+socket 目录用 sfmon 主组和 setgid 使锁文件继承可读组；不要给该目录设置只读默认 ACL，
+否则新 socket 节点的命名 ACL 会阻止连接。目录不给 sfmon 写权限，socket 节点沿用下方 0777，
+数据库连接仍受 SCRAM／peer 规则约束。
 参数明确写入本实例配置，不改系统服务；以下是 8 vCPU／14 GiB 演练机的起始配置：
 
 ```bash
@@ -346,8 +363,98 @@ stat -c '%a %n' "$PGPASSFILE"
 预期：bootstrap、schema、check 成功，结构版本 1.6.0；项目账号通过 socket 密码认证，
 密码文件权限 600。生成器不显示密码，仅通过匿名管道交给本机管理员并发送 SCRAM verifier。
 凭据只保存在程序目录外的 private/；不放进 Git、命令参数、报告或 shell 历史。
+private 由 sfmon 创建并拥有，目录 0700、pgpass 0600 已允许 sfmon 读取；
+不为满足此要求放宽 pgpass 的组权限，否则 [libpq 会忽略密码文件](https://www.postgresql.org/docs/17/libpq-pgpass.html)。
 失败：先核对 peer 身份、socket 权限、SCRAM 规则和密码文件，保留已创建对象；
 密码步骤失败时保留文件，诊断后重新设置，不随意轮换其他实例的账号。
+
+### 7.1 已有部署补齐读取权限
+
+按上方完成的新安装直接执行第 7.2 节。已有部署先确认本实例没有运行中的导入／构建，
+安排一次短暂停机；以下仅适用于本手册的专用目录、用户和无外置表空间布局。
+先核对目录、符号链接和 ACL，备份后修正；不重新 initdb，不更换密码。
+
+```bash
+test "$APM_ROOT" = /data/sql-apm
+test "$APM_SOCKET" = "$APM_ROOT/socket"
+test "$(id -un)" = "$APM_RUN_USER"
+test "$(stat -c %U "$APM_ROOT/pgdata")" = postgres
+test "$(stat -c %U "$PGPASSFILE")" = "$APM_RUN_USER"
+command -v setfacl getfacl
+sudo find "$APM_ROOT" -xdev -type l -ls
+install -d -m 0700 "$APM_ROOT/records"
+APM_ACL_BACKUP="$(mktemp "$APM_ROOT/records/permissions-before.XXXXXX.acl")"
+sudo getfacl -R -p "$APM_ROOT" > "$APM_ACL_BACKUP"
+sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -m fast -w stop
+sudo find "$APM_ROOT" -xdev -type d ! -user "$APM_RUN_USER" ! -path "$APM_SOCKET" \
+  -exec setfacl -m "u:$APM_RUN_USER:r-x,d:u:$APM_RUN_USER:r-x" {} +
+sudo find "$APM_ROOT" -xdev -type f ! -user "$APM_RUN_USER" \
+  -exec setfacl -m "u:$APM_RUN_USER:r-X" {} +
+sudo find "$APM_ROOT" -xdev -type d -user "$APM_RUN_USER" ! -perm -0500 -exec chmod u+rx {} +
+sudo find "$APM_ROOT" -xdev -type f -user "$APM_RUN_USER" ! -perm -0400 -exec chmod u+r {} +
+sudo setfacl -k "$APM_SOCKET"
+sudo setfacl -m "u:$APM_RUN_USER:r-x" "$APM_SOCKET"
+sudo chgrp "$APM_RUN_GROUP" "$APM_SOCKET"
+sudo chmod g+s "$APM_SOCKET"
+test ! -w "$APM_SOCKET"
+sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" \
+  -l "$APM_ROOT/pgdata/server.log" -w start
+```
+
+预期：PGDATA 为 postgres 属主、0750；重启后新建的数据文件采用 0640 并继承读取 ACL。
+socket 目录为 2755，无默认 ACL；新 socket 为 0777、锁文件为 0640，组为 sfmon 主组。
+已有 private／pgpass 仍归 sfmon、保持 0700／0600。ACL 失败先处理文件系统支持或实际路径；
+不以 `chmod -R 777` 替代。需要回退时先停本实例，核对备份范围，使用
+`sudo setfacl --restore="$APM_ACL_BACKUP"` 恢复已有路径，再启动；备份不包含之后新建的文件。
+外部工具若显式创建 0600 文件、覆盖 ACL 或移入不继承 ACL 的目录，须重新执行权限检查并修正。
+
+### 7.2 以 sfmon 核对读取权限
+
+以下直接以 sfmon 执行，不使用 sudo；仅打开普通文件，不读取或输出其正文。
+在无导入／构建任务时检查，以避免文件创建、删除产生瞬时差异。
+
+```bash
+"$APM_PYTHON" - <<'PY'
+import os
+import stat
+from pathlib import Path
+
+root = Path(os.environ['APM_ROOT'])
+assert os.getuid() != 0
+assert __import__('pwd').getpwuid(os.getuid()).pw_name == os.environ['APM_RUN_USER']
+counts = {'directories': 0, 'regular_files': 0}
+
+def fail(error):
+    raise error
+
+for current, directories, files in os.walk(root, followlinks=False, onerror=fail):
+    assert os.access(current, os.R_OK | os.X_OK), current
+    counts['directories'] += 1
+    for name in directories + files:
+        path = Path(current) / name
+        if path.is_symlink():
+            assert path.resolve().is_relative_to(root), str(path)
+        mode = path.stat().st_mode
+        if stat.S_ISDIR(mode):
+            assert os.access(path, os.R_OK | os.X_OK), str(path)
+        elif stat.S_ISREG(mode):
+            with path.open('rb'):
+                pass
+            counts['regular_files'] += 1
+        if path.is_relative_to(root / 'pgdata'):
+            assert not os.access(path, os.W_OK), str(path)
+assert not os.access(root / 'pgdata', os.W_OK)
+assert not os.access(root / 'socket', os.W_OK)
+print('READ_ACCESS_OK', counts)
+PY
+stat -c '%a %U:%G %n' "$APM_ROOT/private" "$PGPASSFILE" "$APM_ROOT/pgdata" "$APM_SOCKET"
+"$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -U sql_apm -d sql_apm \
+  -c 'BEGIN READ ONLY; SELECT current_user,current_database(); COMMIT;'
+```
+
+预期：`READ_ACCESS_OK`、无不可读路径、socket 登录成功；第 8 节继续验证 TCP。
+目录与文件数量随构建／运行变化，不使用固定数量作为门槛。失败时保存路径和错误，
+不要把密码或 SQL 原文复制到验收记录；完成日志传输或后续维护后可再次运行此检查。
 
 ## 8. 远程连接与启停
 

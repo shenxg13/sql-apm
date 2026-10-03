@@ -88,6 +88,7 @@
 | [精简候选包与 HTML 准备验证](reports/slim-release-preparation-2026-10-03.md) | 实施验证报告 | 程序精简、逐文件证据继承、隔离验证、HTML 检查及目标机确认点。 |
 | [精简候选包 Kylin 试跑](reports/slim-release-kylin-trial-2026-10-03.md) | 实施验证报告 | 快照恢复后的完整重装、独立验收、四进程超时与单进程复跑、性能对照。 |
 | [Kylin 用户独立验证核对](reports/kylin-manual-validation-2026-10-04.md) | 验收核对报告 | 用户九任务等值、正常 yum 源和 DBA 验证，以及早期候选包误选与最小补验范围。 |
+| [Kylin 执行账号读取权限修正](reports/kylin-read-access-2026-10-04.md) | 验证报告 | sfmon 全目录读取、private 和 PGDATA 权限、新文件继承及 socket／TCP 复验。 |
 | [构建编排 R1 整改](reports/build-publication-r1-remediation-2026-10-02.md) | 整改验证报告 | 次月预建并发、未登记集群拒绝、知识同步与 R1 退出条件。 |
 | [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
 | [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |

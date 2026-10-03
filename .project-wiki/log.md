@@ -276,3 +276,7 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 
 - 只读核对用户九任务、55 文件输入摘要与实际版本链全部通过，记录正常 yum 源及后续构建、pgAdmin 成功；阶段耗时与空间见[核对报告](../docs/reports/kylin-manual-validation-2026-10-04.md)。
 - 发现手册传输示例指向旧候选目录，实际包的业务代码相同，但验收资源漏四项统计测试。保留业务结果，最终候选对齐和补验仍未完成；事实边界同步到[运行环境主题](decisions/runtime-and-components.md)。后续性能问题已确认为 #34，不再重复请求创建。
+
+## 2026-10-04：执行账号读取权限
+
+- 用户确认 sfmon 至少可读取 APM_ROOT 全部内容（含 private）。同步在线契约、首次安装和已有环境修正步骤；目标机全目录／文件读取、PG 新文件和重启后连接验证通过，原九版保留。当前规则见[运行环境主题](decisions/runtime-and-components.md#已确认的执行账号读取权限2026-10-04)，失败处理与实测见[权限报告](../docs/reports/kylin-read-access-2026-10-04.md)。

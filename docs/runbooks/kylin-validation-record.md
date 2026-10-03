@@ -38,6 +38,8 @@
 | verify.py（实际 PASS 数） | 待填写 | — | 未执行 |
 | verify_publication.py（实际项数） | 待填写 | — | 未执行 |
 | initdb、bootstrap、密码文件、schema、check | 待填写 | — | 未执行 |
+| sfmon 无 sudo 全目录遍历／普通文件读取（含 private）、PGDATA 无新增写权限 | 待填写 | — | 未执行 |
+| PG 重启后新文件读取、socket 目录不可写与连接正常 | 待填写 | — | 未执行 |
 | socket SCRAM、HBA 与监听 | 待填写 | — | 未执行 |
 | 另一台机器正确／错误密码测试 | 待填写 | — | 未执行 |
 | 用户 DBA 工具只读查询 | 待填写 | — | 未执行 |

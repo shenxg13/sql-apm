@@ -30,10 +30,12 @@
 发布前必须获取并核对远程最新状态。构建时间、属主及文件排序固定，重复构建内容相同。
 
 ```bash
+APM_BUILD_COMMIT="$(git rev-parse HEAD)"
+APM_DELIVERY_DIR="$PWD/var/issue31/deliveries/$APM_BUILD_COMMIT"
 var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
 var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
-  --commit HEAD --kind candidate --version v0.1.0 \
-  --output var/issue31/release-candidate \
+  --commit "$APM_BUILD_COMMIT" --kind candidate --version v0.1.0 \
+  --output "$APM_DELIVERY_DIR/release" \
   --previous-program var/issue31/offline-bundle/program.tar.gz
 ```
 
@@ -41,6 +43,9 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 历史版本、依赖清单、初始化脚本）同路径摘要。`all_equal=true` 才支持 K8／K9 证据继承，
 原九任务本身的记录不改；新包安装、自检、119 首批和 HTML 人工确认仍需实际完成。
 差异报告只含路径与摘要，不含业务日志或凭据。
+完整离线包也生成在同一个提交目录下，详见安装手册第 3 节。
+交付时记录该实际目录和包的外部 SHA-256；接收者在解包前核对外部摘要及完整提交号，
+解包后再核对内部清单、程序和验收资源的提交。包内清单自洽不能证明拿到了本次约定版本。
 
 新目录解压精简程序和验收包，以项目 Python 3.9.5 创建隔离 `.venv`，从内网 wheel
 缓存离线安装根目录锁定依赖；使用以下入口检查实际解压的程序，不能在开发仓库根目录

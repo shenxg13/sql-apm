@@ -47,6 +47,8 @@ export APM_PORT=5432
 export APM_SERVER='填写目标机的LAN地址'
 export APM_CLIENT_CIDR='填写允许的客户端CIDR网段'
 export APM_BUNDLE="$APM_ROOT/offline-bundle"
+export APM_EXPECTED_COMMIT='填写交付记录中的40位程序提交'
+export APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
 export PGPASSFILE="$APM_ROOT/private/pgpass"
 export SQL_APM_DSN="host=$APM_SOCKET port=$APM_PORT dbname=sql_apm user=sql_apm"
 unset PGPASSWORD PGSERVICE PGSERVICEFILE PGOPTIONS PGHOSTADDR
@@ -65,7 +67,9 @@ sudo -n ss -ltnp
 这是依据 Alma 的估计，不是性能门槛。5432 未占用，且没有其他任务使用部署目录。
 失败：连接／sudo／磁盘／端口不符先处理环境，不安装到其他主机或改变系统 Python。
 快照存在性由虚拟机操作者确认，SSH 探测不能证明快照可恢复。
-运行前必须填写上面两项；实施时使用交接提供的目标地址和允许网段，连接信息不写入 Issue。
+运行前必须填写目标地址、允许网段，以及交付记录中的完整提交和离线包摘要；
+提交与摘要从实施方的交付记录取得，不用待安装包自行声明的值代替。
+实施时使用交接提供的目标地址和允许网段，连接信息不写入 Issue。
 
 开发机传输命令另定义 SSH 目标（用交接提供的执行账号与地址填写），本次端口为 22：
 
@@ -144,6 +148,8 @@ Python 官方源码沿用已保存的固定摘要；所有二进制和来源证�
 `scripts/deployment/build-requirements.txt`，版本为 Python-Markdown 3.8.2。
 
 ```bash
+APM_BUILD_COMMIT="$(git rev-parse HEAD)"
+APM_DELIVERY_DIR="$PWD/var/issue31/deliveries/$APM_BUILD_COMMIT"
 .venv/bin/python -m venv var/issue31/build-venv
 var/issue31/build-venv/bin/python -m pip --isolated --disable-pip-version-check \
   download --require-hashes --only-binary=:all: \
@@ -152,12 +158,12 @@ var/issue31/build-venv/bin/python -m pip --isolated --disable-pip-version-check 
   install --no-index --find-links var/issue31/build-wheels --require-hashes \
   -r scripts/deployment/build-requirements.txt
 var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
-  --commit HEAD --version v0.1.0 --kind candidate \
-  --output var/issue31/release-candidate \
+  --commit "$APM_BUILD_COMMIT" --version v0.1.0 --kind candidate \
+  --output "$APM_DELIVERY_DIR/release" \
   --previous-program var/issue31/offline-bundle/program.tar.gz
 ```
 
-预期：代码和制包工具已提交，输出目录原先不存在；产生精简 `app/`、独立 `verification/`、
+预期：代码和制包工具已提交，以完整提交号区分交付目录，输出目录原先不存在；产生精简 `app/`、独立 `verification/`、
 两个压缩包及摘要、`build-result.json` 和 `product-files-comparison.json`。
 逐文件产品比较 `all_equal=true` 才能继承原九任务证据。任何不同都需说明和补验，
 不能修改原基准来通过。`app/INSTALL.html` 是单文件手册；浏览器人工体验仍需记录。
@@ -166,8 +172,8 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 
 ```bash
 .venv/bin/python scripts/deployment/build_bundle.py \
-  --output var/issue31/slim-candidate/offline-bundle \
-  --release-dir var/issue31/release-candidate \
+  --output "$APM_DELIVERY_DIR/offline-bundle" \
+  --release-dir "$APM_DELIVERY_DIR/release" \
   --rpm-collection var/issue31/rpm-collection \
   --python-source var/issue31/offline-bundle/sources/Python-3.9.5.tgz \
   --postgres-source var/issue31/offline-bundle/sources/postgresql-17.10.tar.gz \
@@ -178,25 +184,39 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 `--source-manifest` 复用原包记录的官方来源，输入仍逐个检查固定源码／wheel 摘要和 RPM
 原签名记录与摘要；不访问网络。首次收集新材料时省略此参数，并按实际输入填写路径。
 失败目录不能当作成功离线包，修正后使用新目录。旧包和已有试跑证据保留，不覆盖。
+交付记录必须给出实际目录、完整程序提交、离线包 SHA-256 以及程序／HTML 摘要。
+不要把保留旧制品的 `slim-candidate`、`slim-ready` 等目录当作“最新包”的固定别名。
 
 **以下从开发机传输开始属于目标机试跑；实施方必须先取得用户明确确认。**
 用户独立部署复用交付包时，从传输开始，不重复收集、生成或发布制品：
 
 ```bash
-scp -P "$APM_SSH_PORT" var/issue31/slim-candidate/offline-bundle.tar.gz \
-  var/issue31/slim-candidate/offline-bundle.tar.gz.sha256 "$APM_SSH_TARGET:/data/sql-apm/"
+# 在开发机填写本次交付记录中的值；复用现成包不使用当前仓库 HEAD 推断。
+APM_EXPECTED_COMMIT='填写交付记录中的40位程序提交'
+APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
+APM_DELIVERY_DIR="$PWD/var/issue31/deliveries/$APM_EXPECTED_COMMIT"
+[[ "$APM_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+[[ "$APM_EXPECTED_BUNDLE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+printf '%s  %s\n' "$APM_EXPECTED_BUNDLE_SHA256" "$APM_DELIVERY_DIR/offline-bundle.tar.gz" | sha256sum -c -
+test "$(tar -xOf "$APM_DELIVERY_DIR/offline-bundle.tar.gz" offline-bundle/PROGRAM_COMMIT)" = "$APM_EXPECTED_COMMIT"
+scp -P "$APM_SSH_PORT" "$APM_DELIVERY_DIR/offline-bundle.tar.gz" \
+  "$APM_DELIVERY_DIR/offline-bundle.tar.gz.sha256" "$APM_SSH_TARGET:/data/sql-apm/"
 ```
 
 目标机先验证压缩包，再解包并核对每个文件：
 
 ```bash
 cd "$APM_ROOT"
+[[ "$APM_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+[[ "$APM_EXPECTED_BUNDLE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+printf '%s  %s\n' "$APM_EXPECTED_BUNDLE_SHA256" offline-bundle.tar.gz | sha256sum -c -
 sha256sum -c offline-bundle.tar.gz.sha256
+test "$(tar -xOf offline-bundle.tar.gz offline-bundle/PROGRAM_COMMIT)" = "$APM_EXPECTED_COMMIT"
 test ! -e "$APM_BUNDLE"
 tar -xzf offline-bundle.tar.gz
 cd "$APM_BUNDLE"
 sha256sum -c SHA256SUMS
-cat PROGRAM_COMMIT
+test "$(cat PROGRAM_COMMIT)" = "$APM_EXPECTED_COMMIT"
 ```
 
 预期全部 OK，`PROGRAM_COMMIT` 与交付记录一致；根目录 `INSTALL.html` 与程序包内手册相同。
@@ -240,6 +260,8 @@ test ! -e "$APM_VERIFY"
 tar -xzf "$APM_BUNDLE/verification.tar.gz"
 (cd "$APM_APP" && sha256sum -c SHA256SUMS)
 (cd "$APM_VERIFY" && sha256sum -c SHA256SUMS)
+test "$(cat "$APM_APP/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
+test "$(cat "$APM_VERIFY/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
 mkdir -p "$APM_ROOT/build" "$APM_ROOT/records"
 cd "$APM_ROOT/build"
 tar -xzf "$APM_BUNDLE/sources/Python-3.9.5.tgz"

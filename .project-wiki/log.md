@@ -280,3 +280,7 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 ## 2026-10-04：执行账号读取权限
 
 - 用户确认 sfmon 至少可读取 APM_ROOT 全部内容（含 private）。同步在线契约、首次安装和已有环境修正步骤；目标机全目录／文件读取、PG 新文件和重启后连接验证通过，原九版保留。当前规则见[运行环境主题](decisions/runtime-and-components.md#已确认的执行账号读取权限2026-10-04)，失败处理与实测见[权限报告](../docs/reports/kylin-read-access-2026-10-04.md)。
+
+## 2026-10-04：候选交付对齐与补验
+
+- 用户授权继续剩余工作；固定候选对齐完成，实施方补验 66 项通过，用户确认新版 HTML Chrome 检查正常。业务文件等值，原九任务和 venv 保留；交付目录与预期身份检查的当前规则见[运行环境](decisions/runtime-and-components.md)及[源码布局](architecture/source-layout.md)，制品摘要与实测见[对齐报告](../docs/reports/kylin-delivery-alignment-2026-10-04.md)。独立评审与发布仍按原契约交接。

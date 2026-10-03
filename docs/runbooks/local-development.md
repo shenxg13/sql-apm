@@ -115,4 +115,6 @@ GitHub 目标为公开仓库 shenxg13/sql-apm。
 [Kylin 试跑报告](../reports/slim-release-kylin-trial-2026-10-03.md)；
 四进程发布成功不等于归一化完整，按报告区分超时、Alma 等值与待完成的用户独立验收。
 用户九任务已通过[独立结果核对](../reports/kylin-manual-validation-2026-10-04.md)，
-但实际取到早期候选，仍须对齐最终候选和补齐四项普通测试；业务结果不需要全量重跑。
+当时实际取到早期候选；随后完成[候选对齐与补验](../reports/kylin-delivery-alignment-2026-10-04.md)，
+实施方完整 66 项通过，用户确认新版 HTML Chrome 检查正常，业务结果保留且没有全量重跑。
+继续交接独立评审，正式发布按发布说明的合并与确认步骤进行。

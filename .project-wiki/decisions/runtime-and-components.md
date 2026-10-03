@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-04
 sources:
+  - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
+    status: current
   - path: docs/reports/kylin-read-access-2026-10-04.md
     status: current
   - path: docs/reports/kylin-manual-validation-2026-10-04.md
@@ -137,8 +139,15 @@ SSD 上四进程首批专门记录超时、分组、基准和资源；零超时�
 全部零归一化超时；正常 yum 源事务及后续两项源码构建有记录，用户确认本轮 pgAdmin 成功。
 但手册传输示例指向保留的早期候选目录，实际使用 `d49d94b`，与最终候选 `151dfcb`
 的运行代码和业务资源相同，手册、版本信息及验收资源不同；普通测试仅 62 项，缺少
-四项统计测试。因此保留九任务证据，最终候选对齐和完整 66 项普通测试仍需补验，
-不能直接宣称完整人工验收已通过。详见[独立验证核对](../../docs/reports/kylin-manual-validation-2026-10-04.md)。
+四项统计测试。发现时保留九任务证据并明确补验缺口，详见
+[独立验证核对](../../docs/reports/kylin-manual-validation-2026-10-04.md)。
+用户授权继续实施后，目标机程序元数据、HTML、独立验收资源及完整离线包已对齐到
+固定候选 `4191133`；实施方补验完整 66 项通过，用户确认该版 HTML Chrome 检查正常。
+程序与原九任务的 66 个产品文件摘要相同，数据库和 venv 保留，未重复九任务。
+手册以完整提交号划分交付目录，并在传输／解包前核对交接记录的预期提交和外部摘要，
+避免把自洽旧包当作本次交付。实施及人工验收的交付缺口已补齐，独立评审与发布仍待完成；
+原用户 62 项记录和本轮实施方 66 项补验分别保留，见
+[候选对齐报告](../../docs/reports/kylin-delivery-alignment-2026-10-04.md)。
 四进程性能后续问题已由用户在另一需求会话确认创建为
 [#34](https://github.com/shenxg13/sql-apm/issues/34)，不再等待创建确认；本轮未实施该优化。
 

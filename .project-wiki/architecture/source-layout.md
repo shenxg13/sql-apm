@@ -10,8 +10,10 @@ owners:
   - scripts/db/
   - tests/database/
   - scripts/deployment/
-updated: 2026-10-02
+updated: 2026-10-04
 sources:
+  - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/31
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -283,6 +285,9 @@ HTML；`build_bundle.py` 把同一程序与源码／wheel／RPM 组装为内网�
 `render_manual.py` 仅在独立构建环境使用锁定的 Markdown 工具；目标机不安装它。
 `run_verification.py` 显式选择实际程序目录，原三组自检的素材与历史探针在 `app` 外；
 业务模块仍从交付程序加载，不复制另一份业务实现作为测试对象。
+交付目录按完整提交号区分；部署时同时核对交付记录中的预期提交／外部摘要与包内清单，
+程序和验收资源必须属于同一提交。仅包内清单通过不能证明交付身份，操作见
+[Kylin 手册](../../docs/runbooks/kylin-offline-deployment.md#3-在开发机生成并传输离线包)。
 这不引入 Python 安装包、src 布局或新的产品入口；制包与验证方法见
 [发布操作说明](../../docs/runbooks/program-release.md)。
 演练通过已有 CLI 执行 full/rebuild/status/history，仅用计数查询核对结果，

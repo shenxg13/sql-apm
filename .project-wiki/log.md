@@ -147,6 +147,14 @@
 | 2026-09-29 | 按 [Issue #15](https://github.com/shenxg13/sql-apm/issues/15) 及方案 A 确认修订 [SQL 指纹契约](contracts/sql-fingerprints.md)：v5 纳入 SELECT 列表／JOIN ON 常量，并恢复集合分支独立查询上下文；同步冻结版本审计及[耗时诊断说明](../docs/runbooks/duration-dispersion.md)，实测见[v5 验证报告](../docs/reports/sql-normalization-v5-2026-09-29.md)。验收与合并状态由在线 Issue 记录。 |
 | 2026-09-29 | 按 #17 已确认范围交付[近似观察字段](../docs/design/offline-data-contract/fields.md#approximateruleapproximateinput-与-approximateresult)和[结构 1.2.0](architecture/postgresql-storage.md)，冻结旧 DDL 并验证连续升级、复用与可靠路径隔离；[全量往返](../docs/reports/approximate-storage-2026-09-29.md)覆盖10,902条 v5 拒绝原文。实际写入由 #18 同次导入，观察统计另行处理；未改变算法及训练资格。 |
 
+## 2026-10-03 精简预发布与离线 HTML 手册
+
+Issue #31 补充确认 `v0.1.0` 预发布、GitHub／内网制品边界、离线 HTML、独立验收目录及
+SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-components.md)，
+实现布局见[源码职责](architecture/source-layout.md)；目标机新试跑及人工确认仍待执行。
+[开发机准备验证](../docs/reports/slim-release-preparation-2026-10-03.md)记录精简制品、
+逐文件继承、隔离自检和自动 HTML 检查；未执行目标机操作或发布。
+
 ## 2026-09-30：统计完整保存、分区与③④边界
 
 [Issue #25](https://github.com/shenxg13/sql-apm/issues/25)落实五层统计和构建结果保存。
@@ -248,3 +256,31 @@
 - 按 [R1 台账](https://github.com/shenxg13/sql-apm/pull/30#issuecomment-5937040961) 同步当前 1.6.0、任务锁和④交付状态；次月可选预建遇共享分组表锁忙时跳过，后续再试；未登记集群仅允许导入入口登记。见[编排设计](../docs/design/build-publication.md)与[操作主题](features/operator-cli.md)。
 - 将用户已确认的 O1“失败／冲突只阻止当批”和 O2“较早批次 full 可以使窗口倒退”写入[版本正文](features/baseline-versions.md#发布输入与补导确认2026-10-02)，保留确认来源；不新增发布门槛或保护逻辑。
 - 三项整改、并发实测与回归证据见[R1 整改报告](../docs/reports/build-publication-r1-remediation-2026-10-02.md)；独立 R2 结论由在线评审记录。
+
+## 2026-10-02：Kylin 离线演练
+
+- Issue #31 落实项目自带 Python 与离线演练的确认边界，新增部署手册、记录模板和辅助工具，职责同步到[源码布局](architecture/source-layout.md#已实现的部署与演练辅助工具)。
+- 部署决定与验证限制由[运行环境主题](decisions/runtime-and-components.md#已确认的-kylin-演练与项目自带解释器2026-10-02)维护；首批超时差异、有界回放和单进程恢复见[实施报告](../docs/reports/kylin-offline-deployment-2026-10-02.md)，不把环境自检通过等同于全部验收完成。
+- 补录机械盘至 SSD 的运行对比及人工中断恢复；[部署手册](../docs/runbooks/kylin-offline-deployment.md)明确成功导入计数和历史中断审计分别核对，保留原始记录，不改变产品业务规则。
+
+## 2026-10-03：Kylin 九任务试跑完成
+
+- 实施方九任务业务计数、成功导入次数与版本链全部通过，补齐三个 SSD 日批的阶段耗时和资源记录；当前事实见[运行环境主题](decisions/runtime-and-components.md#已确认的-kylin-演练与项目自带解释器2026-10-02)。用户恢复快照后的 yum 源路径及独立执行仍待完成。
+
+## 2026-10-03：精简候选包目标机重走
+
+- 用户恢复快照并允许试跑后，以固定候选包重走离线安装、源码构建、独立验收目录自检、初始化和跨机认证；用户确认 Chrome 离线人工检查正常。
+- SSD 四进程仍出现 882 次超时、正式分组少 114 个；保留失败现场后以干净实例单进程复跑，零超时且全部 Alma 等值通过。结果、阶段对照与证据边界见[试跑报告](../docs/reports/slim-release-kylin-trial-2026-10-03.md)，当前事实同步到[运行环境](decisions/runtime-and-components.md)。本次不修改产品规则、默认并发或 5 秒期限，用户独立执行和发布仍另行完成。
+
+## 2026-10-04：用户独立验证核对
+
+- 只读核对用户九任务、55 文件输入摘要与实际版本链全部通过，记录正常 yum 源及后续构建、pgAdmin 成功；阶段耗时与空间见[核对报告](../docs/reports/kylin-manual-validation-2026-10-04.md)。
+- 发现手册传输示例指向旧候选目录，实际包的业务代码相同，但验收资源漏四项统计测试。保留业务结果，最终候选对齐和补验仍未完成；事实边界同步到[运行环境主题](decisions/runtime-and-components.md)。后续性能问题已确认为 #34，不再重复请求创建。
+
+## 2026-10-04：执行账号读取权限
+
+- 用户确认 sfmon 至少可读取 APM_ROOT 全部内容（含 private）。同步在线契约、首次安装和已有环境修正步骤；目标机全目录／文件读取、PG 新文件和重启后连接验证通过，原九版保留。当前规则见[运行环境主题](decisions/runtime-and-components.md#已确认的执行账号读取权限2026-10-04)，失败处理与实测见[权限报告](../docs/reports/kylin-read-access-2026-10-04.md)。
+
+## 2026-10-04：候选交付对齐与补验
+
+- 用户授权继续剩余工作；固定候选对齐完成，实施方补验 66 项通过，用户确认新版 HTML Chrome 检查正常。业务文件等值，原九任务和 venv 保留；交付目录与预期身份检查的当前规则见[运行环境](decisions/runtime-and-components.md)及[源码布局](architecture/source-layout.md)，制品摘要与实测见[对齐报告](../docs/reports/kylin-delivery-alignment-2026-10-04.md)。独立评审与发布仍按原契约交接。

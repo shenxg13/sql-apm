@@ -1,0 +1,183 @@
+{
+  "verified_at": "2026-10-04T02:19:26.362885+08:00",
+  "previous_commit": "d49d94b22d12094ea42a59463527289a2e8005da",
+  "commit": "41911337fca434a485df9e6b2e0950f4460d31cb",
+  "bundle_sha256": "aee60c808dbdcd3da164115ea2086dac1669aa93eae54f6cb781b409e1ba23fe",
+  "program_sha256": "c75d0a912f928941c14b6c67bfdfe03d2440520e8348c4149ebd5d52d8b724a3",
+  "html_sha256": "5b25d953638e0e6080b72cd8e5afa5da165370f7b3eb462881b71bec7c0f6ee7",
+  "bundle_manifest_files": 417,
+  "verification_manifest_files": 49,
+  "unchanged_app_files": 70,
+  "changed_app_files": [
+    "INSTALL.html",
+    "PROGRAM_COMMIT",
+    "RELEASE.json",
+    "SHA256SUMS"
+  ],
+  "mismatched_kit_rejected": true,
+  "venv_preserved": true,
+  "before": {
+    "tasks": [
+      [
+        "succeeded",
+        9
+      ]
+    ],
+    "current_versions": [
+      [
+        "119",
+        "B:20261003T231916:34e8e19722784640836c7cde5cbba0ec"
+      ],
+      [
+        "120",
+        "B:20261004T005054:afd98c2dfdc148e99cec442e886303b0"
+      ]
+    ],
+    "publications": [
+      [
+        "119",
+        5
+      ],
+      [
+        "120",
+        4
+      ]
+    ]
+  },
+  "after": {
+    "tasks": [
+      [
+        "succeeded",
+        9
+      ]
+    ],
+    "current_versions": [
+      [
+        "119",
+        "B:20261003T231916:34e8e19722784640836c7cde5cbba0ec"
+      ],
+      [
+        "120",
+        "B:20261004T005054:afd98c2dfdc148e99cec442e886303b0"
+      ]
+    ],
+    "publications": [
+      [
+        "119",
+        5
+      ],
+      [
+        "120",
+        4
+      ]
+    ]
+  },
+  "installed": {
+    "passed": true,
+    "version": "v0.1.0",
+    "kind": "candidate",
+    "commit": "41911337fca434a485df9e6b2e0950f4460d31cb",
+    "files": 74
+  },
+  "backup": "/data/sql-apm/records/delivery-alignment-20261004",
+  "passed": true,
+  "tests": [
+    {
+      "name": "unit",
+      "exit_code": 0,
+      "seconds": 0.466,
+      "tests": 66,
+      "statistics_tests": [
+        "test_independent_metrics",
+        "test_time_and_exclusions",
+        "test_trailing_partial_week",
+        "test_configured_thresholds"
+      ]
+    },
+    {
+      "name": "pip-check",
+      "exit_code": 0,
+      "seconds": 0.146
+    },
+    {
+      "name": "environment",
+      "exit_code": 0,
+      "seconds": 0.096
+    }
+  ],
+  "identity_checks": [
+    {
+      "case": "correct_candidate",
+      "exit_code": 0,
+      "transfer_reached": true,
+      "passed": true
+    },
+    {
+      "case": "wrong_external_digest",
+      "exit_code": 1,
+      "transfer_reached": false,
+      "passed": true
+    },
+    {
+      "case": "wrong_expected_commit",
+      "exit_code": 1,
+      "transfer_reached": false,
+      "passed": true
+    },
+    {
+      "case": "old_self_consistent_bundle",
+      "exit_code": 1,
+      "transfer_reached": false,
+      "passed": true
+    }
+  ],
+  "product_files_comparison": {
+    "count": 66,
+    "all_equal": true,
+    "source": "original nine-task archive",
+    "sha256": "07d19fa48973846cd10a317f14d4d3398364a83c27f6c1a45e3b4c351982bdbf"
+  },
+  "html": {
+    "anchors": 58,
+    "code_blocks": 62,
+    "external_resource_requests": 0,
+    "links": 97,
+    "manual_confirmation": {
+      "source": "user-confirmed",
+      "date": "2026-10-04",
+      "browser": "Chrome",
+      "answer": "Chrome 检查正常",
+      "sha256": "5b25d953638e0e6080b72cd8e5afa5da165370f7b3eb462881b71bec7c0f6ee7"
+    }
+  },
+  "permissions_rechecked": {
+    "directories": 1750,
+    "regular_files": 28006,
+    "passed": true,
+    "private_mode": "0700",
+    "pgpass_mode": "0600",
+    "pgdata_mode": "0750",
+    "socket_directory_mode": "2755",
+    "note": "Measured after alignment before removing the temporary extraction tree."
+  },
+  "evidence_sha256": {
+    "alignment-attempt1.stderr": "032d63f18f83c4cbdb2ac2be60ed1616b467327a025cbdae01138f4b91d51144",
+    "alignment.json": "b8fbd87536df2293967e127c40b8b1a1adf1a002668057ff04e199b73e492c86",
+    "alignment.stderr": "b98fc19f2c93701a2c25a2d7886fe80e39c8ed7af7fda33084094cab1de3d59b",
+    "environment.log": "68ead54027dbfde9398b8b585561d768a48ddb0c515b23273ca637b403e5f1e4",
+    "identity-checks.json": "7c292b0cde1ae29c206b7fba7f5f9d99dd7676e6502b1b924dfe3c104d660d1e",
+    "mismatched-kit-negative.log": "ca79ad3336e9471480462467043b5d2157c30ec12844e5db835c9ffbd91a4608",
+    "packaging-tests.log": "1edfeb3ee630887f3c16582e5e5c24c46205804a9972a78674b3039d8a3d6536",
+    "pip-check.log": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+    "read-access.log": "97a35308fbbfeeaf8dfdf5977cd57de80fc1efeda5712d61607b99082d2d90ff",
+    "tests.json": "c3cc01c109fb2a77aa5d5849b48e882de985ad6fa9fd77c6b2783e250f81efec",
+    "unit.log": "ec2e4aa8c354bc688fbc84a698b637e9e8f5be54c0563dca00b3af5a666b36cc"
+  },
+  "artifacts": {
+    "directory": "var/issue31/deliveries/41911337fca434a485df9e6b2e0950f4460d31cb",
+    "bundle_bytes": 483539350,
+    "program_bytes": 209635
+  },
+  "history_preserved": true,
+  "initial_staging_failure": "Strict pristine-package check rejected a Python bytecode file generated by the diagnostic import. Existing installation was unchanged; removed only that cache, disabled bytecode generation, verified again successfully."
+}

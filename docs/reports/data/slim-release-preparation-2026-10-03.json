@@ -1,0 +1,512 @@
+{
+  "date": "2026-10-03",
+  "environment": "development AlmaLinux; Python 3.9.5; private disposable PostgreSQL 17.10",
+  "delivery_commit": "151dfcb61ed1105c776b940734e3aed457814e96",
+  "version": "v0.1.0",
+  "kind": "candidate",
+  "prerelease": true,
+  "artifacts": {
+    "program": {
+      "path": "var/issue31/release-ready/sql-apm-v0.1.0.tar.gz",
+      "bytes": 206621,
+      "sha256": "ef5efb1de9cd59272271902d809fae8ff02f61fdac2478816f80e84daedf176a"
+    },
+    "verification": {
+      "path": "var/issue31/release-ready/sql-apm-verification-v0.1.0.tar.gz",
+      "bytes": 212634,
+      "sha256": "f12cdf39ab7f823aefe180a05f901a64a708fa1676cf6cc6c1d31036456c0748"
+    },
+    "offline_bundle": {
+      "path": "var/issue31/slim-ready/offline-bundle.tar.gz",
+      "bytes": 483535868,
+      "sha256": "373a943321075d46450c8d14ec158997c1ccfc3f830c33574328d55deb9c7b94"
+    },
+    "html": {
+      "path": "var/issue31/release-ready/app/INSTALL.html",
+      "bytes": 108330,
+      "sha256": "9bd83ef127b07054d1b7d5f0b43e2ddfc69c01980bc93d1067a80a94351db9dd"
+    }
+  },
+  "program_file_count": 74,
+  "product_files_compared": 66,
+  "product_all_equal": true,
+  "previous_program_bytes": 4123334,
+  "compressed_program_reduction_percent": 94.989,
+  "tests": {
+    "ordinary": 66,
+    "database": 266,
+    "publication": 31,
+    "default_publication": 31,
+    "package_regressions": 14,
+    "smoke": {
+      "passed": true,
+      "versions": 2,
+      "import_attempts": 1
+    },
+    "html": {
+      "anchors": 56,
+      "code_blocks": 60,
+      "external_resource_requests": 0,
+      "links": 93
+    }
+  },
+  "artifact_verification": {
+    "archive_files_verified": 418,
+    "reproducible_program_and_verification": true,
+    "test_commit": "3e0e416c13bb6ed4c714a1455209d72ada473f9d",
+    "delivery_commit": "151dfcb61ed1105c776b940734e3aed457814e96",
+    "differences_from_tested_package": {
+      "app": [
+        "RELEASE.json",
+        "SHA256SUMS",
+        "PROGRAM_COMMIT",
+        "INSTALL.html"
+      ],
+      "verification": [
+        "SHA256SUMS",
+        "PROGRAM_COMMIT"
+      ]
+    },
+    "program_bytes_identical_in_bundle": true
+  },
+  "evidence": {
+    "final-unit.log": {
+      "path": "var/issue31/final-unit.log",
+      "sha256": "44704666c52cc0b7065be391a85267f30d6c5565c6a12626de298fd3ee991816"
+    },
+    "final-database.log": {
+      "path": "var/issue31/final-database.log",
+      "sha256": "8f1cd0510e65b2ee2bd5bce7eef7053ce68c38ff755074e7bf910c899d0a7b02"
+    },
+    "final-publication.log": {
+      "path": "var/issue31/final-publication.log",
+      "sha256": "3760159dedeae2f6e2de96c10fa042e90c1e22726a420185b948d4789dae4da5"
+    },
+    "final-smoke.log": {
+      "path": "var/issue31/final-smoke.log",
+      "sha256": "ed609cd035b03a72783a85dd3cacc0fe9df43e3be4a57fbf047cb01ccffcf519"
+    },
+    "release-default-publication-permitted.log": {
+      "path": "var/issue31/release-default-publication-permitted.log",
+      "sha256": "074f52e0034d1829c41b17d5eec9fe9885288f8011d41dd128d742d9777f0e4c"
+    },
+    "release-packaging-tests-final.log": {
+      "path": "var/issue31/release-packaging-tests-final.log",
+      "sha256": "96529101afad03ea6d68751ac636cc73ec7e40891d40dd2b7b85697c40268410"
+    }
+  },
+  "product_comparison": {
+    "all_equal": true,
+    "files": [
+      {
+        "candidate_sha256": "c2be5d6f53354c429e75d351185c6dc5ae1be9693b392b8440aadc5c64dc0092",
+        "equal": true,
+        "path": "requirements.txt",
+        "previous_sha256": "c2be5d6f53354c429e75d351185c6dc5ae1be9693b392b8440aadc5c64dc0092"
+      },
+      {
+        "candidate_sha256": "739e5d454d81d31a482469338b7c856f1f5c6b4cdda1551cea6f0f6d18eef62c",
+        "equal": true,
+        "path": "rules/functions/POSTGRESQL-LICENSE.txt",
+        "previous_sha256": "739e5d454d81d31a482469338b7c856f1f5c6b4cdda1551cea6f0f6d18eef62c"
+      },
+      {
+        "candidate_sha256": "7a75761933c3f48ae59855b16ab3cafe2cd17d5ed21d6fdd2df8ef779aefa822",
+        "equal": true,
+        "path": "rules/functions/v1.0.1.json",
+        "previous_sha256": "7a75761933c3f48ae59855b16ab3cafe2cd17d5ed21d6fdd2df8ef779aefa822"
+      },
+      {
+        "candidate_sha256": "dc9e0565d92636f2bfce7b130a037518171a7a70f59b7cc8a82f3da3d023c687",
+        "equal": true,
+        "path": "scripts/db/initialize.sh",
+        "previous_sha256": "dc9e0565d92636f2bfce7b130a037518171a7a70f59b7cc8a82f3da3d023c687"
+      },
+      {
+        "candidate_sha256": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600",
+        "equal": true,
+        "path": "sql_apm/__init__.py",
+        "previous_sha256": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600"
+      },
+      {
+        "candidate_sha256": "0428e67ad1c41d4a143c9c28a2a766a63749fdc15513d22d5a54a786a6564ad1",
+        "equal": true,
+        "path": "sql_apm/__main__.py",
+        "previous_sha256": "0428e67ad1c41d4a143c9c28a2a766a63749fdc15513d22d5a54a786a6564ad1"
+      },
+      {
+        "candidate_sha256": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+        "equal": true,
+        "path": "sql_apm/baseline/__init__.py",
+        "previous_sha256": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40"
+      },
+      {
+        "candidate_sha256": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+        "equal": true,
+        "path": "sql_apm/baseline/statistics.py",
+        "previous_sha256": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4"
+      },
+      {
+        "candidate_sha256": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+        "equal": true,
+        "path": "sql_apm/baseline/watchdog.py",
+        "previous_sha256": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0"
+      },
+      {
+        "candidate_sha256": "6a61b8187397674ddd864c29ff60ddf66e42521e69381ea2e2617eed8abf060c",
+        "equal": true,
+        "path": "sql_apm/baseline/workflow.py",
+        "previous_sha256": "6a61b8187397674ddd864c29ff60ddf66e42521e69381ea2e2617eed8abf060c"
+      },
+      {
+        "candidate_sha256": "8d73b8fd493df706cf6cbd185801cf2870dc84ba3dcdcf19d7a148248b927e50",
+        "equal": true,
+        "path": "sql_apm/cli/__init__.py",
+        "previous_sha256": "8d73b8fd493df706cf6cbd185801cf2870dc84ba3dcdcf19d7a148248b927e50"
+      },
+      {
+        "candidate_sha256": "4ec76149a39595296f630fbddc76903117ccb16a402cce5ee1fc7a9f67db71e5",
+        "equal": true,
+        "path": "sql_apm/cli/ingest.py",
+        "previous_sha256": "4ec76149a39595296f630fbddc76903117ccb16a402cce5ee1fc7a9f67db71e5"
+      },
+      {
+        "candidate_sha256": "eff4ec673fd776f7f000b34bc236a4cb17546a0c9b278ae2dd1da1fdbbd9cdcd",
+        "equal": true,
+        "path": "sql_apm/cli/statistics.py",
+        "previous_sha256": "eff4ec673fd776f7f000b34bc236a4cb17546a0c9b278ae2dd1da1fdbbd9cdcd"
+      },
+      {
+        "candidate_sha256": "7d193d0044280f23ffc16918a7f2282bd88f1145222499693fd57f4f6de0d4b4",
+        "equal": true,
+        "path": "sql_apm/cli/training.py",
+        "previous_sha256": "7d193d0044280f23ffc16918a7f2282bd88f1145222499693fd57f4f6de0d4b4"
+      },
+      {
+        "candidate_sha256": "b7a462550fa221f8123a3bfb1470f644310de4ad8c2b8a430cc7aa19c1cab522",
+        "equal": true,
+        "path": "sql_apm/cli/workflow.py",
+        "previous_sha256": "b7a462550fa221f8123a3bfb1470f644310de4ad8c2b8a430cc7aa19c1cab522"
+      },
+      {
+        "candidate_sha256": "f53216dadbfcf5bfd3c1670ec768a821977d7ea09a9715a5fb0872f24c9833a9",
+        "equal": true,
+        "path": "sql_apm/diagnostics/__init__.py",
+        "previous_sha256": "f53216dadbfcf5bfd3c1670ec768a821977d7ea09a9715a5fb0872f24c9833a9"
+      },
+      {
+        "candidate_sha256": "2c1dedf512f017942747f5d49fcdc6cd515056cd95fe10a346f88b6ba4e15acf",
+        "equal": true,
+        "path": "sql_apm/diagnostics/approximate_sql.py",
+        "previous_sha256": "2c1dedf512f017942747f5d49fcdc6cd515056cd95fe10a346f88b6ba4e15acf"
+      },
+      {
+        "candidate_sha256": "b5a11ca85e9a4f8d019c992549503a15e3362ec456c89d905bbeeaf58a9bc375",
+        "equal": true,
+        "path": "sql_apm/diagnostics/normalize_sql.py",
+        "previous_sha256": "b5a11ca85e9a4f8d019c992549503a15e3362ec456c89d905bbeeaf58a9bc375"
+      },
+      {
+        "candidate_sha256": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+        "equal": true,
+        "path": "sql_apm/ingestion/__init__.py",
+        "previous_sha256": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03"
+      },
+      {
+        "candidate_sha256": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+        "equal": true,
+        "path": "sql_apm/ingestion/config.py",
+        "previous_sha256": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32"
+      },
+      {
+        "candidate_sha256": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+        "equal": true,
+        "path": "sql_apm/ingestion/hashdata/__init__.py",
+        "previous_sha256": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a"
+      },
+      {
+        "candidate_sha256": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+        "equal": true,
+        "path": "sql_apm/ingestion/hashdata/persistence.py",
+        "previous_sha256": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad"
+      },
+      {
+        "candidate_sha256": "0ae7a99f6c73b8c471e790ba6f358e12b9effcf922d5e3f30f495a35de9eb96c",
+        "equal": true,
+        "path": "sql_apm/ingestion/hashdata/reader.py",
+        "previous_sha256": "0ae7a99f6c73b8c471e790ba6f358e12b9effcf922d5e3f30f495a35de9eb96c"
+      },
+      {
+        "candidate_sha256": "53c284bea5007568190762f58785cd088b4f3fdf47cd83b02e2394db50d8783d",
+        "equal": true,
+        "path": "sql_apm/ingestion/importer.py",
+        "previous_sha256": "53c284bea5007568190762f58785cd088b4f3fdf47cd83b02e2394db50d8783d"
+      },
+      {
+        "candidate_sha256": "e8abdde6189258092322d36fee620699c4c44a27d69c4a820c651bf574ff1f3c",
+        "equal": true,
+        "path": "sql_apm/ingestion/normalizing.py",
+        "previous_sha256": "e8abdde6189258092322d36fee620699c4c44a27d69c4a820c651bf574ff1f3c"
+      },
+      {
+        "candidate_sha256": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+        "equal": true,
+        "path": "sql_apm/sql/__init__.py",
+        "previous_sha256": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2"
+      },
+      {
+        "candidate_sha256": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+        "equal": true,
+        "path": "sql_apm/sql/approximate.py",
+        "previous_sha256": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934"
+      },
+      {
+        "candidate_sha256": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+        "equal": true,
+        "path": "sql_apm/sql/function_dictionary.py",
+        "previous_sha256": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f"
+      },
+      {
+        "candidate_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+        "equal": true,
+        "path": "sql_apm/sql/lexical.py",
+        "previous_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f"
+      },
+      {
+        "candidate_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+        "equal": true,
+        "path": "sql_apm/sql/mpp_parser.py",
+        "previous_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39"
+      },
+      {
+        "candidate_sha256": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0",
+        "equal": true,
+        "path": "sql_apm/sql/normalization.py",
+        "previous_sha256": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0"
+      },
+      {
+        "candidate_sha256": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+        "equal": true,
+        "path": "sql_apm/sql/pg_ast.py",
+        "previous_sha256": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be"
+      },
+      {
+        "candidate_sha256": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+        "equal": true,
+        "path": "sql_apm/sql/structure.py",
+        "previous_sha256": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed"
+      },
+      {
+        "candidate_sha256": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c",
+        "equal": true,
+        "path": "sql_apm/sql/type_policy.py",
+        "previous_sha256": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c"
+      },
+      {
+        "candidate_sha256": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+        "equal": true,
+        "path": "sql_apm/storage/__init__.py",
+        "previous_sha256": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4"
+      },
+      {
+        "candidate_sha256": "2fe4650226796cb0af4c19be5072604571407ea205125b4ae247068b0ab5edb0",
+        "equal": true,
+        "path": "sql_apm/storage/bootstrap.sql",
+        "previous_sha256": "2fe4650226796cb0af4c19be5072604571407ea205125b4ae247068b0ab5edb0"
+      },
+      {
+        "candidate_sha256": "3c14e98be3c228337a710316e6f360957602cc7fe68698296485ecf47308aaba",
+        "equal": true,
+        "path": "sql_apm/storage/catalog.sql",
+        "previous_sha256": "3c14e98be3c228337a710316e6f360957602cc7fe68698296485ecf47308aaba"
+      },
+      {
+        "candidate_sha256": "3aa26610645b351cc4eab703da94be3fdfeebfb7286185cc68e3c95f68ce813d",
+        "equal": true,
+        "path": "sql_apm/storage/check_structure.sql",
+        "previous_sha256": "3aa26610645b351cc4eab703da94be3fdfeebfb7286185cc68e3c95f68ce813d"
+      },
+      {
+        "candidate_sha256": "0d29103c38996cc79a44c5636b735ad305b8c93e7c2068152b683e004c86c424",
+        "equal": true,
+        "path": "sql_apm/storage/check_version.sql",
+        "previous_sha256": "0d29103c38996cc79a44c5636b735ad305b8c93e7c2068152b683e004c86c424"
+      },
+      {
+        "candidate_sha256": "ee1ce5e3b0c0f88470f2b92b7885837d2c0ddca4ddd635f27d4b61eb0f0b2170",
+        "equal": true,
+        "path": "sql_apm/storage/expected_partitions.sql",
+        "previous_sha256": "ee1ce5e3b0c0f88470f2b92b7885837d2c0ddca4ddd635f27d4b61eb0f0b2170"
+      },
+      {
+        "candidate_sha256": "85479cac69c59b18d38cf50e8177f6185eac3408b7520064a596b1eb52b78299",
+        "equal": true,
+        "path": "sql_apm/storage/ingestion.py",
+        "previous_sha256": "85479cac69c59b18d38cf50e8177f6185eac3408b7520064a596b1eb52b78299"
+      },
+      {
+        "candidate_sha256": "5193a9d281852222b7c6541166cf7fcd99ad8869ab0b77a16c3bcb184d81df73",
+        "equal": true,
+        "path": "sql_apm/storage/initialize.sql",
+        "previous_sha256": "5193a9d281852222b7c6541166cf7fcd99ad8869ab0b77a16c3bcb184d81df73"
+      },
+      {
+        "candidate_sha256": "e8bb84fd36265aeaac0bcd7274be2391897f244bd4142611af74b7e01b3bccc4",
+        "equal": true,
+        "path": "sql_apm/storage/migrate.sql",
+        "previous_sha256": "e8bb84fd36265aeaac0bcd7274be2391897f244bd4142611af74b7e01b3bccc4"
+      },
+      {
+        "candidate_sha256": "46c1155ba5a6e06590604e852572809fc999d4159d6b465758716fba596cf747",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.0.0-to-1.1.0.sql",
+        "previous_sha256": "46c1155ba5a6e06590604e852572809fc999d4159d6b465758716fba596cf747"
+      },
+      {
+        "candidate_sha256": "36ce1f0c1f06f4b7f694c2fd8e265201b631da4a7bcf3ce3b427e1814a5742b0",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.1.0-to-1.2.0.sql",
+        "previous_sha256": "36ce1f0c1f06f4b7f694c2fd8e265201b631da4a7bcf3ce3b427e1814a5742b0"
+      },
+      {
+        "candidate_sha256": "f2f95e0927a89e52b3a0359691ae23c44cdf0d801c9eeef182ed2c79ede9977b",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.2.0-to-1.3.0.sql",
+        "previous_sha256": "f2f95e0927a89e52b3a0359691ae23c44cdf0d801c9eeef182ed2c79ede9977b"
+      },
+      {
+        "candidate_sha256": "9d74529b521990cb7fc1f4c4bf2b951d3a67a9be4240ee8d42feeda391705e7b",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.3.0-to-1.4.0.sql",
+        "previous_sha256": "9d74529b521990cb7fc1f4c4bf2b951d3a67a9be4240ee8d42feeda391705e7b"
+      },
+      {
+        "candidate_sha256": "9da247a92b7c229cdfbeb1edb3e6ebbe089c23fa09d8feec5429203592d2fea1",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.4.0-to-1.5.0.sql",
+        "previous_sha256": "9da247a92b7c229cdfbeb1edb3e6ebbe089c23fa09d8feec5429203592d2fea1"
+      },
+      {
+        "candidate_sha256": "5df3790d70c703e4150c302c39b692233b7f022ecc7f934fa24d3e135461c376",
+        "equal": true,
+        "path": "sql_apm/storage/migrations/1.5.0-to-1.6.0.sql",
+        "previous_sha256": "5df3790d70c703e4150c302c39b692233b7f022ecc7f934fa24d3e135461c376"
+      },
+      {
+        "candidate_sha256": "cbf7cb7d3356d2ba60225b422a6837e4cdd95f64f5e323268a0bd11750f5764a",
+        "equal": true,
+        "path": "sql_apm/storage/observations.py",
+        "previous_sha256": "cbf7cb7d3356d2ba60225b422a6837e4cdd95f64f5e323268a0bd11750f5764a"
+      },
+      {
+        "candidate_sha256": "e324d86dd99465596ae082723b43366f81a274b1a014a498119e6b98bdac20f7",
+        "equal": true,
+        "path": "sql_apm/storage/prepare.sql",
+        "previous_sha256": "e324d86dd99465596ae082723b43366f81a274b1a014a498119e6b98bdac20f7"
+      },
+      {
+        "candidate_sha256": "ff87ac4ad59b0a94f8884b551e8ab05751305ba1deed039142d6b9a0952313f2",
+        "equal": true,
+        "path": "sql_apm/storage/publication.py",
+        "previous_sha256": "ff87ac4ad59b0a94f8884b551e8ab05751305ba1deed039142d6b9a0952313f2"
+      },
+      {
+        "candidate_sha256": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f",
+        "equal": true,
+        "path": "sql_apm/storage/schema.sql",
+        "previous_sha256": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f"
+      },
+      {
+        "candidate_sha256": "4960ddb0f5bc3c4fee0ae13b3a8a3f26d9072cd52e3cfe85d8665d369e39880a",
+        "equal": true,
+        "path": "sql_apm/storage/statistics.py",
+        "previous_sha256": "4960ddb0f5bc3c4fee0ae13b3a8a3f26d9072cd52e3cfe85d8665d369e39880a"
+      },
+      {
+        "candidate_sha256": "b7d1c29c7a6d32cd2248c569a0156354bf1019a3095d59f0d22edd601cb3d9ca",
+        "equal": true,
+        "path": "sql_apm/storage/statistics_sufficiency.sql",
+        "previous_sha256": "b7d1c29c7a6d32cd2248c569a0156354bf1019a3095d59f0d22edd601cb3d9ca"
+      },
+      {
+        "candidate_sha256": "a73a640737afb7a35b86da82e9e98ca0c839edd560d1d3f94d7255c916233b5d",
+        "equal": true,
+        "path": "sql_apm/storage/tasks.py",
+        "previous_sha256": "a73a640737afb7a35b86da82e9e98ca0c839edd560d1d3f94d7255c916233b5d"
+      },
+      {
+        "candidate_sha256": "df8dd3e77bf64fcf779dfd3697b97a2c3b8d937c2fe01d77109cec3f7cc9961d",
+        "equal": true,
+        "path": "sql_apm/storage/training.py",
+        "previous_sha256": "df8dd3e77bf64fcf779dfd3697b97a2c3b8d937c2fe01d77109cec3f7cc9961d"
+      },
+      {
+        "candidate_sha256": "df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.0.0.sql",
+        "previous_sha256": "df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28"
+      },
+      {
+        "candidate_sha256": "e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.1.0.sql",
+        "previous_sha256": "e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3"
+      },
+      {
+        "candidate_sha256": "b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.2.0.sql",
+        "previous_sha256": "b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7"
+      },
+      {
+        "candidate_sha256": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.3.0.sql",
+        "previous_sha256": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb"
+      },
+      {
+        "candidate_sha256": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.4.0.sql",
+        "previous_sha256": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61"
+      },
+      {
+        "candidate_sha256": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743",
+        "equal": true,
+        "path": "sql_apm/storage/versions/1.5.0.sql",
+        "previous_sha256": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743"
+      },
+      {
+        "candidate_sha256": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+        "equal": true,
+        "path": "sql_apm/training/__init__.py",
+        "previous_sha256": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4"
+      },
+      {
+        "candidate_sha256": "b6d4aae0d340dcbd8d4f9ff26b3bc671461af84703e3c23034fc3bd88ee7ab6c",
+        "equal": true,
+        "path": "sql_apm/training/categories.py",
+        "previous_sha256": "b6d4aae0d340dcbd8d4f9ff26b3bc671461af84703e3c23034fc3bd88ee7ab6c"
+      },
+      {
+        "candidate_sha256": "030255dd409446fe5893f4f7f14bddefece2e324d4f6cf833e40fa506b3aeda1",
+        "equal": true,
+        "path": "sql_apm/training/config.py",
+        "previous_sha256": "030255dd409446fe5893f4f7f14bddefece2e324d4f6cf833e40fa506b3aeda1"
+      }
+    ],
+    "note": "Only identical product files support inheritance of prior nine-task evidence; candidate deployment and four-worker verification remain separate.",
+    "previous_program_sha256": "ed843c6fcb92bb0fcf775997d3f814b651a3e6f21cb9f66861c000dbbfc967c7"
+  },
+  "raw_requirement_blob": "d5b8c6e4ef8d317110aec7737d49088d4a9308e4",
+  "pending": [
+    "user confirmation and snapshot restore before target trial",
+    "candidate Kylin installation, checks, TCP validation and four-worker 119 first batch",
+    "user offline browser confirmation",
+    "user independent nine-task replay after another snapshot restore",
+    "independent review and merge",
+    "user confirmation before tag and prerelease publication"
+  ],
+  "target_contacted_this_iteration": false,
+  "tag_or_release_created": false
+}

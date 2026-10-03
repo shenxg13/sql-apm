@@ -1,0 +1,63 @@
+{
+  "verified_at": "2026-10-04T01:46:53.430512+08:00",
+  "execution_user": "sfmon",
+  "counts": {
+    "directories": 1699,
+    "readable_regular_paths": 27432,
+    "symlinks": 70,
+    "sockets": 1
+  },
+  "unreadable_paths": [],
+  "pgdata_writable_paths": [],
+  "private_mode": "0o700",
+  "pgpass_mode": "0o600",
+  "pgpass_owner_uid": 1000,
+  "pgdata_mode": "0o750",
+  "pgdata_owner_uid": 986,
+  "socket_directory_mode": "0o2755",
+  "socket_directory_writable": false,
+  "socket_group_gid": 1000,
+  "new_postgresql_file": {
+    "mode": "0o640",
+    "readable": true,
+    "writable": false
+  },
+  "current_versions": [
+    [
+      "119",
+      "B:20261003T231916:34e8e19722784640836c7cde5cbba0ec"
+    ],
+    [
+      "120",
+      "B:20261004T005054:afd98c2dfdc148e99cec442e886303b0"
+    ]
+  ],
+  "publication_counts": [
+    [
+      "119",
+      5
+    ],
+    [
+      "120",
+      4
+    ]
+  ],
+  "running_tasks": 0,
+  "passed": true,
+  "connections": {
+    "socket_authenticated": true,
+    "tcp_read_only_query_passed": true,
+    "temporary_credential_deleted": true
+  },
+  "evidence_sha256": {
+    "permissions-before.acl": "7634a70f5d67b038527f65fe3278cd83402cadd540862a775a2d04b3545feac3",
+    "apply.log": "636478e54ec9177725e70c4c538978f04eefe51f70935134391e02795f0ec611",
+    "restart-socket-check.log": "b9b4c6b1e4094cbe770ea31d6c2a9f908923bd91e590c1f34e29d8e88128bea3",
+    "verification.json": "00089037d82f8ec8a84843e828983bd8408d79de85d6fde20e2fba02c6980ae8",
+    "tcp-check.json": "e50b4776763943b0cba541a70b9683e20ae3d26404ccb4e8ad2b8475cacacbcf"
+  },
+  "normal_restarts": 2,
+  "business_versions_unchanged": true,
+  "temporary_relation_rolled_back": true,
+  "failure_and_recovery": "First restart: read-only socket default ACL prevented sfmon connection. Cleared default ACL; socket directory now setgid with sfmon group. Second restart: new socket 0777 and lock 0640; authenticated connection passed."
+}

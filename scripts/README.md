@@ -174,3 +174,21 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `verify_publication.py` 验证失败、恢复与并发，`verify_publication_full.py` 显式重导 55 文件，
 按两个集群首批＋逐日场景运行九次任务；`verify_coverage_migration_full.py` 对指定私有旧实例
 先验证覆盖逐行一致再升级。真实输入、私有连接和详细输出均保留本地忽略目录。
+
+## Kylin 离线演练
+
+[离线部署手册](../docs/runbooks/kylin-offline-deployment.md)与
+[人工验证模板](../docs/runbooks/kylin-validation-record.md)覆盖源码构建、认证、日志传输和九任务核对。
+`scripts/deployment/collect-rpms.sh` 在目标机初始状态收集并验证编译依赖；
+`build_bundle.py` 在开发机生成带来源和摘要的离线包；`check_environment.py` 验证离线解释器；
+`create_password.py` 生成仓库外受保护的凭据并设置 SCRAM；
+`rehearsal.py prepare/run` 核对固定日志、生成批次并通过真实 CLI 执行、记录和比较结果。
+它们是部署／验证辅助入口，不修改产品统计规则，也不替代用户恢复快照后的独立执行。
+
+精简发布使用 `scripts/deployment/build_release.py`，内网完整包继续由 `build_bundle.py` 组装。
+`package-files.json` 管理必要文件规则；`render_manual.py` 生成并检查单文件 HTML。
+`run_verification.py --app-root PATH` 在独立验收目录检查交付程序，
+`verify_package.py` 检查逐文件摘要与多余／缺失文件。
+开发机的构建依赖单独锁在 `build-requirements.txt`；边界回归为
+`var/issue31/build-venv/bin/python scripts/tests/test_deployment.py`。
+完整流程与确认点见[程序发布说明](../docs/runbooks/program-release.md)。

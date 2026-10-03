@@ -1,0 +1,801 @@
+{
+  "evidence_kind": "measured; storage medium and snapshot user-reported",
+  "date": "2026-10-03",
+  "version": "v0.1.0",
+  "program_commit": "151dfcb61ed1105c776b940734e3aed457814e96",
+  "artifacts": {
+    "program": {
+      "path": "var/issue31/release-ready/sql-apm-v0.1.0.tar.gz",
+      "bytes": 206621,
+      "sha256": "ef5efb1de9cd59272271902d809fae8ff02f61fdac2478816f80e84daedf176a"
+    },
+    "verification": {
+      "path": "var/issue31/release-ready/sql-apm-verification-v0.1.0.tar.gz",
+      "bytes": 212634,
+      "sha256": "f12cdf39ab7f823aefe180a05f901a64a708fa1676cf6cc6c1d31036456c0748"
+    },
+    "offline_bundle": {
+      "path": "var/issue31/slim-ready/offline-bundle.tar.gz",
+      "bytes": 483535868,
+      "sha256": "373a943321075d46450c8d14ec158997c1ccfc3f830c33574328d55deb9c7b94"
+    },
+    "html": {
+      "path": "var/issue31/release-ready/app/INSTALL.html",
+      "bytes": 108330,
+      "sha256": "9bd83ef127b07054d1b7d5f0b43e2ddfc69c01980bc93d1067a80a94351db9dd"
+    }
+  },
+  "environment": {
+    "os": "Kylin V10 SP2 Build09",
+    "glibc": "2.28",
+    "architecture": "x86_64",
+    "vcpus": 8,
+    "memory_GiB": 14,
+    "data_filesystem": "xfs",
+    "data_filesystem_GiB": 190,
+    "storage_medium": "SSD (user-reported; VMware guest reports ROTA=1)"
+  },
+  "installation_stages": {
+    "01-unpack": {
+      "seconds": 3,
+      "exit_code": 0,
+      "sha256": "ac3ade73cec424ac63b394c13c088fcfad69612bfcce481a8a81313b2ee622c0"
+    },
+    "02-rpms": {
+      "seconds": 9,
+      "exit_code": 0,
+      "sha256": "ae4f0ab7c64923dfffcf42b2493a3d5e2f8078d95319dc5da4f180e4834b2d54"
+    },
+    "03-deploy": {
+      "seconds": 0,
+      "exit_code": 0,
+      "sha256": "ad82a7a299bdaa8371693a896f47d8fda56a58ed1f26ecc3417bd288e0ead443"
+    },
+    "04-python": {
+      "seconds": 53,
+      "exit_code": 0,
+      "sha256": "d86b4725e994b559435646723b99bf687b3f77a395e90e765266262a8a0742f4"
+    },
+    "05-postgres": {
+      "seconds": 61,
+      "exit_code": 0,
+      "sha256": "89ae0880c5fdf3f32b1dde53b14b817f54e9e503c4cea649003d146f33d35d45"
+    },
+    "06-checks": {
+      "seconds": 63,
+      "exit_code": 0,
+      "sha256": "29d946afc3490f942d84dca941dcd3a4f9726fae82cd08dce18fb7e42dcb42e8"
+    },
+    "07-initialize": {
+      "seconds": 1,
+      "exit_code": 0,
+      "sha256": "f61a81e5f6788b8f6b48557bf2cabcb6ef0c078841cc0250a278f1c434f282a6"
+    },
+    "08-network": {
+      "seconds": 0,
+      "exit_code": 0,
+      "sha256": "c488660ec7ded8ef941f8b564fa2795e578000b6b896f49c4c8cd4ea7b3c0cbf"
+    },
+    "09-config": {
+      "seconds": 19,
+      "exit_code": 0,
+      "sha256": "6e6dc62ba29c5bf92d9037b0b148524b56be3b1719f303a18c6b0d5731e0f1e0"
+    }
+  },
+  "offline_packages": {
+    "signed_rpms": 391,
+    "installed": 18,
+    "upgraded": 28,
+    "network_yum_repositories_disabled": true,
+    "installed_from": "file:// local repository"
+  },
+  "checks": {
+    "python": "3.9.5",
+    "postgresql": "17.10",
+    "schema": "1.6.0",
+    "unit": 66,
+    "database": 266,
+    "publication": 31,
+    "package_files": 74,
+    "target_logs_verified": 55,
+    "input_bytes": 15816193813,
+    "socket_scram": true,
+    "tcp_correct_password_read_only": true,
+    "tcp_wrong_password_rejected": true,
+    "hba_has_trust": false,
+    "temporary_credential_copy_removed": true,
+    "pg_ctl_stop_start": true
+  },
+  "pending": [
+    "user confirmation to create the follow-up product Issue",
+    "user independent nine tasks and yum source path",
+    "independent review and merge",
+    "explicit tag/release approval and actual download verification"
+  ],
+  "html_manual": {
+    "source": "user confirmation in this session",
+    "date": "2026-10-03",
+    "browser": "Chrome",
+    "browser_version": "not provided",
+    "reply": "chrome检查正常",
+    "sha256": "9bd83ef127b07054d1b7d5f0b43e2ddfc69c01980bc93d1067a80a94351db9dd",
+    "offline_reading": true,
+    "toc_navigation": true,
+    "command_copy": true,
+    "search": true,
+    "print_preview": true
+  },
+  "tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "parser_workers": 4,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 201.436,
+        "check": 2.056,
+        "import": 1824.886,
+        "publish": 0.005,
+        "snapshot": 54.957
+      },
+      "seconds": 2083.681,
+      "before": {
+        "database_bytes": 13653683,
+        "filesystem_used_bytes": 19152154624,
+        "filesystem_free_bytes": 184759177216
+      },
+      "after": {
+        "database_bytes": 12454172339,
+        "filesystem_used_bytes": 35392045056,
+        "filesystem_free_bytes": 168519286784
+      },
+      "passed": false,
+      "baseline_equal": false,
+      "version_chain_verified": true,
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 26
+      },
+      "counts": {
+        "formal_groups": 51152,
+        "formal_layers": {
+          "day": 217059,
+          "hour": 66776,
+          "overall": 51152,
+          "week": 79731,
+          "weekday": 93221
+        },
+        "observation_groups": 28,
+        "observation_layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "imported_files": 26,
+        "import_attempts": 26,
+        "added_records": 5124686,
+        "added_occurrences": 2547876,
+        "normalization_timeouts": 882
+      },
+      "timeout_files": [
+        {
+          "index": 4,
+          "file_id": "I:d576608ac3b65719294b92b19bc21a50f554ce3474df9ff16d94287a13b8adf4",
+          "timeouts": 192
+        },
+        {
+          "index": 6,
+          "file_id": "I:216f9d8438611b65a85c3ac1f56bf2210038212068df84f14a879b69d688f557",
+          "timeouts": 36
+        },
+        {
+          "index": 7,
+          "file_id": "I:95ee5d3f292b1d0efcccf8d63b12bfb468db1bb7f31173d0128380632328a8e9",
+          "timeouts": 60
+        },
+        {
+          "index": 20,
+          "file_id": "I:e3ced2fd204ea527b7c7f87d018aecd663020099ca925574d56c23af2a46dbba",
+          "timeouts": 24
+        },
+        {
+          "index": 21,
+          "file_id": "I:23be9a0a14ed56a49397ac55f2083e6119f2ca958112a2a591d5b78382d2d411",
+          "timeouts": 84
+        },
+        {
+          "index": 22,
+          "file_id": "I:371331e3b3fce6add1cbdd98c407d9bb39c7bfe4752103850b3df7a05c41b2fb",
+          "timeouts": 276
+        },
+        {
+          "index": 25,
+          "file_id": "I:e151231f1c66b21d9e180c310ce6c99599f94135e7901762828d4c3d4c91f955",
+          "timeouts": 210
+        }
+      ],
+      "publication_checks": {
+        "batch_complete": {
+          "reason": null,
+          "state": "passed"
+        },
+        "counts_consistent": {
+          "reason": null,
+          "state": "passed"
+        },
+        "results_complete": {
+          "reason": null,
+          "state": "passed"
+        },
+        "results_saved": {
+          "reason": null,
+          "state": "passed"
+        },
+        "rules_consistent": {
+          "reason": null,
+          "state": "passed"
+        },
+        "values_consistent": {
+          "reason": null,
+          "state": "passed"
+        }
+      },
+      "comparison_differences": [
+        {
+          "path": "build.count_scopes[1][2]",
+          "actual": 49887,
+          "expected": 49005
+        },
+        {
+          "path": "build.count_scopes[3][2]",
+          "actual": 1706472,
+          "expected": 1707354
+        },
+        {
+          "path": "build.groups",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "build.layers.day",
+          "actual": 217059,
+          "expected": 217566
+        },
+        {
+          "path": "build.layers.hour",
+          "actual": 66776,
+          "expected": 67265
+        },
+        {
+          "path": "build.layers.overall",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "build.layers.week",
+          "actual": 79731,
+          "expected": 80067
+        },
+        {
+          "path": "build.layers.weekday",
+          "actual": 93221,
+          "expected": 93602
+        },
+        {
+          "path": "build.observations.scopes[0][1]",
+          "actual": 20943,
+          "expected": 20061
+        },
+        {
+          "path": "build.observations.sql_states[2][1]",
+          "actual": 21009,
+          "expected": 20127
+        },
+        {
+          "path": "build.observations.ungrouped_reasons[2][2]",
+          "actual": 20943,
+          "expected": 20061
+        },
+        {
+          "path": "build.reasons[7][2]",
+          "actual": 21009,
+          "expected": 20127
+        },
+        {
+          "path": "build.states[1][1]",
+          "actual": 1706472,
+          "expected": 1707354
+        },
+        {
+          "path": "build.states[2][1]",
+          "actual": 49887,
+          "expected": 49005
+        },
+        {
+          "path": "build.timings.bind[0]",
+          "actual": 388323,
+          "expected": 388617
+        },
+        {
+          "path": "build.timings.execute_first[0]",
+          "actual": 388273,
+          "expected": 388567
+        },
+        {
+          "path": "build.timings.parse[0]",
+          "actual": 385011,
+          "expected": 385305
+        },
+        {
+          "path": "import.files[2].counts.problem:fingerprint_normalization_timeout",
+          "actual": 36,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[3].counts.problem:fingerprint_normalization_timeout",
+          "actual": 84,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[6].counts.problem:fingerprint_normalization_timeout",
+          "actual": 276,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[15].counts.problem:fingerprint_normalization_timeout",
+          "actual": 60,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[21].counts.problem:fingerprint_normalization_timeout",
+          "actual": 192,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[24].counts.problem:fingerprint_normalization_timeout",
+          "actual": 210,
+          "expected": "__absent__"
+        },
+        {
+          "path": "import.files[25].counts.problem:fingerprint_normalization_timeout",
+          "actual": 24,
+          "expected": "__absent__"
+        },
+        {
+          "path": "layers[0][2]",
+          "actual": 217059,
+          "expected": 217566
+        },
+        {
+          "path": "layers[0][3]",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "layers[1][2]",
+          "actual": 66776,
+          "expected": 67265
+        },
+        {
+          "path": "layers[1][3]",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "layers[2][2]",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "layers[2][3]",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "layers[3][2]",
+          "actual": 79731,
+          "expected": 80067
+        },
+        {
+          "path": "layers[3][3]",
+          "actual": 51152,
+          "expected": 51266
+        },
+        {
+          "path": "layers[4][2]",
+          "actual": 93221,
+          "expected": 93602
+        },
+        {
+          "path": "layers[4][3]",
+          "actual": 51152,
+          "expected": 51266
+        }
+      ],
+      "record_sha256": "fe1df771f70758046dcb433a3cd8a573bddabfaf1748d77027db05b1fb838aa1",
+      "resources": {
+        "exit_code": 1,
+        "start_unix_time": 1790965293.5432663,
+        "end_unix_time": 1790967377.2690601,
+        "seconds": 2083.726,
+        "cpu_percent": {
+          "user": 29.955,
+          "nice": 0.0,
+          "system": 1.195,
+          "idle": 68.629,
+          "iowait": 0.067,
+          "irq": 0.123,
+          "softirq": 0.031,
+          "steal": 0.0
+        },
+        "data_disk": {
+          "read_iops": 32.721,
+          "write_iops": 358.471,
+          "read_MiB_per_sec": 3.997,
+          "write_MiB_per_sec": 24.655,
+          "mean_read_ms": 0.614,
+          "mean_write_ms": 0.249,
+          "busy_percent": 3.22
+        }
+      }
+    },
+    {
+      "cluster": "119",
+      "step": 0,
+      "parser_workers": 1,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 200.526,
+        "check": 2.082,
+        "import": 2413.367,
+        "publish": 0.003,
+        "snapshot": 58.563
+      },
+      "seconds": 2674.911,
+      "before": {
+        "database_bytes": 13653683,
+        "filesystem_used_bytes": 33790562304,
+        "filesystem_free_bytes": 170120769536
+      },
+      "after": {
+        "database_bytes": 12444464819,
+        "filesystem_used_bytes": 50054676480,
+        "filesystem_free_bytes": 153856655360
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 26
+      },
+      "counts": {
+        "formal_groups": 51266,
+        "formal_layers": {
+          "day": 217566,
+          "hour": 67265,
+          "overall": 51266,
+          "week": 80067,
+          "weekday": 93602
+        },
+        "observation_groups": 28,
+        "observation_layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "imported_files": 26,
+        "import_attempts": 26,
+        "added_records": 5124686,
+        "added_occurrences": 2547876,
+        "normalization_timeouts": 0
+      },
+      "timeout_files": [],
+      "publication_checks": {
+        "batch_complete": {
+          "reason": null,
+          "state": "passed"
+        },
+        "counts_consistent": {
+          "reason": null,
+          "state": "passed"
+        },
+        "results_complete": {
+          "reason": null,
+          "state": "passed"
+        },
+        "results_saved": {
+          "reason": null,
+          "state": "passed"
+        },
+        "rules_consistent": {
+          "reason": null,
+          "state": "passed"
+        },
+        "values_consistent": {
+          "reason": null,
+          "state": "passed"
+        }
+      },
+      "comparison_differences": [],
+      "record_sha256": "db49d9d4b146b80b2765fdaa6ac513a2be8c09cc296d0eedb3fcbf4b910d64d0",
+      "resources": {
+        "exit_code": 0,
+        "start_unix_time": 1790967531.3826947,
+        "end_unix_time": 1790970206.3974094,
+        "seconds": 2675.015,
+        "cpu_percent": {
+          "user": 11.721,
+          "nice": 0.0,
+          "system": 0.951,
+          "idle": 87.177,
+          "iowait": 0.036,
+          "irq": 0.09,
+          "softirq": 0.025,
+          "steal": 0.0
+        },
+        "data_disk": {
+          "read_iops": 28.199,
+          "write_iops": 314.908,
+          "read_MiB_per_sec": 2.565,
+          "write_MiB_per_sec": 19.188,
+          "mean_read_ms": 0.514,
+          "mean_write_ms": 0.223,
+          "busy_percent": 2.477
+        }
+      }
+    }
+  ],
+  "historical_same_batch": {
+    "hdd_workers4": {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 469.495,
+        "check": 2.162,
+        "import": 1855.321,
+        "publish": 0.003,
+        "snapshot": 108.45
+      },
+      "seconds": 2436.168,
+      "before": {
+        "database_bytes": 12785331,
+        "filesystem_used_bytes": 20107210752,
+        "filesystem_free_bytes": 183804121088
+      },
+      "after": {
+        "database_bytes": 12454287027,
+        "filesystem_used_bytes": 35015069696,
+        "filesystem_free_bytes": 168896262144
+      },
+      "passed": false,
+      "baseline_equal": false,
+      "version_chain_verified": true,
+      "normalization_timeouts": 891,
+      "formal_groups": 51143
+    },
+    "hdd_workers1": {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 475.889,
+        "check": 2.161,
+        "import": 2450.628,
+        "publish": 0.003,
+        "snapshot": 131.765
+      },
+      "seconds": 3060.858,
+      "counts": {
+        "formal_groups": 51266,
+        "formal_layers": {
+          "day": 217566,
+          "hour": 67265,
+          "overall": 51266,
+          "week": 80067,
+          "weekday": 93602
+        },
+        "observation_groups": 28,
+        "observation_layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "import_attempts": 26,
+        "added_records": 5124686,
+        "added_occurrences": 2547876,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 13653683,
+        "filesystem_used_bytes": 34701172736,
+        "filesystem_free_bytes": 169210159104
+      },
+      "after": {
+        "database_bytes": 12444022451,
+        "filesystem_used_bytes": 49344573440,
+        "filesystem_free_bytes": 154566758400
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    }
+  },
+  "evidence": {
+    "01-unpack.log": {
+      "bytes": 21583,
+      "sha256": "ac3ade73cec424ac63b394c13c088fcfad69612bfcce481a8a81313b2ee622c0"
+    },
+    "02-rpms.log": {
+      "bytes": 63013,
+      "sha256": "ae4f0ab7c64923dfffcf42b2493a3d5e2f8078d95319dc5da4f180e4834b2d54"
+    },
+    "03-deploy.log": {
+      "bytes": 5017,
+      "sha256": "ad82a7a299bdaa8371693a896f47d8fda56a58ed1f26ecc3417bd288e0ead443"
+    },
+    "04-python.log": {
+      "bytes": 1150,
+      "sha256": "d86b4725e994b559435646723b99bf687b3f77a395e90e765266262a8a0742f4"
+    },
+    "05-postgres.log": {
+      "bytes": 178,
+      "sha256": "89ae0880c5fdf3f32b1dde53b14b817f54e9e503c4cea649003d146f33d35d45"
+    },
+    "06-checks.log": {
+      "bytes": 662,
+      "sha256": "29d946afc3490f942d84dca941dcd3a4f9726fae82cd08dce18fb7e42dcb42e8"
+    },
+    "07-initialize-workers1.log": {
+      "bytes": 5221,
+      "sha256": "72b2e19aea04cbf93d4e1d0b6ddb9c93a36af25a12eb141749919f31598c1f4b"
+    },
+    "07-initialize.log": {
+      "bytes": 5221,
+      "sha256": "f61a81e5f6788b8f6b48557bf2cabcb6ef0c078841cc0250a278f1c434f282a6"
+    },
+    "08-network.log": {
+      "bytes": 1565,
+      "sha256": "c488660ec7ded8ef941f8b564fa2795e578000b6b896f49c4c8cd4ea7b3c0cbf"
+    },
+    "09-config-workers1.log": {
+      "bytes": 2368,
+      "sha256": "de3cb27e81ce4390c322f633d58b135940f05121cb2bd8e095f33fc89b41379d"
+    },
+    "09-config.log": {
+      "bytes": 2368,
+      "sha256": "6e6dc62ba29c5bf92d9037b0b148524b56be3b1719f303a18c6b0d5731e0f1e0"
+    },
+    "backup-failed-db.log": {
+      "bytes": 191,
+      "sha256": "767609177b1c28362bc93dc0ae5efe625e19192676e01b2be261cbc010d38cc3"
+    },
+    "bundle-transfer.log": {
+      "bytes": 30,
+      "sha256": "0d4d2ad2e3e0c68fc0e0b38804260358ee291c09caf7d9976ae31b77b6799a56"
+    },
+    "initial-system.log": {
+      "bytes": 23409,
+      "sha256": "fae5136b5e59a1446f80cbd4b6bbb4bba08eba7de9a272850eba52f350fea3c9"
+    },
+    "preflight.log": {
+      "bytes": 1337,
+      "sha256": "7ae603ad70c60e06921840a5d7d2e7b907e336bb0b2a6365153ae4767bc424af"
+    },
+    "preserve-reset.log": {
+      "bytes": 225,
+      "sha256": "9e9380e116b8c35af60aec17dfb618b417e692d8f2499b2665519e5001f22d5a"
+    },
+    "tcp-workers1.log": {
+      "bytes": 168,
+      "sha256": "c2ab1e0c3c9c89d73266bb359541da4a0875c9bab1ea9c79bab35827a361c174"
+    },
+    "tcp.log": {
+      "bytes": 168,
+      "sha256": "c2ab1e0c3c9c89d73266bb359541da4a0875c9bab1ea9c79bab35827a361c174"
+    },
+    "workers1-launch.log": {
+      "bytes": 196,
+      "sha256": "ae34fce339d19aa803e3ca070fd7b74629bfb6f12592fe726025c8d0a9488640"
+    },
+    "workers4-launch.log": {
+      "bytes": 532,
+      "sha256": "f72c728bbb56702c99b75a004b157abdc7d91603955c5cc65f8eca1558157b53"
+    },
+    "records-workers1.tar.gz": {
+      "bytes": 42007,
+      "sha256": "3ed372786d4b086eab3f32ec6d252eb9b954cf0aa77e76449b2feece5d83336b"
+    },
+    "records-workers4.tar.gz": {
+      "bytes": 159175,
+      "sha256": "32676548ec2245ca705b38e58b03cec41ba4bf7178eab5de234e43b093630cec"
+    }
+  },
+  "candidate_target_trial_complete": true,
+  "followup_issue": null,
+  "recovery": {
+    "failed_pgdata_preserved": "/data/sql-apm/pgdata-ssd-workers4",
+    "normal_shutdown_verified": true,
+    "fresh_instance_initialized": true,
+    "prior_credentials_and_records_preserved": true,
+    "development_machine_backup": {
+      "path": "var/issue31/slim-trial-20261003/failed-db-ssd-workers4.tar.gz",
+      "bytes": 1622537310,
+      "sha256": "66404fc7ecfc2f71efdcd61acb789c3e30f21a29c20e6dbf980a8338a3c130d1",
+      "archive_entries": 1769,
+      "fully_readable": true,
+      "source_state": "shut down",
+      "mode": "0o600",
+      "restoration_tested": false,
+      "purpose": "preserve failed database before user restores VM snapshot; data remains ignored and private"
+    }
+  },
+  "final_state": {
+    "schema_versions": [
+      [
+        "1.6.0"
+      ]
+    ],
+    "tasks": [
+      [
+        "succeeded",
+        1
+      ]
+    ],
+    "publications": [
+      [
+        "119",
+        "published",
+        1
+      ]
+    ],
+    "import_attempts": [
+      [
+        "succeeded",
+        26
+      ]
+    ],
+    "database_bytes": [
+      [
+        12444587699
+      ]
+    ],
+    "package_check": {
+      "passed": true,
+      "version": "v0.1.0",
+      "kind": "candidate",
+      "commit": "151dfcb61ed1105c776b940734e3aed457814e96",
+      "files": 74
+    },
+    "passfile_mode": "0o600",
+    "html_same_in_app_and_bundle": true,
+    "html_sha256": "9bd83ef127b07054d1b7d5f0b43e2ddfc69c01980bc93d1067a80a94351db9dd"
+  }
+}

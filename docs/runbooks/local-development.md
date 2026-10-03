@@ -114,3 +114,5 @@ GitHub 目标为公开仓库 shenxg13/sql-apm。
 已完成的新候选包安装、自检和解析并发实测见
 [Kylin 试跑报告](../reports/slim-release-kylin-trial-2026-10-03.md)；
 四进程发布成功不等于归一化完整，按报告区分超时、Alma 等值与待完成的用户独立验收。
+用户九任务已通过[独立结果核对](../reports/kylin-manual-validation-2026-10-04.md)，
+但实际取到早期候选，仍须对齐最终候选和补齐四项普通测试；业务结果不需要全量重跑。

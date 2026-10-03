@@ -1,0 +1,795 @@
+{
+  "checked_at": "2026-10-04T01:10:29.606956+08:00",
+  "scope": "user-executed nine tasks and read-only result audit; delivery alignment remains open",
+  "business_verification_passed": true,
+  "complete_manual_acceptance": false,
+  "baseline_sha256": "c19267ecbfc168259d8e0f943ed6b5af244efc2431eae1090a91333eb7e580c6",
+  "input_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "input_files": 55,
+  "input_bytes": 15816193813,
+  "input_checksums_rechecked_against_database": true,
+  "tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "parser_workers": 1,
+      "cutoff_date": "2026-07-28",
+      "seconds": 2683.31,
+      "stages": {
+        "build": 214.101,
+        "check": 2.107,
+        "import": 2408.33,
+        "publish": 0.003,
+        "snapshot": 58.386
+      },
+      "before": {
+        "database_bytes": 12883635,
+        "filesystem_used_bytes": 19151626240,
+        "filesystem_free_bytes": 184759705600
+      },
+      "after": {
+        "database_bytes": 12445095603,
+        "filesystem_used_bytes": 34533646336,
+        "filesystem_free_bytes": 169377685504
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 22:22:41.536729+08:00",
+      "finished_at": "2026-10-03 23:07:24.562363+08:00",
+      "files_cumulative": 26,
+      "groups": 51266,
+      "formal_rows": 509766,
+      "observation_groups": 28,
+      "observation_rows": 164,
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 26
+      }
+    },
+    {
+      "cluster": "119",
+      "step": 1,
+      "parser_workers": 1,
+      "cutoff_date": "2026-07-29",
+      "seconds": 303.69,
+      "stages": {
+        "build": 200.715,
+        "check": 2.17,
+        "import": 96.183,
+        "publish": 0.002,
+        "snapshot": 4.287
+      },
+      "before": {
+        "database_bytes": 12445095603,
+        "filesystem_used_bytes": 34533720064,
+        "filesystem_free_bytes": 169377611776
+      },
+      "after": {
+        "database_bytes": 13338105523,
+        "filesystem_used_bytes": 35701317632,
+        "filesystem_free_bytes": 168210014208
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 23:07:24.895099+08:00",
+      "finished_at": "2026-10-03 23:12:28.348231+08:00",
+      "files_cumulative": 28,
+      "groups": 52897,
+      "formal_rows": 525074,
+      "observation_groups": 29,
+      "observation_rows": 169,
+      "import_attempt_audit": {
+        "before": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 28
+      }
+    },
+    {
+      "cluster": "119",
+      "step": 2,
+      "parser_workers": 1,
+      "cutoff_date": "2026-07-30",
+      "seconds": 208.417,
+      "stages": {
+        "build": 102.023,
+        "check": 2.327,
+        "import": 99.793,
+        "publish": 0.003,
+        "snapshot": 3.92
+      },
+      "before": {
+        "database_bytes": 13338105523,
+        "filesystem_used_bytes": 35701350400,
+        "filesystem_free_bytes": 168209981440
+      },
+      "after": {
+        "database_bytes": 14245148339,
+        "filesystem_used_bytes": 36630990848,
+        "filesystem_free_bytes": 167280340992
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 23:12:28.624151+08:00",
+      "finished_at": "2026-10-03 23:15:56.780117+08:00",
+      "files_cumulative": 29,
+      "groups": 54577,
+      "formal_rows": 540978,
+      "observation_groups": 30,
+      "observation_rows": 178,
+      "import_attempt_audit": {
+        "before": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 29
+      }
+    },
+    {
+      "cluster": "119",
+      "step": 3,
+      "parser_workers": 1,
+      "cutoff_date": "2026-07-31",
+      "seconds": 197.58,
+      "stages": {
+        "build": 103.619,
+        "check": 2.309,
+        "import": 87.335,
+        "publish": 0.002,
+        "snapshot": 3.971
+      },
+      "before": {
+        "database_bytes": 14245148339,
+        "filesystem_used_bytes": 36631023616,
+        "filesystem_free_bytes": 167280308224
+      },
+      "after": {
+        "database_bytes": 15171827379,
+        "filesystem_used_bytes": 36813537280,
+        "filesystem_free_bytes": 167097794560
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 23:15:57.076674+08:00",
+      "finished_at": "2026-10-03 23:19:14.402226+08:00",
+      "files_cumulative": 30,
+      "groups": 53786,
+      "formal_rows": 537198,
+      "observation_groups": 30,
+      "observation_rows": 180,
+      "import_attempt_audit": {
+        "before": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      }
+    },
+    {
+      "cluster": "119",
+      "step": 4,
+      "parser_workers": null,
+      "cutoff_date": "2026-07-31",
+      "seconds": 107.609,
+      "stages": {
+        "build": 103.059,
+        "check": 2.335,
+        "publish": 0.002,
+        "snapshot": 1.89
+      },
+      "before": {
+        "database_bytes": 15171827379,
+        "filesystem_used_bytes": 36813574144,
+        "filesystem_free_bytes": 167097757696
+      },
+      "after": {
+        "database_bytes": 15578044083,
+        "filesystem_used_bytes": 37350264832,
+        "filesystem_free_bytes": 166561067008
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 23:19:14.695053+08:00",
+      "finished_at": "2026-10-03 23:21:02.067611+08:00",
+      "files_cumulative": 30,
+      "groups": 53786,
+      "formal_rows": 537198,
+      "observation_groups": 30,
+      "observation_rows": 180,
+      "import_attempt_audit": {
+        "before": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      }
+    },
+    {
+      "cluster": "120",
+      "step": 0,
+      "parser_workers": 1,
+      "cutoff_date": "2026-09-16",
+      "seconds": 2300.352,
+      "stages": {
+        "build": 253.751,
+        "check": 15.244,
+        "import": 1842.471,
+        "publish": 0.011,
+        "snapshot": 188.497
+      },
+      "before": {
+        "database_bytes": 15578093235,
+        "filesystem_used_bytes": 37348986880,
+        "filesystem_free_bytes": 166562344960
+      },
+      "after": {
+        "database_bytes": 31472735923,
+        "filesystem_used_bytes": 52978790400,
+        "filesystem_free_bytes": 150932541440
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-03 23:24:08.611577+08:00",
+      "finished_at": "2026-10-04 00:02:28.678097+08:00",
+      "files_cumulative": 13,
+      "groups": 404794,
+      "formal_rows": 2819989,
+      "observation_groups": 645,
+      "observation_rows": 4040,
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 13
+      }
+    },
+    {
+      "cluster": "120",
+      "step": 1,
+      "parser_workers": 1,
+      "cutoff_date": "2026-09-17",
+      "seconds": 1177.065,
+      "stages": {
+        "build": 373.767,
+        "check": 24.414,
+        "import": 710.947,
+        "publish": 0.004,
+        "snapshot": 67.516
+      },
+      "before": {
+        "database_bytes": 31472735923,
+        "filesystem_used_bytes": 52978843648,
+        "filesystem_free_bytes": 150932488192
+      },
+      "after": {
+        "database_bytes": 39910364851,
+        "filesystem_used_bytes": 61660590080,
+        "filesystem_free_bytes": 142250741760
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-04 00:02:29.002421+08:00",
+      "finished_at": "2026-10-04 00:22:05.748153+08:00",
+      "files_cumulative": 17,
+      "groups": 607309,
+      "formal_rows": 4076170,
+      "observation_groups": 773,
+      "observation_rows": 4953,
+      "import_attempt_audit": {
+        "before": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 17
+      }
+    },
+    {
+      "cluster": "120",
+      "step": 2,
+      "parser_workers": 1,
+      "cutoff_date": "2026-09-18",
+      "seconds": 1070.744,
+      "stages": {
+        "build": 459.399,
+        "check": 28.335,
+        "import": 526.447,
+        "publish": 0.004,
+        "snapshot": 56.131
+      },
+      "before": {
+        "database_bytes": 39910364851,
+        "filesystem_used_bytes": 61660626944,
+        "filesystem_free_bytes": 142250704896
+      },
+      "after": {
+        "database_bytes": 47169967795,
+        "filesystem_used_bytes": 69538549760,
+        "filesystem_free_bytes": 134372782080
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-04 00:22:06.113415+08:00",
+      "finished_at": "2026-10-04 00:39:56.525468+08:00",
+      "files_cumulative": 21,
+      "groups": 676989,
+      "formal_rows": 4647376,
+      "observation_groups": 921,
+      "observation_rows": 5918,
+      "import_attempt_audit": {
+        "before": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 21
+      }
+    },
+    {
+      "cluster": "120",
+      "step": 3,
+      "parser_workers": 1,
+      "cutoff_date": "2026-09-19",
+      "seconds": 1300.838,
+      "stages": {
+        "build": 604.242,
+        "check": 39.036,
+        "import": 584.463,
+        "publish": 0.005,
+        "snapshot": 72.673
+      },
+      "before": {
+        "database_bytes": 47169967795,
+        "filesystem_used_bytes": 69538586624,
+        "filesystem_free_bytes": 134372745216
+      },
+      "after": {
+        "database_bytes": 56451094195,
+        "filesystem_used_bytes": 78680092672,
+        "filesystem_free_bytes": 125231239168
+      },
+      "normalization_timeouts": 0,
+      "passed": true,
+      "baseline_rechecked": true,
+      "live_version_and_counts_rechecked": true,
+      "started_at": "2026-10-04 00:39:56.909982+08:00",
+      "finished_at": "2026-10-04 01:01:37.424749+08:00",
+      "files_cumulative": 25,
+      "groups": 873957,
+      "formal_rows": 5850925,
+      "observation_groups": 1043,
+      "observation_rows": 6748,
+      "import_attempt_audit": {
+        "before": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 25,
+          "succeeded": 25,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 25
+      }
+    }
+  ],
+  "total_task_seconds": 9349.605,
+  "elapsed_first_start_to_last_finish_seconds": 9535.888,
+  "successful_import_files": 55,
+  "total_import_records": 16390146,
+  "task_states": {
+    "succeeded": 9
+  },
+  "versions": {
+    "119": 5,
+    "120": 4
+  },
+  "published_checks_passed": 54,
+  "schema_version": "1.6.0",
+  "final_database_bytes": 56451290803,
+  "final_disk": {
+    "total": 203911331840,
+    "used": 77979287552,
+    "free": 125932044288
+  },
+  "environment": {
+    "python": "3.9.5",
+    "postgresql": "17.10",
+    "environment_check_passed": true,
+    "pip_check_passed": true,
+    "passfile_mode": "0600"
+  },
+  "manual_checks": {
+    "pgadmin": "user confirmed success in this turn; 2 sessions observed",
+    "chrome": "previous user confirmation retained; actual manual hash differs from final candidate",
+    "package_source": "user confirmed reuse of existing bundle"
+  },
+  "unit_tests": {
+    "actual": 62,
+    "expected_final_candidate": 66,
+    "passed": true,
+    "missing_module": "tests/baseline/test_statistics.py"
+  },
+  "database_checks_passed": 266,
+  "publication_checks_passed": 31,
+  "yum": {
+    "transaction_id": 4,
+    "start": "2026-10-03T21:00:11+08:00",
+    "end": "2026-10-03T21:00:16+08:00",
+    "seconds": 5,
+    "result": "success",
+    "repositories": [
+      "ks10-adv-os",
+      "ks10-adv-updates"
+    ],
+    "followed_by_python_and_postgresql_builds": true
+  },
+  "delivery": {
+    "actual_commit": "d49d94b22d12094ea42a59463527289a2e8005da",
+    "accepted_commit": "151dfcb61ed1105c776b940734e3aed457814e96",
+    "actual_bundle_sha256": "2d1193ce16988106ca309c529cc3677ab228dd5f581733af3043dcd82b802ee8",
+    "accepted_bundle_sha256": "373a943321075d46450c8d14ec158997c1ccfc3f830c33574328d55deb9c7b94",
+    "actual_local_bundle": "var/issue31/slim-candidate/offline-bundle.tar.gz",
+    "accepted_local_bundle": "var/issue31/slim-ready/offline-bundle.tar.gz",
+    "app_file_set_equal": true,
+    "same_manifest_entries": 70,
+    "app_changed_entries": [
+      "INSTALL.html",
+      "PROGRAM_COMMIT"
+    ],
+    "verification_changed_entries": [
+      "PROGRAM_COMMIT",
+      "scripts/deployment/run_verification.py",
+      "tests/baseline/__init__.py",
+      "tests/baseline/oracle.py",
+      "tests/baseline/test_statistics.py"
+    ],
+    "actual_manual_sha256": "f6cd9be0722b80c2eff1054c23ec75de4c293d4719f679a80aff78076dc5f87a",
+    "accepted_manual_sha256": "9bd83ef127b07054d1b7d5f0b43e2ddfc69c01980bc93d1067a80a94351db9dd",
+    "actual_files_self_check": {
+      "files": 73,
+      "all_match": true,
+      "mismatches": []
+    },
+    "actual_verification_self_check": {
+      "files": 46,
+      "all_match": true,
+      "mismatches": []
+    },
+    "runtime_and_business_resources_equal": true
+  },
+  "evidence": {
+    "local_root": "var/issue31/manual-validation-20261004/",
+    "records_archive_sha256": "f337507bbf6c46deec1cc6bf9260126c011566fe544146c1cd578830a964a875",
+    "file_receipts": {
+      "records/pg-configure.log": {
+        "bytes": 16130,
+        "sha256": "2a93e6208dd69bcd5b00013b87f7377bff9967f3e73ac159bf59bdd03ef7d0f5",
+        "modified_at": "2026-10-03T21:13:18.071748+08:00"
+      },
+      "records/pg-install.log": {
+        "bytes": 107811,
+        "sha256": "42f0e1fda7ac79f65d05857ac863d63fea51efb135a0552a937b6188671eb084",
+        "modified_at": "2026-10-03T21:15:54.810765+08:00"
+      },
+      "records/pg-make.log": {
+        "bytes": 743140,
+        "sha256": "e238fcc135d580c98c76eb3111d8bce4b6fa2c32a2082f53734e4b5b9fc31064",
+        "modified_at": "2026-10-03T21:15:50.482677+08:00"
+      },
+      "records/python-configure.log": {
+        "bytes": 26858,
+        "sha256": "fc287866830198a0d84c787b9586568ca1a63d6a39686b256ba7640787815e00",
+        "modified_at": "2026-10-03T21:08:56.378391+08:00"
+      },
+      "records/python-install.log": {
+        "bytes": 737235,
+        "sha256": "4f5b3564350215c6278a1844256b533d464744c8ae0a83dea10634c6aa18cc75",
+        "modified_at": "2026-10-03T21:09:41.923117+08:00"
+      },
+      "records/python-make.log": {
+        "bytes": 138186,
+        "sha256": "20f967dd93a688f316c655cc1bd46ac15064a91685caa7152e1c569599e707db",
+        "modified_at": "2026-10-03T21:09:31.490951+08:00"
+      },
+      "records/tasks/119-0-history.json": {
+        "bytes": 479,
+        "sha256": "90c7ec9c8266a854f20279af896a755cc0c3573b4eeca523514e94497592334c",
+        "modified_at": "2026-10-03T23:07:24.774516+08:00"
+      },
+      "records/tasks/119-0-status.json": {
+        "bytes": 1186,
+        "sha256": "9133c0b418abf1ebb57227573b5d5e96aebb72f5cd7aeeaa88480090834cc09e",
+        "modified_at": "2026-10-03T23:07:24.698515+08:00"
+      },
+      "records/tasks/119-0.json": {
+        "bytes": 51347,
+        "sha256": "1ad2dd5b84c6d2f82053034624d6eed706c54b2d7d018109be6fcdee3ee5368a",
+        "modified_at": "2026-10-03T23:07:24.774516+08:00"
+      },
+      "records/tasks/119-0.log": {
+        "bytes": 75544,
+        "sha256": "ab39d72d6e83fac5fe3c685a8e27acb67da0f4325c9984730af490637710de60",
+        "modified_at": "2026-10-03T23:07:24.570512+08:00"
+      },
+      "records/tasks/119-1-history.json": {
+        "bytes": 983,
+        "sha256": "ae745410caa8704115a45b3fe08558e29a3636ebe4975968f4329374b64d5b30",
+        "modified_at": "2026-10-03T23:12:28.512268+08:00"
+      },
+      "records/tasks/119-1-status.json": {
+        "bytes": 1893,
+        "sha256": "bc272beed3b71690008c708630e5fc99b8364f4d19bb6bd9ee95557787ee1649",
+        "modified_at": "2026-10-03T23:12:28.440266+08:00"
+      },
+      "records/tasks/119-1.json": {
+        "bytes": 10631,
+        "sha256": "0d68ab16025473e9dbfdc8606eff4fd8e31b9e28efde2a5c91d788ce60cd71d9",
+        "modified_at": "2026-10-03T23:12:28.516268+08:00"
+      },
+      "records/tasks/119-1.log": {
+        "bytes": 9894,
+        "sha256": "ed8e9798b09da9f15a657cd3a510df282d11c0ace073951acb6cdce748812c4e",
+        "modified_at": "2026-10-03T23:12:28.348264+08:00"
+      },
+      "records/tasks/119-2-history.json": {
+        "bytes": 1487,
+        "sha256": "50e52a78179ee3541bb71756d0d557271e269e5ef296acb23b690596a3f59b6f",
+        "modified_at": "2026-10-03T23:15:56.968215+08:00"
+      },
+      "records/tasks/119-2-status.json": {
+        "bytes": 2552,
+        "sha256": "6ada2e9c37abe2b8ffa1da9a0d31fda6eb0506264e7dfa0be2f15cdfb80c0174",
+        "modified_at": "2026-10-03T23:15:56.892214+08:00"
+      },
+      "records/tasks/119-2.json": {
+        "bytes": 9211,
+        "sha256": "d3cdae4cb1137d2df5055c71d0817b0ada34a16c22da7ec2c80f8215b5e8df15",
+        "modified_at": "2026-10-03T23:15:56.968215+08:00"
+      },
+      "records/tasks/119-2.log": {
+        "bytes": 8081,
+        "sha256": "5bb10dab52344b6b6779c2f5558d67075d9764580658746a9c09fa5c1d435938",
+        "modified_at": "2026-10-03T23:15:56.780211+08:00"
+      },
+      "records/tasks/119-3-history.json": {
+        "bytes": 1991,
+        "sha256": "cb2c1c6b63f6d1f286fb8e579547a1643427f606c0d14007fee94a2541db292a",
+        "modified_at": "2026-10-03T23:19:14.583957+08:00"
+      },
+      "records/tasks/119-3-status.json": {
+        "bytes": 3212,
+        "sha256": "e01f524ea2feaa129a99e20adb914c624bf08bce9104e50a75e822886eae1183",
+        "modified_at": "2026-10-03T23:19:14.511956+08:00"
+      },
+      "records/tasks/119-3.json": {
+        "bytes": 9722,
+        "sha256": "08d1f6649e8ee27a70000d0d6e51138ba5813b7884c50f049b8e85c37289e74d",
+        "modified_at": "2026-10-03T23:19:14.587957+08:00"
+      },
+      "records/tasks/119-3.log": {
+        "bytes": 8102,
+        "sha256": "3bff9bbe748803b5b2e8541a7213cc67060f5d18e629bb0c31e691b26ba29f8d",
+        "modified_at": "2026-10-03T23:19:14.403954+08:00"
+      },
+      "records/tasks/119-4-history.json": {
+        "bytes": 2495,
+        "sha256": "24ad6b572c1014af8c4861b4624d010a285ed07ce5007a22924b2f0e407d2d70",
+        "modified_at": "2026-10-03T23:21:02.229995+08:00"
+      },
+      "records/tasks/119-4-status.json": {
+        "bytes": 3825,
+        "sha256": "72963b87328ac8b0deea6e67255da8df5f2ba7b7005634b8f57d4bdbb2d316bd",
+        "modified_at": "2026-10-03T23:21:02.153994+08:00"
+      },
+      "records/tasks/119-4.json": {
+        "bytes": 7882,
+        "sha256": "743925e748c111a3e0ad727ea44800a5f86b5cc173d482ece7fe4a17a7e98832",
+        "modified_at": "2026-10-03T23:21:02.229995+08:00"
+      },
+      "records/tasks/119-4.log": {
+        "bytes": 5155,
+        "sha256": "104708b400028d64ac6dc95b156a4248e7ae947f97b08086646fdb1b2a0f4f3a",
+        "modified_at": "2026-10-03T23:21:02.065992+08:00"
+      },
+      "records/tasks/120-0-history.json": {
+        "bytes": 479,
+        "sha256": "5c00ad392d83507f3c8cf32b3cbeea4766756ab912e51bcea53fbd128d2d9007",
+        "modified_at": "2026-10-04T00:02:28.879882+08:00"
+      },
+      "records/tasks/120-0-status.json": {
+        "bytes": 1189,
+        "sha256": "e32da8097d93e71f83ab8bf7c8903b36ed6ebdb177b0647341fa6bd9e61e6db2",
+        "modified_at": "2026-10-04T00:02:28.803881+08:00"
+      },
+      "records/tasks/120-0.json": {
+        "bytes": 30087,
+        "sha256": "fcbc0a1b3e28072d016433f47fa7a3fd8cca1242c42e8ba9b3971dbd050e91ed",
+        "modified_at": "2026-10-04T00:02:28.883882+08:00"
+      },
+      "records/tasks/120-0.log": {
+        "bytes": 52903,
+        "sha256": "2d5583a2ac21ba584e0685432b6af87ee09ce5104880622206480569df0d672b",
+        "modified_at": "2026-10-04T00:02:28.691879+08:00"
+      },
+      "records/tasks/120-1-history.json": {
+        "bytes": 983,
+        "sha256": "b21652d5d762524555a5d999fda22193674923cfd52cae679bcf3107e5861364",
+        "modified_at": "2026-10-04T00:22:05.993826+08:00"
+      },
+      "records/tasks/120-1-status.json": {
+        "bytes": 1900,
+        "sha256": "d07e6608aa8cf43f94f02bb9d299421b5103716f7cce9bb867a7657afe45a7f2",
+        "modified_at": "2026-10-04T00:22:05.913824+08:00"
+      },
+      "records/tasks/120-1.json": {
+        "bytes": 15031,
+        "sha256": "c372b0b3b9067efab69c4d8eec95d2d7063fa8b5c8ad2cc5b6cbc56f71ee541c",
+        "modified_at": "2026-10-04T00:22:05.993826+08:00"
+      },
+      "records/tasks/120-1.log": {
+        "bytes": 27349,
+        "sha256": "7c22ffdfd93dcc378fe431dfda4b535d578d4db75c6749574b120c840d44ba37",
+        "modified_at": "2026-10-04T00:22:05.761821+08:00"
+      },
+      "records/tasks/120-2-history.json": {
+        "bytes": 1487,
+        "sha256": "77348fec47d1d260dbe9b86134f29ffd068aa94e3fcf9e4503bf014c30e9b526",
+        "modified_at": "2026-10-04T00:39:56.782300+08:00"
+      },
+      "records/tasks/120-2-status.json": {
+        "bytes": 2563,
+        "sha256": "cdeb25c931fb7917d72406c6cd78460f3ed794808f1aaefd310235b88204bf78",
+        "modified_at": "2026-10-04T00:39:56.702299+08:00"
+      },
+      "records/tasks/120-2.json": {
+        "bytes": 14785,
+        "sha256": "0b9360745c16ac13ccfccf638906edc9f38b5621f03814604e5bc5a160ebfd1f",
+        "modified_at": "2026-10-04T00:39:56.786300+08:00"
+      },
+      "records/tasks/120-2.log": {
+        "bytes": 26849,
+        "sha256": "248a2845c6c3104e220060210745bef4e010fa448ff4bf6f658c1fa2a2696f7b",
+        "modified_at": "2026-10-04T00:39:56.538296+08:00"
+      },
+      "records/tasks/120-3-history.json": {
+        "bytes": 1991,
+        "sha256": "19fec74a76d86477da027651f148f36ea5a9c952784cc9fbcb1c64b7ac3f7e5e",
+        "modified_at": "2026-10-04T01:01:37.674703+08:00"
+      },
+      "records/tasks/120-3-status.json": {
+        "bytes": 3226,
+        "sha256": "a449b99b5a25e5d45cb894feae91f07da1620b3dd4dcb017bb4066bdf270b4f0",
+        "modified_at": "2026-10-04T01:01:37.598701+08:00"
+      },
+      "records/tasks/120-3.json": {
+        "bytes": 14464,
+        "sha256": "b10c04e2ac11ef9cc600fae44321a29d2f44efbfea3d57b5f77a398f8683ade7",
+        "modified_at": "2026-10-04T01:01:37.678703+08:00"
+      },
+      "records/tasks/120-3.log": {
+        "bytes": 29287,
+        "sha256": "d483a8df7c1bbdd56ce5c6cf08a6db0edfc390e499eed888ef68197fd270fce4",
+        "modified_at": "2026-10-04T01:01:37.434699+08:00"
+      },
+      "records/unittest.log": {
+        "bytes": 5917,
+        "sha256": "debf114bba8e9cdd9933851249f0a33a5eb4f51921798cf86051d0398fb73320",
+        "modified_at": "2026-10-03T21:16:25.499394+08:00"
+      },
+      "records/verify-publication.log": {
+        "bytes": 2899,
+        "sha256": "f8f360e633714ef43139cddb1b9320e9e49913654ebb0651767f69bd0e419556",
+        "modified_at": "2026-10-03T21:18:11.955020+08:00"
+      },
+      "records/verify.log": {
+        "bytes": 19203,
+        "sha256": "d1282d2eea51ef2108b7a345f52222e84b3658d88001cadc02872b01c9c3fd26",
+        "modified_at": "2026-10-03T21:17:37.917184+08:00"
+      }
+    },
+    "live_state_sha256": "f9503785bc217b75387635ffb3fe12725f723fdd93e738cba23133f6f5e27bfa",
+    "additional_receipts": {
+      "yum-history.txt": "9ed875eed02967a21d40ee896915d079a1b0257f8837ddc1b57c5b38a38bc14b",
+      "tcp-check.log": "c2ab1e0c3c9c89d73266bb359541da4a0875c9bab1ea9c79bab35827a361c174",
+      "environment-audit.log": "b0d9fe94975b0bbd5c3ec95f4b71d656a708ef1543631d43d674ea85b48ae208"
+    }
+  },
+  "open_items": [
+    "align delivered candidate and verification kit",
+    "run missing 4 statistics unit tests using complete verification kit",
+    "confirm final HTML and record candidate difference; preserve nine-task results"
+  ],
+  "not_performed": [
+    "full task replay",
+    "database reset",
+    "tag or Release publication",
+    "database row-by-row statistical oracle replay"
+  ],
+  "authentication": {
+    "socket_scram": true,
+    "tcp_readonly_query": true,
+    "wrong_password_rejected": true,
+    "remote_cidr_restricted": true,
+    "trust_present": false,
+    "temporary_password_copy_removed": true,
+    "pgadmin_user_confirmed": true
+  }
+}

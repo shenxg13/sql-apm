@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-03
+updated: 2026-10-04
 sources:
+  - path: docs/reports/kylin-manual-validation-2026-10-04.md
+    status: current
   - path: docs/reports/slim-release-kylin-trial-2026-10-03.md
     status: current
   - path: docs/reports/slim-release-preparation-2026-10-03.md
@@ -111,7 +113,16 @@ SSD 上四进程首批专门记录超时、分组、基准和资源；零超时�
 独立目录的 66／266／31 项自检、初始化及受限 TCP 验证，55 文件摘要一致。
 用户回复 Chrome 离线人工检查正常。保留四进程失败现场后，新实例单进程首批零超时，
 正式分组 51,266，全部 Alma 计数和版本链相同；全流程从原机械盘 51.0 分钟降到 44.6 分钟，
-改善主要来自数据库快照和统计构建。用户独立九任务及正常 yum 源路径仍须另行完成。
+改善主要来自数据库快照和统计构建。
+
+2026-10-04 用户独立执行后，九任务业务结果、55 文件输入摘要和版本链再次核对通过，
+全部零归一化超时；正常 yum 源事务及后续两项源码构建有记录，用户确认本轮 pgAdmin 成功。
+但手册传输示例指向保留的早期候选目录，实际使用 `d49d94b`，与最终候选 `151dfcb`
+的运行代码和业务资源相同，手册、版本信息及验收资源不同；普通测试仅 62 项，缺少
+四项统计测试。因此保留九任务证据，最终候选对齐和完整 66 项普通测试仍需补验，
+不能直接宣称完整人工验收已通过。详见[独立验证核对](../../docs/reports/kylin-manual-validation-2026-10-04.md)。
+四进程性能后续问题已由用户在另一需求会话确认创建为
+[#34](https://github.com/shenxg13/sql-apm/issues/34)，不再等待创建确认；本轮未实施该优化。
 
 ### 已确认的当前开发环境与生产部署安排
 

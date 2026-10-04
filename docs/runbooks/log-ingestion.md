@@ -173,9 +173,11 @@ Analysis 来源解析版本为 `mpp-csv-reader/1`，SQL 解析版本另存 Norma
 各环境在无导入进程、目标目录不存在时手工执行一次目录改名，并修改本地来源清单路径：
 
 ```bash
-test -d raw/inbox/hashdata
-test ! -e raw/inbox/mpp
-mv raw/inbox/hashdata raw/inbox/mpp
+if test -d raw/inbox/hashdata && test ! -e raw/inbox/mpp; then
+  mv -- raw/inbox/hashdata raw/inbox/mpp
+else
+  printf '请核对原目录存在且目标目录尚未创建。\n' >&2
+fi
 ```
 
 程序不自动移动文件；历史报告继续保留旧路径。本地重放可以用显式 `--root` 指定尚未改名

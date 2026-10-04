@@ -675,7 +675,53 @@ SQL_APM_APP_ROOT="$APM_APP" PYTHONPATH="$APM_APP" \
 ### 10.2 MPP 标识版验收
 
 Issue #33 已授权验证机空库重跑；无需重装依赖、Python 或 PostgreSQL，也不重跑全部九任务。
-使用本次提交生成的完整离线包，先按第 3 节核对外部摘要、`PROGRAM_COMMIT` 和两个包的清单。
+使用本次提交生成的完整离线包；各路径沿用第 1 节，外部提交和摘要来自本次交付记录。
+先确认没有项目任务，将现有程序、验收资源和离线包移入本次备份目录，避免新旧模块混装。
+以下在目标机执行；所有前置文件检查通过后才开始移动：
+
+```bash
+set -euo pipefail
+[[ "$APM_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+test "$(sudo -u postgres "$APM_PG_BIN/psql" -X -w -Atq \
+  -h "$APM_SOCKET" -p "$APM_PORT" -d postgres \
+  -c "SELECT count(*) FROM pg_stat_activity WHERE datname='sql_apm';")" = 0
+test -d "$APM_APP/.venv"
+test -d "$APM_VERIFY"
+test -d "$APM_BUNDLE"
+test -f "$APM_ROOT/offline-bundle.tar.gz"
+test -f "$APM_ROOT/offline-bundle.tar.gz.sha256"
+APM_PRE_MPP="$APM_ROOT/records/pre-mpp-$APM_EXPECTED_COMMIT"
+mkdir -- "$APM_PRE_MPP"
+mv -- "$APM_APP" "$APM_VERIFY" "$APM_BUNDLE" "$APM_PRE_MPP/"
+mv -- "$APM_ROOT/offline-bundle.tar.gz" "$APM_ROOT/offline-bundle.tar.gz.sha256" "$APM_PRE_MPP/"
+```
+
+接着只执行第 3 节中从开发机传输到目标机解包、外部摘要／提交和清单校验的步骤。
+保留此目标机 Shell 中的 `APM_PRE_MPP`，然后执行下面的程序替换，跳过第 4–7 节的安装与编译：
+
+```bash
+cd "$APM_ROOT"
+test ! -e "$APM_APP"
+test ! -e "$APM_VERIFY"
+tar -xzf "$APM_BUNDLE/program.tar.gz"
+tar -xzf "$APM_BUNDLE/verification.tar.gz"
+(cd "$APM_APP" && sha256sum -c SHA256SUMS)
+(cd "$APM_VERIFY" && sha256sum -c SHA256SUMS)
+test "$(cat "$APM_APP/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
+test "$(cat "$APM_VERIFY/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
+cmp -s "$APM_PRE_MPP/app/requirements.txt" "$APM_APP/requirements.txt"
+mv -- "$APM_PRE_MPP/app/.venv" "$APM_APP/.venv"
+cd "$APM_APP"
+.venv/bin/python scripts/deployment/check_environment.py
+.venv/bin/python scripts/deployment/verify_package.py --installed
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  unit > "$APM_PRE_MPP/new-unit.log" 2>&1
+```
+
+锁定依赖须与原安装相同，原 `.venv` 回到相同绝对路径，复用现有 Python、依赖和 PostgreSQL。
+普通自检预期 69 项通过。旧程序、包和历史记录保留在备份目录；若在重建库前恢复程序，
+须先另存新目录，将 `.venv` 移回备份中的 app，再把备份目录恢复到原路径。
+
 旧库不能带数据升级到 1.7.0。以下仅针对第 1 节明确指向的专用验证实例中的 `sql_apm` 库，
 必须先确认没有其他任务，且不是生产或其他项目库。旧库不保留；项目角色及其密码继续复用。
 不删除 PGDATA，不重新 initdb，不修改认证规则。

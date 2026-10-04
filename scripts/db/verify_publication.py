@@ -171,6 +171,8 @@ def verify(pg_bin):
             from database.publication_repair import verify_admission,verify_month_preparation
             verify_admission(v,dsn,root)
             verify_month_preparation(v,dsn,root,calls['snapshot'])
+            from database.publication_isolation import verify_isolation
+            verify_isolation(v,dsn,root,ROOT)
         v.init('check');v.init('upgrade')
         print('PUBLICATION CHECKS:',v.completed)
 

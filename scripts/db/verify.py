@@ -39,9 +39,9 @@ def run(args, env=None, sql=None, ok=True):
 
 
 @contextlib.contextmanager
-def instance(pg_bin):
+def instance(pg_bin, parent="/tmp", configuration=""):
     # One private directory owns both the data directory and socket. TCP disabled.
-    directory = Path(tempfile.mkdtemp(prefix="sql-apm-pg-", dir="/tmp"))
+    directory = Path(tempfile.mkdtemp(prefix="sql-apm-pg-", dir=parent))
     data, sock = directory / "data", directory / "socket"
     sock.mkdir(mode=0o700)
     started = False
@@ -55,7 +55,8 @@ def instance(pg_bin):
              "--auth-host=reject", "--encoding=UTF8", "--locale=C"], env)
         with (data / "postgresql.conf").open("a") as file:
             file.write("\nlisten_addresses = ''\nunix_socket_directories = '" + str(sock) +
-                       "'\nport = 55473\nlog_statement = 'none'\nlog_min_error_statement = 'panic'\n")
+                       "'\nport = 55473\nlog_statement = 'none'\nlog_min_error_statement = 'panic'\n" +
+                       configuration)
         run([pg_bin / "pg_ctl", "-D", data, "-l", directory / "server.log", "-w", "start"], env)
         started = True
         yield directory, env

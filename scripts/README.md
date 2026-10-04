@@ -139,6 +139,20 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `scripts/db/reconcile_ingestion.py` 在全量入库后只读核对最终适配器计数和历史原文集合差异；
 参数及验收失败语义见上述导入操作说明。
 
+## 分词性能与等价验证
+
+`python -m sql_apm.diagnostics.scanning_equivalence` 显式读取固定原文索引，逐条比较冻结
+旧适配器与当前实现的扫描字段和完整归一化结果；按摘要校验的分块可恢复，输出无原文。
+`scripts/db/verify_scanning_full.py` 在干净私有 PG17 中执行默认四进程的 119 首批，
+按原 Alma 业务计数核对并记录耗时。`--first-batch-119` 只校验所需 26 文件，
+`--instance-parent` 指定临时实例所在文件系统；`--kylin-settings` 沿用 #31 内存／WAL
+参数并保持 TCP 关闭，结束后自动停止并清理该私有实例。输入、命令和验收边界见
+[分词验证报告](../docs/reports/sql-scanning-2026-10-04.md)。高成本检查不自动加入 Harness。
+
+`scripts/deployment/rehearsal.py run --program-commit COMMIT` 先完整校验指定提交的交付包，
+再与原 Alma 业务计数逐项比较，支持经过验收的新产品实现；省略该参数仍要求原 Alma
+产品文件摘要相同。指定提交不跳过包校验或放宽业务基准。
+
 ## 训练样本判定
 
 - `python -m sql_apm training snapshot`／`training summary`：本地配置、固定快照与脱敏诊断；

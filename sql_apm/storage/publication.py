@@ -158,7 +158,16 @@ def version_status(db, scope, history=False, limit=20):
         if history:
             cur.execute('SELECT '+fields+' FROM '+joins+" WHERE p.scope_id=%s AND p.result='published' ORDER BY p.at DESC,p.publication_id LIMIT %s",(scope,limit))
             return dict(versions=rows())
-        cur.execute('SELECT '+fields+' FROM current_version v JOIN '+joins+' ON v.publication_id=p.publication_id WHERE v.scope_id=%s',(scope,))
+        # The input manifest is frozen; later imports must not change these
+        # record counts. Do not join occurrences (one record can have several).
+        isolation_fields='''coalesce((SELECT sum(pr.count) FROM problem pr
+            JOIN input_file f ON f.file_id=pr.file_id AND f.input_id=b.input_id
+            WHERE pr.level='record' AND pr.effect='isolate_record'
+                AND pr.count_unit='log_record' AND pr.code=%s),0)::bigint'''
+        cur.execute('SELECT '+fields+','+isolation_fields+' AS fingerprint_normalization_timeout,'+
+                    isolation_fields+' AS fingerprint_normalization_worker_failed FROM current_version v JOIN '+joins+
+                    ' ON v.publication_id=p.publication_id WHERE v.scope_id=%s',
+                    ('fingerprint_normalization_timeout','fingerprint_normalization_worker_failed',scope))
         current=rows()
         cur.execute('''SELECT task_id,mode,state,stage,reason,started_at,finished_at,stage_seconds,
             ARRAY(SELECT batch_id FROM task_batch a WHERE a.task_id=t.task_id ORDER BY batch_id) batch_ids,

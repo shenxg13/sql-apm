@@ -12,8 +12,9 @@
   ],
   "verification": [
     "tests/test_*.py", "tests/baseline/*.py", "tests/database/*.py", "tests/ingestion/*.py",
-    "scripts/db/verify.py", "scripts/db/verify_publication.py",
+    "scripts/db/verify.py", "scripts/db/verify_publication.py", "scripts/db/verify_scanning_full.py",
     "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
+    "scripts/deployment/verify_package.py",
     "scripts/functions/*.py", "rules/functions/*.json", "rules/functions/POSTGRESQL-LICENSE.txt",
     "docs/design/offline-data-contract/examples.json",
     "docs/reports/data/kylin-alma-baseline-2026-10-02.json",

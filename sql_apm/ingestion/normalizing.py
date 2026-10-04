@@ -113,9 +113,15 @@ class NormalizingPool:
             ready = wait([child.connection for child in pending], timeout=0.01)
             for child, (index, start, attempt) in list(pending.items()):
                 expired = time.monotonic() - start >= self.timeout
-                if child.connection not in ready and not expired:
+                available = child.connection in ready
+                # A preceding child's synchronous restart can take seconds.
+                # Refresh readiness before declaring a timeout; the wait set
+                # above no longer describes replies that arrived meanwhile.
+                if expired and not available:
+                    available = child.connection.poll()
+                if not available and not expired:
                     continue
-                if child.connection in ready:
+                if available:
                     try:
                         result = child.connection.recv()
                     except (EOFError, OSError):

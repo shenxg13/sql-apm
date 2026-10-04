@@ -99,6 +99,13 @@ JSON 行输出仅含固定原因码、数量、摘要和不透明文件 ID，不
 排查 `fingerprint_normalization_*` 时先定位 problem_evidence 和完整原文，再核对主机资源。
 已成功文件重导会跳过，不重新解析这些记录；当前入口不提供自动重解释或历史覆盖功能。
 
+分词入口以等长 ASCII 占位扫描多字节文本，词内容及语法解析继续使用原文；含非 ASCII
+美元标签、非法编码／NUL 或扫描报错时回到原扫描器。普通路径避免多字节位置换算的平方级
+耗时，回退路径仍可能较慢。解析池在判定超时前重新检查结果是否到达，避免其他进程重启
+期间使用过期的就绪集合。默认四进程、5 秒期限和两次失败后隔离的规则保持不变。
+已发布版本可用 `status` 查看两项隔离记录数，字段和固定输入边界见
+[版本查询说明](build-publication.md#隔离记录计数)。
+
 `import_batch`、`batch_entry`、`import_attempt` 保存批次／文件历史，`problem` 和
 `problem_evidence` 提供原因与文件定位，`source_file.declaration_evidence` 保存文件计数和冲突摘要。
 `analysis.evidence_manifest` 保存冻结配置依据；人工日期声明不证明源端没有漏拷。

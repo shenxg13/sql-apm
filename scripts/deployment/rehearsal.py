@@ -40,8 +40,12 @@ def prepare(args):
         raise ValueError('input_manifest_changed')
     args.output.mkdir(parents=True, exist_ok=False)
     hashes = []
-    for cluster, cutoffs in CUTOFFS.items():
+    first_only = getattr(args, 'first_batch_119', False)
+    batches = {'119': CUTOFFS['119'][:1]} if first_only else CUTOFFS
+    for cluster, cutoffs in batches.items():
         files = manifest['clusters'][cluster]['files']
+        if first_only:
+            files = [file for file in files if file['file'][5:15] <= cutoffs[0]]
         for file in files:
             path = args.logs / cluster / file['file']
             if sha256(path) != file['sha256']:
@@ -67,7 +71,7 @@ def prepare(args):
         save(args.output / ('training-' + cluster + '.json'),
              dict(version=1, clusters=[cluster], window=dict(days=30)))
     (args.output / 'logs.SHA256SUMS').write_text('\n'.join(hashes) + '\n')
-    print(json.dumps(dict(verified_files=len(hashes), batches=8)))
+    print(json.dumps(dict(verified_files=len(hashes), batches=sum(map(len, batches.values())))))
 
 
 def footprint(db, root):
@@ -89,10 +93,17 @@ def attempt_counts(cur, cluster, allowed_interrupted):
                 interrupted=len(interrupted))
 
 
-def run_task(args):
-    import psycopg2
+def verify_product(expected_commit=None):
+    # New accepted implementations must name their immutable delivery commit.
+    # Verify that package in full, while retaining the original golden counts.
+    if expected_commit is not None:
+        from verify_package import verify
+        package = verify(ROOT, installed=True)
+        if package['commit'] != expected_commit:
+            raise ValueError('unexpected_program_commit')
+        return package
+    # Legacy commands still reject drift from the original Alma implementation.
     baseline = json.loads(BASELINE.read_text())
-    # Reject code drift before an expensive replay.
     release_path = ROOT / 'RELEASE.json'
     release_files = json.loads(release_path.read_text())['files'] if release_path.exists() else None
     for path, expected in baseline['provenance']['product_code_sha256'].items():
@@ -101,6 +112,13 @@ def run_task(args):
             continue
         if sha256(ROOT / path) != expected:
             raise ValueError('product_code_changed: ' + path)
+    return dict(baseline_product_equal=True)
+
+
+def run_task(args):
+    import psycopg2
+    baseline = json.loads(BASELINE.read_text())
+    package = verify_product(args.program_commit)
     cluster, step = args.cluster, args.step
     expected = baseline['clusters'][cluster][step]
     args.records.mkdir(parents=True, exist_ok=True)
@@ -184,7 +202,7 @@ def run_task(args):
                                                 allowed_interrupted=args.interrupted_attempt,
                                                 baseline_successful=expected['import_attempts']),
                       normalization_timeouts=normalization_timeouts,
-                      passed=passed, baseline_sha256=sha256(BASELINE))
+                      passed=passed, baseline_sha256=sha256(BASELINE), program_verification=package)
         save(args.records / (stem + '.json'), record)
         print(json.dumps(dict(cluster=cluster, step=step, passed=passed, seconds=record['seconds'],
                               normalization_timeouts=normalization_timeouts)))
@@ -200,6 +218,8 @@ def main():
     prep = sub.add_parser('prepare')
     prep.add_argument('--logs', type=Path, required=True)
     prep.add_argument('--output', type=Path, required=True)
+    prep.add_argument('--first-batch-119', action='store_true',
+                      help='Verify and prepare only the 26 files needed by Issue #34 P8')
     task = sub.add_parser('run')
     task.add_argument('--cluster', choices=CUTOFFS, required=True)
     task.add_argument('--step', type=int, choices=range(5), required=True)
@@ -207,6 +227,8 @@ def main():
     task.add_argument('--records', type=Path, required=True)
     task.add_argument('--data-root', type=Path, required=True)
     task.add_argument('--workers', type=int, choices=range(1, 9), default=1)
+    task.add_argument('--program-commit', help='Verify the delivered package at this exact commit; '
+                      'without it require original Alma product hashes')
     task.add_argument('--interrupted-attempt', action='append', default=[],
                       help='Explicitly audited historical interruption ID; other non-success attempts fail')
     args = parser.parse_args()

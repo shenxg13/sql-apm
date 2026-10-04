@@ -1509,15 +1509,298 @@
     }
   },
   "equivalence": {
-    "completed": false
+    "completed": true,
+    "exit_code": 0,
+    "artifact_sha256": "dae55753ba8b97eb07674bed6442c205865af1245aa73acd35b788692188da16",
+    "counts": {
+      "ascii": 1148686,
+      "inputs": 1497418,
+      "non_ascii": 348732,
+      "normalization_equal": 1497418,
+      "scan_equal": 1497418,
+      "scan_error": 2876,
+      "scan_tokens": 1494542
+    },
+    "differences": [],
+    "fallbacks": {
+      "invalid_encoding": 224,
+      "scanner_error": 1036
+    },
+    "latest_session_seconds": 733.5042547850026,
+    "passed": true,
+    "provenance": {
+      "chunk_size": 500,
+      "code_sha256": {
+        "sql_apm/diagnostics/scanning_equivalence.py": "7feba70f2c6536932454634da7ef710d11225ac4ee85bb8415f376507ef98693",
+        "sql_apm/sql/__init__.py": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+        "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+        "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+        "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+        "sql_apm/sql/mpp_parser.py": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339",
+        "sql_apm/sql/normalization.py": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0",
+        "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+        "sql_apm/sql/scanning.py": "2043c20f67f07fa97026b84ed710ec72c7894a3aee1ee791a666464d7ffafc53",
+        "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+        "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c"
+      },
+      "context": {
+        "algorithm_version": "sql-normalization/5",
+        "dictionary_digest": "74ee855341d41f9fb6df217bd351222806f0f11a8c19d2d2b777138f9c824f45",
+        "dictionary_rules_version": "1.0.1",
+        "dictionary_schema_version": 1,
+        "parser_dependency": "pglast/7.18",
+        "parser_version": "mpp-adapter/9",
+        "profile": "hashdata-pg94",
+        "rules_digest": "00a3d088002566d01a3bbf9aff64619452116c7a8dcf32a6ae4b489342c46a58",
+        "rules_ref": "sha256:cb1e23a966095b526c9c337b2125f65d3521692c473796b179fb038f4f400528"
+      },
+      "format": "scanning-equivalence/1",
+      "inputs": 1497418,
+      "mode": "full results; no reference timeout",
+      "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.34",
+      "python": "3.9.5",
+      "reference_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+      "source_sha256": "b50c2e2660dab8c4d22f9c1e90a1640555c4caadcc0ed96589dcc97f46db59b2"
+    },
+    "states": {
+      "reliable": 1486516,
+      "unsupported_syntax": 10902
+    },
+    "summed_worker_seconds": 5840.262427720983
   },
   "performance_eight": {
-    "completed": false,
-    "selection_sha256": "70cfb21708570d075265ed9a10abe193c7fb34027ed36e0c0b391fe9f5c0daed"
+    "completed": true,
+    "exit_code": 0,
+    "artifact_sha256": "edeb683a4e25d44e11ab7a47b507849d7399fa887e9f5a96687cb7bff840efe8",
+    "candidate_sha256": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339",
+    "method": "measured; single process; alternating old/new complete parse; no product timeout",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.34",
+    "python": "3.9.5",
+    "reference_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+    "repetitions": 3,
+    "samples": [
+      {
+        "after_seconds": [
+          0.0352572580013657,
+          0.030676556008984335,
+          0.035848119005095214
+        ],
+        "before_seconds": [
+          2.5480520730052376,
+          2.7337902930012206,
+          2.773008442003629
+        ],
+        "bytes": 53379,
+        "characters": 30741,
+        "id": 33452,
+        "non_ascii": 11319,
+        "sha256": "903613652d815607ab072fd08ceb968b7d72a5177502fe435dff954cdd19c17f",
+        "structure_sha256": "19efa3e063297307ad49be808afca7683d11948977f6db3320dc8918325ece02"
+      },
+      {
+        "after_seconds": [
+          0.034934776995214634,
+          0.034829853000701405,
+          0.03473219499574043
+        ],
+        "before_seconds": [
+          2.783720262988936,
+          2.7612133450020337,
+          2.7623161670053378
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 33769,
+        "non_ascii": 11319,
+        "sha256": "e448ab39f086eb4b52741050d5ad12f7ce54eff2502d2fdfb5ccf6197de57bc0",
+        "structure_sha256": "d2b4016f548b85c85d546c2e15030f4104b2550cde5bc21e14072746324dac20"
+      },
+      {
+        "after_seconds": [
+          0.03074227499018889,
+          0.03542595599719789,
+          0.034369097993476316
+        ],
+        "before_seconds": [
+          2.78548174900061,
+          2.78557564401126,
+          2.755972772007226
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 193204,
+        "non_ascii": 11319,
+        "sha256": "2107b8dd46aa8d45811f55bb978e96a7dab7c6ac1cbc1316bb41de4bdd9b9519",
+        "structure_sha256": "65be331435e3e55f347962ad10d2c4e436bc78f841bcd1ba369cae5fed448607"
+      },
+      {
+        "after_seconds": [
+          0.035256040006061085,
+          0.03047546200104989,
+          0.03051988998777233
+        ],
+        "before_seconds": [
+          2.778105225006584,
+          2.7953065330075333,
+          2.7730339700065088
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 221627,
+        "non_ascii": 11319,
+        "sha256": "5eef99587359d02609e8ca3af6622e2611859728dda2fcaa5ff5ed4b4203697f",
+        "structure_sha256": "3e81fffa7d2cf2e65cfc958023e00d9b13f51db25b6384b18fbee2c3c630eb9e"
+      },
+      {
+        "after_seconds": [
+          0.03501850800239481,
+          0.03511604300001636,
+          0.03582316599204205
+        ],
+        "before_seconds": [
+          2.777080988002126,
+          2.77058929100167,
+          2.797725028998684
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 33638,
+        "non_ascii": 11319,
+        "sha256": "c0575572da3547f9267b917b1248739fd6f3f96eeb8d11ade19f38c882aa556d",
+        "structure_sha256": "cd71d12288f5b51d0131fc53889858a881c4d558b91617e61f3fcb859d93f87c"
+      },
+      {
+        "after_seconds": [
+          0.030569202994229272,
+          0.035705512011190876,
+          0.035094302002107725
+        ],
+        "before_seconds": [
+          2.798611706995871,
+          2.7687285100109875,
+          2.7933029230043758
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 64349,
+        "non_ascii": 11319,
+        "sha256": "98898d2de500291290642527cd53e186b1913ee5656489fd597020828a599370",
+        "structure_sha256": "ffb362602a1902310c5187509b8f633c1ec078225b50e9614d695d237b6bb8d8"
+      },
+      {
+        "after_seconds": [
+          0.03522257899749093,
+          0.034758957001031376,
+          0.030246184003772214
+        ],
+        "before_seconds": [
+          2.779906165000284,
+          2.767354178999085,
+          2.765213443999528
+        ],
+        "bytes": 53438,
+        "characters": 30800,
+        "id": 197559,
+        "non_ascii": 11319,
+        "sha256": "8b486a1757163789e2b6a549cd504a0b8696087bbfd6cd959aa2132f35e0f75a",
+        "structure_sha256": "21a2f04b064c191eb2e39361b72034e380a31b3608ffe294d4669af5e46bfa92"
+      },
+      {
+        "after_seconds": [
+          0.03614776799804531,
+          0.03496508000534959,
+          0.03449206499499269
+        ],
+        "before_seconds": [
+          2.7934219439921435,
+          2.776737009000499,
+          2.7873052909999387
+        ],
+        "bytes": 53440,
+        "characters": 30802,
+        "id": 197169,
+        "non_ascii": 11319,
+        "sha256": "5b1c5032c71d41a5763066fda9024eb002b94d6354d8fc28c5ad05633a22c271",
+        "structure_sha256": "533fd92a1c3602eafc30203eb73708701eca8113eaf90412dbb1dbb3be93530f"
+      }
+    ],
+    "scanner_sha256": "2043c20f67f07fa97026b84ed710ec72c7894a3aee1ee791a666464d7ffafc53",
+    "selection": {
+      "confirmation": "https://github.com/shenxg13/sql-apm/issues/34#issuecomment-5977015737",
+      "method": "Issue #34 P4 confirmed 2026-10-04: 119 first-batch occurrences; 53379..53440 bytes; sort (byte length, raw bytes); positions round(n*328/7), n=0..7; historical eight not identifiable",
+      "samples": [
+        {
+          "bytes": 53379,
+          "characters": 30741,
+          "id": 33452,
+          "non_ascii": 11319,
+          "sha256": "903613652d815607ab072fd08ceb968b7d72a5177502fe435dff954cdd19c17f"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 33769,
+          "non_ascii": 11319,
+          "sha256": "e448ab39f086eb4b52741050d5ad12f7ce54eff2502d2fdfb5ccf6197de57bc0"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 193204,
+          "non_ascii": 11319,
+          "sha256": "2107b8dd46aa8d45811f55bb978e96a7dab7c6ac1cbc1316bb41de4bdd9b9519"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 221627,
+          "non_ascii": 11319,
+          "sha256": "5eef99587359d02609e8ca3af6622e2611859728dda2fcaa5ff5ed4b4203697f"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 33638,
+          "non_ascii": 11319,
+          "sha256": "c0575572da3547f9267b917b1248739fd6f3f96eeb8d11ade19f38c882aa556d"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 64349,
+          "non_ascii": 11319,
+          "sha256": "98898d2de500291290642527cd53e186b1913ee5656489fd597020828a599370"
+        },
+        {
+          "bytes": 53438,
+          "characters": 30800,
+          "id": 197559,
+          "non_ascii": 11319,
+          "sha256": "8b486a1757163789e2b6a549cd504a0b8696087bbfd6cd959aa2132f35e0f75a"
+        },
+        {
+          "bytes": 53440,
+          "characters": 30802,
+          "id": 197169,
+          "non_ascii": 11319,
+          "sha256": "5b1c5032c71d41a5763066fda9024eb002b94d6354d8fc28c5ad05633a22c271"
+        }
+      ],
+      "selection_population": 329
+    },
+    "selection_sha256": "70cfb21708570d075265ed9a10abe193c7fb34027ed36e0c0b391fe9f5c0daed",
+    "structures_equal": true
   },
   "kylin_first_batch": {
     "completed": false,
-    "reason": "awaiting_ssh_handoff"
+    "reason": "awaiting_ssh_handoff",
+    "observed_connection_failure": "Could not resolve hostname sql-apm-01",
+    "missing": [
+      "reachable_ssh_address",
+      "username",
+      "existing_authentication_method",
+      "isolated_test_directory"
+    ]
   },
   "audit_tool_repair": {
     "exception": "RecursionError",

@@ -169,12 +169,13 @@ var/issue31/build-venv/bin/python -m pip --isolated --disable-pip-version-check 
   -r scripts/deployment/build-requirements.txt
 var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
   --commit "$APM_BUILD_COMMIT" --version v0.1.0 --kind candidate \
-  --output "$APM_DELIVERY_DIR/release" \
-  --previous-program var/issue31/offline-bundle/program.tar.gz
+  --output "$APM_DELIVERY_DIR/release"
 ```
 
 预期：代码和制包工具已提交，以完整提交号区分交付目录，输出目录原先不存在；产生精简 `app/`、独立 `verification/`、
-两个压缩包及摘要、`build-result.json` 和 `product-files-comparison.json`。
+两个压缩包及摘要和 `build-result.json`。#33 使用已确认的 T7／T8 等价与首批验证；
+若额外指定 `--previous-program`，会产生 `product-files-comparison.json` 并在产品文件不同时停止，
+该选项仅用于申请继承原九任务证据的严格相等检查。
 逐文件产品比较 `all_equal=true` 才能继承原九任务证据。任何不同都需说明和补验，
 不能修改原基准来通过。`app/INSTALL.html` 是单文件手册；浏览器人工体验仍需记录。
 

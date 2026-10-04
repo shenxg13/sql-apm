@@ -35,11 +35,12 @@ APM_DELIVERY_DIR="$PWD/var/issue31/deliveries/$APM_BUILD_COMMIT"
 var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
 var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
   --commit "$APM_BUILD_COMMIT" --kind candidate --version v0.1.0 \
-  --output "$APM_DELIVERY_DIR/release" \
-  --previous-program var/issue31/offline-bundle/program.tar.gz
+  --output "$APM_DELIVERY_DIR/release"
 ```
 
-`--previous-program` 指向保留的原试跑程序归档，逐一比较候选产品文件（含规则、SQL
+可选 `--previous-program` 是原九任务证据继承的严格相等门禁；#33 已确认改变产品文件，
+上述制包命令不使用该选项，而是执行本 Issue 的 T7／T8 验证。该选项指向保留的原试跑
+程序归档，逐一比较候选产品文件（含规则、SQL
 历史版本、依赖清单、初始化脚本）同路径摘要。`all_equal=true` 才支持 K8／K9 证据继承，
 原九任务本身的记录不改；新包安装、自检、119 首批和 HTML 人工确认仍需实际完成。
 差异报告只含路径与摘要，不含业务日志或凭据。

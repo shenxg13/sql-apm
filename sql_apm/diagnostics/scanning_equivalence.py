@@ -20,6 +20,7 @@ import time
 from pglast import parser
 
 from sql_apm.sql import mpp_parser, normalization, scanning
+from sql_apm.sql.structure import dumps
 
 ROOT = Path(__file__).resolve().parents[2]
 _STATE = None
@@ -60,6 +61,12 @@ def scan_result(function, sql):
     except (parser.ParseError, UnicodeError) as error:
         # Compare original error details in memory only (they can contain SQL).
         return ('error', type(error).__name__, error.args)
+
+
+def equal_results(before, after):
+    # Native dict/list equality recurses and fails on valid deep SQL trees.
+    # Compare complete canonical bytes with the project's stack-based encoder.
+    return dumps(before) == dumps(after)
 
 
 def compare_chunk(bounds):
@@ -105,7 +112,7 @@ def compare_chunk(bounds):
         after = engine.normalize(raw)
         # Stronger than fingerprints alone: includes context, complete structure,
         # reasons, approximate result and diagnostics as well as source metadata.
-        if before != after:
+        if not equal_results(before, after):
             counters['normalization_differences'] += 1
             differences.append(dict(id=uid, kind='normalization', sha256=expected_sha))
         else:
@@ -182,6 +189,7 @@ if __name__ == '__main__':
         cli.error('positive chunk size required')
     try:
         raise SystemExit(run(args))
-    except Exception:
-        print(json.dumps(dict(phase='failed', reason='equivalence_audit_failed')), flush=True)
+    except Exception as error:
+        print(json.dumps(dict(phase='failed', reason='equivalence_audit_failed',
+                              exception_class=type(error).__name__)), flush=True)
         raise SystemExit(1) from None

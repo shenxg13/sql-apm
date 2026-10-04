@@ -50,7 +50,7 @@
   },
   "synthetic": {
     "unit_tests": 66,
-    "parser_tests": 197,
+    "parser_tests": 199,
     "publication_checks": 33,
     "storage_and_migrations_passed": true
   },
@@ -1518,5 +1518,14 @@
   "kylin_first_batch": {
     "completed": false,
     "reason": "awaiting_ssh_handoff"
+  },
+  "audit_tool_repair": {
+    "exception": "RecursionError",
+    "input_id": 313026,
+    "fix": "compare complete canonical JSON using stack-based encoder",
+    "failed_input_replay_equal": true,
+    "deep_regression_tests": 2,
+    "old_run_counts_excluded": true,
+    "final_diagnostic_workers": 8
   }
 }

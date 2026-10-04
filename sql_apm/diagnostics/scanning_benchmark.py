@@ -8,7 +8,7 @@ import sqlite3
 import sys
 import time
 
-from sql_apm.diagnostics.scanning_equivalence import sha256, save
+from sql_apm.diagnostics.scanning_equivalence import equal_results, sha256, save
 from sql_apm.sql import mpp_parser
 from sql_apm.sql.structure import dumps
 import hashlib
@@ -41,7 +41,7 @@ def run(args):
                 started = time.perf_counter()
                 current = mpp_parser.parse(sql)
                 after.append(time.perf_counter() - started)
-                if previous != current:
+                if not equal_results(previous, current):
                     raise ValueError('parse_structure_difference')
             rows.append(dict(id=sample['id'], sha256=record[0], bytes=len(record[1]),
                              characters=len(sql), non_ascii=sum(not c.isascii() for c in sql),

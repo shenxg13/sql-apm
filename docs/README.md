@@ -45,7 +45,7 @@
 | [SQL 近似指纹接口与边界](design/sql-approximate.md) | 接口说明 | 观察用词法归一化、原文保留、近似结果隔离及命令。 |
 | [离线基线逻辑数据契约](../.project-wiki/contracts/offline-data-contract.md) | 设计说明 | 三个交接边界、对象关系、身份、训练、统计、发布与演进约束。 |
 | [契约字段字典](design/offline-data-contract/fields.md) | 设计说明 | 字段类型、必填与空值、枚举、引用和全部统计指标。 |
-| [HashData 来源映射](design/offline-data-contract/hashdata-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
+| [MPP 来源映射](design/offline-data-contract/mpp-mapping.md) | 设计说明 | 30 列输入与五类计时映射，观察、推导及未知信息的边界。 |
 | [契约样例与需求对应](design/offline-data-contract/README.md) | 设计说明 | 需求到设计条款及正反样例的对应、合成数据与核对方法。 |
 | [构建编排与发布](design/build-publication.md) | 设计／已实现接口 | 集群任务、恢复、六项检查、覆盖推导和原子发布。 |
 | [统计计算设计](design/baseline-statistics.md) | 设计／已实现接口 | 正式及观察五层统计、分区自然键、原子保存与失败恢复。 |
@@ -119,14 +119,14 @@
 | [MPP 解析器扩展验证](reports/mpp-expanded-validation-2026-09-27.md) | 分析证据 | 新形态有界抽样、混合 ALTER 结构丢失修复、格式参数及 ROW 兼容、回归与剩余缺口。 |
 | [MPP 解析适配与 Hint 原型验证](reports/mpp-adapter-probe-2026-09-27.md) | 分析证据 | 显式 MPP 扩展节点、Hint 锚点、格式回归及同组日志重放，保留原型限制。 |
 | [MPP SQL 解析器结构保真探测](reports/parser-fidelity-2026-09-27.md) | 分析证据 | 两个候选的固定版本、MPP 语法／Hint／函数保真缺口、合成核对与有界重放。 |
-| [HashData 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
+| [MPP 日志事实与证据边界](../.project-wiki/contracts/log-evidence.md) | 分析证据 | 已知日志配置、样本来源、调查结果及其适用限制。 |
 | [PostgreSQL 结构 R1 整改验证](reports/postgresql-storage-r1-remediation-2026-09-26.md) | 分析证据 | 外键内部触发器模式漂移的复现、轻量目录检查及恢复／迁移回归。 |
 | [MPP 结构升级验证](reports/mpp-storage-migration-2026-09-26.md) | 分析证据 | 1.0.0 到 1.1.0 的数据／对象保留、失败回滚、重跑和自定义名称验证。 |
 | [近似观察存储 1.2.0 验证](reports/approximate-storage-2026-09-29.md) | 实施验证报告 | 升级、隔离和全部10,902条 v5 拒绝的接口往返；不含 SQL 原文。 |
 | [PostgreSQL 结构验证](reports/postgresql-storage-2026-09-26.md) | 分析证据 | 临时 PG17 实例的存储约束、真实账号、重跑和清理实测。 |
 | [语句类别黑名单核查（2026-09-26）](reports/statement-category-census-2026-09-26.md) | 分析证据 | 全部日志的类别、别名及异常覆盖，保守名单依据与合成规则验收。 |
 | [119、120 集群日志分析（2026-09-24）](reports/cluster-log-analysis-2026-09-24.md) | 分析证据 | 两组日志的覆盖、格式、SQL 文本及计时分类观察。 |
-| [HashData duration 源码位置核查（2026-09-24）](reports/hashdata-duration-source-mapping-2026-09-24.md) | 分析证据 | 请求、Execute、Parse、Bind 的计时解释及上游源码对照边界。 |
+| [MPP duration 源码位置核查（2026-09-24）](reports/hashdata-duration-source-mapping-2026-09-24.md) | 分析证据 | 请求、Execute、Parse、Bind 的计时解释及上游源码对照边界。 |
 | [生产 SQL 日志样本分析（2026-09-23）](reports/production-log-analysis-2026-09-23.md) | 分析证据 | 早期生产样本的覆盖范围、文本缺失、编码和多语句现象。 |
 | [测试日志文本与绑定参数核查（2026-09-23）](reports/sql-log-text-verification.md) | 分析证据 | 两份测试日志中的 SQL 文本、占位参数和相关记录。 |
 | [Python 3.9.5 环境验证（2026-09-25）](reports/python-environment-2026-09-25.md) | 分析证据 | 本地解释器、虚拟环境及标准库检查的实测记录。 |
@@ -168,3 +168,9 @@
 新增、移动、删除面向人的文档或改变文档用途时，同步本页对应链接与导读；
 详细规则见[知识维护方法](../.project-wiki/methods/knowledge-maintenance.md)。
 本页保存阅读导航，需求、设计、操作步骤和 Issue 状态由各自正文或在线任务维护。
+
+## MPP 命名升级证据
+
+| 文档 | 类型 | 用途 |
+| --- | --- | --- |
+| [MPP 来源标识统一验收](reports/mpp-naming-2026-10-05.md) | 验证报告 | 结构迁移、字典不变、55 文件分组与统计等价及 Kylin 首批证据边界。 |

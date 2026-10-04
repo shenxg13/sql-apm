@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-fingerprints.md
-updated: 2026-10-01
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: docs/reports/sql-normalization-v5-2026-09-29.md
@@ -22,7 +24,7 @@ sources:
     status: current
   - path: rules/functions/v1.json
     status: historical
-  - path: rules/functions/v1.0.1.json
+  - path: rules/functions/v1.0.2.json
     status: current
   - path: docs/reports/function-dictionary-2026-09-25.md
     status: historical
@@ -71,7 +73,7 @@ confidence: high
 已确认的常量、参数、对象名、配置值与注释规则统一用于导入和 SQL 检索。
 实现指纹、函数字典或 SQL 输入检索匹配时阅读。
 
-适用范围：以下为首期 HashData 契约；设计后续来源接入时，参照
+适用范围：以下为首期 MPP 契约；设计后续来源接入时，参照
 [多类型系统接入约束](../decisions/project-scope.md#已确认的多类型系统接入扩展约束)。
 
 ## Source Of Truth
@@ -96,7 +98,7 @@ confidence: high
 - 数据库读写、生产日志导入及计时配对、基线计算与发布留给后续任务；导入、
   基线构建和 SQL 检索复用这一模块。输入输出及版本依据遵循
   [离线数据契约](offline-data-contract.md#c06归一化与分组)，本模块无须连接数据库。
-- 以 MPP（HashData）及现有 119／120 日志为依据，覆盖常见查询、写入、DDL 和
+- 以 MPP及现有 119／120 日志为依据，覆盖常见查询、写入、DDL 和
   多语句批次，交付具体语法支持清单及正反用例；不能只实现 SELECT 示例，也不
   承诺所有数据库方言。关键语法若无法可靠支持，须明确提出范围调整，不能仅将
   必需形式列为不支持就声称完成验收。已有词法类别调查不是完整语法支持证据。
@@ -394,7 +396,7 @@ confidence: high
   确认首版保守保留 Hint 内容及所在位置，内容不同允许产生不同指纹，不尝试判断
   不同 Hint 写法是否等价；无法可靠保留时返回诊断，不产生可靠指纹。
   位置记录仍须满足普通排版差异不改变指纹的既有规则。具体识别边界与保留方式
-  由实现和正反用例落实；不构成现网 HashData 已启用任何特定 Hint 扩展的断言。
+  由实现和正反用例落实；不构成现网 MPP 已启用任何特定 Hint 扩展的断言。
 - 上述处理用于指纹比较，不改写原始日志；SQL 原文按上述另行确认的完整内容
   精确去重保存，不用格式或常量归一化结果替代原文，具体留存期限仍待定。
 
@@ -577,3 +579,11 @@ R3 发现 PG 合成常量缺少源位置时，负号映射误拒绝有效 SQL，
 最终指纹编码、具体 Hint 识别和支持矩阵已按上述首版实现落实，后续按版本维护。
 现场扩展清单仍未完整核实。函数规则按上述字典执行；较早条款中的函数字典待定
 描述以本页后续实现及其明确边界为准。
+
+## MPP profile 与字典版本（2026-10-05）
+
+[Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 使用 `mpp-sql` 和函数字典 1.0.2；
+除 profile、rules_version 外，规则与历史 1.0.1 逐条相同，原文件保持原字节。
+归一化与近似算法版本不变，但 profile／字典摘要参与哈希，指纹值、分组和相关 ID 会变化。
+当前加载器拒绝旧 profile；历史算法重放须使用对应历史提交。新旧对应及系统组成见
+[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)。

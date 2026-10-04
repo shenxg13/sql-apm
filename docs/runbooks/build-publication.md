@@ -92,7 +92,7 @@ mpp_build_group／mpp_build_observation_group；次月可选预建通过 NOWAIT 
 .venv/bin/python scripts/db/verify_publication.py
 .venv/bin/python scripts/db/verify.py
 .venv/bin/python scripts/db/verify_publication_full.py \
-  --root raw/inbox/hashdata --output var/publication-fresh
+  --root raw/inbox/mpp --output var/publication-fresh
 ```
 
 前两个命令创建并自动清理私有 PG17，合成用例涵盖故障注入、真实进程强杀、连接失效、

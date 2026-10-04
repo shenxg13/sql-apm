@@ -10,8 +10,10 @@ owners:
   - scripts/db/
   - tests/database/
   - scripts/deployment/
-updated: 2026-10-04
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/31
@@ -83,7 +85,7 @@ sql-apm/
 │   ├── cli/                    # 已有：导入、训练快照、统计参数和薄调用
 │   ├── contracts/              # 后续：跨模块数据对象与约束
 │   ├── ingestion/              # 已有：批次、来源追踪、异常处理
-│   │   └── hashdata/           # 已有：来源日志解析与计时解释
+│   │   └── mpp/           # 已有：来源日志解析与计时解释
 │   ├── sql/
 │   │   ├── __init__.py
 │   │   ├── function_dictionary.py
@@ -124,11 +126,11 @@ sql-apm/
 - `contracts/` 后续承载跨模块的数据对象与约束，遵循
   [离线数据契约设计](../contracts/offline-data-contract.md)；当前交付文档及合成样例，
   尚未创建该产品子包或运行时校验器。
-- `ingestion/hashdata/` 封装 HashData 特有格式、对象识别和计时解释；通用导入流程
+- `ingestion/mpp/` 封装 MPP 特有格式、对象识别和计时解释；通用导入流程
   管理批次、来源和异常。来源数据经明确契约进入后续处理。
 - `sql/` 只负责 SQL 专属处理；非 SQL 来源接入基线无需生成 SQL 指纹。
 - `baseline/` 消费约定的数据对象，负责可复用统计及构建能力；来源特有的分组、
-  资格和耗时解释必须有独立约定，不把 HashData 五类计时强加给所有未来来源。
+  资格和耗时解释必须有独立约定，不把 MPP 五类计时强加给所有未来来源。
 - `storage/` 集中数据库读写与事务；规则和统计计算不直接执行数据库操作，
   由上层流程组织读取、计算和保存。
 - `diagnostics/` 放可复用诊断逻辑；当前词法候选探测是诊断用途，不作为完整解析器。
@@ -236,8 +238,8 @@ v4→v5 投影位于 `diagnostics/normalization_v5_audit.py`；两类新位置�
 ## 已实现的导入边界
 
 Issue #18 新增 `ingestion/config.py`、`ingestion/importer.py`、`ingestion/normalizing.py` 和
-`ingestion/hashdata/reader.py`，分别负责登记、文件／批次、受限归一化和来源解释。
-`ingestion/hashdata/persistence.py` 保存 HashData 原始字段到 MPP 表的映射，通用文件流程不解释列号。
+`ingestion/mpp/reader.py`，分别负责登记、文件／批次、受限归一化和来源解释。
+`ingestion/mpp/persistence.py` 保存 MPP 原始字段到 MPP 表的映射，通用文件流程不解释列号。
 `storage/ingestion.py` 负责 PostgreSQL 连接、COPY、精确原文和近似写入；
 `cli/ingest.py` 与 `__main__.py` 是薄命令入口。产品模块不依赖 diagnostics 或 tests。
 [设计](../../docs/design/log-ingestion.md)和[操作说明](../../docs/runbooks/log-ingestion.md)
@@ -320,3 +322,10 @@ HTML；`build_bundle.py` 把同一程序与源码／wheel／RPM 组装为内网�
 
 具体跨模块字段、存储接口、统一 CLI 参数及包发布方式在对应 Issue 中落实；
 `src` 布局尚未采用。这些事项不阻塞当前两模块迁移。
+
+## MPP 命名边界（2026-10-05）
+
+依据 [Issue #33](https://github.com/shenxg13/sql-apm/issues/33)，来源解释包现为
+`ingestion/mpp/`，映射文档现为 `docs/design/offline-data-contract/mpp-mapping.md`；
+默认日志位置为 `raw/inbox/mpp/`，应用不自动移动文件。统一命名和系统组成见
+[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)，函数规则的默认文件为 1.0.2。

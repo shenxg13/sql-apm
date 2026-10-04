@@ -11,7 +11,7 @@
 | --- | --- |
 | [逻辑契约](../../../.project-wiki/contracts/offline-data-contract.md) | C01–C11 关系、一致性、身份、统计、发布和演进约束 |
 | [字段字典](fields.md) | 类型、必填／空值、枚举、引用、全部指标和状态 |
-| [HashData 来源映射](hashdata-mapping.md) | 30 列来源、五类计时、关联证据、已观察／推导／未知边界 |
+| [MPP 来源映射](mpp-mapping.md) | 30 列来源、五类计时、关联证据、已观察／推导／未知边界 |
 | [合成样例](examples.json) | 完整基础实例与 76 个有输入和预期的正反场景 |
 | [设计验证记录](verification.md) | 实际检查证据及其限制，区别于后续产品验收 |
 

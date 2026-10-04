@@ -74,6 +74,24 @@ def prepare(args):
     print(json.dumps(dict(verified_files=len(hashes), batches=sum(map(len, batches.values())))))
 
 
+def mpp_identifiers(cur):
+    """Only versioned identifiers are exported, never source SQL identities."""
+    identifiers = {}
+    for table, column, expected_value in (
+        ('scope', 'system_kind', 'mpp'), ('scope', 'profile', 'mpp-csv/1'),
+        ('analysis', 'mapping_version', 'mpp-mapping/1'),
+        ('analysis', 'parser_version', 'mpp-csv-reader/1'),
+        ('mpp_fingerprint', 'profile', 'mpp-csv/1'),
+        ('mpp_normalization', 'dictionary_rules_version', '1.0.2'),
+        ('config_snapshot', 'profile', 'mpp-csv/1'), ('build', 'profile', 'mpp-csv/1')):
+        cur.execute('SELECT DISTINCT ' + column + ' FROM ' + table + ' ORDER BY 1')
+        values = [row[0] for row in cur]
+        identifiers[table + '.' + column] = values
+        if values != [expected_value]:
+            raise ValueError('unexpected_mpp_identifier')
+    return identifiers
+
+
 def footprint(db, root):
     with db.cursor() as cur:
         cur.execute('SELECT pg_database_size(current_database())')
@@ -168,6 +186,7 @@ def run_task(args):
             observed['import_attempts'] = after_attempts['total']
             cur.execute('SELECT stage_seconds FROM task WHERE task_id=%s', (payload['task_id'],))
             stages = cur.fetchone()[0]
+            identifiers = mpp_identifiers(cur)
         queries = {}
         for action in ('status', 'history'):
             result = subprocess.run([sys.executable, '-m', 'sql_apm', action, '--cluster', cluster],
@@ -202,6 +221,7 @@ def run_task(args):
                                                 allowed_interrupted=args.interrupted_attempt,
                                                 baseline_successful=expected['import_attempts']),
                       normalization_timeouts=normalization_timeouts,
+                      identifiers=identifiers, identifiers_verified=True,
                       passed=passed, baseline_sha256=sha256(BASELINE), program_verification=package)
         save(args.records / (stem + '.json'), record)
         print(json.dumps(dict(cluster=cluster, step=step, passed=passed, seconds=record['seconds'],

@@ -301,3 +301,14 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 - [运行环境主题](decisions/runtime-and-components.md#open-questions)、发布说明和记录模板同步默认四进程首批的实际产出及失败停止边界；Issue #31 原包的历史单进程证据保留。
 - 修复包重新完成两机默认四进程首批：零超时、全部 Alma 计数及版本链相同，Kylin 1,123.731 秒；来源与适用范围见 [R1 整改报告](../docs/reports/sql-scanning-r1-remediation-2026-10-04.md)。
 - 全量 1,497,418 条分词和完整归一化重新比较，差异为 0；20 万条合成片段差分及固定八条性能重测通过，原始候选测量另行保留。
+
+## 2026-10-05：MPP 来源标识统一
+
+- 按 [Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 的确认统一正文、模块和来源标识，
+  [系统称谓](decisions/project-scope.md#已确认的生产系统称谓)集中维护组成版本和新旧对照。
+- 结构 1.7.0 仅允许旧空库升级，有数据须重建；逻辑契约仍为 1.0.0。
+  默认函数字典 1.0.2 仅变更 profile 和自身版本，旧字典、DDL 与迁移保持原字节。
+- 适配包和映射文档改为 `mpp`，默认日志目录及手工改名步骤见
+  [导入说明](../docs/runbooks/log-ingestion.md#mpp-命名升级与日志目录)。
+- [验收报告](../docs/reports/mpp-naming-2026-10-05.md)记录验证证据和待完成项；
+  GitHub Issue／PR 继续维护交付状态。

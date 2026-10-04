@@ -82,7 +82,7 @@ def verify_current_triggers(v, runner):
                        "'::regnamespace ORDER BY oid")
 
         v.init(names=names)
-        sql("INSERT INTO scope VALUES ('TRIGGER_SCOPE','hashdata','hashdata-csv/1','1.0.0'); "
+        sql("INSERT INTO scope VALUES ('TRIGGER_SCOPE','mpp','mpp-csv/1','1.0.0'); "
             "INSERT INTO source VALUES ('TRIGGER_SOURCE','TRIGGER_SCOPE','map','build','UTC+08:00','synthetic')")
         verify_trigger_modes(v, names, runner, state)
     print("RESULT: " + str(v.completed) + " FK trigger compatibility checks passed", flush=True)

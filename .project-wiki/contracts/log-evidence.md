@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/log-evidence.md
-updated: 2026-09-29
+updated: 2026-10-05
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/18
     status: current
@@ -23,9 +23,13 @@ related:
 confidence: high
 ---
 
-# HashData 日志事实与证据边界
+# MPP 日志事实与证据边界
 
 ## Summary
+
+历史观察中的 `raw/inbox/hashdata/` 保留原路径；#33 后约定目录改为
+`raw/inbox/mpp/`，各环境按[导入手册](../../docs/runbooks/log-ingestion.md)手工改名。
+系统组成版本以[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)为准。
 
 区分用户提供的环境事实、样本观察与源码推断；这些证据不是解析器验收。
 调查日志格式、来源行号或解释现有样本覆盖时阅读。
@@ -80,7 +84,7 @@ confidence: high
   记录的最低时长门槛；`log_statement = all` 另行记录语句，文本不一定在耗时
   消息中重复。扩展协议各阶段可分别计时，因此该配置仍不能证明一条 duration
   就是一条业务 SQL 或整个多语句批次的完整耗时，CSV 字段的计时归属仍需验证。
-- 用户补充：生产 HashData 中单次 SQL 执行可能持续数小时，完成记录可能落入
+- 用户补充：生产 MPP 中单次 SQL 执行可能持续数小时，完成记录可能落入
   后续日志文件或导入批次。首期按下述已确认的时间估算假设取得开始时间，
   不以跨文件寻找开始记录为前提；其他执行关联及必要上下文的处理另行落实。
 - 日志记录范围与训练样本范围分别确定：SQL 黑名单继续生效，基本训练资格见下述
@@ -190,7 +194,7 @@ confidence: high
 > [七天补充观察](#120-集群七天补充观察2026-09-28)取代；旧报告和本节原文保留，
 > 其他配置、计时、来源推断及其限制仍按各自确认依据解释。
 
-- 来源状态：current；用户本轮确认两个集群均使用上述 HashData／GP／PG 版本，
+- 来源状态：current；用户本轮确认两个集群均使用[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)所列版本，
   以及 `log_duration=on`、`log_min_duration_statement=1min`、`log_statement=all`。
   各自来自单一 Master，文件已关闭并拷贝完整，CST 均为北京时间。没有直接
   查询源端配置；本轮提问未逐项重问 `log_min_error_statement`。
@@ -255,7 +259,7 @@ confidence: high
   因而显式 parse／bind 的条数不是各阶段调用总次数。
 - 上游每个协议消息重设 statement 起点，Execute 再更新 activity 的开始字段。
   不能仅凭 Parse／Bind 很长就断言必须累加阶段才能与 query_start 对齐。
-  HashData 同期 activity 尚未核验；保留 derived 标记及既定时间归属和首期
+  MPP 同期 activity 尚未核验；保留 derived 标记及既定时间归属和首期
   忽略 Parse／Bind 的假设，Simple Query 与 Execute 计时范围差异仍须注意。
 - 当前基本 SQL 分组仍是集群、数据库、用户和结构指纹四维；后续用户确认的
   Execute 首次／续取及 Parse／Bind 分类现已纳入下述五项统计分组。识别重点

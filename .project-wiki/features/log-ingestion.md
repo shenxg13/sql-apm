@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-10-04
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
@@ -36,7 +38,7 @@ confidence: high
 保存完整文件导入、来源登记、安全重试及按问题影响范围处理的要求。
 修改导入、文件识别、批次完整性或导入诊断时阅读。
 
-适用范围：以下为首期 HashData 契约；设计后续来源接入时，参照
+适用范围：以下为首期 MPP 契约；设计后续来源接入时，参照
 [多类型系统接入约束](../decisions/project-scope.md#已确认的多类型系统接入扩展约束)。
 
 ## Source Of Truth
@@ -79,7 +81,7 @@ confidence: high
   必属同一集群。既有日志关联的可靠性要求仍适用。
 - 来源未登记、来源不明确或映射不明确的文件先不导入，提示补充信息；完善
   归属后再按已有完整文件、批次和导入资格规则处理。
-- `hashdata-119`、`119-master-a` 仅是讨论中的命名示例，不代表已经创建登记项；
+- `mpp-119`、`119-master-a` 仅是讨论中的命名示例，不代表已经创建登记项；
   来源映射通过本地配置文件维护，JSON 格式、命令与持久化见本页首期实现。
   本条不改变现有安全重试要求；
   变更及部分重叠文件的首期处理见下文。
@@ -271,3 +273,11 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
 ## Open Questions
 
 任意中间重叠、跨文件 Execute 与其他来源适配不在当前实现保证内；留存期限、样本筛选、统计和发布仍按各负责主题落实。
+
+## MPP 命名版导入（2026-10-05）
+
+[Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 保持导入和计时行为，
+统一来源标识及适配包为[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)所列值。
+来源构建串与配置格式不变，当前适配器仅接受 `mpp-csv/1`；默认日志目录变为
+`raw/inbox/mpp/`。旧库须重建，日志目录和本地清单由操作者按
+[导入说明](../../docs/runbooks/log-ingestion.md#mpp-命名升级与日志目录)一次性改名。

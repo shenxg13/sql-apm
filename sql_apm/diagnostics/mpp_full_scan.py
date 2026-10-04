@@ -377,7 +377,7 @@ def report(db):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--root', type=Path, default=ROOT / 'raw/inbox/hashdata')
+    ap.add_argument('--root', type=Path, default=ROOT / 'raw/inbox/mpp')
     ap.add_argument('--evidence', type=Path, default=EVIDENCE)
     ap.add_argument('--database', type=Path, default=ROOT / 'var/parser-probe/full-scan.sqlite')
     ap.add_argument('--output', type=Path, required=True)

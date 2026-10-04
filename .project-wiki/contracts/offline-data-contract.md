@@ -5,8 +5,10 @@ status: active
 owners:
   - .project-wiki/contracts/offline-data-contract.md
   - docs/design/offline-data-contract/
-updated: 2026-10-01
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -21,7 +23,7 @@ sources:
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/3#issuecomment-5836680294
     status: current
-  - path: docs/design/offline-data-contract/hashdata-mapping.md
+  - path: docs/design/offline-data-contract/mpp-mapping.md
     status: current
 related:
   - feature.log-ingestion
@@ -44,7 +46,7 @@ confidence: high
 不表示解析器、存储、统计引擎或运行时校验器已实现。既有业务规则仍由所属主题页维护。
 
 阅读顺序：本文的关系及约束 → [字段字典](../../docs/design/offline-data-contract/fields.md)
-→ [HashData 映射](../../docs/design/offline-data-contract/hashdata-mapping.md)
+→ [MPP 映射](../../docs/design/offline-data-contract/mpp-mapping.md)
 → [需求对应与样例说明](../../docs/design/offline-data-contract/README.md)。
 
 ## Source Of Truth
@@ -59,7 +61,7 @@ confidence: high
 ### C01：类型、版本和缺失值
 
 每份交接数据声明 `contract_version` 和 `profile`。首期 profile 为
-`hashdata-csv/1`，含义限于已调查 HashData 构建，适用边界见来源映射。
+`mpp-csv/1`，含义限于已调查的 MPP 构建，适用边界见来源映射。
 对象引用使用不透明逻辑 ID，不规定 UUID、哈希或数据库主键算法。
 同类型 ID 在数据集内唯一；引用必须指向对应类型的对象，并满足所属集群、规则及版本约束。
 
@@ -68,7 +70,7 @@ confidence: high
 可省略的只有字典标为可选的补充证据。非有限数值、负耗时、悬空引用及相互矛盾的状态
 属于契约错误；源记录存在这些问题时保留证据和诊断，不伪造合法训练样本。
 
-时间使用带偏移的时间点；HashData 业务表示统一为 UTC+8，自然日及自然周按此计算。
+时间使用带偏移的时间点；MPP 业务表示统一为 UTC+8，自然日及自然周按此计算。
 耗时使用非负十进制毫秒，保留来源小数精度；样例用十进制字符串避免 JSON 浮点改写，
 这不是数据库类型或序列化框架的选择。计数为非负整数；比值和对数统计无单位。
 
@@ -182,7 +184,7 @@ Fingerprint 针对 `(sql_id, normalization_id, profile)` 返回可靠结果或�
 原有 v1 样例不代表近似验收，日志导入由 #18 实施、观察统计由 #27 实施；完整边界由
 [指纹主题](sql-fingerprints.md#已确认的观察用近似指纹)维护。
 
-HashData Group 的逻辑键仍为
+MPP Group 的逻辑键仍为
 `cluster_id + database + execution_user + fingerprint_value + timing_type`。
 `profile`、`normalization_id` 是解释上下文，阻止跨来源语义、跨规则版本误比较，
 不是新增业务聚合维度。同一版本同一上下文相同五项只能有一个 Group。
@@ -257,13 +259,19 @@ Publication 把计算、发布决定与当前指针分开：至少一类有样�
 未训练但可可靠归属的执行不删除，未知耗时显示未知；无归属问题从批次诊断查询。
 这些是数据引用约束，不定义服务 API、CLI 参数或 Grafana 页面。
 
-可复用的是证据、结果度量、统计范围和版本引用框架；HashData 的 SQL 对象、五项键、
+可复用的是证据、结果度量、统计范围和版本引用框架；MPP 的 SQL 对象、五项键、
 五类计时和门槛属于 profile。合成 `batch-job-example/1` 可使用作业定义／运行及自身耗时，
 通过独立对象身份和 `scope_id` 引用，不含 SQL、数据库或用户字段。
 示例不规定未来适配器、分组、训练资格、门槛、发布范围或真实性能要求，不能直接套用
-HashData 统计语义。来源改变必须另行确认 profile，不用任意标签把所有系统混成一组。
+MPP 统计语义。来源改变必须另行确认 profile，不用任意标签把所有系统混成一组。
 
 ### C11：兼容与演进
+
+2026-10-02 确认的 [Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 以
+`mpp-csv/1`／`mpp-sql` 替代旧 profile，含义、对象及字段类型不变，因此
+`contract_version` 保持 **1.0.0**。profile 是独立版本维度；旧解释不原地覆写，
+已有数据须在新库重导，当前代码拒绝旧 profile。新旧标识及系统组成统一引用
+[系统称谓](../decisions/project-scope.md#已确认的生产系统称谓)。
 
 | 版本 | 改变什么 | 不自动改变什么 |
 | --- | --- | --- |

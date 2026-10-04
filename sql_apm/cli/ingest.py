@@ -7,7 +7,7 @@ from sql_apm.ingestion.importer import Importer, emit
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='导入已确认完整的 HashData CSV 批次')
+    parser = argparse.ArgumentParser(description='导入已确认完整的 MPP CSV 批次')
     parser.add_argument('--config', required=True)
     parser.add_argument('--source', required=True)
     parser.add_argument('--batch', required=True)

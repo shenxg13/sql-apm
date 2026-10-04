@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-02
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -44,7 +46,7 @@ confidence: high
 
 ## Summary
 
-当前物理结构版本 1.6.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径。
+当前物理结构版本 1.7.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径。
 交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
 新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 尚未实现。
 
@@ -69,8 +71,8 @@ confidence: high
   26 张 MPP 专属表及其索引／约束使用 mpp_ 前缀，其他系统接入时再交付自身结构。
   原名清单、公共表残留 MPP 关联及边界见物理设计；不引入公共统计／分组表。
 - 冻结的 1.0.0／1.1.0／1.2.0／1.3.0／1.4.0／1.5.0 DDL 保持字节不变；upgrade 先完整校验各步旧结构及摘要，
-  一笔事务完成 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 或中间版本起步的升级，保留旧版本时间与业务数据。
-  新库直接登记 1.6.0；升级与新库使用同一目标 catalog 检查。
+  一笔事务完成 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 或中间版本起步的空库升级，保留旧版本登记时间；已有数据须重建。
+  新库直接登记 1.7.0；升级与新库使用同一目标 catalog 检查。
   需要维护窗口停写及串行操作，DDL 锁等待 5 秒，失败回滚后可重试，无自动降级。
 - 近似观察以独立规则、原字节、结果和证据／事件关联表保存。bytea 保留残片与非法编码，
   JSON 文本保留近似表示中的转义；规则和结构拒绝原因参与复用，事件次数不合并。
@@ -87,7 +89,7 @@ confidence: high
   项目 schema 专用于版本化对象；兼容表子集可补全，结构漂移明确失败。
   引用表及被引用表的外键内部触发器须保持默认 O 模式，D／R／A 均拒绝；
   仅核对系统目录，不自动启用触发器，也不证明异常期间写入的历史行有效。
-- 通用构建核心允许非 SQL profile 不具备 normalization_id；当前 HashData
+- 通用构建核心允许非 SQL profile 不具备 normalization_id；当前 MPP
   执行／指纹／分组／统计结构不冒充未来所有系统的共同模型。
 
 1.3.0 新增规则／原文缓存、输入解释清单和配置补充表；快照及缓存有不可变触发器。
@@ -145,3 +147,14 @@ Task 增加时间、阶段耗时、snapshot／statistics 模式及 snapshot／ch
 ## Open Questions
 
 导入事务与来源解析见 #18 设计；发布编排见 #29；留存清理由后续工作落实。
+
+## MPP 标识统一（2026-10-05）
+
+依据 [Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 的 2026-10-02 确认，
+1.7.0 使用[统一标识](../decisions/project-scope.md#已确认的生产系统称谓)，
+逻辑契约仍为 1.0.0，profile 独立于契约版本，语义与字段类型不变。
+1.6.0 的 DDL、此前迁移和旧字典保持原字节；空库可连续升级，已有导入数据的库必须
+重新初始化、重新导入和构建。入口在迁移前拒绝非空业务表，固定原因
+`mpp_naming_requires_empty_schema`，不执行旧 ID 换算。
+实施与验收见[物理设计](../../docs/design/postgresql-storage.md#170-来源标识统一)；
+原有带数据迁移保留测试针对冻结的 1.6.0，不能据此声称可带数据进入 1.7.0。

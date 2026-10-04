@@ -6,7 +6,7 @@
 
 ## 前提与调用
 
-先按[初始化说明](database-initialization.md#升级到-160)升级到 1.6.0，完成导入，
+先按[初始化说明](database-initialization.md#升级到-170)初始化 1.7.0（旧库有数据时须重建），完成导入，
 使用[训练快照命令](training-decisions.md)得到 input_id 与 config_id。
 继续使用相同 libpq 环境或 SQL_APM_DSN，不把密码写入命令或提交配置。
 
@@ -121,7 +121,7 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 
 ```bash
 .venv/bin/python scripts/db/verify_statistics_full.py \
-  --root raw/inbox/hashdata --output var/statistics/new-acceptance
+  --root raw/inbox/mpp --output var/statistics/new-acceptance
 ```
 
 输出目录必须新建；原始数据、配置、数据库和中间结果不提交。
@@ -149,7 +149,7 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 ```bash
 .venv/bin/python scripts/db/verify_observations.py
 .venv/bin/python scripts/db/verify_observations_full.py \
-  --root raw/inbox/hashdata --output var/observation-acceptance/new-run
+  --root raw/inbox/mpp --output var/observation-acceptance/new-run
 ```
 
 第二条显式重新导入 55 文件，在私有 PG17 以 119 截止 2026-07-31、120 截止 2026-09-19

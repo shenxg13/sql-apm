@@ -2,7 +2,7 @@
 
 [Issue #31](https://github.com/shenxg13/sql-apm/issues/31) 的演练手册，目标是 Kylin V10 SP2
 x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、PostgreSQL 17.10，
-应用版本为 `v0.1.0`，以预发布形式交付，不用于生产。#33 将修改落库标识，下一版需要
+应用版本为 `v0.1.0`，以预发布形式交付，不用于生产。#33 已将来源标识统一为 MPP，结构 1.7.0 需要
 全新数据库；0.x 预发布版本之间不保证数据库兼容。产品基准为包含 #29 的 main
 `6451d140d44f4e06cc34862c3e5aff7593d7afeb`；候选包的实施提交见 `PROGRAM_COMMIT`，
 文件摘要、产品基准和候选／发布类型见 `RELEASE.json`。应用版本不等于数据库结构版本。
@@ -29,6 +29,10 @@ x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、Pos
 独立部署复用已交付制品，按第 2 节末尾说明准备目录和 tar，执行第 3 节的传输、
 解包及校验，再从第 4 节的 yum 源路径继续完成全部构建、自检、初始化和九任务。
 不要在开发机已有的输出目录上重新执行制包命令。
+
+Issue #33 的增量验收适用第 10.2 节：复用已安装的系统依赖、Python 和 PostgreSQL，
+重建验证库后执行至少一个集群的首批完整流程。第 1–9 节继续作为全新部署说明，
+Issue #33 不要求重复裸机安装或原九任务。
 
 ## 1. 参数与前置检查
 
@@ -313,7 +317,7 @@ cd "$APM_APP"
   --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
 ```
 
-预期：PG17.10；普通测试 66 项、verify.py 共 266 个 PASS、分词修复版发布检查 33 项。
+预期：PG17.10；普通测试 69 项、verify.py 共 269 个 PASS、分词修复版发布检查 33 项。
 三个命令均退出 0，开头 `APPLICATION` 指向 `$APM_APP`；记录实际项数，不以文件存在代替通过。
 验收目录保存原合成测试及其探针，核心模块从精简 `app` 加载；不把测试或探针复制回 `app`。后两项自己创建私有临时实例，
 禁用 TCP 并最终停止清理，不连接下面的演练实例。其合成测试中的 trust 仅限私有临时实例，
@@ -391,7 +395,7 @@ scripts/db/initialize.sh check --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin 
 stat -c '%a %n' "$PGPASSFILE"
 ```
 
-预期：bootstrap、schema、check 成功，结构版本 1.6.0；项目账号通过 socket 密码认证，
+预期：bootstrap、schema、check 成功，结构版本 1.7.0；项目账号通过 socket 密码认证，
 密码文件权限 600。生成器不显示密码，仅通过匿名管道交给本机管理员并发送 SCRAM verifier。
 凭据只保存在程序目录外的 private/；不放进 Git、命令参数、报告或 shell 历史。
 private 由 sfmon 创建并拥有，目录 0700、pgpass 0600 已允许 sfmon 读取；
@@ -528,7 +532,7 @@ sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata
 
 ## 9. 传输日志并生成批次配置
 
-开发机先按仓库固定 manifest 核对 55 个文件；通过 scp 将 `raw/inbox/hashdata/119` 和
+开发机先按仓库固定 manifest 核对 55 个文件；通过 scp 将 `raw/inbox/mpp/119` 和
 `120` 复制到目标机 `$APM_ROOT/logs/`，仅该主机及 /data 接收真实日志。
 不将日志、数据库、原始 SQL 或详细诊断加入 Git。
 
@@ -536,8 +540,8 @@ sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata
 
 ```bash
 .venv/bin/python scripts/deployment/rehearsal.py prepare \
-  --logs raw/inbox/hashdata --output var/issue31/source-check
-scp -r -P "$APM_SSH_PORT" raw/inbox/hashdata/119 raw/inbox/hashdata/120 \
+  --logs raw/inbox/mpp --output var/issue31/source-check
+scp -r -P "$APM_SSH_PORT" raw/inbox/mpp/119 raw/inbox/mpp/120 \
   "$APM_SSH_TARGET:/data/sql-apm/logs/"
 ```
 
@@ -660,12 +664,49 @@ SQL_APM_APP_ROOT="$APM_APP" PYTHONPATH="$APM_APP" \
 
 工具记录输入和程序摘要、数据库参数、超时计数、全部 Alma 比较、各阶段耗时和版本链。
 预期退出 0、26 文件／5,124,686 条记录、归一化超时 0、正式分组 51,266，全部计数等值，
-结构检查仍为 1.6.0。保存 `.log`、`.json` 和 `verification.json`；临时实例退出后自动
+结构检查为 1.7.0。保存 `.log`、`.json` 和 `verification.json`；临时实例退出后自动
 停止清理，日志和报告保留。若失败，区分环境／CLI 失败与业务差异，保留输出并停止验收，
 不得修改基准或把单进程通过替代默认四进程要求。
 
 该步骤只证明本次环境及 119 首批，不继承为全部九任务或其他主机的性能保证。
 已成功文件仍不会重新解析；已有超时数据不因换包、重跑或 rebuild 自动修复。
+
+### 10.2 MPP 标识版验收
+
+Issue #33 已授权验证机空库重跑；无需重装依赖、Python 或 PostgreSQL，也不重跑全部九任务。
+使用本次提交生成的完整离线包，先按第 3 节核对外部摘要、`PROGRAM_COMMIT` 和两个包的清单。
+旧库不能带数据升级到 1.7.0。以下仅针对第 1 节明确指向的专用验证实例中的 `sql_apm` 库，
+必须先确认没有其他任务，且不是生产或其他项目库。旧库不保留；项目角色及其密码继续复用。
+不删除 PGDATA，不重新 initdb，不修改认证规则。
+
+```bash
+sudo -u postgres "$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -d postgres \
+  -c "SELECT datname,usename,state FROM pg_stat_activity WHERE datname='sql_apm';"
+# 确认无活动任务后删除准确命名的验证库；有连接时 dropdb 失败，不强制终止其他任务。
+sudo -u postgres "$APM_PG_BIN/dropdb" -h "$APM_SOCKET" -p "$APM_PORT" --username postgres sql_apm
+sudo -u postgres "$APM_APP/scripts/db/initialize.sh" bootstrap \
+  --host "$APM_SOCKET" --port "$APM_PORT" --admin-user postgres --admin-database postgres \
+  --pg-bin "$APM_PG_BIN"
+"$APM_APP/scripts/db/initialize.sh" schema --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN"
+"$APM_APP/scripts/db/initialize.sh" check --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN"
+APM_NAMING_RUN="$APM_ROOT/records/mpp-$APM_EXPECTED_COMMIT"
+"$APM_APP/.venv/bin/python" "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
+  --logs "$APM_ROOT/logs" --output "$APM_NAMING_RUN/config" --first-batch-119
+cd "$APM_APP"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 119 --step 0 \
+  --config "$APM_NAMING_RUN/config" --records "$APM_NAMING_RUN/tasks" --data-root "$APM_ROOT" \
+  --workers 4 --program-commit "$APM_EXPECTED_COMMIT"
+scripts/db/initialize.sh check --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN"
+```
+
+程序与验收资源使用同一提交；新库不得引用历史归一化缓存。首批入口额外核对系统类别、
+来源 profile、解析／映射标识、字典版本及构建 profile；预期 `identifiers_verified=true`、
+`baseline_equal=true`、零归一化超时、成功发布且六项检查通过。阶段耗时保存在该次记录中。
+普通自检为 69 项（原 66 项加 3 项命名／字典边界用例）。
+
+原九任务机器记录继续按原字节保留，不将改名后的 ID 写回历史记录。
+改名前后按来源定位的全部分组／统计等价验证见本次交付报告；Kylin 的首批计数比较
+仍引用既有业务基准，不能据此声称重跑了两个集群全部九任务。
 
 ## 11. 可选并行与重置
 

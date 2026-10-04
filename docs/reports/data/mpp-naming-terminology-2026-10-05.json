@@ -1,0 +1,490 @@
+{
+  "method": "observed; tracked files; case-insensitive hashdata search; per-file classification",
+  "files": [
+    {
+      "path": ".project-wiki/contracts/log-evidence.md",
+      "category": "naming_record_historical_paths_and_vendor_evidence",
+      "sha256": "9a6e0d3ce48e83a04abc7e12c9e81739ab683703e679861316d2be8b5fa7c0d4"
+    },
+    {
+      "path": ".project-wiki/contracts/offline-data-contract.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "ef0c0a8fc17f55933676662629166a5fccb7c3d61cafc371c338108faa859176"
+    },
+    {
+      "path": ".project-wiki/contracts/timing-and-grouping.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "71bd0693a43bfaedbb6b999c0117b5797cd1ecc3300f9378259194b5090812de"
+    },
+    {
+      "path": ".project-wiki/contracts/training-eligibility.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "5c314a7a2651718becbd434f8f3c6f4ce51ad71ebfb5e741de27a7a9d8414896"
+    },
+    {
+      "path": ".project-wiki/decisions/project-scope.md",
+      "category": "naming_contract_and_identifier_mapping",
+      "sha256": "657848ffe0492c77321bc03b042a750a33de2e2f4c17bb6cf5e9bc488cc2fa38"
+    },
+    {
+      "path": ".project-wiki/decisions/runtime-and-components.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "56e4776a15c6365a8e2983c19f0ae7d20ff75b93653d2819d0f1b173b76ce432"
+    },
+    {
+      "path": ".project-wiki/log.md",
+      "category": "historical_unchanged",
+      "sha256": "88423ca544f6f1fc0f75967516c2e3cb1c33961b016d9114374d68f4dd310d1e"
+    },
+    {
+      "path": ".project-wiki/raw/sql-baseline.md",
+      "category": "historical_unchanged",
+      "sha256": "0316f4c5b4f9456b39dffc61938b8bbf906d2e6c3575981f7e118ba37a2d7037"
+    },
+    {
+      "path": "docs/README.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "b349fe67b1b310d589ab24ceba34d9daf9032af400e58def5714e0c78da87008"
+    },
+    {
+      "path": "docs/design/offline-data-contract/mpp-mapping.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "6f722f83ff3f74429cbabff67f2429dd501f4be13b488c5754bad20c678ac24d"
+    },
+    {
+      "path": "docs/reports/cluster-log-analysis-2026-09-24.md",
+      "category": "historical_unchanged",
+      "sha256": "c5aa0c19d0905c861159d4a106dc568be4a9e0e0a382c1bfaf9336a545411bd4"
+    },
+    {
+      "path": "docs/reports/data/approximate-storage-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "4f41f6c90d8068940c9d2f962a47aa5ab8f21cbab399c09daa2aabcd72a96d5c"
+    },
+    {
+      "path": "docs/reports/data/baseline-statistics-2026-09-30.json",
+      "category": "historical_unchanged",
+      "sha256": "aa5bd8a52cd7e58317b77ea95ad1829dd3189e2c29da9b21241f4941f96a2a8b"
+    },
+    {
+      "path": "docs/reports/data/baseline-statistics-2026-10-01.json",
+      "category": "historical_unchanged",
+      "sha256": "07095f5ac7b2720575de975519d31c38955b88b4098ba604e870353776a84b0b"
+    },
+    {
+      "path": "docs/reports/data/build-publication-2026-10-01.json",
+      "category": "historical_unchanged",
+      "sha256": "97e9ace88c16524f0377b4c6130183b7df2e2efa25d108fb5300d8e51afc5c9b"
+    },
+    {
+      "path": "docs/reports/data/kylin-alma-baseline-2026-10-02.json",
+      "category": "historical_unchanged",
+      "sha256": "c19267ecbfc168259d8e0f943ed6b5af244efc2431eae1090a91333eb7e580c6"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-checks-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "77b4fdc746fcd28f13be16e5849362c0f4ad6972ba9b0af355da6522d0e3d875"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-full-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "8bf996ced59a88ecff3fb67c39746154cb9c7334b9a825d0de6475b1f1ea270d"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-r1-remediation-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "cc3a391a2a95990705a4fbf1e31b718f1848bf8985add9607a0c48fae9d02350"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-r2-remediation-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "52536cce6b8a1457ae6784cb642d45195f7d735d905df6cf6a2c43547ddb3f7b"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-reconciliation-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "c66b29d3a1b714527af703d19191421a90410932ce0a0290e876d653b19f3a9a"
+    },
+    {
+      "path": "docs/reports/data/log-supplement-coverage-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "daa482eb780615d777ad89c79e42090fa9e047cf5698eab403c3e21a7bafc9cc"
+    },
+    {
+      "path": "docs/reports/data/log-supplement-r1-encoding-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "73536b0a55a23cd0fb49bf51e5dde204b93ef5e058286be4984dd681ce374ae8"
+    },
+    {
+      "path": "docs/reports/data/observation-statistics-2026-10-01.json",
+      "category": "historical_unchanged",
+      "sha256": "055107c33a7cb5691cd1e3f05f41a9864913fa6daae2d553e0b7ed7fd6f6f529"
+    },
+    {
+      "path": "docs/reports/data/slim-release-preparation-2026-10-03.json",
+      "category": "historical_unchanged",
+      "sha256": "e0714620ef82b4c657264f262f85ff30c0989948923707e6a24570e45efb217a"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-2026-09-27.json",
+      "category": "historical_unchanged",
+      "sha256": "cd98842c87a458584ad56f7efd149b1737d57267ce9f3e81891a2c15ed031b76"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "adc0a9834df315d6dafbb8b5f0582be4f2c6535bf533cfc122305e33b7262f14"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-checks-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "3ec80d03c60b5fa8bfbb2c4722fa9de864f8e3eed04c23b78cd8b2136233a5f3"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-hints-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "38266ebb7ac92bb48667cf3e04a3f899d6c80d7e98c966af14cfb2ffeb237f8d"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r1-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "00dfe7bcb478008dc08a3d75cf994745a0b9da813b953534b428b7dcdee1d64d"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r2-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "d03ee2b36d53a80007759324580f4478843a34fdb012eee15a8f27ca2227d418"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r2-hints-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "94d6e708cf77e1c359364b8f98bb7a22eb9f59e90e3f6a1bf3494528734f3aad"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-checks-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "1e58acbd76f4a2757c6138929ce6968bb323c7b2cf08d83ccdeea57ba96a1a55"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-fixed-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "b0f6657e1481403e44a97e27dc2e292fee51c0eb72f39eb022652403688e8a60"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-hints-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "8d2284de6fb50b6115aff9120df0a4d3c94bfd7a8fead52c60c0cf9201da73f5"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-in-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "a368e2254e8138c54c80fff043c5f6c11f0a3370984052df623b88522e2a7119"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-checks-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "f41274bc20d4982d245e2b7fd5a8431088a107b82df9fc6099ce9b263d4d6cba"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-fixed-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "4bdde7d36e5d33ee6a1fe3228fb1a56d1612a63035e66eb2817957ec0a5ab312"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-hints-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "b7609f84606e2ccd290cdd82ccf5d648e549f307f04d72f81c9d3d95ba51b9ae"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-in-2026-09-28.json",
+      "category": "historical_unchanged",
+      "sha256": "d675f001d46abbf3d092dd42ec2a6bf6a42937b5f948ba99ec41f4788b8fafff"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-checks-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "285cdd2f9e5e0ccf7245a4193118d33e8158487f0ba02d5f7834a5a344e883d8"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-diff-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "bc1b244ff8c5bbddfa7f8d2c85703d56b35b50ac0df63ccbc461e95735d2b2fc"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-duration-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "c4dbe33cab27ce48c19c36ccf0fc6da677a8ead3b529d725ae0d0fbb9ebfa2c3"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-fixed-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "e1dbc16a1dfcf74e4846e6606d101a0bd97b80886b9bdc926846373f8444c763"
+    },
+    {
+      "path": "docs/reports/data/sql-scanning-2026-10-04.json",
+      "category": "historical_unchanged",
+      "sha256": "d1c5f8b6195a1d2097a83894d39973244ac558f901db6b389b06b1dccfd8195c"
+    },
+    {
+      "path": "docs/reports/data/sql-scanning-r1-remediation-2026-10-04.json",
+      "category": "historical_unchanged",
+      "sha256": "2bf2293bcaa11e70a714283f1989079ff60a4bfecd4bdf949531f3951bca432d"
+    },
+    {
+      "path": "docs/reports/data/training-category-aliases-2026-09-30.json",
+      "category": "historical_unchanged",
+      "sha256": "2de8e85a4b9055199fb66901eee411d0960ace1298ac02bf8d01588532a8ea94"
+    },
+    {
+      "path": "docs/reports/data/training-decisions-2026-09-29.json",
+      "category": "historical_unchanged",
+      "sha256": "e15849db6d87e1ab8e43c96ee75de79c0aa8ca40c1c946d28864aa99929560ca"
+    },
+    {
+      "path": "docs/reports/function-dictionary-2026-09-25.md",
+      "category": "historical_unchanged",
+      "sha256": "a24a686a9b23c029a7779b8e0fa86e6ff358f34b91a13b8cb72aa9db995fda47"
+    },
+    {
+      "path": "docs/reports/function-dictionary-coverage-2026-09-25-r1.json",
+      "category": "historical_unchanged",
+      "sha256": "676d29be1a5fad39daf19a30280eb26d5c8b273f23be9162957dac56b2649c87"
+    },
+    {
+      "path": "docs/reports/function-dictionary-coverage-2026-09-25.json",
+      "category": "historical_unchanged",
+      "sha256": "217b848572407de9bad0ba6ae279a58aa6f272df69f526e88c8f67d9fa1d712c"
+    },
+    {
+      "path": "docs/reports/function-dictionary-r1-remediation-2026-09-25.md",
+      "category": "historical_unchanged",
+      "sha256": "6e83e7109961d649f1715744c292295d06e0d85056814dfec975bae79b7b59d7"
+    },
+    {
+      "path": "docs/reports/function-dictionary-sample-2026-09-25-r1.json",
+      "category": "historical_unchanged",
+      "sha256": "ee317acf3dd692437cd536d245e47e62198210dc6e1b32ef4decb05ee268c4be"
+    },
+    {
+      "path": "docs/reports/function-dictionary-sample-2026-09-25.json",
+      "category": "historical_unchanged",
+      "sha256": "178c82ce665b06ef5ce8499918111e496c03347dd5e3eab7c64ce4d7fd05d5b6"
+    },
+    {
+      "path": "docs/reports/hashdata-duration-source-mapping-2026-09-24.md",
+      "category": "historical_unchanged",
+      "sha256": "98f558f1fc53398ab5e096da03aab5efbee1366a719a6d1e69fbfdabc4a11cdc"
+    },
+    {
+      "path": "docs/reports/knowledge-reorganization-2026-09-25.md",
+      "category": "historical_unchanged",
+      "sha256": "d41d439dfff1a70c28482804fee0605b9d6fc9acfbe4580852e8d0ad7668cc57"
+    },
+    {
+      "path": "docs/reports/log-ingestion-2026-09-29.md",
+      "category": "historical_unchanged",
+      "sha256": "127b204aca67bcb884ebde895467dc8a34f124fcf8a8a067b6b852044117c4de"
+    },
+    {
+      "path": "docs/reports/log-ingestion-r1-remediation-2026-09-29.md",
+      "category": "historical_unchanged",
+      "sha256": "c15368840a889a229e06890eb36b4512de457007a1b8d131dbefbdc2bcb3fac5"
+    },
+    {
+      "path": "docs/reports/log-ingestion-r2-remediation-2026-09-29.md",
+      "category": "historical_unchanged",
+      "sha256": "36772e1211e9ec8aab7256a1198d5f7ddf39d91d0f31cfb409621ca6cfbf1ce4"
+    },
+    {
+      "path": "docs/reports/mpp-adapter-probe-2026-09-27.md",
+      "category": "historical_unchanged",
+      "sha256": "e021eac1a2ce67286fa61bb4622033660d2c67f644ddc2c162ed0c47006dddf1"
+    },
+    {
+      "path": "docs/reports/mpp-broad-validation-2026-09-27.md",
+      "category": "historical_unchanged",
+      "sha256": "8d17a7d3814ca12d644f03b302b8a22fa321f283cbd26abef48e7ef0f49d5f9b"
+    },
+    {
+      "path": "docs/reports/mpp-expanded-validation-2026-09-27.md",
+      "category": "historical_unchanged",
+      "sha256": "004c39985f43d3b93f062c377ce3d97d5271b798fed0671128b921853279ba4e"
+    },
+    {
+      "path": "docs/reports/mpp-naming-2026-10-05.md",
+      "category": "naming_report",
+      "sha256": "addb807b474d5b447cb90c9e3a4bbde6b727a1d9b319e8662a07a17915cfa6ee"
+    },
+    {
+      "path": "docs/reports/parser-fidelity-2026-09-27.md",
+      "category": "historical_unchanged",
+      "sha256": "83e5785d43ec7ae33f656eeb76293fcd20d7501363460a97a972c9ba06b2c724"
+    },
+    {
+      "path": "docs/reports/production-log-analysis-2026-09-23.md",
+      "category": "historical_unchanged",
+      "sha256": "519f0475aacc222c22fb2ab44eba9a83c0dbaf47215740f0f4fa5e5683eae2a8"
+    },
+    {
+      "path": "docs/reports/sql-log-text-verification.md",
+      "category": "historical_unchanged",
+      "sha256": "932cb51bce969ec8ab61b1627926897437b5d08855e454f0e801c3b8295e2833"
+    },
+    {
+      "path": "docs/reports/sql-scanning-2026-10-04.md",
+      "category": "historical_unchanged",
+      "sha256": "aac938113da1930ea15e15d0a93fa5c7da0bf26f5841a080cc177f9688d31628"
+    },
+    {
+      "path": "docs/reports/statement-category-census-2026-09-26.md",
+      "category": "historical_unchanged",
+      "sha256": "e398b20c0dd0d7a78fd20a976702b33d6986b3e94f9bbe01dd578e5c199ac5c1"
+    },
+    {
+      "path": "docs/reports/training-decisions-2026-09-29.md",
+      "category": "historical_unchanged",
+      "sha256": "cee7800fa102b245a49df9b6c4bff79ef5acb88c289b77fc186647152bb4213f"
+    },
+    {
+      "path": "docs/runbooks/database-initialization.md",
+      "category": "source_build_declaration",
+      "sha256": "3684002a9928a56023f3a6fccf2ce5f2e8748a8dc22b28a3e825364b7c70e0f2"
+    },
+    {
+      "path": "docs/runbooks/log-ingestion.md",
+      "category": "naming_record_historical_paths_and_vendor_evidence",
+      "sha256": "cc64ba497c592f4c51055ba031af8bae1471b138afddae935b2991ce212799be"
+    },
+    {
+      "path": "rules/functions/README.md",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "8659a7675bc116121ef111681cb4ccc1aff701cc5a0998abb35d4a57c72401cd"
+    },
+    {
+      "path": "rules/functions/v1.0.1.json",
+      "category": "historical_unchanged",
+      "sha256": "7a75761933c3f48ae59855b16ab3cafe2cd17d5ed21d6fdd2df8ef779aefa822"
+    },
+    {
+      "path": "rules/functions/v1.0.2.json",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "25a3c1ecf81fc198d0ea734f5a530f5e13910c73f2d7ff20efa4b25eaec9dc5a"
+    },
+    {
+      "path": "rules/functions/v1.json",
+      "category": "historical_unchanged",
+      "sha256": "bd4962567d8f0d0446e246bf2ef4bbc9a9375f77ee82e302b1d5c362f8b2cdf3"
+    },
+    {
+      "path": "scripts/db/verify_ingestion_full.py",
+      "category": "source_build_declaration",
+      "sha256": "28a32714b562d48dee23bca2763b5e32ec2575365ac8809b38284578668d8cff"
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming_full.py",
+      "category": "source_build_declaration",
+      "sha256": "b3b7eedb0ef770827beda475f073ac9b66558a389268eb2a3e86939e11eb3166"
+    },
+    {
+      "path": "scripts/db/verify_observations_full.py",
+      "category": "legacy_identifier_detection_and_validation",
+      "sha256": "6f673c1593169a6471ef328fd0f11a47c764efa294716e2820f64d93b29c02e5"
+    },
+    {
+      "path": "scripts/db/verify_publication_full.py",
+      "category": "source_build_declaration",
+      "sha256": "d6fe42bf051a36c42cd1b4cb55b368984956b97ef1cf904629c3c1aa34f270a3"
+    },
+    {
+      "path": "scripts/db/verify_statistics_full.py",
+      "category": "source_build_declaration",
+      "sha256": "8dd5803c733dfb183d12c72bd124504b7276a38acd59f733b459c5403e505c63"
+    },
+    {
+      "path": "scripts/db/verify_training_full.py",
+      "category": "source_build_declaration",
+      "sha256": "79a5874e9d99a93382b10018d2f835e94749928c1a645d73520db914fb2fa0f3"
+    },
+    {
+      "path": "scripts/deployment/rehearsal.py",
+      "category": "source_build_declaration",
+      "sha256": "9314a8e7998e712293647667ad8765bb07c7be0e193d4455f9a55e766dbdd8fe"
+    },
+    {
+      "path": "scripts/functions/build_dictionary.py",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "f87b138ceed3c8730db4a0774361270a57ca59dbc3ccbe77fd4dd4e7ee3d833a"
+    },
+    {
+      "path": "scripts/functions/coverage.py",
+      "category": "vendor_or_upstream_evidence_and_historical_source_links",
+      "sha256": "38c4a562b5662a3787032deb21a80d968e6256a429a15762cba780888e716756"
+    },
+    {
+      "path": "sql_apm/ingestion/config.py",
+      "category": "source_build_declaration",
+      "sha256": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32"
+    },
+    {
+      "path": "sql_apm/storage/migrations/1.6.0-to-1.7.0.sql",
+      "category": "legacy_identifier_detection_and_validation",
+      "sha256": "539279c98a6e9aafa947d0d3fa19fd13d0a7086a0e1011347e45335ca8691251"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.0.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.1.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.2.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.3.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.4.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.5.0.sql",
+      "category": "historical_unchanged",
+      "sha256": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.6.0.sql",
+      "category": "historical_frozen_ddl",
+      "sha256": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f"
+    },
+    {
+      "path": "tests/database/legacy_160/expected_partitions.sql",
+      "category": "legacy_identifier_detection_and_validation",
+      "sha256": "ee1ce5e3b0c0f88470f2b92b7885837d2c0ddca4ddd635f27d4b61eb0f0b2170"
+    },
+    {
+      "path": "tests/database/naming_migration.py",
+      "category": "legacy_identifier_detection_and_validation",
+      "sha256": "4ff6a34364c48968182c70fa301134c26027bf7d94f50f1b2ae556fb60ba8b5e"
+    },
+    {
+      "path": "tests/ingestion/test_reader.py",
+      "category": "source_build_declaration",
+      "sha256": "9e7207978311d5fe16f5504852c7e99f966a21558c20d3212daa1b86dc230d0b"
+    },
+    {
+      "path": "tests/test_mpp_naming.py",
+      "category": "legacy_identifier_detection_and_validation",
+      "sha256": "38b3917222cf5b19d590555fef2e643b532c657b021a5b3ac3e9bde2bc029539"
+    }
+  ]
+}

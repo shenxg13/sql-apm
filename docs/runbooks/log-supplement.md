@@ -66,7 +66,7 @@ PG 词法器；没有运行 TiDB，不保证与任何 TiDB 版本产生相同分
 
 ```bash
 .venv/bin/python -m sql_apm.diagnostics.log_supplement manifest \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --previous docs/reports/data/statement-census-2026-09-26.json \
   --output docs/reports/data/log-supplement-manifest-2026-09-28.json
 
@@ -76,14 +76,14 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m sql_apm.diagnostic
   --output var/parser-probe/issue13/full-scan.json --workers 8 --record-dates
 
 .venv/bin/python -m sql_apm.diagnostics.statement_census \
-  --root raw/inbox/hashdata/120 --output var/parser-probe/issue13/census-120
+  --root raw/inbox/mpp/120 --output var/parser-probe/issue13/census-120
 .venv/bin/python -m sql_apm.diagnostics.log_supplement census \
   --directory var/parser-probe/issue13/census-120 \
   --previous docs/reports/data/statement-census-2026-09-26.json \
   --evidence docs/reports/data/log-supplement-manifest-2026-09-28.json \
   --output docs/reports/data/log-supplement-census-2026-09-28.json
 .venv/bin/python -m sql_apm.diagnostics.statement_census \
-  --root raw/inbox/hashdata --output var/parser-probe/issue13/census-replay \
+  --root raw/inbox/mpp --output var/parser-probe/issue13/census-replay \
   --replay docs/reports/data/log-supplement-census-2026-09-28.json
 
 .venv/bin/python -m sql_apm.diagnostics.log_supplement scan \

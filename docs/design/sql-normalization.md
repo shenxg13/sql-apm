@@ -23,7 +23,7 @@ wheel 摘要。SQLGlot 仅用于旧候选解析实验，不是产品模块依赖
 ```python
 from sql_apm.sql.normalization import Normalizer
 
-engine = Normalizer()  # 默认 rules/functions/v1.0.1.json；构造时验证并固定快照
+engine = Normalizer()  # 默认 rules/functions/v1.0.2.json；构造时验证并固定快照
 one = engine.normalize('SELECT * FROM orders WHERE id = 1001')
 two = engine.normalize('SELECT * FROM orders WHERE id = $2')
 assert one['fingerprint']['state'] == 'reliable'

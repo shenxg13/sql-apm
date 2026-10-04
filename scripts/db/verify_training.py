@@ -102,7 +102,7 @@ def verify():
             # from missing/incomplete text; it still carries a fingerprint reason.
             target=next(i for i,(n,r) in enumerate(cases,1) if n=='fingerprint_failed')
             v.sql("INSERT INTO mpp_sql_text VALUES('FAILED_SQL','SELECT * FROM t QUALIFY x=1',sha256(convert_to('SELECT * FROM t QUALIFY x=1','UTF8'))); "
-                  "INSERT INTO mpp_fingerprint SELECT 'FAILED_FP','FAILED_SQL',normalization_id,'hashdata-csv/1','unsupported_syntax',NULL,'base_parser_rejected' FROM mpp_normalization; "
+                  "INSERT INTO mpp_fingerprint SELECT 'FAILED_FP','FAILED_SQL',normalization_id,'mpp-csv/1','unsupported_syntax',NULL,'base_parser_rejected' FROM mpp_normalization; "
                   "UPDATE mpp_occurrence SET sql_state='complete',sql_id='FAILED_SQL' WHERE anchor_ref IN (SELECT record_id FROM evidence_record WHERE record_no="+str(target)+")")
             store=TrainingStore(dsn)
             try:

@@ -30,7 +30,7 @@ def frozen_store():
     module=types.ModuleType('frozen_formal_statistics')
     # The frozen computation remains the reference. 1.6.0 replaces only its
     # obsolete physical coverage sink; coverage itself is checked independently.
-    adapted=source.decode().replace("covers = ResultWriter(self.db,'mpp_build_coverage',COVER_COLUMNS)",
+    adapted=source.decode().replace("hashdata-csv/1", "mpp-csv/1").replace("covers = ResultWriter(self.db,'mpp_build_coverage',COVER_COLUMNS)",
         "covers = type('DiscardCoverage',(),{'add':lambda self,row:None,'flush':lambda self:None})()")
     exec(compile(adapted,'frozen_formal_statistics.py','exec'),module.__dict__)
     return module.StatisticsStore,hashlib.sha256(source).hexdigest()
@@ -140,7 +140,7 @@ def validate(dsn,output):
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
     Baseline,baseline_sha=frozen_store();baseline=Baseline(dsn)
     imported=json.loads((output/'import-report.json').read_text())
-    report=dict(schema_version='1.6.0',method='measured; private PG17; 55-file fresh import',clusters={},
+    report=dict(schema_version='1.7.0',method='measured; private PG17; 55-file fresh import',clusters={},
         input_manifest_sha256=imported['manifest_sha256'],input_files=sum(len(r['files']) for r in imported['first_runs']),
         import_seconds=imported['import_seconds'],baseline_ref=BASELINE_REF,baseline_statistics_sha256=baseline_sha,
         decision_version=DECISION_VERSION,normalization_context=training.context)

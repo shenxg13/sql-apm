@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/timing-and-grouping.md
-updated: 2026-09-30
+updated: 2026-10-05
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/25
     status: current
@@ -28,7 +28,7 @@ confidence: high
 五类计时分别统计；完整请求、阶段和调用的单位保持区分，开始时间标明推算性质。
 实现日志计时识别、Execute 配对、分组或时间归属时阅读。
 
-适用范围：以下为首期 HashData 契约；设计后续来源接入时，参照
+适用范围：以下为首期 MPP 契约；设计后续来源接入时，参照
 [多类型系统接入约束](../decisions/project-scope.md#已确认的多类型系统接入扩展约束)。
 
 ## Source Of Truth
@@ -235,7 +235,7 @@ confidence: high
 
 按任务涉及的边界补读：
 
-- [HashData 日志事实与证据边界](log-evidence.md)。
+- [MPP 日志事实与证据边界](log-evidence.md)。
 - [训练资格、黑名单与排除时段](training-eligibility.md)。
 - [统计指标、训练窗口与样本门槛](baseline-statistics.md)。
 - [基线构建、版本与发布](../features/baseline-versions.md)。

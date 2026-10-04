@@ -114,7 +114,7 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m unittest discover 
 
 ```bash
 .venv/bin/python scripts/db/verify_training_full.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --output var/training/full-validation
 ```
 
@@ -130,7 +130,7 @@ excluded 的数量和混合转纯黑名单批次。单条含多个别名时，�
 
 ```bash
 .venv/bin/python scripts/db/verify_training_full.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --output var/training/aliases-replay --compare-aliases
 ```
 

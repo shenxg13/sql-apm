@@ -46,7 +46,7 @@ def statements(legacy=False, results=True, include_coverage=False):
     def fields(obj, omitted=(), **extra):
         return dict({k: v for k, v in obj.items() if k not in omitted}, **extra)
     context = dict(scope_id="CL1", normalization_id="N1", profile=doc["profile"])
-    add("scope", dict(scope_id="CL1", system_kind="hashdata",
+    add("scope", dict(scope_id="CL1", system_kind="mpp",
                       profile=doc["profile"], contract_version=doc["contract_version"]))
     for o in b["sources"].values():
         add("source", fields(o, ("system_kind",)))

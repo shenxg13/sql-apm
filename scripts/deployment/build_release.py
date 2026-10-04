@@ -58,23 +58,22 @@ def select(source, destination, patterns):
 
 
 def compare_product(app, previous):
-    paths = sorted(str(p.relative_to(app)) for p in app.rglob('*') if p.is_file() and
-                   (p.relative_to(app).parts[0] in ('sql_apm', 'rules') or
-                    str(p.relative_to(app)) in ('requirements.txt', 'scripts/db/initialize.sh')))
-    rows = []
+    def product(name):
+        return (Path(name).parts[0] in ('sql_apm', 'rules') or
+                name in ('requirements.txt', 'scripts/db/initialize.sh'))
+    current = {str(p.relative_to(app)): digest(p) for p in app.rglob('*')
+               if p.is_file() and product(str(p.relative_to(app)))}
+    original = {}
     with tarfile.open(previous, 'r:gz') as tar:
-        for name in paths:
-            try:
-                original = tar.extractfile('app/' + name).read()
-            except KeyError:
-                raise ValueError('previous program lacks product file: ' + name) from None
-            before = hashlib.sha256(original).hexdigest()
-            after = digest(app / name)
-            rows.append(dict(path=name, previous_sha256=before, candidate_sha256=after, equal=before == after))
+        for member in tar.getmembers():
+            if member.isfile() and member.name.startswith('app/') and product(member.name[4:]):
+                original[member.name[4:]] = hashlib.sha256(tar.extractfile(member).read()).hexdigest()
+    rows = [dict(path=name, previous_sha256=original.get(name), candidate_sha256=current.get(name),
+                 equal=original.get(name) == current.get(name)) for name in sorted(set(current) | set(original))]
     return dict(previous_program_sha256=digest(previous), files=rows,
                 all_equal=all(row['equal'] for row in rows),
-                note='Only identical product files support inheritance of prior nine-task evidence; '
-                     'candidate deployment and four-worker verification remain separate.')
+                note='Added and removed product paths have a null checksum on the absent side; '
+                     'only identical product files support inheritance of prior nine-task evidence.')
 
 
 def build(args):

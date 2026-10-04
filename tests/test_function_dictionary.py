@@ -11,7 +11,7 @@ from sql_apm.sql.function_dictionary import DictionaryError, FunctionDictionary,
 from sql_apm.diagnostics.function_probe import call_candidates, ProbeError
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = read_json(ROOT/'rules/functions/v1.0.1.json')
+DATA = read_json(ROOT/'rules/functions/v1.0.2.json')
 
 
 class DictionaryTests(unittest.TestCase):
@@ -128,7 +128,7 @@ class DictionaryTests(unittest.TestCase):
 
     def test_invalid_configuration(self):
         rule=next(copy.deepcopy(r) for r in DATA['rules'] if r['name']=='to_date')
-        base=dict(schema_version=1,rules_version='1.0.0',profile='hashdata-pg94',rules=[rule])
+        base=dict(schema_version=1,rules_version='1.0.0',profile='mpp-sql',rules=[rule])
         mutations=[lambda d:d.pop('rules_version'),lambda d:d.update(schema_version=True),
                    lambda d:d.update(rules_version='v1'),lambda d:d.update(rules=[]),
                    lambda d:d['rules'].append(copy.deepcopy(d['rules'][0])),

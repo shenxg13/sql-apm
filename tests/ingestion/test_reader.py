@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 from sql_apm.ingestion.config import IngestionError, load_config
-from sql_apm.ingestion.hashdata.reader import Interpreter, Records
+from sql_apm.ingestion.mpp.reader import Interpreter, Records
 
 
 def row(line='1946', message='duration: 1200000.001 ms', text='SELECT $1;', **fields):

@@ -17,9 +17,9 @@ from .type_policy import KNOWN_TYPES, NORMALIZABLE_CASTS
 
 ALGORITHM_VERSION = 'sql-normalization/5'
 PARSER_DEPENDENCY_VERSION = '7.18'
-PROFILE = 'hashdata-pg94'
+PROFILE = 'mpp-sql'
 MAX_BYTES = approximate.MAX_BYTES
-DEFAULT_DICTIONARY = Path(__file__).resolve().parents[2] / 'rules/functions/v1.0.1.json'
+DEFAULT_DICTIONARY = Path(__file__).resolve().parents[2] / 'rules/functions/v1.0.2.json'
 # O: ordinary; B: WHERE/SELECT target/JOIN ON business expression; D: direct business value;
 # F: legacy FILTER business values without IN bucketing; P: fully protected; T: assignment target; I/V/R: INSERT/multiassignment containers.
 RULES = {

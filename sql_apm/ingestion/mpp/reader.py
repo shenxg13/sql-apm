@@ -9,7 +9,7 @@ import re
 
 from sql_apm.ingestion.config import IngestionError, canonical
 
-PARSER_VERSION = 'hashdata-csv-reader/1'
+PARSER_VERSION = 'mpp-csv-reader/1'
 
 BEIJING = timezone(timedelta(hours=8))
 DURATION = re.compile(r'^duration:\s*([0-9]+(?:\.[0-9]+)?)\s+ms\b', re.I)
@@ -113,7 +113,9 @@ class Records:
 
 class Interpreter:
     """Consume each anchor once. No temporal-nearest or command-number matching."""
-    def __init__(self, max_sessions=100000):
+    def __init__(self, max_sessions=100000, profile="mpp-csv/1"):
+        if profile != "mpp-csv/1":
+            raise ValueError("unsupported_profile")
         self.pending = OrderedDict()
         self.max_sessions = max_sessions
 

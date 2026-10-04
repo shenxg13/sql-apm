@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
-from build_release import archive, select
+from build_release import archive, select, compare_product
 from render_manual import inspect, render
 from verify_package import digest, verify
 import rehearsal
@@ -97,6 +97,21 @@ class PackageTests(unittest.TestCase):
         archive(self.app, second)
         self.assertEqual(first.read_bytes(), second.read_bytes())
 
+    def test_product_comparison_records_renamed_and_removed_paths(self):
+        (self.app / 'sql_apm').mkdir()
+        old = self.app / 'sql_apm/old.py'
+        old.write_text('same implementation')
+        previous = self.root / 'previous.tar.gz'
+        archive(self.app, previous)
+        self.assertTrue(compare_product(self.app, previous)['all_equal'])
+        old.rename(self.app / 'sql_apm/new.py')
+        report = compare_product(self.app, previous)
+        self.assertFalse(report['all_equal'])
+        rows = {row['path']: row for row in report['files']}
+        self.assertIsNone(rows['sql_apm/old.py']['candidate_sha256'])
+        self.assertIsNone(rows['sql_apm/new.py']['previous_sha256'])
+        self.assertEqual(rows['sql_apm/old.py']['previous_sha256'], rows['sql_apm/new.py']['candidate_sha256'])
+
     def test_directory_rule_and_missing_pattern(self):
         source = self.root / 'source'
         (source / 'runtime/nested').mkdir(parents=True)
@@ -114,7 +129,7 @@ class PackageTests(unittest.TestCase):
         runner = kit / 'scripts/deployment/run_verification.py'
         shutil.copy2(ROOT / 'scripts/deployment/run_verification.py', runner)
         (kit / 'PROGRAM_COMMIT').write_text('different-commit\n')
-        for name in ('sql_apm/__init__.py', 'scripts/db/initialize.sh', 'rules/functions/v1.0.1.json'):
+        for name in ('sql_apm/__init__.py', 'scripts/db/initialize.sh', 'rules/functions/v1.0.2.json'):
             path = self.app / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('')

@@ -15,7 +15,7 @@ RESOURCES = Path(__file__).resolve().parents[2]
 
 def setup(app):
     app = app.resolve()
-    for name in ('sql_apm/__init__.py', 'scripts/db/initialize.sh', 'rules/functions/v1.0.1.json'):
+    for name in ('sql_apm/__init__.py', 'scripts/db/initialize.sh', 'rules/functions/v1.0.2.json'):
         if not (app / name).is_file():
             raise ValueError('missing selected application resource: ' + name)
     paths = [str(app), str(RESOURCES), str(RESOURCES / 'tests'), str(RESOURCES / 'scripts/db')]
@@ -50,8 +50,8 @@ def unit():
             sys.modules[qualified] = module
             spec.loader.exec_module(module)
     suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'))
-    if suite.countTestCases() != 66:
-        raise ValueError('v0.1.0 verification kit must retain all 66 ordinary tests')
+    if suite.countTestCases() != 69:
+        raise ValueError('MPP verification kit must retain all 69 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     return 0 if result.wasSuccessful() else 1
 

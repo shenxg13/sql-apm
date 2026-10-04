@@ -1,6 +1,6 @@
-"""HashData field-to-MPP persistence mapping; no generic-source assumptions."""
+"""MPP field-to-storage persistence mapping; no generic-source assumptions."""
 from sql_apm.ingestion.config import canonical, identity
-from sql_apm.ingestion.hashdata.reader import raw_bytes, valid_text, site
+from sql_apm.ingestion.mpp.reader import raw_bytes, valid_text, site
 from sql_apm.storage.ingestion import copy_rows
 
 ASSOCIATION = 'execute-file-sequence/1'

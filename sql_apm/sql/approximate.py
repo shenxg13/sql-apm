@@ -11,7 +11,7 @@ import json
 import re
 
 VERSION = 'sql-approximate/2'
-PROFILE = 'hashdata-csv/1'
+PROFILE = 'mpp-csv/1'
 MAX_BYTES = 512 * 1024
 _ASCII_LOWER = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
 _WORD = re.compile(r'[A-Za-z_\u0080-\uffff][A-Za-z_0-9$\u0080-\uffff]*')

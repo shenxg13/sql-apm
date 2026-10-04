@@ -17,6 +17,7 @@ RESOURCE_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(RESOURCE_ROOT))).resolve()
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(RESOURCE_ROOT / "tests"))
+from database.naming_migration import legacy_target, verify_naming_migration
 from database.fixture import statements  # noqa: E402
 from database.approximate import verify_approximate  # noqa: E402
 from database.approximate_migration import verify_approximate_migration  # noqa: E402
@@ -145,7 +146,7 @@ class Verification:
         self.sql("INSERT INTO publication VALUES ('PUB_FAIL','CL1','V1','V1','publish_failed','synthetic failure','2026-10-02 00:00:00+08')")
         self.rejects("UPDATE current_version SET publication_id='PUB_FAIL',last_success_at='2026-10-02 00:00:00+08'", "failed publication cannot become current")
         self.require(self.sql("SELECT build_id||':'||publication_id FROM current_version") == "V1:PUB1", "failed writes preserve current version")
-        self.sql("INSERT INTO scope VALUES ('CL2','hashdata','hashdata-csv/1','1.0.0')")
+        self.sql("INSERT INTO scope VALUES ('CL2','mpp','mpp-csv/1','1.0.0')")
         self.rejects("UPDATE mpp_decision SET scope_id='CL2'", "cross-cluster build references rejected")
 
         self.require(self.sql("SELECT count(*) FROM information_schema.columns WHERE table_schema='sql_apm' AND table_name='mpp_statistic' AND column_name='sufficiency'")=='0', "sufficiency is derived, not a physical column")
@@ -236,7 +237,7 @@ class Verification:
         self.init("bootstrap", names=partial)
         self.sql("SET ROLE apm_partial; CREATE SCHEMA apm_partial; SET search_path=apm_partial,pg_catalog; "
                  "CREATE TABLE scope (scope_id text PRIMARY KEY CHECK (scope_id <> ''), system_kind text NOT NULL CHECK (system_kind <> ''), profile text NOT NULL CHECK (profile <> ''), contract_version text NOT NULL CHECK (contract_version <> ''), UNIQUE(scope_id,profile)); "
-                 "INSERT INTO scope VALUES ('retained','hashdata','hashdata-csv/1','1.0.0')",
+                 "INSERT INTO scope VALUES ('retained','mpp','mpp-csv/1','1.0.0')",
                  admin=True, database="apm_partial")
         self.init(names=partial)
         self.require(self.sql("SELECT scope_id FROM apm_partial.scope", admin=True, database="apm_partial") == "retained",
@@ -288,19 +289,33 @@ def main():
     with instance(args.pg_bin) as (directory, env):
         Verification(args.pg_bin, directory, env).tests()
     with instance(args.pg_bin) as (directory, env):
-        verify_training_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_training_migration(v, root, runner)
     with instance(args.pg_bin) as (directory, env):
         verify_current_triggers(Verification(args.pg_bin, directory, env), run)
     with instance(args.pg_bin) as (directory, env):
-        verify_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_migration(v, root, runner)
     with instance(args.pg_bin) as (directory, env):
-        verify_approximate_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_approximate_migration(v, root, runner)
     with instance(args.pg_bin) as (directory, env):
-        verify_statistics_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_statistics_migration(v, root, runner)
     with instance(args.pg_bin) as (directory, env):
-        verify_observation_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_observation_migration(v, root, runner)
     with instance(args.pg_bin) as (directory, env):
-        verify_publication_migration(Verification(args.pg_bin, directory, env), ROOT, run)
+        v = Verification(args.pg_bin, directory, env)
+        with legacy_target(v, ROOT, run) as (root, runner):
+            verify_publication_migration(v, root, runner)
+    with instance(args.pg_bin) as (directory, env):
+        verify_naming_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

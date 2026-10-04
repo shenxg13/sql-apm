@@ -12,7 +12,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from sql_apm.ingestion.config import canonical, identity
-from sql_apm.ingestion.hashdata.reader import Records, Interpreter, raw_bytes, record_metrics
+from sql_apm.ingestion.mpp.reader import Records, Interpreter, raw_bytes, record_metrics
 from sql_apm.diagnostics.mpp_full_scan import candidates
 
 

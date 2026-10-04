@@ -16,7 +16,7 @@ def verify_publication_migration(v,root,runner):
     raw=b'SELECT 1 FROM'
     approx=fingerprint(raw,structural_reason='base_parser_rejected')
     v.sql(rule_sql(approx)+insert_sql('MIGRATION_APPROX',raw,approx))
-    v.sql("""INSERT INTO mpp_observation_group SELECT 'OG:migration','CL1','hashdata-csv/1','synthetic','synthetic',rule_id,result_id,value,'request'
+    v.sql("""INSERT INTO mpp_observation_group SELECT 'OG:migration','CL1','mpp-csv/1','synthetic','synthetic',rule_id,result_id,value,'request'
         FROM mpp_approximate_result WHERE result_id='MIGRATION_APPROX';
         INSERT INTO mpp_build_observation_group SELECT partition_id,build_id,'OG:migration' FROM build WHERE build_id='V1';
         INSERT INTO mpp_observation_statistic SELECT (jsonb_populate_record(NULL::mpp_observation_statistic,

@@ -114,7 +114,7 @@ def verify():
                 v.rejects("UPDATE mpp_baseline_group SET fingerprint_id='synthetic-result/3'",'reliable group rejects approximate result')
                 v.rejects("INSERT INTO mpp_observation_group SELECT 'OG:bad-reference',scope_id,profile,database,execution_user,rule_id,result_id,'sha256:reliable',timing_type FROM mpp_observation_group LIMIT 1",'observation group requires actual available approximate value')
                 v.rejects("UPDATE mpp_observation_group SET database='changed'",'referenced observation identity is immutable')
-                v.sql("INSERT INTO scope VALUES ('C2','hashdata','hashdata-csv/1','1.0.0')")
+                v.sql("INSERT INTO scope VALUES ('C2','mpp','mpp-csv/1','1.0.0')")
                 v.sql("INSERT INTO mpp_observation_group SELECT 'OG:other-cluster','C2',profile,database,execution_user,rule_id,result_id,approximate_value,timing_type FROM mpp_observation_group LIMIT 1")
                 v.rejects("INSERT INTO mpp_build_observation_group SELECT partition_id,build_id,'OG:other-cluster' FROM build LIMIT 1",'cross-cluster observation association rejected')
                 with store.db,store.db.cursor() as cur:

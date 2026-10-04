@@ -112,7 +112,7 @@ JSON 行输出仅含固定原因码、数量、摘要和不透明文件 ID，不
 `batch_member_changed` 的 `problem.reason` 是包含 previous_file_ids、current_file_ids、removed_file_ids
 的 JSON 依据；CLI 仍只返回固定原因码。冲突尝试不覆盖原成功条目的 final_attempt_id。
 
-Analysis 来源解析版本为 `hashdata-csv-reader/1`，SQL 解析版本另存 Normalization。旧实验 Analysis
+Analysis 来源解析版本为 `mpp-csv-reader/1`，SQL 解析版本另存 Normalization。旧实验 Analysis
 若记录为 `mpp-adapter/9`，同批次重跑会被版本检查拒绝，旧记录保留；本入口不自动回填版本或
 建立 supersedes。已成功文件仍跳过，不利用重导悄悄更换其解释或指纹。
 
@@ -134,7 +134,7 @@ Analysis 来源解析版本为 `hashdata-csv-reader/1`，SQL 解析版本另存 
 
 ```bash
 .venv/bin/python scripts/db/verify_ingestion_full.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --manifest docs/reports/data/log-supplement-manifest-2026-09-28.json \
   --index var/parser-probe/issue13/full-scan.sqlite \
   --output var/ingestion/full-validation
@@ -148,7 +148,7 @@ Analysis 来源解析版本为 `hashdata-csv-reader/1`，SQL 解析版本另存 
 
 ```bash
 .venv/bin/python scripts/db/reconcile_ingestion.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --manifest docs/reports/data/log-supplement-manifest-2026-09-28.json \
   --report var/ingestion/full-validation/report.json \
   --audit var/ingestion/full-validation/identity-audit.sqlite \
@@ -162,3 +162,21 @@ Analysis 来源解析版本为 `hashdata-csv-reader/1`，SQL 解析版本另存 
 
 `--snapshot` 可选：提供同上下文的 v5 快照时，逐条核对已存原文的解析状态／拒绝原因，
 并给出历史未纳入文本的可靠／拒绝分布；版本上下文不同会拒绝。
+
+## MPP 命名升级与日志目录
+
+结构 1.7.0 使用 `mpp-csv/1`、`mpp-mapping/1`、`mpp-csv-reader/1` 和字典 1.0.2
+的 `mpp-sql`。已有导入数据的旧库拒绝升级，返回 `mpp_naming_requires_empty_schema`；
+须重新初始化独立的新库、重新导入与构建，不能复用旧指纹或分组 ID。
+来源声明的 `build` 仍为 `HashData Warehouse 3.13.13`，配置格式不变。
+
+各环境在无导入进程、目标目录不存在时手工执行一次目录改名，并修改本地来源清单路径：
+
+```bash
+test -d raw/inbox/hashdata
+test ! -e raw/inbox/mpp
+mv raw/inbox/hashdata raw/inbox/mpp
+```
+
+程序不自动移动文件；历史报告继续保留旧路径。本地重放可以用显式 `--root` 指定尚未改名
+的证据目录。系统组成和标识对照见[系统称谓](../../.project-wiki/decisions/project-scope.md#已确认的生产系统称谓)。

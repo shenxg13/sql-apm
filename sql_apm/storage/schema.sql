@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS mpp_fingerprint (
     fingerprint_id text PRIMARY KEY CHECK (fingerprint_id <> ''),
     sql_id text NOT NULL REFERENCES mpp_sql_text,
     normalization_id text NOT NULL REFERENCES mpp_normalization,
-    profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
+    profile text NOT NULL CHECK (profile = 'mpp-csv/1'),
     state text NOT NULL CHECK (state IN ('reliable','unsupported_syntax','normalization_failed')),
     value text CHECK (value <> ''),
     CONSTRAINT mpp_fingerprint_not_approximate CHECK (value NOT LIKE 'approx:%'),
@@ -216,7 +216,7 @@ CREATE INDEX IF NOT EXISTS mpp_fingerprint_value_idx ON mpp_fingerprint (normali
 CREATE TABLE IF NOT EXISTS mpp_baseline_group (
     group_id text PRIMARY KEY CHECK (group_id <> ''),
     scope_id text NOT NULL,
-    profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
+    profile text NOT NULL CHECK (profile = 'mpp-csv/1'),
     normalization_id text NOT NULL,
     database text NOT NULL CHECK (database <> ''),
     execution_user text NOT NULL CHECK (execution_user <> ''),
@@ -282,16 +282,16 @@ CREATE TABLE IF NOT EXISTS config_snapshot (
     window_days integer NOT NULL CHECK (window_days > 0),
     window_start timestamptz NOT NULL,
     window_end timestamptz NOT NULL,
-    blacklist jsonb NOT NULL CHECK (jsonb_typeof(blacklist) = 'object' AND (profile <> 'hashdata-csv/1' OR blacklist ?& ARRAY['category_ref','template_ref','category_rules','template_rules'])),
+    blacklist jsonb NOT NULL CHECK (jsonb_typeof(blacklist) = 'object' AND (profile <> 'mpp-csv/1' OR blacklist ?& ARRAY['category_ref','template_ref','category_rules','template_rules'])),
     exclusions jsonb NOT NULL CHECK (jsonb_typeof(exclusions) = 'array'),
-    thresholds jsonb NOT NULL CHECK (jsonb_typeof(thresholds) = 'object' AND (profile <> 'hashdata-csv/1' OR thresholds ?& ARRAY['overall','day','week','weekday','hour'])),
+    thresholds jsonb NOT NULL CHECK (jsonb_typeof(thresholds) = 'object' AND (profile <> 'mpp-csv/1' OR thresholds ?& ARRAY['overall','day','week','weekday','hour'])),
     statistics_version text NOT NULL CHECK (statistics_version <> ''),
     FOREIGN KEY (scope_id, profile) REFERENCES scope (scope_id, profile),
     CHECK (window_start < window_end),
-    CHECK (profile <> 'hashdata-csv/1' OR (
+    CHECK (profile <> 'mpp-csv/1' OR (
         window_start = (cutoff_date - (window_days - 1))::timestamp AT TIME ZONE INTERVAL '+08:00'
         AND window_end = (cutoff_date + 1)::timestamp AT TIME ZONE INTERVAL '+08:00')),
-    CHECK (profile <> 'hashdata-csv/1' OR normalization_id IS NOT NULL),
+    CHECK (profile <> 'mpp-csv/1' OR normalization_id IS NOT NULL),
     UNIQUE (config_id, scope_id, profile),
     UNIQUE (config_id, scope_id, normalization_id, profile)
 );
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS build (
     finished_at timestamptz,
     results_saved boolean NOT NULL,
     FOREIGN KEY (input_id, scope_id) REFERENCES input_snapshot (input_id, scope_id),
-    CHECK (profile <> 'hashdata-csv/1' OR normalization_id IS NOT NULL),
+    CHECK (profile <> 'mpp-csv/1' OR normalization_id IS NOT NULL),
     FOREIGN KEY (config_id, scope_id, profile) REFERENCES config_snapshot (config_id, scope_id, profile),
     FOREIGN KEY (config_id, scope_id, normalization_id, profile) REFERENCES config_snapshot (config_id, scope_id, normalization_id, profile),
     UNIQUE (build_id, scope_id),
@@ -750,7 +750,7 @@ CREATE TABLE IF NOT EXISTS task_publication (
 CREATE TABLE IF NOT EXISTS mpp_approximate_rule (
     rule_id text PRIMARY KEY CHECK (rule_id <> ''),
     algorithm_version text NOT NULL CHECK (algorithm_version ~ '^sql-approximate/[1-9][0-9]*$'),
-    profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
+    profile text NOT NULL CHECK (profile = 'mpp-csv/1'),
     rules_digest text NOT NULL CHECK (rules_digest ~ '^[0-9a-f]{64}$'),
     rules_ref text NOT NULL CHECK (rules_ref <> ''),
     rules jsonb NOT NULL CHECK (jsonb_typeof(rules) = 'object'),
@@ -1021,7 +1021,7 @@ END;
 CREATE TABLE IF NOT EXISTS mpp_observation_group (
     group_id text PRIMARY KEY CHECK (starts_with(group_id, 'OG:')),
     scope_id text NOT NULL,
-    profile text NOT NULL CHECK (profile = 'hashdata-csv/1'),
+    profile text NOT NULL CHECK (profile = 'mpp-csv/1'),
     database text NOT NULL CHECK (database <> ''),
     execution_user text NOT NULL CHECK (execution_user <> ''),
     rule_id text NOT NULL,

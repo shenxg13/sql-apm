@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-02
+updated: 2026-10-04
 sources:
+  - path: docs/reports/sql-scanning-2026-10-04.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
@@ -127,6 +129,12 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 对较早批次执行 full 会使窗口回到该批日期；补导时由操作者显式指定截止日，用户已于 2026-10-02 确认，
 详见[发布输入与补导规则](baseline-versions.md#发布输入与补导确认2026-10-02)。
 `status` 显示当前版本、最近任务及最近未发布原因，`history` 显示历史成功版本。
+按 [Issue #34](https://github.com/shenxg13/sql-apm/issues/34)，`status.current` 还显示
+`fingerprint_normalization_timeout` 和 `fingerprint_normalization_worker_failed` 两个整数，
+0 也显式返回。单位是当前版本固定输入中的隔离日志记录，不是执行或不同 SQL 数；
+后来导入但尚未纳入当前版本的文件不参与计数。没有当前版本时仍为 `current=null`。
+查询只读且仅展示，不新增发布检查；字段示例与边界见
+[隔离记录计数](../../docs/runbooks/build-publication.md#隔离记录计数)。
 
 五种写入入口共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
 忙时返回 `cluster_busy` 并保存 busy_rejected 任务；不会排队或中断持有者。

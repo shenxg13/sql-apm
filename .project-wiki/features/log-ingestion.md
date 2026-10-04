@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-10-02
+updated: 2026-10-04
 sources:
+  - path: docs/reports/sql-scanning-2026-10-04.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
@@ -233,6 +235,17 @@ R2 整改后，已发送的单条 SQL 超时／工作进程异常先在新进程
 R1 的成功内容成员保护、旧条目保留、来源解释器独立版本与 Analysis 复用检查继续有效，
 原始验证见[R1 整改报告](../../docs/reports/log-ingestion-r1-remediation-2026-09-29.md)。
 55 文件实测、逐项对账和恢复验证见[导入验证报告](../../docs/reports/log-ingestion-2026-09-29.md)。
+
+### 分词性能与超时判定（Issue #34）
+
+来源：[已确认契约](https://github.com/shenxg13/sql-apm/issues/34)。等长 ASCII 占位仅用于扫描
+词的位置和类别，词内容、语法树及指纹继续由原文生成；占位形成的关键字还原为标识符。
+非 ASCII 美元引用标签等不能保证等价的输入回退原扫描器，扫描错误保留原位置。
+三处分词共用 `sql_apm/sql/scanning.py`；`mpp-adapter/9`、`sql-normalization/5`、
+pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复，不因另一进程同步重启而
+隔离已返回结果。默认四进程、5 秒期限和最多一次新进程重试仍适用。
+这不重新解析已成功导入的文件，也不覆盖历史解释；观察、全量等价和性能验证分别记录在
+[实施报告](../../docs/reports/sql-scanning-2026-10-04.md)。
 
 ## Workflows
 

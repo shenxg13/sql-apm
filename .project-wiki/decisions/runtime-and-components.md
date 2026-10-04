@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-04
 sources:
+  - path: docs/reports/sql-scanning-2026-10-04.md
+    status: current
   - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
     status: current
   - path: docs/reports/kylin-read-access-2026-10-04.md
@@ -156,6 +158,15 @@ SSD 上四进程首批专门记录超时、分组、基准和资源；零超时�
 K11、K15 已同步；候选包、手册原稿、九任务结果和其他验收要求不变。
 四进程性能后续问题已由用户在另一需求会话确认创建为
 [#34](https://github.com/shenxg13/sql-apm/issues/34)，不再等待创建确认；本轮未实施该优化。
+
+### 分词性能修复的运行边界（Issue #34）
+
+[Issue #34](https://github.com/shenxg13/sql-apm/issues/34) 已确认先于 #33 实施：保持 pglast
+7.18 及锁定哈希、现有算法版本、5 秒期限、默认四解析进程和数据库结构 1.6.0。
+分词位置换算采用等长 ASCII 占位路径，原语法解析仍使用原文；保守回退路径仍可能较慢。
+不向上游报告、不重新解释已成功文件，也不继续诊断演练机宿主的多核表现。
+开发机与 Kylin 的全量／首批验证证据及适用范围见
+[实施报告](../../docs/reports/sql-scanning-2026-10-04.md)；优化结论不能由环境自检推定。
 
 ### 已确认的当前开发环境与生产部署安排
 

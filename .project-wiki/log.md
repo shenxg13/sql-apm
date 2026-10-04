@@ -288,3 +288,8 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 ## 2026-10-04：R1 整改与验证记录口径
 
 - 用户已在 [Issue #31](https://github.com/shenxg13/sql-apm/issues/31#issuecomment-5976092271) 确认采用已有核对报告及机器记录作为本次验证记录，不另填模板；对应范围与 K11／K15 已同步。将该决定写入[运行环境主题](decisions/runtime-and-components.md)，并修正其 Open Questions 及根 README 的旧阶段表述。候选包、七份手册原稿和业务结果不变；R1 两项处置提交 R2 独立复核。
+
+## 2026-10-04：分词性能与隔离计数
+
+- Issue #34 实现等长 ASCII 分词、超时前重新检查回复，以及当前版本输入的两项隔离记录计数；原依赖、算法和结构版本及历史文件跳过规则不变。持久边界见[导入主题](features/log-ingestion.md#分词性能与超时判定issue-34)、[命令行主题](features/operator-cli.md#完整流程与版本查询2026-10-01)和[运行环境](decisions/runtime-and-components.md#分词性能修复的运行边界issue-34)。
+- [实施报告](../docs/reports/sql-scanning-2026-10-04.md)分别记录合成验证、全量比较及两机实测；未完成项继续由在线 Issue 追踪，不从局部测试推定全部验收。

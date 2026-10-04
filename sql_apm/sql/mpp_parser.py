@@ -12,6 +12,7 @@ from pglast import parser
 
 from sql_apm.sql.lexical import diagnose
 from sql_apm.sql.pg_ast import pg_clean
+from sql_apm.sql.scanning import scan
 from sql_apm.sql.structure import dumps, loads
 
 VERSION = 'mpp-adapter/9'
@@ -55,7 +56,7 @@ def _constant_sign_offsets(sql, tree):
     neighboring keyword spellings. Keep parentheses and every real operator.
     JSON locations are UTF-8 byte offsets; scanner offsets are characters.
     """
-    scanned = parser.scan(sql)
+    scanned = scan(sql)
     by_byte, previous, offset = {}, 0, 0
     for i, token in enumerate(scanned):
         offset += len(sql[previous:token.start].encode('utf-8'))
@@ -822,7 +823,7 @@ def parse(sql):
     if issues:
         raise Unsupported('lexical_' + issues[0])
     try:
-        scanned = parser.scan(sql)
+        scanned = scan(sql)
     except parser.ParseError:
         raise Unsupported('scanner_rejected') from None
     hints, comments = [], []
@@ -839,7 +840,7 @@ def parse(sql):
     # newlines; Hint contents/anchors have already been saved above.
     sql = mask(sql, comments)
     try:
-        scanned = parser.scan(sql)
+        scanned = scan(sql)
     except parser.ParseError:
         raise Unsupported('scanner_rejected') from None
     tokens = [Token(sql[t.start:t.end + 1], t.name, t.start, t.end + 1) for t in scanned]

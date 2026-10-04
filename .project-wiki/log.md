@@ -308,6 +308,7 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
   [系统称谓](decisions/project-scope.md#已确认的生产系统称谓)集中维护组成版本和新旧对照。
 - 结构 1.7.0 仅允许旧空库升级，有数据须重建；逻辑契约仍为 1.0.0。
   默认函数字典 1.0.2 仅变更 profile 和自身版本，旧字典、DDL 与迁移保持原字节。
+- [SQL 留存主题](contracts/sql-storage.md)同步当前结构引用；原文、明细与统计保存口径不变。
 - 适配包和映射文档改为 `mpp`，默认日志目录及手工改名步骤见
   [导入说明](../docs/runbooks/log-ingestion.md#mpp-命名升级与日志目录)。
 - [验收报告](../docs/reports/mpp-naming-2026-10-05.md)记录验证证据和待完成项；

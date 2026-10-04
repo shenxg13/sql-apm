@@ -1,0 +1,879 @@
+{
+  "evidence_kind": "measured",
+  "target_platform": "Kylin V10 SP2 Build09 x86_64",
+  "program_commit": "6451d140d44f4e06cc34862c3e5aff7593d7afeb",
+  "implementation_trial_complete": true,
+  "user_independent_run_complete": false,
+  "environment": {
+    "environment": {
+      "passed": true,
+      "python": "3.9.5",
+      "executable": "/data/sql-apm/app/.venv/bin/python",
+      "base_prefix": "/data/sql-apm/python-3.9.5",
+      "modules": [
+        "ssl",
+        "_ssl",
+        "hashlib",
+        "_hashlib",
+        "bz2",
+        "lzma",
+        "zlib",
+        "sqlite3",
+        "ctypes",
+        "readline",
+        "decimal",
+        "uuid",
+        "zoneinfo",
+        "multiprocessing",
+        "pglast",
+        "psycopg2"
+      ],
+      "openssl": "OpenSSL 1.1.1f  31 Mar 2020",
+      "sqlite": "3.32.3",
+      "network_checks": false
+    },
+    "phase_seconds": {
+      "python-build": 120,
+      "postgres-build": 147,
+      "unittest": 2,
+      "verify": 142,
+      "verify-publication": 12
+    },
+    "unittest": {
+      "count": 66,
+      "passed": true
+    },
+    "verify_pass_count": 266,
+    "publication_pass_count": 31,
+    "passfile_mode": "0o600"
+  },
+  "offline_packages": {
+    "signed_rpm_count": 391,
+    "initial_installed_packages_unchanged": true,
+    "initial_installed_packages_sha256": "2be5e16b49ee920ac1be1ef72aaecd935d4d8de85aa977f4d1f8059f401cdbb0",
+    "compile_roots": [
+      "gcc",
+      "gcc-c++",
+      "make",
+      "perl",
+      "bison",
+      "flex",
+      "pkgconf",
+      "zlib-devel",
+      "libffi-devel",
+      "readline-devel",
+      "openssl-devel",
+      "bzip2-devel",
+      "xz-devel",
+      "sqlite-devel",
+      "util-linux-devel",
+      "ncurses-devel",
+      "libicu-devel"
+    ],
+    "installation_method": "all network repositories disabled; only file:// local repository; gpgcheck=1",
+    "installation_seconds": 66,
+    "installed_count": 18,
+    "upgraded_count": 28
+  },
+  "bundle": {
+    "checksum_file": "offline-bundle.tar.gz.sha256",
+    "manifest_file": "offline-bundle/manifest.json",
+    "note": "Archive SHA-256 is external because this report is included in the archive; the PR records the delivered archive checksum."
+  },
+  "log_input": {
+    "files": 55,
+    "bytes": 15816193813,
+    "sha256_all_equal": true
+  },
+  "database": {
+    "version": "17.10",
+    "schema_version": "1.6.0",
+    "bootstrap_schema_check_passed": true,
+    "local_project_scram_passed": true,
+    "hba_has_trust": false,
+    "tcp_wrong_password_rejected": true,
+    "tcp_correct_password_verified": true,
+    "user_dba_tool_verified": true,
+    "temporary_credential_export_explicitly_authorized": true,
+    "temporary_credential_copy_removed": true,
+    "user_dba_tool": "pgAdmin",
+    "user_dba_tool_status": "user reported successful pgAdmin connection and read-only verification",
+    "user_dba_tool_evidence_kind": "user_reported"
+  },
+  "local_default_publication_checks": 31,
+  "pending": [
+    "yum-source dependency path followed by both source builds",
+    "user snapshot restoration and independent execution"
+  ],
+  "boundaries": [
+    "not a production deployment",
+    "production yum contents not checked",
+    "RPM closure not verified for different initial systems",
+    "120 cluster 30-day first-batch cost not measured",
+    "aarch64 not covered",
+    "optional parallel rebuild not performed"
+  ],
+  "trial_failure": {
+    "cluster": "119",
+    "step": 0,
+    "publication_succeeded": true,
+    "publication_checks_passed": 6,
+    "runner_exit_code": 1,
+    "remaining_tasks_executed": 0,
+    "reason": "Alma baseline counts differ after first publication",
+    "observed_counts": {
+      "added_records": 5124686,
+      "added_occurrences": 2547876,
+      "formal_groups": 51143,
+      "observation_groups": 28,
+      "fingerprint_normalization_timeout": 891,
+      "fingerprint_normalization_worker_failed": 0,
+      "fingerprint_base_parser_rejected": 197
+    },
+    "alma_counts": {
+      "added_records": 5124686,
+      "added_occurrences": 2547876,
+      "formal_groups": 51266,
+      "observation_groups": 28,
+      "fingerprint_normalization_timeout": 0,
+      "fingerprint_normalization_worker_failed": 0,
+      "fingerprint_base_parser_rejected": 197
+    },
+    "root_cause_confirmed": false,
+    "original_timeout_seconds": 5,
+    "initial_workers": 4,
+    "concurrency_effect_observed": true,
+    "root_cause_note": "Concurrency affects timeout outcome in bounded replay; underlying resource-contention mechanism not independently established.",
+    "resolution": "single parser worker; original product code and 5-second timeout unchanged; nine-task business counts and successful import counts equal Alma; one user-requested interrupted attempt audited separately"
+  },
+  "failed_trial_tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 469.495,
+        "check": 2.162,
+        "import": 1855.321,
+        "publish": 0.003,
+        "snapshot": 108.45
+      },
+      "seconds": 2436.168,
+      "before": {
+        "database_bytes": 12785331,
+        "filesystem_used_bytes": 20107210752,
+        "filesystem_free_bytes": 183804121088
+      },
+      "after": {
+        "database_bytes": 12454287027,
+        "filesystem_used_bytes": 35015069696,
+        "filesystem_free_bytes": 168896262144
+      },
+      "passed": false,
+      "baseline_equal": false,
+      "version_chain_verified": true
+    }
+  ],
+  "tasks": [
+    {
+      "cluster": "119",
+      "step": 0,
+      "cutoff_date": "2026-07-28",
+      "stages": {
+        "build": 475.889,
+        "check": 2.161,
+        "import": 2450.628,
+        "publish": 0.003,
+        "snapshot": 131.765
+      },
+      "seconds": 3060.858,
+      "counts": {
+        "formal_groups": 51266,
+        "formal_layers": {
+          "day": 217566,
+          "hour": 67265,
+          "overall": 51266,
+          "week": 80067,
+          "weekday": 93602
+        },
+        "observation_groups": 28,
+        "observation_layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "import_attempts": 26,
+        "added_records": 5124686,
+        "added_occurrences": 2547876,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 13653683,
+        "filesystem_used_bytes": 34701172736,
+        "filesystem_free_bytes": 169210159104
+      },
+      "after": {
+        "database_bytes": 12444022451,
+        "filesystem_used_bytes": 49344573440,
+        "filesystem_free_bytes": 154566758400
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 1,
+      "cutoff_date": "2026-07-29",
+      "stages": {
+        "build": 224.961,
+        "check": 2.202,
+        "import": 96.232,
+        "publish": 0.002,
+        "snapshot": 6.648
+      },
+      "seconds": 330.848,
+      "counts": {
+        "formal_groups": 52897,
+        "formal_layers": {
+          "day": 226043,
+          "hour": 69013,
+          "overall": 52897,
+          "week": 81792,
+          "weekday": 95329
+        },
+        "observation_groups": 29,
+        "observation_layers": {
+          "day": 41,
+          "hour": 31,
+          "overall": 29,
+          "week": 35,
+          "weekday": 33
+        },
+        "import_attempts": 28,
+        "added_records": 199164,
+        "added_occurrences": 98949,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 12444022451,
+        "filesystem_used_bytes": 49344647168,
+        "filesystem_free_bytes": 154566684672
+      },
+      "after": {
+        "database_bytes": 13336737459,
+        "filesystem_used_bytes": 50393481216,
+        "filesystem_free_bytes": 153517850624
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 2,
+      "cutoff_date": "2026-07-30",
+      "stages": {
+        "build": 112.466,
+        "check": 2.349,
+        "import": 103.611,
+        "publish": 0.002,
+        "snapshot": 4.13
+      },
+      "seconds": 223.017,
+      "counts": {
+        "formal_groups": 54577,
+        "formal_layers": {
+          "day": 234613,
+          "hour": 71118,
+          "overall": 54577,
+          "week": 83503,
+          "weekday": 97167
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 44,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 29,
+        "added_records": 203063,
+        "added_occurrences": 101599,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 13336737459,
+        "filesystem_used_bytes": 50393513984,
+        "filesystem_free_bytes": 153517817856
+      },
+      "after": {
+        "database_bytes": 14243534515,
+        "filesystem_used_bytes": 51820728320,
+        "filesystem_free_bytes": 152090603520
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 3,
+      "cutoff_date": "2026-07-31",
+      "stages": {
+        "build": 106.821,
+        "check": 2.336,
+        "import": 121.2,
+        "publish": 0.002,
+        "snapshot": 4.391
+      },
+      "seconds": 235.365,
+      "counts": {
+        "formal_groups": 53786,
+        "formal_layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 46,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 30,
+        "added_records": 201727,
+        "added_occurrences": 100411,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 14243534515,
+        "filesystem_used_bytes": 51820761088,
+        "filesystem_free_bytes": 152090570752
+      },
+      "after": {
+        "database_bytes": 15171188403,
+        "filesystem_used_bytes": 52920733696,
+        "filesystem_free_bytes": 150990598144
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "119",
+      "step": 4,
+      "cutoff_date": "2026-07-31",
+      "stages": {
+        "build": 103.6,
+        "check": 2.36,
+        "publish": 0.002,
+        "snapshot": 1.874
+      },
+      "seconds": 108.635,
+      "counts": {
+        "formal_groups": 53786,
+        "formal_layers": {
+          "day": 235223,
+          "hour": 69471,
+          "overall": 53786,
+          "week": 82356,
+          "weekday": 96362
+        },
+        "observation_groups": 30,
+        "observation_layers": {
+          "day": 46,
+          "hour": 32,
+          "overall": 30,
+          "week": 36,
+          "weekday": 36
+        },
+        "import_attempts": 30
+      },
+      "before": {
+        "database_bytes": 15171188403,
+        "filesystem_used_bytes": 52920770560,
+        "filesystem_free_bytes": 150990561280
+      },
+      "after": {
+        "database_bytes": 15577159347,
+        "filesystem_used_bytes": 53457846272,
+        "filesystem_free_bytes": 150453485568
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 0,
+      "cutoff_date": "2026-09-16",
+      "stages": {
+        "build": 1109.569,
+        "check": 132.03,
+        "import": 3462.279,
+        "publish": 0.338,
+        "snapshot": 1527.621
+      },
+      "seconds": 6239.992,
+      "counts": {
+        "formal_groups": 404794,
+        "formal_layers": {
+          "day": 719306,
+          "hour": 468434,
+          "overall": 404794,
+          "week": 508149,
+          "weekday": 719306
+        },
+        "observation_groups": 645,
+        "observation_layers": {
+          "day": 972,
+          "hour": 698,
+          "overall": 645,
+          "week": 753,
+          "weekday": 972
+        },
+        "import_attempts": 13,
+        "added_records": 5540943,
+        "added_occurrences": 2385583,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 15577159347,
+        "filesystem_used_bytes": 53457874944,
+        "filesystem_free_bytes": 150453456896
+      },
+      "after": {
+        "database_bytes": 31471425203,
+        "filesystem_used_bytes": 68560941056,
+        "filesystem_free_bytes": 135350390784
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 1,
+      "cutoff_date": "2026-09-17",
+      "stages": {
+        "build": 378.364,
+        "check": 23.777,
+        "import": 698.662,
+        "publish": 0.004,
+        "snapshot": 63.167
+      },
+      "seconds": 1164.477,
+      "counts": {
+        "formal_groups": 607309,
+        "formal_layers": {
+          "day": 1032579,
+          "hour": 692996,
+          "overall": 607309,
+          "week": 710707,
+          "weekday": 1032579
+        },
+        "observation_groups": 773,
+        "observation_layers": {
+          "day": 1219,
+          "hour": 861,
+          "overall": 773,
+          "week": 881,
+          "weekday": 1219
+        },
+        "import_attempts": 18,
+        "successful_import_attempts": 17,
+        "interrupted_import_attempts": 1,
+        "added_records": 2022404,
+        "added_occurrences": 842659,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 31688373939,
+        "filesystem_used_bytes": 67841515520,
+        "filesystem_free_bytes": 136069816320
+      },
+      "after": {
+        "database_bytes": 39986288307,
+        "filesystem_used_bytes": 77139890176,
+        "filesystem_free_bytes": 126771441664
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 2,
+      "cutoff_date": "2026-09-18",
+      "stages": {
+        "build": 548.566,
+        "check": 29.418,
+        "import": 522.232,
+        "publish": 0.006,
+        "snapshot": 54.983
+      },
+      "seconds": 1155.711,
+      "counts": {
+        "formal_groups": 676989,
+        "formal_layers": {
+          "day": 1210431,
+          "hour": 769124,
+          "overall": 676989,
+          "week": 780401,
+          "weekday": 1210431
+        },
+        "observation_groups": 921,
+        "observation_layers": {
+          "day": 1476,
+          "hour": 1016,
+          "overall": 921,
+          "week": 1029,
+          "weekday": 1476
+        },
+        "import_attempts": 22,
+        "successful_import_attempts": 21,
+        "interrupted_import_attempts": 1,
+        "added_records": 1499944,
+        "added_occurrences": 641729,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 39986288307,
+        "filesystem_used_bytes": 77139927040,
+        "filesystem_free_bytes": 126771404800
+      },
+      "after": {
+        "database_bytes": 47249176243,
+        "filesystem_used_bytes": 84831387648,
+        "filesystem_free_bytes": 119079944192
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    },
+    {
+      "cluster": "120",
+      "step": 3,
+      "cutoff_date": "2026-09-19",
+      "stages": {
+        "build": 709.558,
+        "check": 38.815,
+        "import": 583.887,
+        "publish": 0.003,
+        "snapshot": 69.354
+      },
+      "seconds": 1402.148,
+      "counts": {
+        "formal_groups": 873957,
+        "formal_layers": {
+          "day": 1513777,
+          "hour": 971941,
+          "overall": 873957,
+          "week": 977473,
+          "weekday": 1513777
+        },
+        "observation_groups": 1043,
+        "observation_layers": {
+          "day": 1707,
+          "hour": 1140,
+          "overall": 1043,
+          "week": 1151,
+          "weekday": 1707
+        },
+        "import_attempts": 26,
+        "successful_import_attempts": 25,
+        "interrupted_import_attempts": 1,
+        "added_records": 1598215,
+        "added_occurrences": 705998,
+        "normalization_timeouts": 0
+      },
+      "before": {
+        "database_bytes": 47249176243,
+        "filesystem_used_bytes": 84831424512,
+        "filesystem_free_bytes": 119079907328
+      },
+      "after": {
+        "database_bytes": 56530884275,
+        "filesystem_used_bytes": 94125678592,
+        "filesystem_free_bytes": 109785653248
+      },
+      "passed": true,
+      "baseline_equal": true,
+      "version_chain_verified": true
+    }
+  ],
+  "timeout_replay": [
+    {
+      "distinct": 297,
+      "event": "input_summary",
+      "max_bytes": 53440,
+      "min_bytes": 53379,
+      "records": 891
+    },
+    {
+      "byte_sizes": [
+        53379,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53440
+      ],
+      "elapsed_seconds": 25.714,
+      "event": "replay",
+      "other": 0,
+      "reliable": 8,
+      "samples": 8,
+      "timeouts": 0,
+      "worker_failed": 0,
+      "workers": 1
+    },
+    {
+      "byte_sizes": [
+        53379,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53438,
+        53440
+      ],
+      "elapsed_seconds": 21.628,
+      "event": "replay",
+      "other": 0,
+      "reliable": 0,
+      "samples": 8,
+      "timeouts": 8,
+      "worker_failed": 0,
+      "workers": 4
+    }
+  ],
+  "recovery": {
+    "failed_database_preserved": true,
+    "failed_task_records_preserved": true,
+    "fresh_instance_initialized": true,
+    "credential_reused_on_host": true,
+    "workers": 1,
+    "product_code_changed": false,
+    "timeout_seconds": 5,
+    "full_replay_complete": true
+  },
+  "migration_pause": {
+    "reason": "User requested safe stop before migrating VM from mechanical disk to SSD",
+    "stopped_at_utc": "2026-10-02T14:27:36.064507+00:00",
+    "passed_tasks": 6,
+    "published_versions": {
+      "119": 5,
+      "120": 1
+    },
+    "interrupted_task": {
+      "cluster": "120",
+      "step": 1,
+      "stage": "import",
+      "reason": "operator_interrupt"
+    },
+    "120_import_attempts": {
+      "succeeded": 13,
+      "interrupted": 1
+    },
+    "next_step": "Resume from 120-1 after migration; preserve interruption evidence and account for the additional interrupted import attempt in acceptance comparison.",
+    "product_code_changed": false,
+    "parser_workers": 1,
+    "storage_medium": "mechanical disk, user-reported",
+    "postgres_control_state": "shut down",
+    "remaining_project_processes": 0,
+    "local_record_backup_files": 48,
+    "local_record_backup_sha256": "98f135bcff08dde58fcff973e5b098a90a37a5a24c14dcd83a8a7f5d3c29599d",
+    "resource_sample": {
+      "sample_seconds": 20.098,
+      "cpu_percent": {
+        "user": 0.49,
+        "nice": 0.0,
+        "system": 0.69,
+        "idle": 87.91,
+        "iowait": 10.71,
+        "irq": 0.11,
+        "softirq": 0.08,
+        "steal": 0.0
+      },
+      "process_cpu_percent_one_core_100": {
+        "postgres": 5.22,
+        "python": 3.83
+      },
+      "activity_samples": {
+        "insert_fingerprint|IO|DataFileRead": 7,
+        "copy_sql_evidence|IO|DataFileRead": 7,
+        "copy_occurrences|IO|DataFileRead": 4,
+        "other|IO|DataFileRead": 1,
+        "fingerprint_cache_lookup|IO|DataFileRead": 1
+      },
+      "data_disk": {
+        "read_iops": 45.08,
+        "read_MiB_per_sec": 0.501,
+        "mean_read_ms": 41.842,
+        "write_iops": 67.37,
+        "mean_write_ms": 0.444,
+        "busy_percent": 93.54
+      }
+    },
+    "interpretation": "Sample supports storage read latency as the current import bottleneck; SSD improvement remains unverified."
+  },
+  "ssd_resume": {
+    "storage_medium": "SSD, user-reported",
+    "same_product_code_hashes_verified": 69,
+    "parser_workers": 1,
+    "database_parameters_unchanged": true,
+    "hdd_interrupted_import_seconds": 1802.929,
+    "hdd_last_reported_records_in_first_file": 94000,
+    "hdd_last_reported_occurrences_in_first_file": 34471,
+    "ssd_resource_samples": [
+      {
+        "sample_seconds": 20.04,
+        "cpu_percent": {
+          "user": 6.28,
+          "nice": 0.0,
+          "system": 6.78,
+          "idle": 85.25,
+          "iowait": 1.06,
+          "irq": 0.51,
+          "softirq": 0.12,
+          "steal": 0.0
+        },
+        "process_cpu_percent_one_core_100": {
+          "postgres": 25.9,
+          "python": 28.44
+        },
+        "activity_samples": {
+          "other|IO|WalSync": 1,
+          "insert_fingerprint|None|None": 1,
+          "insert_fingerprint|IO|DataFileRead": 3,
+          "other|Client|ClientRead": 1,
+          "other|None|None": 1
+        },
+        "data_disk": {
+          "read_iops": 1853.72,
+          "read_MiB_per_sec": 35.69,
+          "mean_read_ms": 0.158,
+          "write_iops": 2186.91,
+          "mean_write_ms": 0.11,
+          "busy_percent": 24.99
+        }
+      },
+      {
+        "sample_seconds": 20.038,
+        "cpu_percent": {
+          "user": 8.13,
+          "nice": 0.0,
+          "system": 4.36,
+          "idle": 87.08,
+          "iowait": 0.2,
+          "irq": 0.18,
+          "softirq": 0.04,
+          "steal": 0.0
+        },
+        "process_cpu_percent_one_core_100": {
+          "postgres": 22.81,
+          "python": 32.14
+        },
+        "activity_samples": {
+          "other|None|None": 5,
+          "insert_fingerprint|None|None": 1
+        },
+        "data_disk": {
+          "read_iops": 99.81,
+          "read_MiB_per_sec": 2.718,
+          "mean_read_ms": 0.606,
+          "write_iops": 810.36,
+          "mean_write_ms": 0.173,
+          "busy_percent": 6.17
+        }
+      }
+    ],
+    "comparison_limits": [
+      "20-second observational samples during the same daily batch, not a controlled hardware benchmark",
+      "VM restart changed memory cache state; normalization cache persisted from the interrupted attempt",
+      "HDD daily batch did not complete, so no measured whole-batch speedup ratio is available"
+    ],
+    "first_file_comparison": {
+      "same_file_verified": true,
+      "hdd": {
+        "state": "interrupted",
+        "seconds": 1780.568
+      },
+      "ssd": {
+        "state": "succeeded",
+        "records": 688482,
+        "seconds": 234.879,
+        "records_per_second": 2931.22
+      }
+    },
+    "completed": true,
+    "final_state": {
+      "verified_at": "2026-10-03 00:03:04.423294+08",
+      "logical_cpu_count": 8,
+      "published_versions": [
+        [
+          "119",
+          5
+        ],
+        [
+          "120",
+          4
+        ]
+      ],
+      "task_states": [
+        [
+          "119",
+          "succeeded",
+          5
+        ],
+        [
+          "120",
+          "interrupted",
+          1
+        ],
+        [
+          "120",
+          "succeeded",
+          4
+        ]
+      ],
+      "import_attempt_states": [
+        [
+          "119",
+          "succeeded",
+          30
+        ],
+        [
+          "120",
+          "interrupted",
+          1
+        ],
+        [
+          "120",
+          "succeeded",
+          25
+        ]
+      ],
+      "running_task_count": 0
+    },
+    "final_record_backup": {
+      "files": 63,
+      "archive_sha256": "e66fc7b4290947d0d013756b6fe33d32eea4d82c7ce9775f9b505c2fd3f8f677",
+      "git_ignored": true,
+      "parent_directory_mode": "0700"
+    },
+    "daily_tasks_total_seconds": 3722.336
+  }
+}

@@ -1,0 +1,5 @@
+# Build-only HTML renderer; never installed into the application venv.
+# https://pypi.org/project/Markdown/3.8.2/
+Markdown==3.8.2 --hash=sha256:5c83764dbd4e00bdd94d85a19b8d55ccca20fe35b2e678a1422b380324dd5f24
+importlib-metadata==8.7.0 --hash=sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd
+zipp==3.23.0 --hash=sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e

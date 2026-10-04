@@ -63,6 +63,9 @@
 | --- | --- | --- |
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
+| [Kylin 离线部署与九任务验证](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线包、项目自带解释器、PG17.10、SCRAM、日志传输及 Alma 比对。 |
+| [精简程序包与预发布交付](runbooks/program-release.md) | 操作说明 | 必要文件打包、离线 HTML、独立验收及用户确认后发布。 |
+| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 快照恢复后的独立执行、DBA 查询、每步实际输出与结论。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |
 | [统计计算操作](runbooks/baseline-statistics.md) | 操作说明 | 快照计算、观察诊断、重试引用、分区维护和真实验收。 |
@@ -81,6 +84,12 @@
 | [近似分组观察统计验证](reports/observation-statistics-2026-10-01.md) | 实施验证报告 | 55 文件重导、全部观察组复算、正式结果逐行对照、重复一致与资源实测。 |
 | [统计 R2 整改](reports/baseline-statistics-r2-remediation-2026-10-01.md) | 整改验证报告 | 批量门槛查询一致性、单组／聚合实测与统计容量接受同步。 |
 | [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
+| [Kylin 离线部署验证](reports/kylin-offline-deployment-2026-10-02.md) | 实施验证报告 | 离线编译、自检、认证和与 Alma 比对的实测及未完成验收边界。 |
+| [精简候选包与 HTML 准备验证](reports/slim-release-preparation-2026-10-03.md) | 实施验证报告 | 程序精简、逐文件证据继承、隔离验证、HTML 检查及目标机确认点。 |
+| [精简候选包 Kylin 试跑](reports/slim-release-kylin-trial-2026-10-03.md) | 实施验证报告 | 快照恢复后的完整重装、独立验收、四进程超时与单进程复跑、性能对照。 |
+| [Kylin 用户独立验证核对](reports/kylin-manual-validation-2026-10-04.md) | 验收核对报告 | 用户九任务等值、正常 yum 源和 DBA 验证，以及早期候选包误选与最小补验范围。 |
+| [Kylin 执行账号读取权限修正](reports/kylin-read-access-2026-10-04.md) | 验证报告 | sfmon 全目录读取、private 和 PGDATA 权限、新文件继承及 socket／TCP 复验。 |
+| [Kylin 候选交付对齐与补验](reports/kylin-delivery-alignment-2026-10-04.md) | 验证报告 | 修正旧包误选、对齐程序与验收资源、补齐 66 项测试及新版 HTML 人工确认。 |
 | [构建编排 R1 整改](reports/build-publication-r1-remediation-2026-10-02.md) | 整改验证报告 | 次月预建并发、未登记集群拒绝、知识同步与 R1 退出条件。 |
 | [统计范围变更与 R1 整改验收](reports/baseline-statistics-2026-10-01.md) | 整改验证报告 | 派生门槛、数据库时钟修复、新结构 55 文件全量验收与容量对比。 |
 | [统计计算原验收](reports/baseline-statistics-2026-09-30.md) | 实施验证报告 | 55 文件重导、两集群五层守恒、独立复算、重复一致与资源实测。 |

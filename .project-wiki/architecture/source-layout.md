@@ -9,8 +9,13 @@ owners:
   - sql_apm/storage/
   - scripts/db/
   - tests/database/
-updated: 2026-10-01
+  - scripts/deployment/
+updated: 2026-10-04
 sources:
+  - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/31
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/27
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/25
@@ -270,6 +275,24 @@ Issue #29 新增 `baseline/workflow.py` 连接导入、快照、统计及发布�
 原有三个写入模块接受同一任务连接，单独调用时也创建任务；不反向依赖诊断或测试。
 覆盖函数和构建层计数由存储层维护，命令、原子性及恢复边界见
 [编排设计](../../docs/design/build-publication.md)。
+
+## 已实现的部署与演练辅助工具
+
+Issue #31 的 `scripts/deployment/` 保存离线制品收集／打包、解释器自检、凭据初始化、
+固定演练配置和结果核对。程序包由 `package-files.json` 的必要文件规则从固定提交生成，
+不再交付整棵仓库。`build_release.py` 生成精简 `app`、独立验收包、逐文件摘要和单文件
+HTML；`build_bundle.py` 把同一程序与源码／wheel／RPM 组装为内网包。
+`render_manual.py` 仅在独立构建环境使用锁定的 Markdown 工具；目标机不安装它。
+`run_verification.py` 显式选择实际程序目录，原三组自检的素材与历史探针在 `app` 外；
+业务模块仍从交付程序加载，不复制另一份业务实现作为测试对象。
+交付目录按完整提交号区分；部署时同时核对交付记录中的预期提交／外部摘要与包内清单，
+程序和验收资源必须属于同一提交。仅包内清单通过不能证明交付身份，操作见
+[Kylin 手册](../../docs/runbooks/kylin-offline-deployment.md#3-在开发机生成并传输离线包)。
+这不引入 Python 安装包、src 布局或新的产品入口；制包与验证方法见
+[发布操作说明](../../docs/runbooks/program-release.md)。
+演练通过已有 CLI 执行 full/rebuild/status/history，仅用计数查询核对结果，
+不复制产品导入、资格或统计实现；产品模块不反向依赖这些脚本。
+目录内脚本的操作契约由[部署手册](../../docs/runbooks/kylin-offline-deployment.md)维护。
 
 ## Workflows
 

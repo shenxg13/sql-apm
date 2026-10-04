@@ -9,8 +9,10 @@ Baseline 存储采用 PostgreSQL 17，后续 Grafana 按已确认范围直接查
 SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名单见[训练资格与黑名单](.project-wiki/contracts/training-eligibility.md#已确认的-sql-纳入与排除策略)。
 基线按计算集群、数据库、执行用户、SQL 结构指纹及计时类别分别统计，详见[分组规则](.project-wiki/contracts/timing-and-grouping.md)。
 后续按需准备 PostgreSQL 9.4.26 做实时采集兼容测试。
-当前开发以可联网的 AlmaLinux 环境为准；生产 Kylin V10 SP2 的离线安装方案
-由后续专项 Issue 承接。环境准备说明见[开发说明](docs/runbooks/local-development.md)。
+当前开发以可联网的 AlmaLinux 环境为准；Kylin V10 SP2 x86_64 演练机已完成
+[离线部署与验证](docs/runbooks/kylin-offline-deployment.md)，正式生产部署尚未实施。
+精简程序及内网依赖包的交付边界见[发布说明](docs/runbooks/program-release.md)，
+开发环境准备见[开发说明](docs/runbooks/local-development.md)。
 首期先交付离线基线流程，再接入 SQL 检索和 Grafana 展示；两部分均在首期范围内。
 交付顺序及验证安排见[项目知识](.project-wiki/decisions/project-scope.md#已确认的首期交付顺序)。
 已确认需求按主题保存在知识库；各主题标明尚待确认或实施验证的事项。

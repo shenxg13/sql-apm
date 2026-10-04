@@ -7,12 +7,14 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from build_release import archive, select
 from render_manual import inspect, render
 from verify_package import digest, verify
+import rehearsal
 
 
 class PackageTests(unittest.TestCase):
@@ -33,6 +35,25 @@ class PackageTests(unittest.TestCase):
 
     def test_valid_tree(self):
         self.assertTrue(verify(self.app)['passed'])
+
+    def test_rehearsal_requires_expected_commit_and_unchanged_package(self):
+        with patch.object(rehearsal, 'ROOT', self.app):
+            self.assertTrue(rehearsal.verify_product('abc123')['passed'])
+            with self.assertRaisesRegex(ValueError, 'unexpected_program_commit'):
+                rehearsal.verify_product('other-commit')
+            (self.app / 'schema.sql').write_text('SELECT 2;\n')
+            with self.assertRaisesRegex(ValueError, 'package checksum mismatch'):
+                rehearsal.verify_product('abc123')
+
+    def test_rehearsal_legacy_path_rejects_original_product_drift(self):
+        baseline = self.root / 'baseline.json'
+        baseline.write_text(json.dumps(dict(provenance=dict(
+            product_code_sha256={'schema.sql': digest(self.app / 'schema.sql')}))))
+        with patch.object(rehearsal, 'ROOT', self.app), patch.object(rehearsal, 'BASELINE', baseline):
+            self.assertEqual({'baseline_product_equal': True}, rehearsal.verify_product())
+            (self.app / 'schema.sql').write_text('SELECT 2;\n')
+            with self.assertRaisesRegex(ValueError, 'product_code_changed'):
+                rehearsal.verify_product()
 
     def test_missing_sql(self):
         (self.app / 'schema.sql').unlink()

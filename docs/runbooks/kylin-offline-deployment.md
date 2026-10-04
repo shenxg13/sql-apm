@@ -7,6 +7,10 @@ x86_64 的专用演练机；不是生产部署方案。使用 Python 3.9.5、Pos
 `6451d140d44f4e06cc34862c3e5aff7593d7afeb`；候选包的实施提交见 `PROGRAM_COMMIT`，
 文件摘要、产品基准和候选／发布类型见 `RELEASE.json`。应用版本不等于数据库结构版本。
 
+[Issue #34](https://github.com/shenxg13/sql-apm/issues/34) 更新了分词修复版的并发建议和首批
+验收入口。以下四进程设置适用于包含该修复且通过第 10.1 节验收的程序包；#31 原包仍用
+单进程及其随包手册。#34 本轮只验证 119 首批，不宣称重新完成用户独立九任务。
+
 精简程序包只包含运行所需代码、规则与 PostgreSQL 许可证、SQL／迁移资源、必要工具和
 本 HTML 手册；测试和历史探针在独立验收目录。GitHub Releases 仅提供程序包及其校验文件，
 完整离线包（Python、PG、wheel、RPM、程序和验收资源）继续内网交付。
@@ -49,6 +53,7 @@ export APM_CLIENT_CIDR='填写允许的客户端CIDR网段'
 export APM_BUNDLE="$APM_ROOT/offline-bundle"
 export APM_EXPECTED_COMMIT='填写交付记录中的40位程序提交'
 export APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
+export APM_WORKERS=4
 export PGPASSFILE="$APM_ROOT/private/pgpass"
 export SQL_APM_DSN="host=$APM_SOCKET port=$APM_PORT dbname=sql_apm user=sql_apm"
 unset PGPASSWORD PGSERVICE PGSERVICEFILE PGOPTIONS PGHOSTADDR
@@ -308,11 +313,12 @@ cd "$APM_APP"
   --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
 ```
 
-预期：PG17.10；普通测试 66 项、verify.py 共 266 个 PASS、发布检查 31 项。
+预期：PG17.10；普通测试 66 项、verify.py 共 266 个 PASS、分词修复版发布检查 33 项。
 三个命令均退出 0，开头 `APPLICATION` 指向 `$APM_APP`；记录实际项数，不以文件存在代替通过。
 验收目录保存原合成测试及其探针，核心模块从精简 `app` 加载；不把测试或探针复制回 `app`。后两项自己创建私有临时实例，
 禁用 TCP 并最终停止清理，不连接下面的演练实例。其合成测试中的 trust 仅限私有临时实例，
-不复制到演练实例的认证规则。不运行 `*_full`、`tests/parser_probe` 或 Kylin 上的 Harness。
+不复制到演练实例的认证规则。不运行 `tests/parser_probe` 或 Kylin 上的 Harness；
+全量探针仅按第 10.1 节显式执行 119 首批，其他 `*_full` 不在本手册验收范围。
 失败：保留原输出，核对二进制路径和链接库；不能因测试失败修改产品行为绕过。
 
 ## 7. 建立实例与项目数据库
@@ -550,29 +556,35 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 
 ## 10. 串行完整流程、版本查询与 Alma 比对
 
-本节九任务用于用户独立执行，默认保持单解析进程。实施方候选包重走时使用第 10.1 节，
-只运行 119 首批四进程验证，不执行下面两个九任务循环。
+本节九任务用于完整部署验证。分词修复版使用第 1 节的四解析进程设置；#31 原包的
+单进程历史记录保持不变。#34 的实施验收使用第 10.1 节，只运行 119 首批，
+不执行下面两个九任务循环。
 
 下面的辅助工具逐次调用真实 `python -m sql_apm full/rebuild`，每次再调用 status 和 history，
 保存日志、查询 JSON、阶段耗时、数据库大小和 /data 磁盘占用。它不会调用任何 `*_full`。
 每次导入后读取结果中的 `normalization_timeouts`，须为 0；非零会使辅助工具拒绝通过。
 每条任务结束后立即与[Alma 基准](../reports/data/kylin-alma-baseline-2026-10-02.json)比对，
-不匹配退出非零。基准源于 #29 R2 最终 head 实测，与程序包产品代码摘要逐文件一致。
+不匹配退出非零。业务计数基准源于 #29 R2 最终 head 实测，修复分词后仍逐项保持一致。
+新程序包通过 `--program-commit` 指定交付提交并完整校验文件集合及摘要；不接受其他提交
+或被修改的包。省略该参数的历史命令仍要求产品代码与原 Alma 摘要逐文件相同。
 基准与已合并报告的九版计数一致；不能用含合成排除时段的旧统计报告替代。
 归一化超时意味着部分执行缺少可靠指纹，六项发布检查通过也不能说明数据齐全。
 已成功导入的文件不会自动重新解析；修改并发后直接重跑或 rebuild 不能修复这些记录，
 须保留证据并在确认重置后从干净数据库重新导入。不要将出现超时的版本当作有效基线。
 
-部署辅助工具默认使用一个解析进程（`--workers 1`）。本机四进程首批曾出现归一化超时，
-八条样本单进程均通过、四进程均超时，见[试跑报告](../reports/kylin-offline-deployment-2026-10-02.md)。
-产品自身的默认并发和 5 秒限制没有修改；增加并发前须重新验证计数，不根据 vCPU 数直接推定。
+#31 原包在本机四进程首批曾出现归一化超时，见
+[历史试跑报告](../reports/kylin-offline-deployment-2026-10-02.md)。分词修复版通过
+第 10.1 节后使用产品默认四进程；部署辅助工具为兼容历史命令仍默认一个进程，
+因此下面显式传入 `--workers "$APM_WORKERS"`。5 秒限制没有修改；更高并发或其他主机
+须重新验证计数，不根据 vCPU 数直接推定。实测及适用边界见
+[分词验证报告](../reports/sql-scanning-2026-10-04.md)。
 
 例如 119/0 实际调用如下 full 命令，119/4 调用下列 rebuild。使用辅助工具执行后，
 不要再重复执行这些等价命令，否则会生成额外版本：
 
 ```bash
 .venv/bin/python -m sql_apm full --config "$APM_ROOT/config/import-119.json" \
-  --source daily-119 --batch 119-0 --training-config "$APM_ROOT/config/training-119.json" --workers 1
+  --source daily-119 --batch 119-0 --training-config "$APM_ROOT/config/training-119.json" --workers "$APM_WORKERS"
 .venv/bin/python -m sql_apm rebuild --cluster 119 \
   --training-config "$APM_ROOT/config/training-119.json" --cutoff-date 2026-07-31
 ```
@@ -581,11 +593,13 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 cd "$APM_APP"
 for step in 0 1 2 3 4; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 119 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT"
+    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT"
 done
 for step in 0 1 2 3; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 120 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT"
+    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT"
 done
 ```
 
@@ -626,26 +640,32 @@ done
 单独保留在 `import_attempt_audit` 中；正式／观察统计、文件计数和版本链的比对不变。
 恢复日志使用新文件，旧 `.log` 先保留到单独的中断证据目录，不覆盖或删除数据库审计记录。
 
-### 10.1 实施方 SSD 四进程首批验证
+### 10.1 分词修复版默认四进程首批验证
 
-此步骤只在用户恢复初始快照、明确确认开始目标机试跑，且第 1–9 节通过之后执行。
-首次部署使用独立记录目录；不要先执行单进程九任务，否则不再是四进程首批验证。
+此步骤在已获授权的演练机执行。先完成运行时、程序包及独立验收资源的安装校验，
+明确源日志可用于本机验收。只需要原清单中 119 首批的 26 个文件；不必传输其余 29 个。
+已有演练实例可以保留，工具另建 0700 私有目录及干净数据库，不连接已有服务。
+临时实例放在 `$APM_ROOT` 所在文件系统，沿用 #31 的内存／WAL 参数，禁用 TCP；
+真实 CLI 不传 `--workers`，验证产品默认四进程。输出目录必须全新。
 
 ```bash
 cd "$APM_APP"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run \
-  --cluster 119 --step 0 --workers 4 --config "$APM_ROOT/config" \
-  --records "$APM_ROOT/records/ssd-workers4" --data-root "$APM_ROOT"
+.venv/bin/python scripts/deployment/verify_package.py --installed
+SQL_APM_APP_ROOT="$APM_APP" PYTHONPATH="$APM_APP" \
+  .venv/bin/python "$APM_VERIFY/scripts/db/verify_scanning_full.py" \
+  --app-root "$APM_APP" --logs "$APM_ROOT/logs" \
+  --output "$APM_ROOT/records/scanning-workers4" --pg-bin "$APM_PG_BIN" \
+  --instance-parent "$APM_ROOT" --kylin-settings --first-batch-119
 ```
 
-工具记录四进程、超时计数、正式分组、全部 Alma 比较、耗时和版本链。
-预期零超时且与基准一致；该结果用于实测判断，不预先认定磁盘是原因。
-若一致，记录结论，存储较慢主机仍建议单进程；九任务手册参数不改。
-若退出非零，先判断 CLI／环境失败还是业务计数差异，保留全部日志和 JSON，
-不得为了继续而修改基准。对超时或计数差异，先保存失败数据库和记录，
-再按第 11 节重置项目并从第 7–9 节恢复，使用新的记录目录、`--workers 1`
-重跑 119 首批。单进程必须通过，产品问题经用户确认后另建 Issue；本 Issue 不修复。
-完成后先汇报结果，再由用户恢复快照并独立执行单进程九任务。
+工具记录输入和程序摘要、数据库参数、超时计数、全部 Alma 比较、各阶段耗时和版本链。
+预期退出 0、26 文件／5,124,686 条记录、归一化超时 0、正式分组 51,266，全部计数等值，
+结构检查仍为 1.6.0。保存 `.log`、`.json` 和 `verification.json`；临时实例退出后自动
+停止清理，日志和报告保留。若失败，区分环境／CLI 失败与业务差异，保留输出并停止验收，
+不得修改基准或把单进程通过替代默认四进程要求。
+
+该步骤只证明本次环境及 119 首批，不继承为全部九任务或其他主机的性能保证。
+已成功文件仍不会重新解析；已有超时数据不因换包、重跑或 rebuild 自动修复。
 
 ## 11. 可选并行与重置
 

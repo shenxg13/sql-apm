@@ -293,3 +293,4 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 
 - Issue #34 实现等长 ASCII 分词、超时前重新检查回复，以及当前版本输入的两项隔离记录计数；原依赖、算法和结构版本及历史文件跳过规则不变。持久边界见[导入主题](features/log-ingestion.md#分词性能与超时判定issue-34)、[命令行主题](features/operator-cli.md#完整流程与版本查询2026-10-01)和[运行环境](decisions/runtime-and-components.md#分词性能修复的运行边界issue-34)。
 - [实施报告](../docs/reports/sql-scanning-2026-10-04.md)分别记录合成验证、全量比较及两机实测；未完成项继续由在线 Issue 追踪，不从局部测试推定全部验收。
+- 全量 1,497,418 条分词／归一化零差异；两机默认四进程首批均零超时且 Alma 等值，Kylin 1,121.232 秒。按实测同步[修复版并发建议](decisions/runtime-and-components.md#分词性能修复的运行边界issue-34)与部署手册；旧包边界和历史九任务记录保留。

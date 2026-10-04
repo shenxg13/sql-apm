@@ -102,6 +102,10 @@
       "category": "historical"
     },
     {
+      "path": "docs/reports/data/mpp-naming-2026-10-05.json",
+      "category": "naming_record"
+    },
+    {
       "path": "docs/reports/data/mpp-naming-terminology-2026-10-05.json",
       "category": "naming_record"
     },

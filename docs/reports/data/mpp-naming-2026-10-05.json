@@ -1,0 +1,1383 @@
+{
+  "all_equal": true,
+  "baseline_assembly": {
+    "119": {
+      "path": "baseline-run/report.json",
+      "sha256": "4eefdc653f81eef11e17ec5d0137753659533cc2cffde6f252239d3c8cc88fbb"
+    },
+    "120": {
+      "path": "baseline-120-retry/report.json",
+      "sha256": "535fc66c682311676e09d2a96b2454727cdef17c98032b9b972b5b1314b15a6e"
+    }
+  },
+  "baseline_commit": "7ebd1256335b6659477ca4c04f37139b7ec4c7b8",
+  "candidate_equality": {
+    "all_equal": true,
+    "product_files_equal": 69,
+    "verification_resource_files_equal": 60
+  },
+  "candidate_package_commit": "a743ce57b5d3ecf8b570a2377ac7b1b3434b2af0",
+  "candidate_replay_difference_from_package": {
+    "change": "missing-schema diagnostic additionally names version 1.7.0; all other replayed Python and SQL resources identical",
+    "path": "sql_apm/storage/migrate.sql"
+  },
+  "cutoffs": {
+    "119": "2026-07-31",
+    "120": "2026-09-19"
+  },
+  "dictionary_sha256": {
+    "baseline": "7a75761933c3f48ae59855b16ab3cafe2cd17d5ed21d6fdd2df8ef779aefa822",
+    "candidate": "25a3c1ecf81fc198d0ea734f5a530f5e13910c73f2d7ff20efa4b25eaec9dc5a"
+  },
+  "equivalence": {
+    "119": {
+      "checks": [
+        [
+          "batch_complete",
+          "passed",
+          null
+        ],
+        [
+          "counts_consistent",
+          "passed",
+          null
+        ],
+        [
+          "results_complete",
+          "passed",
+          null
+        ],
+        [
+          "results_saved",
+          "passed",
+          null
+        ],
+        [
+          "rules_consistent",
+          "passed",
+          null
+        ],
+        [
+          "values_consistent",
+          "passed",
+          null
+        ]
+      ],
+      "counts": {
+        "approximate": [
+          [
+            "available",
+            2232
+          ],
+          [
+            "unavailable",
+            117
+          ]
+        ],
+        "fingerprints": [
+          [
+            "reliable",
+            228679
+          ]
+        ],
+        "occurrences": [
+          [
+            2848835
+          ]
+        ],
+        "problems": [
+          [
+            "duration_ms_unknown",
+            "isolate_record",
+            21973,
+            "21973"
+          ],
+          [
+            "error_without_execution",
+            "isolate_record",
+            54289,
+            "54289"
+          ],
+          [
+            "estimated_start_at_unknown",
+            "isolate_record",
+            21973,
+            "21973"
+          ],
+          [
+            "execute_start_missing",
+            "isolate_record",
+            1,
+            "1"
+          ],
+          [
+            "fingerprint_base_parser_rejected",
+            "isolate_record",
+            214,
+            "214"
+          ],
+          [
+            "fingerprint_invalid_encoding",
+            "isolate_record",
+            7,
+            "7"
+          ],
+          [
+            "fingerprint_lexical_ambiguous_string_escape",
+            "isolate_record",
+            47,
+            "47"
+          ],
+          [
+            "fingerprint_lexical_unbalanced_bracket",
+            "isolate_record",
+            2423,
+            "2423"
+          ],
+          [
+            "fingerprint_lexical_unclosed_comment",
+            "isolate_record",
+            58,
+            "58"
+          ],
+          [
+            "fingerprint_lexical_unclosed_string",
+            "isolate_record",
+            360,
+            "360"
+          ],
+          [
+            "fingerprint_sql_missing_or_empty",
+            "isolate_record",
+            22427,
+            "22427"
+          ],
+          [
+            "fingerprint_unsupported_distribution_statement",
+            "isolate_record",
+            2,
+            "2"
+          ],
+          [
+            "record_encoding_invalid",
+            "isolate_record",
+            14,
+            "14"
+          ],
+          [
+            "sql_missing",
+            "isolate_record",
+            33151,
+            "33151"
+          ],
+          [
+            "timing_out_of_scope",
+            "isolate_record",
+            27959,
+            "27959"
+          ]
+        ],
+        "records": [
+          [
+            5728640
+          ]
+        ],
+        "sql_texts": [
+          [
+            228679
+          ]
+        ]
+      },
+      "formal": {
+        "rows": 537198,
+        "sha256": "05662716861ae09f89f5baae3b6a40f1286c418ee0d42d29fe6f12bb82922616"
+      },
+      "memberships": {
+        "rows": 2717446,
+        "sha256": "bffee36ca4c4a224720554e58f45aa87b1e0a66505d7391aabe7ae53e28ca608"
+      },
+      "observation": {
+        "rows": 180,
+        "sha256": "2a4c04143b7e84c5d7570b7db2edb510a9395b8615ae6b0610b59bd87db284cc"
+      },
+      "publication": "published"
+    },
+    "120": {
+      "checks": [
+        [
+          "batch_complete",
+          "passed",
+          null
+        ],
+        [
+          "counts_consistent",
+          "passed",
+          null
+        ],
+        [
+          "results_complete",
+          "passed",
+          null
+        ],
+        [
+          "results_saved",
+          "passed",
+          null
+        ],
+        [
+          "rules_consistent",
+          "passed",
+          null
+        ],
+        [
+          "values_consistent",
+          "passed",
+          null
+        ]
+      ],
+      "counts": {
+        "approximate": [
+          [
+            "available",
+            8053
+          ],
+          [
+            "unavailable",
+            116
+          ]
+        ],
+        "fingerprints": [
+          [
+            "reliable",
+            1157191
+          ]
+        ],
+        "occurrences": [
+          [
+            4575969
+          ]
+        ],
+        "problems": [
+          [
+            "duration_ms_unknown",
+            "isolate_record",
+            35466,
+            "35466"
+          ],
+          [
+            "error_without_execution",
+            "isolate_record",
+            29002,
+            "29002"
+          ],
+          [
+            "estimated_start_at_unknown",
+            "isolate_record",
+            35466,
+            "35466"
+          ],
+          [
+            "execute_context_mismatch",
+            "isolate_record",
+            213,
+            "213"
+          ],
+          [
+            "execute_start_missing",
+            "isolate_record",
+            32,
+            "32"
+          ],
+          [
+            "fingerprint_base_parser_rejected",
+            "isolate_record",
+            1595,
+            "1595"
+          ],
+          [
+            "fingerprint_invalid_encoding",
+            "isolate_record",
+            479,
+            "479"
+          ],
+          [
+            "fingerprint_lexical_ambiguous_string_escape",
+            "isolate_record",
+            1887,
+            "1887"
+          ],
+          [
+            "fingerprint_lexical_unbalanced_bracket",
+            "isolate_record",
+            5927,
+            "5927"
+          ],
+          [
+            "fingerprint_lexical_unclosed_comment",
+            "isolate_record",
+            247,
+            "247"
+          ],
+          [
+            "fingerprint_lexical_unclosed_string",
+            "isolate_record",
+            2542,
+            "2542"
+          ],
+          [
+            "fingerprint_scanner_rejected",
+            "isolate_record",
+            50,
+            "50"
+          ],
+          [
+            "fingerprint_sql_missing_or_empty",
+            "isolate_record",
+            66097,
+            "66097"
+          ],
+          [
+            "record_encoding_invalid",
+            "isolate_record",
+            1153,
+            "1153"
+          ],
+          [
+            "sql_missing",
+            "isolate_record",
+            30204,
+            "30204"
+          ],
+          [
+            "timing_out_of_scope",
+            "isolate_record",
+            122642,
+            "122642"
+          ]
+        ],
+        "records": [
+          [
+            10661506
+          ]
+        ],
+        "sql_texts": [
+          [
+            1157191
+          ]
+        ]
+      },
+      "formal": {
+        "rows": 5850925,
+        "sha256": "2521251f11b1bbac91de2da7214d59a86046d6646868d22f381f9bcb9ab19f96"
+      },
+      "memberships": {
+        "rows": 4444170,
+        "sha256": "20c8294d4f9b25247fb9befddca60d644d666828ab298cc855f4e64710eb1de3"
+      },
+      "observation": {
+        "rows": 6748,
+        "sha256": "b02700cad24b4ea0a60825a1da7272f0498567335bfb7d845b44ff8612ad0ddb"
+      },
+      "publication": "published"
+    }
+  },
+  "export_failure_kernel_evidence_sha256": "450805fc3d2f8a058f2769fdf813c0223444a5f8231bd22ae9386617340db74d",
+  "export_recovery": {
+    "baseline_retry_clusters": [
+      "120"
+    ],
+    "comparison_criteria_changed": false,
+    "export_parallel_workers": 0,
+    "kernel_observation": "concurrent_global_oom_killed_postgres; exact_backend_pid_not_correlated",
+    "reason": "baseline_connection_lost_during_count_export",
+    "retry_export_work_mem_mib": 16
+  },
+  "full_cli_seconds": {
+    "baseline": {
+      "119": 1211.7267324619897,
+      "120": 3615.516141539003
+    },
+    "candidate": {
+      "119": 1415.802598492999,
+      "120": 4296.060963415002
+    }
+  },
+  "group_counts": {
+    "119": {
+      "formal": 53786,
+      "observation": 30
+    },
+    "120": {
+      "formal": 873957,
+      "observation": 1043
+    }
+  },
+  "historical_files_unchanged": {
+    ".project-wiki/raw/sql-baseline.md": "0316f4c5b4f9456b39dffc61938b8bbf906d2e6c3575981f7e118ba37a2d7037",
+    "docs/reports/approximate-storage-2026-09-29.md": "b6c07e07322e5365cc8a579461c82ce6816ea22aaf7fe725a845f001c46ca402",
+    "docs/reports/baseline-statistics-2026-09-30.md": "98187f803e34dc40016efcbb2df1dfd15f4fefe5df9197a13bcf6c85699f2061",
+    "docs/reports/baseline-statistics-2026-10-01.md": "8672e3e61d82fd25dfcad3ac5f3e87ccaf017d96ee312439e4b8559d315ff36d",
+    "docs/reports/baseline-statistics-r2-remediation-2026-10-01.md": "4295df630a17b95db3b66a09b487a4d81bdf0ec415e5a5238ebb2fa7dc3f6d98",
+    "docs/reports/build-publication-2026-10-01.md": "2db5fcacf48bf5c6bffff9e4f380072e89943395ece6962ac1a6decb5853b8f4",
+    "docs/reports/build-publication-r1-remediation-2026-10-02.md": "3ea8e5a6035207364e166538cf9e7cb8c38ed17a464f7d055d40436a7abaf504",
+    "docs/reports/cluster-log-analysis-2026-09-24.md": "c5aa0c19d0905c861159d4a106dc568be4a9e0e0a382c1bfaf9336a545411bd4",
+    "docs/reports/cluster-log-supplement-2026-09-28.md": "672d23d804ab20cc8f2d9b59415530263fbc5bfdeef4b827d0b28e29882aa473",
+    "docs/reports/data/approximate-storage-2026-09-29.json": "4f41f6c90d8068940c9d2f962a47aa5ab8f21cbab399c09daa2aabcd72a96d5c",
+    "docs/reports/data/baseline-statistics-2026-09-30.json": "aa5bd8a52cd7e58317b77ea95ad1829dd3189e2c29da9b21241f4941f96a2a8b",
+    "docs/reports/data/baseline-statistics-2026-10-01.json": "07095f5ac7b2720575de975519d31c38955b88b4098ba604e870353776a84b0b",
+    "docs/reports/data/baseline-statistics-r2-query-cost-2026-10-01.json": "7b1cc089581f9f3a65df6aefaf82d38035283a8df3caeffb127b169d34f87ee6",
+    "docs/reports/data/build-publication-2026-10-01.json": "97e9ace88c16524f0377b4c6130183b7df2e2efa25d108fb5300d8e51afc5c9b",
+    "docs/reports/data/kylin-alma-baseline-2026-10-02.json": "c19267ecbfc168259d8e0f943ed6b5af244efc2431eae1090a91333eb7e580c6",
+    "docs/reports/data/kylin-delivery-alignment-2026-10-04.json": "61527e3533b0f2981d1f037d38e7b6b1f7696ff3d3c5413b08c93a38c543eddb",
+    "docs/reports/data/kylin-manual-validation-2026-10-04.json": "a7af0b8eac95e412defb6f4c6849ff629617a713ef3238999b9dde425ef4520f",
+    "docs/reports/data/kylin-offline-deployment-2026-10-02.json": "bbcfa9c7a59d139276ee964bc1c36fc319fe2202aedf37932e9174f83f9f317d",
+    "docs/reports/data/kylin-read-access-2026-10-04.json": "0a4bb508936f9887f98e342e51cece5979f126251889338296c8587260041707",
+    "docs/reports/data/log-ingestion-checks-2026-09-29.json": "77b4fdc746fcd28f13be16e5849362c0f4ad6972ba9b0af355da6522d0e3d875",
+    "docs/reports/data/log-ingestion-full-2026-09-29.json": "8bf996ced59a88ecff3fb67c39746154cb9c7334b9a825d0de6475b1f1ea270d",
+    "docs/reports/data/log-ingestion-r1-remediation-2026-09-29.json": "cc3a391a2a95990705a4fbf1e31b718f1848bf8985add9607a0c48fae9d02350",
+    "docs/reports/data/log-ingestion-r1-replay-manifest-2026-09-29.json": "9c95efcef07708a58d65dcfea04bf3f8c9b637c914825eb4f405316fa9311aba",
+    "docs/reports/data/log-ingestion-r2-remediation-2026-09-29.json": "52536cce6b8a1457ae6784cb642d45195f7d735d905df6cf6a2c43547ddb3f7b",
+    "docs/reports/data/log-ingestion-reconciliation-2026-09-29.json": "c66b29d3a1b714527af703d19191421a90410932ce0a0290e876d653b19f3a9a",
+    "docs/reports/data/log-supplement-census-2026-09-28.json": "75f4a40c2dbc26a585a372e2383ed8108ee9fa71097ef4290cae71ddb92b514f",
+    "docs/reports/data/log-supplement-checks-2026-09-28.json": "393005a85240024ca4a9f075be0ef463a0468b2a50f2b8f927f82334a7e12d09",
+    "docs/reports/data/log-supplement-coverage-2026-09-28.json": "daa482eb780615d777ad89c79e42090fa9e047cf5698eab403c3e21a7bafc9cc",
+    "docs/reports/data/log-supplement-dates-2026-09-28.json": "ff76343848ba54c5d7acc41d1dc13f67778d32639697d3a7d2ea3b308b3526ca",
+    "docs/reports/data/log-supplement-manifest-2026-09-28.json": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+    "docs/reports/data/log-supplement-parser-2026-09-28.json": "19df610100b31f82517b61ec907333e84cf6f560efe2978d1a7ca426226ed20c",
+    "docs/reports/data/log-supplement-r1-checks-2026-09-28.json": "e5b57b61f0d7d72b0662d295d2747bb4deb3e81cc7bab3c257a60eb199ade618",
+    "docs/reports/data/log-supplement-r1-encoding-2026-09-28.json": "73536b0a55a23cd0fb49bf51e5dde204b93ef5e058286be4984dd681ce374ae8",
+    "docs/reports/data/mixed-alter-2026-09-27.json": "7b469770587e67e89cca5cbae051ac01c12ddc60b04ffae6bb6fbe635336545e",
+    "docs/reports/data/mpp-adapter-probe-2026-09-27.json": "83b59035ad14d6f691480cc57159a5e5252791e40c57bb0e5509fe1998e0dc32",
+    "docs/reports/data/mpp-approximate-replay-2026-09-27.json": "31fb3dcecaae8266e77e9512f0b12bdb12bbbea10fd6c62ee3e134b4766875c2",
+    "docs/reports/data/mpp-broad-validation-2026-09-27.json": "5c1f23d0844ed8069f74c446f751e866d239daa2e05929dc1eee99ae8b4e2251",
+    "docs/reports/data/mpp-expansion-2026-09-27.json": "e7954533b87c36ddc3a8f6559827a98c0b4463685bd049585540ee9d1de5bb60",
+    "docs/reports/data/mpp-full-audit-2026-09-27.json": "462ebcecabed5e6613ff6e14b12524efa3df12cd82b876110b263dc5e47654c0",
+    "docs/reports/data/mpp-full-repair-2026-09-27.json": "40fb2fe8284f82f029a63f9caeb7b9b57d57ec902ef5857e1ffcd2fd14ddb17d",
+    "docs/reports/data/mpp-full-repair-validation-2026-09-27.json": "9d24d232f64cc9810393ed44923eea0ffb71b89c52439e54b20253721a464d60",
+    "docs/reports/data/mpp-full-scan-2026-09-27.json": "52d16adfc6a43b24a48852bc6093fe956d297d7d26b1ec5732ff80f140cc6d39",
+    "docs/reports/data/observation-availability-2026-10-01.json": "010b04b520533a9e412fbda5cb44714284721ba39c8dcad4bc38d8b0e2fe132d",
+    "docs/reports/data/observation-statistics-2026-10-01.json": "055107c33a7cb5691cd1e3f05f41a9864913fa6daae2d553e0b7ed7fd6f6f529",
+    "docs/reports/data/parser-fidelity-2026-09-27.json": "41737957fe7991a5f3f3af92a2dc4127eecfa2ff2b52aab114c87e7e74109f45",
+    "docs/reports/data/parser-fidelity-manual-2026-09-27.json": "0811ac9755406285574dcd8f734e2bebf165c04744759e9192addfdbb9c0dad8",
+    "docs/reports/data/parser-layout-2026-09-27.json": "ec026bd5a6ce56a9349977d527ad88ff48d17c51f2af11fb0e6c12e966e8660a",
+    "docs/reports/data/slim-release-kylin-trial-2026-10-03.json": "952a4b92337c04859b0662fdc2189f84b8062e857cecf39237f63067c09834ec",
+    "docs/reports/data/slim-release-preparation-2026-10-03.json": "e0714620ef82b4c657264f262f85ff30c0989948923707e6a24570e45efb217a",
+    "docs/reports/data/sql-normalization-2026-09-27.json": "cd98842c87a458584ad56f7efd149b1737d57267ce9f3e81891a2c15ed031b76",
+    "docs/reports/data/sql-normalization-adj-2026-09-28.json": "adc0a9834df315d6dafbb8b5f0582be4f2c6535bf533cfc122305e33b7262f14",
+    "docs/reports/data/sql-normalization-adj-checks-2026-09-28.json": "3ec80d03c60b5fa8bfbb2c4722fa9de864f8e3eed04c23b78cd8b2136233a5f3",
+    "docs/reports/data/sql-normalization-adj-hints-2026-09-28.json": "38266ebb7ac92bb48667cf3e04a3f899d6c80d7e98c966af14cfb2ffeb237f8d",
+    "docs/reports/data/sql-normalization-r1-2026-09-28.json": "00dfe7bcb478008dc08a3d75cf994745a0b9da813b953534b428b7dcdee1d64d",
+    "docs/reports/data/sql-normalization-r1-checks-2026-09-28.json": "d05e0a90f2588cd1a69917eab4ab778a73cfb32ed4e839b695ab3587174b1ecf",
+    "docs/reports/data/sql-normalization-r2-2026-09-28.json": "d03ee2b36d53a80007759324580f4478843a34fdb012eee15a8f27ca2227d418",
+    "docs/reports/data/sql-normalization-r2-checks-2026-09-28.json": "d09de36d682ffdaf22e8d33e938d71b693ccab73bf68baa925f504c299138c55",
+    "docs/reports/data/sql-normalization-r2-hints-2026-09-28.json": "94d6e708cf77e1c359364b8f98bb7a22eb9f59e90e3f6a1bf3494528734f3aad",
+    "docs/reports/data/sql-normalization-v4-checks-2026-09-28.json": "1e58acbd76f4a2757c6138929ce6968bb323c7b2cf08d83ccdeea57ba96a1a55",
+    "docs/reports/data/sql-normalization-v4-fixed-2026-09-28.json": "b0f6657e1481403e44a97e27dc2e292fee51c0eb72f39eb022652403688e8a60",
+    "docs/reports/data/sql-normalization-v4-hints-2026-09-28.json": "8d2284de6fb50b6115aff9120df0a4d3c94bfd7a8fead52c60c0cf9201da73f5",
+    "docs/reports/data/sql-normalization-v4-in-2026-09-28.json": "a368e2254e8138c54c80fff043c5f6c11f0a3370984052df623b88522e2a7119",
+    "docs/reports/data/sql-normalization-v4-r1-checks-2026-09-28.json": "f41274bc20d4982d245e2b7fd5a8431088a107b82df9fc6099ce9b263d4d6cba",
+    "docs/reports/data/sql-normalization-v4-r1-fixed-2026-09-28.json": "4bdde7d36e5d33ee6a1fe3228fb1a56d1612a63035e66eb2817957ec0a5ab312",
+    "docs/reports/data/sql-normalization-v4-r1-hints-2026-09-28.json": "b7609f84606e2ccd290cdd82ccf5d648e549f307f04d72f81c9d3d95ba51b9ae",
+    "docs/reports/data/sql-normalization-v4-r1-in-2026-09-28.json": "d675f001d46abbf3d092dd42ec2a6bf6a42937b5f948ba99ec41f4788b8fafff",
+    "docs/reports/data/sql-normalization-v5-checks-2026-09-29.json": "285cdd2f9e5e0ccf7245a4193118d33e8158487f0ba02d5f7834a5a344e883d8",
+    "docs/reports/data/sql-normalization-v5-diff-2026-09-29.json": "bc1b244ff8c5bbddfa7f8d2c85703d56b35b50ac0df63ccbc461e95735d2b2fc",
+    "docs/reports/data/sql-normalization-v5-duration-2026-09-29.json": "c4dbe33cab27ce48c19c36ccf0fc6da677a8ead3b529d725ae0d0fbb9ebfa2c3",
+    "docs/reports/data/sql-normalization-v5-fixed-2026-09-29.json": "e1dbc16a1dfcf74e4846e6606d101a0bd97b80886b9bdc926846373f8444c763",
+    "docs/reports/data/sql-normalization-v5-historical-ratio-2026-09-29.json": "81afaf88aeb581ce5fda4520418ef6db69ca62763c57abc0838eef37daf09e31",
+    "docs/reports/data/sql-scanning-2026-10-04.json": "d1c5f8b6195a1d2097a83894d39973244ac558f901db6b389b06b1dccfd8195c",
+    "docs/reports/data/sql-scanning-performance-selection-2026-10-04.json": "70cfb21708570d075265ed9a10abe193c7fb34027ed36e0c0b391fe9f5c0daed",
+    "docs/reports/data/sql-scanning-r1-remediation-2026-10-04.json": "2bf2293bcaa11e70a714283f1989079ff60a4bfecd4bdf949531f3951bca432d",
+    "docs/reports/data/statement-census-2026-09-26.json": "77580f1ee63ae744f8f6141bfc0fb60dae754aeb36c6d58c01875d1b72abb0f2",
+    "docs/reports/data/training-category-aliases-2026-09-30.json": "2de8e85a4b9055199fb66901eee411d0960ace1298ac02bf8d01588532a8ea94",
+    "docs/reports/data/training-decisions-2026-09-29.json": "e15849db6d87e1ab8e43c96ee75de79c0aa8ca40c1c946d28864aa99929560ca",
+    "docs/reports/data/training-decisions-r1-remediation-2026-09-30.json": "ca1c0a664a176c3629cd9898992ca74bbad213cccf54fd610e5d7ca16a86fef4",
+    "docs/reports/function-dictionary-2026-09-25.md": "a24a686a9b23c029a7779b8e0fa86e6ff358f34b91a13b8cb72aa9db995fda47",
+    "docs/reports/function-dictionary-coverage-2026-09-25-r1.json": "676d29be1a5fad39daf19a30280eb26d5c8b273f23be9162957dac56b2649c87",
+    "docs/reports/function-dictionary-coverage-2026-09-25.json": "217b848572407de9bad0ba6ae279a58aa6f272df69f526e88c8f67d9fa1d712c",
+    "docs/reports/function-dictionary-r1-remediation-2026-09-25.md": "6e83e7109961d649f1715744c292295d06e0d85056814dfec975bae79b7b59d7",
+    "docs/reports/function-dictionary-sample-2026-09-25-r1.json": "ee317acf3dd692437cd536d245e47e62198210dc6e1b32ef4decb05ee268c4be",
+    "docs/reports/function-dictionary-sample-2026-09-25.json": "178c82ce665b06ef5ce8499918111e496c03347dd5e3eab7c64ce4d7fd05d5b6",
+    "docs/reports/hashdata-duration-source-mapping-2026-09-24.md": "98f558f1fc53398ab5e096da03aab5efbee1366a719a6d1e69fbfdabc4a11cdc",
+    "docs/reports/initial-publication.md": "a7b3c843fe0892b7453a66b223b8ced23904f67cfee54bc738b30a78e821615e",
+    "docs/reports/initial-validation.md": "818178cf3065521f4ad5fb02950ff6507560d3143de62b41b90068d186e7f591",
+    "docs/reports/knowledge-reorganization-2026-09-25.json": "8cf2ef585535e5292668626c6557cdba67d5b25963965427d5a2e286ac7cea70",
+    "docs/reports/knowledge-reorganization-2026-09-25.md": "d41d439dfff1a70c28482804fee0605b9d6fc9acfbe4580852e8d0ad7668cc57",
+    "docs/reports/kylin-delivery-alignment-2026-10-04.md": "9f0cef943e3047e3278244e32f8d4e3b8ef2be9db31f2ce1beea6d853a53bb74",
+    "docs/reports/kylin-manual-validation-2026-10-04.md": "a70fd7151421eee2cfba4a976bf5a606d5cc8f80f1e77ca00d0001a027b1ec98",
+    "docs/reports/kylin-offline-deployment-2026-10-02.md": "9c88c58964c05cf9e0f4adc698e5c427247ce9fd0ad986a920a5bd01f219cfc1",
+    "docs/reports/kylin-read-access-2026-10-04.md": "df26de8cd39862ab8b0711c0254d6abfe0a495ad28bb5c1ad4b1d16b5c8e0940",
+    "docs/reports/local-bootstrap-validation.md": "3e0a13fe364706b9c457cc14af8f6e94541a069ea35f0ffff44af5e502a62655",
+    "docs/reports/log-ingestion-2026-09-29.md": "127b204aca67bcb884ebde895467dc8a34f124fcf8a8a067b6b852044117c4de",
+    "docs/reports/log-ingestion-r1-remediation-2026-09-29.md": "c15368840a889a229e06890eb36b4512de457007a1b8d131dbefbdc2bcb3fac5",
+    "docs/reports/log-ingestion-r2-remediation-2026-09-29.md": "36772e1211e9ec8aab7256a1198d5f7ddf39d91d0f31cfb409621ca6cfbf1ce4",
+    "docs/reports/log-supplement-r1-remediation-2026-09-28.md": "e220c3b2119e7dbae769fca02d6fae41aee1d07b15df3d4b917be247b7850a66",
+    "docs/reports/mixed-alter-2026-09-27.md": "1e2679fc7e8933944ec601c596caa87d084766915604023ed98e16c4084ba2d0",
+    "docs/reports/mpp-adapter-probe-2026-09-27.md": "e021eac1a2ce67286fa61bb4622033660d2c67f644ddc2c162ed0c47006dddf1",
+    "docs/reports/mpp-approximate-2026-09-27.md": "98e360dc5719e9146190dfcef7ee543d067aab3237b6212b00682e91ac49077d",
+    "docs/reports/mpp-broad-validation-2026-09-27.md": "8d17a7d3814ca12d644f03b302b8a22fa321f283cbd26abef48e7ef0f49d5f9b",
+    "docs/reports/mpp-expanded-validation-2026-09-27.md": "004c39985f43d3b93f062c377ce3d97d5271b798fed0671128b921853279ba4e",
+    "docs/reports/mpp-full-repair-2026-09-27.md": "f7065523ebc27131d80dffbc142f6901b8b6e2e7c20fbfb26dbaa5ee8620cb32",
+    "docs/reports/mpp-full-scan-2026-09-27.md": "c5f341129faf564aed17ae12db9d7b1199d97a0bb2ce5337038961b29656dfcb",
+    "docs/reports/mpp-storage-migration-2026-09-26.md": "f94571fec31c1ffed668be22a257a9eda80b4a18d63d71e11fa8b6840ba36d76",
+    "docs/reports/observation-statistics-2026-10-01.md": "077ab57876f0bed1c3f2c8b8faa02e8694fb9476860f92c57639f2cdd7ed191a",
+    "docs/reports/parser-fidelity-2026-09-27.md": "83e5785d43ec7ae33f656eeb76293fcd20d7501363460a97a972c9ba06b2c724",
+    "docs/reports/parser-layout-2026-09-27.md": "c75aa458a74ea94358b054e662c565e3be327b50eebf35594859663faf1b91d9",
+    "docs/reports/postgresql-storage-2026-09-26.md": "c942682c00402e757cc7c8770e463dbb0d11f73a86bb0bfccbf3d6c576e5e68b",
+    "docs/reports/postgresql-storage-r1-remediation-2026-09-26.md": "0fa816c5b2ff6be05479f340e797765f366270ee693bbabbc01f973c26042abc",
+    "docs/reports/production-log-analysis-2026-09-23.md": "519f0475aacc222c22fb2ab44eba9a83c0dbaf47215740f0f4fa5e5683eae2a8",
+    "docs/reports/python-environment-2026-09-25.md": "6f0b5add811a58f37a49309e1a179bb3d0bdcf126897b01af8f496964c7e48c8",
+    "docs/reports/slim-release-kylin-trial-2026-10-03.md": "2feea6c86a577de2f5ef5e1f056d44b0578fdf4b96a6327098e58e14eb67aa1d",
+    "docs/reports/slim-release-preparation-2026-10-03.md": "6ccb6f814ed64ad799b5d03baf0d1197754a5703006c01e5b78f34cc89e09375",
+    "docs/reports/sql-log-text-verification.md": "932cb51bce969ec8ab61b1627926897437b5d08855e454f0e801c3b8295e2833",
+    "docs/reports/sql-normalization-2026-09-27.md": "ffef5c5751cc01a26b007a590aeb7019e6a105399ec0ec2ee8297325420190a7",
+    "docs/reports/sql-normalization-adj-remediation-2026-09-28.md": "7143eebe4f3e1e28aae9364e2f9871b4b56395d7cb8294e95fffa5c5c3edad80",
+    "docs/reports/sql-normalization-r1-remediation-2026-09-28.md": "abcb6be8057e51b9f85e10ef707c0d7aa50569f3d88da4a4877bd7ff8d8b8618",
+    "docs/reports/sql-normalization-r2-remediation-2026-09-28.md": "69448e9f3aa54cdd85535e836389eec523b743cc8a3c1578bf1234b6c99a0c59",
+    "docs/reports/sql-normalization-v4-2026-09-28.md": "ee2c5b5defe0db1b2cb81999ff9109150120c776249b292b666e74088cb4fb3d",
+    "docs/reports/sql-normalization-v4-r1-remediation-2026-09-28.md": "b3487e0f87e86ff34ff02e2b94272735545d18bfadde2c0181304fc991f32ca0",
+    "docs/reports/sql-normalization-v5-2026-09-29.md": "bd900b8c0488784612d1c4fb5cf1a64da2bb15eeed0271b07ab6411f40a1a74e",
+    "docs/reports/sql-scanning-2026-10-04.md": "aac938113da1930ea15e15d0a93fa5c7da0bf26f5841a080cc177f9688d31628",
+    "docs/reports/sql-scanning-r1-remediation-2026-10-04.md": "75a51ddd66c6a31909b765852f937ec46d213464c3514d1c7b30989a55dedeac",
+    "docs/reports/statement-category-census-2026-09-26.md": "e398b20c0dd0d7a78fd20a976702b33d6986b3e94f9bbe01dd578e5c199ac5c1",
+    "docs/reports/training-category-aliases-2026-09-30.md": "21895078729c0d546fc68772a797891014a2f759e1be41603a1ef0f279ef6ed3",
+    "docs/reports/training-decisions-2026-09-29.md": "cee7800fa102b245a49df9b6c4bff79ef5acb88c289b77fc186647152bb4213f",
+    "docs/reports/training-decisions-r1-remediation-2026-09-30.md": "92069e3e3b140e4ada8360570782e5daa88ef07eca4d19d76a7bd9eaf02232ed",
+    "rules/functions/v1.0.1.json": "7a75761933c3f48ae59855b16ab3cafe2cd17d5ed21d6fdd2df8ef779aefa822",
+    "rules/functions/v1.json": "bd4962567d8f0d0446e246bf2ef4bbc9a9375f77ee82e302b1d5c362f8b2cdf3",
+    "sql_apm/storage/migrations/1.0.0-to-1.1.0.sql": "46c1155ba5a6e06590604e852572809fc999d4159d6b465758716fba596cf747",
+    "sql_apm/storage/migrations/1.1.0-to-1.2.0.sql": "36ce1f0c1f06f4b7f694c2fd8e265201b631da4a7bcf3ce3b427e1814a5742b0",
+    "sql_apm/storage/migrations/1.2.0-to-1.3.0.sql": "f2f95e0927a89e52b3a0359691ae23c44cdf0d801c9eeef182ed2c79ede9977b",
+    "sql_apm/storage/migrations/1.3.0-to-1.4.0.sql": "9d74529b521990cb7fc1f4c4bf2b951d3a67a9be4240ee8d42feeda391705e7b",
+    "sql_apm/storage/migrations/1.4.0-to-1.5.0.sql": "9da247a92b7c229cdfbeb1edb3e6ebbe089c23fa09d8feec5429203592d2fea1",
+    "sql_apm/storage/migrations/1.5.0-to-1.6.0.sql": "5df3790d70c703e4150c302c39b692233b7f022ecc7f934fa24d3e135461c376",
+    "sql_apm/storage/versions/1.0.0.sql": "df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28",
+    "sql_apm/storage/versions/1.1.0.sql": "e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3",
+    "sql_apm/storage/versions/1.2.0.sql": "b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7",
+    "sql_apm/storage/versions/1.3.0.sql": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb",
+    "sql_apm/storage/versions/1.4.0.sql": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61",
+    "sql_apm/storage/versions/1.5.0.sql": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743"
+  },
+  "identifiers": {
+    "baseline": {
+      "119": {
+        "analysis.mapping_version": [
+          "hashdata-3.13.13/1"
+        ],
+        "analysis.parser_version": [
+          "hashdata-csv-reader/1"
+        ],
+        "analysis.profile": [
+          "hashdata-csv/1"
+        ],
+        "build.profile": [
+          "hashdata-csv/1"
+        ],
+        "config_snapshot.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_approximate_rule.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_fingerprint.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_normalization.dictionary_rules_version": [
+          "1.0.1"
+        ],
+        "scope.profile": [
+          "hashdata-csv/1"
+        ],
+        "scope.system_kind": [
+          "hashdata"
+        ]
+      },
+      "120": {
+        "analysis.mapping_version": [
+          "hashdata-3.13.13/1"
+        ],
+        "analysis.parser_version": [
+          "hashdata-csv-reader/1"
+        ],
+        "analysis.profile": [
+          "hashdata-csv/1"
+        ],
+        "build.profile": [
+          "hashdata-csv/1"
+        ],
+        "config_snapshot.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_approximate_rule.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_fingerprint.profile": [
+          "hashdata-csv/1"
+        ],
+        "mpp_normalization.dictionary_rules_version": [
+          "1.0.1"
+        ],
+        "scope.profile": [
+          "hashdata-csv/1"
+        ],
+        "scope.system_kind": [
+          "hashdata"
+        ]
+      }
+    },
+    "candidate": {
+      "119": {
+        "analysis.mapping_version": [
+          "mpp-mapping/1"
+        ],
+        "analysis.parser_version": [
+          "mpp-csv-reader/1"
+        ],
+        "analysis.profile": [
+          "mpp-csv/1"
+        ],
+        "build.profile": [
+          "mpp-csv/1"
+        ],
+        "config_snapshot.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_approximate_rule.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_fingerprint.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_normalization.dictionary_rules_version": [
+          "1.0.2"
+        ],
+        "scope.profile": [
+          "mpp-csv/1"
+        ],
+        "scope.system_kind": [
+          "mpp"
+        ]
+      },
+      "120": {
+        "analysis.mapping_version": [
+          "mpp-mapping/1"
+        ],
+        "analysis.parser_version": [
+          "mpp-csv-reader/1"
+        ],
+        "analysis.profile": [
+          "mpp-csv/1"
+        ],
+        "build.profile": [
+          "mpp-csv/1"
+        ],
+        "config_snapshot.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_approximate_rule.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_fingerprint.profile": [
+          "mpp-csv/1"
+        ],
+        "mpp_normalization.dictionary_rules_version": [
+          "1.0.2"
+        ],
+        "scope.profile": [
+          "mpp-csv/1"
+        ],
+        "scope.system_kind": [
+          "mpp"
+        ]
+      }
+    }
+  },
+  "initialization_script_sha256": {
+    "baseline": "dc9e0565d92636f2bfce7b130a037518171a7a70f59b7cc8a82f3da3d023c687",
+    "candidate": "fc64c035d2ae9f3eb7400a7a46e9aa92445cd237d7d7c6f74e43f934c32c4b35"
+  },
+  "input_manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "knowledge_log_original_prefix_unchanged": true,
+  "kylin": {
+    "baseline_equal": true,
+    "baseline_sha256": "c19267ecbfc168259d8e0f943ed6b5af244efc2431eae1090a91333eb7e580c6",
+    "build": {
+      "count_scopes": [
+        [
+          "batch",
+          "excluded",
+          19672
+        ],
+        [
+          "batch",
+          "unresolved",
+          49005
+        ],
+        [
+          "group",
+          "excluded",
+          771845
+        ],
+        [
+          "group",
+          "included",
+          1707354
+        ]
+      ],
+      "groups": 51266,
+      "layers": {
+        "day": 217566,
+        "hour": 67265,
+        "overall": 51266,
+        "week": 80067,
+        "weekday": 93602
+      },
+      "observations": {
+        "groups": 28,
+        "layers": {
+          "day": 40,
+          "hour": 30,
+          "overall": 28,
+          "week": 34,
+          "weekday": 32
+        },
+        "observation_only": true,
+        "rules": {
+          "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+            "excluded": 0,
+            "groups": 28,
+            "included": 40,
+            "reasons": {}
+          }
+        },
+        "scopes": [
+          [
+            "approximate_unavailable",
+            20061
+          ],
+          [
+            "group",
+            40
+          ],
+          [
+            "sql_missing",
+            28904
+          ],
+          [
+            "start_unknown",
+            30
+          ]
+        ],
+        "sql_states": [
+          [
+            "incomplete",
+            4
+          ],
+          [
+            "missing",
+            28904
+          ],
+          [
+            "uncertain",
+            20127
+          ]
+        ],
+        "ungrouped_reasons": [
+          [
+            "approximate_unavailable",
+            "duration_unknown",
+            1
+          ],
+          [
+            "approximate_unavailable",
+            "execution_failed",
+            1
+          ],
+          [
+            "approximate_unavailable",
+            "sql_uncertain",
+            20061
+          ],
+          [
+            "approximate_unavailable",
+            "start_unknown",
+            1
+          ],
+          [
+            "approximate_unavailable",
+            "timing_unknown",
+            1
+          ],
+          [
+            "sql_missing",
+            "sql_missing",
+            28904
+          ],
+          [
+            "start_unknown",
+            "duration_unknown",
+            30
+          ],
+          [
+            "start_unknown",
+            "execution_failed",
+            30
+          ],
+          [
+            "start_unknown",
+            "sql_incomplete",
+            4
+          ],
+          [
+            "start_unknown",
+            "sql_uncertain",
+            26
+          ],
+          [
+            "start_unknown",
+            "start_unknown",
+            30
+          ],
+          [
+            "start_unknown",
+            "timing_unknown",
+            30
+          ]
+        ]
+      },
+      "reasons": [
+        [
+          "batch",
+          "association_unreliable",
+          1
+        ],
+        [
+          "batch",
+          "duration_unknown",
+          19672
+        ],
+        [
+          "batch",
+          "execution_cancelled",
+          31
+        ],
+        [
+          "batch",
+          "execution_failed",
+          19600
+        ],
+        [
+          "batch",
+          "execution_timed_out",
+          41
+        ],
+        [
+          "batch",
+          "sql_incomplete",
+          4
+        ],
+        [
+          "batch",
+          "sql_missing",
+          28904
+        ],
+        [
+          "batch",
+          "sql_uncertain",
+          20127
+        ],
+        [
+          "batch",
+          "start_unknown",
+          19672
+        ],
+        [
+          "batch",
+          "timing_unknown",
+          19673
+        ],
+        [
+          "group",
+          "blacklist_category",
+          771845
+        ]
+      ],
+      "results_saved": true,
+      "state": "calculated",
+      "states": [
+        [
+          "excluded",
+          791517
+        ],
+        [
+          "included",
+          1707354
+        ],
+        [
+          "unresolved",
+          49005
+        ]
+      ],
+      "timings": {
+        "bind": [
+          388617,
+          199627
+        ],
+        "execute_fetch": [
+          12348,
+          0
+        ],
+        "execute_first": [
+          388567,
+          199626
+        ],
+        "parse": [
+          385305,
+          191529
+        ],
+        "request": [
+          532517,
+          181063
+        ]
+      }
+    },
+    "checks": {
+      "batch_complete": {
+        "reason": null,
+        "state": "passed"
+      },
+      "counts_consistent": {
+        "reason": null,
+        "state": "passed"
+      },
+      "results_complete": {
+        "reason": null,
+        "state": "passed"
+      },
+      "results_saved": {
+        "reason": null,
+        "state": "passed"
+      },
+      "rules_consistent": {
+        "reason": null,
+        "state": "passed"
+      },
+      "values_consistent": {
+        "reason": null,
+        "state": "passed"
+      }
+    },
+    "checks_passed": {
+      "database": 269,
+      "ordinary": 69,
+      "publication": 33
+    },
+    "cluster": "119",
+    "completed": true,
+    "cutoff_date": "2026-07-28",
+    "database_bytes_after": 12431062707,
+    "database_bytes_before": 13653683,
+    "environment_difference": {
+      "listen": "loopback and local socket",
+      "observed_data_directory_empty": true,
+      "old_database_to_drop": false,
+      "postgresql": "17.10",
+      "preexisting_postgresql_found": false,
+      "preexisting_system_python": "3.7.9",
+      "preparation": "manual sections 3-7; offline RPMs, Python and PostgreSQL build; section 10.2 first batch",
+      "python": "3.9.5"
+    },
+    "environment_preparation_phase_seconds": {
+      "database": 57.0,
+      "dependencies": 7.0,
+      "extract": 0.0,
+      "identity": 5.0,
+      "postgres": 48.0,
+      "publication": 12.0,
+      "python": 38.0,
+      "unit": 0.0
+    },
+    "identifiers": {
+      "analysis.mapping_version": [
+        "mpp-mapping/1"
+      ],
+      "analysis.parser_version": [
+        "mpp-csv-reader/1"
+      ],
+      "build.profile": [
+        "mpp-csv/1"
+      ],
+      "config_snapshot.profile": [
+        "mpp-csv/1"
+      ],
+      "mpp_fingerprint.profile": [
+        "mpp-csv/1"
+      ],
+      "mpp_normalization.dictionary_rules_version": [
+        "1.0.2"
+      ],
+      "scope.profile": [
+        "mpp-csv/1"
+      ],
+      "scope.system_kind": [
+        "mpp"
+      ]
+    },
+    "identifiers_verified": true,
+    "import": {
+      "added_occurrences": 2547876,
+      "added_records": 5124686,
+      "state": "complete"
+    },
+    "input_files": 26,
+    "layers": [
+      [
+        "formal",
+        "day",
+        217566,
+        51266
+      ],
+      [
+        "formal",
+        "hour",
+        67265,
+        51266
+      ],
+      [
+        "formal",
+        "overall",
+        51266,
+        51266
+      ],
+      [
+        "formal",
+        "week",
+        80067,
+        51266
+      ],
+      [
+        "formal",
+        "weekday",
+        93602,
+        51266
+      ],
+      [
+        "observation",
+        "day",
+        40,
+        28
+      ],
+      [
+        "observation",
+        "hour",
+        30,
+        28
+      ],
+      [
+        "observation",
+        "overall",
+        28,
+        28
+      ],
+      [
+        "observation",
+        "week",
+        34,
+        28
+      ],
+      [
+        "observation",
+        "weekday",
+        32,
+        28
+      ]
+    ],
+    "method": "measured; Kylin V10; fresh dedicated database; delivered offline package; first 119 batch only",
+    "normalization_timeouts": 0,
+    "parser_workers": 4,
+    "program_commit": "a743ce57b5d3ecf8b570a2377ac7b1b3434b2af0",
+    "publication": "published",
+    "raw_evidence_sha256": {
+      "119-0-history.json": "915aa7aec2c195e6951e85dc829330ab7340643f5afce2212485453a2667252a",
+      "119-0-status.json": "d43883c81e2429281d86c3a3cb213e7773f364f4ea18909bd628989f446e4981",
+      "119-0.json": "e4aeaf49f1d3f39c0333b0f09697f707cfa464c544f55593f8892aef2a3ebf19",
+      "119-0.log": "d0c3e3d0b0b3c22f5530933d042c4857de5e81e6e5397f9d6f4953ddd8998997",
+      "issue33-install.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "issue33-install.log": "6b0e4d930f840af5f72d839d9eefdc25c7fb93cc64ae726a0bb0627f214f91db",
+      "issue33-run.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "issue33-run.log": "86bd56d41626542ab0b84c7366936bf4f42710ddd4f98cdaad0bcedd28de1cb9",
+      "unittest.log": "7edf3c967f09557c130f9a82ea8e4b7b4d9c32166a572a486b5d209135a0cf60",
+      "verify-publication.log": "415a2bc675f4165808c436f6efbf4906065eca45c82f241b9479659e86c196d0",
+      "verify.log": "71fbdb6560de577b3ec2d8095b1eb63aa37f66162538803e047d101ce1bc3fdd"
+    },
+    "seconds": 1118.981,
+    "stages": {
+      "build": 201.187,
+      "check": 2.058,
+      "import": 861.161,
+      "publish": 0.004,
+      "snapshot": 54.104
+    },
+    "step": 0,
+    "version_chain_verified": true
+  },
+  "method": "measured; fresh PG17 instances; complete ordered stable membership and statistics streams; no sampled groups",
+  "offline_bundle": {
+    "bytes": 483594718,
+    "sha256": "8fe2511a76db849df0ef47c4e13aa42aa45ea92fb52aa568b8555de0b655e9ae"
+  },
+  "original_baseline_120_full_log_sha256": "5baf3b53d8fcb0755fcda2ca772a4337bde8c5073285a073e813fa19a89b1461",
+  "original_baseline_120_summary_equal": true,
+  "original_baseline_export_failure_log_sha256": "35c1783f30aa79683ddcf562f57df07d84e72997281eaaa826e213ccfff76f8e",
+  "raw_report_sha256": {
+    "baseline": "cb5f017b3c7d2778945d7c61b5f56b84d847827494db05007f029fdec81f6929",
+    "candidate": "2792568cb7442d727719a82721cf466e827ec0eab18729b42433a8e47e18744f"
+  },
+  "release": {
+    "bytes": 227798,
+    "commit": "a743ce57b5d3ecf8b570a2377ac7b1b3434b2af0",
+    "html_checks": {
+      "anchors": 61,
+      "code_blocks": 66,
+      "external_resource_requests": 0,
+      "links": 105
+    },
+    "sha256": "fff012f8cee6c36433fb8b98eba45993828785fe58413cb6a6227c58bd0daf6e"
+  },
+  "replayed_resource_sha256": {
+    "baseline": {
+      "sql_apm/__init__.py": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600",
+      "sql_apm/__main__.py": "0428e67ad1c41d4a143c9c28a2a766a63749fdc15513d22d5a54a786a6564ad1",
+      "sql_apm/baseline/__init__.py": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+      "sql_apm/baseline/statistics.py": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+      "sql_apm/baseline/watchdog.py": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+      "sql_apm/baseline/workflow.py": "6a61b8187397674ddd864c29ff60ddf66e42521e69381ea2e2617eed8abf060c",
+      "sql_apm/cli/__init__.py": "8d73b8fd493df706cf6cbd185801cf2870dc84ba3dcdcf19d7a148248b927e50",
+      "sql_apm/cli/ingest.py": "4ec76149a39595296f630fbddc76903117ccb16a402cce5ee1fc7a9f67db71e5",
+      "sql_apm/cli/statistics.py": "eff4ec673fd776f7f000b34bc236a4cb17546a0c9b278ae2dd1da1fdbbd9cdcd",
+      "sql_apm/cli/training.py": "7d193d0044280f23ffc16918a7f2282bd88f1145222499693fd57f4f6de0d4b4",
+      "sql_apm/cli/workflow.py": "b7a462550fa221f8123a3bfb1470f644310de4ad8c2b8a430cc7aa19c1cab522",
+      "sql_apm/diagnostics/__init__.py": "f53216dadbfcf5bfd3c1670ec768a821977d7ea09a9715a5fb0872f24c9833a9",
+      "sql_apm/diagnostics/approximate_sql.py": "2c1dedf512f017942747f5d49fcdc6cd515056cd95fe10a346f88b6ba4e15acf",
+      "sql_apm/diagnostics/duration_dispersion.py": "be9f4de7b8eac4717cc5f96cb8707afadc03f83d0512fba7558d5409c5d36bfd",
+      "sql_apm/diagnostics/function_probe.py": "1f0b76dd46dc7e023097c802094800c61efabe405ddfb6958771bd380e435e72",
+      "sql_apm/diagnostics/log_supplement.py": "95e19cd82ef6ea803e11167aca174cf866c11e7750652358111c9b6d05f5d43e",
+      "sql_apm/diagnostics/mpp_adapter_probe.py": "bc1f54b59ca6ebf9b0b7af5e536b7246cb9392386c917fac159cc3a3cde1af78",
+      "sql_apm/diagnostics/mpp_approximate_replay.py": "123b29859f5f489fce89d2bee95b81e2b17d49b4b94dbda6d568ab233f01dd87",
+      "sql_apm/diagnostics/mpp_broad_matrix.py": "c28b0406bceda5662cd7b561f27a6acf3a1d06bc747543f909143169cfa29692",
+      "sql_apm/diagnostics/mpp_broad_replay.py": "ec6ffe23929ac125f5dfea1fcf6f600c6ec1a0cd20feaa9ccfcd5e2b2a88995d",
+      "sql_apm/diagnostics/mpp_expansion_matrix.py": "7d024dd010672d902a6b289261ff04a52bd6fdf7801f941d46cfef115beb4e6b",
+      "sql_apm/diagnostics/mpp_expansion_probe.py": "6b4356f3aa31d24c327d4d62461aec3c0fec2b78f6b9ba065c31d5176adca8b2",
+      "sql_apm/diagnostics/mpp_full_audit.py": "94fe9515ebe0dec23e28b897618bee8da7f230e314fa05223650bbf330d11cdf",
+      "sql_apm/diagnostics/mpp_full_repair.py": "f361f5a39016dcc638cc76f3b54666064915b192601c56c38e22eef2ed5d1361",
+      "sql_apm/diagnostics/mpp_full_scan.py": "d503647e9dae3c38b5884830fab338c5a3444b9dd10f1ae9643c45cb4ae5c8d0",
+      "sql_apm/diagnostics/normalization_diff.py": "ed0a23c9372a6452eea3d614054b7f4dd3b89ca44023ca23744351317a1dd237",
+      "sql_apm/diagnostics/normalization_replay.py": "d2a4b79f4f1fa3736984a8de441997f2ec803cd8e95806137b6d15cd25700711",
+      "sql_apm/diagnostics/normalization_v5_audit.py": "a7554401c4c4aa74d9b211def5e265ce465ec42ccbffd7b66723a3fa68e1bd31",
+      "sql_apm/diagnostics/normalize_sql.py": "b5a11ca85e9a4f8d019c992549503a15e3362ec456c89d905bbeeaf58a9bc375",
+      "sql_apm/diagnostics/parser_fidelity.py": "20bf5ceed64d930f6d172bb35370220504cfa7f2ba143f9c53fda82442eb344a",
+      "sql_apm/diagnostics/scanning_benchmark.py": "0e1c83a96f090b17169ca0f75dab44a4e38a52534638e96b9ba403d24edb8ea5",
+      "sql_apm/diagnostics/scanning_equivalence.py": "7feba70f2c6536932454634da7ef710d11225ac4ee85bb8415f376507ef98693",
+      "sql_apm/diagnostics/statement_census.py": "b07ccfab71613af518832b9280da8ef49b9b420e97da57c301f72409cbee38cf",
+      "sql_apm/diagnostics/threshold_coverage.py": "9a3a11faff07ad29f1a9da1a430d6bc8c991e095c9b41eca836947a602cf4996",
+      "sql_apm/diagnostics/threshold_encoding_audit.py": "045e68ad3fad175ebba7e4952620856c36297d70777559517f951df96091fa9e",
+      "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+      "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+      "sql_apm/ingestion/hashdata/__init__.py": "ecc32c94772683bcb76fdc92aee96a0e9c5019505ebe96f3d8e50396dfb2ec1a",
+      "sql_apm/ingestion/hashdata/persistence.py": "679258f34e0ad46a030bad2f98defdfb566baf39bed55c97020ca65260f4e6ad",
+      "sql_apm/ingestion/hashdata/reader.py": "0ae7a99f6c73b8c471e790ba6f358e12b9effcf922d5e3f30f495a35de9eb96c",
+      "sql_apm/ingestion/importer.py": "53c284bea5007568190762f58785cd088b4f3fdf47cd83b02e2394db50d8783d",
+      "sql_apm/ingestion/normalizing.py": "118cac1c7a0a62b4592ef5478f9600ecab66776c4de665636210ad2124ee5e3e",
+      "sql_apm/sql/__init__.py": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+      "sql_apm/sql/approximate.py": "1131face4ada5702b761aeab833affcd19dc5c24c2289135f0fb35719f6fa934",
+      "sql_apm/sql/function_dictionary.py": "81a80fd927525262cb915b743a14466cd567208b1ba2470b8bdcb644a574955f",
+      "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+      "sql_apm/sql/mpp_parser.py": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339",
+      "sql_apm/sql/normalization.py": "825e5b6e3f6935d318f92ef6f271565c7352d0cd074b9ec5d6940fbc189d5bd0",
+      "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+      "sql_apm/sql/scanning.py": "13a22d7c7fd17c2ae8b462f4befbbb88211faca01d1f97aa9e25fa63fedb085c",
+      "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+      "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c",
+      "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+      "sql_apm/storage/bootstrap.sql": "2fe4650226796cb0af4c19be5072604571407ea205125b4ae247068b0ab5edb0",
+      "sql_apm/storage/catalog.sql": "3c14e98be3c228337a710316e6f360957602cc7fe68698296485ecf47308aaba",
+      "sql_apm/storage/check_structure.sql": "3aa26610645b351cc4eab703da94be3fdfeebfb7286185cc68e3c95f68ce813d",
+      "sql_apm/storage/check_version.sql": "0d29103c38996cc79a44c5636b735ad305b8c93e7c2068152b683e004c86c424",
+      "sql_apm/storage/expected_partitions.sql": "ee1ce5e3b0c0f88470f2b92b7885837d2c0ddca4ddd635f27d4b61eb0f0b2170",
+      "sql_apm/storage/ingestion.py": "85479cac69c59b18d38cf50e8177f6185eac3408b7520064a596b1eb52b78299",
+      "sql_apm/storage/initialize.sql": "5193a9d281852222b7c6541166cf7fcd99ad8869ab0b77a16c3bcb184d81df73",
+      "sql_apm/storage/migrate.sql": "e8bb84fd36265aeaac0bcd7274be2391897f244bd4142611af74b7e01b3bccc4",
+      "sql_apm/storage/observations.py": "cbf7cb7d3356d2ba60225b422a6837e4cdd95f64f5e323268a0bd11750f5764a",
+      "sql_apm/storage/prepare.sql": "e324d86dd99465596ae082723b43366f81a274b1a014a498119e6b98bdac20f7",
+      "sql_apm/storage/publication.py": "93a2e30f96e331ceace7e9e6556836f4318bf2201ed69cdf0220a2175dbde8d3",
+      "sql_apm/storage/schema.sql": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f",
+      "sql_apm/storage/statistics.py": "4960ddb0f5bc3c4fee0ae13b3a8a3f26d9072cd52e3cfe85d8665d369e39880a",
+      "sql_apm/storage/statistics_sufficiency.sql": "b7d1c29c7a6d32cd2248c569a0156354bf1019a3095d59f0d22edd601cb3d9ca",
+      "sql_apm/storage/tasks.py": "a73a640737afb7a35b86da82e9e98ca0c839edd560d1d3f94d7255c916233b5d",
+      "sql_apm/storage/training.py": "df8dd3e77bf64fcf779dfd3697b97a2c3b8d937c2fe01d77109cec3f7cc9961d",
+      "sql_apm/training/__init__.py": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+      "sql_apm/training/categories.py": "b6d4aae0d340dcbd8d4f9ff26b3bc671461af84703e3c23034fc3bd88ee7ab6c",
+      "sql_apm/training/config.py": "030255dd409446fe5893f4f7f14bddefece2e324d4f6cf833e40fa506b3aeda1"
+    },
+    "candidate": {
+      "sql_apm/__init__.py": "e9b17d11563c34819348c3d96b2f3ba0d4298575bad2911eeabdedf0bd8ff600",
+      "sql_apm/__main__.py": "0428e67ad1c41d4a143c9c28a2a766a63749fdc15513d22d5a54a786a6564ad1",
+      "sql_apm/baseline/__init__.py": "d03770efd2ec42a950fe922747cb8b91bb97725ac0f6a252d3c5b7be77916e40",
+      "sql_apm/baseline/statistics.py": "80f0725a1e8c74133dbc74ae11326bcb52dd0659b4b9aabdf10cfc54d617e4e4",
+      "sql_apm/baseline/watchdog.py": "1c498c69104b6a70cba485f50c30f096c20e27f787d6a26462fa2a8bc04643b0",
+      "sql_apm/baseline/workflow.py": "6a61b8187397674ddd864c29ff60ddf66e42521e69381ea2e2617eed8abf060c",
+      "sql_apm/cli/__init__.py": "8d73b8fd493df706cf6cbd185801cf2870dc84ba3dcdcf19d7a148248b927e50",
+      "sql_apm/cli/ingest.py": "2e03057590eed763292983d9fb697bad41308c58d105d47dbce83db7bb7aa8c3",
+      "sql_apm/cli/statistics.py": "eff4ec673fd776f7f000b34bc236a4cb17546a0c9b278ae2dd1da1fdbbd9cdcd",
+      "sql_apm/cli/training.py": "7d193d0044280f23ffc16918a7f2282bd88f1145222499693fd57f4f6de0d4b4",
+      "sql_apm/cli/workflow.py": "b7a462550fa221f8123a3bfb1470f644310de4ad8c2b8a430cc7aa19c1cab522",
+      "sql_apm/diagnostics/__init__.py": "f53216dadbfcf5bfd3c1670ec768a821977d7ea09a9715a5fb0872f24c9833a9",
+      "sql_apm/diagnostics/approximate_sql.py": "2c1dedf512f017942747f5d49fcdc6cd515056cd95fe10a346f88b6ba4e15acf",
+      "sql_apm/diagnostics/duration_dispersion.py": "be9f4de7b8eac4717cc5f96cb8707afadc03f83d0512fba7558d5409c5d36bfd",
+      "sql_apm/diagnostics/function_probe.py": "1f0b76dd46dc7e023097c802094800c61efabe405ddfb6958771bd380e435e72",
+      "sql_apm/diagnostics/log_supplement.py": "95e19cd82ef6ea803e11167aca174cf866c11e7750652358111c9b6d05f5d43e",
+      "sql_apm/diagnostics/mpp_adapter_probe.py": "bc1f54b59ca6ebf9b0b7af5e536b7246cb9392386c917fac159cc3a3cde1af78",
+      "sql_apm/diagnostics/mpp_approximate_replay.py": "123b29859f5f489fce89d2bee95b81e2b17d49b4b94dbda6d568ab233f01dd87",
+      "sql_apm/diagnostics/mpp_broad_matrix.py": "c28b0406bceda5662cd7b561f27a6acf3a1d06bc747543f909143169cfa29692",
+      "sql_apm/diagnostics/mpp_broad_replay.py": "ec6ffe23929ac125f5dfea1fcf6f600c6ec1a0cd20feaa9ccfcd5e2b2a88995d",
+      "sql_apm/diagnostics/mpp_expansion_matrix.py": "7d024dd010672d902a6b289261ff04a52bd6fdf7801f941d46cfef115beb4e6b",
+      "sql_apm/diagnostics/mpp_expansion_probe.py": "6b4356f3aa31d24c327d4d62461aec3c0fec2b78f6b9ba065c31d5176adca8b2",
+      "sql_apm/diagnostics/mpp_full_audit.py": "94fe9515ebe0dec23e28b897618bee8da7f230e314fa05223650bbf330d11cdf",
+      "sql_apm/diagnostics/mpp_full_repair.py": "f361f5a39016dcc638cc76f3b54666064915b192601c56c38e22eef2ed5d1361",
+      "sql_apm/diagnostics/mpp_full_scan.py": "8979e61ce033466ebb9b986d38c382b412d762e6ea1e8e821c1d62ab544e1f42",
+      "sql_apm/diagnostics/normalization_diff.py": "ed0a23c9372a6452eea3d614054b7f4dd3b89ca44023ca23744351317a1dd237",
+      "sql_apm/diagnostics/normalization_replay.py": "d2a4b79f4f1fa3736984a8de441997f2ec803cd8e95806137b6d15cd25700711",
+      "sql_apm/diagnostics/normalization_v5_audit.py": "a7554401c4c4aa74d9b211def5e265ce465ec42ccbffd7b66723a3fa68e1bd31",
+      "sql_apm/diagnostics/normalize_sql.py": "b5a11ca85e9a4f8d019c992549503a15e3362ec456c89d905bbeeaf58a9bc375",
+      "sql_apm/diagnostics/parser_fidelity.py": "20bf5ceed64d930f6d172bb35370220504cfa7f2ba143f9c53fda82442eb344a",
+      "sql_apm/diagnostics/scanning_benchmark.py": "0e1c83a96f090b17169ca0f75dab44a4e38a52534638e96b9ba403d24edb8ea5",
+      "sql_apm/diagnostics/scanning_equivalence.py": "7feba70f2c6536932454634da7ef710d11225ac4ee85bb8415f376507ef98693",
+      "sql_apm/diagnostics/statement_census.py": "b07ccfab71613af518832b9280da8ef49b9b420e97da57c301f72409cbee38cf",
+      "sql_apm/diagnostics/threshold_coverage.py": "9a3a11faff07ad29f1a9da1a430d6bc8c991e095c9b41eca836947a602cf4996",
+      "sql_apm/diagnostics/threshold_encoding_audit.py": "045e68ad3fad175ebba7e4952620856c36297d70777559517f951df96091fa9e",
+      "sql_apm/ingestion/__init__.py": "457a8439a28fe5daa4e3825ac8f93cc6d63ccf15ddb0899da96fa8db3f88bc03",
+      "sql_apm/ingestion/config.py": "168d278fc29a9ed923c8909f9ad4a247049ebb19a185f920d10cad7ab8b66f32",
+      "sql_apm/ingestion/importer.py": "87565281bb65826d697b1618eaccf0b380fd9f14f484359505e41b2d6bceff31",
+      "sql_apm/ingestion/mpp/__init__.py": "33012d3cd5eab9c89b209ee1f989358522f0de2c010e622838f1c66d577e5fea",
+      "sql_apm/ingestion/mpp/persistence.py": "7217dd768852f6b20e1bbeefa30796fe4612551cea95fc0e5b4ec248624cf102",
+      "sql_apm/ingestion/mpp/reader.py": "b1f49c81578e2ae4759f66469248e7c5629e0f91390a41aeba2254b4c03b2991",
+      "sql_apm/ingestion/normalizing.py": "118cac1c7a0a62b4592ef5478f9600ecab66776c4de665636210ad2124ee5e3e",
+      "sql_apm/sql/__init__.py": "429017aec6db9623bb5cb9174129914f19baae1dfc9bc065185a1facd866b3d2",
+      "sql_apm/sql/approximate.py": "08f9a852860467a2844e5ecb697889ab108ebe3cd4701d04d7f5500e20d448b2",
+      "sql_apm/sql/function_dictionary.py": "60284ce8808e89a9120490bbb241398bd6fa4e41128fb2a3f2151db5ebc1e7e1",
+      "sql_apm/sql/lexical.py": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+      "sql_apm/sql/mpp_parser.py": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339",
+      "sql_apm/sql/normalization.py": "759900f29df6e6912caee796aff117caf2ded434d9de82b2f31acccf677d4e92",
+      "sql_apm/sql/pg_ast.py": "5ad007e34ab5a4932beb19a7e9cd2066180857ce045ebf8d45cd233f903148be",
+      "sql_apm/sql/scanning.py": "13a22d7c7fd17c2ae8b462f4befbbb88211faca01d1f97aa9e25fa63fedb085c",
+      "sql_apm/sql/structure.py": "54b8f3aaeea7bb3b831fa6286534cbc74c716805df8b63b197edcedda219b8ed",
+      "sql_apm/sql/type_policy.py": "c35054265fe857110f3d7350848378e266c9214f400aab8a9743d7dcee66688c",
+      "sql_apm/storage/__init__.py": "916dc3b504d184443203519a9b014f36d5b8ceef6e0fece6312707ebe6eee0e4",
+      "sql_apm/storage/bootstrap.sql": "2fe4650226796cb0af4c19be5072604571407ea205125b4ae247068b0ab5edb0",
+      "sql_apm/storage/catalog.sql": "3c14e98be3c228337a710316e6f360957602cc7fe68698296485ecf47308aaba",
+      "sql_apm/storage/check_structure.sql": "3aa26610645b351cc4eab703da94be3fdfeebfb7286185cc68e3c95f68ce813d",
+      "sql_apm/storage/check_version.sql": "8b1acdf143cb850ed5d2a95b8b4a3d55faef4f334ec59b31ffcde97631492b30",
+      "sql_apm/storage/expected_partitions.sql": "0eb3beb6a6562626b12c2951f79e85b4be1f985aaad13e652ed26cf80d6152e3",
+      "sql_apm/storage/ingestion.py": "68c3ff2849d1e96d96e20d9e36914b7b96f2299b3f4c477eb9848ca2aabdcd95",
+      "sql_apm/storage/initialize.sql": "3f8a53886731ac324f0fbcab260b5f6e95a9cd0aff4308831dabfbdb78ca30d7",
+      "sql_apm/storage/migrate.sql": "0e4ad78393ccc172d93bba82b4408ef09c17f2c5f727c2e316252cd132eb5054",
+      "sql_apm/storage/observations.py": "361c221c53cc94ab94caa93c4edf09a6c5f4b2850de8d5711fe7d9387162965b",
+      "sql_apm/storage/prepare.sql": "87ff0d6688fc19b302b6a613a2b0495df9c292afcaaee033a491ff3abd809689",
+      "sql_apm/storage/publication.py": "93a2e30f96e331ceace7e9e6556836f4318bf2201ed69cdf0220a2175dbde8d3",
+      "sql_apm/storage/schema.sql": "a8e0e11223c9e07fc1729e841298e5fe11da73f990ca51dc504e071430c0dbc7",
+      "sql_apm/storage/statistics.py": "ece3a48c7a8643b396d30eabc92a6a8fd0b83938f9794f510651f173eeb826cc",
+      "sql_apm/storage/statistics_sufficiency.sql": "b7d1c29c7a6d32cd2248c569a0156354bf1019a3095d59f0d22edd601cb3d9ca",
+      "sql_apm/storage/tasks.py": "82d42746aaa5263953d51eb15031b0a4605ee69e88c6e2d5f0b07169054bc05f",
+      "sql_apm/storage/training.py": "bb36306735ec6e5f6b360bb626f6c947685beee51f3bbc03bcc7058cc7be0500",
+      "sql_apm/training/__init__.py": "ff7003999960ff59e0805dd8429981c1ef1456063f0c745624600e5c9c8edcc4",
+      "sql_apm/training/categories.py": "b6d4aae0d340dcbd8d4f9ff26b3bc671461af84703e3c23034fc3bd88ee7ab6c",
+      "sql_apm/training/config.py": "030255dd409446fe5893f4f7f14bddefece2e324d4f6cf833e40fa506b3aeda1"
+    }
+  },
+  "verification": {
+    "database": {
+      "checks": 269,
+      "log": "database.log",
+      "passed": true,
+      "sha256": "d774b23bc3dfe4c1b586dd70506cc7eeb8f1dd6836bf99565f2e5a1f8f8fc831"
+    },
+    "delivered_database": {
+      "checks": 269,
+      "log": "isolated-database-rerun.log",
+      "passed": true,
+      "sha256": "9a66aa041510eb5d8dead2c4c5a780f9940bbbb2233996af0dca80774e5decc4"
+    },
+    "delivered_ordinary": {
+      "log": "final-unit.log",
+      "passed": true,
+      "sha256": "689cb1fbb9956bd5f449e7ad08bfc869aa94fc9fdce23e212209ff100747942f",
+      "tests": 69
+    },
+    "delivered_publication": {
+      "checks": 33,
+      "log": "isolated-publication.log",
+      "passed": true,
+      "sha256": "69df734a31925c794a859da2b40a0df72f85a0e8e6c71fc59dfee9f7d22eee25"
+    },
+    "delivered_smoke": {
+      "log": "isolated-smoke.log",
+      "passed": true,
+      "sha256": "f95f151c7cdd5b2dce90f513e3edb0d45a8c8e7c7e26f5c6586dd701591be738"
+    },
+    "deployment": {
+      "log": "deployment-manual.log",
+      "passed": true,
+      "sha256": "6ab7ecce4603f1cec098314d4dd58f5475d07c36151829ab60ba2edf1be81384",
+      "tests": 17
+    },
+    "harness_and_live_pr": {
+      "log": "harness-final-evidence.log",
+      "passed": true,
+      "sha256": "fc0c1c7c8c3c4c183841f4d4efd822aa8a18f3ec5a68c6290a8141acfca542d7"
+    },
+    "ingestion": {
+      "checks": 125,
+      "log": "ingestion-rerun.log",
+      "passed": true,
+      "sha256": "67c5e9a98a70bfa21753318cae494a9efff5c2ca9ceaeae6e454c9b36d5f3332"
+    },
+    "naming_oracle": {
+      "checks": 2,
+      "log": "naming-oracle-rerun.log",
+      "passed": true,
+      "sha256": "83310b04f70b15af0fa704f315d81346a25e45a82463c4d22644634c86ac5e81"
+    },
+    "ordinary": {
+      "log": "unit-final.log",
+      "passed": true,
+      "sha256": "9533d8ad676bba556f1263627fde9f701d4f2dd2d2eb4f356d8c358dbd6bbb21",
+      "tests": 69
+    },
+    "parser": {
+      "log": "parser.log",
+      "passed": true,
+      "sha256": "552f52b1a148552316e4dceaba10d37231a12889688307dce5777b0e338defc2",
+      "tests": 202
+    },
+    "preserved_failures": {
+      "isolated-database.log": {
+        "reason": "private_instance_restart_exceeded_existing_60_second_timeout",
+        "recovery": "isolated-database-rerun.log; same timeout and verification criteria",
+        "sha256": "9191034eb4b24a4990231d4dd09191cc84c645f0274d60742e41bd0cb7c480ec"
+      }
+    },
+    "publication": {
+      "checks": 33,
+      "log": "publication.log",
+      "passed": true,
+      "sha256": "9c4433a30fe6a341afb69fa210623d2b3aa04a1654d0c7a389960eaf799749e9"
+    },
+    "training": {
+      "checks": 300,
+      "log": "training.log",
+      "passed": true,
+      "sha256": "130e77eeaa907ca800cb0fdfcab43199f6fc62bed3112432565ac136e3ca1fd4"
+    }
+  },
+  "window_days": 30,
+  "workers_per_run": 4
+}

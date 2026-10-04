@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -44,6 +45,14 @@ def export(db, result, scope):
     with db.cursor() as cur:
         cur.execute('SET search_path=sql_apm,pg_catalog')
         cur.execute("SET TIME ZONE 'Asia/Shanghai'")
+        # The acceptance joins span all evidence. Keep their parallel memory
+        # demand bounded, and plan against the just-imported cardinalities.
+        # These settings affect only export, not the product CLI subprocess.
+        cur.execute('SET LOCAL max_parallel_workers_per_gather=0')
+        cur.execute("SET LOCAL work_mem='16MB'")
+        for table in ('evidence_record', 'mpp_sql_text_evidence', 'mpp_fingerprint',
+                      'mpp_approximate_evidence', 'mpp_approximate_result'):
+            cur.execute('ANALYZE ' + table)
         counts = {}
         for name, query in {
             'records': 'SELECT count(*) FROM evidence_record WHERE scope_id=%s',
@@ -120,6 +129,7 @@ def main(args):
     manifest = json.loads(manifest_path.read_text())
     report = dict(method='measured; fresh private PG17; all member keys and all metric columns',
                   manifest_sha256=digest(manifest_path), equivalence={}, identifiers={}, tasks={},
+                  clusters=args.clusters,
                   product_sha256={str(p.relative_to(args.app_root)):digest(p) for p in
                                   sorted((args.app_root/'sql_apm').rglob('*.py')) +
                                   sorted((args.app_root/'sql_apm/storage').glob('*.sql'))})
@@ -128,6 +138,8 @@ def main(args):
         dsn='host='+str(directory/'socket')+' port=55473 dbname=sql_apm user=sql_apm'
         with psycopg2.connect(dsn) as db:
             for scope, details in sorted(manifest['clusters'].items()):
+                if scope not in args.clusters:
+                    continue
                 files=details['files']
                 for file in files:
                     assert digest(args.logs/scope/file['file'])==file['sha256'], 'source_checksum_mismatch'
@@ -148,8 +160,14 @@ def main(args):
                 assert status==0, 'full_failed_'+scope
                 result=json.loads(log.read_text().splitlines()[-1]); assert result['publication']['result']=='published'
                 report['tasks'][scope]=dict(seconds=time.monotonic()-started,result=result)
+                save(args.output/'report.json', report)
                 print(json.dumps(dict(phase='full_finished',scope=scope,seconds=report['tasks'][scope]['seconds'])),flush=True)
-                report['equivalence'][scope],report['identifiers'][scope]=export(db,result,scope)
+                try:
+                    report['equivalence'][scope],report['identifiers'][scope]=export(db,result,scope)
+                except BaseException:
+                    # Preserve diagnostics before the private instance cleans up.
+                    shutil.copyfile(directory/'server.log', args.output/'export-failure-server.log')
+                    raise
                 save(args.output/'report.json',report)
                 print(json.dumps(dict(phase='export_finished',scope=scope)),flush=True)
         v.init('check',root=args.app_root)
@@ -163,5 +181,6 @@ if __name__=='__main__':
     parser.add_argument('--output',type=Path)
     parser.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
     parser.add_argument('--workers',type=int,default=4)
+    parser.add_argument('--clusters', nargs='+', choices=['119', '120'], default=['119', '120'])
     parser.add_argument('--compare',type=Path,nargs=2)
     main(parser.parse_args())

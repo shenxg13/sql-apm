@@ -34,7 +34,7 @@ requirements 哈希、默认四解析进程、5 秒期限、结构 1.6.0 均保�
 - `.venv/bin/python -m unittest discover -s tests -v`：66 项通过。
 - `PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m unittest discover -s tests/parser_probe -v`：
   检查原有解析用例及新分词／解析池回归。首次未设置可选 SQLGlot 依赖路径时，入口测试
-  因候选解析器不可用失败；补齐已安装依赖路径后重跑，最终结果将在交付记录中核对。
+  因候选解析器不可用失败；补齐已安装依赖路径后重跑，197 项全部通过。
 - `.venv/bin/python scripts/db/verify_publication.py`：私有 PG17 验证发布与新计数，
   包括重复 SQL 的多记录计数、零值、其他集群、后续导入、发布继续通过及公开输出脱敏。
 - `.venv/bin/python scripts/db/verify.py`：私有 PG17 验证当前结构及迁移，数据库结构未修改。
@@ -65,6 +65,23 @@ requirements 哈希、默认四解析进程、5 秒期限、结构 1.6.0 均保�
 全量比较以固定块保存计数与差异定位，可在原文／代码摘要完全相同时恢复；参考实现不设
 产品 5 秒期限，不能把旧实现超时当成等价。119 首批使用新的私有 PG17，按原 Alma 的
 冻结业务计数核对，并记录各阶段实测耗时；比较期间避免并发的全量等价任务干扰性能。
+
+### P4 八条样本的确认
+
+原诊断只保留了长度，未保存八条原文 ID／摘要。用户于本轮明确确认使用已固定的
+同长度段八条，并已[同步在线 P4](https://github.com/shenxg13/sql-apm/issues/34#issuecomment-5977015737)。
+从 119 首批文件关联的 329 条 53,379–53,440 字节原文中，按（字节长度、原文字节）排序，
+取 `round(n*328/7)`、n=0..7。每条 ID、摘要及字符量保存在
+[固定选择集](data/sql-scanning-performance-selection-2026-10-04.json)。不宣称它们与历史八条相同。
+
+```bash
+.venv/bin/python -m sql_apm.diagnostics.scanning_benchmark \
+  --index var/parser-probe/issue13/full-scan.sqlite --reference var/issue34/reference \
+  --selection docs/reports/data/sql-scanning-performance-selection-2026-10-04.json \
+  --output var/issue34/performance.json
+```
+
+同一进程按每条原文交替测量旧／新完整解析，重复三次，记录原始秒数并核对结构相同。
 
 P1／P2 全量比较、P4 性能、P7 开发机首批、P8 Kylin 干净实例首批仍需最终实测记录。
 Kylin 尚需本轮 SSH 交接；不能继承 #31 的单进程结果来替代本次四进程验收。

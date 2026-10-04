@@ -1,0 +1,63 @@
+{
+  "method": "Issue #34 P4 confirmed 2026-10-04: 119 first-batch occurrences; 53379..53440 bytes; sort (byte length, raw bytes); positions round(n*328/7), n=0..7; historical eight not identifiable",
+  "selection_population": 329,
+  "samples": [
+    {
+      "id": 33452,
+      "sha256": "903613652d815607ab072fd08ceb968b7d72a5177502fe435dff954cdd19c17f",
+      "bytes": 53379,
+      "characters": 30741,
+      "non_ascii": 11319
+    },
+    {
+      "id": 33769,
+      "sha256": "e448ab39f086eb4b52741050d5ad12f7ce54eff2502d2fdfb5ccf6197de57bc0",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 193204,
+      "sha256": "2107b8dd46aa8d45811f55bb978e96a7dab7c6ac1cbc1316bb41de4bdd9b9519",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 221627,
+      "sha256": "5eef99587359d02609e8ca3af6622e2611859728dda2fcaa5ff5ed4b4203697f",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 33638,
+      "sha256": "c0575572da3547f9267b917b1248739fd6f3f96eeb8d11ade19f38c882aa556d",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 64349,
+      "sha256": "98898d2de500291290642527cd53e186b1913ee5656489fd597020828a599370",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 197559,
+      "sha256": "8b486a1757163789e2b6a549cd504a0b8696087bbfd6cd959aa2132f35e0f75a",
+      "bytes": 53438,
+      "characters": 30800,
+      "non_ascii": 11319
+    },
+    {
+      "id": 197169,
+      "sha256": "5b1c5032c71d41a5763066fda9024eb002b94d6354d8fc28c5ad05633a22c271",
+      "bytes": 53440,
+      "characters": 30802,
+      "non_ascii": 11319
+    }
+  ],
+  "confirmation": "https://github.com/shenxg13/sql-apm/issues/34#issuecomment-5977015737"
+}

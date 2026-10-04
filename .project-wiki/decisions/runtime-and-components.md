@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-04
 sources:
+  - path: docs/reports/sql-scanning-r1-remediation-2026-10-04.md
+    status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
     status: current
   - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
@@ -176,6 +178,12 @@ Issue #31 原包的单进程记录和适用边界保留。较高并发、其他�
 性能保证；本轮未重新执行九任务。包身份、私有实例参数和首批范围由
 [部署手册](../../docs/runbooks/kylin-offline-deployment.md#101-分词修复版默认四进程首批验证)约束，
 已有超时文件仍按原规则跳过，不因更换程序包重算。
+
+R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包；两机默认四进程首批
+再次零超时、全部 Alma 计数和版本链一致，结构检查通过。整改包 Kylin 实测
+1,123.731 秒；本轮复用已验证运行时，并未重装整机。当前证据见
+[R1 整改报告](../../docs/reports/sql-scanning-r1-remediation-2026-10-04.md)，初始候选的
+1,121.232 秒等历史测量继续保留，不标作本次测量。
 
 ### 已确认的当前开发环境与生产部署安排
 

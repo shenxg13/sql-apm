@@ -55,6 +55,47 @@ class ScanningTests(unittest.TestCase):
                     scanning.scan(sql)
                 self.assertEqual(original.exception.args, optimized.exception.args)
 
+    def test_overlapping_dollar_candidates(self):
+        for sql in ['$q$ $a$中$ x$q$', 'SELECT $sql$ $a$s中l$ x$sql$, 1',
+                    'SELECT $q$ $a$b$c$中$ x$q$',
+                    'SELECT $q$ $a$中$ -- x$q$ FROM t',
+                    'SELECT $q$ $a$中$ /*+ foo */ x$q$ FROM t']:
+            with self.subTest(sql=sql):
+                self.assertEqual('non_ascii_dollar_tag', scanning.fallback_reason(sql))
+                self.assertEqual(parser.scan(sql), scanning.scan(sql))
+
+    def test_dollar_candidate_chains_and_errors(self):
+        # Every intervening tag is a candidate, even inside quoted text or a
+        # comment; an empty tag or invalid identifier must not hide its neighbor.
+        for prefix in ('', '$a', '$a$b$c', '$', '$0', '$a-', '$a '):
+            for tag in ('中', 's中l', '_中1', '😀', 'é'):
+                body = prefix + '$' + tag + '$'
+                for sql in (body, '/* ' + body + ' */ SELECT 1',
+                            "SELECT '" + body + "'", 'SELECT $q$ ' + body):
+                    with self.subTest(sql=sql):
+                        self.assertEqual('non_ascii_dollar_tag', scanning.fallback_reason(sql))
+                        try:
+                            before = parser.scan(sql)
+                        except parser.ParseError as original:
+                            with self.assertRaises(parser.ParseError) as optimized:
+                                scanning.scan(sql)
+                            self.assertEqual(original.args, optimized.exception.args)
+                        else:
+                            self.assertEqual(before, scanning.scan(sql))
+        for sql in ('$a$b$c$', '$a$0中$', '$a$中-', '$a$中', '$a$-中$', '$a$ 中$'):
+            with self.subTest(sql=sql):
+                self.assertIsNone(scanning.fallback_reason(sql))
+
+    def test_overlapping_dollar_normalization(self):
+        engine = Normalizer()
+        for sql in ('select $q$ $a$中$ -- x$q$ from t',
+                    'select $q$ $a$中$ /*+ foo */ x$q$ from t'):
+            with self.subTest(sql=sql):
+                result = engine.normalize(sql.encode())
+                self.assertEqual('reliable', result['fingerprint']['state'])
+                with patch.object(mpp_parser, 'scan', parser.scan):
+                    self.assertEqual(engine.normalize(sql.encode()), result)
+
     def test_all_three_adapter_sites_and_normalization(self):
         sql = 'SELECT /*+ 中文 */ -2 AS 中文'
         engine = Normalizer()

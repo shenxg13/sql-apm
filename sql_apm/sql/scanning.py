@@ -12,7 +12,7 @@ from pglast import parser
 
 
 _NON_ASCII = re.compile(r'[^\x00-\x7f]')
-_DOLLAR_TAG = re.compile(r'\$[A-Za-z_\x80-\U0010ffff][A-Za-z_0-9\x80-\U0010ffff]*\$')
+_DOLLAR_TAG = re.compile(r'\$[A-Za-z_\x80-\U0010ffff][A-Za-z_0-9\x80-\U0010ffff]*(?=\$)')
 _SURROGATE = re.compile(r'[\ud800-\udfff]')
 
 
@@ -23,7 +23,10 @@ def fallback_reason(sql):
     if '\x00' in sql:
         return 'nul_input'
     # Distinct non-ASCII tags could collapse to one delimiter. Checking even
-    # tags inside comments/strings is intentionally conservative.
+    # tags inside comments/strings is intentionally conservative. Leave the
+    # closing $ unconsumed: PostgreSQL rescans it after an unmatched delimiter
+    # in a dollar-quoted body, so $a$中$ also contains the candidate $中$.
+    # Tag characters exclude $, bounding each search to one intervening run.
     if any(not match[0].isascii() for match in _DOLLAR_TAG.finditer(sql)):
         return 'non_ascii_dollar_tag'
     return None
@@ -45,8 +48,6 @@ def scan(sql):
     except parser.ParseError:
         return parser.scan(sql)
     # Keywords are ASCII only: e.g. uni中ue masks to unique but remains IDENT.
-    # No pglast lookahead keyword contains q, so the placeholder cannot create
-    # NOT_LA, NULLS_LA, WITH_LA, or WITHOUT_LA and affect the following token.
     return [token._replace(name='IDENT', kind='NO_KEYWORD')
             if token.kind != 'NO_KEYWORD' and not sql[token.start:token.end + 1].isascii()
             else token for token in tokens]

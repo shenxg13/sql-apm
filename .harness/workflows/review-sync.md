@@ -157,6 +157,12 @@ R1, R2, and R3 are the only ordinary formal rounds. Their number increases
 monotonically within the PR. R0 is an entry gate and does not count. A fourth
 ordinary handoff is invalid and must enter Convergence Adjudication.
 
+Any of R1, R2, or R3 may end the sequence with `approve`. In every round
+`approve` is valid only when the consolidated ledger has no current blocker and
+that round verified every current acceptance criterion and non-waivable gate
+against its `head_sha`. An approving round is the last ordinary round; no later
+round is required or consumed.
+
 ### R0: Entry Gate
 
 R0 freezes and records the current Issue contract and review surface. Its
@@ -216,12 +222,18 @@ and never replaces origin. A late finding also requires `late_reason`, why the
 earlier stage missed it, and evidence that the bounded sibling/class-wide sweep
 was completed.
 
-A completed R2 verdict is `pass_to_R3`, `changes_requested`, or `escalate`.
-`pass_to_R3` is valid only when the consolidated ledger has no current blocker.
-If any current blocker remains, a completed R2 must return `changes_requested`
-or `escalate`; it cannot consume R3 merely by carrying the blocker forward. R2
-cannot issue the final approval. An aborted handoff records `aborted` and the
-unfinished verification responsibilities.
+A completed R2 verdict is `approve`, `changes_requested`, or `escalate`.
+`approve` is valid only when the consolidated ledger has no current blocker and
+R2 has also verified every current acceptance criterion and non-waivable gate
+against the reviewed head; it is the final approval and no R3 follows. If any
+current blocker remains, a completed R2 must return `changes_requested` or
+`escalate`; it cannot consume R3 merely by carrying the blocker forward. A
+blocker-free R2 that cannot validly complete that verification returns
+`escalate`. An aborted handoff records `aborted` and the unfinished
+verification responsibilities.
+
+The retired R2 verdict `pass_to_R3` (no current blocker, approval deferred to
+R3) appears only in records made before 2026-10-05 and is no longer issued.
 
 ### R3: Final Ordinary Verification
 

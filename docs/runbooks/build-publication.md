@@ -130,6 +130,7 @@ Issue #35 取代此前“选取本集群全部完整批次”的操作口径。�
 `window_fallback`。前三项为完整批次总数、实际选入数、未选入数；回退时选入全部，
 `excluded_batches=0`、`window_fallback=true`。窗口未选入不代表清理，旧明细仍在库中；
 无该版本判定时按[展示约定](../../.project-wiki/features/sql-search-and-views.md#未选入批次的历史判定2026-10-04)解释。
+同一文件若在另一选入批次中重复引用，仍属于快照输入；检查历史事件时以快照文件清单为准。
 
 专项命令 `.venv/bin/python scripts/db/verify_window.py` 使用私有临时实例。
 真实对照由 `scripts/db/verify_window_full.py` 显式选择基线／候选 checkout 与固定日志，

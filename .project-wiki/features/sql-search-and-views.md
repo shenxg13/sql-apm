@@ -4,7 +4,7 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-05
+updated: 2026-10-06
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/35
     status: current
@@ -173,10 +173,15 @@ confidence: high
 ### 未选入批次的历史判定（2026-10-04）
 
 来源：[Issue #35](https://github.com/shenxg13/sql-apm/issues/35)。按窗口选批后，未选入批次
-的事件在该版本下没有判定结果；展示时须标为“不在该版本输入范围内”，不能称为已经
+中未进入该版本快照的事件没有判定结果；展示时须标为“不在该版本输入范围内”，不能称为已经
 该版本筛选或伪造 `outside_window`。选入批次中的窗口外事件仍可返回 `outside_window`。
 执行历史直接读取保留的事件，不因是否选入而删除或隐藏；时间范围独立于训练窗口。
 这是已确认的展示约定，查询界面仍待交付。
+
+实现边界（2026-10-06，代码与合成验证）：既有去重允许同一文件被多个批次引用，
+快照按选入批次的文件并集封存。因此事件是否在输入范围内须以 `input_file` 为准：
+若另一选入批次包含该文件，其事件仍可返回判定，窗口外事件仍为 `outside_window`。
+不能只看其中一个批次是否选入。此处说明既有去重与整批选入的组合行为，不新增展示功能。
 
 ## Workflows
 

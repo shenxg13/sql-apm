@@ -90,6 +90,21 @@ def verify(pg_bin):
             explicit = training.snapshot(config(),['OLD'])
             assert selected(dict(snapshot=explicit)) == ['OLD']
             v.require(True,'explicit training snapshot preserves the supplied old batch')
+            shared = make('SHARED',[[event('2026-07-01 12:00:00 CST','4')],
+                                   [event('2026-07-26 12:00:00 CST','11')]])
+            duplicate = ingest(shared)
+            shared_file = duplicate['files'][0]['file_id']
+            assert duplicate['files'][0]['state'] == 'duplicate_skipped'
+            assert bounds(shared_file) == ('2026-07-01T12:00:00+08:00',)*2
+            reused = run(dsn,'sql_apm',config())
+            assert 'OLD' not in selected(reused) and 'SHARED' in selected(reused)
+            with db,db.cursor() as cur:
+                cur.execute('''SELECT d.reason_codes FROM mpp_training_decisions(%s,%s) d
+                    JOIN mpp_occurrence o USING(analysis_id,occurrence_id)
+                    JOIN evidence_record e ON e.record_id=o.anchor_ref WHERE e.file_id=%s''',
+                    (reused['snapshot']['input_id'],reused['snapshot']['config_id'],shared_file))
+                assert cur.fetchall() == [(['outside_window'],)]
+            v.require(True,'cross-batch duplicate keeps bounds; selected whole batch retains shared old event with outside_window')
             recent = make('FALLBACK',[[event('2026-07-26 12:00:00 CST','10')]],scope='C2')
             current = run(dsn,'sql_apm',config('C2'),recent,workers=1)
             assert current['publication']['result']=='published'

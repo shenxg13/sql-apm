@@ -48,6 +48,7 @@ verified：合成专项覆盖时间无效／无时区、全部无效、非执行
 | `python scripts/db/verify_training.py` | 300 项通过 |
 | `python scripts/db/verify_publication.py` | 33 项通过 |
 | `python scripts/db/verify_window.py` | 文件时间、整批选入、显式选批、回退和输出通过 |
+| `python scripts/db/verify_window_replay.py --reference var/issue35/reference` | 两版完整九任务／每日分批合成对照通过，指标摘要改变时拒绝 |
 | `python scripts/db/verify_mpp_naming.py` | 稳定来源键导出器检测正式／观察指标改动与精确恢复 |
 | `PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh` | 完整离线 Harness 通过 |
 
@@ -73,13 +74,18 @@ verified：合成专项覆盖时间无效／无时区、全部无效、非执行
 ```bash
 .venv/bin/python scripts/db/verify_window_full.py \
   --app-root var/issue35/reference --logs raw/inbox/hashdata \
-  --output var/issue35/baseline-run
+  --output var/issue35/baseline-run2
 .venv/bin/python scripts/db/verify_window_full.py \
   --app-root var/issue35/candidate --logs raw/inbox/hashdata \
-  --output var/issue35/candidate-run --candidate
+  --output var/issue35/candidate-run2 --candidate
 .venv/bin/python scripts/db/verify_window_full.py --compare \
-  var/issue35/baseline-run/report.json var/issue35/candidate-run/report.json
+  var/issue35/baseline-run2/report.json var/issue35/candidate-run2/report.json
 ```
+
+首轮真实基线完成首批构建后，验收工具重复进入连接事务，在导出阶段失败；
+该次不计验收。候选随后主动中断，两套私有实例均已清理。修复为 `closing` 管理连接寿命，
+先用小型数据完成两版九任务和每日分批对照（5→4 批、10→8 事件，逐值等价），
+再用上述新目录完整重跑。比较器对人为改动指标摘要的测试也能正确拒绝。
 
 全量结果正在生成，W5–W7 在报告补齐前不视为通过。原文、详细命令输出和私有连接留在忽略目录。
 计时采用现有 `decisions_derived.seconds`（含构建登记、判定物化、摘要与分组登记）及

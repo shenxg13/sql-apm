@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Issue #35: nine-task and daily-batch replays against an explicit checkout."""
 import argparse
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -91,12 +92,12 @@ def record_build(args, db, record, scope):
     return record
 
 
-def scenario(args, manifest, bounds, daily):
+def scenario(args, manifest, bounds, daily, expected_outside=55808):
     records = {}
     with instance(args.pg_bin) as (directory, env):
         v = Verification(args.pg_bin, directory, env); v.init(root=args.app_root)
         dsn = 'host=' + str(directory/'socket') + ' port=55473 dbname=sql_apm user=sql_apm'
-        with psycopg2.connect(dsn) as db:
+        with closing(psycopg2.connect(dsn)) as db:
             with db.cursor() as cur:
                 cur.execute('SET search_path=sql_apm,pg_catalog')
                 cur.execute("SET TIME ZONE 'Asia/Shanghai'")
@@ -133,7 +134,7 @@ def scenario(args, manifest, bounds, daily):
                         assert len(record['selected']) == i+1
                         if scope == '119' and i == 3:
                             outside = sum(n for _, reason, n in record['result']['build']['reasons'] if reason == 'outside_window')
-                            assert outside == 55808
+                            assert outside == expected_outside
                             record['outside_window'] = outside
                         records[batch] = record
                         save(args.output/(label+'-records.json'), records)

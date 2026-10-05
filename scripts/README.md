@@ -223,4 +223,5 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `verify_window_full.py --app-root PATH --logs PATH --output NEW_DIR` 在全新私有 PG17
 执行九任务及 119 每日一批／7 天窗口，候选增加 `--candidate`，两份报告通过
 `--compare BASE_REPORT CANDIDATE_REPORT` 核对稳定来源成员、全部指标、检查和计数差值。
-这是显式高成本验收，不自动加入 Harness；原文、配置、临时实例和详细输出留在本地忽略区域。
+`verify_window_replay.py --reference BASE_CHECKOUT` 用合成日志先验证完整对照工具链，
+包括九任务、每日分批和指标变化拒绝。真实流程是显式高成本验收，不自动加入 Harness；原文、配置、临时实例和详细输出留在本地忽略区域。

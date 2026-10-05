@@ -182,7 +182,8 @@ class Importer:
         declaration = dict(origin_key=entry['origin_key'], declaration=config['source']['declaration'],
                            input_observed=observed_input)
         with self.db, self.db.cursor() as cur:
-            cur.execute('''INSERT INTO source_file VALUES (%s,%s,%s,%s,%s,%s,%s,%s,true,%s)
+            cur.execute('''INSERT INTO source_file (file_id,source_id,scope_id,content_identity,checksum_algorithm,
+                checksum_value,byte_count,locator,closed_and_copied,declaration_evidence) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,true,%s)
                 ON CONFLICT DO NOTHING''', (fid, config['source_id'], config['scope_id'], sha, 'sha256' if observed_input else 'unavailable',
                                            sha, size, str(path), canonical(declaration)))
             cur.execute('SELECT attempt_id FROM import_attempt WHERE file_id=%s AND state=\'succeeded\' ORDER BY finished_at LIMIT 1', (fid,))
@@ -252,7 +253,8 @@ class Importer:
                 if any(set(edges).intersection(json.loads(row[0]).get('edge_pairs', [])) for row in cur):
                     raise IngestionError('record_edge_overlap')
                 declaration.update(edge_pairs=edges, counts=dict(counts), sha256=sha)
-                cur.execute('UPDATE source_file SET declaration_evidence=%s WHERE file_id=%s', (canonical(declaration), fid))
+                cur.execute('''UPDATE source_file SET declaration_evidence=%s,first_log_at=%s,last_log_at=%s
+                    WHERE file_id=%s''', (canonical(declaration), rows.first_log_at, rows.last_log_at, fid))
                 cur.execute("UPDATE import_attempt SET state='succeeded',finished_at=clock_timestamp(),reliable_record_count=%s WHERE attempt_id=%s", (rows.count, attempt))
             return dict(file_id=fid, state='succeeded', counts=dict(counts), added_records=rows.count, added_occurrences=counts['occurrences'])
         except (KeyboardInterrupt, SystemExit):

@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.7.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.8.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.7.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.8.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -25,7 +25,7 @@
   数量使用非负 `bigint`；未知为 NULL，有明确原因，真实零仍为 0。
 - 状态采用 `text + CHECK`，逻辑契约枚举变化仍按契约演进；不用数据库 enum 固定未来升级路径。
 - `schema_version` 保存结构版本、schema.sql 的 SHA-256 和首次应用时间。
-  升级保留原始历史记录并登记经过的版本，新库只记录 1.7.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
+  升级保留原始历史记录并登记经过的版本，新库只记录 1.8.0；相同版本重跑保留时间；结构版本与契约、Normalization、配置及 Build 版本各自独立。
 
 ## 逻辑对象到物理映射
 
@@ -35,7 +35,7 @@
 | 逻辑对象／字段 | 物理结构与差异 |
 | --- | --- |
 | Source | `scope` 保存 system_kind/profile/contract_version；`source` 保存映射、源端版本、时区、声明证据。 |
-| File | `source_file`；checksum 拆为 algorithm/value，content_identity 与字节摘要分开；来源下内容身份唯一，locator 可迁移。 |
+| File | `source_file`；checksum 拆为 algorithm/value，content_identity 与字节摘要分开；来源下内容身份唯一，locator 可迁移；1.8.0 增加可空 first_log_at／last_log_at。 |
 | Batch | `import_batch`；declared_dates → `batch_date`，entries → `batch_entry`。条目最终尝试须匹配 batch/file。 |
 | ImportAttempt | `import_attempt`；retry_of/duplicate_of 自引用同一 File。重试不覆盖尝试历史。 |
 | EvidenceRecord | `evidence_record`；唯一 (file_id,record_no)，定位行区间正数；observed 为 JSONB 投影。 |
@@ -99,11 +99,11 @@ MPP 是这套生产系统的内部统称，详见[系统称谓](../../.project-w
 
 [冻结的 1.0.0 DDL](../../sql_apm/storage/versions/1.0.0.sql)保持原始字节，
 [冻结的 1.1.0 DDL](../../sql_apm/storage/versions/1.1.0.sql)同样保持已发布字节；
-[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0，仅允许空库，亦允许从任一已发布中间版本开始。
+[迁移入口](../../sql_apm/storage/migrate.sql)支持 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0；1.7.0 可带数据升级，更早版本只允许空库，亦允许从任一已发布中间版本开始。
 入口先完整核对旧 catalog 和版本摘要，再执行表／索引／约束改名，
 验证最终 catalog 与新库目标一致后登记版本；同一事务提交，失败整体回滚。
 约束名按目标定义对应，处理 PostgreSQL 自动命名的长度截断，不猜测截断后的列名。
-每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.7.0 的库只核验，不重复登记。
+每一步先验证完整源结构再迁移，连续升级同一事务提交。已在 1.8.0 的库只核验，不重复登记。
 
 这是有维护窗口的串行升级，执行前暂停业务写入及相关查询。
 DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据，1.2.0 新增
@@ -123,7 +123,7 @@ DDL 锁等待上限为 5 秒，等待超时回滚；1.1.0 改名不重写数据�
 2026-09-30 范围变更取消物理 sufficiency；schema 及有效的 1.3.0→1.4.0 迁移同步使用新目标定义。
 该调整发生于 1.4.0 交付前，当时没有生产部署，因此未另增版本号；早期验收实例不作为兼容升级起点。
 Issue #27 已将最终 [1.4.0 DDL](../../sql_apm/storage/versions/1.4.0.sql)冻结为迁移与结构检查基线；
-当前结构为下述 1.7.0，保留 1.6.0 的独立观察统计与覆盖推导，使用统一 MPP 标识。
+当前结构为下述 1.8.0，保留 1.6.0 的独立观察统计与覆盖推导，使用统一 MPP 标识。
 
 ## 训练判定结构 1.3.0
 
@@ -312,3 +312,19 @@ Task 新增模式、阶段、数据库时间及阶段耗时，既有任务新增
 历史迁移本身仍按已发布脚本保留。其带数据回归在验收资源中以冻结的 1.6.0 入口执行，
 不作为旧库可以带数据升级至 1.7.0 的证据。新建、空库连续升级、带数据拒绝和同版本重跑
 均另由当前入口验证。
+
+## 1.8.0 文件实际日志时间
+
+[Issue #35](https://github.com/shenxg13/sql-apm/issues/35) 新增 `source_file.first_log_at` 和
+`last_log_at`（timestamptz），命名约束 `source_file_log_time_bounds` 要求同时为空或
+同时有值且最早不晚于最晚。导入读取全部日志记录第 0 列，与事件结束时间共用解析函数；
+无法解析的时间忽略。与文件成功状态同事务写入，失败回滚；重复文件沿用首次值。
+
+1.7.0 DDL 冻结于 `sql_apm/storage/versions/1.7.0.sql`；新迁移
+`sql_apm/storage/migrations/1.7.0-to-1.8.0.sql` 只增加列及约束，允许已有数据，
+不回填，两列均为 NULL。旧 DDL 与迁移摘要不变，新库直接建立 1.8.0；更早版本的
+非空库仍须按 #33 重建，空库可连续升级。结构检查包含新列和约束。
+
+这两列是导入过程派生的物理元数据，与文件校验和、字节数同类，逻辑契约保持 1.0.0。
+可供后续留存清理和导入侧大表分区复用，本次不实现清理或分区。
+选批只查询文件元数据，既有事件、SQL 原文、判定算法及统计数据不重写。

@@ -6,6 +6,8 @@ owners:
   - .project-wiki/contracts/sql-storage.md
 updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/35
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/33
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
@@ -118,7 +120,7 @@ confidence: high
 2026-09-30 [后续范围确认](https://github.com/shenxg13/sql-apm/issues/25#issuecomment-5914482826)进一步移除
 逐统计行重复保存的 `sufficiency` JSONB，按原构建封存配置和公式版本派生完整门槛结果，
 见[统计契约](baseline-statistics.md#统计完整保存与首期边界2026-09-30)。正式统计自然键由 1.4.0 确定，1.5.0 增加独立观察结果，1.6.0 保留这些结果并将覆盖改为推导，见[物理设计](../../docs/design/postgresql-storage.md#观察统计结构-150)。
-当前 1.7.0 仅统一 MPP 标识，统计保存口径不变；旧库重建边界由[存储主题](../architecture/postgresql-storage.md#mpp-标识统一2026-10-05)维护。
+1.7.0 仅统一 MPP 标识，1.8.0 增加下述文件时间，统计保存口径不变；旧库重建边界由[存储主题](../architecture/postgresql-storage.md#mpp-标识统一2026-10-05)维护。
 
 ### 统计存储量级接受（2026-10-01）
 
@@ -145,6 +147,17 @@ confidence: high
 版本保留周期与清理紧接 #29 单独建 Issue，未授权本次删除历史版本或原始日志。
 120 本地仅七天日志，生产首批三十天的耗时与存储仍须在首次生产运行测量；
 既有 modeled 容量不能转称本轮 measured。当前映射见[存储主题](../architecture/postgresql-storage.md)。
+
+### 文件时间与历史保留（2026-10-04）
+
+来源：[Issue #35](https://github.com/shenxg13/sql-apm/issues/35)。历史数据尽量保留，
+构建按[窗口选批](../features/baseline-versions.md#按训练窗口选批2026-10-04-确认issue-35)
+减少输入；不以删除、归档或自动清理换取构建速度，也不实现导入侧大表分区。
+`source_file.first_log_at`／`last_log_at` 是导入过程派生的物理信息，与摘要、字节数同类，
+不改变逻辑对象语义，因此 `contract_version` 保持 1.0.0；物理结构升为 1.8.0。
+字段从文件全部记录的可解析日志时间计算，与事件结束时间共用解析函数。
+已有成功文件不回填、重复跳过不重算，无有效时间或首次导入失败时两列为空。
+两列可供后续留存清理及导入侧大表分区复用；这些能力须另行确认和实施。
 
 ## Workflows
 

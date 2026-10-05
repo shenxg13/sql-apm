@@ -22,12 +22,25 @@ def run(dsn, schema, config, ingestion=None, retry_of=None, workers=4, progress=
                 if imported['state']!='complete':
                     raise IngestionError('batch_incomplete')
             with db,db.cursor() as cur:
-                cur.execute("SELECT batch_id FROM import_batch WHERE scope_id=%s AND state='complete' AND files_confirmed_complete ORDER BY batch_id",(config['scope_id'],))
-                batches=[r[0] for r in cur]
+                cur.execute('''SELECT b.batch_id,EXISTS (
+                    SELECT FROM batch_entry e JOIN source_file f USING(file_id)
+                    JOIN import_attempt a ON a.attempt_id=e.final_attempt_id
+                    WHERE e.batch_id=b.batch_id AND a.state IN ('succeeded','duplicate_skipped')
+                        AND (f.last_log_at IS NULL OR f.last_log_at >= %s::timestamptz))
+                    FROM import_batch b WHERE b.scope_id=%s AND b.state='complete'
+                        AND b.files_confirmed_complete ORDER BY b.batch_id''',
+                    (config['window_start'],config['scope_id']))
+                completed=cur.fetchall()
+                batches=[batch for batch,selected in completed if selected]
+                fallback=bool(completed) and not batches
+                if fallback:
+                    batches=[batch for batch,_ in completed]
+                selection=dict(completed_batches=len(completed),selected_batches=len(batches),
+                    excluded_batches=len(completed)-len(batches),window_fallback=fallback)
             training=TrainingStore(dsn,schema,db=db)
             frozen=training.snapshot(config,batches,task=task)
             if progress:
-                progress(phase='snapshot_finished',task_id=task.task_id,input_id=frozen['input_id'],config_id=frozen['config_id'])
+                progress(phase='snapshot_finished',task_id=task.task_id,input_id=frozen['input_id'],config_id=frozen['config_id'],**selection)
             statistics=StatisticsStore(dsn,schema,db=db)
             built=statistics.calculate(config['scope_id'],frozen['input_id'],frozen['config_id'],retry_of,
                 progress=(lambda row:progress(**row)) if progress else None,task=task)

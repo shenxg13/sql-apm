@@ -86,6 +86,7 @@
 | [近似分组观察统计验证](reports/observation-statistics-2026-10-01.md) | 实施验证报告 | 55 文件重导、全部观察组复算、正式结果逐行对照、重复一致与资源实测。 |
 | [统计 R2 整改](reports/baseline-statistics-r2-remediation-2026-10-01.md) | 整改验证报告 | 批量门槛查询一致性、单组／聚合实测与统计容量接受同步。 |
 | [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
+| [文件时间与窗口选批验证](reports/window-batches-2026-10-05.md) | 分析证据 | 1.8.0 迁移、整批选入、九任务等价及每日分批对照。 |
 | [Kylin 离线部署验证](reports/kylin-offline-deployment-2026-10-02.md) | 实施验证报告 | 离线编译、自检、认证和与 Alma 比对的实测及未完成验收边界。 |
 | [精简候选包与 HTML 准备验证](reports/slim-release-preparation-2026-10-03.md) | 实施验证报告 | 程序精简、逐文件证据继承、隔离验证、HTML 检查及目标机确认点。 |
 | [精简候选包 Kylin 试跑](reports/slim-release-kylin-trial-2026-10-03.md) | 实施验证报告 | 快照恢复后的完整重装、独立验收、四进程超时与单进程复跑、性能对照。 |

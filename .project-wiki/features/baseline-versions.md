@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-10-02
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/35
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29
@@ -348,12 +350,34 @@ rebuild 复用完整导入数据并创建新快照，status／history 查询各�
 ### 发布输入与补导确认（2026-10-02）
 
 来源：[R1 观察 O1、O2 的用户确认](https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169)，current；这是既有口径的确认，不新增发布门槛。
-失败或冲突未解决的批次只阻止该批次自身发布；后续日批 full 和 rebuild 只选择已完成批次，
+失败或冲突未解决的批次只阻止该批次自身发布；后续日批 full 和 rebuild 只选择已完成批次（并加上下节 #35 的窗口条件），
 六项检查中的批次完整性只针对本次输入快照引用的批次。窗口内缺少未完成批次的日期不阻止发布，
 也不要求在当前版本上另加缺天提示；失败任务仍保留诊断。
 
 full 默认截止日仍取本批声明的最后日期。对较早批次执行 full，当前版本的窗口可以回到该日期；
 补导时由操作者显式指定 `--cutoff-date`，不增加窗口倒退拒绝或自动保护逻辑。
+
+### 按训练窗口选批（2026-10-04 确认，Issue #35）
+
+来源：[Issue #35](https://github.com/shenxg13/sql-apm/issues/35)，current。
+`full`／`rebuild` 在“本集群已完成且已确认完整”的条件上，增加文件实际日志时间条件：
+批次至少有一个成功文件的 `last_log_at` 不早于窗口起点，或至少一个成功文件的时间未知。
+时间未知一律不可排除；不设窗口终点上界，不使用 `batch_date` 选批。批次是最小单位，
+一旦选入即封存整批成功文件，不拆分首批或跨窗口批次。
+
+若一个候选批次也没有，则退回原规则，选入全部已完成批次，继续既有零样本处理：
+五类均无有效样本时保存 `no_samples`，不切换当前版本。`training snapshot --batch`
+仍原样封存显式批次，不采用上述自动选择条件；窗口、判定、统计与六项检查不变。
+
+本条补充上节 2026-10-02“只选择已完成批次”，并取代旧操作说明的
+“选取本集群全部完整批次”表述（仅无候选时保留该回退行为）。
+快照进度输出已完成、选入、未选入数及回退标记，只含计数和标识。
+
+窗口外明细继续保留。未选入的批次事件没有该版本的训练判定，展示约定见
+[历史判定边界](sql-search-and-views.md#未选入批次的历史判定2026-10-04)。
+被排除批次不再计入构建摘要；选入批次中的窗口外事件仍由逐条规则判为 `outside_window`。
+首批多日合并可能使读取量暂时超过窗口，直到该批最后文件滑出；希望更早缩小输入时，
+操作者可从首批开始按每天一批导入。补导旧批次仍按显式截止日选择，未来批次由逐条规则筛除。
 
 ## Workflows
 

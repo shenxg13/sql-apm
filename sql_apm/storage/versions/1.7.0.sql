@@ -1,4 +1,4 @@
--- Structure version 1.8.0. Called only after catalog compatibility checks.
+-- Structure version 1.3.0. Called only after catalog compatibility checks.
 -- The caller sets the verified project schema as search_path.
 CREATE TABLE IF NOT EXISTS schema_version (
     version text PRIMARY KEY,
@@ -33,11 +33,6 @@ CREATE TABLE IF NOT EXISTS source_file (
     locator text NOT NULL CHECK (locator <> ''),
     closed_and_copied boolean NOT NULL,
     declaration_evidence text NOT NULL CHECK (declaration_evidence <> ''),
-    first_log_at timestamptz,
-    last_log_at timestamptz,
-    CONSTRAINT source_file_log_time_bounds CHECK (
-        (first_log_at IS NULL AND last_log_at IS NULL) OR
-        (first_log_at IS NOT NULL AND last_log_at IS NOT NULL AND first_log_at <= last_log_at)),
     FOREIGN KEY (source_id, scope_id) REFERENCES source (source_id, scope_id),
     UNIQUE (source_id, content_identity),
     UNIQUE (file_id, scope_id),

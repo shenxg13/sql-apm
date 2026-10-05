@@ -150,7 +150,7 @@ call 和主证据，但 timing_type=null；不能用 unpaired 同时给出 execu
 | Normalization.normalization_id | id | 固定规则组合的身份 |
 | Normalization.algorithm_version、parser_version | text 各一 | 指纹算法与 SQL 解析能力版本，和来源记录解析器区分 |
 | Normalization.dictionary_schema_version | 正整数 | 当前字典格式 1，非本数据契约版本 |
-| Normalization.dictionary_rules_version | text | 当前字典语义版本 1.0.1；历史可以引用旧版 |
+| Normalization.dictionary_rules_version | text | 当前字典语义版本 1.0.2；历史可以引用旧版 |
 | Normalization.dictionary_digest | digest | 现有字典工具返回的规范内容摘要，不是任意文件字节摘要 |
 | Normalization.rules_ref | text | 不可变规则内容引用，摘要本身不能替代解释规则 |
 | Fingerprint.fingerprint_id | id | 一次规则组合下的文本指纹结果身份 |

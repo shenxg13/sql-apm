@@ -24,6 +24,8 @@ sources:
     status: current
   - path: rules/functions/v1.json
     status: historical
+  - path: rules/functions/v1.0.1.json
+    status: historical
   - path: rules/functions/v1.0.2.json
     status: current
   - path: docs/reports/function-dictionary-2026-09-25.md
@@ -357,8 +359,8 @@ confidence: high
   对象身份、布尔、结构化和未知类型转换子树整体保留，外层 text 不绕过内层保护。
   anyelement 不作为标量依据；已知多态候选按有限内置类型事实检查类别及关联，
   未知类别／现场类型返回需解析器的保守原因，完整规则及支持边界见字典说明。
-- 当前规则版本为 1.0.1，原 1.0.0 文件按原字节保留，格式版本为 1；加载形成固定快照及确定摘要。新语义使用新
-  规则版本；后续构建固定算法版本、字典版本与摘要，同一窗口不混用规则，
+- 当前规则版本为 1.0.2，历史 1.0.0 与 1.0.1 文件按原字节保留，格式版本为 1；
+  加载形成固定快照及确定摘要。新语义使用新规则版本；后续构建固定算法版本、字典版本与摘要，同一窗口不混用规则，
   历史基线保留原依据、源 SQL 不改写。本次只交付该接口约定，不实施整窗重建。
 - 字段、逐函数依据、嵌套边界和维护步骤见[字典说明](../../rules/functions/README.md)；
   目录分母、人工用例、脱敏有界重放及证据限制见[验证报告](../../docs/reports/function-dictionary-2026-09-25.md)。

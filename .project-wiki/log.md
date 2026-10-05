@@ -313,3 +313,13 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
   [导入说明](../docs/runbooks/log-ingestion.md#mpp-命名升级与日志目录)。
 - [验收报告](../docs/reports/mpp-naming-2026-10-05.md)记录验证证据和待完成项；
   GitHub Issue／PR 继续维护交付状态。
+
+## 2026-10-05：Issue #33 R1 文档整改
+
+- 按 [R1-F001](https://github.com/shenxg13/sql-apm/pull/37#issuecomment-5988678740) 修正
+  [逻辑契约](contracts/offline-data-contract.md#c11兼容与演进)、
+  [指纹主题](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)、
+  [字段字典](../docs/design/offline-data-contract/fields.md#normalization-与-fingerprint)和
+  [规则维护说明](../rules/functions/README.md#来源重建与维护)中当前字典版本的遗漏，统一为 1.0.2。
+- 规则维护说明区分当前生成器、历史 1.0.1 重建和首版 1.0.0 回放；指纹主题补回历史字典来源。
+  本轮只修正文档，既有规则文件、产品、手册原稿和验收制品保持不变，整改后交接 R2 独立复核。

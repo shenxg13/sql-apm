@@ -46,7 +46,7 @@ def validate(data):
     _require(type(data['schema_version']) is int and data['schema_version'] == 1, 'unsupported schema_version')
     _require(isinstance(data['rules_version'], str) and
              re.fullmatch(r'[1-9]\d*\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)', data['rules_version']), 'invalid rules_version')
-    _require(data['profile'] == 'hashdata-pg94', 'unsupported profile')
+    _require(data['profile'] == 'mpp-sql', 'unsupported profile')
     _require(isinstance(data['rules'], list) and data['rules'], 'rules must be a nonempty list')
     ids, keys = set(), set()
     fields = {'id', 'name', 'schema', 'types', 'defaults', 'variadic', 'kind',

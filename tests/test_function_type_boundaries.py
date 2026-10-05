@@ -27,7 +27,7 @@ def call(name, arg, types=None):
 class TypeBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dictionary = FunctionDictionary.load(ROOT/'rules/functions/v1.0.1.json')
+        cls.dictionary = FunctionDictionary.load(ROOT/'rules/functions/v1.0.2.json')
 
     def test_protected_cast_values_and_nested_casts(self):
         cases = [('regclass', 'orders', 'customers'), ('regtype', 'int4', 'text'),

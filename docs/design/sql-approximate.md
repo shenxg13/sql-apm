@@ -26,7 +26,7 @@ near = fingerprint(b'SELECT * FROM orders WHERE id IN (1001,',
                    structural_reason='lexical_unbalanced_bracket')
 ```
 
-输入接受 `str` 或原始 `bytes`，当前 profile 固定为 `hashdata-csv/1`。不得把数据库错误消息
+输入接受 `str` 或原始 `bytes`，当前 profile 固定为 `mpp-csv/1`。不得把数据库错误消息
 原文作为 `structural_reason`，该参数只接受固定诊断码；正常使用优先调用 `analyze`。
 
 | 层次／字段 | 行为 |

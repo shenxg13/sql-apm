@@ -44,7 +44,7 @@ def verify_statistics_migration(v, root, runner):
             "INSERT INTO mpp_baseline_group SELECT 'G2',scope_id,profile,'N2',database,execution_user,'F2',fingerprint_value,timing_type FROM mpp_baseline_group WHERE group_id='G1'")
         sql("INSERT INTO mpp_build_group SELECT partition_id,build_id,'G2' FROM build WHERE build_id='V1'",ok=False)
         v.require(True,schema+': result relation rejects a group under another normalization')
-        sql("INSERT INTO scope VALUES ('CL2','hashdata','hashdata-csv/1','1.0.0'); "
+        sql("INSERT INTO scope VALUES ('CL2','mpp','mpp-csv/1','1.0.0'); "
             "INSERT INTO mpp_baseline_group SELECT 'G3','CL2',profile,normalization_id,database,execution_user,fingerprint_id,fingerprint_value,timing_type FROM mpp_baseline_group WHERE group_id='G1'")
         sql("INSERT INTO mpp_build_group SELECT partition_id,build_id,'G3' FROM build WHERE build_id='V1'",ok=False)
         v.require(True,schema+': result relation rejects a group under another cluster')

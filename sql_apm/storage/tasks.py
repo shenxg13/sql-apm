@@ -20,7 +20,7 @@ class Task:
     def __enter__(self):
         with self.db, self.db.cursor() as cur:
             if self.mode in ('full', 'import_only'):
-                cur.execute("INSERT INTO scope VALUES (%s,'hashdata','hashdata-csv/1','1.0.0') ON CONFLICT DO NOTHING", (self.scope,))
+                cur.execute("INSERT INTO scope VALUES (%s,'mpp','mpp-csv/1','1.0.0') ON CONFLICT DO NOTHING", (self.scope,))
             else:
                 cur.execute('SELECT 1 FROM scope WHERE scope_id=%s', (self.scope,))
                 if not cur.fetchone():

@@ -45,7 +45,7 @@
 PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \
   -m sql_apm.diagnostics.duration_dispersion extract \
   --source var/parser-probe/issue13/full-scan.sqlite \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --cache var/parser-probe/issue15/durations.sqlite --workers 8
 
 PYTHONPATH=var/parser-probe/site-packages .venv/bin/python \

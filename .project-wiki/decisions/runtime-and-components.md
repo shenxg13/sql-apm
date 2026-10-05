@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-04
+updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/33
+    status: current
   - path: docs/reports/sql-scanning-r1-remediation-2026-10-04.md
     status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
@@ -209,8 +211,7 @@ R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包
 
 - 确认日期：2026-09-23；来源状态：current，用户明确指出版本已记录在
   [原始需求文档](../raw/sql-baseline.md)的“已确认现网环境”中，本次已核对原文。
-- PostgreSQL **9.4.26**、Greenplum Database **6.20.3**、HashData Warehouse
-  **3.13.13**。
+- 系统组成与三个版本统一见[系统称谓](project-scope.md#已确认的生产系统称谓)。
 - 以上为用户指明的现网版本事实，不表示原始文档中的其他设计建议同时获确认。
   尚未取得与该 HashData 构建对应的日志源码映射。用户随后提供下述 psql
   多语句测试的终端照片，支持该案例按整批计时；不能将其或 PostgreSQL 的
@@ -267,7 +268,7 @@ R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包
   选定并记录。
 - 当前先准备一个 Baseline 存储实例；后续按需准备独立的 **PostgreSQL 9.4.26**
   实例，测试旧版查询状态、开始时间和锁等待等基础接口。
-- 普通 PostgreSQL 的验证不能覆盖 GP/HashData 的特有字段和行为；相关字段映射
+- 普通 PostgreSQL 的验证不能覆盖 MPP 的特有字段和行为；相关字段映射
   使用现场字段定义及脱敏样本验证，后续补充真实环境联调。
 - Python 仍固定为 3.9.5；数据库驱动需同时满足 Python 兼容约束和对应数据库的
   连接要求，具体依赖版本另行验证并锁定。
@@ -323,7 +324,7 @@ SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`�
 ### 已确认的首期组件分工
 
 - 确认日期：2026-09-22。
-- 来源：用户指出基线构建状态属于平台自身监控，activity 汇总已有 HashData
+- 来源：用户指出基线构建状态属于平台自身监控，activity 汇总已有 MPP
   监控指标覆盖，并对“首期不引入 Prometheus”的组件分工建议回复“确认”。
 - 来源状态：current；已确认职责边界，尚未完成业务实现和组件部署。
 
@@ -332,7 +333,7 @@ SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`�
 | 自研 Python 3.9.5 程序 | 日志解析、SQL 指纹和 Baseline 计算 |
 | PostgreSQL 17 | 保存执行明细、SQL 指纹和基线结果 |
 | Grafana | 直接查询 PostgreSQL，展示基线总览、单条 SQL 历史执行曲线、耗时分布与基线对比 |
-| HashData 现有监控 | 按用户说明继续复用已有的 activity 和数据库运行指标监控 |
+| MPP 现有监控 | 按用户说明继续复用已有的 activity 和数据库运行指标监控 |
 
 首期不引入 Prometheus，也不要求为首期业务建设 Prometheus 指标出口。
 后续出现统一指标接入或集中监控的明确需求时再评估。
@@ -351,7 +352,7 @@ Grafana 的版本、部署方式和具体面板设计尚待后续落实。
 按任务涉及的边界补读：
 
 - [项目范围、资料来源与交付顺序](project-scope.md)。
-- [HashData 日志事实与证据边界](../contracts/log-evidence.md)。
+- [MPP 日志事实与证据边界](../contracts/log-evidence.md)。
 - [SQL 检索、Grafana 与历史展示](../features/sql-search-and-views.md)。
 
 ## Failure Modes

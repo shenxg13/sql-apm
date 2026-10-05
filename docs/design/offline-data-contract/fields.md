@@ -11,7 +11,7 @@
 | 类型 | 定义与约束 |
 | --- | --- |
 | id、text | 非空字符串；id 不透明，text 原文不作 trim／改写；无值用约定的 null |
-| instant | 带明确 UTC 偏移的时间点；样例使用 ISO 8601，HashData 转成 `+08:00`，不损失来源精度 |
+| instant | 带明确 UTC 偏移的时间点；样例使用 ISO 8601，MPP 转成 `+08:00`，不损失来源精度 |
 | date | 北京时间自然日期 `YYYY-MM-DD`，不是时间戳截断前的其他时区日期 |
 | decimal | 有限十进制数；JSON 样例用字符串；耗时非负，0 与 null 分开 |
 | count | 非负整数；定位序号和必需非空列表另设下限 |
@@ -22,7 +22,7 @@
 | metric | `{value: decimal?, reason: null/no_samples/zero_denominator}`；有值时 reason=null，null 时必须有原因 |
 
 交接包头 `contract_version: text`、`profile: text`、`dataset_id: id` 必填。
-HashData profile 为 `hashdata-csv/1`；样例的 `batch-job-example/1` 仅示范独立来源结构。
+MPP profile 为 `mpp-csv/1`；样例的 `batch-job-example/1` 仅示范独立来源结构。
 常规对象均有各自 `*_id`，同一交接包共享头部上下文，不要求每行重复存版本。
 
 ## 输入和导入
@@ -32,8 +32,8 @@ HashData profile 为 `hashdata-csv/1`；样例的 `batch-job-example/1` 仅示�
 | 字段 | 类型／条件 | 含义 |
 | --- | --- | --- |
 | source_id | id | 固定日志来源；改路径不换身份 |
-| system_kind | text | HashData 为 `hashdata`；未来来源独立定义 |
-| scope_id | id | HashData 的逻辑计算集群标识；与本来源产生的 cluster_id 相同 |
+| system_kind | text | MPP 为 `mpp`；未来来源独立定义 |
+| scope_id | id | MPP 的逻辑计算集群标识；与本来源产生的 cluster_id 相同 |
 | mapping_ref | text | 不可变人工来源映射配置的版本／内容引用；不能只有可变文件路径 |
 | declared_build | text | 已确认源端版本谱系；不伪称已经读取私有源码 |
 | timezone | text | 本 profile 为 `UTC+08:00`；解释 CST 必须有来源确认 |
@@ -150,7 +150,7 @@ call 和主证据，但 timing_type=null；不能用 unpaired 同时给出 execu
 | Normalization.normalization_id | id | 固定规则组合的身份 |
 | Normalization.algorithm_version、parser_version | text 各一 | 指纹算法与 SQL 解析能力版本，和来源记录解析器区分 |
 | Normalization.dictionary_schema_version | 正整数 | 当前字典格式 1，非本数据契约版本 |
-| Normalization.dictionary_rules_version | text | 当前字典语义版本 1.0.1；历史可以引用旧版 |
+| Normalization.dictionary_rules_version | text | 当前字典语义版本 1.0.2；历史可以引用旧版 |
 | Normalization.dictionary_digest | digest | 现有字典工具返回的规范内容摘要，不是任意文件字节摘要 |
 | Normalization.rules_ref | text | 不可变规则内容引用，摘要本身不能替代解释规则 |
 | Fingerprint.fingerprint_id | id | 一次规则组合下的文本指纹结果身份 |
@@ -170,7 +170,7 @@ call 和主证据，但 timing_type=null；不能用 unpaired 同时给出 execu
 | 对象．字段 | 类型／条件 | 接口对应与含义 |
 | --- | --- | --- |
 | ApproximateRule.rule_id | id | 固定近似规则上下文的存储身份 |
-| algorithm_version、profile | text | 同名输出；当前为 sql-approximate/2、hashdata-csv/1，独立于可靠归一化的 profile |
+| algorithm_version、profile | text | 同名输出；当前为 sql-approximate/2、mpp-csv/1，独立于可靠归一化的 profile |
 | rules_digest | SHA-256 十六进制 | 同名输出，规范规则内容摘要；不同摘要不得混比 |
 | rules_ref、rules | text、object | 同名引用及完整规则快照，不能只留摘要 |
 | ApproximateInput.input_id | id | 已取得原字节的身份，不代表完整 SqlText |

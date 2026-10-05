@@ -1,6 +1,6 @@
 {
   "contract_version": "1.0.0",
-  "profile": "hashdata-csv/1",
+  "profile": "mpp-csv/1",
   "dataset_id": "synthetic-offline-contract-v1",
   "synthetic_only": true,
   "description": "base is a complete logical fixture; case boundary projections are inputs plus explicit expected outcomes, not runtime tests or production evidence",
@@ -65,10 +65,10 @@
     "sources": {
       "S1": {
         "source_id": "S1",
-        "system_kind": "hashdata",
+        "system_kind": "mpp",
         "scope_id": "CL1",
         "mapping_ref": "synthetic:source-map/1",
-        "declared_build": "synthetic fixture for surveyed HashData 3.13.13 profile",
+        "declared_build": "synthetic fixture for surveyed MPP profile",
         "timezone": "UTC+08:00",
         "declaration_evidence": "synthetic operator declaration; no production identity"
       }
@@ -169,8 +169,8 @@
         "file_ids": [
           "F1"
         ],
-        "profile": "hashdata-csv/1",
-        "mapping_version": "design:hashdata-mapping/1",
+        "profile": "mpp-csv/1",
+        "mapping_version": "design:mpp-mapping/1",
         "parser_version": "synthetic:source-parser/1",
         "association_version": "synthetic:association/1",
         "supersedes": null,
@@ -250,7 +250,7 @@
     "groups": {
       "G1": {
         "group_id": "G1",
-        "profile": "hashdata-csv/1",
+        "profile": "mpp-csv/1",
         "normalization_id": "N1",
         "cluster_id": "CL1",
         "database": "demo_db",
@@ -3255,9 +3255,9 @@
         "sql_required": false,
         "database_required": false,
         "execution_user_required": false,
-        "hashdata_fingerprint_required": false,
-        "mix_with_hashdata": false,
-        "hashdata_thresholds_inherited": false,
+        "mpp_fingerprint_required": false,
+        "mix_with_mpp": false,
+        "mpp_thresholds_inherited": false,
         "adapter_delivered": false
       }
     },

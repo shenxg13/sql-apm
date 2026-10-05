@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def build(inventory, policies, rules_version='1.0.1'):
+def build(inventory, policies, rules_version='1.0.2'):
     rules = []
     for proc in inventory['catalog']:
         if proc['name'] not in inventory['document_mentions']:
@@ -55,13 +55,13 @@ def build(inventory, policies, rules_version='1.0.1'):
                           decision='pending', arguments=[dict(position=1, action='preserve', role='configuration_or_relation_identity')],
                           rationale='文档说明配置／表名用途，但未取得现场精确签名；保留且不计已审查签名覆盖。',
                           sources=['https://docs-cn.greenplum.org/v6/ref_guide/gp_toolkit.html'], enabled=True))
-    return dict(schema_version=1, rules_version=rules_version, profile='hashdata-pg94', rules=sorted(rules,key=lambda r:r['id']))
+    return dict(schema_version=1, rules_version=rules_version, profile='mpp-sql', rules=sorted(rules,key=lambda r:r['id']))
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,default=ROOT/'rules/functions/v1.0.1.json')
-    parser.add_argument('--rules-version',default='1.0.1')
+    parser.add_argument('--output',type=Path,default=ROOT/'rules/functions/v1.0.2.json')
+    parser.add_argument('--rules-version',default='1.0.2')
     args=parser.parse_args()
     inventory=json.loads((ROOT/'rules/functions/postgres-9.4.26-inventory.json').read_text())
     policies=json.loads((ROOT/'rules/functions/review-policies.json').read_text())

@@ -61,6 +61,7 @@ def first_batch(dsn, args, directory):
                     "('server_version','shared_buffers','work_mem','maintenance_work_mem',"
                     "'max_connections','max_wal_size','min_wal_size','TimeZone','listen_addresses') ORDER BY name")
         pg_settings = [dict(name=name, setting=value, unit=unit) for name, value, unit in cur]
+        identifiers = rehearsal.mpp_identifiers(cur)
     queries = {}
     for action in ('status', 'history'):
         query = subprocess.run([sys.executable, '-m', 'sql_apm', action, '--cluster', '119'],
@@ -80,6 +81,7 @@ def first_batch(dsn, args, directory):
                   product_sha256={str(p.relative_to(args.app_root)): rehearsal.sha256(p)
                                   for p in sorted((args.app_root / 'sql_apm').rglob('*.py'))},
                   seconds=time.monotonic() - started, stages=stages, observed=observed, footprint=size,
+                  identifiers=identifiers, identifiers_verified=True,
                   pg_settings=pg_settings, instance_parent=str(directory.parent),
                   baseline_equal=observed == expected, version_chain_verified=chain,
                   normalization_timeouts=timeout_count, parser_workers=4,

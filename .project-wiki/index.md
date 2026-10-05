@@ -12,7 +12,7 @@
 | [运行环境、组件与资源边界](decisions/runtime-and-components.md) | 准备环境、选择依赖或讨论组件职责时阅读。 |
 | [离线基线逻辑数据契约](contracts/offline-data-contract.md) | 设计或实现跨模块对象、字段、来源映射、版本及验收样例时阅读。 |
 | [SQL 原文、明细与留存](contracts/sql-storage.md) | 设计 SQL 原文、执行／调用明细或历史版本存储时阅读。 |
-| [HashData 日志事实与证据边界](contracts/log-evidence.md) | 调查日志格式、来源行号或解释样本覆盖及120七天补充观察时阅读。 |
+| [MPP 日志事实与证据边界](contracts/log-evidence.md) | 调查日志格式、来源行号或解释样本覆盖及120七天补充观察时阅读。 |
 | [日志导入、来源与异常处理](features/log-ingestion.md) | 修改导入、文件识别、批次完整性或导入诊断时阅读。 |
 | [训练资格、黑名单与排除时段](contracts/training-eligibility.md) | 调整训练筛选、单条／整批单位、黑名单或排除时段时阅读。 |
 | [计时分类、分组与时间归属](contracts/timing-and-grouping.md) | 实现日志计时识别、Execute 配对、分组或时间归属时阅读。 |

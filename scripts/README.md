@@ -36,7 +36,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 以下产品检查独立于 Harness，实施／评审时分别运行：
 
 ```bash
-.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.2.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```
@@ -46,7 +46,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 ## 语句类别调查
 
-`python -m sql_apm.diagnostics.statement_census` 只读盘点 HashData CSV 的词法类别与异常，
+`python -m sql_apm.diagnostics.statement_census` 只读盘点 MPP CSV 的词法类别与异常，
 输出固定标签、计数、摘要和来源定位，不执行 SQL、不判定训练黑名单。
 全量扫描及有界回放命令见[类别核查报告](../docs/reports/statement-category-census-2026-09-26.md)。
 生产输入保留在本地忽略目录；合成回归随 `.venv/bin/python -m unittest discover -s tests -v` 运行。
@@ -55,7 +55,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0，支持由中间版本开始。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0，仅支持空库；已有数据须重建。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
@@ -130,7 +130,7 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 ## 首期日志导入
 
-`python -m sql_apm import` 从已登记来源按完整清单导入 HashData CSV，不构建或切换版本。
+`python -m sql_apm import` 从已登记来源按完整清单导入 MPP CSV，不构建或切换版本。
 参数、配置、重试与诊断见[操作说明](../docs/runbooks/log-ingestion.md)，
 写入与资源边界见[设计](../docs/design/log-ingestion.md)。
 `.venv/bin/python scripts/db/verify_ingestion.py` 回放合成导入用例；
@@ -206,3 +206,12 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 开发机的构建依赖单独锁在 `build-requirements.txt`；边界回归为
 `var/issue31/build-venv/bin/python scripts/tests/test_deployment.py`。
 完整流程与确认点见[程序发布说明](../docs/runbooks/program-release.md)。
+
+## MPP 标识验收
+
+`verify_mpp_naming.py` 在合成私有 PG17 实例核对新标识并检查等价比较器对统计变化的敏感性。
+`verify_mpp_naming_full.py` 显式重导固定 55 文件，以文件摘要／记录定位核对所有分组成员
+及五层全部指标；运行方法和资源边界见[验收报告](../docs/reports/mpp-naming-2026-10-05.md)。
+当前结构为 1.7.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
+验证至 1.6.0，不支持已有数据进入新标识上下文。历史 `verify_coverage_migration_full.py`
+须从 #29 对应提交运行，不能用当前初始化器对含数据旧库执行升级。

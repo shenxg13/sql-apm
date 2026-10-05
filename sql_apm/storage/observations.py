@@ -40,7 +40,7 @@ def calculate_observations(db, build_id, partition, start, end, writer_factory, 
                 CASE WHEN state='unresolved' AND cardinality(exclusions)=0 THEN true ELSE false END AS observed,
                 CASE WHEN approximate_state='available' AND sql_state<>'missing'
                         AND in_window IS TRUE AND database IS NOT NULL AND execution_user IS NOT NULL
-                     THEN 'OG:'||encode(sha256(convert_to(jsonb_build_array(scope_id,'hashdata-csv/1',
+                     THEN 'OG:'||encode(sha256(convert_to(jsonb_build_array(scope_id,'mpp-csv/1',
                           database,execution_user,rule_id,value,coalesce(timing_type,'unknown'))::text,'UTF8')),'hex') END AS observation_group_id
             FROM linked''', (list(SQL_REASONS),))
         cur.execute('ANALYZE observation_events')
@@ -57,7 +57,7 @@ def calculate_observations(db, build_id, partition, start, end, writer_factory, 
             cur.execute(query)
             summary[label] = cur.fetchall()
         cur.execute('''INSERT INTO mpp_observation_group
-            SELECT DISTINCT ON (observation_group_id) observation_group_id,scope_id,'hashdata-csv/1',
+            SELECT DISTINCT ON (observation_group_id) observation_group_id,scope_id,'mpp-csv/1',
                 database,execution_user,rule_id,result_id,value,coalesce(timing_type,'unknown')
             FROM observation_events WHERE observation_scope='group'
             ORDER BY observation_group_id,result_id ON CONFLICT (group_id) DO NOTHING''')

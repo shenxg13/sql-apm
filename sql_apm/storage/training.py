@@ -110,7 +110,7 @@ class TrainingStore:
                     cur.execute('''SELECT s.sql_id,s.text,f.fingerprint_id,f.state,f.value,f.reason
                         FROM training_needed n JOIN mpp_sql_text s USING(sql_id)
                         LEFT JOIN mpp_training_sql c ON c.sql_id=s.sql_id AND c.rule_id=%s
-                        LEFT JOIN mpp_fingerprint f ON f.sql_id=s.sql_id AND f.normalization_id=%s AND f.profile='hashdata-csv/1'
+                        LEFT JOIN mpp_fingerprint f ON f.sql_id=s.sql_id AND f.normalization_id=%s AND f.profile='mpp-csv/1'
                         WHERE s.sql_id>%s AND c.sql_id IS NULL ORDER BY s.sql_id LIMIT 1000''', (rule_id,self.normalization_id,after))
                     rows = cur.fetchall()
                 if not rows:
@@ -121,7 +121,7 @@ class TrainingStore:
                         result = self.engine.normalize(text)['fingerprint']
                         state, value, reason = (result[k] for k in ('state','value','reason'))
                         fid = 'F:' + identity(sid,self.normalization_id)
-                        fingerprints.append((fid,sid,self.normalization_id,'hashdata-csv/1',state,value,reason))
+                        fingerprints.append((fid,sid,self.normalization_id,'mpp-csv/1',state,value,reason))
                     category = classify(text,grammar_verified=(state == 'reliable'))
                     matches = [t['id'] for t in templates if state == 'reliable' and t['fingerprint']==value]
                     values.append((sid,rule_id,self.normalization_id,fid,category['kind'],category['categories'],matches))
@@ -163,7 +163,7 @@ class TrainingStore:
             execute_values(cur,'INSERT INTO input_file_analysis VALUES %s',[(input_id,r[0],r[1]) for r in manifest['analyses']])
             cur.execute('INSERT INTO input_manifest VALUES (%s,%s)',(input_id,Json(manifest)))
             cur.execute('INSERT INTO config_snapshot VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-                        (config_id,scope,self.normalization_id,'hashdata-csv/1',Json([m['mapping_ref'] for m in manifest['source_mappings']]),
+                        (config_id,scope,self.normalization_id,'mpp-csv/1',Json([m['mapping_ref'] for m in manifest['source_mappings']]),
                          config['cutoff_date'],config['window_days'],config['window_start'],config['window_end'],Json(blacklist),
                          Json(config['exclusions']),Json(config['thresholds']),'baseline-formulas/1'))
             cur.execute('INSERT INTO training_config VALUES (%s,%s,%s,%s)',

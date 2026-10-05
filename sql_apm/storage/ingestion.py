@@ -1,4 +1,4 @@
-"""PostgreSQL 1.6.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
+"""PostgreSQL 1.7.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
 from collections import OrderedDict
 import hashlib
 import io
@@ -24,9 +24,9 @@ def connect(dsn, schema):
             # a version history, so applied_at cannot identify the current version.
             cur.execute('SELECT version FROM schema_version')
             versions = {row[0] for row in cur}
-            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0']
+            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0', '1.7.0']
             if versions not in [set(history[i:]) for i in range(len(history))]:
-                raise IngestionError('schema_1_6_0_required')
+                raise IngestionError('schema_1_7_0_required')
         connection.commit()
         return connection
     except BaseException:
@@ -105,7 +105,7 @@ class SqlWriter:
                         sid = row[0] if row else 'S:' + uuid.uuid4().hex
                         if not row:
                             cur.execute('INSERT INTO mpp_sql_text VALUES (%s,%s,%s)', (sid, text, digest))
-                        cur.execute('''INSERT INTO mpp_fingerprint VALUES (%s,%s,%s,'hashdata-csv/1',%s,%s,%s)
+                        cur.execute('''INSERT INTO mpp_fingerprint VALUES (%s,%s,%s,'mpp-csv/1',%s,%s,%s)
                             ON CONFLICT (sql_id,normalization_id,profile) DO NOTHING''',
                             ('F:' + identity(sid, self.normalization_id), sid, self.normalization_id, fp['state'], fp['value'], fp['reason']))
                     result.update(sql_id=sid, approximate_id=None, rule_id=None)

@@ -1,6 +1,6 @@
 # 训练快照与判定诊断
 
-先按[初始化说明](database-initialization.md)升级到 1.6.0，并通过
+先按[初始化说明](database-initialization.md)准备 1.7.0 结构，已有数据的旧库须重建，再通过
 [导入命令](log-ingestion.md)完成批次。本入口交付②，业务范围见
 [训练资格](../../.project-wiki/contracts/training-eligibility.md)和
 [判定设计](../design/training-decisions.md)，不创建构建或统计版本。
@@ -10,7 +10,8 @@
 JSON 存放于被忽略的 `var/training/`；不执行配置或 `.env`。下面均为合成示例。
 类别固定为已确认的七类；首期模板默认空列表，用户运行时维护。
 类别 v3 将三个别名归入已有类别，覆盖边界见[训练资格](../../.project-wiki/contracts/training-eligibility.md#三个纯别名的补充确认2026-09-30)。
-升级代码后首次创建快照会准备新缓存，旧快照继续使用原有结果；无需数据库结构迁移。
+单独升级类别规则后首次创建快照会准备新缓存，旧快照继续使用原有结果；类别规则本身不要求结构迁移。
+MPP 标识改名的重建要求由上面的初始化说明另行约束。
 
 ```json
 {
@@ -114,7 +115,7 @@ PYTHONPATH=var/parser-probe/site-packages .venv/bin/python -m unittest discover 
 
 ```bash
 .venv/bin/python scripts/db/verify_training_full.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --output var/training/full-validation
 ```
 
@@ -130,7 +131,7 @@ excluded 的数量和混合转纯黑名单批次。单条含多个别名时，�
 
 ```bash
 .venv/bin/python scripts/db/verify_training_full.py \
-  --root raw/inbox/hashdata \
+  --root raw/inbox/mpp \
   --output var/training/aliases-replay --compare-aliases
 ```
 

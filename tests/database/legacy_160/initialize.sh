@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# PostgreSQL 17 project bootstrap and verified schema installation.
+set -euo pipefail
+usage() {
+    cat <<'EOF'
+Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
+  --host HOST_OR_SOCKET --port PORT
+  [--database sql_apm] [--schema sql_apm] [--role sql_apm]
+  [--admin-user USER --admin-database DATABASE] [--pg-bin DIRECTORY]
+
+Connections always name host, port, database and user explicitly.
+bootstrap/all require both admin options. schema/check/upgrade use the project role.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0 schemas to 1.6.0; stop writers first.
+Use a protected PGPASSFILE or configured local authentication; no password flags.
+bootstrap creates a LOGIN role without a password. If password authentication
+is required, set it using administrator psql \password, then run schema.
+EOF
+}
+die() {
+    printf 'ERROR: %s\n' "$*" >&2
+    exit 1
+}
+mode=${1:-}
+[[ $# -gt 0 ]] && shift
+case "$mode" in all | bootstrap | schema | check | upgrade) ;; -h | --help)
+    usage
+    exit 0
+    ;;
+*)
+    usage >&2
+    exit 2
+    ;;
+esac
+host='' port='' admin_user='' admin_database='' pg_bin=''
+database=sql_apm schema=sql_apm project_role=sql_apm
+while (($#)); do
+    [[ $# -ge 2 ]] || die "missing value for $1"
+    case "$1" in
+        --host) host=$2 ;; --port) port=$2 ;;
+        --database) database=$2 ;; --schema) schema=$2 ;; --role) project_role=$2 ;;
+        --admin-user) admin_user=$2 ;; --admin-database) admin_database=$2 ;;
+        --pg-bin) pg_bin=$2 ;; *) die "unknown option: $1" ;;
+    esac
+    shift 2
+done
+[[ -n $host && $port =~ ^[0-9]+$ ]] || die 'explicit --host and numeric --port required'
+((10#$port >= 1 && 10#$port <= 65535)) || die 'invalid port'
+for name in "$database" "$schema" "$project_role"; do
+    [[ $name =~ ^[a-z][a-z0-9_]{0,62}$ && $name != pg_* ]] || die 'project names must match [a-z][a-z0-9_]{0,62}, excluding pg_*'
+    case "$name" in postgres | template0 | template1 | public | information_schema) die "reserved project name: $name" ;; esac
+done
+if [[ $mode == all || $mode == bootstrap ]]; then
+    [[ -n $admin_user && $admin_database =~ ^[a-z][a-z0-9_]{0,62}$ && $admin_user != "$project_role" ]] || die 'explicit, distinct administrator identity and database required'
+fi
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+psql=psql
+[[ -z $pg_bin ]] || psql="$pg_bin/psql"
+command -v "$psql" >/dev/null || die 'psql not found'
+# -X ignores psqlrc; PGOPTIONS is not inherited into administrative DDL sessions.
+unset PGOPTIONS PGSERVICE PGSERVICEFILE PGHOSTADDR
+export PGCONNECT_TIMEOUT=10
+common=(-X -w -q --host="$host" --port="$port" --set=ON_ERROR_STOP=1
+    --set=project_database="$database" --set=project_schema="$schema" --set=project_role="$project_role")
+phase=preflight
+trap 'printf "ERROR: initialization failed at phase=%s (completed stages retained; see recovery guide)\n" "$phase" >&2' ERR
+if [[ $mode == all || $mode == bootstrap ]]; then
+    phase=bootstrap
+    "$psql" "${common[@]}" --username="$admin_user" --dbname="$admin_database" --file="$root/sql_apm/storage/bootstrap.sql"
+fi
+if [[ $mode != bootstrap ]]; then
+    phase=$mode
+    entry=initialize.sql
+    [[ $mode != upgrade ]] || entry=migrate.sql
+    check_only=false
+    [[ $mode != check && $mode != upgrade ]] || check_only=true
+    script_sha256=$(sha256sum "$root/sql_apm/storage/schema.sql")
+    script_sha256=${script_sha256%% *}
+    legacy_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.0.0.sql")
+    legacy_sha256=${legacy_sha256%% *}
+    [[ $legacy_sha256 == df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28 ]] || die 'frozen 1.0.0 DDL checksum mismatch'
+    v110_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.1.0.sql")
+    v110_sha256=${v110_sha256%% *}
+    [[ $v110_sha256 == e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3 ]] || die 'frozen 1.1.0 DDL checksum mismatch'
+    v120_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.2.0.sql")
+    v120_sha256=${v120_sha256%% *}
+    [[ $v120_sha256 == b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7 ]] || die 'frozen 1.2.0 DDL checksum mismatch'
+    v130_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.3.0.sql")
+    v130_sha256=${v130_sha256%% *}
+    [[ $v130_sha256 == 4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb ]] || die 'frozen 1.3.0 DDL checksum mismatch'
+    v140_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.4.0.sql")
+    v140_sha256=${v140_sha256%% *}
+    [[ $v140_sha256 == 21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61 ]] || die 'frozen 1.4.0 DDL checksum mismatch'
+    v150_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.5.0.sql")
+    v150_sha256=${v150_sha256%% *}
+    [[ $v150_sha256 == 50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743 ]] || die 'frozen 1.5.0 DDL checksum mismatch'
+    "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=check_only="$check_only" \
+        --file="$root/sql_apm/storage/$entry"
+fi
+printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"

@@ -1,0 +1,409 @@
+{
+  "method": "observed; git grep -il hashdata; tracked working-tree files; per-file classification; includes this record itself",
+  "categories": {
+    "historical": "非目标内的历史材料，或按既有约定新增冻结的 1.6.0 DDL",
+    "naming_contract": "称谓条款及新旧标识对照",
+    "source_build": "来源声明的构建串及其校验、测试和示例",
+    "vendor_evidence": "厂商产品／上游源码事实及其历史报告链接",
+    "legacy_validation": "1.7.0 迁移及验收中识别、拒绝旧标识所需的旧值",
+    "naming_record": "知识日志和验证报告中对本次改名的记述，包括目录改名步骤"
+  },
+  "files": [
+    {
+      "path": ".project-wiki/contracts/log-evidence.md",
+      "category": "naming_record"
+    },
+    {
+      "path": ".project-wiki/contracts/offline-data-contract.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": ".project-wiki/contracts/timing-and-grouping.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": ".project-wiki/contracts/training-eligibility.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": ".project-wiki/decisions/project-scope.md",
+      "category": "naming_contract"
+    },
+    {
+      "path": ".project-wiki/decisions/runtime-and-components.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": ".project-wiki/log.md",
+      "category": "naming_record"
+    },
+    {
+      "path": ".project-wiki/raw/sql-baseline.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/README.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "docs/design/offline-data-contract/mpp-mapping.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "docs/reports/cluster-log-analysis-2026-09-24.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/approximate-storage-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/baseline-statistics-2026-09-30.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/baseline-statistics-2026-10-01.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/build-publication-2026-10-01.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/kylin-alma-baseline-2026-10-02.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-checks-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-full-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-r1-remediation-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-r2-remediation-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-ingestion-reconciliation-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-supplement-coverage-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/log-supplement-r1-encoding-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/mpp-naming-2026-10-05.json",
+      "category": "naming_record"
+    },
+    {
+      "path": "docs/reports/data/mpp-naming-terminology-2026-10-05.json",
+      "category": "naming_record"
+    },
+    {
+      "path": "docs/reports/data/observation-statistics-2026-10-01.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/slim-release-preparation-2026-10-03.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-2026-09-27.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-checks-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-adj-hints-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r1-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r2-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-r2-hints-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-checks-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-fixed-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-hints-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-in-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-checks-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-fixed-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-hints-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v4-r1-in-2026-09-28.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-checks-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-diff-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-duration-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-normalization-v5-fixed-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-scanning-2026-10-04.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/sql-scanning-r1-remediation-2026-10-04.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/training-category-aliases-2026-09-30.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/data/training-decisions-2026-09-29.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-2026-09-25.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-coverage-2026-09-25-r1.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-coverage-2026-09-25.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-r1-remediation-2026-09-25.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-sample-2026-09-25-r1.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/function-dictionary-sample-2026-09-25.json",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/hashdata-duration-source-mapping-2026-09-24.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/knowledge-reorganization-2026-09-25.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/log-ingestion-2026-09-29.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/log-ingestion-r1-remediation-2026-09-29.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/log-ingestion-r2-remediation-2026-09-29.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/mpp-adapter-probe-2026-09-27.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/mpp-broad-validation-2026-09-27.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/mpp-expanded-validation-2026-09-27.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/mpp-naming-2026-10-05.md",
+      "category": "naming_record"
+    },
+    {
+      "path": "docs/reports/parser-fidelity-2026-09-27.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/production-log-analysis-2026-09-23.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/sql-log-text-verification.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/sql-scanning-2026-10-04.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/statement-category-census-2026-09-26.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/reports/training-decisions-2026-09-29.md",
+      "category": "historical"
+    },
+    {
+      "path": "docs/runbooks/database-initialization.md",
+      "category": "source_build"
+    },
+    {
+      "path": "docs/runbooks/log-ingestion.md",
+      "category": "naming_record"
+    },
+    {
+      "path": "rules/functions/README.md",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "rules/functions/v1.0.1.json",
+      "category": "historical"
+    },
+    {
+      "path": "rules/functions/v1.0.2.json",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "rules/functions/v1.json",
+      "category": "historical"
+    },
+    {
+      "path": "scripts/db/verify_ingestion_full.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming_full.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/db/verify_observations_full.py",
+      "category": "legacy_validation"
+    },
+    {
+      "path": "scripts/db/verify_publication_full.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/db/verify_statistics_full.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/db/verify_training_full.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/deployment/rehearsal.py",
+      "category": "source_build"
+    },
+    {
+      "path": "scripts/functions/build_dictionary.py",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "scripts/functions/coverage.py",
+      "category": "vendor_evidence"
+    },
+    {
+      "path": "sql_apm/ingestion/config.py",
+      "category": "source_build"
+    },
+    {
+      "path": "sql_apm/storage/migrations/1.6.0-to-1.7.0.sql",
+      "category": "legacy_validation"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.0.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.1.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.2.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.3.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.4.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.5.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "sql_apm/storage/versions/1.6.0.sql",
+      "category": "historical"
+    },
+    {
+      "path": "tests/database/legacy_160/expected_partitions.sql",
+      "category": "legacy_validation"
+    },
+    {
+      "path": "tests/database/naming_migration.py",
+      "category": "legacy_validation"
+    },
+    {
+      "path": "tests/ingestion/test_reader.py",
+      "category": "source_build"
+    },
+    {
+      "path": "tests/test_mpp_naming.py",
+      "category": "legacy_validation"
+    }
+  ]
+}

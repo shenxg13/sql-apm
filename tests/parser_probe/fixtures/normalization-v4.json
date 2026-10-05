@@ -7,7 +7,7 @@
     "dictionary_schema_version": 1,
     "parser_dependency": "pglast/7.18",
     "parser_version": "mpp-adapter/9",
-    "profile": "hashdata-pg94",
+    "profile": "mpp-sql",
     "rules_digest": "ff864d482a90684f5a6dda98f921392d002c37106c2c6565adfc61699fcd97a3",
     "rules_ref": "sha256:b7e9266a3a391253ffb977bab2686d7928537b9651c90f366d6b9f152e2c9007"
   },

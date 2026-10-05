@@ -310,3 +310,25 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
   停用 `pass_to_R3`，此前的评审记录保持原样。
 - 同步评论模板、校验脚本和流程回归。仅评审流程变化，业务主题无需更新；
   本地定制见 [Harness 更新日志](../.harness/update-log.md)和[来源记录](../docs/provenance.md)。
+
+## 2026-10-05：MPP 来源标识统一
+
+- 按 [Issue #33](https://github.com/shenxg13/sql-apm/issues/33) 的确认统一正文、模块和来源标识，
+  [系统称谓](decisions/project-scope.md#已确认的生产系统称谓)集中维护组成版本和新旧对照。
+- 结构 1.7.0 仅允许旧空库升级，有数据须重建；逻辑契约仍为 1.0.0。
+  默认函数字典 1.0.2 仅变更 profile 和自身版本，旧字典、DDL 与迁移保持原字节。
+- [SQL 留存主题](contracts/sql-storage.md)同步当前结构引用；原文、明细与统计保存口径不变。
+- 适配包和映射文档改为 `mpp`，默认日志目录及手工改名步骤见
+  [导入说明](../docs/runbooks/log-ingestion.md#mpp-命名升级与日志目录)。
+- [验收报告](../docs/reports/mpp-naming-2026-10-05.md)记录验证证据和待完成项；
+  GitHub Issue／PR 继续维护交付状态。
+
+## 2026-10-05：Issue #33 R1 文档整改
+
+- 按 [R1-F001](https://github.com/shenxg13/sql-apm/pull/37#issuecomment-5988678740) 修正
+  [逻辑契约](contracts/offline-data-contract.md#c11兼容与演进)、
+  [指纹主题](contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)、
+  [字段字典](../docs/design/offline-data-contract/fields.md#normalization-与-fingerprint)和
+  [规则维护说明](../rules/functions/README.md#来源重建与维护)中当前字典版本的遗漏，统一为 1.0.2。
+- 规则维护说明区分当前生成器、历史 1.0.1 重建和首版 1.0.0 回放；指纹主题补回历史字典来源。
+  本轮只修正文档，既有规则文件、产品、手册原稿和验收制品保持不变，整改后交接 R2 独立复核。

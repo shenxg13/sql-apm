@@ -1,13 +1,13 @@
-# HashData 来源映射与证据边界
+# MPP 来源映射与证据边界
 
-适用 profile：`hashdata-csv/1`。这是一份逻辑映射设计，不是解析器或配对准确率报告。
+适用 profile：`mpp-csv/1`。这是一份逻辑映射设计，不是解析器或配对准确率报告。
 字段接收规则遵循[契约 C01–C07](../../../.project-wiki/contracts/offline-data-contract.md)
 和[字段字典](fields.md)。未来来源或其他构建必须另核对 profile，不能只按同名字段套用。
 
 ## 依据与置信范围
 
 - [119／120 调查](../../reports/cluster-log-analysis-2026-09-24.md)：用户提供版本
-  HashData Warehouse 3.13.13／GP 6.20.3／PG 9.4.26，单 Master、完整拷贝和 CST=UTC+8
+  [系统组成](../../../.project-wiki/decisions/project-scope.md#已确认的生产系统称谓)，单 Master、完整拷贝和 CST=UTC+8
   是用户确认；46 文件的摘要及逻辑记录定位保存在报告中，本次没有重新全量扫描。
 - [计时映射调查](../../reports/hashdata-duration-source-mapping-2026-09-24.md)：
   上游固定提交与本地记录对照支持本构建的阶段解释；不是厂商私有源码逐行核验。

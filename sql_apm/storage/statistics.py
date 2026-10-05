@@ -108,7 +108,7 @@ class StatisticsStore:
             if not row:
                 raise StatisticsError('sealed_snapshot_pair_required')
             normalization, profile, start, end, version, _ = row
-            if profile != 'hashdata-csv/1' or version != 'baseline-formulas/1':
+            if profile != 'mpp-csv/1' or version != 'baseline-formulas/1':
                 raise StatisticsError('unsupported_statistics_context')
             if retry_of:
                 cur.execute('SELECT state,scope_id,input_id,config_id FROM build WHERE build_id=%s', (retry_of,))

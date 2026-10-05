@@ -351,7 +351,7 @@ def verify(pg_bin):
                       'checksum-to-use mutation fails without replacing a successful final attempt')
             v.require(ingest([stable_a, stable_b], 'STABLE')['state'] == 'conflict', 'retry still detects the previously successful changed member')
             # R1-F003: reject every source interpretation version drift, without mutation.
-            from sql_apm.ingestion.hashdata.reader import PARSER_VERSION
+            from sql_apm.ingestion.mpp.reader import PARSER_VERSION
             analysis_id = 'A:' + identity('B1')
             v.require(v.sql("SELECT parser_version FROM analysis WHERE analysis_id='" + analysis_id + "'") == PARSER_VERSION and
                       v.sql("SELECT count(*) FROM mpp_normalization WHERE parser_version='mpp-adapter/9'") == '1', 'source parser and SQL parser have distinct version identities')
@@ -405,7 +405,7 @@ def verify(pg_bin):
             upgraded = Importer(migrated_dsn, schema='ingest_upgrade', workers=1, progress=lambda **kw: None)
             cfg.write_text(json.dumps(configuration(cfg, [path], 'UPGRADED')))
             try:
-                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.6.0 migration')
+                v.require(upgraded.run(load_config(cfg, 'S1', 'UPGRADED'))['state'] == 'complete', 'product import succeeds after real 1.0.0 to 1.7.0 migration')
             finally:
                 upgraded.close()
             upgrade_sql("INSERT INTO schema_version(version,script_sha256) VALUES ('9.0.0',repeat('0',64))")
@@ -413,7 +413,7 @@ def verify(pg_bin):
             try:
                 connection = connect(migrated_dsn, 'ingest_upgrade')
             except IngestionError as error:
-                v.require(str(error) == 'schema_1_6_0_required', 'unknown future receipt rejected')
+                v.require(str(error) == 'schema_1_7_0_required', 'unknown future receipt rejected')
             else:
                 connection.close()
                 raise AssertionError('unknown version admitted')

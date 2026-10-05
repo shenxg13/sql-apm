@@ -1,7 +1,7 @@
 # 首期日志导入设计
 
 本设计实现 [Issue #18](https://github.com/shenxg13/sql-apm/issues/18) 已确认范围。
-基于结构 1.2.0，按来源登记、文件事务、HashData 解释、SQL 归一化、存储写入分层。
+基于结构 1.2.0，按来源登记、文件事务、MPP 解释、SQL 归一化、存储写入分层。
 不执行训练判定、统计、构建或发布。业务依据见
 [导入契约](../../.project-wiki/features/log-ingestion.md)及
 [计时契约](../../.project-wiki/contracts/timing-and-grouping.md)。
@@ -13,7 +13,7 @@
 2. SHA-256＋来源确定内容身份；文件原子事务提交 evidence、occurrence 及其原文／近似引用。
    先提交 running 尝试，失败回滚文件数据，另记失败；进程退出释放 advisory lock，
    下一次将遗留 running 记为 interrupted 后重放。验证中途退出、提交前故障及重试计数。
-3. HashData 3.13.13 专属解释器区分五类计时与范围外位置；单文件会话顺序匹配 Execute。
+3. MPP 专属解释器区分五类计时与范围外位置；单文件会话顺序匹配 Execute。
    验证首次、续取、重复前置、缺前置、SQL 不一致、身份缺失、命令号变化、ERROR 清理、
    跨日时间、多语句、Parse／Bind 后取消、NULL 失败耗时及真实重复执行。
 4. 批量查找并逐字节核对完整 SQL，复用当前规则指纹；有限进程池运行 Normalizer。
@@ -69,7 +69,7 @@
 
 同内容重复提交时也保留额外人工源文件标识；已知人工标识绑定的内容发生变化，
 即使新内容已经以另一个文件身份成功导入，也先按冲突暂停，不由内容去重掩盖该变更。
-HashData 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/hashdata/persistence.py`，
+MPP 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/mpp/persistence.py`，
 通用文件／批次流程不解释 CSV 列号；后续来源须提供独立的来源适配，不沿用本构建行号。
 
 ## R1 恢复与解释版本边界
@@ -88,8 +88,8 @@ HashData 字段与 MPP 记录的映射集中在 `sql_apm/ingestion/hashdata/pers
   的启动／发送失败。map 抛出异常时清理全部子进程和在途回复，恢复环境后重试整文件。
   已独立提交的 SQL 元数据可复用，不代表文件成功。Normalizer 的大小上限、结构拒绝等
   明确记录级返回无需运行故障重试，沿用原契约隔离。
-- Analysis 的 `parser_version` 为来源适配内的 `hashdata-csv-reader/1`，覆盖本构建 CSV 读取与
-  行解释；`mapping_version=hashdata-3.13.13/1` 与 `association_version=execute-file-sequence/1`
+- Analysis 的 `parser_version` 为来源适配内的 `mpp-csv-reader/1`，覆盖本构建 CSV 读取与
+  行解释；`mapping_version=mpp-mapping/1` 与 `association_version=execute-file-sequence/1`
   分别标识映射与配对。SQL 解析器 `mpp-adapter/9` 仍属于 Normalization，不代替来源版本。
   复用 Analysis 时比较 scope、profile 和三个版本；不符则 `analysis_version_mismatch`，
   在创建新任务／尝试或写事件前拒绝。包括此前把 SQL 解析版本填入 Analysis 的实验记录。

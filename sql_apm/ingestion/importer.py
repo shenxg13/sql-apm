@@ -7,14 +7,14 @@ import time
 import uuid
 
 from sql_apm.ingestion.config import IngestionError, canonical, identity
-from sql_apm.ingestion.hashdata.reader import Records, Interpreter, record_metrics, PARSER_VERSION
-from sql_apm.ingestion.hashdata.persistence import write_records
+from sql_apm.ingestion.mpp.reader import Records, Interpreter, record_metrics, PARSER_VERSION
+from sql_apm.ingestion.mpp.persistence import write_records
 from sql_apm.ingestion.normalizing import NormalizingPool
 from sql_apm.storage.ingestion import connect, SqlWriter
 from sql_apm.storage.tasks import task_context
 
-PROFILE = 'hashdata-csv/1'
-MAPPING = 'hashdata-3.13.13/1'
+PROFILE = 'mpp-csv/1'
+MAPPING = 'mpp-mapping/1'
 ASSOCIATION = 'execute-file-sequence/1'
 
 
@@ -69,7 +69,7 @@ class Importer:
         self.analysis_id = 'A:' + identity(config['batch_id'])
         with self.db, self.db.cursor() as cur:
             source = config['source']
-            scope_values = (config['scope_id'], 'hashdata', PROFILE, '1.0.0')
+            scope_values = (config['scope_id'], 'mpp', PROFILE, '1.0.0')
             cur.execute('INSERT INTO scope VALUES (%s,%s,%s,%s) ON CONFLICT DO NOTHING', scope_values)
             cur.execute('SELECT scope_id,system_kind,profile,contract_version FROM scope WHERE scope_id=%s', (config['scope_id'],))
             if cur.fetchone() != scope_values:

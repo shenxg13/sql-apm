@@ -1,6 +1,6 @@
 # 函数参数规则
 
-本目录提供 HashData 首期指纹处理的函数规则，当前版本为 `1.0.1`。
+本目录提供 MPP 首期指纹处理的函数规则，当前版本为 `1.0.2`。
 规则选择器接受结构化调用描述；不解析 SQL、不查询数据库、不生成完整 SQL 指纹。
 人工 SQL 的归并预期仍需后续主引擎接入验证。
 
@@ -8,8 +8,9 @@
 
 | 文件 | 用途 |
 | --- | --- |
-| [v1.0.1.json](v1.0.1.json) | 当前版本字典，修复对象身份与多态输入边界 |
-| [v1.json](v1.json) | 原 1.0.0 字典，按原字节保留供历史追溯，新构建使用 1.0.1 |
+| [v1.0.1.json](v1.0.1.json) | 历史字典，修复对象身份与多态输入边界，按原字节保留 |
+| [v1.0.2.json](v1.0.2.json) | 当前字典，仅统一为 `mpp-sql` 与版本 1.0.2，规则内容不变 |
+| [v1.json](v1.json) | 原 1.0.0 字典，按原字节保留供历史追溯，新构建使用 1.0.2 |
 | [review-policies.json](review-policies.json) | 按函数维护的语义审查策略，生成字典的维护输入 |
 | [postgres-9.4.26-inventory.json](postgres-9.4.26-inventory.json) | 固定上游源码的签名事实、文档条目和 SHA-256 |
 | [special-syntax.json](special-syntax.json) | 特殊语法、表格片段和历史／其他系统名称的处置 |
@@ -20,7 +21,7 @@
 再用同版本初始目录展开重载。共 409 个函数名、775 个签名；
 174 个签名允许至少一个业务参数归一化，601 个签名明确保留。
 目录另外保留 1,805 个章外签名事实用于审计，未把它们计为已审查。
-这不是 PostgreSQL 所有扩展或 HashData 现场函数的穷尽目录。
+这不是 PostgreSQL 所有扩展或 MPP 现场函数的穷尽目录。
 
 Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5 条只有用途说明、
 缺精确类型证据的条目标为 `pending`。尚未取得 HashData 3.13.13 现场函数目录及
@@ -30,7 +31,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ## 字典字段
 
 顶层字段只有 `schema_version`、`rules_version`、`profile`、`rules`。
-当前格式版本为整数 1，规则版本采用 `major.minor.patch`，profile 为 `hashdata-pg94`。
+当前格式版本为整数 1，规则版本采用 `major.minor.patch`，profile 为 `mpp-sql`。
 
 | 规则字段 | 含义 |
 | --- | --- |
@@ -93,7 +94,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 在仓库根目录、Python 3.9.5 环境执行：
 
 ```bash
-.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.1.json
+.venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.2.json
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/functions/coverage.py
 ```
@@ -105,7 +106,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ```
 
 ```bash
-.venv/bin/python -m sql_apm.sql.function_dictionary select rules/functions/v1.0.1.json /tmp/call.json
+.venv/bin/python -m sql_apm.sql.function_dictionary select rules/functions/v1.0.2.json /tmp/call.json
 ```
 
 返回 decision、reason、逐参数 actions、命中 rule_ids、rules_version 和 sha256。
@@ -119,7 +120,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 ```bash
 .venv/bin/python scripts/functions/import_postgres.py /tmp/postgresql-9.4.26 \
   --output /tmp/postgres-inventory.json
-.venv/bin/python scripts/functions/build_dictionary.py --output /tmp/v1.0.1-rebuilt.json
+.venv/bin/python scripts/functions/build_dictionary.py --output /tmp/v1.0.2-rebuilt.json
 ```
 
 导入器读取 `pg_proc.h`、`pg_type.h`、`system_views.sql` 和 `func.sgml`，
@@ -131,11 +132,11 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 纯类型资料不自动推出业务动作；不要根据 volatility、strict 或函数名相似性自动归一化。
 在同一目标 schema／name／types／kind 下不允许重复定义优先级覆盖。
 
-R1 整改移除 anyelement 标量白名单，规则 1285／1290 从 normalize 改为 preserve；
-3176（to_json）仅更新保留理由。新文件为 v1.0.1.json（1.0.1），v1.json（1.0.0）保持
-原字节及摘要。当前生成器和审查输入重建 1.0.1；重放旧输入及旧算法请固定原提交
-`96ae6da`，不能把新策略生成内容强行标成旧版。人工树预览／选择算法的修复独立于
-字典文件版本，历史算法回放还需固定代码提交，不能只加载旧 JSON。
+2026-09-25 的 R1 整改移除 anyelement 标量白名单，规则 1285／1290 从 normalize 改为 preserve；
+3176（to_json）仅更新保留理由。当时新增 v1.0.1.json（1.0.1），v1.json（1.0.0）保持原字节及摘要。
+当前生成器和审查输入重建 1.0.2；重建 1.0.1 须使用 #33 之前的提交，例如 `7ebd125`。
+重放首版 1.0.0 的旧输入及旧算法请固定原提交 `96ae6da`，不能把新策略生成内容强行标成旧版。
+人工树预览／选择算法的修复独立于字典文件版本，历史算法回放还需固定代码提交，不能只加载旧 JSON。
 
 已发布的规则文件必须保留原样；语义更新生成新文件并增加 rules_version，
 停用规则通过新版本的 enabled=false 表示，同时保留旧版本可追溯。
@@ -145,3 +146,7 @@ R1 整改移除 anyelement 标量白名单，规则 1285／1290 从 normalize �
 每次未来基线构建固定并记录指纹算法版本、字典版本和字典摘要，整个训练窗口使用
 同一快照，导入与检索复用同一套规则。历史基线保留当时分组与版本，源 SQL 不改写。
 本 Issue 没有实现加载多个基线版本、窗口重建或历史迁移。
+
+2026-10-02 确认的 #33 将 profile 统一为 `mpp-sql`，默认字典升为 1.0.2。
+当前加载器拒绝旧 profile；重放旧版本须使用其历史提交。组成版本及标识对照见
+[系统称谓](../../.project-wiki/decisions/project-scope.md#已确认的生产系统称谓)。

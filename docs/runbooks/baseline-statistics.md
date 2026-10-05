@@ -6,7 +6,7 @@
 
 ## 前提与调用
 
-先按[初始化说明](database-initialization.md#升级到-160)升级到 1.6.0，完成导入，
+先按[初始化说明](database-initialization.md#升级到-170)初始化 1.7.0（旧库有数据时须重建），完成导入，
 使用[训练快照命令](training-decisions.md)得到 input_id 与 config_id。
 继续使用相同 libpq 环境或 SQL_APM_DSN，不把密码写入命令或提交配置。
 
@@ -121,7 +121,7 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 
 ```bash
 .venv/bin/python scripts/db/verify_statistics_full.py \
-  --root raw/inbox/hashdata --output var/statistics/new-acceptance
+  --root raw/inbox/mpp --output var/statistics/new-acceptance
 ```
 
 输出目录必须新建；原始数据、配置、数据库和中间结果不提交。
@@ -149,13 +149,14 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 ```bash
 .venv/bin/python scripts/db/verify_observations.py
 .venv/bin/python scripts/db/verify_observations_full.py \
-  --root raw/inbox/hashdata --output var/observation-acceptance/new-run
+  --root raw/inbox/mpp --output var/observation-acceptance/new-run
 ```
 
 第二条显式重新导入 55 文件，在私有 PG17 以 119 截止 2026-07-31、120 截止 2026-09-19
 各构建并重复。沿用 #25 的固定验收排除时段；复算全部观察组的每个桶和 17 指标。
 用冻结 main 基线 `f038932fe0d5453450b91a59d5239c95bacb0078` 的统计实现生成正式对照，
-通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.6.0 结构；只移除冻结计算器的旧覆盖物理写入，保留原计算。
+通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.7.0 结构；
+移除冻结计算器的旧覆盖物理写入并替换旧 profile 字面值，保留原计算。
 `--dsn` 仅供已重导私有实例的分阶段验收；输出目录、原文、实例和中间结果保持本地忽略。
 
 计算用时、观察阶段用时及进程树 PSS 峰值分别记录；基线与新构建按顺序运行，受缓存和系统

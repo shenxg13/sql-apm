@@ -244,10 +244,10 @@ def validate_r2:
             .ledger_exit_conditions_verified and .repair_delta_reviewed and
                 .repair_interactions_reviewed and .regressions_reviewed and
                 one_of(.verdict; [
-                    "pass_to_R3", "changes_requested", "escalate"
+                    "approve", "changes_requested", "escalate"
                 ])
         end;
-        "completed R2 must verify ledger, delta, interactions, and regressions")
+        "completed R2 must run its duties and approve, request changes, or escalate")
     | require(
         if .aborted then true
         elif any(.findings[]?; .blocks_current_pr) then
@@ -255,10 +255,12 @@ def validate_r2:
         else true end;
         "completed R2 with a current blocker must request changes or escalate")
     | require(
-        if .verdict == "pass_to_R3" then
-            all(.findings[]?; .blocks_current_pr == false)
+        if .verdict == "approve" then
+            all(.findings[]?; .blocks_current_pr == false) and
+                .acceptance_criteria_verified == true and
+                .non_waivable_gates_verified == true
         else true end;
-        "R2 cannot pass a current blocker to R3");
+        "R2 cannot approve with a blocker or unverified acceptance or gates");
 
 def validate_r3:
     require(.formal_rounds_consumed == 3; "R3 must consume round three")

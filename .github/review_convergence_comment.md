@@ -54,7 +54,7 @@ For every row, attach the JSON fields below. Do not omit false booleans.
 
 ### Verdict
 
-- verdict: <admitted|approve|pass_to_R3|changes_requested|escalate|aborted>
+- verdict: <admitted|approve|changes_requested|escalate|aborted>
 - issue_handoff_url: <Issue audit comment URL>
 - remaining_responsibilities: <none or explicit list>
 ```
@@ -138,9 +138,10 @@ Stage-specific evidence:
 - R1: `safe_stop`, `safe_stop_reason`, and `r1_scope_complete`.
 - R2: `complete_r1_ledger`, `ledger_exit_conditions_verified`,
   `repair_delta_reviewed`, `repair_interactions_reviewed`, and
-  `regressions_reviewed`; a completed verdict is `pass_to_R3`,
-  `changes_requested`, or `escalate`. `pass_to_R3` requires no current blocker;
-  otherwise the verdict is `changes_requested` or `escalate`.
+  `regressions_reviewed`; a completed verdict is `approve`,
+  `changes_requested`, or `escalate`. `approve` requires no current blocker plus
+  `acceptance_criteria_verified=true` and `non_waivable_gates_verified=true`;
+  with a current blocker the verdict is `changes_requested` or `escalate`.
 - R3: `remaining_blockers_verified`, `latest_delta_reviewed`,
   `acceptance_criteria_verified`, `non_waivable_gates_verified`, and
   `regressions_verified`; a completed verdict is only `approve` or `escalate`.

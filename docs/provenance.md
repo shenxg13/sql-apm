@@ -43,6 +43,9 @@
 通用脚本、流程回归、工具版本合同、Issue/PR 模板和 CI 入口保持上游实现。
 2026-09-25 按用户授权调整入口、按需阅读及知识维护流程；
 [迁移记录](reports/knowledge-reorganization-2026-09-25.md)记录本地定制和需求保留核对。
+2026-10-05 按 [Issue #38](https://github.com/shenxg13/sql-apm/issues/38) 调整评审收敛协议，
+R2 可直接批准并停用 `pass_to_R3`；规则正文、评论模板、校验脚本和流程回归自此偏离上游，
+见[更新日志](../.harness/update-log.md)。
 原文仍参与模板引用检查，并通过 Git blob SHA 单独核对内容完整性。
 后续采用上游更新时，应按[人工更新流程](updating.md)审阅上述定制。
 

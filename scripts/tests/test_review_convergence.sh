@@ -152,11 +152,28 @@ expect_pass r1_changed_diff_aborted "$test_root/r1_aborted.json"
 
 mutate "$test_root/r1.json" "$test_root/r2.json" \
     '.review_id = "review-18-99-R2" | .review_round = "R2" |
-     .formal_rounds_consumed = 2 | .verdict = "pass_to_R3" |
+     .formal_rounds_consumed = 2 | .verdict = "approve" |
      .complete_r1_ledger = true | .ledger_exit_conditions_verified = true |
      .repair_delta_reviewed = true | .repair_interactions_reviewed = true |
-     .regressions_reviewed = true'
-expect_pass r2_complete "$test_root/r2.json"
+     .regressions_reviewed = true | .acceptance_criteria_verified = true |
+     .non_waivable_gates_verified = true'
+expect_pass r2_approve_without_blockers "$test_root/r2.json"
+
+for field in acceptance_criteria_verified non_waivable_gates_verified; do
+    mutate "$test_root/r2.json" "$test_root/r2_approve_false_$field.json" \
+        ".$field = false"
+    expect_fail "r2_approval_requires_true_$field" \
+        "$test_root/r2_approve_false_$field.json"
+
+    mutate "$test_root/r2.json" "$test_root/r2_approve_no_$field.json" \
+        "del(.$field)"
+    expect_fail "r2_approval_requires_present_$field" \
+        "$test_root/r2_approve_no_$field.json"
+done
+
+mutate "$test_root/r2.json" "$test_root/r2_retired_pass.json" \
+    '.verdict = "pass_to_R3"'
+expect_fail r2_pass_to_r3_is_retired "$test_root/r2_retired_pass.json"
 
 mutate "$test_root/r2.json" "$test_root/r2_inherits_r1.json" \
     '.incomplete_stage_inherited_from = "R1" |
@@ -207,10 +224,16 @@ expect_pass r2_repair_introduced_finding \
     "$test_root/r2_repair_delta_finding.json"
 
 mutate "$test_root/r2_repair_delta_finding.json" \
-    "$test_root/r2_passes_open_blocker.json" \
-    '.verdict = "pass_to_R3"'
-expect_fail r2_cannot_pass_open_blocker_to_r3 \
-    "$test_root/r2_passes_open_blocker.json"
+    "$test_root/r2_changes_without_approval_fields.json" \
+    'del(.acceptance_criteria_verified, .non_waivable_gates_verified)'
+expect_pass r2_changes_requested_needs_no_approval_fields \
+    "$test_root/r2_changes_without_approval_fields.json"
+
+mutate "$test_root/r2_repair_delta_finding.json" \
+    "$test_root/r2_approves_open_blocker.json" \
+    '.verdict = "approve"'
+expect_fail r2_cannot_approve_open_blocker \
+    "$test_root/r2_approves_open_blocker.json"
 
 mutate "$test_root/r2_repair_delta_finding.json" \
     "$test_root/r2_escalates_open_blocker.json" \
@@ -463,5 +486,9 @@ for field in \
     grep -Fq "$field" "$template" ||
         fail "comment template is missing field: $field"
 done
+
+if grep -Fq 'pass_to_R3' "$template"; then
+    fail 'comment template still lists the retired pass_to_R3 verdict'
+fi
 
 printf '%s\n' 'review convergence tests passed'

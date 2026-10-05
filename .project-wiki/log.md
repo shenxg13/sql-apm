@@ -301,3 +301,12 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 - [运行环境主题](decisions/runtime-and-components.md#open-questions)、发布说明和记录模板同步默认四进程首批的实际产出及失败停止边界；Issue #31 原包的历史单进程证据保留。
 - 修复包重新完成两机默认四进程首批：零超时、全部 Alma 计数及版本链相同，Kylin 1,123.731 秒；来源与适用范围见 [R1 整改报告](../docs/reports/sql-scanning-r1-remediation-2026-10-04.md)。
 - 全量 1,497,418 条分词和完整归一化重新比较，差异为 0；20 万条合成片段差分及固定八条性能重测通过，原始候选测量另行保留。
+
+## 2026-10-05：评审收敛流程调整
+
+- 按 [Issue #38](https://github.com/shenxg13/sql-apm/issues/38) 的确认，
+  [评审收敛协议](../.harness/workflows/review-sync.md#review-convergence-protocol)允许 R1～R3 任一轮直接批准：
+  R2 没有当前阻断项且已核对全部验收标准与不可豁免门禁时给出 `approve`，不再强制进入 R3；
+  停用 `pass_to_R3`，此前的评审记录保持原样。
+- 同步评论模板、校验脚本和流程回归。仅评审流程变化，业务主题无需更新；
+  本地定制见 [Harness 更新日志](../.harness/update-log.md)和[来源记录](../docs/provenance.md)。

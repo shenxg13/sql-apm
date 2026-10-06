@@ -346,3 +346,11 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 补充[历史判定的实现边界](features/sql-search-and-views.md#未选入批次的历史判定2026-10-04)：
 同一文件可被多个批次引用，实际输入以选入批次的文件并集为准。增加跨批次重复文件的
 合成验证，保留整批选入、去重、首次时间和窗口外判定；未新增业务功能。
+
+## 2026-10-06：强制终止后的集群占用（Issue #41）
+
+按 [Issue #41](https://github.com/shenxg13/sql-apm/issues/41) 补充
+[命令行占用条款](features/operator-cli.md)：强制终止进程后须等旧数据库会话退出，
+正在执行语句时占用持续到语句结束；[操作说明](../docs/runbooks/build-publication.md#占用与恢复)
+提供只读会话定位和退出检查。产品仍立即拒绝忙时申请，无手工解锁或自动重试；
+连接参数是否调整留待每日自动任务确认。

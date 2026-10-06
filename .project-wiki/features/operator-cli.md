@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-04
+updated: 2026-10-06
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/41
+    status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/29#issuecomment-5937111169
@@ -138,6 +140,12 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 
 五种写入入口共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
 忙时返回 `cluster_busy` 并保存 busy_rejected 任务；不会排队或中断持有者。
+按 [Issue #41](https://github.com/shenxg13/sql-apm/issues/41) 的确认补充现有占用边界：
+进程被强制终止后，在其数据库会话退出之前集群仍被占用，新任务仍返回 `cluster_busy`。
+当前连接未设置存活检查参数；若当时正在执行语句，占用持续到该语句结束。
+确认旧会话已退出后人工重新运行；无手工解锁命令，不自动等待、排队或重试。
+查看占用会话与确认退出的方法见[占用与恢复](../../docs/runbooks/build-publication.md#占用与恢复)。
+是否调整连接存活检查等参数留到配置每日自动任务时另行确认，本次不改变产品连接或任务行为。
 只有 import／full 首次登记集群；另外三个写入入口对未登记集群返回 unknown_cluster，不新增集群或任务。
 任务保留模式、阶段、产物、时间和原因，查询仅输出标识、时间、计数及原因码。
 参数及 JSON 示例由[操作说明](../../docs/runbooks/build-publication.md)维护；

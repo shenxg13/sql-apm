@@ -11,6 +11,8 @@ import sys
 import time
 from datetime import datetime
 
+from acceptance import command as measured_command, selected
+
 RESOURCE_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(RESOURCE_ROOT))).resolve()
 MANIFEST = RESOURCE_ROOT / 'docs/reports/data/log-supplement-manifest-2026-09-28.json'
@@ -164,11 +166,15 @@ def run_task(args):
             command += ['rebuild', '--cluster', cluster, '--training-config', training,
                         '--cutoff-date', CUTOFFS[cluster][-1]]
         started = time.monotonic()
-        with log.open('x') as stream:
-            result = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT)
-        if result.returncode:
-            raise ValueError('task_failed; inspect protected step log')
-        payload = json.loads(log.read_text().splitlines()[-1])
+        events, resources = measured_command(ROOT, log, command[3:])
+        payload = events[-1]
+        selection = selected(events)
+        selection_equal = None
+        if args.selection_baseline:
+            new_baseline = json.loads(args.selection_baseline.read_text())
+            if new_baseline['program_commit'] != args.program_commit:
+                raise ValueError('selection baseline program differs')
+            selection_equal = selection == new_baseline['selection'][stem]
         bid = payload['build']['build_id']
         observed = dict(cutoff_date=payload['cutoff_date'], window_start=payload['window_start'],
                         window_end=payload['window_end'], checks=payload['checks'],
@@ -210,7 +216,8 @@ def run_task(args):
         normalization_timeouts = sum(file.get('counts', {}).get('problem:fingerprint_normalization_timeout', 0)
                                      for file in payload.get('import', {}).get('files', []))
         passed = (baseline_equal and chain_ok and normalization_timeouts == 0
-                  and (step < 4 or before_attempts == after_attempts))
+                  and (step < 4 or before_attempts == after_attempts)
+                  and selection_equal is not False)
         record = dict(cluster=cluster, step=step, parser_workers=args.workers if step < 4 else None,
                       cutoff_date=payload['cutoff_date'], build_id=bid,
                       publication=payload['publication'], stages=stages,
@@ -220,7 +227,8 @@ def run_task(args):
                       import_attempt_audit=dict(before=before_attempts, after=after_attempts,
                                                 allowed_interrupted=args.interrupted_attempt,
                                                 baseline_successful=expected['import_attempts']),
-                      normalization_timeouts=normalization_timeouts,
+                      normalization_timeouts=normalization_timeouts, selection=selection,
+                      selection_baseline_equal=selection_equal, resources=resources,
                       identifiers=identifiers, identifiers_verified=True,
                       passed=passed, baseline_sha256=sha256(BASELINE), program_verification=package)
         save(args.records / (stem + '.json'), record)
@@ -249,6 +257,7 @@ def main():
     task.add_argument('--workers', type=int, choices=range(1, 9), default=1)
     task.add_argument('--program-commit', help='Verify the delivered package at this exact commit; '
                       'without it require original Alma product hashes')
+    task.add_argument('--selection-baseline', type=Path)
     task.add_argument('--interrupted-attempt', action='append', default=[],
                       help='Explicitly audited historical interruption ID; other non-success attempts fail')
     args = parser.parse_args()

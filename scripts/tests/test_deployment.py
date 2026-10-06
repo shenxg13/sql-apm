@@ -11,8 +11,9 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
-from build_release import archive, select, compare_product
-from render_manual import inspect, render
+from build_release import archive, select, compare_product, version_number
+from render_manual import DOCUMENTS, inspect, render
+from check_documents import check, check_guide, check_structure, check_paths, GUIDE, STRUCTURE
 from verify_package import digest, verify
 import rehearsal
 
@@ -141,8 +142,21 @@ class PackageTests(unittest.TestCase):
 
 class HtmlTests(unittest.TestCase):
     def test_current_manual(self):
-        _, checks = render(ROOT, 'a' * 40, 'v0.1.0')
-        self.assertGreater(checks['code_blocks'], 40)
+        for filename in DOCUMENTS:
+            with self.subTest(filename=filename):
+                html, checks = render(ROOT, 'a' * 40, 'v0.2.0', filename)
+                self.assertIn('v0.2.0', html)
+                self.assertGreater(checks['anchors'], 3)
+                self.assertEqual(checks['external_resource_requests'], 0)
+        self.assertIn('data:image/svg+xml;base64,', render(ROOT, 'a' * 40, 'v0.2.0', 'DATABASE.html')[0])
+
+    def test_version_format(self):
+        import argparse
+        for value in ('v0.2.0', 'v1.0.12', 'v10.20.30'):
+            self.assertEqual(version_number(value), value)
+        for value in ('0.2.0', 'v01.2.0', 'v0.2', 'v0.2.0/x', 'v0.2.0\n', 'v0.2.0-rc1'):
+            with self.subTest(value=value), self.assertRaises(argparse.ArgumentTypeError):
+                version_number(value)
 
     def test_external_resources_rejected(self):
         for fragment in ('<script src="https://example.com/a.js"></script>',
@@ -164,6 +178,43 @@ class HtmlTests(unittest.TestCase):
         self.assertEqual(inspect(document, [command])['code_blocks'], 1)
         with self.assertRaisesRegex(ValueError, 'differ'):
             inspect(document, [command.rstrip()])
+
+
+class DocumentTests(unittest.TestCase):
+    def test_current_documents(self):
+        self.assertEqual(check()['structure']['tables'], 57)
+
+    def test_missing_configuration_key(self):
+        source = (ROOT / GUIDE).read_text().replace('"cutoff_date", "days"', '"cutoff_date"', 1)
+        with self.assertRaisesRegex(ValueError, 'key set differs'):
+            check_guide(ROOT, source)
+
+    def test_invalid_configuration_example(self):
+        source = (ROOT / GUIDE).read_text().replace('"days":2', '"days":0', 1)
+        with self.assertRaisesRegex(ValueError, 'invalid configuration example'):
+            check_guide(ROOT, source)
+
+    def test_missing_table(self):
+        source = '\n'.join(line for line in (ROOT / STRUCTURE).read_text().splitlines()
+                           if not line.startswith('| `mpp_cleanup_month` |'))
+        with self.assertRaisesRegex(ValueError, 'inventory differs'):
+            check_structure(ROOT, source)
+
+    def test_invented_column(self):
+        source = (ROOT / STRUCTURE).read_text().replace('`checksum_value`', '`not_a_column`', 1)
+        with self.assertRaisesRegex(ValueError, 'unknown documented'):
+            check_structure(ROOT, source)
+
+    def test_missing_packaged_command(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md',
+                         'scripts/deployment/package-files.json'):
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / name, target)
+            with self.assertRaisesRegex(ValueError, 'missing from program'):
+                check_paths(root)
 
 
 if __name__ == '__main__':

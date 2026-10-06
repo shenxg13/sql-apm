@@ -237,3 +237,13 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `verify_cleanup_full.py verify` 恢复副本、对比升级前后全表摘要、构造受保护当前月份并实测清理。
 完整命令、月份构造、测量边界和机器记录见[验收报告](../docs/reports/result-retention-2026-10-06.md)。
 高成本真实数据验收不自动加入 Harness，数据库副本及原文均留在本地忽略目录。
+
+## v0.2.0 文档与完整演练验收
+
+`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、57 张表／列名和随包命令；
+随 `scripts/tests/test_deployment.py` 运行并覆盖反例。
+`verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例。
+`rehearsal.py` 保存九任务的选批字段、每 250ms 主机内存采样与 OOM 计数；
+`guide_examples.py` 执行单项配置示例，`cleanup_rehearsal.py` 验证自然／模拟日期清理。
+后两个入口仅对明确指定的专用演练库运行，参数及操作顺序见[部署手册](../docs/runbooks/kylin-offline-deployment.md)。
+高成本真实验收不自动加入 Harness。

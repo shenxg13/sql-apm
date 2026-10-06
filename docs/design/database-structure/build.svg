@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="890" viewBox="0 0 1380 890" role="img" aria-labelledby="title desc">
+<title id="title">构建、结果、发布与月份清理</title><desc id="desc">箭头表示主要引用方向；浅橙色为结果清理相关结构，分组定义不删除</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#738397"/></marker></defs>
+<rect width="1380" height="890" fill="white"/>
+<text x="28" y="40" font-family="sans-serif" font-size="25" font-weight="bold" fill="#172c43">构建、结果、发布与月份清理</text>
+<text x="28" y="70" font-family="sans-serif" font-size="17" fill="#4a5968">箭头表示主要引用方向；浅橙色为结果清理相关结构，分组定义不删除</text>
+<path d="M 455 185 H 400" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 930 185 H 875" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 665 235 V 340" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 400 400 H 455" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 930 400 H 875" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 455 615 H 400" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 930 615 H 875" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 665 565 V 465" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 665 465 V 500 H 900 V 710 H 690 V 740" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="135" width="375" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="212.5" y="165" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_baseline_group</text>
+<text x="212.5" y="192" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">正式分组定义，跨构建保留</text>
+<rect x="455" y="135" width="420" height="100" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="665.0" y="165" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_build_group</text>
+<text x="665.0" y="192" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">构建 × 正式分组</text>
+<rect x="930" y="135" width="420" height="100" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="1140.0" y="165" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_statistic</text>
+<text x="1140.0" y="192" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">正式五层统计，月分区</text>
+<rect x="25" y="340" width="375" height="125" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="212.5" y="370" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">检查与记账</text>
+<text x="212.5" y="397" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">build_check</text>
+<text x="212.5" y="420" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">mpp_build_timing_coverage</text>
+<text x="212.5" y="443" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">mpp_build_layer_count</text>
+<rect x="455" y="340" width="420" height="125" rx="10" fill="#e9f3ff" stroke="#2675bd" stroke-width="2"/>
+<text x="665.0" y="370" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">build</text>
+<text x="665.0" y="397" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">引用快照、月份；诊断与状态</text>
+<text x="665.0" y="420" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">构建及发布记录永久保留</text>
+<rect x="930" y="340" width="420" height="125" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="1140.0" y="370" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">发布与当前版本</text>
+<text x="1140.0" y="397" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">publication / current_version</text>
+<text x="1140.0" y="420" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">当前版本整月受保护</text>
+<rect x="25" y="565" width="375" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="212.5" y="595" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_observation_group</text>
+<text x="212.5" y="622" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">观察分组定义，跨构建保留</text>
+<rect x="455" y="565" width="420" height="100" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="665.0" y="595" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_build_observation_group</text>
+<text x="665.0" y="622" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">构建 × 观察分组</text>
+<rect x="930" y="565" width="420" height="100" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="1140.0" y="595" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_observation_statistic</text>
+<text x="1140.0" y="622" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">观察五层统计，月分区</text>
+<rect x="330" y="740" width="720" height="105" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="690.0" y="770" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_result_partition / mpp_cleanup_month</text>
+<text x="690.0" y="797" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">月份、两阶段清理标记；清理任务的每月计数与耗时</text>
+</svg>

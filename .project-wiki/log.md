@@ -373,3 +373,10 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 统一[配置错误退出码](features/operator-cli.md#版本结果清理入口2026-10-06)。
 操作说明补充统计叶表 autovacuum 占用和受保护的批量读取用法；
 [验证报告](../docs/reports/result-retention-2026-10-06.md)维护整改回归和真实副本证据。
+
+## 2026-10-07：v0.2.0 随包文档与演练授权（Issue #45）
+
+按已确认契约同步[预发布交付条款](decisions/runtime-and-components.md#v020-预发布交付与本轮演练2026-10-07)，
+明确三份离线 HTML、配置／结构核对、一次裸机实测及模拟日期清理的授权和证据绑定。
+[配置指南](../docs/runbooks/configuration-guide.md)和[结构说明](../docs/design/database-structure.md)
+进入随包文档；本轮实测与发布尚待完成，不把旧版结果当作新版验证。

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Assemble checked offline inputs; no production logs or credentials are included."""
 import argparse
+import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -140,8 +141,9 @@ def main():
     for file in sorted(args.rpm_collection.glob('*')):
         if file.is_file():
             add(file, 'rpm-evidence/' + file.name, 'collection/1', 'snapshot-initial Kylin host')
-    add(args.release_dir / 'app/INSTALL.html', 'INSTALL.html', release['version'],
-        'Markdown handbook generated from commit ' + commit, release['files']['INSTALL.html'])
+    for filename in release['documents']:
+        add(args.release_dir / 'app' / filename, filename, release['version'],
+            'Markdown document generated from commit ' + commit, release['files'][filename])
     add(args.rpm_collection / 'compile-packages.txt', 'support/compile-packages.txt',
         'compile-package-roots/1', 'original RPM collection')
     (out / 'manifest.json').write_text(json.dumps(dict(program_commit=commit, version=release['version'],
@@ -150,8 +152,16 @@ def main():
     files = sorted(p for p in out.rglob('*') if p.is_file())
     (out / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + str(p.relative_to(out)) + '\n'
                                           for p in files))
-    with tarfile.open(str(out) + '.tar.gz', 'w:gz') as file:
-        file.add(out, arcname=out.name)
+    with Path(str(out) + '.tar.gz').open('xb') as stream:
+        with gzip.GzipFile(filename='', mode='wb', fileobj=stream, mtime=0) as gz:
+            with tarfile.open(fileobj=gz, mode='w') as tar:
+                for path in sorted(p for p in out.rglob('*') if p.is_file()):
+                    info = tar.gettarinfo(str(path), arcname='offline-bundle/' + str(path.relative_to(out)))
+                    info.uid = info.gid = info.mtime = 0
+                    info.uname = info.gname = ''
+                    info.mode = 0o644
+                    with path.open('rb') as source:
+                        tar.addfile(info, source)
     bundle = Path(str(out) + '.tar.gz')
     Path(str(bundle) + '.sha256').write_text(digest(bundle) + '  ' + bundle.name + '\n')
     print(json.dumps(dict(bundle=str(bundle), sha256=digest(bundle), files=len(entries))))

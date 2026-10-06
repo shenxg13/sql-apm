@@ -5,17 +5,24 @@ import fnmatch
 import gzip
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
 import tarfile
 import tempfile
 
-from render_manual import PAGES, render
+from render_manual import DOCUMENTS, render
 from verify_package import digest, verify
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = '6451d140d44f4e06cc34862c3e5aff7593d7afeb'
+BASE = '9bf4e4b6eb3871d6f996339b403c0c93f403e15c'
+
+
+def version_number(value):
+    if not re.fullmatch(r'v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', value):
+        raise argparse.ArgumentTypeError('version must be vMAJOR.MINOR.PATCH without leading zeros')
+    return value
 
 
 def git(*args):
@@ -77,6 +84,8 @@ def compare_product(app, previous):
 
 
 def build(args):
+    if git('status', '--porcelain', '--untracked-files=all'):
+        raise ValueError('commit repository changes before building')
     commit = git('rev-parse', args.commit + '^{commit}')
     subprocess.run(['git', 'merge-base', '--is-ancestor', BASE, commit], cwd=ROOT, check=True)
     if args.kind == 'release':
@@ -108,14 +117,20 @@ def build(args):
             target = validation / 'probes' / (name + '.py')
             target.parent.mkdir(exist_ok=True)
             shutil.copy2(source / 'sql_apm/diagnostics' / (name + '.py'), target)
-        html, html_checks = render(source, commit, args.version)
-        (app / 'INSTALL.html').write_text(html, encoding='utf-8')
+        documents = {}
+        for filename, definition in DOCUMENTS.items():
+            html, checks = render(source, commit, args.version, filename)
+            (app / filename).write_text(html, encoding='utf-8')
+            documents[filename] = dict(title=definition['title'], html_checks=checks,
+                                      sources={name: digest(source / name) for name in definition['sources']})
+        html_checks = documents['INSTALL.html']['html_checks']
         (app / 'VERSION').write_text(args.version + '\n')
         (app / 'PROGRAM_COMMIT').write_text(commit + '\n')
         metadata = dict(format='sql-apm-release/1', version=args.version, kind=args.kind,
                         prerelease=True, production_use=False, commit=commit, product_base=BASE,
                         build_requirements_sha256=digest(source / 'scripts/deployment/build-requirements.txt'),
-                        manual_sources={name: digest(source / name) for name in PAGES}, html_checks=html_checks,
+                        documents=documents, entrypoint='RELEASE.html',
+                        manual_sources=documents['INSTALL.html']['sources'], html_checks=html_checks,
                         files={str(p.relative_to(app)): digest(p) for p in sorted(app.rglob('*')) if p.is_file()})
         save(app / 'RELEASE.json', metadata)
         (app / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + str(p.relative_to(app)) + '\n'
@@ -141,7 +156,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', default='HEAD')
-    parser.add_argument('--version', choices=['v0.1.0'], default='v0.1.0')
+    parser.add_argument('--version', type=version_number, default='v0.2.0')
     parser.add_argument('--kind', choices=['candidate', 'release'], default='candidate')
     parser.add_argument('--previous-program', type=Path)
     build(parser.parse_args())

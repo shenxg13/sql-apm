@@ -54,7 +54,10 @@ def verify(pg_bin):
         with db,db.cursor() as cur:
             cur.execute('SELECT p.build_month FROM build b JOIN mpp_result_partition p USING(partition_id) WHERE b.build_id=%s',(source,))
             source_month=cur.fetchone()[0]
-        reference=date(source_month.year+1,1,1)
+        # Three months ahead expires the protected current month, while keeping
+        # the precreated next-month partition at the N=2 boundary for later full.
+        reference_year,reference_month=divmod(source_month.year*12+source_month.month+2,12)
+        reference=date(reference_year,reference_month+1,1)
         clone_build(db,source,'retained',reference.isoformat(),True)
         # All fixtures are intentionally old except the current-version month.
         before=contents(db);current=version_status(db,'C1')['current']

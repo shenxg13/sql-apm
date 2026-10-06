@@ -460,14 +460,15 @@
   "python": "3.9.5 (default, Sep 25 2026, 21:33:50) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
   "code_sha256": {
     "sql_apm/storage/schema.sql": "9ac4648732cf8d002a52f464017ee241efa2d2095025b60d3f3256a996283597",
-    "sql_apm/storage/cleanup.py": "043449892e2d4c3cf8bb39b8e90a17e0c4d70af7ebc59c69a9343637ea563041",
+    "sql_apm/storage/cleanup.py": "e3bca9860db89e6823b26783d153f04e7d4a6d9c650a2ac2b571115377f11d61",
     "sql_apm/baseline/retention.py": "82e556c53ca05a3a4329b3c9c06d50e2c78e0e3154f2eb10047af953b198281a",
+    "sql_apm/cli/cleanup.py": "0fd974a359434f9e9ef9cd4017a683e9a523e5d491778dc9dcf9c7a2f286a3ab",
     "sql_apm/storage/migrations/1.8.0-to-1.9.0.sql": "5b696dc9c91e408193236f630186b57be03684c4229e24dc764559697bb3bd01",
-    "scripts/db/verify_cleanup_full.py": "29017bf17ea6981fce7d16b69a2194d30c2c8e95437070288d057ab22413edb1",
+    "scripts/db/verify_cleanup_full.py": "b7fac0fade929af611dc70ee148ff37dfa4bd49b10a68de0ed36d51898edfd02",
     "tests/database/retention.py": "58606c74c06ff2480606e2399adbd944ccab7581e31bc79976611e763b2bef51"
   },
   "postgresql": "17.10",
-  "upgrade_seconds": 0.8351815519999946,
+  "upgrade_seconds": 0.7826478800002405,
   "fixture": {
     "build_id": "B:20261006T200827:dce27eb0b9a64e1e8d61f7bac0cfc947",
     "build_month": "2027-11-01",
@@ -491,7 +492,7 @@
       }
     }
   },
-  "fixture_seconds": 444.0686171109992,
+  "fixture_seconds": 441.61059347399987,
   "preview": {
     "119": {
       "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
@@ -579,18 +580,18 @@
   },
   "runs": {
     "119": {
-      "seconds": 0.06197103099839296,
+      "seconds": 0.0590739350000149,
       "result": {
         "state": "succeeded",
         "reason": null,
-        "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+        "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
         "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
         "retention_months": 2,
         "current_month": "2027-11-01",
         "current_version_month": "2026-10-01",
         "months": [
           {
-            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
             "partition_id": 594693963537055769,
             "state": "protected",
             "reason": "current_version_month",
@@ -601,15 +602,15 @@
             "released_bytes": 0,
             "formal_groups_deleted": 0,
             "observation_groups_deleted": 0,
-            "started_at": "2026-10-06 21:18:24.974677+08:00",
-            "finished_at": "2026-10-06 21:18:24.974677+08:00",
+            "started_at": "2026-10-07 00:22:13.898697+08:00",
+            "finished_at": "2026-10-07 00:22:13.898697+08:00",
             "exclusive_seconds": 0.0,
             "group_seconds": 0.0,
             "build_month": "2026-10-01",
             "cleaned_at": null
           },
           {
-            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
             "partition_id": 1104237901969524100,
             "state": "succeeded",
             "reason": "results_cleaned",
@@ -620,29 +621,29 @@
             "released_bytes": 49152,
             "formal_groups_deleted": 0,
             "observation_groups_deleted": 0,
-            "started_at": "2026-10-06 21:18:24.977086+08:00",
-            "finished_at": "2026-10-06 21:18:25.015418+08:00",
-            "exclusive_seconds": 0.01816668799438048,
-            "group_seconds": 0.0018366190051892772,
+            "started_at": "2026-10-07 00:22:13.901073+08:00",
+            "finished_at": "2026-10-07 00:22:13.937554+08:00",
+            "exclusive_seconds": 0.016533277000235103,
+            "group_seconds": 0.00189457999977094,
             "build_month": "2026-11-01",
-            "cleaned_at": "2026-10-06 21:18:25.002652+08:00"
+            "cleaned_at": "2026-10-07 00:22:13.924388+08:00"
           }
         ]
       },
       "attempts": [
         {
-          "seconds": 0.06168903099023737,
+          "seconds": 0.05879237199997078,
           "result": {
             "state": "succeeded",
             "reason": null,
-            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
             "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2026-10-01",
             "months": [
               {
-                "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+                "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
                 "partition_id": 594693963537055769,
                 "state": "protected",
                 "reason": "current_version_month",
@@ -653,15 +654,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:24.974677+08:00",
-                "finished_at": "2026-10-06 21:18:24.974677+08:00",
+                "started_at": "2026-10-07 00:22:13.898697+08:00",
+                "finished_at": "2026-10-07 00:22:13.898697+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-10-01",
                 "cleaned_at": null
               },
               {
-                "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+                "task_id": "T:a3eac3860c654fb0bba0916eb34b7973",
                 "partition_id": 1104237901969524100,
                 "state": "succeeded",
                 "reason": "results_cleaned",
@@ -672,12 +673,12 @@
                 "released_bytes": 49152,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:24.977086+08:00",
-                "finished_at": "2026-10-06 21:18:25.015418+08:00",
-                "exclusive_seconds": 0.01816668799438048,
-                "group_seconds": 0.0018366190051892772,
+                "started_at": "2026-10-07 00:22:13.901073+08:00",
+                "finished_at": "2026-10-07 00:22:13.937554+08:00",
+                "exclusive_seconds": 0.016533277000235103,
+                "group_seconds": 0.00189457999977094,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:25.002652+08:00"
+                "cleaned_at": "2026-10-07 00:22:13.924388+08:00"
               }
             ]
           },
@@ -710,37 +711,37 @@
       ]
     },
     "120": {
-      "seconds": 61.32916582199687,
+      "seconds": 80.25229572900025,
       "result": {
         "state": "succeeded",
         "reason": null,
-        "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+        "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
         "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
         "retention_months": 2,
         "current_month": "2027-11-01",
         "current_version_month": "2027-11-01",
         "months": [
           {
-            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
             "partition_id": 974329813721629853,
             "state": "succeeded",
             "reason": "results_cleaned",
             "published_builds": 3,
             "unpublished_builds": 0,
-            "before_bytes": 12619046912,
+            "before_bytes": 12860022784,
             "after_bytes": 0,
-            "released_bytes": 12619046912,
+            "released_bytes": 12860022784,
             "formal_groups_deleted": 1689092,
             "observation_groups_deleted": 2339,
-            "started_at": "2026-10-06 21:19:06.764432+08:00",
-            "finished_at": "2026-10-06 21:19:26.342594+08:00",
-            "exclusive_seconds": 0.30717085099604446,
-            "group_seconds": 16.99770449004427,
+            "started_at": "2026-10-07 00:23:06.096785+08:00",
+            "finished_at": "2026-10-07 00:23:34.185738+08:00",
+            "exclusive_seconds": 0.3946681769998577,
+            "group_seconds": 17.14779384799749,
             "build_month": "2026-10-01",
-            "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+            "cleaned_at": "2026-10-07 00:23:16.003043+08:00"
           },
           {
-            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
             "partition_id": 456575920272075899,
             "state": "already_cleaned",
             "reason": "results_cleaned",
@@ -751,15 +752,15 @@
             "released_bytes": 0,
             "formal_groups_deleted": 0,
             "observation_groups_deleted": 0,
-            "started_at": "2026-10-06 21:19:26.344814+08:00",
-            "finished_at": "2026-10-06 21:19:26.344814+08:00",
+            "started_at": "2026-10-07 00:23:34.188318+08:00",
+            "finished_at": "2026-10-07 00:23:34.188318+08:00",
             "exclusive_seconds": 0.0,
             "group_seconds": 0.0,
             "build_month": "2026-11-01",
-            "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+            "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
           },
           {
-            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
             "partition_id": 790239868297632383,
             "state": "retained",
             "reason": "within_retention",
@@ -770,8 +771,8 @@
             "released_bytes": 0,
             "formal_groups_deleted": 0,
             "observation_groups_deleted": 0,
-            "started_at": "2026-10-06 21:19:26.346925+08:00",
-            "finished_at": "2026-10-06 21:19:26.346925+08:00",
+            "started_at": "2026-10-07 00:23:34.190904+08:00",
+            "finished_at": "2026-10-07 00:23:34.190904+08:00",
             "exclusive_seconds": 0.0,
             "group_seconds": 0.0,
             "build_month": "2027-11-01",
@@ -781,18 +782,18 @@
       },
       "attempts": [
         {
-          "seconds": 9.938795555004617,
+          "seconds": 9.943109413000002,
           "result": {
             "state": "failed",
             "reason": "cleanup_incomplete",
-            "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+            "task_id": "T:d604dc2ee98941508427da6bc8637384",
             "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2027-11-01",
             "months": [
               {
-                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "task_id": "T:d604dc2ee98941508427da6bc8637384",
                 "partition_id": 974329813721629853,
                 "state": "lock_timeout",
                 "reason": "cleanup_lock_timeout",
@@ -803,15 +804,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:25.028420+08:00",
-                "finished_at": "2026-10-06 21:18:34.931205+08:00",
+                "started_at": "2026-10-07 00:22:13.949793+08:00",
+                "finished_at": "2026-10-07 00:22:23.856040+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-10-01",
                 "cleaned_at": null
               },
               {
-                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "task_id": "T:d604dc2ee98941508427da6bc8637384",
                 "partition_id": 456575920272075899,
                 "state": "succeeded",
                 "reason": "results_cleaned",
@@ -822,15 +823,15 @@
                 "released_bytes": 49152,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:34.933820+08:00",
-                "finished_at": "2026-10-06 21:18:34.954087+08:00",
-                "exclusive_seconds": 0.01021564299298916,
-                "group_seconds": 0.0008695599972270429,
+                "started_at": "2026-10-07 00:22:23.858405+08:00",
+                "finished_at": "2026-10-07 00:22:23.879494+08:00",
+                "exclusive_seconds": 0.010286142000040854,
+                "group_seconds": 0.0011216949997105985,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
               },
               {
-                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "task_id": "T:d604dc2ee98941508427da6bc8637384",
                 "partition_id": 790239868297632383,
                 "state": "retained",
                 "reason": "within_retention",
@@ -841,8 +842,8 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:34.956454+08:00",
-                "finished_at": "2026-10-06 21:18:34.956454+08:00",
+                "started_at": "2026-10-07 00:22:23.881715+08:00",
+                "finished_at": "2026-10-07 00:22:23.881715+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2027-11-01",
@@ -900,18 +901,18 @@
           ]
         },
         {
-          "seconds": 9.919076745994971,
+          "seconds": 9.923096573000294,
           "result": {
             "state": "failed",
             "reason": "cleanup_incomplete",
-            "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+            "task_id": "T:8f910d2ad8b94f1d8e6de33ccf47f0c3",
             "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2027-11-01",
             "months": [
               {
-                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "task_id": "T:8f910d2ad8b94f1d8e6de33ccf47f0c3",
                 "partition_id": 974329813721629853,
                 "state": "lock_timeout",
                 "reason": "cleanup_lock_timeout",
@@ -922,15 +923,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:35.469976+08:00",
-                "finished_at": "2026-10-06 21:18:45.372630+08:00",
+                "started_at": "2026-10-07 00:22:24.395046+08:00",
+                "finished_at": "2026-10-07 00:22:34.300815+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-10-01",
                 "cleaned_at": null
               },
               {
-                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "task_id": "T:8f910d2ad8b94f1d8e6de33ccf47f0c3",
                 "partition_id": 456575920272075899,
                 "state": "already_cleaned",
                 "reason": "results_cleaned",
@@ -941,15 +942,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:45.375110+08:00",
-                "finished_at": "2026-10-06 21:18:45.375110+08:00",
+                "started_at": "2026-10-07 00:22:34.303286+08:00",
+                "finished_at": "2026-10-07 00:22:34.303286+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
               },
               {
-                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "task_id": "T:8f910d2ad8b94f1d8e6de33ccf47f0c3",
                 "partition_id": 790239868297632383,
                 "state": "retained",
                 "reason": "within_retention",
@@ -960,8 +961,8 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:45.377268+08:00",
-                "finished_at": "2026-10-06 21:18:45.377268+08:00",
+                "started_at": "2026-10-07 00:22:34.305772+08:00",
+                "finished_at": "2026-10-07 00:22:34.305772+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2027-11-01",
@@ -996,18 +997,18 @@
           ]
         },
         {
-          "seconds": 9.920913497000583,
+          "seconds": 9.924676250000175,
           "result": {
             "state": "failed",
             "reason": "cleanup_incomplete",
-            "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+            "task_id": "T:93edebb5f6d84ca29f88baa0154a85bd",
             "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2027-11-01",
             "months": [
               {
-                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "task_id": "T:93edebb5f6d84ca29f88baa0154a85bd",
                 "partition_id": 974329813721629853,
                 "state": "lock_timeout",
                 "reason": "cleanup_lock_timeout",
@@ -1018,15 +1019,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:45.890076+08:00",
-                "finished_at": "2026-10-06 21:18:55.792480+08:00",
+                "started_at": "2026-10-07 00:22:34.820563+08:00",
+                "finished_at": "2026-10-07 00:22:44.726705+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-10-01",
                 "cleaned_at": null
               },
               {
-                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "task_id": "T:93edebb5f6d84ca29f88baa0154a85bd",
                 "partition_id": 456575920272075899,
                 "state": "already_cleaned",
                 "reason": "results_cleaned",
@@ -1037,15 +1038,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:55.796707+08:00",
-                "finished_at": "2026-10-06 21:18:55.796707+08:00",
+                "started_at": "2026-10-07 00:22:44.729214+08:00",
+                "finished_at": "2026-10-07 00:22:44.729214+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
               },
               {
-                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "task_id": "T:93edebb5f6d84ca29f88baa0154a85bd",
                 "partition_id": 790239868297632383,
                 "state": "retained",
                 "reason": "within_retention",
@@ -1056,8 +1057,8 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:55.798813+08:00",
-                "finished_at": "2026-10-06 21:18:55.798813+08:00",
+                "started_at": "2026-10-07 00:22:44.731611+08:00",
+                "finished_at": "2026-10-07 00:22:44.731611+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2027-11-01",
@@ -1092,18 +1093,18 @@
           ]
         },
         {
-          "seconds": 9.92015525100578,
+          "seconds": 9.92330592899998,
           "result": {
             "state": "failed",
             "reason": "cleanup_incomplete",
-            "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+            "task_id": "T:dcbaf84e0ca34adbbea937d3e17d7cf4",
             "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2027-11-01",
             "months": [
               {
-                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "task_id": "T:dcbaf84e0ca34adbbea937d3e17d7cf4",
                 "partition_id": 974329813721629853,
                 "state": "lock_timeout",
                 "reason": "cleanup_lock_timeout",
@@ -1114,15 +1115,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:18:56.312663+08:00",
-                "finished_at": "2026-10-06 21:19:06.215022+08:00",
+                "started_at": "2026-10-07 00:22:45.247794+08:00",
+                "finished_at": "2026-10-07 00:22:55.153941+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-10-01",
                 "cleaned_at": null
               },
               {
-                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "task_id": "T:dcbaf84e0ca34adbbea937d3e17d7cf4",
                 "partition_id": 456575920272075899,
                 "state": "already_cleaned",
                 "reason": "results_cleaned",
@@ -1133,15 +1134,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:19:06.217743+08:00",
-                "finished_at": "2026-10-06 21:19:06.217743+08:00",
+                "started_at": "2026-10-07 00:22:55.156420+08:00",
+                "finished_at": "2026-10-07 00:22:55.156420+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
               },
               {
-                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "task_id": "T:dcbaf84e0ca34adbbea937d3e17d7cf4",
                 "partition_id": 790239868297632383,
                 "state": "retained",
                 "reason": "within_retention",
@@ -1152,8 +1153,8 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:19:06.220333+08:00",
-                "finished_at": "2026-10-06 21:19:06.220333+08:00",
+                "started_at": "2026-10-07 00:22:55.158565+08:00",
+                "finished_at": "2026-10-07 00:22:55.158565+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2027-11-01",
@@ -1188,37 +1189,133 @@
           ]
         },
         {
-          "seconds": 19.624391503995867,
+          "seconds": 9.922506526000234,
+          "result": {
+            "state": "failed",
+            "reason": "cleanup_incomplete",
+            "task_id": "T:5b57b2b472424728801823da00dfaee5",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:5b57b2b472424728801823da00dfaee5",
+                "partition_id": 974329813721629853,
+                "state": "lock_timeout",
+                "reason": "cleanup_lock_timeout",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12860022784,
+                "after_bytes": 12860022784,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-07 00:22:55.672323+08:00",
+                "finished_at": "2026-10-07 00:23:05.578106+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:5b57b2b472424728801823da00dfaee5",
+                "partition_id": 456575920272075899,
+                "state": "already_cleaned",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 0,
+                "after_bytes": 0,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-07 00:23:05.580491+08:00",
+                "finished_at": "2026-10-07 00:23:05.580491+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
+              },
+              {
+                "task_id": "T:5b57b2b472424728801823da00dfaee5",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-07 00:23:05.582840+08:00",
+                "finished_at": "2026-10-07 00:23:05.582840+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seconds": 28.106973778999873,
           "result": {
             "state": "succeeded",
             "reason": null,
-            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
             "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
             "retention_months": 2,
             "current_month": "2027-11-01",
             "current_version_month": "2027-11-01",
             "months": [
               {
-                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
                 "partition_id": 974329813721629853,
                 "state": "succeeded",
                 "reason": "results_cleaned",
                 "published_builds": 3,
                 "unpublished_builds": 0,
-                "before_bytes": 12619046912,
+                "before_bytes": 12860022784,
                 "after_bytes": 0,
-                "released_bytes": 12619046912,
+                "released_bytes": 12860022784,
                 "formal_groups_deleted": 1689092,
                 "observation_groups_deleted": 2339,
-                "started_at": "2026-10-06 21:19:06.764432+08:00",
-                "finished_at": "2026-10-06 21:19:26.342594+08:00",
-                "exclusive_seconds": 0.30717085099604446,
-                "group_seconds": 16.99770449004427,
+                "started_at": "2026-10-07 00:23:06.096785+08:00",
+                "finished_at": "2026-10-07 00:23:34.185738+08:00",
+                "exclusive_seconds": 0.3946681769998577,
+                "group_seconds": 17.14779384799749,
                 "build_month": "2026-10-01",
-                "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+                "cleaned_at": "2026-10-07 00:23:16.003043+08:00"
               },
               {
-                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
                 "partition_id": 456575920272075899,
                 "state": "already_cleaned",
                 "reason": "results_cleaned",
@@ -1229,15 +1326,15 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:19:26.344814+08:00",
-                "finished_at": "2026-10-06 21:19:26.344814+08:00",
+                "started_at": "2026-10-07 00:23:34.188318+08:00",
+                "finished_at": "2026-10-07 00:23:34.188318+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2026-11-01",
-                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+                "cleaned_at": "2026-10-07 00:22:23.868502+08:00"
               },
               {
-                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "task_id": "T:1a532fa0f1c440e9b79b28012884cf48",
                 "partition_id": 790239868297632383,
                 "state": "retained",
                 "reason": "within_retention",
@@ -1248,8 +1345,8 @@
                 "released_bytes": 0,
                 "formal_groups_deleted": 0,
                 "observation_groups_deleted": 0,
-                "started_at": "2026-10-06 21:19:26.346925+08:00",
-                "finished_at": "2026-10-06 21:19:26.346925+08:00",
+                "started_at": "2026-10-07 00:23:34.190904+08:00",
+                "finished_at": "2026-10-07 00:23:34.190904+08:00",
                 "exclusive_seconds": 0.0,
                 "group_seconds": 0.0,
                 "build_month": "2027-11-01",
@@ -1317,7 +1414,7 @@
           "statistic_bytes": 0,
           "observation_bytes": 0,
           "total_bytes": 0,
-          "cleaned_at": "2026-10-06 21:18:25.002652+08:00",
+          "cleaned_at": "2026-10-07 00:22:13.924388+08:00",
           "groups_pending": false
         }
       ]
@@ -1339,7 +1436,7 @@
           "statistic_bytes": 0,
           "observation_bytes": 0,
           "total_bytes": 0,
-          "cleaned_at": "2026-10-06 21:19:08.398602+08:00",
+          "cleaned_at": "2026-10-07 00:23:16.003043+08:00",
           "groups_pending": false
         },
         {
@@ -1352,7 +1449,7 @@
           "statistic_bytes": 0,
           "observation_bytes": 0,
           "total_bytes": 0,
-          "cleaned_at": "2026-10-06 21:18:34.944143+08:00",
+          "cleaned_at": "2026-10-07 00:22:23.868502+08:00",
           "groups_pending": false
         },
         {
@@ -1474,7 +1571,7 @@
           "window_end": "2026-09-19 00:00:00+08:00",
           "request_baseline_missing": false,
           "results_cleaned": true,
-          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+          "cleaned_at": "2026-10-07 00:23:16.003043+08:00"
         },
         {
           "publication_id": "PUB:08597a7e9a144742913ef7e5c5b93167",
@@ -1488,7 +1585,7 @@
           "window_end": "2026-09-18 00:00:00+08:00",
           "request_baseline_missing": false,
           "results_cleaned": true,
-          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+          "cleaned_at": "2026-10-07 00:23:16.003043+08:00"
         },
         {
           "publication_id": "PUB:50ca7a5eb2e94986bbc2c13401630485",
@@ -1502,11 +1599,11 @@
           "window_end": "2026-09-17 00:00:00+08:00",
           "request_baseline_missing": false,
           "results_cleaned": true,
-          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+          "cleaned_at": "2026-10-07 00:23:16.003043+08:00"
         }
       ]
     }
   },
   "complete": true,
-  "total_seconds": 1900.9044466860068
+  "total_seconds": 1923.1375702120001
 }

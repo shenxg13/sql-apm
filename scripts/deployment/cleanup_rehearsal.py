@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Explicit real-clock acceptance on the dedicated rehearsal database only."""
 import argparse
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -61,7 +62,7 @@ def main():
     if (args.records/(args.phase+'.json')).exists():
         raise ValueError('fresh phase record required; do not repeat completed rebuilds')
     package=verify(args.app_root,installed=True)
-    with connect() as db:
+    with closing(connect()) as db:
         with db,db.cursor() as cur:
             cur.execute("SELECT date_trunc('month',clock_timestamp() AT TIME ZONE 'Asia/Shanghai')::date")
             month=cur.fetchone()[0].isoformat()

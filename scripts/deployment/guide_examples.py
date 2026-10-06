@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Execute independent configuration examples after the fixed nine tasks."""
 import argparse
+from contextlib import closing
 from copy import deepcopy
 import json
 import os
@@ -64,7 +65,7 @@ def run(args):
     args.records.mkdir(parents=True,exist_ok=True,mode=0o700)
     package = verify(args.app_root,installed=True)
     metadata = json.loads((args.app_root/'RELEASE.json').read_text())
-    with connect() as db:
+    with closing(connect()) as db:
         original = seed(args,db)
         path, fingerprint = make_config(args,db,original)
         if args.case in ('workers','import'):

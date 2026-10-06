@@ -224,6 +224,8 @@ Issue #35 取代此前“选取本集群全部完整批次”的操作口径。�
 该月保持原样，其他月份继续；可在占用解除后重跑。成功取得锁后的短事务同时移除两张统计
 分区并标记 cleaned_at，提交后按每批最多 10,000 行删除分组关联。分组删除中断时预览显示
 `groups_pending=true`，重跑会继续收尾，即使后来调大保留月数也会清完已移除统计的月份。
+收尾阶段若另一个清理事务短暂持有分组表排他锁，立即放弃当前批次并返回
+`cleanup_groups_pending`；此时统计已清理，不报告为“该月份保持原样”的前置锁超时。
 
 执行输出的 months 来自 `mpp_cleanup_month`，包含每月状态、原因、构建数、before_bytes、
 after_bytes、released_bytes、两种分组删除行数、起止时间、exclusive_seconds 和 group_seconds。

@@ -106,7 +106,7 @@ def verify(args):
         source=json.loads((args.dump.parent/'complete.json').read_text()),
         source_dump_sha256=sha(args.dump),preservation={},python=sys.version,
         code_sha256={str(p.relative_to(ROOT)):sha(p) for p in [
-            ROOT/'sql_apm/storage/schema.sql',ROOT/'sql_apm/storage/cleanup.py',
+            ROOT/'sql_apm/storage/schema.sql',ROOT/'sql_apm/storage/cleanup.py',ROOT/'sql_apm/baseline/retention.py',
             ROOT/'sql_apm/storage/migrations/1.8.0-to-1.9.0.sql',
             ROOT/'scripts/db/verify_cleanup_full.py',ROOT/'tests/database/retention.py']})
     started=time.monotonic()

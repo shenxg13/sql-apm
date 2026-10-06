@@ -114,7 +114,7 @@ def verify(pg_bin):
             assert all(m['released_bytes']==0 and m['before_bytes']==m['after_bytes'] for m in timed)
             assert elapsed<10*len(timed)+0.5,(kind,elapsed)
             assert contents(db,cleanup=True)==unchanged and digest(db,'mpp_statistic')==old
-            v.require(True,kind+' abandons each month within lock budget and changes no results')
+            v.require(True,kind+' abandons each month within lock budget and changes no results; seconds='+str(round(elapsed,3)))
         preserved=contents(db,cleanup=True)
         other=digest(db,'mpp_statistic',where='WHERE partition_id<>%s',params=(pid,))
         out=CleanupStore(db).execute('C1',2,reference_month=reference)
@@ -144,6 +144,22 @@ def verify(pg_bin):
         assert all(m['released_bytes']==0 for m in out['months'])
         v.init('check');v.init('upgrade');v.init('check')
         v.require(True,'atomic removal, row preservation, history/query distinction, rerun, post-cleanup structure check')
+        pending_pid=clone_build(db,source,'group-timeout','2024-01-01')
+        holder=connect(dsn,'sql_apm')
+        def hold_groups(stage,_):
+            if stage=='partitions_committed':
+                with holder.cursor() as cur:
+                    cur.execute('LOCK TABLE mpp_build_group IN ACCESS EXCLUSIVE MODE')
+        try:
+            pending=CleanupStore(db,fault=hold_groups).execute('C1',2,reference_month=reference)
+            outcome=next(m for m in pending['months'] if m['partition_id']==pending_pid)
+            assert pending['state']=='failed' and outcome['reason']=='cleanup_groups_pending'
+            assert outcome['cleaned_at'] and outcome['released_bytes']>0
+        finally:
+            holder.rollback();holder.close()
+        assert CleanupStore(db).execute('C1',10000)['state']=='succeeded'
+        assert v.sql('SELECT count(*) FROM mpp_build_group WHERE partition_id='+str(pending_pid))=='0'
+        v.require(True,'group-phase lock conflict reports already-removed results; rerun finishes even with increased retention')
         # SIGKILL occurs inside the actual transaction, and between group batches.
         for i,stage in enumerate(('before_partitions','partitions_locked','partitions_dropped',
                                   'partitions_committed','groups_deleting','groups_committed')):

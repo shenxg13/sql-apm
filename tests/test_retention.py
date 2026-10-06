@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from sql_apm.storage.cleanup import expired
+from sql_apm.baseline.retention import expired
 from sql_apm.training.config import TrainingError, validate, retention_months, load_retention, load_config
 
 

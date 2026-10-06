@@ -4,6 +4,7 @@ import time
 from psycopg2 import sql
 from psycopg2.errors import LockNotAvailable, QueryCanceled
 
+from sql_apm.baseline.retention import expired
 from sql_apm.ingestion.config import IngestionError, identity
 from sql_apm.storage.tasks import Task
 
@@ -11,11 +12,6 @@ TABLES = ('mpp_statistic', 'mpp_observation_statistic')
 GROUPS = ('mpp_build_group', 'mpp_build_observation_group')
 LOCK_BUDGET = 10.0
 CHUNK = 10000
-
-
-def expired(month, current, months):
-    """Integer month arithmetic handles cross-year and arbitrarily large N."""
-    return month.year * 12 + month.month < current.year * 12 + current.month - months
 
 
 def _clock(cur, reference_month):
@@ -105,13 +101,16 @@ class CleanupStore:
                          month['total_bytes'],month['total_bytes'],eligible))
                 if not eligible:
                     continue
+                removed = bool(month['cleaned_at'])
                 try:
-                    if not month['cleaned_at']:
+                    if not removed:
                         self._remove_partitions(pid)
+                        removed = True
                     self._point('partitions_committed', pid)
                     self._remove_groups(pid)
                 except (LockNotAvailable, QueryCanceled):
-                    self._failed(pid,'lock_timeout','cleanup_lock_timeout')
+                    self._failed(pid,'failed' if removed else 'lock_timeout',
+                                 'cleanup_groups_pending' if removed else 'cleanup_lock_timeout')
                     task.failure='cleanup_incomplete'
                 except (KeyboardInterrupt, SystemExit):
                     self._failed(pid,'interrupted','operator_interrupt')
@@ -140,7 +139,7 @@ class CleanupStore:
         # Try the entire required lock set without queueing behind active readers
         # or another cluster's build. Failed attempts roll back *all* locks.
         # A single monotonic deadline also bounds any unexpected DDL lock wait.
-        deadline = time.monotonic()+LOCK_BUDGET-0.01
+        deadline = time.monotonic()+LOCK_BUDGET-0.1
         self._point('before_partitions', pid)
         while True:
             remaining = deadline-time.monotonic()
@@ -182,17 +181,25 @@ class CleanupStore:
 
     def _remove_groups(self, pid):
         for table, field in zip(GROUPS,('formal_groups_deleted','observation_groups_deleted')):
+            last_key = ('', '')
             while True:
                 started = time.monotonic()
                 with self.db, self.db.cursor() as cur:
                     # Another cluster's brief DDL must not add an unbounded wait
                     # after statistics were removed. A retry resumes this phase.
                     cur.execute("SET LOCAL lock_timeout='1ms'")
-                    # ctid bounds both selection and deletion, using the existing
-                    # partition-leading primary key and a TidScan for the batch.
-                    cur.execute(sql.SQL('DELETE FROM {} WHERE ctid = ANY(ARRAY(SELECT ctid FROM {} WHERE partition_id=%s LIMIT %s))').format(
-                        sql.Identifier(table),sql.Identifier(table)), (pid,CHUNK))
+                    # Advance along the partition-leading primary key. Repeating
+                    # an unordered LIMIT from the beginning can rescan dead rows
+                    # quadratically before VACUUM. ctid bounds the actual delete.
+                    cur.execute(sql.SQL('''DELETE FROM {} WHERE ctid = ANY(ARRAY(
+                        SELECT ctid FROM {} WHERE partition_id=%s AND (build_id,group_id)>(%s,%s)
+                        ORDER BY build_id,group_id LIMIT %s)) RETURNING build_id,group_id''').format(
+                        sql.Identifier(table),sql.Identifier(table)), (pid,*last_key,CHUNK))
                     count = cur.rowcount
+                    if count:
+                        # Project databases use C collation; UTF-8 key ordering
+                        # matches Python. Memory is bounded by one small batch.
+                        last_key = max(cur.fetchall())
                     self._point('groups_deleting', pid)
                     cur.execute(sql.SQL('''UPDATE mpp_cleanup_month SET {}={}+%s,group_seconds=group_seconds+%s,
                         state='removing_groups',reason='results_cleaned' WHERE task_id=%s AND partition_id=%s''').format(

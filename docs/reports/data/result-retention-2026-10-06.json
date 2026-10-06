@@ -1,0 +1,1512 @@
+{
+  "evidence": "measured",
+  "schema_before": "1.8.0",
+  "schema_after": "1.9.0",
+  "contract_version": "1.0.0",
+  "source": {
+    "base_commit": "f4ef32af9d70ab479d66293dd1e0fd69cf9dc714",
+    "manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+    "tasks": [
+      5,
+      4
+    ],
+    "dump_bytes": 2501915700
+  },
+  "source_dump_sha256": "e507d566a1e10e863b64da081ef4d56065cd948f645cfc63bc6c205b921ac1a2",
+  "preservation": {
+    "upgrade": {
+      "analysis": {
+        "rows": 8,
+        "sha256": "aa44e1f2027ddfa82dae9034132abaffc19049cc0c0af144f6344b272a21fb86"
+      },
+      "analysis_file": {
+        "rows": 55,
+        "sha256": "e9a45a458d4801a3abbd573a0b16e5811d1a7fb2765112deb71dc7bc498d0cd6"
+      },
+      "attempt_problem": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "batch_date": {
+        "rows": 36,
+        "sha256": "7782f334d439284105c252a848e403c82a674cd9795a8f31208fd1b7d40341ad"
+      },
+      "batch_entry": {
+        "rows": 55,
+        "sha256": "00223939ef324bd154a11bdcbe2e89980fe9fa072ddb1af6335eb1ca2c117659"
+      },
+      "build": {
+        "rows": 9,
+        "sha256": "ba37fbf93fba29cbd7b6a7bc8d7da128ada42fc867418320a889d5ee936797f2"
+      },
+      "build_check": {
+        "rows": 54,
+        "sha256": "c00d4b624934e54fbf705060dcfeb99d03f3e5d418b5edb682d7c70453c0bef0"
+      },
+      "config_snapshot": {
+        "rows": 9,
+        "sha256": "b17af51091421732e0649891cc0ff6cd57b572cf2aa89213767c5b477369c21a"
+      },
+      "current_version": {
+        "rows": 2,
+        "sha256": "e41a079c904bac9657dd85ac3ecc4042b0b4a8b69e4a1330df877eae21abd469"
+      },
+      "evidence_record": {
+        "rows": 16390146,
+        "sha256": "4adab07f4b4f4444028a8bf6f03175622f667da160b30ee955f70009e5c86993"
+      },
+      "import_attempt": {
+        "rows": 55,
+        "sha256": "4b2a758ebbf73dbf78cea1b4ebaa01a5950f387db31c8fbc46900bff5b5b2c53"
+      },
+      "import_batch": {
+        "rows": 8,
+        "sha256": "37e54ccad08207ea9bf67347a1f48b5b1066e585a9f17c143e79b4cc0c084e3c"
+      },
+      "input_analysis": {
+        "rows": 24,
+        "sha256": "23b0785d92b5b941b1e2d47653fae67c36547e60d61e35da6dd97dbe0badd445"
+      },
+      "input_batch": {
+        "rows": 24,
+        "sha256": "cfa6da8881da855447a6978120c5c823784fd02a8af3a0267ee57ba734fec4bf"
+      },
+      "input_file": {
+        "rows": 219,
+        "sha256": "ff2f59a085b105c72a187dd1ff4b18945ef7184c68659a113cb6b6c1f1166a6f"
+      },
+      "input_file_analysis": {
+        "rows": 219,
+        "sha256": "cf1921edd68f1ce748451d31f1a06f72833f876024e510d75aa64dbe09c03a52"
+      },
+      "input_manifest": {
+        "rows": 9,
+        "sha256": "63b3f7a2cacdbbd4e3846e31c292879fbf1221c2007c806edb31449f4c89d11c"
+      },
+      "input_snapshot": {
+        "rows": 9,
+        "sha256": "7f4accc00670bb04a9e67e8f71de5d7d1144aff4a4e90e76491125adca6a0f6f"
+      },
+      "mpp_approximate_evidence": {
+        "rows": 104362,
+        "sha256": "f567e708733ea7cb11afe3bdc65dba02cb5c327b2cef66318988c5400844ba00"
+      },
+      "mpp_approximate_input": {
+        "rows": 10517,
+        "sha256": "efedf273a784088105a6abfef59228918df63098b3fc3b8470f41fe3684dd0fc"
+      },
+      "mpp_approximate_result": {
+        "rows": 10517,
+        "sha256": "ac902e87a0fe08c77420a5486a615d00a2901fc444c7c848ed0602d93f8dbb66"
+      },
+      "mpp_approximate_rule": {
+        "rows": 1,
+        "sha256": "e2730ed375df7c9ef896182498dba6950522b6c3f0ddd5c42a34b009b9df2b9e"
+      },
+      "mpp_baseline_group": {
+        "rows": 930187,
+        "sha256": "d9410167bb28d244d76812addad2743713c80b5d5925a0e63c66b0738e2ace8b"
+      },
+      "mpp_build_group": {
+        "rows": 2829361,
+        "sha256": "09c5de0e94f711843c03a34574f8454ec05e350c592e2919e99d13685572773d"
+      },
+      "mpp_build_layer_count": {
+        "rows": 90,
+        "sha256": "663952c42ed1b32d1325460b5716806767ec8ce8b205ce9ca7a5b157f811b1e3"
+      },
+      "mpp_build_observation_group": {
+        "rows": 3529,
+        "sha256": "6276b2e35101d21ff2b18cda47c608ded49dde7ed8b09b4e54431ceaa8d9d219"
+      },
+      "mpp_build_timing_coverage": {
+        "rows": 45,
+        "sha256": "eeb0ff7368dbe1f951e73db92d04da6a8673fd86285f1b893a66acfa0e888f4e"
+      },
+      "mpp_decision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_decision_reason": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_decision_reason_evidence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_fingerprint": {
+        "rows": 1385776,
+        "sha256": "59768b80fe1a9233b6e91bd53e347f924afdc5700789f1065d828cfee1629c29"
+      },
+      "mpp_input_occurrence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_normalization": {
+        "rows": 1,
+        "sha256": "e3f726ce7dfd7fe36561c5ff89b339371236c66ea6523c48cb33a36090b93b41"
+      },
+      "mpp_observation_group": {
+        "rows": 1074,
+        "sha256": "3c285121b4f54f8a042a4b0a4896190a888e5acd770dfbb4f0aa469a6ba3c6c2"
+      },
+      "mpp_observation_statistic": {
+        "rows": 22530,
+        "sha256": "55f192e34820cbe8049a11280944564efe6d4010fbddad993776c012902629e3"
+      },
+      "mpp_occurrence": {
+        "rows": 7424804,
+        "sha256": "a9c76df81dcfc16e3d1f0627e3a61028e7c4a5c4468a417f7982d69e45d03657"
+      },
+      "mpp_occurrence_approximate": {
+        "rows": 92059,
+        "sha256": "e9d2d788c85aa92a63e10276f2fd96464db1d7a2e47c8f5cc7c1f2284f736422"
+      },
+      "mpp_occurrence_evidence": {
+        "rows": 1448320,
+        "sha256": "2f29c2784602b80533089924aa01501122ec10729721ad41e2b35749c34de406"
+      },
+      "mpp_result_partition": {
+        "rows": 4,
+        "sha256": "c231f4a40881bb817b72f3d5f54b8abf1c1276200235b4b330714ab3cc489650"
+      },
+      "mpp_sql_text": {
+        "rows": 1385776,
+        "sha256": "99aaf2dcb1de15f9805d6828b4971c06aa0c7e4799b8bb9dcdab6089ec7ecc43"
+      },
+      "mpp_sql_text_evidence": {
+        "rows": 7407688,
+        "sha256": "23a1f7f7e817841ff8e7c7290816880dd7de26341ff841d9540c470f44ce6af2"
+      },
+      "mpp_statistic": {
+        "rows": 20044674,
+        "sha256": "e01f6bbc04d2bf801dc42fe240eafa8213f696b6f0dfc2bcde5290eb024347b3"
+      },
+      "mpp_training_rule": {
+        "rows": 1,
+        "sha256": "ccc051d8aefc4449090cea51d3fe645a52ddd1b98a3b2e02cea06b861af84a8e"
+      },
+      "mpp_training_sql": {
+        "rows": 1384227,
+        "sha256": "c0d61151329df8e76e3252f9a17e255b1bbac95d9be7fc55f419999677beac8c"
+      },
+      "problem": {
+        "rows": 517900,
+        "sha256": "452d6b9b16f40827875e766a390504c31a453d52b5ebddd5677ba3947d44563c"
+      },
+      "problem_evidence": {
+        "rows": 517900,
+        "sha256": "2043e1714978d74e6c9f4b98123f6b78a22a9196f52cb91947f5cdbc61fde9a6"
+      },
+      "publication": {
+        "rows": 9,
+        "sha256": "6a1174f6aea6a7ccbf066e2b03530b0fe541ae1fb3fc8849d2ed86fd6d683b27"
+      },
+      "scope": {
+        "rows": 2,
+        "sha256": "1eabd43c6f33463537f8da480987fd87a573ac0c4309dc20094d664606d0611c"
+      },
+      "source": {
+        "rows": 2,
+        "sha256": "0ad420f49af4f86546aa90f5dacf48c399de6963553edff4f9cd37dff434a9b7"
+      },
+      "source_file": {
+        "rows": 55,
+        "sha256": "c1169ca1442411c528fe1b2ac6b53cfe3994bb765d8619d07de71e05fd0d73de"
+      },
+      "task": {
+        "rows": 9,
+        "sha256": "8131d404b68266f35fe04f9732df77e7bffb381fcca4d3f7d3d939d83f836a9d"
+      },
+      "task_batch": {
+        "rows": 8,
+        "sha256": "7469b45a737d2a8842339c3bc54f6cd0412dc03ce9b2587e45b0d39c3c5cbbba"
+      },
+      "task_build": {
+        "rows": 9,
+        "sha256": "a23a664c85e2f7bb9bcc072d1937bd82f8f87d70896564274e1ff347b8556793"
+      },
+      "task_publication": {
+        "rows": 9,
+        "sha256": "fead347cdaa55a476928d53bf8f222ea3bb184080478ab1d5712573eefa1e4e1"
+      },
+      "training_config": {
+        "rows": 9,
+        "sha256": "351923744ee868afb482419e17ff9d55207eeb3458a3949c0e99a10c31f017cb"
+      }
+    },
+    "cleanup": {
+      "analysis": {
+        "rows": 8,
+        "sha256": "aa44e1f2027ddfa82dae9034132abaffc19049cc0c0af144f6344b272a21fb86"
+      },
+      "analysis_file": {
+        "rows": 55,
+        "sha256": "e9a45a458d4801a3abbd573a0b16e5811d1a7fb2765112deb71dc7bc498d0cd6"
+      },
+      "attempt_problem": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "batch_date": {
+        "rows": 36,
+        "sha256": "7782f334d439284105c252a848e403c82a674cd9795a8f31208fd1b7d40341ad"
+      },
+      "batch_entry": {
+        "rows": 55,
+        "sha256": "00223939ef324bd154a11bdcbe2e89980fe9fa072ddb1af6335eb1ca2c117659"
+      },
+      "build": {
+        "rows": 9,
+        "sha256": "69320d176a6b37d89a4f5b14f91fc2d306022e1d638061317d4783f66c514fe1"
+      },
+      "build_check": {
+        "rows": 54,
+        "sha256": "c00d4b624934e54fbf705060dcfeb99d03f3e5d418b5edb682d7c70453c0bef0"
+      },
+      "config_snapshot": {
+        "rows": 9,
+        "sha256": "b17af51091421732e0649891cc0ff6cd57b572cf2aa89213767c5b477369c21a"
+      },
+      "current_version": {
+        "rows": 2,
+        "sha256": "e41a079c904bac9657dd85ac3ecc4042b0b4a8b69e4a1330df877eae21abd469"
+      },
+      "evidence_record": {
+        "rows": 16390146,
+        "sha256": "4adab07f4b4f4444028a8bf6f03175622f667da160b30ee955f70009e5c86993"
+      },
+      "import_attempt": {
+        "rows": 55,
+        "sha256": "4b2a758ebbf73dbf78cea1b4ebaa01a5950f387db31c8fbc46900bff5b5b2c53"
+      },
+      "import_batch": {
+        "rows": 8,
+        "sha256": "37e54ccad08207ea9bf67347a1f48b5b1066e585a9f17c143e79b4cc0c084e3c"
+      },
+      "input_analysis": {
+        "rows": 24,
+        "sha256": "23b0785d92b5b941b1e2d47653fae67c36547e60d61e35da6dd97dbe0badd445"
+      },
+      "input_batch": {
+        "rows": 24,
+        "sha256": "cfa6da8881da855447a6978120c5c823784fd02a8af3a0267ee57ba734fec4bf"
+      },
+      "input_file": {
+        "rows": 219,
+        "sha256": "ff2f59a085b105c72a187dd1ff4b18945ef7184c68659a113cb6b6c1f1166a6f"
+      },
+      "input_file_analysis": {
+        "rows": 219,
+        "sha256": "cf1921edd68f1ce748451d31f1a06f72833f876024e510d75aa64dbe09c03a52"
+      },
+      "input_manifest": {
+        "rows": 9,
+        "sha256": "63b3f7a2cacdbbd4e3846e31c292879fbf1221c2007c806edb31449f4c89d11c"
+      },
+      "input_snapshot": {
+        "rows": 9,
+        "sha256": "7f4accc00670bb04a9e67e8f71de5d7d1144aff4a4e90e76491125adca6a0f6f"
+      },
+      "mpp_approximate_evidence": {
+        "rows": 104362,
+        "sha256": "f567e708733ea7cb11afe3bdc65dba02cb5c327b2cef66318988c5400844ba00"
+      },
+      "mpp_approximate_input": {
+        "rows": 10517,
+        "sha256": "efedf273a784088105a6abfef59228918df63098b3fc3b8470f41fe3684dd0fc"
+      },
+      "mpp_approximate_result": {
+        "rows": 10517,
+        "sha256": "ac902e87a0fe08c77420a5486a615d00a2901fc444c7c848ed0602d93f8dbb66"
+      },
+      "mpp_approximate_rule": {
+        "rows": 1,
+        "sha256": "e2730ed375df7c9ef896182498dba6950522b6c3f0ddd5c42a34b009b9df2b9e"
+      },
+      "mpp_baseline_group": {
+        "rows": 930187,
+        "sha256": "d9410167bb28d244d76812addad2743713c80b5d5925a0e63c66b0738e2ace8b"
+      },
+      "mpp_build_layer_count": {
+        "rows": 90,
+        "sha256": "663952c42ed1b32d1325460b5716806767ec8ce8b205ce9ca7a5b157f811b1e3"
+      },
+      "mpp_build_timing_coverage": {
+        "rows": 45,
+        "sha256": "eeb0ff7368dbe1f951e73db92d04da6a8673fd86285f1b893a66acfa0e888f4e"
+      },
+      "mpp_decision": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_decision_reason": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_decision_reason_evidence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_fingerprint": {
+        "rows": 1385776,
+        "sha256": "59768b80fe1a9233b6e91bd53e347f924afdc5700789f1065d828cfee1629c29"
+      },
+      "mpp_input_occurrence": {
+        "rows": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "mpp_normalization": {
+        "rows": 1,
+        "sha256": "e3f726ce7dfd7fe36561c5ff89b339371236c66ea6523c48cb33a36090b93b41"
+      },
+      "mpp_observation_group": {
+        "rows": 1074,
+        "sha256": "3c285121b4f54f8a042a4b0a4896190a888e5acd770dfbb4f0aa469a6ba3c6c2"
+      },
+      "mpp_occurrence": {
+        "rows": 7424804,
+        "sha256": "a9c76df81dcfc16e3d1f0627e3a61028e7c4a5c4468a417f7982d69e45d03657"
+      },
+      "mpp_occurrence_approximate": {
+        "rows": 92059,
+        "sha256": "e9d2d788c85aa92a63e10276f2fd96464db1d7a2e47c8f5cc7c1f2284f736422"
+      },
+      "mpp_occurrence_evidence": {
+        "rows": 1448320,
+        "sha256": "2f29c2784602b80533089924aa01501122ec10729721ad41e2b35749c34de406"
+      },
+      "mpp_result_partition": {
+        "rows": 5,
+        "sha256": "e30fd5212e9d9be42de97fc77bbf9b38b514d68879c78d04f855ea5b0791f469"
+      },
+      "mpp_sql_text": {
+        "rows": 1385776,
+        "sha256": "99aaf2dcb1de15f9805d6828b4971c06aa0c7e4799b8bb9dcdab6089ec7ecc43"
+      },
+      "mpp_sql_text_evidence": {
+        "rows": 7407688,
+        "sha256": "23a1f7f7e817841ff8e7c7290816880dd7de26341ff841d9540c470f44ce6af2"
+      },
+      "mpp_training_rule": {
+        "rows": 1,
+        "sha256": "ccc051d8aefc4449090cea51d3fe645a52ddd1b98a3b2e02cea06b861af84a8e"
+      },
+      "mpp_training_sql": {
+        "rows": 1384227,
+        "sha256": "c0d61151329df8e76e3252f9a17e255b1bbac95d9be7fc55f419999677beac8c"
+      },
+      "problem": {
+        "rows": 517900,
+        "sha256": "452d6b9b16f40827875e766a390504c31a453d52b5ebddd5677ba3947d44563c"
+      },
+      "problem_evidence": {
+        "rows": 517900,
+        "sha256": "2043e1714978d74e6c9f4b98123f6b78a22a9196f52cb91947f5cdbc61fde9a6"
+      },
+      "publication": {
+        "rows": 9,
+        "sha256": "6a1174f6aea6a7ccbf066e2b03530b0fe541ae1fb3fc8849d2ed86fd6d683b27"
+      },
+      "scope": {
+        "rows": 2,
+        "sha256": "1eabd43c6f33463537f8da480987fd87a573ac0c4309dc20094d664606d0611c"
+      },
+      "source": {
+        "rows": 2,
+        "sha256": "0ad420f49af4f86546aa90f5dacf48c399de6963553edff4f9cd37dff434a9b7"
+      },
+      "source_file": {
+        "rows": 55,
+        "sha256": "c1169ca1442411c528fe1b2ac6b53cfe3994bb765d8619d07de71e05fd0d73de"
+      },
+      "task_batch": {
+        "rows": 8,
+        "sha256": "7469b45a737d2a8842339c3bc54f6cd0412dc03ce9b2587e45b0d39c3c5cbbba"
+      },
+      "task_build": {
+        "rows": 9,
+        "sha256": "a23a664c85e2f7bb9bcc072d1937bd82f8f87d70896564274e1ff347b8556793"
+      },
+      "task_publication": {
+        "rows": 9,
+        "sha256": "fead347cdaa55a476928d53bf8f222ea3bb184080478ab1d5712573eefa1e4e1"
+      },
+      "training_config": {
+        "rows": 9,
+        "sha256": "351923744ee868afb482419e17ff9d55207eeb3458a3949c0e99a10c31f017cb"
+      }
+    },
+    "untouched_results": {
+      "mpp_statistic": {
+        "rows": 8501139,
+        "sha256": "b7eec5c748f3d102b57f741367278e2d514e2742ca0864ed115ee91b4945df2c"
+      },
+      "mpp_observation_statistic": {
+        "rows": 7619,
+        "sha256": "ff816c5b9ee27dfbe4db1cbd5009e43a22a00cbec1106c03518bed5ca2a010a6"
+      },
+      "mpp_build_group": {
+        "rows": 1140269,
+        "sha256": "1cf9dc98bf4240a752b597b92827b13faf6b4c8bc6be60452d0a4ef1e1ee7588"
+      },
+      "mpp_build_observation_group": {
+        "rows": 1190,
+        "sha256": "8dee0bdc9f7db23b22968b6739b639b8010d8e5e6671e7eedb42720ac467685b"
+      }
+    }
+  },
+  "python": "3.9.5 (default, Sep 25 2026, 21:33:50) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+  "code_sha256": {
+    "sql_apm/storage/schema.sql": "9ac4648732cf8d002a52f464017ee241efa2d2095025b60d3f3256a996283597",
+    "sql_apm/storage/cleanup.py": "043449892e2d4c3cf8bb39b8e90a17e0c4d70af7ebc59c69a9343637ea563041",
+    "sql_apm/baseline/retention.py": "82e556c53ca05a3a4329b3c9c06d50e2c78e0e3154f2eb10047af953b198281a",
+    "sql_apm/storage/migrations/1.8.0-to-1.9.0.sql": "5b696dc9c91e408193236f630186b57be03684c4229e24dc764559697bb3bd01",
+    "scripts/db/verify_cleanup_full.py": "29017bf17ea6981fce7d16b69a2194d30c2c8e95437070288d057ab22413edb1",
+    "tests/database/retention.py": "58606c74c06ff2480606e2399adbd944ccab7581e31bc79976611e763b2bef51"
+  },
+  "postgresql": "17.10",
+  "upgrade_seconds": 0.8351815519999946,
+  "fixture": {
+    "build_id": "B:20261006T200827:dce27eb0b9a64e1e8d61f7bac0cfc947",
+    "build_month": "2027-11-01",
+    "partition_id": 790239868297632383,
+    "result_rows": {
+      "mpp_build_group": {
+        "rows": 873957,
+        "sha256": "88b9db93e4fc1f2cf8e7a3c158aa27356bafa252bd01fdd09ea0e16dd070e1eb"
+      },
+      "mpp_build_observation_group": {
+        "rows": 1043,
+        "sha256": "3a8d500a1fe1934f18e09cb3ce852b7afe7ffc56c560a364072676d6c0b417d6"
+      },
+      "mpp_statistic": {
+        "rows": 5850925,
+        "sha256": "4f199e9021b1720f8871efc5ec283dd9320fbefd79d1388d759c7b279f73c134"
+      },
+      "mpp_observation_statistic": {
+        "rows": 6748,
+        "sha256": "adf40e6f8f27d996d020e3fd7fc00b1184495e08cfb5deefec7329a326032c46"
+      }
+    }
+  },
+  "fixture_seconds": 444.0686171109992,
+  "preview": {
+    "119": {
+      "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+      "retention_months": 2,
+      "current_month": "2027-11-01",
+      "current_version_month": "2026-10-01",
+      "expired_months": 2,
+      "months": [
+        {
+          "partition_id": 594693963537055769,
+          "build_month": "2026-10-01",
+          "state": "protected",
+          "reason": "current_version_month",
+          "published_builds": 5,
+          "unpublished_builds": 0,
+          "statistic_bytes": 1908555776,
+          "observation_bytes": 843776,
+          "total_bytes": 1909399552,
+          "cleaned_at": null,
+          "groups_pending": false
+        },
+        {
+          "partition_id": 1104237901969524100,
+          "build_month": "2026-11-01",
+          "state": "expired",
+          "reason": "retention_expired",
+          "published_builds": 0,
+          "unpublished_builds": 0,
+          "statistic_bytes": 24576,
+          "observation_bytes": 24576,
+          "total_bytes": 49152,
+          "cleaned_at": null,
+          "groups_pending": false
+        }
+      ]
+    },
+    "120": {
+      "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+      "retention_months": 2,
+      "current_month": "2027-11-01",
+      "current_version_month": "2027-11-01",
+      "expired_months": 2,
+      "months": [
+        {
+          "partition_id": 974329813721629853,
+          "build_month": "2026-10-01",
+          "state": "expired",
+          "reason": "retention_expired",
+          "published_builds": 3,
+          "unpublished_builds": 0,
+          "statistic_bytes": 12846104576,
+          "observation_bytes": 13918208,
+          "total_bytes": 12860022784,
+          "cleaned_at": null,
+          "groups_pending": false
+        },
+        {
+          "partition_id": 456575920272075899,
+          "build_month": "2026-11-01",
+          "state": "expired",
+          "reason": "retention_expired",
+          "published_builds": 0,
+          "unpublished_builds": 0,
+          "statistic_bytes": 24576,
+          "observation_bytes": 24576,
+          "total_bytes": 49152,
+          "cleaned_at": null,
+          "groups_pending": false
+        },
+        {
+          "partition_id": 790239868297632383,
+          "build_month": "2027-11-01",
+          "state": "retained",
+          "reason": "within_retention",
+          "published_builds": 1,
+          "unpublished_builds": 0,
+          "statistic_bytes": 5641814016,
+          "observation_bytes": 6815744,
+          "total_bytes": 5648629760,
+          "cleaned_at": null,
+          "groups_pending": false
+        }
+      ]
+    }
+  },
+  "runs": {
+    "119": {
+      "seconds": 0.06197103099839296,
+      "result": {
+        "state": "succeeded",
+        "reason": null,
+        "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+        "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+        "retention_months": 2,
+        "current_month": "2027-11-01",
+        "current_version_month": "2026-10-01",
+        "months": [
+          {
+            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "partition_id": 594693963537055769,
+            "state": "protected",
+            "reason": "current_version_month",
+            "published_builds": 5,
+            "unpublished_builds": 0,
+            "before_bytes": 1909399552,
+            "after_bytes": 1909399552,
+            "released_bytes": 0,
+            "formal_groups_deleted": 0,
+            "observation_groups_deleted": 0,
+            "started_at": "2026-10-06 21:18:24.974677+08:00",
+            "finished_at": "2026-10-06 21:18:24.974677+08:00",
+            "exclusive_seconds": 0.0,
+            "group_seconds": 0.0,
+            "build_month": "2026-10-01",
+            "cleaned_at": null
+          },
+          {
+            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "partition_id": 1104237901969524100,
+            "state": "succeeded",
+            "reason": "results_cleaned",
+            "published_builds": 0,
+            "unpublished_builds": 0,
+            "before_bytes": 49152,
+            "after_bytes": 0,
+            "released_bytes": 49152,
+            "formal_groups_deleted": 0,
+            "observation_groups_deleted": 0,
+            "started_at": "2026-10-06 21:18:24.977086+08:00",
+            "finished_at": "2026-10-06 21:18:25.015418+08:00",
+            "exclusive_seconds": 0.01816668799438048,
+            "group_seconds": 0.0018366190051892772,
+            "build_month": "2026-11-01",
+            "cleaned_at": "2026-10-06 21:18:25.002652+08:00"
+          }
+        ]
+      },
+      "attempts": [
+        {
+          "seconds": 0.06168903099023737,
+          "result": {
+            "state": "succeeded",
+            "reason": null,
+            "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+            "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2026-10-01",
+            "months": [
+              {
+                "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+                "partition_id": 594693963537055769,
+                "state": "protected",
+                "reason": "current_version_month",
+                "published_builds": 5,
+                "unpublished_builds": 0,
+                "before_bytes": 1909399552,
+                "after_bytes": 1909399552,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:24.974677+08:00",
+                "finished_at": "2026-10-06 21:18:24.974677+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:f5762b9ef3464819ae5bf195a0eac490",
+                "partition_id": 1104237901969524100,
+                "state": "succeeded",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 49152,
+                "after_bytes": 0,
+                "released_bytes": 49152,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:24.977086+08:00",
+                "finished_at": "2026-10-06 21:18:25.015418+08:00",
+                "exclusive_seconds": 0.01816668799438048,
+                "group_seconds": 0.0018366190051892772,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:25.002652+08:00"
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 1104237901969524100,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "120": {
+      "seconds": 61.32916582199687,
+      "result": {
+        "state": "succeeded",
+        "reason": null,
+        "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+        "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+        "retention_months": 2,
+        "current_month": "2027-11-01",
+        "current_version_month": "2027-11-01",
+        "months": [
+          {
+            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "partition_id": 974329813721629853,
+            "state": "succeeded",
+            "reason": "results_cleaned",
+            "published_builds": 3,
+            "unpublished_builds": 0,
+            "before_bytes": 12619046912,
+            "after_bytes": 0,
+            "released_bytes": 12619046912,
+            "formal_groups_deleted": 1689092,
+            "observation_groups_deleted": 2339,
+            "started_at": "2026-10-06 21:19:06.764432+08:00",
+            "finished_at": "2026-10-06 21:19:26.342594+08:00",
+            "exclusive_seconds": 0.30717085099604446,
+            "group_seconds": 16.99770449004427,
+            "build_month": "2026-10-01",
+            "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+          },
+          {
+            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "partition_id": 456575920272075899,
+            "state": "already_cleaned",
+            "reason": "results_cleaned",
+            "published_builds": 0,
+            "unpublished_builds": 0,
+            "before_bytes": 0,
+            "after_bytes": 0,
+            "released_bytes": 0,
+            "formal_groups_deleted": 0,
+            "observation_groups_deleted": 0,
+            "started_at": "2026-10-06 21:19:26.344814+08:00",
+            "finished_at": "2026-10-06 21:19:26.344814+08:00",
+            "exclusive_seconds": 0.0,
+            "group_seconds": 0.0,
+            "build_month": "2026-11-01",
+            "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+          },
+          {
+            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "partition_id": 790239868297632383,
+            "state": "retained",
+            "reason": "within_retention",
+            "published_builds": 1,
+            "unpublished_builds": 0,
+            "before_bytes": 5648629760,
+            "after_bytes": 5648629760,
+            "released_bytes": 0,
+            "formal_groups_deleted": 0,
+            "observation_groups_deleted": 0,
+            "started_at": "2026-10-06 21:19:26.346925+08:00",
+            "finished_at": "2026-10-06 21:19:26.346925+08:00",
+            "exclusive_seconds": 0.0,
+            "group_seconds": 0.0,
+            "build_month": "2027-11-01",
+            "cleaned_at": null
+          }
+        ]
+      },
+      "attempts": [
+        {
+          "seconds": 9.938795555004617,
+          "result": {
+            "state": "failed",
+            "reason": "cleanup_incomplete",
+            "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "partition_id": 974329813721629853,
+                "state": "lock_timeout",
+                "reason": "cleanup_lock_timeout",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12860022784,
+                "after_bytes": 12860022784,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:25.028420+08:00",
+                "finished_at": "2026-10-06 21:18:34.931205+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "partition_id": 456575920272075899,
+                "state": "succeeded",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 49152,
+                "after_bytes": 0,
+                "released_bytes": 49152,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:34.933820+08:00",
+                "finished_at": "2026-10-06 21:18:34.954087+08:00",
+                "exclusive_seconds": 0.01021564299298916,
+                "group_seconds": 0.0008695599972270429,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+              },
+              {
+                "task_id": "T:7d2af84691f84ce6aa43edb2e055bb95",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:34.956454+08:00",
+                "finished_at": "2026-10-06 21:18:34.956454+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            },
+            {
+              "partition_id": 456575920272075899,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seconds": 9.919076745994971,
+          "result": {
+            "state": "failed",
+            "reason": "cleanup_incomplete",
+            "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "partition_id": 974329813721629853,
+                "state": "lock_timeout",
+                "reason": "cleanup_lock_timeout",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12860022784,
+                "after_bytes": 12860022784,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:35.469976+08:00",
+                "finished_at": "2026-10-06 21:18:45.372630+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "partition_id": 456575920272075899,
+                "state": "already_cleaned",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 0,
+                "after_bytes": 0,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:45.375110+08:00",
+                "finished_at": "2026-10-06 21:18:45.375110+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+              },
+              {
+                "task_id": "T:c243f25f92c64247a875a6ccf25247c1",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:45.377268+08:00",
+                "finished_at": "2026-10-06 21:18:45.377268+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seconds": 9.920913497000583,
+          "result": {
+            "state": "failed",
+            "reason": "cleanup_incomplete",
+            "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "partition_id": 974329813721629853,
+                "state": "lock_timeout",
+                "reason": "cleanup_lock_timeout",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12860022784,
+                "after_bytes": 12860022784,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:45.890076+08:00",
+                "finished_at": "2026-10-06 21:18:55.792480+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "partition_id": 456575920272075899,
+                "state": "already_cleaned",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 0,
+                "after_bytes": 0,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:55.796707+08:00",
+                "finished_at": "2026-10-06 21:18:55.796707+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+              },
+              {
+                "task_id": "T:d6549c1c9d89467ba809a218b9c9ba2e",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:55.798813+08:00",
+                "finished_at": "2026-10-06 21:18:55.798813+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seconds": 9.92015525100578,
+          "result": {
+            "state": "failed",
+            "reason": "cleanup_incomplete",
+            "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "partition_id": 974329813721629853,
+                "state": "lock_timeout",
+                "reason": "cleanup_lock_timeout",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12860022784,
+                "after_bytes": 12860022784,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:18:56.312663+08:00",
+                "finished_at": "2026-10-06 21:19:06.215022+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-10-01",
+                "cleaned_at": null
+              },
+              {
+                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "partition_id": 456575920272075899,
+                "state": "already_cleaned",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 0,
+                "after_bytes": 0,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:19:06.217743+08:00",
+                "finished_at": "2026-10-06 21:19:06.217743+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+              },
+              {
+                "task_id": "T:07cbfc5f3e914a06bdcd0b83fbe0c116",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:19:06.220333+08:00",
+                "finished_at": "2026-10-06 21:19:06.220333+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "seconds": 19.624391503995867,
+          "result": {
+            "state": "succeeded",
+            "reason": null,
+            "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+            "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+            "retention_months": 2,
+            "current_month": "2027-11-01",
+            "current_version_month": "2027-11-01",
+            "months": [
+              {
+                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "partition_id": 974329813721629853,
+                "state": "succeeded",
+                "reason": "results_cleaned",
+                "published_builds": 3,
+                "unpublished_builds": 0,
+                "before_bytes": 12619046912,
+                "after_bytes": 0,
+                "released_bytes": 12619046912,
+                "formal_groups_deleted": 1689092,
+                "observation_groups_deleted": 2339,
+                "started_at": "2026-10-06 21:19:06.764432+08:00",
+                "finished_at": "2026-10-06 21:19:26.342594+08:00",
+                "exclusive_seconds": 0.30717085099604446,
+                "group_seconds": 16.99770449004427,
+                "build_month": "2026-10-01",
+                "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+              },
+              {
+                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "partition_id": 456575920272075899,
+                "state": "already_cleaned",
+                "reason": "results_cleaned",
+                "published_builds": 0,
+                "unpublished_builds": 0,
+                "before_bytes": 0,
+                "after_bytes": 0,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:19:26.344814+08:00",
+                "finished_at": "2026-10-06 21:19:26.344814+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2026-11-01",
+                "cleaned_at": "2026-10-06 21:18:34.944143+08:00"
+              },
+              {
+                "task_id": "T:12eedec3ef5f48ebaae5c0e1a9bb34b1",
+                "partition_id": 790239868297632383,
+                "state": "retained",
+                "reason": "within_retention",
+                "published_builds": 1,
+                "unpublished_builds": 0,
+                "before_bytes": 5648629760,
+                "after_bytes": 5648629760,
+                "released_bytes": 0,
+                "formal_groups_deleted": 0,
+                "observation_groups_deleted": 0,
+                "started_at": "2026-10-06 21:19:26.346925+08:00",
+                "finished_at": "2026-10-06 21:19:26.346925+08:00",
+                "exclusive_seconds": 0.0,
+                "group_seconds": 0.0,
+                "build_month": "2027-11-01",
+                "cleaned_at": null
+              }
+            ]
+          },
+          "locks_before": [
+            {
+              "partition_id": 974329813721629853,
+              "holders": [
+                {
+                  "relation": "mpp_statistic_p974329813721629853",
+                  "mode": "ShareUpdateExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p974329813721629853_group_id_build_id_layer_idx",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                },
+                {
+                  "relation": "mpp_statistic_p97432981372162_partition_id_build_id_group_i_key",
+                  "mode": "RowExclusiveLock",
+                  "granted": true,
+                  "backend_type": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "after": {
+    "119": {
+      "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+      "retention_months": 2,
+      "current_month": "2027-11-01",
+      "current_version_month": "2026-10-01",
+      "expired_months": 1,
+      "months": [
+        {
+          "partition_id": 594693963537055769,
+          "build_month": "2026-10-01",
+          "state": "protected",
+          "reason": "current_version_month",
+          "published_builds": 5,
+          "unpublished_builds": 0,
+          "statistic_bytes": 1908555776,
+          "observation_bytes": 843776,
+          "total_bytes": 1909399552,
+          "cleaned_at": null,
+          "groups_pending": false
+        },
+        {
+          "partition_id": 1104237901969524100,
+          "build_month": "2026-11-01",
+          "state": "cleaned",
+          "reason": "results_cleaned",
+          "published_builds": 0,
+          "unpublished_builds": 0,
+          "statistic_bytes": 0,
+          "observation_bytes": 0,
+          "total_bytes": 0,
+          "cleaned_at": "2026-10-06 21:18:25.002652+08:00",
+          "groups_pending": false
+        }
+      ]
+    },
+    "120": {
+      "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+      "retention_months": 2,
+      "current_month": "2027-11-01",
+      "current_version_month": "2027-11-01",
+      "expired_months": 0,
+      "months": [
+        {
+          "partition_id": 974329813721629853,
+          "build_month": "2026-10-01",
+          "state": "cleaned",
+          "reason": "results_cleaned",
+          "published_builds": 3,
+          "unpublished_builds": 0,
+          "statistic_bytes": 0,
+          "observation_bytes": 0,
+          "total_bytes": 0,
+          "cleaned_at": "2026-10-06 21:19:08.398602+08:00",
+          "groups_pending": false
+        },
+        {
+          "partition_id": 456575920272075899,
+          "build_month": "2026-11-01",
+          "state": "cleaned",
+          "reason": "results_cleaned",
+          "published_builds": 0,
+          "unpublished_builds": 0,
+          "statistic_bytes": 0,
+          "observation_bytes": 0,
+          "total_bytes": 0,
+          "cleaned_at": "2026-10-06 21:18:34.944143+08:00",
+          "groups_pending": false
+        },
+        {
+          "partition_id": 790239868297632383,
+          "build_month": "2027-11-01",
+          "state": "retained",
+          "reason": "within_retention",
+          "published_builds": 1,
+          "unpublished_builds": 0,
+          "statistic_bytes": 5641814016,
+          "observation_bytes": 6815744,
+          "total_bytes": 5648629760,
+          "cleaned_at": null,
+          "groups_pending": false
+        }
+      ]
+    }
+  },
+  "history": {
+    "119": {
+      "versions": [
+        {
+          "publication_id": "PUB:e30997276dc042eeb84eb4f7408f7bee",
+          "build_id": "B:20261006T193114:ef9e3e8811684363b22fca1a79f22e2a",
+          "previous_build_id": "B:20261006T192904:a76ac61b319145938041c0caa496336e",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:32:56.164880+08:00",
+          "cutoff_date": "2026-07-31",
+          "window_start": "2026-07-02 00:00:00+08:00",
+          "window_end": "2026-08-01 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        },
+        {
+          "publication_id": "PUB:f0ea2a98bc7a4a1baafa23ab2202c69f",
+          "build_id": "B:20261006T192904:a76ac61b319145938041c0caa496336e",
+          "previous_build_id": "B:20261006T192546:3682ec7b133444e89779c5cd931a9bcd",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:31:08.424854+08:00",
+          "cutoff_date": "2026-07-31",
+          "window_start": "2026-07-02 00:00:00+08:00",
+          "window_end": "2026-08-01 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        },
+        {
+          "publication_id": "PUB:52d6bf212b634bbd85d1bc615a7141ef",
+          "build_id": "B:20261006T192546:3682ec7b133444e89779c5cd931a9bcd",
+          "previous_build_id": "B:20261006T192229:770e1f847a2d48e5a1a03d2531c82f19",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:28:15.087137+08:00",
+          "cutoff_date": "2026-07-30",
+          "window_start": "2026-07-01 00:00:00+08:00",
+          "window_end": "2026-07-31 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        },
+        {
+          "publication_id": "PUB:68bc3be2240c484c9e62277e8558fe3d",
+          "build_id": "B:20261006T192229:770e1f847a2d48e5a1a03d2531c82f19",
+          "previous_build_id": "B:20261006T191907:a4df2b55a33e442fb80431be731321e2",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:25:02.338794+08:00",
+          "cutoff_date": "2026-07-29",
+          "window_start": "2026-06-30 00:00:00+08:00",
+          "window_end": "2026-07-30 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        },
+        {
+          "publication_id": "PUB:cb9a1a5d811f4fb1a3c371231bf1a8cc",
+          "build_id": "B:20261006T191907:a4df2b55a33e442fb80431be731321e2",
+          "previous_build_id": null,
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:21:44.599281+08:00",
+          "cutoff_date": "2026-07-28",
+          "window_start": "2026-06-29 00:00:00+08:00",
+          "window_end": "2026-07-29 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        }
+      ]
+    },
+    "120": {
+      "versions": [
+        {
+          "publication_id": "PUB:29b8da89227843909f487c53a45b1350",
+          "build_id": "B:20261006T200827:dce27eb0b9a64e1e8d61f7bac0cfc947",
+          "previous_build_id": "B:20261006T195343:c9124be31587468daf4777c9c5d56d0b",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 20:16:46.429234+08:00",
+          "cutoff_date": "2026-09-19",
+          "window_start": "2026-08-21 00:00:00+08:00",
+          "window_end": "2026-09-20 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": false,
+          "cleaned_at": null
+        },
+        {
+          "publication_id": "PUB:cf66e28aa1c24caf9a17369a9dab0254",
+          "build_id": "B:20261006T195343:c9124be31587468daf4777c9c5d56d0b",
+          "previous_build_id": "B:20261006T194129:6c319d55d49a41338c8de1e1544a191c",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 20:00:29.833214+08:00",
+          "cutoff_date": "2026-09-18",
+          "window_start": "2026-08-20 00:00:00+08:00",
+          "window_end": "2026-09-19 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": true,
+          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+        },
+        {
+          "publication_id": "PUB:08597a7e9a144742913ef7e5c5b93167",
+          "build_id": "B:20261006T194129:6c319d55d49a41338c8de1e1544a191c",
+          "previous_build_id": "B:20261006T192729:f928d8423f19493e9767d3f6bfcacd26",
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:47:17.152721+08:00",
+          "cutoff_date": "2026-09-17",
+          "window_start": "2026-08-19 00:00:00+08:00",
+          "window_end": "2026-09-18 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": true,
+          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+        },
+        {
+          "publication_id": "PUB:50ca7a5eb2e94986bbc2c13401630485",
+          "build_id": "B:20261006T192729:f928d8423f19493e9767d3f6bfcacd26",
+          "previous_build_id": null,
+          "result": "published",
+          "reason": null,
+          "at": "2026-10-06 19:32:39.858360+08:00",
+          "cutoff_date": "2026-09-16",
+          "window_start": "2026-08-18 00:00:00+08:00",
+          "window_end": "2026-09-17 00:00:00+08:00",
+          "request_baseline_missing": false,
+          "results_cleaned": true,
+          "cleaned_at": "2026-10-06 21:19:08.398602+08:00"
+        }
+      ]
+    }
+  },
+  "complete": true,
+  "total_seconds": 1900.9044466860068
+}

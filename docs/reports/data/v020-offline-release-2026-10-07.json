@@ -3551,7 +3551,7 @@
     "data_available_bytes": 202455056384,
     "data_bytes": 203911331840,
     "data_empty": true,
-    "initial_state": "requires clarification of preinstalled tar",
+    "initial_state": true,
     "listening_ports": [
       22
     ],
@@ -3561,9 +3561,11 @@
       "added": [
         "tar 2:1.32-4.ky10.x86_64"
       ],
-      "confirmation_pending": true,
+      "confirmation": "https://github.com/shenxg13/sql-apm/issues/45#issuecomment-6025240925",
+      "confirmation_pending": false,
       "installed_local_time": "2026-10-07T03:39:55+08:00",
-      "removed": []
+      "removed": [],
+      "user_confirmed_only_tar": true
     },
     "postgres_account_exists": false,
     "swap_bytes": 4294963200,

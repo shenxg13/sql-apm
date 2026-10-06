@@ -44,8 +44,8 @@ def main(command, argv=None):
             ingestion=import_config(args.config,args.source,args.batch) if command=='full' else None
             scope=ingestion['scope_id'] if ingestion else args.cluster
             cutoff=args.cutoff_date or max(ingestion['dates'])
-            config=load_config(args.training_config,scope,cutoff_date=cutoff,window_days=args.days)
-            result=run(dsn,args.schema,config,ingestion,getattr(args,'retry_of',None),getattr(args,'workers',4),emit)
+            config,months=load_config(args.training_config,scope,cutoff_date=cutoff,window_days=args.days,with_retention=True)
+            result=run(dsn,args.schema,config,ingestion,getattr(args,'retry_of',None),getattr(args,'workers',4),emit,months)
         emit(**json.loads(json.dumps(result,default=str)))
         return 1 if result.get('state')=='failed' else 0
     except (IngestionError,TrainingError,StatisticsError) as error:

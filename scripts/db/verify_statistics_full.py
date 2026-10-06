@@ -212,7 +212,7 @@ def sizes(db):
 def validate(dsn,output):
     output.mkdir(parents=True,exist_ok=True)
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
-    report=dict(schema_version='1.8.0',method='measured; private PG17; all 55 files reimported',clusters={},
+    report=dict(schema_version='1.9.0',method='measured; private PG17; all 55 files reimported',clusters={},
                 source_head_sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                 normalization_context=training.context,decision_version=DECISION_VERSION)
     imported=json.loads((output/'import-report.json').read_text())

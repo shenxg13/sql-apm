@@ -1,7 +1,7 @@
 # 完整流程、重新构建与版本查询
 
 业务规则见[构建与版本](../../.project-wiki/features/baseline-versions.md)，
-连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.8.0；
+连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.9.0；
 连接通过既有 `SQL_APM_DSN` 提供，不把凭据写进命令参数或报告。
 
 ## 显式运行
@@ -38,9 +38,9 @@ rebuild 必须给出该参数，可用 `--retry-of BUILD_ID` 引用同集群失�
 
 ## 占用与恢复
 
-full、import、rebuild、training snapshot、statistics 都按集群互斥。
+full、import、rebuild、training snapshot、statistics 和 cleanup --execute 都按集群互斥。
 忙时返回 cluster_busy 并记录 busy_rejected。不同集群可同时执行，共享规则缓存按短事务更新。
-只有 import 和 full 可首次登记集群；rebuild、training snapshot 和 statistics 对未登记集群返回
+只有 import 和 full 可首次登记集群；rebuild、training snapshot、statistics 和 cleanup 对未登记集群返回
 unknown_cluster，不写集群或任务记录。每次新占用获得后自动将残留任务、尝试和未发布构建记为 interrupted／owner_exited；
 无手工解锁或续算命令。数据库连接失效后原进程不能重连提交，人工重新运行任务。
 已经完整成功导入的文件按原去重规则复用；原失败记录保留。
@@ -98,8 +98,8 @@ history 只列成功发布的历史版本，按发布时间倒序；两者限量
 计数来自版本输入文件关联的 `problem` 记录，不是不同 SQL 数、执行次数或全库累计问题数；
 同一 SQL 在多条日志中失败会分别计数。后来导入的文件在成为新版本输入前不影响当前计数。
 仅展示，不增加发布检查或阻止发布；没有生效版本时 `current=null`。
-`history` 的历史版本输出保持原格式。这两个计数在 #34 中未改变当时的 1.6.0 结构；
-当前采用 1.8.0；1.7.0 可带数据升级，更早非空库仍须按[初始化说明](database-initialization.md#升级到-180)重建。
+`history` 在 #43 增加结果清理标记和时间（见下节）。这两个计数在 #34 中未改变当时的 1.6.0 结构；
+当前采用 1.9.0；1.7.0／1.8.0 可带数据升级，更早非空库仍须按[初始化说明](database-initialization.md#升级到-190)重建。
 
 ## 覆盖与分区
 
@@ -171,3 +171,87 @@ Issue #35 取代此前“选取本集群全部完整批次”的操作口径。�
 专项命令 `.venv/bin/python scripts/db/verify_window.py` 使用私有临时实例。
 真实对照由 `scripts/db/verify_window_full.py` 显式选择基线／候选 checkout 与固定日志，
 不纳入日常 Harness。
+
+## 版本结果清理
+
+[留存契约](../../.project-wiki/contracts/sql-storage.md#版本结果按月留存2026-10-06)由 #43 确认。
+先预览该集群全部结果月份，再显式执行：
+
+```bash
+.venv/bin/python -m sql_apm cleanup --cluster 119 --training-config var/local/training.json
+.venv/bin/python -m sql_apm cleanup --cluster 119 --training-config var/local/training.json --execute
+```
+
+同样支持 `--schema`。省略 `--execute` 只读，不占用任务、不写记录。
+保留月数来自训练配置的 `retention`，默认 2；月份由数据库北京时间决定，无手工日期参数。
+例如当前 2026-10、N=2 时，保留 8、9、10 月及未来月份；7 月及更早过期。
+当前生效版本所在月份受保护，即使已过期也不删除。配置改小后按新值执行，不再二次确认。
+建议在两个集群都没有构建时运行。
+
+预览示例字段（标识及数值均为合成示例）：
+
+```json
+{
+  "state": "preview",
+  "retention_months": 2,
+  "current_month": "2026-10-01",
+  "current_version_month": "2026-09-01",
+  "expired_months": 1,
+  "months": [{
+    "partition_id": 123,
+    "build_month": "2026-07-01",
+    "state": "expired",
+    "reason": "retention_expired",
+    "published_builds": 20,
+    "unpublished_builds": 2,
+    "statistic_bytes": 1048576,
+    "observation_bytes": 65536,
+    "total_bytes": 1114112,
+    "cleaned_at": null,
+    "groups_pending": false
+  }]
+}
+```
+
+月份状态为 retained／expired／protected／cleaned；构建数统计曾保存结果的构建，
+发布数按是否有成功发布记录区分，同一构建不重复计数。已清理月份仍显示历史构建数。
+占用字节包括两张统计叶表、索引和 TOAST，不含共享分组关联表或 WAL。
+`full` 最后一行增加 `expired_result_months`，0 也显式输出；计数包含过期但受保护的月份。
+它只提示，不自动删除；`rebuild` 也不清理。
+
+执行留下一条 mode=cleanup 的任务；忙时返回 `cluster_busy`，仍记录 busy_rejected。
+每个月份先尝试取得所需锁，按单调时钟给定总共 10 秒预算，超时输出 `cleanup_lock_timeout`、
+该月保持原样，其他月份继续；可在占用解除后重跑。成功取得锁后的短事务同时移除两张统计
+分区并标记 cleaned_at，提交后按每批最多 10,000 行删除分组关联。分组删除中断时预览显示
+`groups_pending=true`，重跑会继续收尾，即使后来调大保留月数也会清完已移除统计的月份。
+
+执行输出的 months 来自 `mpp_cleanup_month`，包含每月状态、原因、构建数、before_bytes、
+after_bytes、released_bytes、两种分组删除行数、起止时间、exclusive_seconds 和 group_seconds。
+排他时长从成功的锁请求发起到事务提交返回测量，含往返开销，是持锁时长的上界；分组耗时
+为本次运行各删除批次的语句及计数更新前耗时合计。分组行删除的空间由普通 VACUUM 复用，
+不计作立即释放的磁盘字节，也不自动执行 VACUUM FULL。
+
+退出码：成功或无可清理为 0；部分月份未完成、占用拒绝或执行失败为 1；配置／参数错误为 2；
+捕获人工中断为 130。强制终止按前文的数据库会话退出规则恢复，重跑保留旧任务及其逐月记录。
+
+`history` 继续显示已清理的版本，并增加 `results_cleaned` 和 `cleaned_at`。
+`build.results_saved` 表示曾成功保存，保持原值；与月份的 cleaned_at 联合判断现有结果。
+results_saved=false 表示从未保存，与 results_saved=true 且 cleaned_at 非空明确区分。
+`mpp_coverage`（正式／观察）、`mpp_read_statistics` 和批量门槛接口对已清理构建报固定
+`results_cleaned`，不能把它解释为没有分组或空桶。当前版本及其查询不受清理影响。
+
+```sql
+SELECT b.build_id, b.results_saved,
+       b.results_saved AND p.cleaned_at IS NOT NULL AS results_cleaned,
+       CASE WHEN b.results_saved THEN p.cleaned_at END AS cleaned_at
+FROM build b LEFT JOIN mpp_result_partition p USING (partition_id)
+WHERE b.build_id = 'BUILD_ID';
+
+SELECT * FROM mpp_read_statistics('BUILD_ID');
+SELECT * FROM mpp_read_statistics('BUILD_ID', true);
+SELECT * FROM mpp_cleanup_month WHERE task_id = 'TASK_ID';
+```
+
+查询入口先持有统计父表的读锁再检查标记，防止通过检查后遇上分区移除。
+直接按物理表执行的维护 SQL 须自行检查上述状态；产品按构建读取结果统一使用受保护入口。
+没有恢复或删除单个构建的命令。展示界面的选择限制另行交付。

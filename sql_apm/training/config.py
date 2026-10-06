@@ -28,14 +28,19 @@ def unique(pairs):
     return result
 
 
-def load_config(path, cluster, *, cutoff_date=None, window_days=None):
+def load_config(path, cluster, *, cutoff_date=None, window_days=None, with_retention=False):
     try:
         document = json.loads(Path(path).read_text(), object_pairs_hook=unique)
+        if not isinstance(document, dict):
+            raise TrainingError('invalid_training_config')
+        if (cutoff_date is not None or window_days is not None) and not isinstance(document.get('window', {}), dict):
+            raise TrainingError('invalid_window')
         if cutoff_date is not None:
             document.setdefault('window', {})['cutoff_date'] = cutoff_date
         if window_days is not None:
             document.setdefault('window', {})['days'] = window_days
-        return validate(document, cluster)
+        config = validate(document, cluster)
+        return (config, retention_months(document, cluster)) if with_retention else config
     except TrainingError:
         raise
     except (OSError, ValueError, TypeError, KeyError, OverflowError):
@@ -46,13 +51,14 @@ def validate(document, cluster):
     try:
         if type(document['version']) is not int or document['version'] != 1:
             raise TrainingError('training_config_version')
-        if set(document) - {'version', 'clusters', 'window', 'templates', 'exclusions', 'thresholds'}:
+        if set(document) - {'version', 'clusters', 'window', 'templates', 'exclusions', 'thresholds', 'retention'}:
             raise TrainingError('unknown_config_key')
         clusters = document['clusters']
         if not isinstance(clusters, list) or not clusters or not all(required_string(c) for c in clusters) or len(set(clusters)) != len(clusters):
             raise TrainingError('invalid_cluster')
         if cluster not in clusters:
             raise TrainingError('unknown_cluster')
+        retention_months(document, cluster)
         window = document['window']
         cutoff = date.fromisoformat(window['cutoff_date'])
         days = window.get('days', 30)
@@ -109,3 +115,24 @@ def validate(document, cluster):
         raise
     except (ValueError, KeyError, TypeError, OverflowError):
         raise TrainingError('invalid_training_config') from None
+
+
+def retention_months(document, cluster):
+    """Operational policy is validated but never included in the sealed config."""
+    retention = document.get('retention', {})
+    if not isinstance(retention, dict) or set(retention) - {'months', 'clusters'}:
+        raise TrainingError('invalid_retention')
+    months, overrides = retention.get('months', 2), retention.get('clusters', {})
+    if not isinstance(overrides, dict):
+        raise TrainingError('invalid_retention')
+    if any(type(n) is not int or n < 1 for n in [months] + list(overrides.values())):
+        raise TrainingError('invalid_retention_months')
+    if set(overrides) - set(document['clusters']):
+        raise TrainingError('unknown_retention_cluster')
+    return overrides.get(cluster, months)
+
+
+def load_retention(path, cluster):
+    # Cleanup has no training cutoff. Use an internal placeholder solely to
+    # validate a full-style config whose cutoff normally comes from its batch.
+    return load_config(path, cluster, cutoff_date='2000-01-01', with_retention=True)[1]

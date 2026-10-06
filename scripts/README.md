@@ -55,7 +55,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0；1.7.0 可带数据升级且不回填，更早非空库须重建。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0；1.7.0／1.8.0 可带数据升级且不回填，更早非空库须重建。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
@@ -212,7 +212,7 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `verify_mpp_naming.py` 在合成私有 PG17 实例核对新标识并检查等价比较器对统计变化的敏感性。
 `verify_mpp_naming_full.py` 显式重导固定 55 文件，以文件摘要／记录定位核对所有分组成员
 及五层全部指标；运行方法和资源边界见[验收报告](../docs/reports/mpp-naming-2026-10-05.md)。
-当前结构为 1.8.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
+当前结构为 1.9.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
 验证至 1.6.0，不支持已有数据进入新标识上下文。历史 `verify_coverage_migration_full.py`
 须从 #29 对应提交运行，不能用当前初始化器对含数据旧库执行升级。
 
@@ -225,3 +225,14 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `--compare BASE_REPORT CANDIDATE_REPORT` 核对稳定来源成员、全部指标、检查和计数差值。
 `verify_window_replay.py --reference BASE_CHECKOUT` 用合成日志先验证完整对照工具链，
 包括九任务、每日分批和指标变化拒绝。真实流程是显式高成本验收，不自动加入 Harness；原文、配置、临时实例和详细输出留在本地忽略区域。
+
+## 版本结果留存验收
+
+`python -m sql_apm cleanup --cluster CLUSTER --training-config FILE` 默认只预览，
+增加 `--execute` 才执行按月清理；配置、锁及恢复见[操作说明](../docs/runbooks/build-publication.md#版本结果清理)。
+`verify_cleanup.py` 在私有 PG17 验证预览只读、保留内容、清理标记、任务互斥、10 秒等待及六阶段 SIGKILL；
+`verify.py` 增加 1.8.0 带数据升级到 1.9.0，并保留旧迁移字节核对。
+`verify_cleanup_full.py prepare` 从指定的冻结 1.8.0 checkout 和 55 文件构建九版本、导出数据库副本；
+`verify_cleanup_full.py verify` 恢复副本、对比升级前后全表摘要、构造受保护当前月份并实测清理。
+完整命令、月份构造、测量边界和机器记录见[验收报告](../docs/reports/result-retention-2026-10-06.md)。
+高成本真实数据验收不自动加入 Harness，数据库副本及原文均留在本地忽略目录。

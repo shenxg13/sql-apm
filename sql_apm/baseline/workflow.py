@@ -6,9 +6,10 @@ from sql_apm.storage.tasks import Task
 from sql_apm.storage.training import TrainingStore
 from sql_apm.storage.statistics import StatisticsStore
 from sql_apm.storage.publication import PublicationStore
+from sql_apm.storage.cleanup import overdue_count
 
 
-def run(dsn, schema, config, ingestion=None, retry_of=None, workers=4, progress=None):
+def run(dsn, schema, config, ingestion=None, retry_of=None, workers=4, progress=None, retention_months=2):
     db = connect(dsn,schema)
     try:
         with Task(db,config['scope_id'],'full' if ingestion else 'rebuild') as task:
@@ -54,6 +55,8 @@ def run(dsn, schema, config, ingestion=None, retry_of=None, workers=4, progress=
                 build=built,checks=checks,publication=published)
             if imported:
                 result['import']=imported
+            if ingestion:
+                result['expired_result_months']=overdue_count(db,config['scope_id'],retention_months)
         result.update(state='failed' if task.failure else 'succeeded',stage_seconds=task.seconds)
         return result
     finally:

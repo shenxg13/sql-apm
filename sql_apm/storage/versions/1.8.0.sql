@@ -1,4 +1,4 @@
--- Structure version 1.9.0. Called only after catalog compatibility checks.
+-- Structure version 1.8.0. Called only after catalog compatibility checks.
 -- The caller sets the verified project schema as search_path.
 CREATE TABLE IF NOT EXISTS schema_version (
     version text PRIMARY KEY,
@@ -304,9 +304,6 @@ CREATE TABLE IF NOT EXISTS mpp_result_partition (
     partition_id bigint PRIMARY KEY,
     scope_id text NOT NULL REFERENCES scope,
     build_month date NOT NULL CHECK (extract(day FROM build_month) = 1),
-    cleaned_at timestamptz,
-    groups_cleaned_at timestamptz,
-    CHECK (groups_cleaned_at IS NULL OR (cleaned_at IS NOT NULL AND groups_cleaned_at >= cleaned_at)),
     UNIQUE (scope_id, build_month),
     UNIQUE (partition_id, scope_id)
 );
@@ -438,8 +435,6 @@ CREATE TABLE IF NOT EXISTS mpp_build_group (
 );
 CREATE OR REPLACE FUNCTION mpp_check_build_groups() RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
-    IF EXISTS (SELECT FROM added_groups a JOIN mpp_result_partition p USING(partition_id)
-        WHERE p.cleaned_at IS NOT NULL) THEN RAISE EXCEPTION 'results_cleaned'; END IF;
     IF EXISTS (SELECT FROM added_groups a JOIN build b USING(build_id)
         JOIN mpp_baseline_group g USING(group_id)
         WHERE (b.scope_id,b.normalization_id,b.profile) IS DISTINCT FROM
@@ -637,9 +632,6 @@ $function$;
 CREATE OR REPLACE FUNCTION mpp_result_context_guard() RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
     IF TG_TABLE_NAME = 'build' THEN
-        IF (TG_OP = 'INSERT' OR NEW.partition_id IS DISTINCT FROM OLD.partition_id)
-            AND EXISTS (SELECT FROM mpp_result_partition WHERE partition_id=NEW.partition_id
-                AND cleaned_at IS NOT NULL) THEN RAISE EXCEPTION 'results_cleaned'; END IF;
         IF NEW.partition_id IS NOT NULL AND NOT EXISTS (
             SELECT FROM mpp_result_partition WHERE partition_id=NEW.partition_id
                 AND scope_id=NEW.scope_id
@@ -675,12 +667,9 @@ BEGIN
     pid := ('x'||substr(encode(sha256(convert_to(jsonb_build_array(selected_scope,selected_month)::text,'UTF8')),'hex'),1,15))::bit(60)::bigint;
     -- A brief transaction lock only coordinates DDL for this cluster/month.
     PERFORM pg_advisory_xact_lock(pid);
-    INSERT INTO mpp_result_partition (partition_id,scope_id,build_month) VALUES (pid,selected_scope,selected_month) ON CONFLICT DO NOTHING;
+    INSERT INTO mpp_result_partition VALUES (pid,selected_scope,selected_month) ON CONFLICT DO NOTHING;
     IF NOT EXISTS (SELECT FROM mpp_result_partition WHERE partition_id=pid AND scope_id=selected_scope AND build_month=selected_month) THEN
         RAISE EXCEPTION 'partition_identity_collision';
-    END IF;
-    IF EXISTS (SELECT FROM mpp_result_partition WHERE partition_id=pid AND cleaned_at IS NOT NULL) THEN
-        RAISE EXCEPTION 'results_cleaned';
     END IF;
     FOREACH table_name IN ARRAY ARRAY['mpp_statistic','mpp_observation_statistic'] LOOP
         child_name := table_name||'_p'||pid;
@@ -722,9 +711,9 @@ CREATE TABLE IF NOT EXISTS current_version (
 CREATE TABLE IF NOT EXISTS task (
     task_id text PRIMARY KEY CHECK (task_id <> ''),
     scope_id text NOT NULL REFERENCES scope,
-    mode text NOT NULL CHECK (mode IN ('full','import_only','rebuild','snapshot','statistics','cleanup')),
+    mode text NOT NULL CHECK (mode IN ('full','import_only','rebuild','snapshot','statistics')),
     state text NOT NULL CHECK (state IN ('running','succeeded','failed','interrupted','busy_rejected')),
-    stage text NOT NULL CHECK (stage IN ('import','snapshot','build','check','publish','none','cleanup')),
+    stage text NOT NULL CHECK (stage IN ('import','snapshot','build','check','publish','none')),
     busy_task_id text,
     reason text CHECK (reason <> ''),
     started_at timestamptz NOT NULL DEFAULT current_timestamp,
@@ -1057,8 +1046,6 @@ CREATE TABLE IF NOT EXISTS mpp_build_observation_group (
 );
 CREATE OR REPLACE FUNCTION mpp_check_build_observation_groups() RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
-    IF EXISTS (SELECT FROM added_groups a JOIN mpp_result_partition p USING(partition_id)
-        WHERE p.cleaned_at IS NOT NULL) THEN RAISE EXCEPTION 'results_cleaned'; END IF;
     IF EXISTS (SELECT FROM added_groups a JOIN build b USING(build_id)
         JOIN mpp_observation_group g USING(group_id)
         WHERE (b.scope_id,b.profile) IS DISTINCT FROM (g.scope_id,g.profile)) THEN
@@ -1214,58 +1201,12 @@ CREATE TABLE IF NOT EXISTS mpp_build_layer_count (
     PRIMARY KEY (build_id,kind,layer)
 );
 CREATE INDEX IF NOT EXISTS task_scope_time_idx ON task (scope_id,started_at);
--- Retention status is physical metadata; build.results_saved remains historical.
-CREATE OR REPLACE FUNCTION mpp_require_results(selected_build text)
-RETURNS bigint LANGUAGE plpgsql AS $function$
-DECLARE pid bigint; saved boolean; cleaned timestamptz;
-BEGIN
-    LOCK TABLE ONLY mpp_statistic,ONLY mpp_observation_statistic IN ACCESS SHARE MODE;
-    SELECT b.partition_id,b.results_saved,p.cleaned_at INTO pid,saved,cleaned
-        FROM build b LEFT JOIN mpp_result_partition p USING(partition_id) WHERE b.build_id=selected_build;
-    IF saved AND cleaned IS NOT NULL THEN RAISE EXCEPTION 'results_cleaned'; END IF;
-    RETURN pid;
-END $function$;
-
-CREATE OR REPLACE FUNCTION mpp_read_statistics(selected_build text, observation boolean DEFAULT false,
-    selected_group text DEFAULT NULL)
-RETURNS SETOF mpp_statistic LANGUAGE plpgsql AS $function$
-DECLARE pid bigint;
-BEGIN
-    pid := mpp_require_results(selected_build);
-    IF observation THEN
-        RETURN QUERY SELECT * FROM mpp_observation_statistic WHERE partition_id=pid AND build_id=selected_build
-            AND (selected_group IS NULL OR group_id=selected_group);
-    ELSE
-        RETURN QUERY SELECT * FROM mpp_statistic WHERE partition_id=pid AND build_id=selected_build
-            AND (selected_group IS NULL OR group_id=selected_group);
-    END IF;
-END $function$;
-
-CREATE TABLE IF NOT EXISTS mpp_cleanup_month (
-    task_id text NOT NULL REFERENCES task,
-    partition_id bigint NOT NULL REFERENCES mpp_result_partition,
-    state text NOT NULL CHECK (state IN ('pending','removing_groups','succeeded','retained','protected','already_cleaned','lock_timeout','failed','interrupted')),
-    reason text NOT NULL CHECK (reason <> ''),
-    published_builds bigint NOT NULL CHECK (published_builds >= 0),
-    unpublished_builds bigint NOT NULL CHECK (unpublished_builds >= 0),
-    before_bytes bigint NOT NULL CHECK (before_bytes >= 0),
-    after_bytes bigint NOT NULL CHECK (after_bytes >= 0),
-    released_bytes bigint NOT NULL DEFAULT 0 CHECK (released_bytes >= 0),
-    formal_groups_deleted bigint NOT NULL DEFAULT 0 CHECK (formal_groups_deleted >= 0),
-    observation_groups_deleted bigint NOT NULL DEFAULT 0 CHECK (observation_groups_deleted >= 0),
-    started_at timestamptz NOT NULL DEFAULT clock_timestamp(),
-    finished_at timestamptz,
-    exclusive_seconds double precision NOT NULL DEFAULT 0 CHECK (exclusive_seconds >= 0),
-    group_seconds double precision NOT NULL DEFAULT 0 CHECK (group_seconds >= 0),
-    PRIMARY KEY (task_id,partition_id)
-);
 CREATE OR REPLACE FUNCTION mpp_coverage(selected_build text, observation boolean DEFAULT false,
     selected_group text DEFAULT NULL)
 RETURNS TABLE (group_id text,layer text,computed_keys jsonb,empty_keys jsonb)
-LANGUAGE plpgsql AS $function$
+LANGUAGE plpgsql STABLE AS $function$
 DECLARE group_table text; statistic_table text;
 BEGIN
-    PERFORM mpp_require_results(selected_build);
     group_table := CASE WHEN observation THEN 'mpp_build_observation_group' ELSE 'mpp_build_group' END;
     statistic_table := CASE WHEN observation THEN 'mpp_observation_statistic' ELSE 'mpp_statistic' END;
     RETURN QUERY EXECUTE format($query$

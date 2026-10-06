@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(RESOURCE_ROOT / "tests"))
 from database.naming_migration import legacy_target, verify_naming_migration
 from database.window_migration import verify_window_migration
+from database.retention_migration import verify_retention_migration
 from database.fixture import statements  # noqa: E402
 from database.approximate import verify_approximate  # noqa: E402
 from database.approximate_migration import verify_approximate_migration  # noqa: E402
@@ -319,6 +320,8 @@ def main():
         verify_naming_migration(Verification(args.pg_bin, directory, env), ROOT, run)
     with instance(args.pg_bin) as (directory, env):
         verify_window_migration(Verification(args.pg_bin, directory, env), ROOT)
+    with instance(args.pg_bin) as (directory, env):
+        verify_retention_migration(Verification(args.pg_bin, directory, env), ROOT)
     # Exercise exceptional cleanup through exactly the same owner/context manager.
     failure_directory = None
     try:

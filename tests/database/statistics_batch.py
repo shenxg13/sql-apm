@@ -47,7 +47,11 @@ def verify_batch(v, store, thresholds, builds):
     # the real schema. Synthetic boundary rows never change a sealed snapshot.
     try:
         with store.db.cursor() as cur:
-            cur.execute('''CREATE TEMP TABLE build (build_id text,partition_id bigint,config_id text);
+            # The batch entrypoint now executes a stored retention guard. An
+            # explicit search-path change makes its cached plans resolve these
+            # connection-local boundary fixtures rather than prior real tables.
+            cur.execute('''SET LOCAL search_path=pg_temp,sql_apm,pg_catalog;
+                CREATE TEMP TABLE build (build_id text,partition_id bigint,config_id text,results_saved boolean DEFAULT false);
                 CREATE TEMP TABLE config_snapshot (config_id text,statistics_version text,thresholds jsonb);
                 CREATE TEMP TABLE mpp_statistic (partition_id bigint,build_id text,group_id text,
                     layer text,bucket_date date,bucket_number smallint,included_count bigint,

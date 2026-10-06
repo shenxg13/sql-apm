@@ -354,3 +354,12 @@ SSD 四进程验证衔接。约定见[运行环境](decisions/runtime-and-compon
 正在执行语句时占用持续到语句结束；[操作说明](../docs/runbooks/build-publication.md#占用与恢复)
 提供只读会话定位和退出检查。产品仍立即拒绝忙时申请，无手工解锁或自动重试；
 连接参数是否调整留待每日自动任务确认。
+
+## 2026-10-06：版本结果按月留存（Issue #43）
+
+按用户确认新增[结果留存规则](contracts/sql-storage.md#版本结果按月留存2026-10-06)，
+交付默认预览的 cleanup 命令、当前月份保护、原子清理及中断收尾；
+[结构 1.9.0](architecture/postgresql-storage.md#版本结果留存结构-1902026-10-06)支持带数据升级。
+[历史展示](features/sql-search-and-views.md#已清理历史版本的展示2026-10-06)明确已清理版本不可选作基线；
+GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次范围。
+验证与实测见[报告](../docs/reports/result-retention-2026-10-06.md)。

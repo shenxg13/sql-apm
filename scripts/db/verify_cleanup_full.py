@@ -101,6 +101,44 @@ def move_current(db,scope,month):
     return dict(build_id=build,build_month=month,partition_id=pid,result_rows=after)
 
 
+def cleanup_measure(db,scope,reference,report,path):
+    """Record bounded retries, including normal contention in a restored copy.
+
+    The product still abandons each blocked month within its own lock budget.
+    This acceptance driver models an operator rerun; it never cancels holders.
+    """
+    started=time.monotonic();attempts=[]
+    for _ in range(18):
+        locks=[]
+        def observe(stage,pid):
+            if stage!='before_partitions':return
+            with db,db.cursor() as cur:
+                cur.execute('''SELECT c.relname,l.mode,l.granted,a.backend_type
+                    FROM pg_locks l JOIN pg_class c ON c.oid=l.relation
+                    LEFT JOIN pg_stat_activity a ON a.pid=l.pid
+                    WHERE c.relnamespace=current_schema()::regnamespace
+                      AND c.relname LIKE 'mpp_%' AND l.pid<>pg_backend_pid()
+                    ORDER BY c.relname,l.mode''')
+                locks.append(dict(partition_id=pid,holders=[dict(zip(
+                    ('relation','mode','granted','backend_type'),row)) for row in cur]))
+        tick=time.monotonic()
+        result=CleanupStore(db,fault=observe).execute(scope,2,reference_month=reference)
+        attempts.append(dict(seconds=time.monotonic()-tick,result=result,locks_before=locks))
+        record=dict(seconds=time.monotonic()-started,result=result,attempts=attempts)
+        report['runs'][scope]=record;save(path,report)
+        if result['state']=='succeeded':return record
+        # A lock-timeout month must remain wholly intact; preserve every failed
+        # attempt in the evidence instead of relabeling it as successful.
+        assert result['reason']=='cleanup_incomplete',result
+        failed=[m for m in result['months'] if m['state'] not in
+                ('succeeded','protected','retained','already_cleaned')]
+        assert failed and all(m['state']=='lock_timeout' and m['cleaned_at'] is None
+            and m['before_bytes']==m['after_bytes'] and m['released_bytes']==0 for m in failed),result
+        print(json.dumps(dict(phase='cleanup_lock_retry',cluster=scope,attempt=len(attempts))),flush=True)
+        time.sleep(0.5)
+    raise AssertionError('cleanup copy remains busy after bounded operator retries')
+
+
 def verify(args):
     report=dict(evidence='measured',schema_before='1.8.0',schema_after='1.9.0',contract_version='1.0.0',
         source=json.loads((args.dump.parent/'complete.json').read_text()),
@@ -116,6 +154,7 @@ def verify(args):
         with (args.output/'restore.log').open('w') as log:
             subprocess.run([str(args.pg_bin/'pg_restore'),'--exit-on-error','--no-owner','--no-acl','-j','4','-d',dsn,str(args.dump)],
                 check=True,stdout=log,stderr=subprocess.STDOUT)
+        print('RESTORE: complete; collecting source hashes',flush=True)
         with closing(psycopg2.connect(dsn)) as db:
             with db,db.cursor() as cur:
                 cur.execute("SET search_path=sql_apm,pg_catalog; SET TIME ZONE 'Asia/Shanghai'")
@@ -136,22 +175,23 @@ def verify(args):
             # 120's current result to the first retained month; 119 stays protected.
             new_month=date(month.year+1,month.month,1)
             reference=date(new_month.year,new_month.month,1)
-            report['fixture']=move_current(db,'120',new_month)
+            tick=time.monotonic();report['fixture']=move_current(db,'120',new_month)
+            report['fixture_seconds']=time.monotonic()-tick
             save(args.output/'report-progress.json',report)
+            print('FIXTURE: moved current month; all result hashes unchanged',flush=True)
             current={s:version_status(db,s)['current'] for s in ('119','120')}
             preserved=contents(db,cleanup=True)
             previews={s:preview(db,s,2,reference_month=reference) for s in ('119','120')}
             eligible=[p['partition_id'] for data in previews.values() for p in data['months'] if p['state']=='expired']
             result_tables=('mpp_statistic','mpp_observation_statistic','mpp_build_group','mpp_build_observation_group')
             untouched={t:digest(db,t,where='WHERE NOT partition_id=ANY(%s)',params=(eligible,)) for t in result_tables}
+            print('CLEANUP: preservation baselines collected',flush=True)
             report['preview']=previews
             report['runs']={}
             for scope in ('119','120'):
-                tick=time.monotonic();result=CleanupStore(db).execute(scope,2,reference_month=reference)
-                assert result['state']=='succeeded',result
-                report['runs'][scope]=dict(seconds=time.monotonic()-tick,result=result)
-                save(args.output/'report-progress.json',report)
+                cleanup_measure(db,scope,reference,report,args.output/'report-progress.json')
                 print(json.dumps(dict(phase='cleanup_complete',cluster=scope,seconds=report['runs'][scope]['seconds'])),flush=True)
+            print('CLEANUP: comparing all preserved contents',flush=True)
             assert contents(db,cleanup=True)==preserved
             assert {t:digest(db,t,where='WHERE NOT partition_id=ANY(%s)',params=(eligible,)) for t in result_tables}==untouched
             assert {s:version_status(db,s)['current'] for s in ('119','120')}==current

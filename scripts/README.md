@@ -242,7 +242,8 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 `check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、57 张表／列名和随包命令；
 随 `scripts/tests/test_deployment.py` 运行并覆盖反例。
-`verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例。
+`verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例，
+并在九任务加四个示例的版本形态下验证自然日期清理的空操作与数据不变。
 `rehearsal.py` 保存九任务的选批字段、每 250ms 主机内存采样与 OOM 计数；
 `guide_examples.py` 执行单项配置示例，`cleanup_rehearsal.py` 验证自然／模拟日期清理。
 后两个入口仅对明确指定的专用演练库运行，参数及操作顺序见[部署手册](../docs/runbooks/kylin-offline-deployment.md)。

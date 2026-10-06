@@ -61,6 +61,14 @@ def main():
                     'run',case],env=env,stdout=stream,stderr=subprocess.STDOUT)
             assert result.returncode==0,'helper_'+case
             report.append(dict(example=case,helper_passed=True))
+        # At this point the private fixture has the same 9+4 publication shape
+        # required by the target's natural-date cleanup step. Exercise its real
+        # CLI and row/audit comparisons before adding the literal examples.
+        with (args.output/'cleanup-natural.log').open('x') as stream:
+            result=subprocess.run([str(args.app_root/'.venv/bin/python'),str(ROOT/'scripts/deployment/cleanup_rehearsal.py'),
+                '--app-root',str(args.app_root),'--config',str(args.output),'--records',str(args.output/'cleanup'),
+                'natural'],env=env,stdout=stream,stderr=subprocess.STDOUT)
+        assert result.returncode==0,'cleanup_natural'
         # Execute every literal JSON sample too, including the synthetic import manifest.
         cases=examples((ROOT/GUIDE).read_text())
         for name,kind,document in cases:
@@ -77,8 +85,8 @@ def main():
             assert result['state'] in ('complete','succeeded','preview')
             report.append(dict(example=name,literal_executed=True,state=result['state']))
         v.init('check',root=args.app_root)
-    (args.output/'report.json').write_text(json.dumps(dict(passed=True,examples=report),indent=2)+'\n')
-    print(json.dumps(dict(passed=True,examples=len(report))),flush=True)
+    (args.output/'report.json').write_text(json.dumps(dict(passed=True,examples=report,natural_cleanup_passed=True),indent=2)+'\n')
+    print(json.dumps(dict(passed=True,examples=len(report),natural_cleanup_passed=True)),flush=True)
 
 
 if __name__=='__main__':main()

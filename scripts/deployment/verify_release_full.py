@@ -10,16 +10,46 @@ import time
 from acceptance import product_files
 
 
+def collect_baseline(metadata, out):
+    """Read exactly the nine task records, never adjacent resource sidecars."""
+    baseline=dict(program_commit=metadata['commit'],product_sha256=product_files(metadata),selection={},examples={})
+    for cluster,total in [('119',5),('120',4)]:
+        for step in range(total):
+            name=cluster+'-'+str(step)
+            document=json.loads((out/'tasks'/(name+'.json')).read_text())
+            if not document['passed'] or document['program_verification']['commit']!=metadata['commit']:
+                raise ValueError('task evidence failed or belongs to another candidate: '+name)
+            baseline['selection'][name]=document['selection']
+    for case in ('window','threshold','template','exclusion','retention','workers','import'):
+        document=json.loads((out/'guide'/(case+'.json')).read_text())
+        if not document['passed'] or document['program_commit']!=metadata['commit']:
+            raise ValueError('guide evidence failed or belongs to another candidate: '+case)
+        baseline['examples'][case]=document['comparable']
+    with (out/'v020-development-baseline.json').open('x') as file:
+        file.write(json.dumps(baseline,sort_keys=True,indent=2)+'\n')
+    return baseline
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root',type=Path,required=True)
-    parser.add_argument('--verification-root',type=Path,required=True)
-    parser.add_argument('--logs',type=Path,required=True)
+    parser.add_argument('--verification-root',type=Path)
+    parser.add_argument('--logs',type=Path)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
+    parser.add_argument('--collect-only',action='store_true',help='collect completed, passing records without replaying any task')
     args=parser.parse_args()
     for name in ('app_root','verification_root','logs','output','pg_bin'):
-        setattr(args,name,getattr(args,name).resolve())
+        if getattr(args,name) is not None:
+            setattr(args,name,getattr(args,name).resolve())
+    if args.collect_only:
+        from verify_package import verify
+        verify(args.app_root,installed=True)
+        collect_baseline(json.loads((args.app_root/'RELEASE.json').read_text()),args.output)
+        print(json.dumps(dict(collected=True,nine_tasks=9,examples=7)),flush=True)
+        return
+    if args.verification_root is None or args.logs is None:
+        parser.error('--verification-root and --logs are required for execution')
     args.output.mkdir(parents=True,exist_ok=False,mode=0o700)
     os.umask(0o077)
     app,kit,out,pg=args.app_root,args.verification_root,args.output,args.pg_bin
@@ -61,16 +91,7 @@ def main():
             run('guide-'+case,[python,kit/'scripts/deployment/guide_examples.py','--app-root',app,
                 '--config',out/'config','--records',out/'guide','run',case])
         run('schema-check',[app/'scripts/db/initialize.sh','check','--host',socket,'--port','55473','--pg-bin',pg])
-        baseline=dict(program_commit=metadata['commit'],product_sha256=product_files(metadata),selection={},examples={})
-        for path in sorted((out/'tasks').glob('*.json')):
-            if path.stem.count('-')!=1:continue
-            document=json.loads(path.read_text());assert document['passed']
-            baseline['selection'][path.stem]=document['selection']
-        for case in ('window','threshold','template','exclusion','retention','workers','import'):
-            document=json.loads((out/'guide'/(case+'.json')).read_text());assert document['passed']
-            baseline['examples'][case]=document['comparable']
-        assert len(baseline['selection'])==9
-        (out/'v020-development-baseline.json').write_text(json.dumps(baseline,sort_keys=True,indent=2)+'\n')
+        collect_baseline(metadata,out)
         print(json.dumps(dict(passed=True,nine_tasks=9,examples=7)),flush=True)
     finally:
         if started or (data/'postmaster.pid').exists():

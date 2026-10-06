@@ -17,6 +17,7 @@ from check_documents import check, check_guide, check_structure, check_paths, GU
 from verify_package import digest, verify
 import rehearsal
 from acceptance import verify_baseline
+from verify_release_full import collect_baseline
 
 
 class PackageTests(unittest.TestCase):
@@ -44,6 +45,27 @@ class PackageTests(unittest.TestCase):
                 verify_baseline(dict(metadata,files=files),baseline)
         with self.assertRaisesRegex(ValueError,'product hashes required'):
             verify_baseline(metadata,dict(program_commit='old'))
+
+    def test_baseline_collection_ignores_sidecars_and_rejects_bad_evidence(self):
+        metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
+        for folder in ('tasks','guide'):
+            (self.root/folder).mkdir()
+        for cluster,total in [('119',5),('120',4)]:
+            for step in range(total):
+                path=self.root/'tasks'/(cluster+'-'+str(step)+'.json')
+                path.write_text(json.dumps(dict(passed=True,program_verification=dict(commit='tested'),selection={})))
+        (self.root/'tasks/119-0.resources.json').write_text('{"seconds":12}')
+        for case in ('window','threshold','template','exclusion','retention','workers','import'):
+            (self.root/'guide'/(case+'.json')).write_text(json.dumps(dict(passed=True,program_commit='tested',comparable={})))
+        result=collect_baseline(metadata,self.root)
+        self.assertEqual(len(result['selection']),9)
+        self.assertEqual(result['product_sha256'],metadata['files'])
+        (self.root/'v020-development-baseline.json').unlink()
+        for passed,commit in ((False,'tested'),(True,'different')):
+            (self.root/'tasks/119-0.json').write_text(json.dumps(dict(passed=passed,program_verification=dict(commit=commit),selection={})))
+            with self.subTest(passed=passed,commit=commit),self.assertRaisesRegex(ValueError,'task evidence'):
+                collect_baseline(metadata,self.root)
+            self.assertFalse((self.root/'v020-development-baseline.json').exists())
 
     def test_valid_tree(self):
         self.assertTrue(verify(self.app)['passed'])

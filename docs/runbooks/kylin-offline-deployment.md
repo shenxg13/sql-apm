@@ -231,7 +231,8 @@ cd "$APM_APP"
   --pg-bin "$APM_PG_BIN" smoke > "$APM_ROOT/records/verify-smoke.log" 2>&1
 ```
 
-预期：PG17.10，各入口退出 0；普通测试 72 项，数据库／发布检查实际通过数保存在机器记录。
+预期：PG17.10，各入口退出 0；普通测试 72 项、数据库验证 276 个 PASS、发布检查 33 项、smoke 通过。
+合成清理检查 23 项；实际项数及输出摘要保存在机器记录。
 开头 APPLICATION 应指向 APM_APP，不能只检查输出文件存在。测试在 verification 中，
 核心代码从 app 加载；数据库检查各自创建禁用 TCP 的私有临时实例，退出后停止清理，
 不连接演练库。不在目标机运行 Harness 或未列出的开发全量探针。

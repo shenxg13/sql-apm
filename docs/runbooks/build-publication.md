@@ -45,6 +45,42 @@ unknown_cluster，不写集群或任务记录。每次新占用获得后自动�
 无手工解锁或续算命令。数据库连接失效后原进程不能重连提交，人工重新运行任务。
 已经完整成功导入的文件按原去重规则复用；原失败记录保留。
 
+进程被强制终止后，其数据库会话退出之前集群仍被占用，新任务仍返回 `cluster_busy`。
+当前连接未设置存活检查参数；若终止时正在执行语句，占用会持续到该语句结束。
+确认旧会话已退出后重新运行即可；没有手工解锁命令，也不自动等待、排队或重试。
+
+在 Baseline PostgreSQL 17 上用项目数据库账号连接实际项目库，通过以下只读查询查看
+指定集群的占用会话；`cluster` 替换为实际集群标识。锁键与当前任务申请使用相同算法，
+这里不尝试取得锁，也不创建任务记录。
+
+```sql
+\set cluster '119'
+WITH lock_key AS (
+    SELECT hashtextextended(:'cluster', 1835101) AS value
+)
+SELECT a.pid, a.backend_start, a.state, a.query_start, a.wait_event_type, a.wait_event
+FROM pg_locks l
+JOIN pg_stat_activity a ON a.pid = l.pid
+CROSS JOIN lock_key k
+WHERE l.locktype = 'advisory' AND l.granted AND l.objsubid = 1
+  AND l.database = (SELECT oid FROM pg_database WHERE datname = current_database())
+  AND l.classid::bigint = ((k.value >> 32) & 4294967295::bigint)
+  AND l.objid::bigint = (k.value & 4294967295::bigint);
+```
+
+记录该旧会话的 `pid` 和 `backend_start`，将下面两个示例值替换为实际结果后查询。
+无结果表示该旧会话已退出；同时核对启动时间，避免把复用的 PID 误认为旧会话。
+任务表中的 `running`／`interrupted` 状态不能替代会话退出检查。
+
+```sql
+\set old_pid 12345
+\set old_backend_start '2026-10-06 10:00:00+08'
+SELECT pid, backend_start, state, query_start, wait_event_type, wait_event
+FROM pg_stat_activity
+WHERE pid = :'old_pid'::integer
+  AND backend_start = :'old_backend_start'::timestamptz;
+```
+
 status 返回当前版本、最近任务（包括阶段、时间、产物、原因）、最近一次未发布原因。
 未发布原因也包含完整流程／重建在导入或计算等前置阶段的失败，按实际时间与发布决定比较。
 history 只列成功发布的历史版本，按发布时间倒序；两者限量 1–1000，默认 20。

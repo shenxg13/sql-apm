@@ -10,9 +10,11 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'tests'))
 from verify import instance, Verification, run
+from database.session_wait import wait_for_backend_exit
 from ingestion.test_reader import row, configuration, write_csv
 from sql_apm.ingestion.config import load_config, IngestionError, identity
 from sql_apm.ingestion.importer import Importer
+from sql_apm.storage.ingestion import connect
 
 
 def timeout_worker(connection):
@@ -160,13 +162,20 @@ def verify(pg_bin):
                 "sys.path.insert(0," + repr(str(ROOT)) + ")\n" +
                 "from sql_apm.ingestion.importer import Importer\n" +
                 "from sql_apm.ingestion.config import load_config\n" +
-                "def die(number): os.kill(os.getpid(),signal.SIGKILL)\n" +
+                "def die(number):\n" +
+                " print(i.db.get_backend_pid(),flush=True)\n" +
+                " os.kill(os.getpid(),signal.SIGKILL)\n" +
                 "if __name__ == '__main__':\n" +
                 " i=Importer(" + repr(dsn) + ",workers=1,progress=lambda **kw:None,fault=die)\n" +
                 " i.run(load_config(" + repr(str(cfg)) + ",'S1','CRASH'))\n")
             before = v.sql('SELECT count(*) FROM mpp_occurrence')
-            killed = subprocess.run([sys.executable, str(helper)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+            killed = subprocess.run([sys.executable, str(helper)], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, timeout=60)
             v.require(killed.returncode == -9, 'SIGKILL terminates actual importer after COPY')
+            observer = connect(dsn, 'sql_apm')
+            try:
+                wait_for_backend_exit(observer, int(killed.stdout.strip()))
+            finally:
+                observer.close()
             v.require(v.sql('SELECT count(*) FROM mpp_occurrence') == before, 'process death rolls back uncommitted events')
             v.require(ingest([crash], 'CRASH')['added_occurrences'] == 2001, 'killed import safely retries without duplicates')
             v.require(v.sql("SELECT count(*) FROM import_attempt WHERE batch_id='CRASH' AND state='interrupted'") == '1', 'orphaned running attempt retained as interrupted')
@@ -409,7 +418,6 @@ def verify(pg_bin):
             finally:
                 upgraded.close()
             upgrade_sql("INSERT INTO schema_version(version,script_sha256) VALUES ('9.0.0',repeat('0',64))")
-            from sql_apm.storage.ingestion import connect
             try:
                 connection = connect(migrated_dsn, 'ingest_upgrade')
             except IngestionError as error:

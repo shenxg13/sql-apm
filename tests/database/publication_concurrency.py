@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 
+from database.session_wait import wait_for_backend_exit
 from sql_apm.storage.ingestion import connect
 from sql_apm.storage.tasks import Task
 from sql_apm.storage.statistics import StatisticsStore
@@ -62,6 +63,7 @@ from sql_apm.ingestion.config import load_config
 stage=os.environ['STAGE']
 db=connect(os.environ['SQL_APM_DSN'],'sql_apm')
 def stop(**values):
+ values['backend']=db.get_backend_pid()
  print(json.dumps(values),flush=True)
  time.sleep(300)
 with Task(db,'C1','full') as task:
@@ -91,6 +93,7 @@ with Task(db,'C1','full') as task:
             assert message,child.stderr.read()
             evidence=json.loads(message)
             child.kill();child.wait(timeout=10)
+            wait_for_backend_exit(db,evidence['backend'])
         finally:
             if child.poll() is None:child.kill();child.wait(timeout=10)
             child.stdout.close();child.stderr.close()

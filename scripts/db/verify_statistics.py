@@ -14,6 +14,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
 from verify import instance,Verification
+from database.session_wait import wait_for_backend_exit
 from ingestion.test_reader import row,write_csv,configuration
 from baseline.oracle import assert_metrics
 from sql_apm.ingestion.config import load_config
@@ -130,24 +131,26 @@ def verify():
                 retried=store.calculate('C1',snap['input_id'],snap['config_id'],failed['build_id'])
                 v.require(v.sql("SELECT retry_of FROM build WHERE build_id='"+retried['build_id']+"'")==failed['build_id'],'retry starts a distinct complete build')
                 # Stop a child immediately after its committed Build registration.
-                code="""import os,time
+                code="""import json,os,time
 from sql_apm.storage.statistics import StatisticsStore
 s=StatisticsStore(os.environ['SQL_APM_DSN'])
 def progress(row):
  if row['phase']=='build_created':
-  print(row['build_id'],flush=True)
+  print(json.dumps(dict(build_id=row['build_id'],backend=s.db.get_backend_pid())),flush=True)
   time.sleep(60)
 s.calculate('C1',os.environ['TEST_INPUT'],os.environ['TEST_CONFIG'],progress=progress)
 """
                 for sig in [signal.SIGTERM,signal.SIGKILL]:
                     child=subprocess.Popen([sys.executable,'-c',code],cwd=ROOT,env=dict(os.environ,SQL_APM_DSN=dsn,TEST_INPUT=snap['input_id'],TEST_CONFIG=snap['config_id']),stdout=subprocess.PIPE,text=True)
-                    killed=child.stdout.readline().strip();assert killed.startswith('B:')
+                    evidence=json.loads(child.stdout.readline())
+                    killed=evidence['build_id'];assert killed.startswith('B:')
                     child.send_signal(sig);child.wait(timeout=10)
                     for _ in range(100):
                         state=v.sql("SELECT state FROM build WHERE build_id='"+killed+"'")
                         if state=='interrupted':break
                         time.sleep(.1)
                     v.require(state=='interrupted','watchdog records process signal '+str(sig))
+                    wait_for_backend_exit(store.db,evidence['backend'])
                 command=[sys.executable,'-m','sql_apm','statistics','--cluster','C1','--input',snap['input_id'],'--config-id',snap['config_id']]
                 shown=subprocess.run(command,env=dict(os.environ,SQL_APM_DSN=dsn),cwd=ROOT,capture_output=True,text=True,check=True)
                 assert not any(secret in shown.stdout+shown.stderr for secret in ['synthetic_db','synthetic_user','SELECT','pause'])

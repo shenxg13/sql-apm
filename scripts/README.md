@@ -230,7 +230,8 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 `python -m sql_apm cleanup --cluster CLUSTER --training-config FILE` 默认只预览，
 增加 `--execute` 才执行按月清理；配置、锁及恢复见[操作说明](../docs/runbooks/build-publication.md#版本结果清理)。
-`verify_cleanup.py` 在私有 PG17 验证预览只读、保留内容、清理标记、任务互斥、10 秒等待及六阶段 SIGKILL；
+`verify_cleanup.py` 在私有 PG17 验证预览只读、保留内容、清理标记、任务互斥、每月共享 10 秒等待及六阶段 SIGKILL；
+另覆盖分组表 VACUUM 锁、收尾重试与小批分页、配置退出码、跨集群当前月份和提示计数边界。
 `verify.py` 增加 1.8.0 带数据升级到 1.9.0，并保留旧迁移字节核对。
 `verify_cleanup_full.py prepare` 从指定的冻结 1.8.0 checkout 和 55 文件构建九版本、导出数据库副本；
 `verify_cleanup_full.py verify` 恢复副本、对比升级前后全表摘要、构造受保护当前月份并实测清理。

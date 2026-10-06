@@ -134,6 +134,7 @@ def cleanup_measure(db,scope,reference,report,path):
                 ('succeeded','protected','retained','already_cleaned')]
         assert failed and all(m['state']=='lock_timeout' and m['cleaned_at'] is None
             and m['before_bytes']==m['after_bytes'] and m['released_bytes']==0 for m in failed),result
+        assert all((m['finished_at']-m['started_at']).total_seconds()<=10 for m in failed),failed
         print(json.dumps(dict(phase='cleanup_lock_retry',cluster=scope,attempt=len(attempts))),flush=True)
         time.sleep(0.5)
     raise AssertionError('cleanup copy remains busy after bounded operator retries')
@@ -145,6 +146,7 @@ def verify(args):
         source_dump_sha256=sha(args.dump),preservation={},python=sys.version,
         code_sha256={str(p.relative_to(ROOT)):sha(p) for p in [
             ROOT/'sql_apm/storage/schema.sql',ROOT/'sql_apm/storage/cleanup.py',ROOT/'sql_apm/baseline/retention.py',
+            ROOT/'sql_apm/cli/cleanup.py',
             ROOT/'sql_apm/storage/migrations/1.8.0-to-1.9.0.sql',
             ROOT/'scripts/db/verify_cleanup_full.py',ROOT/'tests/database/retention.py']})
     started=time.monotonic()

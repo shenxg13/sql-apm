@@ -150,7 +150,11 @@ mpp_result_partition 增加 cleaned_at 与 groups_cleaned_at，mpp_cleanup_month
 逻辑 contract_version 仍为 1.0.0。新 DDL、迁移和冻结 1.8.0 同步进入结构检查，旧文件字节不变。
 
 两张统计分区的删除与月份标记原子提交；随后用现有索引按行批量删除两张分组关联表。
-排他事务只处理 DDL 和固定数量的元数据，不扫描结果或逐构建更新。
+排他锁只覆盖两张统计父表及两张目标叶表，不申请分组关联表排他锁，因此分组表上的
+VACUUM／autovacuum 不阻挡移除。排他事务只处理 DDL 和固定数量的元数据，不扫描结果
+或逐构建更新。分区移除与分组收尾共用每月 10 秒锁等待预算；分组批次遇锁回滚后重试，
+预算用尽报告 cleanup_groups_pending，保留已提交批次，重跑继续。游标只在提交后推进。
+依据：[R1 缺陷与维护者确认的整改](https://github.com/shenxg13/sql-apm/issues/43#issuecomment-6019720422)。
 清理时间通过 build.partition_id 关联，build.results_saved 保持历史含义。
 已清理月份的统计叶表不再创建；分区构建与分组写入守卫拒绝此类写入。
 查询函数在读锁下先检查留存，正式／观察覆盖与门槛推导对已清理构建报 results_cleaned。

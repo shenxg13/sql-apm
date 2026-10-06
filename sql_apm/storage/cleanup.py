@@ -14,6 +14,22 @@ LOCK_BUDGET = 10.0
 CHUNK = 10000
 
 
+class _LockBudget:
+    """One month's failed lock attempts and backoff, excluding useful work."""
+    def __init__(self):
+        self.remaining = LOCK_BUDGET-0.1  # Leave room to persist the outcome.
+
+    def retry(self, started):
+        self.remaining -= time.monotonic()-started
+        if self.remaining <= 0:
+            raise LockNotAvailable()
+        tick = time.monotonic()
+        time.sleep(min(0.05,self.remaining))
+        self.remaining -= time.monotonic()-tick
+        if self.remaining <= 0:
+            raise LockNotAvailable()
+
+
 def _clock(cur, reference_month):
     cur.execute("SELECT date_trunc('month',clock_timestamp() AT TIME ZONE 'Asia/Shanghai')::date")
     return reference_month or cur.fetchone()[0]
@@ -101,13 +117,14 @@ class CleanupStore:
                          month['total_bytes'],month['total_bytes'],eligible))
                 if not eligible:
                     continue
+                budget = _LockBudget()
                 removed = bool(month['cleaned_at'])
                 try:
                     if not removed:
-                        self._remove_partitions(pid)
+                        self._remove_partitions(pid,budget)
                         removed = True
                     self._point('partitions_committed', pid)
-                    self._remove_groups(pid)
+                    self._remove_groups(pid,budget)
                 except (LockNotAvailable, QueryCanceled):
                     self._failed(pid,'failed' if removed else 'lock_timeout',
                                  'cleanup_groups_pending' if removed else 'cleanup_lock_timeout')
@@ -135,16 +152,13 @@ class CleanupStore:
             cur.execute('''UPDATE mpp_cleanup_month SET state=%s,reason=%s,finished_at=clock_timestamp()
                 WHERE task_id=%s AND partition_id=%s''', (state,reason,self.task.task_id,pid))
 
-    def _remove_partitions(self, pid):
+    def _remove_partitions(self, pid, budget):
         # Try the entire required lock set without queueing behind active readers
         # or another cluster's build. Failed attempts roll back *all* locks.
-        # A single monotonic deadline also bounds any unexpected DDL lock wait.
-        deadline = time.monotonic()+LOCK_BUDGET-0.1
+        # Share the remaining wait budget with subsequent group batches.
         self._point('before_partitions', pid)
         while True:
-            remaining = deadline-time.monotonic()
-            if remaining <= 0:
-                raise LockNotAvailable()
+            started = time.monotonic()
             try:
                 with self.db, self.db.cursor() as cur:
                     # Required relation locks use NOWAIT. Unexpected catalog
@@ -154,7 +168,7 @@ class CleanupStore:
                     parents = [sql.SQL('ONLY {}').format(sql.Identifier(t)) for t in TABLES]
                     leaves = [sql.Identifier(t+'_p'+str(pid)) for t in TABLES]
                     cur.execute(sql.SQL('LOCK TABLE {} IN ACCESS EXCLUSIVE MODE NOWAIT').format(
-                        sql.SQL(',').join(parents+[sql.Identifier(t) for t in GROUPS]+leaves)))
+                        sql.SQL(',').join(parents+leaves)))
                     # Everything below is metadata / constant-row work. Do not
                     # inspect builds, statistics, or groups while holding AX.
                     self._point('partitions_locked', pid)
@@ -174,37 +188,21 @@ class CleanupStore:
                 return
             except LockNotAvailable:
                 self.db.rollback()
-                remaining = deadline-time.monotonic()
-                if remaining <= 0:
-                    raise
-                time.sleep(min(0.05,remaining))
+                budget.retry(started)
 
-    def _remove_groups(self, pid):
+    def _remove_groups(self, pid, budget):
         for table, field in zip(GROUPS,('formal_groups_deleted','observation_groups_deleted')):
             last_key = ('', '')
             while True:
                 started = time.monotonic()
-                with self.db, self.db.cursor() as cur:
-                    # Another cluster's brief DDL must not add an unbounded wait
-                    # after statistics were removed. A retry resumes this phase.
-                    cur.execute("SET LOCAL lock_timeout='1ms'")
-                    # Advance along the partition-leading primary key. Repeating
-                    # an unordered LIMIT from the beginning can rescan dead rows
-                    # quadratically before VACUUM. ctid bounds the actual delete.
-                    cur.execute(sql.SQL('''DELETE FROM {} WHERE ctid = ANY(ARRAY(
-                        SELECT ctid FROM {} WHERE partition_id=%s AND (build_id,group_id)>(%s,%s)
-                        ORDER BY build_id,group_id LIMIT %s)) RETURNING build_id,group_id''').format(
-                        sql.Identifier(table),sql.Identifier(table)), (pid,*last_key,CHUNK))
-                    count = cur.rowcount
-                    if count:
-                        # Project databases use C collation; UTF-8 key ordering
-                        # matches Python. Memory is bounded by one small batch.
-                        last_key = max(cur.fetchall())
-                    self._point('groups_deleting', pid)
-                    cur.execute(sql.SQL('''UPDATE mpp_cleanup_month SET {}={}+%s,group_seconds=group_seconds+%s,
-                        state='removing_groups',reason='results_cleaned' WHERE task_id=%s AND partition_id=%s''').format(
-                        sql.Identifier(field),sql.Identifier(field)),
-                        (count,time.monotonic()-started,self.task.task_id,pid))
+                try:
+                    count, next_key = self._remove_group_batch(pid,table,field,last_key)
+                except LockNotAvailable:
+                    self.db.rollback()
+                    budget.retry(started)
+                    continue
+                # A rolled-back batch must never advance the pagination key.
+                last_key = next_key
                 self._point('groups_committed', pid)
                 if count < CHUNK:
                     break
@@ -212,3 +210,23 @@ class CleanupStore:
             cur.execute('UPDATE mpp_result_partition SET groups_cleaned_at=clock_timestamp() WHERE partition_id=%s', (pid,))
             cur.execute('''UPDATE mpp_cleanup_month SET state='succeeded',reason='results_cleaned',finished_at=clock_timestamp()
                 WHERE task_id=%s AND partition_id=%s''', (self.task.task_id,pid))
+
+    def _remove_group_batch(self, pid, table, field, last_key):
+        started = time.monotonic()
+        with self.db, self.db.cursor() as cur:
+            cur.execute("SET LOCAL lock_timeout='1ms'")
+            # Advance along the partition-leading primary key rather than
+            # rescanning dead prefixes. ctid bounds the actual delete.
+            cur.execute(sql.SQL('''DELETE FROM {} WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM {} WHERE partition_id=%s AND (build_id,group_id)>(%s,%s)
+                ORDER BY build_id,group_id LIMIT %s)) RETURNING build_id,group_id''').format(
+                sql.Identifier(table),sql.Identifier(table)), (pid,*last_key,CHUNK))
+            count = cur.rowcount
+            # Project databases use C collation; Python has the same key order.
+            next_key = max(cur.fetchall()) if count else last_key
+            self._point('groups_deleting', pid)
+            cur.execute(sql.SQL('''UPDATE mpp_cleanup_month SET {}={}+%s,group_seconds=group_seconds+%s,
+                state='removing_groups',reason='results_cleaned' WHERE task_id=%s AND partition_id=%s''').format(
+                sql.Identifier(field),sql.Identifier(field)),
+                (count,time.monotonic()-started,self.task.task_id,pid))
+        return count, next_key

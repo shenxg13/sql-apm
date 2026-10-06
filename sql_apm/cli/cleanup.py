@@ -33,7 +33,7 @@ def main(argv=None):
         return 1 if result['state']=='failed' else 0
     except TrainingError as error:
         emit(state='failed',reason=str(error))
-        return 2
+        return 1
     except IngestionError as error:
         emit(state='failed',reason=str(error))
         return 1

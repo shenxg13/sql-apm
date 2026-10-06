@@ -220,20 +220,29 @@ Issue #35 取代此前“选取本集群全部完整批次”的操作口径。�
 它只提示，不自动删除；`rebuild` 也不清理。
 
 执行留下一条 mode=cleanup 的任务；忙时返回 `cluster_busy`，仍记录 busy_rejected。
-每个月份先尝试取得所需锁，按单调时钟给定总共 10 秒预算，超时输出 `cleanup_lock_timeout`、
+每个月份先尝试取得两张统计父表及两张目标叶表的排他锁，不对分组关联表申请排他锁。
+分区移除和分组收尾共用按单调时钟累计的 10 秒锁等待预算。移除前超时输出 `cleanup_lock_timeout`、
 该月保持原样，其他月份继续；可在占用解除后重跑。成功取得锁后的短事务同时移除两张统计
 分区并标记 cleaned_at，提交后按每批最多 10,000 行删除分组关联。分组删除中断时预览显示
 `groups_pending=true`，重跑会继续收尾，即使后来调大保留月数也会清完已移除统计的月份。
-收尾阶段若另一个清理事务短暂持有分组表排他锁，立即放弃当前批次并返回
-`cleanup_groups_pending`；此时统计已清理，不报告为“该月份保持原样”的前置锁超时。
+收尾阶段遇锁冲突时回滚当前批次，在该月剩余预算内短暂停顿后重试；短暂占用解除后，
+可在同一次运行中完成。预算用尽才返回 `cleanup_groups_pending`；此时统计已清理，
+已提交的删除批次保留，不报告为“该月份保持原样”的前置锁超时。正常删除的工作时间
+不占锁等待预算，月份处理总耗时可以超过 10 秒。
+
+没有构建和查询时出现 `cleanup_lock_timeout`，可能是 autovacuum 正在处理该月份的
+统计分区，刚恢复或刚大量改动过的库上较常见；稍后重跑即可。目标叶表仍采用有预算的
+NOWAIT 重试。分组表上的 VACUUM 锁与分批 DELETE 兼容，不再阻挡统计分区移除。
 
 执行输出的 months 来自 `mpp_cleanup_month`，包含每月状态、原因、构建数、before_bytes、
 after_bytes、released_bytes、两种分组删除行数、起止时间、exclusive_seconds 和 group_seconds。
 排他时长从成功的锁请求发起到事务提交返回测量，含往返开销，是持锁时长的上界；分组耗时
-为本次运行各删除批次的语句及计数更新前耗时合计。分组行删除的空间由普通 VACUUM 复用，
+为本次运行成功提交批次的语句及计数更新前耗时合计；回滚批次不计删除行数或该项耗时。
+分组行删除的空间由普通 VACUUM 复用，
 不计作立即释放的磁盘字节，也不自动执行 VACUUM FULL。
 
-退出码：成功或无可清理为 0；部分月份未完成、占用拒绝或执行失败为 1；配置／参数错误为 2；
+退出码：成功或无可清理为 0；配置文件内容错误、部分月份未完成、占用拒绝或执行失败为 1；
+命令行参数解析错误为 2（如缺少必填参数或使用未知选项）；
 捕获人工中断为 130。强制终止按前文的数据库会话退出规则恢复，重跑保留旧任务及其逐月记录。
 
 `history` 继续显示已清理的版本，并增加 `results_cleaned` 和 `cleaned_at`。
@@ -249,11 +258,28 @@ SELECT b.build_id, b.results_saved,
 FROM build b LEFT JOIN mpp_result_partition p USING (partition_id)
 WHERE b.build_id = 'BUILD_ID';
 
-SELECT * FROM mpp_read_statistics('BUILD_ID');
-SELECT * FROM mpp_read_statistics('BUILD_ID', true);
+SELECT * FROM mpp_read_statistics('BUILD_ID', false, 'GROUP_ID');
+SELECT * FROM mpp_read_statistics('BUILD_ID', true, 'GROUP_ID');
 SELECT * FROM mpp_cleanup_month WHERE task_id = 'TASK_ID';
 ```
 
-查询入口先持有统计父表的读锁再检查标记，防止通过检查后遇上分区移除。
-直接按物理表执行的维护 SQL 须自行检查上述状态；产品按构建读取结果统一使用受保护入口。
+`mpp_read_statistics` 用于按分组读取，应传入第三个参数。不带分组过滤时，函数会先
+取出整个版本的全部行；在外层加 WHERE 或 LIMIT 也不能避免这项物化成本。
+批量读取使用下面的守卫写法，与 `statistics_sufficiency.sql` 相同。`$1` 由驱动绑定
+为 Build ID；观察结果把内层表换成 `mpp_observation_statistic`：
+
+```sql
+SELECT result.*
+FROM (SELECT mpp_require_results($1) AS partition_id OFFSET 0) guard
+CROSS JOIN LATERAL (
+    SELECT s.* FROM mpp_statistic s
+    WHERE s.partition_id = guard.partition_id AND s.build_id = $1
+      AND s.layer = 'overall'
+    OFFSET 0
+) result;
+```
+
+先执行的守卫持有统计父表读锁并检查标记，随后读取物理表；两个 OFFSET 0 保留执行边界，
+避免空分区让优化器跳过检查，也不物化整个版本。直接读取物理表的维护 SQL 须自行执行
+相同的留存检查；产品按构建读取结果使用单组函数或上述受保护的批量入口。
 没有恢复或删除单个构建的命令。展示界面的选择限制另行交付。

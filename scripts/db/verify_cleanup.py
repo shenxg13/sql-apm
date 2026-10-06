@@ -8,16 +8,16 @@ from pathlib import Path
 import select
 import subprocess
 import sys
-import time
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
 from verify import instance,Verification
 from database.retention import clone_build,contents,digest
+from database.retention_edges import verify_edges,month_seconds
 from database.session_wait import wait_for_backend_exit
 from ingestion.test_reader import row,write_csv,configuration
 from sql_apm.ingestion.config import load_config
-from sql_apm.storage.cleanup import CleanupStore,preview,overdue_count
+from sql_apm.storage.cleanup import CleanupStore,preview
 from sql_apm.storage.ingestion import connect
 from sql_apm.storage.publication import version_status
 from sql_apm.storage.tasks import Task
@@ -47,7 +47,7 @@ def verify(pg_bin):
         other_doc['sources']['S2']=dict(other_doc['sources'].pop('S1'),cluster='C2')
         other_doc['batches']['B2']['source']='S2';import_path2=directory/'import2.json'
         import_path2.write_text(json.dumps(other_doc))
-        run(dsn,'sql_apm',validate(config,'C2'),load_config(import_path2,'S2','B2'),workers=1)
+        other_result=run(dsn,'sql_apm',validate(config,'C2'),load_config(import_path2,'S2','B2'),workers=1)
         pid=clone_build(db,source,'old-published','2026-01-01',True)
         clone_build(db,source,'old-unpublished','2026-01-01')
         clone_build(db,source,'never-saved','2026-01-01',saved=False)
@@ -75,7 +75,7 @@ def verify(pg_bin):
             values=cur.fetchall();assert values[0]==values[1]
         v.require(True,'retention changes neither stored config content nor training rule identity')
         hinted=run(dsn,'sql_apm',validate(config,'C1'),ingestion,workers=1)
-        assert hinted['expired_result_months']==overdue_count(db,'C1')>0
+        assert hinted['expired_result_months']==1
         current=version_status(db,'C1')['current']
         def cli(words, timeout=20):
             return subprocess.run([sys.executable,'-m','sql_apm']+words,cwd=ROOT,
@@ -84,8 +84,12 @@ def verify(pg_bin):
         original=contents(db)
         assert cli(cleanup).returncode==0 and contents(db)==original
         assert cli(cleanup+['--reference-month','2027-01-01']).returncode==2
-        training.write_text(json.dumps(dict(config,retention={'months':0})))
-        bad=cli(cleanup);assert bad.returncode==2 and json.loads(bad.stdout)['reason']=='invalid_retention_months'
+        for document,reason in [(dict(config,retention={'months':0}),'invalid_retention_months'),
+                                (dict(config,clusters=['C2']),'unknown_cluster'),([], 'invalid_training_config')]:
+            training.write_text(json.dumps(document))
+            for suffix in ([],['--execute']):
+                bad=cli(cleanup+suffix)
+                assert bad.returncode==1 and json.loads(bad.stdout)['reason']==reason,(reason,bad.stdout)
         training.write_text(json.dumps(config))
         with Task(db,'C1','snapshot'):
             busy=cli(cleanup+['--execute']);assert busy.returncode==1 and json.loads(busy.stdout)['reason']=='cluster_busy'
@@ -107,14 +111,15 @@ def verify(pg_bin):
             holder=connect(dsn,'sql_apm')
             with holder.cursor() as cur:cur.execute(statement)
             unchanged=contents(db,cleanup=True);old=digest(db,'mpp_statistic')
-            started=time.monotonic();out=CleanupStore(db).execute('C1',2,reference_month=reference);elapsed=time.monotonic()-started
+            out=CleanupStore(db).execute('C1',2,reference_month=reference)
             holder.rollback();holder.close()
             timed=[m for m in out['months'] if m['state']=='lock_timeout']
             assert out['state']=='failed' and timed
             assert all(m['released_bytes']==0 and m['before_bytes']==m['after_bytes'] for m in timed)
-            assert elapsed<10*len(timed)+0.5,(kind,elapsed)
+            elapsed=[month_seconds(m) for m in timed]
+            assert all(s<=10 for s in elapsed),(kind,elapsed)
             assert contents(db,cleanup=True)==unchanged and digest(db,'mpp_statistic')==old
-            v.require(True,kind+' abandons each month within lock budget and changes no results; seconds='+str(round(elapsed,3)))
+            v.require(True,kind+' abandons each month within lock budget and changes no results; month_seconds='+str([round(s,3) for s in elapsed]))
         preserved=contents(db,cleanup=True)
         other=digest(db,'mpp_statistic',where='WHERE partition_id<>%s',params=(pid,))
         out=CleanupStore(db).execute('C1',2,reference_month=reference)
@@ -129,6 +134,14 @@ def verify(pg_bin):
         assert next(h for h in history if h['build_id']=='old-published')['results_cleaned']
         for table in ('mpp_build_group','mpp_build_observation_group'):
             assert v.sql('SELECT count(*) FROM '+table+' WHERE partition_id='+str(pid))=='0'
+            with db.cursor() as cur:
+                try:
+                    cur.execute('INSERT INTO '+table+' SELECT %s,%s,group_id FROM '+table+' WHERE build_id=%s LIMIT 1',
+                                (pid,'old-published',source))
+                except Exception as error:assert error.diag.message_primary=='results_cleaned'
+                else:raise AssertionError('cleaned_group_write_accepted')
+            db.rollback()
+        v.require(True,'formal and observation group writes into a cleaned month reject with results_cleaned')
         for query in ("SELECT * FROM mpp_coverage('old-published')", "SELECT * FROM mpp_coverage('old-unpublished',true)",
                       "SELECT * FROM mpp_read_statistics('old-published')", "SELECT * FROM mpp_read_statistics('old-unpublished',true)",
                       (ROOT/'sql_apm/storage/statistics_sufficiency.sql').read_text().replace('%(build_id)s',"'old-published'")):
@@ -155,6 +168,7 @@ def verify(pg_bin):
             outcome=next(m for m in pending['months'] if m['partition_id']==pending_pid)
             assert pending['state']=='failed' and outcome['reason']=='cleanup_groups_pending'
             assert outcome['cleaned_at'] and outcome['released_bytes']>0
+            assert 9.5<=month_seconds(outcome)<=10,month_seconds(outcome)
         finally:
             holder.rollback();holder.close()
         assert CleanupStore(db).execute('C1',10000)['state']=='succeeded'
@@ -195,9 +209,12 @@ cleanup.CleanupStore(db,fault=point).execute('C1',2,reference_month=date.fromiso
             assert recovered['state']=='succeeded',recovered
             assert v.sql("SELECT count(*) FROM task WHERE mode='cleanup' AND state='running'")=='0'
             assert int(v.sql("SELECT count(*) FROM task WHERE mode='cleanup' AND state='interrupted' AND reason='owner_exited'"))==i+1
+            assert v.sql("SELECT count(*) FROM mpp_cleanup_month WHERE state='interrupted' AND reason='owner_exited' AND partition_id="+str(kill_pid))=='1'
             assert v.sql('SELECT count(*) FROM mpp_build_group WHERE partition_id='+str(kill_pid))=='0'
             assert v.sql('SELECT count(*) FROM mpp_build_observation_group WHERE partition_id='+str(kill_pid))=='0'
             v.require(True,'SIGKILL '+stage+' preserves atomic visibility; interrupted task and restart finish all groups')
+        verify_edges(v,db,dsn,source,other_result['build']['build_id'],source_month,reference,
+                     lambda:run(dsn,'sql_apm',validate(config,'C1'),ingestion,workers=1))
         status=version_status(db,'C1');assert status['tasks'][0]['mode']=='cleanup'
         assert not any(s in json.dumps(status,default=str) for s in ('SELECT','synthetic_db','synthetic_user'))
         v.init('check');db.close()

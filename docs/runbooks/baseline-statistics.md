@@ -48,6 +48,8 @@ WHERE s.build_id = $1 AND s.group_id = $2;
 ```
 
 在选定项目 schema 的 search_path 下执行；不要用当前默认配置替换 c.thresholds 或版本。
+`mpp_read_statistics` 应传入分组参数；省略时会物化整个版本，不能依靠外层过滤减小开销。
+批量直接读取统计行使用[先守卫再连接物理表的写法](build-publication.md#版本结果清理)。
 返回三项完整 ThresholdResult；未知公式版本明确报 unsupported_statistics_version。
 结果是样本条件标记，是否能用于异常判断仍受统计契约限制。
 

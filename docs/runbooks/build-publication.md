@@ -1,7 +1,7 @@
 # 完整流程、重新构建与版本查询
 
 业务规则见[构建与版本](../../.project-wiki/features/baseline-versions.md)，
-连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.8.0；
+连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.9.0；
 连接通过既有 `SQL_APM_DSN` 提供，不把凭据写进命令参数或报告。
 
 ## 显式运行
@@ -38,9 +38,9 @@ rebuild 必须给出该参数，可用 `--retry-of BUILD_ID` 引用同集群失�
 
 ## 占用与恢复
 
-full、import、rebuild、training snapshot、statistics 都按集群互斥。
+full、import、rebuild、training snapshot、statistics 和 cleanup --execute 都按集群互斥。
 忙时返回 cluster_busy 并记录 busy_rejected。不同集群可同时执行，共享规则缓存按短事务更新。
-只有 import 和 full 可首次登记集群；rebuild、training snapshot 和 statistics 对未登记集群返回
+只有 import 和 full 可首次登记集群；rebuild、training snapshot、statistics 和 cleanup 对未登记集群返回
 unknown_cluster，不写集群或任务记录。每次新占用获得后自动将残留任务、尝试和未发布构建记为 interrupted／owner_exited；
 无手工解锁或续算命令。数据库连接失效后原进程不能重连提交，人工重新运行任务。
 已经完整成功导入的文件按原去重规则复用；原失败记录保留。
@@ -98,8 +98,8 @@ history 只列成功发布的历史版本，按发布时间倒序；两者限量
 计数来自版本输入文件关联的 `problem` 记录，不是不同 SQL 数、执行次数或全库累计问题数；
 同一 SQL 在多条日志中失败会分别计数。后来导入的文件在成为新版本输入前不影响当前计数。
 仅展示，不增加发布检查或阻止发布；没有生效版本时 `current=null`。
-`history` 的历史版本输出保持原格式。这两个计数在 #34 中未改变当时的 1.6.0 结构；
-当前采用 1.8.0；1.7.0 可带数据升级，更早非空库仍须按[初始化说明](database-initialization.md#升级到-180)重建。
+`history` 在 #43 增加结果清理标记和时间（见下节）。这两个计数在 #34 中未改变当时的 1.6.0 结构；
+当前采用 1.9.0；1.7.0／1.8.0 可带数据升级，更早非空库仍须按[初始化说明](database-initialization.md#升级到-190)重建。
 
 ## 覆盖与分区
 
@@ -171,3 +171,115 @@ Issue #35 取代此前“选取本集群全部完整批次”的操作口径。�
 专项命令 `.venv/bin/python scripts/db/verify_window.py` 使用私有临时实例。
 真实对照由 `scripts/db/verify_window_full.py` 显式选择基线／候选 checkout 与固定日志，
 不纳入日常 Harness。
+
+## 版本结果清理
+
+[留存契约](../../.project-wiki/contracts/sql-storage.md#版本结果按月留存2026-10-06)由 #43 确认。
+先预览该集群全部结果月份，再显式执行：
+
+```bash
+.venv/bin/python -m sql_apm cleanup --cluster 119 --training-config var/local/training.json
+.venv/bin/python -m sql_apm cleanup --cluster 119 --training-config var/local/training.json --execute
+```
+
+同样支持 `--schema`。省略 `--execute` 只读，不占用任务、不写记录。
+保留月数来自训练配置的 `retention`，默认 2；月份由数据库北京时间决定，无手工日期参数。
+例如当前 2026-10、N=2 时，保留 8、9、10 月及未来月份；7 月及更早过期。
+当前生效版本所在月份受保护，即使已过期也不删除。配置改小后按新值执行，不再二次确认。
+建议在两个集群都没有构建时运行。
+
+预览示例字段（标识及数值均为合成示例）：
+
+```json
+{
+  "state": "preview",
+  "retention_months": 2,
+  "current_month": "2026-10-01",
+  "current_version_month": "2026-09-01",
+  "expired_months": 1,
+  "months": [{
+    "partition_id": 123,
+    "build_month": "2026-07-01",
+    "state": "expired",
+    "reason": "retention_expired",
+    "published_builds": 20,
+    "unpublished_builds": 2,
+    "statistic_bytes": 1048576,
+    "observation_bytes": 65536,
+    "total_bytes": 1114112,
+    "cleaned_at": null,
+    "groups_pending": false
+  }]
+}
+```
+
+月份状态为 retained／expired／protected／cleaned；构建数统计曾保存结果的构建，
+发布数按是否有成功发布记录区分，同一构建不重复计数。已清理月份仍显示历史构建数。
+占用字节包括两张统计叶表、索引和 TOAST，不含共享分组关联表或 WAL。
+`full` 最后一行增加 `expired_result_months`，0 也显式输出；计数包含过期但受保护的月份。
+它只提示，不自动删除；`rebuild` 也不清理。
+
+执行留下一条 mode=cleanup 的任务；忙时返回 `cluster_busy`，仍记录 busy_rejected。
+每个月份先尝试取得两张统计父表及两张目标叶表的排他锁，不对分组关联表申请排他锁。
+分区移除和分组收尾共用按单调时钟累计的 10 秒锁等待预算。移除前超时输出 `cleanup_lock_timeout`、
+该月保持原样，其他月份继续；可在占用解除后重跑。成功取得锁后的短事务同时移除两张统计
+分区并标记 cleaned_at，提交后按每批最多 10,000 行删除分组关联。分组删除中断时预览显示
+`groups_pending=true`，重跑会继续收尾，即使后来调大保留月数也会清完已移除统计的月份。
+收尾阶段遇锁冲突时回滚当前批次，在该月剩余预算内短暂停顿后重试；短暂占用解除后，
+可在同一次运行中完成。预算用尽才返回 `cleanup_groups_pending`；此时统计已清理，
+已提交的删除批次保留，不报告为“该月份保持原样”的前置锁超时。正常删除的工作时间
+不占锁等待预算，月份处理总耗时可以超过 10 秒。
+
+没有构建和查询时出现 `cleanup_lock_timeout`，可能是 autovacuum 正在处理该月份的
+统计分区，刚恢复或刚大量改动过的库上较常见；稍后重跑即可。目标叶表仍采用有预算的
+NOWAIT 重试。分组表上的 VACUUM 锁与分批 DELETE 兼容，不再阻挡统计分区移除。
+
+执行输出的 months 来自 `mpp_cleanup_month`，包含每月状态、原因、构建数、before_bytes、
+after_bytes、released_bytes、两种分组删除行数、起止时间、exclusive_seconds 和 group_seconds。
+排他时长从成功的锁请求发起到事务提交返回测量，含往返开销，是持锁时长的上界；分组耗时
+为本次运行成功提交批次的语句及计数更新前耗时合计；回滚批次不计删除行数或该项耗时。
+分组行删除的空间由普通 VACUUM 复用，
+不计作立即释放的磁盘字节，也不自动执行 VACUUM FULL。
+
+退出码：成功或无可清理为 0；配置文件内容错误、部分月份未完成、占用拒绝或执行失败为 1；
+命令行参数解析错误为 2（如缺少必填参数或使用未知选项）；
+捕获人工中断为 130。强制终止按前文的数据库会话退出规则恢复，重跑保留旧任务及其逐月记录。
+
+`history` 继续显示已清理的版本，并增加 `results_cleaned` 和 `cleaned_at`。
+`build.results_saved` 表示曾成功保存，保持原值；与月份的 cleaned_at 联合判断现有结果。
+results_saved=false 表示从未保存，与 results_saved=true 且 cleaned_at 非空明确区分。
+`mpp_coverage`（正式／观察）、`mpp_read_statistics` 和批量门槛接口对已清理构建报固定
+`results_cleaned`，不能把它解释为没有分组或空桶。当前版本及其查询不受清理影响。
+
+```sql
+SELECT b.build_id, b.results_saved,
+       b.results_saved AND p.cleaned_at IS NOT NULL AS results_cleaned,
+       CASE WHEN b.results_saved THEN p.cleaned_at END AS cleaned_at
+FROM build b LEFT JOIN mpp_result_partition p USING (partition_id)
+WHERE b.build_id = 'BUILD_ID';
+
+SELECT * FROM mpp_read_statistics('BUILD_ID', false, 'GROUP_ID');
+SELECT * FROM mpp_read_statistics('BUILD_ID', true, 'GROUP_ID');
+SELECT * FROM mpp_cleanup_month WHERE task_id = 'TASK_ID';
+```
+
+`mpp_read_statistics` 用于按分组读取，应传入第三个参数。不带分组过滤时，函数会先
+取出整个版本的全部行；在外层加 WHERE 或 LIMIT 也不能避免这项物化成本。
+批量读取使用下面的守卫写法，与 `statistics_sufficiency.sql` 相同。`$1` 由驱动绑定
+为 Build ID；观察结果把内层表换成 `mpp_observation_statistic`：
+
+```sql
+SELECT result.*
+FROM (SELECT mpp_require_results($1) AS partition_id OFFSET 0) guard
+CROSS JOIN LATERAL (
+    SELECT s.* FROM mpp_statistic s
+    WHERE s.partition_id = guard.partition_id AND s.build_id = $1
+      AND s.layer = 'overall'
+    OFFSET 0
+) result;
+```
+
+先执行的守卫持有统计父表读锁并检查标记，随后读取物理表；两个 OFFSET 0 保留执行边界，
+避免空分区让优化器跳过检查，也不物化整个版本。直接读取物理表的维护 SQL 须自行执行
+相同的留存检查；产品按构建读取结果使用单组函数或上述受保护的批量入口。
+没有恢复或删除单个构建的命令。展示界面的选择限制另行交付。

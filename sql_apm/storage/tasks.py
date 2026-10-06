@@ -44,6 +44,9 @@ class Task:
         return self
 
     def recover(self, cur):
+        cur.execute("""UPDATE mpp_cleanup_month m SET state='interrupted',reason='owner_exited',finished_at=clock_timestamp()
+            FROM task t WHERE m.task_id=t.task_id AND t.scope_id=%s AND t.state='running'
+                AND m.state IN ('pending','removing_groups')""", (self.scope,))
         # A calculated build can be orphaned during checks/publication. Exclude
         # committed publications: a kill immediately after commit is not rollback.
         cur.execute('''UPDATE build b SET state='interrupted',finished_at=clock_timestamp()

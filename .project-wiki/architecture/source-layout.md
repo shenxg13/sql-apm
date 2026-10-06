@@ -10,8 +10,10 @@ owners:
   - scripts/db/
   - tests/database/
   - scripts/deployment/
-updated: 2026-10-05
+updated: 2026-10-06
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/43
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/33
     status: current
   - path: docs/reports/kylin-delivery-alignment-2026-10-04.md
@@ -295,6 +297,13 @@ HTML；`build_bundle.py` 把同一程序与源码／wheel／RPM 组装为内网�
 演练通过已有 CLI 执行 full/rebuild/status/history，仅用计数查询核对结果，
 不复制产品导入、资格或统计实现；产品模块不反向依赖这些脚本。
 目录内脚本的操作契约由[部署手册](../../docs/runbooks/kylin-offline-deployment.md)维护。
+
+### 版本结果留存模块（2026-10-06）
+
+Issue #43 将纯日历判断放在 `sql_apm/baseline/retention.py`，不依赖数据库驱动；
+`sql_apm/storage/cleanup.py` 管理 PG 任务、锁和删除事务，`sql_apm/cli/cleanup.py` 处理
+参数与脱敏输出。配置解析仍在 training/config.py，留存值不进入训练快照。
+宿主 Python 的离线单元测试无需安装 psycopg2；数据库验收使用锁定的项目解释器和依赖。
 
 ## Workflows
 

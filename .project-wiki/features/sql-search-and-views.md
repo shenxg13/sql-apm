@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/sql-search-and-views.md
 updated: 2026-10-06
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/43
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/35
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/21
@@ -65,7 +67,7 @@ confidence: high
   Business Forms，也不表示其在本项目中的维护成本已经验证更低。
 - Appsmith 保留为未选定的替代方案。检索与分组选择采用下述已确认规则；
   指纹算法细节、具体接口、插件兼容性和面板交互仍待落实。
-- 展示需求不改变 SQL 原文、逐次执行明细及历史版本留存策略的待定状态。
+- 展示需求不改变 SQL 原文和逐次执行明细的留存待定状态；版本结果现按下述 #43 规则处理。
 
 关联条款：[已确认的首期操作入口](operator-cli.md#已确认的首期操作入口)；[已确认的 SQL 原文存储方式](../contracts/sql-storage.md#已确认的-sql-原文存储方式)；[已确认的首期留存与自动清理边界](../contracts/sql-storage.md#已确认的首期留存与自动清理边界)。
 
@@ -182,6 +184,17 @@ confidence: high
 快照按选入批次的文件并集封存。因此事件是否在输入范围内须以 `input_file` 为准：
 若另一选入批次包含该文件，其事件仍可返回判定，窗口外事件仍为 `outside_window`。
 不能只看其中一个批次是否选入。此处说明既有去重与整批选入的组合行为，不新增展示功能。
+
+### 已清理历史版本的展示（2026-10-06）
+
+[Issue #43](https://github.com/shenxg13/sql-apm/issues/43)确认：
+版本选择仍显示已清理版本的基本信息，但不能选作基线参照。查询明确表示“已清理”，
+不把不存在的结果解释为没有分组、零样本或全部空桶。版本元信息和清理时间保留；
+结果从未保存与曾保存后被清理区分。当前版本月份受保护，仍可作为默认基线。
+
+history 的清理标记及正式／观察结果的数据库查询守卫由 #43 实现，图形界面另行交付。
+[留存范围](../contracts/sql-storage.md#版本结果按月留存2026-10-06)不删除执行明细、SQL 原文
+或规则依据，不改变原先的历史执行和训练判定展示边界。
 
 ## Workflows
 

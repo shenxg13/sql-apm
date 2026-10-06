@@ -6,7 +6,7 @@
 
 ## 前提与调用
 
-先按[初始化说明](database-initialization.md#升级到-180)初始化 1.8.0（1.7.0 可带数据升级，更早非空库须重建），完成导入，
+先按[初始化说明](database-initialization.md#升级到-190)初始化 1.9.0（1.7.0／1.8.0 可带数据升级，更早非空库须重建），完成导入，
 使用[训练快照命令](training-decisions.md)得到 input_id 与 config_id。
 继续使用相同 libpq 环境或 SQL_APM_DSN，不把密码写入命令或提交配置。
 
@@ -41,13 +41,15 @@ SELECT s.build_id, s.group_id, s.layer, s.bucket_date, s.bucket_number,
          c.statistics_version, c.thresholds, s.layer, s.included_count,
          s.active_dates, s.active_week_starts
        ) AS sufficiency
-FROM mpp_statistic s
+FROM mpp_read_statistics($1, false, $2) s
 JOIN build b USING (build_id)
 JOIN config_snapshot c USING (config_id)
 WHERE s.build_id = $1 AND s.group_id = $2;
 ```
 
 在选定项目 schema 的 search_path 下执行；不要用当前默认配置替换 c.thresholds 或版本。
+`mpp_read_statistics` 应传入分组参数；省略时会物化整个版本，不能依靠外层过滤减小开销。
+批量直接读取统计行使用[先守卫再连接物理表的写法](build-publication.md#版本结果清理)。
 返回三项完整 ThresholdResult；未知公式版本明确报 unsupported_statistics_version。
 结果是样本条件标记，是否能用于异常判断仍受统计契约限制。
 
@@ -70,7 +72,8 @@ distribution = cur.fetchall()
 
 在仓库根目录运行该示例；SQL 文本来自仓库固定资源，Build ID 始终通过驱动绑定。
 批量路径只返回三个达标标记；明细及不足原因仍用上面的完整函数。
-普通批量汇总无需先取回所有统计行到 Python。不存在的 Build 返回空集；空集本身不代表构建成功。
+普通批量汇总无需先取回所有统计行到 Python。不存在的 Build 返回空集；空集本身不代表构建成功。已清理的 Build 固定报 results_cleaned；
+正式与观察覆盖、mpp_read_statistics 的行为相同，详见[清理说明](build-publication.md#版本结果清理)。
 
 成本测量命令只创建合成数据与私有 PG17，不连接现有服务；输出文件必须不存在：
 
@@ -155,7 +158,7 @@ retry_of 仅接受同集群、同一对快照的 failed／interrupted 构建；�
 第二条显式重新导入 55 文件，在私有 PG17 以 119 截止 2026-07-31、120 截止 2026-09-19
 各构建并重复。沿用 #25 的固定验收排除时段；复算全部观察组的每个桶和 17 指标。
 用冻结 main 基线 `f038932fe0d5453450b91a59d5239c95bacb0078` 的统计实现生成正式对照，
-通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.8.0 结构；
+通过数据库逐行比较确认不变；该 Git 对象须在本地存在。只复用正式计算类，使用当前连接和 1.9.0 结构；
 移除冻结计算器的旧覆盖物理写入并替换旧 profile 字面值，保留原计算。
 `--dsn` 仅供已重导私有实例的分阶段验收；输出目录、原文、实例和中间结果保持本地忽略。
 

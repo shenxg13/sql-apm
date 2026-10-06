@@ -10,7 +10,7 @@ Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0, to 1.8.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0/1.8.0, to 1.9.0; stop writers first.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.
@@ -99,8 +99,23 @@ if [[ $mode != bootstrap ]]; then
     v170_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.7.0.sql")
     v170_sha256=${v170_sha256%% *}
     [[ $v170_sha256 == a8e0e11223c9e07fc1729e841298e5fe11da73f990ca51dc504e071430c0dbc7 ]] || die 'frozen 1.7.0 DDL checksum mismatch'
+    v180_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.8.0.sql")
+    v180_sha256=${v180_sha256%% *}
+    [[ $v180_sha256 == 995d4759444fa6f87a7782917ad74c3c0997e53a648a3e620052abc6a274a591 ]] || die 'frozen 1.8.0 DDL checksum mismatch'
+    # Released migrations include ../schema.sql. Bind that include to their
+    # frozen target without editing the released migration bytes.
+    migration_dir=$(mktemp -d)
+    trap 'rm -rf -- "$migration_dir"' EXIT
+    for step in 1.5.0-to-1.6.0 1.6.0-to-1.7.0; do
+        target_version=${step##*-to-}
+        mkdir -p "$migration_dir/$step/migrations"
+        cp "$root/sql_apm/storage/migrations/$step.sql" "$migration_dir/$step/migrations/step.sql"
+        cp "$root/sql_apm/storage/versions/$target_version.sql" "$migration_dir/$step/schema.sql"
+    done
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
-        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=check_only="$check_only" \
+        --set=migration_150_160="$migration_dir/1.5.0-to-1.6.0/migrations/step.sql" \
+        --set=migration_160_170="$migration_dir/1.6.0-to-1.7.0/migrations/step.sql" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=v180_sha256="$v180_sha256" --set=check_only="$check_only" \
         --file="$root/sql_apm/storage/$entry"
 fi
 printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"

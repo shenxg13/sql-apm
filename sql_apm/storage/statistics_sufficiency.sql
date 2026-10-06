@@ -1,10 +1,13 @@
--- Read-only, one build per execution. Bind build_id with psycopg2 named parameters.
--- Execute under the selected project schema's search_path, as for other queries.
--- For complete ThresholdResult objects, use mpp_statistic_sufficiency directly.
+-- The volatile guard is the outer row of a parameterized LATERAL query.
+-- OFFSET 0 keeps both subquery boundaries: even an empty result partition must
+-- first check retention. No full-build result tuplestore is introduced.
+SELECT result.*
+FROM (SELECT mpp_require_results(%(build_id)s) AS partition_id OFFSET 0) guard
+CROSS JOIN LATERAL (
 WITH selected_build AS MATERIALIZED (
     SELECT b.build_id, b.partition_id, c.statistics_version, c.thresholds
     FROM build b JOIN config_snapshot c USING (config_id)
-    WHERE b.build_id = %(build_id)s
+    WHERE b.build_id = %(build_id)s AND b.partition_id = guard.partition_id
 ), validated AS MATERIALIZED (
     -- Exactly five validations, independent of the number of statistic rows.
     -- Reuse the version dispatch and threshold validation of the full function.
@@ -35,3 +38,5 @@ CROSS JOIN LATERAL (
         WHEN 'active_days' THEN cardinality(s.active_dates)
         ELSE cardinality(s.active_week_starts) END AS actual
 ) coverage
+OFFSET 0
+) result

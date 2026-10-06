@@ -12,7 +12,8 @@ SELECT set_config('apm.schema', :'project_schema', true),
        set_config('apm.v140_sha256', :'v140_sha256', true),
        set_config('apm.v150_sha256', :'v150_sha256', true),
        set_config('apm.v160_sha256', :'v160_sha256', true),
-       set_config('apm.v170_sha256', :'v170_sha256', true);
+       set_config('apm.v170_sha256', :'v170_sha256', true),
+       set_config('apm.v180_sha256', :'v180_sha256', true);
 DO $block$
 DECLARE r record; d record; n record;
 BEGIN

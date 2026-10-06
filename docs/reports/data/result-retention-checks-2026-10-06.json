@@ -1,0 +1,152 @@
+{
+  "evidence": "measured synthetic and offline verification; not production throughput",
+  "collected_at": "2026-10-07T00:28:51.686258+08:00",
+  "base_commit": "f4ef32af9d70ab479d66293dd1e0fd69cf9dc714",
+  "initial_review_commit": "a274051ba662fb92eb038d44c9722b937d939721",
+  "implementation_commit": "43eb404424167eec9fe24f346d1908650690248e",
+  "checks": {
+    "unit": {
+      "command": ".venv/bin/python -m unittest discover -s tests -v",
+      "passed": 72,
+      "log_sha256": "b839793793a14945892f12bc3877819f0d6da93faf54e9632e6322627e6a89f0"
+    },
+    "host-unit": {
+      "command": "python3 -m unittest discover -s tests -v",
+      "passed": 72,
+      "log_sha256": "caad09137824678d72f518330c5c98b709c3146ecef7306797aeb2762011a60f"
+    },
+    "verify-db": {
+      "command": ".venv/bin/python scripts/db/verify.py",
+      "passed": 276,
+      "log_sha256": "a56f792c3975c7beff00388b429068f69b179f4f15e266926361028ef48113a0"
+    },
+    "verify-publication": {
+      "command": ".venv/bin/python scripts/db/verify_publication.py",
+      "passed": 33,
+      "log_sha256": "1ab9e7a26a5ac761e9947e89c068a1ab20f1129320292efaba8bcd740d1b5987"
+    },
+    "verify-statistics": {
+      "command": ".venv/bin/python scripts/db/verify_statistics.py",
+      "passed": 32,
+      "log_sha256": "33c03716872b80cf3b604717d007aa034eb023c9873c2458aecf63b64ab6f170"
+    },
+    "verify-cleanup": {
+      "command": ".venv/bin/python scripts/db/verify_cleanup.py",
+      "passed": 23,
+      "log_sha256": "91067d1c1e90606cc3cfeccdd52034d0ff088c80c2375cb3b1cf69e70285f224"
+    },
+    "harness": {
+      "command": "PATH=\"$PWD/var/harness-tools/bin:$PATH\" scripts/quality/check.sh",
+      "passed": true,
+      "log_sha256": "79825da71341228f688de6100eda41bc34211c0580e5b4138a99ef1aa4b138e4"
+    }
+  },
+  "cleanup_pass_labels": [
+    "preview under busy cluster is read-only; old published/unpublished counts and current-month protection",
+    "retention changes neither stored config content nor training rule identity",
+    "cleanup busy rejection and all five writer entrypoints reject active cleanup; CLI parameter codes",
+    "other_cluster_build abandons each month within lock budget and changes no results; month_seconds=[9.906]",
+    "statistics_reader abandons each month within lock budget and changes no results; month_seconds=[9.906]",
+    "formal and observation group writes into a cleaned month reject with results_cleaned",
+    "cleaned month cannot be recreated",
+    "atomic removal, row preservation, history/query distinction, rerun, post-cleanup structure check",
+    "group-phase lock conflict reports already-removed results; rerun finishes even with increased retention",
+    "SIGKILL before_partitions preserves atomic visibility; interrupted task and restart finish all groups",
+    "SIGKILL partitions_locked preserves atomic visibility; interrupted task and restart finish all groups",
+    "SIGKILL partitions_dropped preserves atomic visibility; interrupted task and restart finish all groups",
+    "SIGKILL partitions_committed preserves atomic visibility; interrupted task and restart finish all groups",
+    "SIGKILL groups_deleting preserves atomic visibility; interrupted task and restart finish all groups",
+    "SIGKILL groups_committed preserves atomic visibility; interrupted task and restart finish all groups",
+    "full hint is exactly 1 then 0; N boundary, cleaned months and other cluster are excluded",
+    "different current months protect only their own clusters, including an expired current month",
+    "held SHARE UPDATE EXCLUSIVE on mpp_build_group permits removal, marker and complete group deletion",
+    "held SHARE UPDATE EXCLUSIVE on mpp_build_observation_group permits removal, marker and complete group deletion",
+    "brief group-phase lock on mpp_build_group is retried and finishes in the same invocation",
+    "brief group-phase lock on mpp_build_observation_group is retried and finishes in the same invocation",
+    "partition and group lock conflicts share one monthly budget; persisted month_seconds=9.913",
+    "small complete batches and a rolled-back delete preserve exact counts and leave no formal/observation rows"
+  ],
+  "lock_wait_measurement": "mpp_cleanup_month.finished_at minus started_at; not whole invocation",
+  "lock_wait_cases": [
+    {
+      "scenario": "other_cluster_build",
+      "month_seconds": [
+        9.906
+      ],
+      "unchanged": true
+    },
+    {
+      "scenario": "statistics_reader",
+      "month_seconds": [
+        9.906
+      ],
+      "unchanged": true
+    }
+  ],
+  "shared_partition_and_group_budget_month_seconds": 9.913,
+  "unchanged_frozen_files": {
+    "sql_apm/storage/migrations/1.0.0-to-1.1.0.sql": "46c1155ba5a6e06590604e852572809fc999d4159d6b465758716fba596cf747",
+    "sql_apm/storage/migrations/1.1.0-to-1.2.0.sql": "36ce1f0c1f06f4b7f694c2fd8e265201b631da4a7bcf3ce3b427e1814a5742b0",
+    "sql_apm/storage/migrations/1.2.0-to-1.3.0.sql": "f2f95e0927a89e52b3a0359691ae23c44cdf0d801c9eeef182ed2c79ede9977b",
+    "sql_apm/storage/migrations/1.3.0-to-1.4.0.sql": "9d74529b521990cb7fc1f4c4bf2b951d3a67a9be4240ee8d42feeda391705e7b",
+    "sql_apm/storage/migrations/1.4.0-to-1.5.0.sql": "9da247a92b7c229cdfbeb1edb3e6ebbe089c23fa09d8feec5429203592d2fea1",
+    "sql_apm/storage/migrations/1.5.0-to-1.6.0.sql": "5df3790d70c703e4150c302c39b692233b7f022ecc7f934fa24d3e135461c376",
+    "sql_apm/storage/migrations/1.6.0-to-1.7.0.sql": "539279c98a6e9aafa947d0d3fa19fd13d0a7086a0e1011347e45335ca8691251",
+    "sql_apm/storage/migrations/1.7.0-to-1.8.0.sql": "64c58b27ddd84339ef4845503ea7e2b30899cdb2750b0451f5b5c9ff8f8911e0",
+    "sql_apm/storage/versions/1.0.0.sql": "df6b4cec6abac9742c56afc3c238d2f16fadd2895da1d61c04fb6255336c3c28",
+    "sql_apm/storage/versions/1.1.0.sql": "e53ea534d1b110a95ebae2a4889744b557b8333cd9d13d1daf6536a808661eb3",
+    "sql_apm/storage/versions/1.2.0.sql": "b3be12ee144f9a12ca27f33c87a13138b1b6f5cb557b257a2707840b6a7bd0e7",
+    "sql_apm/storage/versions/1.3.0.sql": "4254aed437f830faa5b027666e5bab7f54b104fb50d5eb4720e494a81dc1eedb",
+    "sql_apm/storage/versions/1.4.0.sql": "21b044742a664aa11b156db7a18d687a9bded94661fe2dcce6e59c6a3b96dc61",
+    "sql_apm/storage/versions/1.5.0.sql": "50e468eebd148c1853fa9cf9bbefd97d92bd877cf000e4b6cabe6903e392c743",
+    "sql_apm/storage/versions/1.6.0.sql": "9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f",
+    "sql_apm/storage/versions/1.7.0.sql": "a8e0e11223c9e07fc1729e841298e5fe11da73f990ca51dc504e071430c0dbc7"
+  },
+  "frozen_180_sha256": "995d4759444fa6f87a7782917ad74c3c0997e53a648a3e620052abc6a274a591",
+  "code_sha256": {
+    "scripts/db/benchmark_statistics_sufficiency.py": "449e108d3581db4d93164bb0ff581371dc8c4ebd4d58be0e625ea4465dcd5230",
+    "scripts/db/initialize.sh": "40ed44457ab2c293397acd764bd7fb7b93794034753f647dbf77c1234369de0d",
+    "scripts/db/verify.py": "a7a4d6163221b4c013437f56be5144d395139ffc7a8639722971e1e85da7b9b1",
+    "scripts/db/verify_cleanup.py": "b4a669747ff7560494edf7c5e04afbbeaf9f994d731c80e7c8f1f6f205e31d0e",
+    "scripts/db/verify_cleanup_full.py": "b7fac0fade929af611dc70ee148ff37dfa4bd49b10a68de0ed36d51898edfd02",
+    "scripts/db/verify_ingestion.py": "7cb29c4ed15592e8f5fd6f4eacdc26fb43a6229f57a4cc7c6bdf7a0cc3d88beb",
+    "scripts/db/verify_observations_full.py": "88c1aa0854172408e730d196733acd29e102896e0ac8ff8afdd53af2135346c5",
+    "scripts/db/verify_statistics_full.py": "5db2b5951b9b5ce9d75e02357d43c71ac462afcf494fb6596158fd8ac399dcdc",
+    "scripts/db/verify_training_full.py": "0d9b83df9959352c978821888041f6c34439bb5688398c9a30a8b3c8dbb5f7c2",
+    "sql_apm/__main__.py": "95f297a57619dead18d5b5d5e9f2826260956c95b3e8167ac37aae325b4cefd7",
+    "sql_apm/baseline/retention.py": "82e556c53ca05a3a4329b3c9c06d50e2c78e0e3154f2eb10047af953b198281a",
+    "sql_apm/baseline/workflow.py": "686334ee3f481627d0280c9db956fbd5cb4f903989c43ed8e14502bb75682a9e",
+    "sql_apm/cli/cleanup.py": "0fd974a359434f9e9ef9cd4017a683e9a523e5d491778dc9dcf9c7a2f286a3ab",
+    "sql_apm/cli/workflow.py": "bb61d576ca83e3fce4080c709e236b6b6ea3d6eecabe40ffb6654c3b62393890",
+    "sql_apm/storage/check_version.sql": "2c7f908db14b15b91b6984b769b585a8007a27c60ce43de3bc3c52d99c8c3480",
+    "sql_apm/storage/cleanup.py": "e3bca9860db89e6823b26783d153f04e7d4a6d9c650a2ac2b571115377f11d61",
+    "sql_apm/storage/expected_partitions.sql": "e0e2e4b95acb662c06285e547b1657d3a714eeac21b01586a486a08065833cca",
+    "sql_apm/storage/ingestion.py": "2dff4adb61222b8f68f1c10ff0d6a002a2e1df2cf2dbf57cceaaebb279c2720e",
+    "sql_apm/storage/initialize.sql": "71181897d38c41317614396dfaebe130924b8b081aad159c553f06f51460be97",
+    "sql_apm/storage/migrate.sql": "1e2292050f90b02f060feb0c8ecbd7d4af961dc1c6681e7e15df8436d4aaeca8",
+    "sql_apm/storage/migrations/1.8.0-to-1.9.0.sql": "5b696dc9c91e408193236f630186b57be03684c4229e24dc764559697bb3bd01",
+    "sql_apm/storage/prepare.sql": "853ab30e414c0a5139f204a35686bce52c53cb0f4eec1acb605f2e2296ba1834",
+    "sql_apm/storage/publication.py": "4e47f444310e3f9542c0db476791de003e4517ea992585cd3ff71ef046c549d0",
+    "sql_apm/storage/schema.sql": "9ac4648732cf8d002a52f464017ee241efa2d2095025b60d3f3256a996283597",
+    "sql_apm/storage/statistics_sufficiency.sql": "331d8405c426bc9f2456e8c4253cdcf669bcb60a678846a6d8a17715de0ac298",
+    "sql_apm/storage/tasks.py": "e349ead964e1e347e14103024698238824414abfdeb2a5ceb7ebdffb86f19d75",
+    "sql_apm/storage/versions/1.8.0.sql": "995d4759444fa6f87a7782917ad74c3c0997e53a648a3e620052abc6a274a591",
+    "sql_apm/training/config.py": "228469cc5bd18c209e74361751dbfb6012e9c95ac1eb45c0537a10cd75e03340",
+    "tests/database/naming_migration.py": "caba273d99b65bf1fa5127d7fd44437a0c616c9c45738b9867269a2d47a75932",
+    "tests/database/retention.py": "58606c74c06ff2480606e2399adbd944ccab7581e31bc79976611e763b2bef51",
+    "tests/database/retention_edges.py": "f4f714364b7dd29c7c6c94676e40d8cac35788f6de7ba8ba9c40b7a92f481952",
+    "tests/database/retention_migration.py": "a1b3c582de27f336cb0742ba714cff7ae474c41ff8e65507aedd1dbbf8206263",
+    "tests/database/statistics_batch.py": "b304bb774785ad2589f9c5b5d05fa7c32b8027435b5ada7dbfebea8eef91bc36",
+    "tests/database/window_migration.py": "00db6dbc70b53537c5750a0b0380d7954324ae2a6121ef4843d0b763a9225b49",
+    "tests/test_retention.py": "432f5990615b53401a0a76553a22aaff69097f856abe34a24d61b2f8785e35f1"
+  },
+  "raw_requirement_blob": "d5b8c6e4ef8d317110aec7737d49088d4a9308e4",
+  "remediation_contract": "https://github.com/shenxg13/sql-apm/issues/43#issuecomment-6019720422",
+  "real_copy_initial_start": {
+    "result": "instance startup failed before restore",
+    "reason": "Unix socket path exceeded AF_UNIX limit; reproduced with socket.bind",
+    "socket_path_bytes": 111,
+    "recovery": "rerun with shorter private output directory",
+    "log_sha256": "fb8e9cb7db913674d8c66654082484c3567b2700d94449f4baed2f8f2630f978"
+  }
+}

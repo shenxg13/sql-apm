@@ -69,7 +69,8 @@ def benchmark(groups, repetitions):
                     CREATE UNIQUE INDEX ON mpp_statistic
                         (partition_id,build_id,group_id,layer,bucket_date,bucket_number) NULLS NOT DISTINCT;
                     CREATE INDEX ON mpp_statistic (group_id,build_id,layer);
-                    CREATE TEMP TABLE build (build_id text PRIMARY KEY,partition_id bigint,config_id text);
+                    CREATE TEMP TABLE build (build_id text PRIMARY KEY,partition_id bigint,config_id text,
+                        results_saved boolean DEFAULT false);
                     CREATE TEMP TABLE config_snapshot (config_id text PRIMARY KEY,statistics_version text,thresholds jsonb)''')
                 cur.execute('INSERT INTO build VALUES (%s,1,%s)',(BUILD,'config'))
                 cur.execute('INSERT INTO config_snapshot VALUES (%s,%s,%s)',('config','baseline-formulas/1',Json(THRESHOLDS)))

@@ -16,6 +16,7 @@ class PublicationStore:
     def check(self, build_id):
         self.task.set_stage('check')
         with self.db, self.db.cursor() as cur:
+            cur.execute('SELECT mpp_require_results(%s)', (build_id,))
             cur.execute('SELECT state,results_saved,input_id,config_id,partition_id FROM build WHERE build_id=%s AND scope_id=%s',
                         (build_id,self.task.scope))
             build = cur.fetchone()
@@ -105,6 +106,8 @@ class PublicationStore:
 
     def publish(self, build_id, fault=None):
         self.task.set_stage('publish')
+        with self.db, self.db.cursor() as cur:
+            cur.execute('SELECT mpp_require_results(%s)', (build_id,))
         try:
             with self.db, self.db.cursor() as cur:
                 cur.execute('''SELECT b.state,b.results_saved,
@@ -156,6 +159,9 @@ def version_status(db, scope, history=False, limit=20):
             names=[d[0] for d in cur.description]
             return [dict(zip(names,row)) for row in cur]
         if history:
+            fields += ''',b.results_saved AND rp.cleaned_at IS NOT NULL AS results_cleaned,
+                CASE WHEN b.results_saved THEN rp.cleaned_at END AS cleaned_at'''
+            joins += ' LEFT JOIN mpp_result_partition rp USING(partition_id)'
             cur.execute('SELECT '+fields+' FROM '+joins+" WHERE p.scope_id=%s AND p.result='published' ORDER BY p.at DESC,p.publication_id LIMIT %s",(scope,limit))
             return dict(versions=rows())
         # The input manifest is frozen; later imports must not change these

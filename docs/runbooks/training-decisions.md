@@ -1,6 +1,6 @@
 # 训练快照与判定诊断
 
-先按[初始化说明](database-initialization.md)准备 1.8.0 结构；1.7.0 可带数据升级，更早非空库须重建，再通过
+先按[初始化说明](database-initialization.md)准备 1.9.0 结构；1.7.0／1.8.0 可带数据升级，更早非空库须重建，再通过
 [导入命令](log-ingestion.md)完成批次。本入口交付②，业务范围见
 [训练资格](../../.project-wiki/contracts/training-eligibility.md)和
 [判定设计](../design/training-decisions.md)，不创建构建或统计版本。
@@ -39,6 +39,21 @@ MPP 标识改名的重建要求由上面的初始化说明另行约束。
 只覆盖明确填写的非负整数，其余使用默认值；层名为 overall/day/week/weekday/hour。
 各层 coverage_kind 固定，day 的 coverage_min 只能为 0，不能借配置改变五层覆盖语义。
 门槛实际内容封存在配置快照中，由[③统计计算](baseline-statistics.md)使用。
+
+## 结果保留配置
+
+可选顶层 `retention` 只控制[版本结果清理](build-publication.md#版本结果清理)，不属于训练输入：
+
+```json
+{"retention": {"months": 2, "clusters": {"119": 12}}}
+```
+
+把该项加入既有完整训练 JSON；示例中的 119 必须列在顶层 clusters。
+省略 retention 或 months 时默认 2；months 及每个集群覆盖值必须为不小于 1 的整数，
+不接受布尔值、浮点数或字符串。未知键、非对象或未登记在顶层 clusters 的覆盖键均拒绝；
+固定原因码为 invalid_retention、invalid_retention_months 或 unknown_retention_cluster。
+修改该项不改变 full、rebuild、training snapshot 封存的配置内容，也不改变训练规则 ID。
+清理命令可使用 full 配置中尚未指定 cutoff_date 的 window，因为清理不使用训练截止日。
 
 ## 创建快照
 

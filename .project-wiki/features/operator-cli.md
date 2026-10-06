@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-06
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/43
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/41
     status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
@@ -138,7 +140,7 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 查询只读且仅展示，不新增发布检查；字段示例与边界见
 [隔离记录计数](../../docs/runbooks/build-publication.md#隔离记录计数)。
 
-五种写入入口共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
+五种原有写入入口及 cleanup --execute 共用集群任务占用，包括独立的 import、training snapshot 和 statistics。
 忙时返回 `cluster_busy` 并保存 busy_rejected 任务；不会排队或中断持有者。
 按 [Issue #41](https://github.com/shenxg13/sql-apm/issues/41) 的确认补充现有占用边界：
 进程被强制终止后，在其数据库会话退出之前集群仍被占用，新任务仍返回 `cluster_busy`。
@@ -146,10 +148,27 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 确认旧会话已退出后人工重新运行；无手工解锁命令，不自动等待、排队或重试。
 查看占用会话与确认退出的方法见[占用与恢复](../../docs/runbooks/build-publication.md#占用与恢复)。
 是否调整连接存活检查等参数留到配置每日自动任务时另行确认，本次不改变产品连接或任务行为。
-只有 import／full 首次登记集群；另外三个写入入口对未登记集群返回 unknown_cluster，不新增集群或任务。
+只有 import／full 首次登记集群；其余写入入口及 cleanup 预览对未登记集群返回 unknown_cluster，不新增集群或任务。
 任务保留模式、阶段、产物、时间和原因，查询仅输出标识、时间、计数及原因码。
 参数及 JSON 示例由[操作说明](../../docs/runbooks/build-publication.md)维护；
 失败／零样本发布行为继续由[版本要求](baseline-versions.md)维护。
+
+### 版本结果清理入口（2026-10-06）
+
+[Issue #43](https://github.com/shenxg13/sql-apm/issues/43) 提供 `cleanup --cluster CLUSTER
+--training-config FILE [--execute]`，支持 --schema。默认预览全部月份的保留／过期／保护／
+已清理状态、历史发布／未发布构建数和两种统计分区字节，不占用任务、不写记录。
+执行逐月报告结果、删除行数与释放空间，退出码为成功 0、配置文件内容错误／执行失败／
+部分未完成 1、命令行参数解析错误 2、人工中断 130；固定原因码不变。
+此区分由[维护者整改决定](https://github.com/shenxg13/sql-apm/issues/43#issuecomment-6019720422)
+明确，沿用其余五个入口的约定；脱敏范围仍为标识、月份、时间、计数、大小和固定原因码。
+
+训练 JSON 的可选顶层 retention 包含默认 months 及 clusters 覆盖，值为最小 1 的整数，
+省略默认 2，覆盖键须列在顶层 clusters，未知键拒绝。此配置不进入封存快照，不影响
+训练规则标识。full 增加 expired_result_months，0 也显示，包含过期但受当前版本保护的
+月份；full／rebuild 均不执行清理。具体示例、等待和恢复见
+[操作说明](../../docs/runbooks/build-publication.md#版本结果清理)，配置校验见
+[训练配置](../../docs/runbooks/training-decisions.md#结果保留配置)。
 
 ## Workflows
 

@@ -339,8 +339,8 @@ history 根据月份标记显示结果已清理；results_saved 保留“曾完�
 | `mpp_ensure_result_partition` | 函数，1.9.0 替换 | 建立集群／月份分区；拒绝重新创建已清理月份 |
 | `mpp_require_results` | 函数，1.9.0 新增 | 在读取锁下核对 results_saved 与 cleaned_at；已清理时抛出 results_cleaned |
 | `mpp_read_statistics` | 函数，1.9.0 新增 | 经清理保护读取正式或观察统计，支持指定分组 |
-| `mpp_check_build_groups`、`mpp_check_build_observation_groups` | 触发器函数，1.9.0 替换 | 两套构建分组的上下文校验，并允许已清理月份的关联收尾删除 |
-| `mpp_result_context_guard` | 触发器函数，1.9.0 替换 | 保持上下文和月份约束；清理后的构建结果不可改写 |
+| `mpp_check_build_groups`、`mpp_check_build_observation_groups` | 触发器函数，1.9.0 替换 | 校验两套构建分组的上下文，并拒绝向已清理月份新增或改写关联 |
+| `mpp_result_context_guard` | 触发器函数，1.9.0 替换 | 保持上下文和月份约束；拒绝把构建放入已清理月份 |
 | `training_immutable` | 触发器 | 快照、配置、规则、分类缓存封存后拒绝增删改 |
 | `mpp_build_group_context`、`mpp_observation_group_context` | 触发器 | 构建与其分组的集群、归一化版本、profile 必须一致 |
 | `mpp_result_context`、`mpp_observation_context` | 触发器 | 已有结果的构建和分组不能改上下文；构建的分区月份必须与开始时间一致 |

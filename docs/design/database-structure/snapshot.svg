@@ -4,9 +4,8 @@
 <rect width="1370" height="800" fill="white"/>
 <text x="28" y="40" font-family="sans-serif" font-size="25" font-weight="bold" fill="#172c43">快照封存输入与配置</text>
 <text x="28" y="70" font-family="sans-serif" font-size="17" fill="#4a5968">左侧是输入成员，右侧是规则；保留月数是操作策略，不封存到训练配置</text>
-<path d="M 520 655 V 595 H 168 V 225" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M 900 655 V 625" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M 877 525 V 225" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 450 655 H 8 V 175 H 25" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 900 655 H 700 V 175 H 735" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 1195 225 V 330" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 1195 525 V 430" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
 <path d="M 1055 575 H 1020" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>

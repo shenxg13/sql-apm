@@ -42,19 +42,19 @@ def legacy_target(v, root, runner):
 
 def verify_naming_migration(v,root,runner):
     v.init('bootstrap')
-    for version in ('1.6.0','1.0.0'):
+    for version in ('1.7.0','1.6.0','1.0.0'):
         old=(root/'sql_apm/storage/versions'/ (version+'.sql')).read_bytes()
         sha=hashlib.sha256(old).hexdigest()
         v.sql('CREATE SCHEMA sql_apm;'+old.decode()+
               "INSERT INTO schema_version(version,script_sha256) VALUES ('"+version+"','"+sha+"');")
         receipt=v.sql("SELECT row_to_json(s) FROM schema_version s")
         v.init('upgrade');v.init('check')
-        assert v.sql('SELECT max(version) FROM schema_version')=='1.7.0'
+        assert v.sql('SELECT max(version) FROM schema_version')=='1.8.0'
         assert v.sql("SELECT row_to_json(s) FROM schema_version s WHERE version='"+version+"'")==receipt
         before=v.sql('SELECT jsonb_agg(s ORDER BY version) FROM schema_version s')
         for mode in ('schema','all','upgrade','check'):v.init(mode)
         assert v.sql('SELECT jsonb_agg(s ORDER BY version) FROM schema_version s')==before
-        v.require(True,'empty '+version+' -> 1.7.0 and every rerun preserve receipts')
+        v.require(True,'empty '+version+' -> 1.8.0 and every rerun preserve receipts')
         v.sql('DROP SCHEMA sql_apm CASCADE')
     old=(root/'sql_apm/storage/versions/1.6.0.sql').read_bytes()
     fixture=statements().replace('mpp-csv/1','hashdata-csv/1').replace("'mpp'","'hashdata'")

@@ -1,6 +1,6 @@
 # 训练快照与判定诊断
 
-先按[初始化说明](database-initialization.md)准备 1.7.0 结构，已有数据的旧库须重建，再通过
+先按[初始化说明](database-initialization.md)准备 1.8.0 结构；1.7.0 可带数据升级，更早非空库须重建，再通过
 [导入命令](log-ingestion.md)完成批次。本入口交付②，业务范围见
 [训练资格](../../.project-wiki/contracts/training-eligibility.md)和
 [判定设计](../design/training-decisions.md)，不创建构建或统计版本。

@@ -1,7 +1,7 @@
 # 完整流程、重新构建与版本查询
 
 业务规则见[构建与版本](../../.project-wiki/features/baseline-versions.md)，
-连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.7.0；
+连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.8.0；
 连接通过既有 `SQL_APM_DSN` 提供，不把凭据写进命令参数或报告。
 
 ## 显式运行
@@ -25,9 +25,9 @@
 full 默认截止日为本批声明日期的最大值；可用 `--cutoff-date YYYY-MM-DD` 覆盖。
 对较早批次执行 full 会把当前版本窗口移回该批日期；补导历史日批且希望保持当前窗口时，须显式传入截止日。
 rebuild 必须给出该参数，可用 `--retry-of BUILD_ID` 引用同集群失败／中断构建，
-但仍重新封存输入配置、从头计算。两种流程选取本集群全部完整批次，在固定窗口内按原判定筛选；
+但仍重新封存输入配置、从头计算。两种流程按[窗口条件](../../.project-wiki/features/baseline-versions.md#按训练窗口选批2026-10-04-确认issue-35)选入完整批次，再按既有逐条规则筛选；
 日批次只新增当日文件，旧明细不重复导入或复制到版本中。
-失败或冲突只阻止该批次自身发布；后续 full／rebuild 仍只选已完成批次，窗口内缺少未完成批次不阻止发布，
+失败或冲突只阻止该批次自身发布；后续 full／rebuild 只选满足窗口条件的已完成批次，窗口内缺少未完成批次不阻止发布，
 当前版本也不另加缺天提示。两项均已由用户确认，见[版本规则](../../.project-wiki/features/baseline-versions.md#发布输入与补导确认2026-10-02)。
 
 阶段顺序为 import → snapshot → build → check → publish，rebuild 从 snapshot 开始。
@@ -63,7 +63,7 @@ history 只列成功发布的历史版本，按发布时间倒序；两者限量
 同一 SQL 在多条日志中失败会分别计数。后来导入的文件在成为新版本输入前不影响当前计数。
 仅展示，不增加发布检查或阻止发布；没有生效版本时 `current=null`。
 `history` 的历史版本输出保持原格式。这两个计数在 #34 中未改变当时的 1.6.0 结构；
-当前 MPP 标识版采用 1.7.0，已有数据的旧库按[初始化说明](database-initialization.md#升级到-170)重建。
+当前采用 1.8.0；1.7.0 可带数据升级，更早非空库仍须按[初始化说明](database-initialization.md#升级到-180)重建。
 
 ## 覆盖与分区
 
@@ -119,3 +119,19 @@ mpp_build_group／mpp_build_observation_group；次月可选预建通过 NOWAIT 
 
 该命令检查连接确实指向 `/tmp/sql-apm-pg-*/socket` 且版本为 1.5.0，
 先比较覆盖，再升级并核对统计；输出文件须不存在。旧实例拥有者负责最后停止和清理。
+
+## 窗口选批与进度
+
+Issue #35 取代此前“选取本集群全部完整批次”的操作口径。文件的最晚实际时间不早于窗口起点，
+或文件时间未知时保留整批；不设终点上界。若无候选，退回全部完整批次，照常生成零样本结果。
+显式 `training snapshot --batch` 不改变。首批可按每日一批登记，避免一个多日首批长期留在窗口输入内。
+
+`snapshot_finished` 增加 `completed_batches`、`selected_batches`、`excluded_batches` 和
+`window_fallback`。前三项为完整批次总数、实际选入数、未选入数；回退时选入全部，
+`excluded_batches=0`、`window_fallback=true`。窗口未选入不代表清理，旧明细仍在库中；
+无该版本判定时按[展示约定](../../.project-wiki/features/sql-search-and-views.md#未选入批次的历史判定2026-10-04)解释。
+同一文件若在另一选入批次中重复引用，仍属于快照输入；检查历史事件时以快照文件清单为准。
+
+专项命令 `.venv/bin/python scripts/db/verify_window.py` 使用私有临时实例。
+真实对照由 `scripts/db/verify_window_full.py` 显式选择基线／候选 checkout 与固定日志，
+不纳入日常 Harness。

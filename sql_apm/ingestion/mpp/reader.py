@@ -69,6 +69,7 @@ class Records:
     def __init__(self, path):
         self.path, self.count, self.first, self.last = path, 0, [], deque(maxlen=32)
         self.sha256 = self.byte_count = None
+        self.first_log_at = self.last_log_at = None
 
     def __iter__(self):
         csv.field_size_limit(128 * 1024 * 1024)
@@ -89,6 +90,12 @@ class Records:
                             raise IngestionError('csv_columns')
                         start, previous_line = previous_line + 1, reader.line_num
                         self.count = number
+                        when = timestamp(row[0])
+                        if when is not None:
+                            if self.first_log_at is None or when < self.first_log_at:
+                                self.first_log_at = when
+                            if self.last_log_at is None or when > self.last_log_at:
+                                self.last_log_at = when
                         digest = hashlib.sha256(canonical(row).encode('ascii')).hexdigest()
                         edge = (digest, row[0], bool(session(row)))
                         if len(self.first) < 32:

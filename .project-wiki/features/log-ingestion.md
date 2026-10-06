@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/log-ingestion.md
 updated: 2026-10-05
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/35
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/33
     status: current
   - path: docs/reports/sql-scanning-2026-10-04.md
@@ -250,6 +252,14 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
 这不重新解析已成功导入的文件，也不覆盖历史解释；观察、全量等价和性能验证分别记录在
 [实施报告](../../docs/reports/sql-scanning-2026-10-04.md)，重叠标签回退的补验见
 [R1 整改报告](../../docs/reports/sql-scanning-r1-remediation-2026-10-04.md)。
+
+### 成功文件实际时间（2026-10-04）
+
+[Issue #35](https://github.com/shenxg13/sql-apm/issues/35) 为窗口选批增加
+[文件时间物理元数据](../architecture/postgresql-storage.md#文件日志时间结构-1802026-10-05)。
+时间覆盖全部记录，不限于产生执行的记录；使用与事件结束时间相同的解析函数，
+无法解析的时间不参与也不使文件失败。导入成功时同一事务保存最早／最晚时间，
+失败回滚，成功重复跳过保留首次值，不回填旧文件。不改变去重、冲突或批次完整性规则。
 
 ## Workflows
 

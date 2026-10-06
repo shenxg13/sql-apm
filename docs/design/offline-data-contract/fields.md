@@ -429,3 +429,15 @@ CurrentVersion 更新必须原子可见整个版本；任何发布失败都保�
 
 没有事件的桶从 Build 窗口和已有观察行推导，不新增观察覆盖表；无法确定开始时间或身份、
 无文本、近似不可用的事件只在 Build.diagnostics.observations 中汇总。各规则版本单独计数。
+
+## File 的物理时间元数据（1.8.0）
+
+| 物理字段 | 类型／条件 | 含义 |
+| --- | --- | --- |
+| source_file.first_log_at | timestamptz，可空 | 全部记录可解析日志时间的最小值 |
+| source_file.last_log_at | timestamptz，可空 | 全部记录可解析日志时间的最大值 |
+
+两列同时为空或同时有值，前者不晚于后者；与文件成功事务一起保存，未知和失败为空，
+成功重复保留首次值，旧文件不回填。[Issue #35](https://github.com/shenxg13/sql-apm/issues/35)
+确认这些是导入派生的物理信息，与摘要、字节数同类，`contract_version` 保持 1.0.0。
+逻辑 File 和既有样例不扩版；自动构建按[窗口规则](../../../.project-wiki/features/baseline-versions.md#按训练窗口选批2026-10-04-确认issue-35)选择整批，显式快照不变。

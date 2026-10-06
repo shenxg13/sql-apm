@@ -10,7 +10,7 @@ Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas to 1.7.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0, to 1.8.0; stop writers first.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.
@@ -96,8 +96,11 @@ if [[ $mode != bootstrap ]]; then
     v160_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.6.0.sql")
     v160_sha256=${v160_sha256%% *}
     [[ $v160_sha256 == 9a9f0b57e40a13cd524cd8107a58da326615be9bbe849f690b3bf989ae632a1f ]] || die 'frozen 1.6.0 DDL checksum mismatch'
+    v170_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.7.0.sql")
+    v170_sha256=${v170_sha256%% *}
+    [[ $v170_sha256 == a8e0e11223c9e07fc1729e841298e5fe11da73f990ca51dc504e071430c0dbc7 ]] || die 'frozen 1.7.0 DDL checksum mismatch'
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
-        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=check_only="$check_only" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=check_only="$check_only" \
         --file="$root/sql_apm/storage/$entry"
 fi
 printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"

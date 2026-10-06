@@ -300,7 +300,7 @@ HTML；`build_bundle.py` 把同一程序与源码／wheel／RPM 组装为内网�
 
 ### 版本结果留存模块（2026-10-06）
 
-#43 将纯日历判断放在 `sql_apm/baseline/retention.py`，不依赖数据库驱动；
+Issue #43 将纯日历判断放在 `sql_apm/baseline/retention.py`，不依赖数据库驱动；
 `sql_apm/storage/cleanup.py` 管理 PG 任务、锁和删除事务，`sql_apm/cli/cleanup.py` 处理
 参数与脱敏输出。配置解析仍在 training/config.py，留存值不进入训练快照。
 宿主 Python 的离线单元测试无需安装 psycopg2；数据库验收使用锁定的项目解释器和依赖。

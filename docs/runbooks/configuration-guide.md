@@ -219,7 +219,9 @@ path 非空，相对路径按配置文件目录解释；解析到同一路径的
 连接凭据放程序目录外 0600 的 PGPASSFILE，`SQL_APM_DSN` 指定 host、port、dbname、user。
 DSN 留空时由 libpq 使用默认连接参数，本手册始终显式填写；不把密码写进 JSON、命令行或报告。目标实例、监听地址、
 允许客户端网段、端口、Python／PG 安装路径和日志目录，统一按安装手册第 1、7、8 节设置。
-`--schema` 默认 `sql_apm`，必须是合法 SQL 标识；初始化必须使用同一个 schema。
+`--schema` 默认 `sql_apm`，初始化必须使用同一个 schema。
+初始化的数据库、schema 和项目角色名须匹配 `[a-z][a-z0-9_]{0,62}`，不能以 `pg_` 开头，
+也不能取 `postgres`、`template0`、`template1`、`public`、`information_schema`；端口为 1–65535 的整数。
 手册固定 shared_buffers、work_mem、maintenance_work_mem、WAL 设置是本次演练配置，
 不是新增产品开关；变更这些 PG 参数按 PostgreSQL 生效方式处理，本轮不做调优实验。
 

@@ -404,16 +404,18 @@ sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata
 
 ## 9. 传输日志并生成批次配置
 
-开发机先按仓库固定 manifest 核对 55 个文件；通过 scp 将 `raw/inbox/mpp/119` 和
-`120` 复制到目标机 `$APM_ROOT/logs/`，仅该主机及 /data 接收真实日志。
+开发机先按仓库固定 manifest 核对 55 个文件；令 APM_LOGS 指向实际输入目录，再通过 scp
+将其中的 119 和 120 复制到目标机 APM_ROOT/logs，只有指定演练机接收真实日志。
+本次开发机原文件仍在历史目录 raw/inbox/hashdata；目录名称不改变产品的 MPP 来源标识。
 不将日志、数据库、原始 SQL 或详细诊断加入 Git。
 
 目标机先执行 `install -d -m 0700 "$APM_ROOT/logs"`，然后在开发机执行：
 
 ```bash
+APM_LOGS="$PWD/raw/inbox/hashdata"
 .venv/bin/python scripts/deployment/rehearsal.py prepare \
-  --logs raw/inbox/mpp --output var/issue45/source-check
-scp -r -P "$APM_SSH_PORT" raw/inbox/mpp/119 raw/inbox/mpp/120 \
+  --logs "$APM_LOGS" --output var/issue45/source-check
+scp -r -P "$APM_SSH_PORT" "$APM_LOGS/119" "$APM_LOGS/120" \
   "$APM_SSH_TARGET:/data/sql-apm/logs/"
 ```
 

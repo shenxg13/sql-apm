@@ -7,6 +7,8 @@ from pathlib import Path
 import subprocess
 import time
 
+from acceptance import product_files
+
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -59,7 +61,7 @@ def main():
             run('guide-'+case,[python,kit/'scripts/deployment/guide_examples.py','--app-root',app,
                 '--config',out/'config','--records',out/'guide','run',case])
         run('schema-check',[app/'scripts/db/initialize.sh','check','--host',socket,'--port','55473','--pg-bin',pg])
-        baseline=dict(program_commit=metadata['commit'],selection={},examples={})
+        baseline=dict(program_commit=metadata['commit'],product_sha256=product_files(metadata),selection={},examples={})
         for path in sorted((out/'tasks').glob('*.json')):
             if path.stem.count('-')!=1:continue
             document=json.loads(path.read_text());assert document['passed']

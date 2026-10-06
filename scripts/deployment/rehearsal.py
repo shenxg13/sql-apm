@@ -11,7 +11,7 @@ import sys
 import time
 from datetime import datetime
 
-from acceptance import command as measured_command, selected
+from acceptance import command as measured_command, selected, verify_baseline
 
 RESOURCE_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(RESOURCE_ROOT))).resolve()
@@ -172,8 +172,7 @@ def run_task(args):
         selection_equal = None
         if args.selection_baseline:
             new_baseline = json.loads(args.selection_baseline.read_text())
-            if new_baseline['program_commit'] != args.program_commit:
-                raise ValueError('selection baseline program differs')
+            verify_baseline(json.loads((ROOT/'RELEASE.json').read_text()),new_baseline)
             selection_equal = selection == new_baseline['selection'][stem]
         bid = payload['build']['build_id']
         observed = dict(cutoff_date=payload['cutoff_date'], window_start=payload['window_start'],

@@ -16,6 +16,7 @@ from render_manual import DOCUMENTS, inspect, render
 from check_documents import check, check_guide, check_structure, check_paths, GUIDE, STRUCTURE
 from verify_package import digest, verify
 import rehearsal
+from acceptance import verify_baseline
 
 
 class PackageTests(unittest.TestCase):
@@ -33,6 +34,16 @@ class PackageTests(unittest.TestCase):
         (self.app / 'RELEASE.json').write_text(json.dumps(doc))
         (self.app / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + p.name + '\n'
                                                   for p in sorted(self.app.iterdir())))
+
+    def test_baseline_inheritance_requires_every_product_file(self):
+        metadata=dict(commit='new',files={'sql_apm/a.py':'abc','RELEASE.html':'new-docs'})
+        baseline=dict(program_commit='old',product_sha256={'sql_apm/a.py':'abc'})
+        verify_baseline(metadata,baseline)
+        for files in ({'sql_apm/a.py':'changed'}, {}, {'sql_apm/a.py':'abc','rules/new.json':'added'}):
+            with self.subTest(files=files), self.assertRaisesRegex(ValueError,'product files differ'):
+                verify_baseline(dict(metadata,files=files),baseline)
+        with self.assertRaisesRegex(ValueError,'product hashes required'):
+            verify_baseline(metadata,dict(program_commit='old'))
 
     def test_valid_tree(self):
         self.assertTrue(verify(self.app)['passed'])

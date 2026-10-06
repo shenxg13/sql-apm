@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 from acceptance import (build_counts, command, connect, current_build, save,
-                        selected, statistics, sufficiency)
+                        selected, statistics, sufficiency, verify_baseline)
 from verify_package import verify
 
 CASES = ('window','threshold','template','exclusion','retention','workers','import')
@@ -103,7 +103,7 @@ def run(args):
         equal = None
         if args.baseline:
             baseline = json.loads(args.baseline.read_text())
-            assert baseline['program_commit']==metadata['commit'], 'guide baseline program differs'
+            verify_baseline(metadata,baseline)
             equal = comparable==baseline['examples'][args.case]
         record = dict(case=args.case,program_commit=metadata['commit'],program_verification=package,
             resources=resources,comparable=comparable,baseline_equal=equal,passed=equal is not False)

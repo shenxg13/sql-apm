@@ -19,7 +19,7 @@
 
 离线业务 CLI 已交付，展示功能另行实施；数据库初始化／物理结构见下文，
 下列质量命令用于仓库 Harness。
-开发日志样本位于本地忽略目录 `raw/inbox/mpp/`，不是既定生产接收目录。
+开发日志样本位于本地忽略目录 `raw/inbox/hashdata/`（历史目录名，来源语义为 MPP），不是既定生产接收目录。
 
 ## Python 项目环境
 
@@ -118,7 +118,7 @@ GitHub 目标为公开仓库 shenxg13/sql-apm。
 var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
 .venv/bin/python scripts/deployment/verify_release_examples.py --app-root APP --output NEW_DIR
 .venv/bin/python scripts/deployment/verify_release_full.py \
-  --app-root APP --verification-root KIT --logs raw/inbox/mpp --output NEW_DIR
+  --app-root APP --verification-root KIT --logs raw/inbox/hashdata --output NEW_DIR
 ```
 
 第一项检查配置键集合、每个 JSON 示例、57 张表及所列列名、手册引用的随包命令；

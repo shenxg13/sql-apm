@@ -109,3 +109,18 @@ def sufficiency(db, build):
 def build_counts(result):
     keys = ('groups','layers','timings','states','count_scopes','reasons','observations','results_saved','state')
     return {key: result['build'][key] for key in keys}
+
+
+def product_files(metadata):
+    return {name: digest for name, digest in metadata['files'].items()
+            if name.startswith(('sql_apm/', 'rules/')) or name in ('requirements.txt', 'scripts/db/initialize.sh')}
+
+
+def verify_baseline(metadata, baseline):
+    # Document-only candidates may inherit measured product evidence (Issue #45).
+    # A different commit still requires every product path and byte to match.
+    if baseline.get('product_sha256') is not None:
+        if baseline['product_sha256'] != product_files(metadata):
+            raise ValueError('baseline product files differ')
+    elif baseline['program_commit'] != metadata['commit']:
+        raise ValueError('baseline program differs; product hashes required for evidence inheritance')

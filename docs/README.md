@@ -91,6 +91,7 @@
 | [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
 | [文件时间与窗口选批验证](reports/window-batches-2026-10-05.md) | 分析证据 | 1.8.0 迁移、整批选入、九任务等价及每日分批对照。 |
 | [版本结果留存验证](reports/result-retention-2026-10-06.md) | 验证报告 | 清理语义、带数据升级、互斥与中断、真实数据库副本空间及持锁成本。 |
+| [v0.2.0 离线交付验证](reports/v020-offline-release-2026-10-07.md) | 验证报告 | 三份离线文档、固定候选、本地与目标机实测证据及尚未完成的验收边界。 |
 | [Kylin 离线部署验证](reports/kylin-offline-deployment-2026-10-02.md) | 实施验证报告 | 离线编译、自检、认证和与 Alma 比对的实测及未完成验收边界。 |
 | [精简候选包与 HTML 准备验证](reports/slim-release-preparation-2026-10-03.md) | 实施验证报告 | 程序精简、逐文件证据继承、隔离验证、HTML 检查及目标机确认点。 |
 | [精简候选包 Kylin 试跑](reports/slim-release-kylin-trial-2026-10-03.md) | 实施验证报告 | 快照恢复后的完整重装、独立验收、四进程超时与单进程复跑、性能对照。 |

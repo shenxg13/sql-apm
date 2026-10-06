@@ -380,3 +380,4 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 明确三份离线 HTML、配置／结构核对、一次裸机实测及模拟日期清理的授权和证据绑定。
 [配置指南](../docs/runbooks/configuration-guide.md)和[结构说明](../docs/design/database-structure.md)
 进入随包文档；本轮实测与发布尚待完成，不把旧版结果当作新版验证。
+[验证报告](../docs/reports/v020-offline-release-2026-10-07.md)记录候选摘要、本地检查和实测证据边界。

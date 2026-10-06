@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-07
 sources:
+  - path: docs/reports/v020-offline-release-2026-10-07.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/45
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/33
@@ -82,6 +84,8 @@ GitHub 自定义附件仍只有程序包和 SHA-256 文件，验收包和完整�
 继承证据、补验受影响步骤。产品文件变化先确认重跑范围。合并后的发布类型包还须对照最终候选，
 把精确提交、标签、附件大小／摘要及发布说明交给用户，取得明确确认后才打标签和发布。
 当前尚未完成本轮目标机实测；不继承旧版首批或九任务为新版已通过。
+候选文档、制包和本地检查证据见[v0.2.0 验证报告](../../docs/reports/v020-offline-release-2026-10-07.md)，
+其中明确区分开发机结果、目标机结果和未完成部分。
 
 ### 已确认的 Kylin 演练与项目自带解释器（2026-10-02）
 
@@ -95,7 +99,8 @@ Python 3.9.5 解释器属于正式部署流程，从离线源码包构建并安�
 项目账号经本机 socket/SCRAM 登录，DBA 工具使用同一项目账号和受限客户端网段。
 实例不做 systemd 托管、不启用 TLS，凭据仅放程序目录外的 0600 文件。
 编译依赖根包及完整依赖由演练机初始状态的 yum 源收集、检查 RPM 签名并交付离线包；
-正常手册先尝试已有 yum 源，不可用时禁用网络源，仅启用 file:// 离线仓库。
+该轮手册先尝试已有 yum 源，不可用时仅启用 file:// 离线仓库；
+v0.2.0 本轮编译依赖固定走离线 RPM 路径，按上文新契约执行。
 
 上述为已确认部署决定；实际操作、验证进展和适用限制见
 [部署手册](../../docs/runbooks/kylin-offline-deployment.md)和

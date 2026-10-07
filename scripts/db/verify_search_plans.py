@@ -193,7 +193,10 @@ def run(args):
         original = cur.fetchone()[0].rstrip().rstrip(';')
         path = private/'rare_hint.sql'
         path.write_text(original+';\nSELECT * FROM sql_apm_issue47_r1_never_seen;')
-        offset = (directory/'server.log').stat().st_size
+        ac.execute('SELECT pg_current_logfile()')
+        logfile = ac.fetchone()[0]
+        server_log = directory/'pgdata'/logfile if logfile else directory/'server.log'
+        offset = server_log.stat().st_size
         options = '-c session_preload_libraries=auto_explain -c auto_explain.log_min_duration=0 '
         options += '-c auto_explain.log_analyze=on -c auto_explain.log_nested_statements=on '
         options += '-c auto_explain.log_timing=off -c auto_explain.log_format=json -c plan_cache_mode=force_generic_plan'
@@ -201,7 +204,7 @@ def run(args):
                                   PGOPTIONS=options))
         assert value['state'] == 'not_seen' and value['statement_count'] == 2
         assert value['statement_hints'][0]['fingerprint'] == fp and value['statement_hints'][0]['hits']
-        with (directory/'server.log').open('rb') as log:
+        with server_log.open('rb') as log:
             log.seek(offset)
             raw = log.read().decode()
         (private/'cli_hint.plans').write_text(raw)

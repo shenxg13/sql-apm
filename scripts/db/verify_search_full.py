@@ -71,7 +71,9 @@ def prepare(args):
     (directory/'socket').mkdir(mode=0o700)
     start(directory,args.pg_bin)
     try:
-        with connection(directory) as db:before=snapshot(db)
+        db=connection(directory)
+        try:before=snapshot(db)
+        finally:db.close()
         (directory/'before.json').write_text(json.dumps(before))
         began=time.monotonic()
         command([ROOT/'scripts/db/initialize.sh','upgrade','--host',directory/'socket','--port','55474',

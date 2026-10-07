@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import json
 import os
 from pathlib import Path
+import random
 import subprocess
 import sys
 
@@ -23,6 +24,26 @@ from sql_apm.storage.ingestion import connect
 from sql_apm.storage.cleanup import CleanupStore
 from sql_apm.training.config import validate
 from psycopg2.extras import Json
+
+
+def reference_terms(value):
+    """The original character scanner, kept as an independent bounded oracle."""
+    terms, token, i = [], [], 0
+    spaces = ' \t\n\r\f\v'
+    fold = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', spaces)
+    while i < len(value):
+        char = value[i]
+        if char == '"':
+            end = value.find('"', i + 1)
+            if end >= 0:
+                token.append(value[i + 1:end]); i = end + 1; continue
+        if char in spaces:
+            if token: terms.append(''.join(token)); token = []
+        else:
+            token.append(char)
+        i += 1
+    if token: terms.append(''.join(token))
+    return [term.translate(fold) for term in terms if term.translate(fold)]
 
 
 def verify(pg_bin):
@@ -75,6 +96,23 @@ def verify(pg_bin):
             rejects('mpp_search_terms','empty_search_input',value)
         rejects('mpp_search_terms','too_many_search_terms',' '.join(['x']*21))
         assert len(call('mpp_search_terms',' '.join(['x']*20)))==20
+        rng = random.Random(47)
+        inputs = ['"a"."b"', '"a",', '"a"=1', 'a" b "c', '" "x', '"a" "b"',
+                  '"a b', 'a\u00a0b', '中文" 双引号 "x']
+        inputs += [''.join(rng.choice('abAB中Ä\u00a0\"=., \t\n\r\f\v')
+                           for _ in range(rng.randrange(180))) for _ in range(400)]
+        for value in inputs:
+            expected = reference_terms(value)
+            if not expected:
+                rejects('mpp_search_terms','empty_search_input',value)
+            elif len(expected)>20:
+                rejects('mpp_search_terms','too_many_search_terms',value)
+            else:
+                assert call('mpp_search_terms',value)==expected
+        assert call('mpp_search_terms','A'*100000)==['a'*100000]
+        assert call('mpp_search_terms','"中 文"'*20000)==['中文'*20000]
+        rejects('mpp_search_terms','too_many_search_terms','x '*50000)
+        rejects('mpp_search_terms','empty_search_input','""'*50000)
         v.require(True,'S2/S3: six ASCII spaces, ASCII-only case, phrases, unmatched quote, empty/20-term boundary')
         before=contents(db)
         def find(text,scope=None,database=None,user=None,start=None,end=None,order='count'):
@@ -98,6 +136,14 @@ def verify(pg_bin):
         hit=call('mpp_query_exact',norm,fingerprint)
         assert hit['state']=='has_baseline' and len(hit['hits'])==2
         assert find(fingerprint)==hit
+        for space in ' \t\n\r\f\v':
+            assert find(space+fingerprint+space)==hit
+        assert find('\u00a0'+fingerprint+'\u00a0')['match_kind']=='text'
+        rows("SELECT set_config('plan_cache_mode','force_generic_plan',false)")
+        for _ in range(7):
+            assert call('mpp_query_exact',norm,fingerprint)==hit
+        assert rows('SHOW plan_cache_mode')==[('force_generic_plan',)]
+        rows("SELECT set_config('plan_cache_mode','auto',false)")
         assert hit['hits'][0]['has_unknown_timing'] and len(hit['hits'][0]['timing_types'])==5
         assert call('mpp_query_exact',norm,fp('SELECT a FROM failure_only'))['state']=='records_without_baseline'
         assert call('mpp_query_exact',norm,fp('SELECT a FROM old_only'))['state']=='records_without_baseline'
@@ -171,6 +217,23 @@ def verify(pg_bin):
             assert sum(x['record_count'] for g in timeline['groups'] for x in g['rows'])==len(flat)
             request=timeline['groups'][0]['rows'][0]
             assert request['record_count']==2 and request['p50_ms']==3 and request['p95_ms']==3.9 and request['max_ms']==4
+        future=[]
+        for bucket in (None,'hour','day'):
+            empty=call('mpp_query_history',*hist_args,'2030-01-01',None,100,None,None,bucket)
+            assert empty['state']=='ok' and len(empty['groups'])==6 and not ids(empty)
+            assert empty['next_cursor'] is None
+            future.append((empty['start_at'],empty['end_at']))
+            empty=call('mpp_query_history',norm,fp('SELECT absent'),'C1','synthetic_db','synthetic_user',
+                       None,None,100,None,None,bucket)
+            assert not ids(empty) and empty['state']=='ok'
+        assert len(set(future))==1
+        rejects('mpp_query_history','invalid_time_bucket',*hist_args,'2030-01-01',None,100,None,None,'invalid')
+        bounds=rows('SELECT * FROM mpp_query_time_bounds(%s,%s,%s,%s,%s,%s,%s)',
+                    hist_args+['2030-01-01','2030-01-02'])[0]
+        assert tuple(x.date().isoformat() for x in bounds)==('2030-01-01','2030-01-02')
+        assert rows('SELECT * FROM mpp_query_time_bounds(%s,%s,NULL,NULL,NULL)',(norm,fingerprint))==rows(
+            "SELECT max(end_at)-interval '7 days',max(end_at)+interval '1 microsecond' "
+            'FROM mpp_query_occurrences(%s,%s)',(norm,fingerprint))
         assert contents(db)==before
         v.require(True,'S12/S13/S14/S16: independent history window, paging without duplicates, null unknown timing, decisions, quantiles, read-only digests')
         # Import after the saved snapshot: input membership uses files, not a batch heuristic.

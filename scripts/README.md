@@ -251,6 +251,11 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 
 ## SQL检索与查询层
 
+`verify_search_plans.py --directory PRIVATE_COPY` 对已升级、已停止的专用全量副本核对嵌套执行计划，
+补测稀疏／密集结构、20条语句完整命令和长输入切分；原始SQL与计划仅留在该私有目录。
+它需要副本内 `apm_test_admin` 诊断身份加载 PG17 自带 `auto_explain`，不新增扩展，
+不用于生产库；耗时与其他全量验证串行测量，避免并发互相干扰。
+
 `python -m sql_apm search find/exact/baseline/executions/versions/text` 输出JSON，使用数据库查询积木。
 [开发说明](../docs/design/sql-search.md)定义函数、字段与并发行为；
 [试用步骤](../docs/runbooks/sql-search-trial.md)提供用户自选输入及可复制命令。

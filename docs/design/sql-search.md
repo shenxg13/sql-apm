@@ -45,6 +45,13 @@
 匹配文本先物化，再和保留记录统一聚合；只有匹配原文在筛选内的记录参与计数。
 原文仅匹配但没有相应记录时不产生候选。
 
+引号相邻片段保持拼接，例如 `"a"."b"` 切成一项 `a.b`，`"a",` 切成一项 `a,`。
+这不等于按 SQL 标识符语法解析；原样粘贴带引号的限定名可能查不到原文中的同段文本。
+这是[维护者确认保留的限制](https://github.com/shenxg13/sql-apm/issues/47#issuecomment-6041514525)，
+后续 Grafana 任务再确定交互和文档；完整 SQL 可使用精确检索。
+切分采用一次正则片段流和缓冲聚合，保留原有相邻拼接及不配对引号语义，不另设输入长度限制。
+没有可靠指纹、未进入原文表的输入不在模糊检索范围内，这是既有存储边界。
+
 统计列包括 `sample_state, included_count, active_days, excluded_count, exclusions_by_reason,
 sufficiency, metric_null_reasons`，以及17列：`min_ms, max_ms, mean_ms, p25_ms, p50_ms,
 p75_ms, p90_ms, p95_ms, p99_ms, stddev_ms, cv, mad_ms, iqr_ms, log_median, log_mad, p95_p50, p99_p50`。
@@ -54,7 +61,8 @@ p75_ms, p90_ms, p95_ms, p99_ms, stddev_ms, cv, mad_ms, iqr_ms, log_median, log_m
 ## JSON 适配与命令
 
 `mpp_query_search` 包装模糊结果，零行时仍给 `total_structures=0`；输入完整 `struct:算法:64位十六进制摘要`
-时转调精确命中列表。指纹直查采用精确检索的身份筛选，时间／文本排序参数不参与直查。
+时转调精确命中列表；数据库入口先去掉首尾六类 ASCII 空白再判断，内部空白不删除。
+指纹直查采用精确检索的身份筛选，时间／文本排序参数不参与直查。
 `mpp_query_exact` 接收 Python 已算出的指纹和可选近似值，返回 `has_baseline`、
 `records_without_baseline`、`not_seen`、`unreliable_fingerprint`；可靠未命中仍给指纹。
 每个命中行的 `has_baseline=false` 明确代表该身份的当前版本无正式统计。
@@ -68,6 +76,8 @@ p75_ms, p90_ms, p95_ms, p99_ms, stddev_ms, cv, mad_ms, iqr_ms, log_median, log_m
 cursor jsonb, build, bucket])` 提供明细或便利时间汇总的 JSON 包装。
 无起止时间时由 `mpp_query_time_bounds` 取该身份最近一条记录减7天，结束边界多1微秒以包含最后一条。
 只给结束时间时开始取其前7天；只给开始时间时结束取最后一条加1微秒。
+只给开始时间且晚于该身份最后一条记录，或该身份没有可靠结束时间时，明细与小时／天汇总
+均返回成功的六个空组及空游标，仍给出推导的边界。显式同时给出起止且起点不早于终点仍拒绝。
 返回六组：五类计时及 NULL 未知计时；阶段和调用标记 `stage_or_call`，不相加为完整执行。
 `next_cursor` 按结束时间、analysis_id、occurrence_id 的倒序键分页；保持相同筛选与返回的起止范围。
 `limit` 为1–1000；训练判定用 `build` 显式启用，使用该版本实际封存的文件／分析映射。
@@ -114,6 +124,25 @@ WHERE timing_type IN ('request','execute_first');
 `verify_search.py` 是合成验收；`verify_search_full.py prepare/audit/exact` 是显式全量核对，使用关闭的真实库副本。
 全量核对会扫描原文和全部原有表并占用副本空间；摘要逐行在服务器计算，公开输出只含数量、哈希和耗时。
 不自动加入日常 Harness。测试文档见[开发机试用步骤](../runbooks/sql-search-trial.md)。
+
+## 查询计划与累积规模
+
+精确命中直接按当前归一化、profile、可靠状态及结构指纹等值连接指纹和执行记录，计数不读取
+来源证据表。基线存在性及统计分组查找都给齐 `profile='mpp-csv/1'`，允许使用现有分组索引。
+`mpp_query_hits`、模糊聚合、历史、时间边界、时间汇总及统计函数局部设置
+`plan_cache_mode=force_custom_plan`，让 PostgreSQL 按本次参数化简可选条件并估算选择率。
+设置只在函数内生效，不改变调用者会话；没有禁用顺序扫描或强制某个索引。
+依据见 [PG17 计划缓存说明](https://www.postgresql.org/docs/17/runtime-config-query.html#GUC-PLAN-CACHE-MODE)。
+
+精确命中的主要成本随匹配原文数、对应执行记录数和身份数增长；密集结构允许规划器选择顺序
+扫描。多语句逐条提示最多另做20次精确查找，成本累加，不能用单条耗时代表整条命令。
+模糊匹配仍扫描原文，再聚合匹配记录；全库缺少当前规则结果的精确计数也仍读取全部原文及指纹。
+该计数提供当前事务的一致性警告，本轮不新增缓存或计数表，避免过期结果和写入维护成本。
+时间边界在已给结束时间时直接由参数计算，只有缺少结束时间才读取该身份记录求最新时间。
+
+`verify_search_plans.py --directory PRIVATE_COPY` 在已升级且停止的专用副本核对函数内部实际计划，
+记录四类结构、1／5／20条完整命令和长输入切分耗时。它仅在诊断管理员会话加载 `auto_explain`，
+不安装扩展；SQL 和原始计划只保留在指定私有目录，公开摘要不含业务原文或身份。
 
 数据库函数名、参数和列是供后续 Grafana 消费的契约；未来变化须修改本说明并进入之后的发布说明。
 本次不发版；随包三份用户文档仍对应 v0.2.0／1.9.0，由后续 Grafana 工作补齐查询说明。

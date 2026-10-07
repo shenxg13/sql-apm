@@ -4,9 +4,11 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-07
+updated: 2026-10-08
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/47
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/47#issuecomment-6041514525
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
@@ -233,6 +235,13 @@ history 的清理标记及正式／观察结果的数据库查询守卫由 #43 �
   全量测量包含最坏和随机情况；本地120只有7天，生产30天且原文／明细累积，不能推定生产时延。
 - 交付不包含Grafana、常驻Python服务、发版、Kylin实测及三份用户查询文档；开发说明与用户试用步骤随PR。
   用户自选SQL和关键词的试用确认是合并前要求，不能以自动化通过替代。
+
+2026-10-08 实现修订依据为[维护者对 R1 的逐项决定](https://github.com/shenxg13/sql-apm/issues/47#issuecomment-6041514525)：
+只给开始时间且晚于该身份最后一条记录时，明细与按小时／天汇总统一返回成功的空结果；
+完整指纹值判断前删除首尾六类 ASCII 空白；长输入切分保持原有词法，不增加长度拒绝。
+相邻引号片段仍拼成一项（例如 `"a"."b"` 得到 `a.b`、`"a",` 得到 `a,`），因此原样粘贴
+带引号的 SQL 片段不保证找到同段原文。此限制本轮保持，后续 Grafana Issue 再确定交互与使用文档；
+完整 SQL 可用精确检索。这是已确认的保留边界，不代表该限制已经消除。
 
 ## Workflows
 

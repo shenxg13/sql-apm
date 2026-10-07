@@ -381,3 +381,7 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 [配置指南](../docs/runbooks/configuration-guide.md)和[结构说明](../docs/design/database-structure.md)
 进入随包文档；本轮实测与发布尚待完成，不把旧版结果当作新版验证。
 [验证报告](../docs/reports/v020-offline-release-2026-10-07.md)记录候选摘要、本地检查和实测证据边界。
+
+用户随后确认本轮[跨机数值比较与开发机证据继承](decisions/runtime-and-components.md#v020-预发布交付与本轮演练2026-10-07)：
+仅两列对数统计采用有界逐行比较，其他跨机字段和同机不变检查保持精确；
+原候选实测保留并由产品文件摘要绑定，只读补采及受影响资源补验见本地开发说明。

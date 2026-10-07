@@ -15,6 +15,7 @@
     "scripts/db/verify.py", "scripts/db/verify_publication.py", "scripts/db/verify_cleanup.py",
     "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
     "scripts/deployment/acceptance.py", "scripts/deployment/guide_examples.py",
+    "scripts/deployment/statistic_comparison.py",
     "scripts/deployment/cleanup_rehearsal.py",
     "scripts/deployment/verify_package.py",
     "scripts/functions/*.py", "rules/functions/*.json", "rules/functions/POSTGRESQL-LICENSE.txt",

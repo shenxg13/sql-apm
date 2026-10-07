@@ -11,6 +11,8 @@ import sys
 from acceptance import (build_counts, command, connect, current_build, save,
                         selected, statistics, sufficiency, verify_baseline)
 from verify_package import verify
+from statistic_comparison import (FORMAT, compare_statistics, exact_fields,
+                                  export_statistics, verify_values)
 
 CASES = ('window','threshold','template','exclusion','retention','workers','import')
 
@@ -65,6 +67,15 @@ def run(args):
     args.records.mkdir(parents=True,exist_ok=True,mode=0o700)
     package = verify(args.app_root,installed=True)
     metadata = json.loads((args.app_root/'RELEASE.json').read_text())
+    baseline = None
+    if args.baseline:
+        baseline = json.loads(args.baseline.read_text())
+        verify_baseline(metadata,baseline)
+        if baseline.get('statistics_comparison') != FORMAT:
+            raise ValueError('confirmed statistics comparison baseline required')
+        if args.case in CASES[:4]:
+            verify_values(args.baseline.parent,baseline['statistics_values'][args.case])
+    strict_statistics, values, comparison = None, None, None
     with closing(connect()) as db:
         original = seed(args,db)
         path, fingerprint = make_config(args,db,original)
@@ -90,23 +101,27 @@ def run(args):
         else:
             assert result['state']=='succeeded' and result['publication']['result']=='published'
             bid = result['build']['build_id']
+            strict_statistics = statistics(db,bid)
+            values = export_statistics(db,bid,args.records,args.case)
             comparable = dict(selection=selected(events),build=build_counts(result),
-                statistics=statistics(db,bid),sufficiency=sufficiency(db,bid),template_fingerprint=fingerprint)
+                statistics=exact_fields(values),sufficiency=sufficiency(db,bid),template_fingerprint=fingerprint)
             if args.case=='window':
                 assert comparable['selection']['excluded_batches']>0
             elif args.case=='threshold':
-                assert comparable['statistics']==original['statistics'], 'threshold changed metric values'
+                assert strict_statistics==original['statistics'], 'threshold changed metric values'
                 assert comparable['sufficiency']!=original['sufficiency'], 'threshold must change insufficiency counts'
             else:
                 reason = 'blacklist_template' if args.case=='template' else 'excluded_interval'
                 assert sum(n for _,code,n in comparable['build']['reasons'] if code==reason)>0
         equal = None
-        if args.baseline:
-            baseline = json.loads(args.baseline.read_text())
-            verify_baseline(metadata,baseline)
+        if baseline is not None:
             equal = comparable==baseline['examples'][args.case]
+            if values is not None:
+                comparison = compare_statistics(values,args.records,baseline['statistics_values'][args.case],args.baseline.parent)
+                equal = equal and comparison['passed']
         record = dict(case=args.case,program_commit=metadata['commit'],program_verification=package,
-            resources=resources,comparable=comparable,baseline_equal=equal,passed=equal is not False)
+            resources=resources,comparable=comparable,baseline_equal=equal,passed=equal is not False,
+            statistics_exact=strict_statistics,statistics_values=values,statistics_comparison=comparison)
         save(args.records/(args.case+'.json'),record)
         print(json.dumps(dict(case=args.case,passed=record['passed'],baseline_equal=equal)),flush=True)
         if equal is False:

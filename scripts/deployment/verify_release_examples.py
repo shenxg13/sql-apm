@@ -13,12 +13,15 @@ sys.path[:0]=[str(ROOT/'scripts/db'),str(ROOT/'tests'),str(ROOT)]
 from verify import instance,Verification
 from ingestion.test_reader import row,write_csv
 from check_documents import examples, GUIDE
+from statistic_comparison import FORMAT, compare_statistics
+from acceptance import product_files
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--baseline',type=Path,help='compare every helper to an earlier synthetic run')
     parser.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
     args=parser.parse_args();args.app_root=args.app_root.resolve();args.output=args.output.resolve()
     args.output.mkdir(parents=True,exist_ok=False)
@@ -55,12 +58,28 @@ def main():
                 cli('119-rebuild',['rebuild','--cluster',cluster,'--training-config',str(training),'--cutoff-date','2026-07-31'])
         # Exercise the same helper and checks later used with the real nine-task database.
         for case in ('window','threshold','template','exclusion','retention','workers','import'):
+            baseline_args=['--baseline',str(args.baseline.resolve())] if args.baseline else []
             with (args.output/('helper-'+case+'.log')).open('x') as stream:
                 result=subprocess.run([str(args.app_root/'.venv/bin/python'),str(ROOT/'scripts/deployment/guide_examples.py'),
                     '--app-root',str(args.app_root),'--config',str(args.output),'--records',str(args.output/'guide'),
-                    'run',case],env=env,stdout=stream,stderr=subprocess.STDOUT)
+                    *baseline_args,'run',case],env=env,stdout=stream,stderr=subprocess.STDOUT)
             assert result.returncode==0,'helper_'+case
             report.append(dict(example=case,helper_passed=True))
+            if case in ('window','threshold','template','exclusion'):
+                record=json.loads((args.output/'guide'/(case+'.json')).read_text())
+                comparison=compare_statistics(record['statistics_values'],args.output/'guide',
+                                              record['statistics_values'],args.output/'guide')
+                assert comparison['passed']
+                report[-1]['statistics_comparison']=comparison
+        metadata=json.loads((args.app_root/'RELEASE.json').read_text())
+        baseline=dict(program_commit=metadata['commit'],product_sha256=product_files(metadata),
+                      statistics_comparison=FORMAT,examples={},statistics_values={})
+        for case in ('window','threshold','template','exclusion','retention','workers','import'):
+            record=json.loads((args.output/'guide'/(case+'.json')).read_text())
+            baseline['examples'][case]=record['comparable']
+            if record['statistics_values'] is not None:
+                baseline['statistics_values'][case]=record['statistics_values']
+        (args.output/'guide/v020-development-baseline.json').write_text(json.dumps(baseline,indent=2)+'\n')
         # At this point the private fixture has the same 9+4 publication shape
         # required by the target's natural-date cleanup step. Exercise its real
         # CLI and row/audit comparisons before adding the literal examples.

@@ -131,3 +131,16 @@ var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
 该模式只核对包身份并读取固定九任务／七示例记录，失败、缺失或不同候选的记录会被拒绝，
 不连接数据库、不重复构建，也不覆盖已有基准。原始失败输出仍须保留并在报告说明。
 历史 v0.1.0 的独立九任务与候选对齐证据保留在原报告中，不作为 v0.2.0 已通过的证明。
+
+用户确认需要在保留库补采跨机比较数据时，先用原端口／socket 启动该私有实例，设置
+SQL_APM_DSN 指向它，再执行下面的开发机专用命令，结束后停止实例：
+
+```bash
+.venv/bin/python scripts/deployment/verify_release_full.py \
+  --app-root ORIGINAL_APP --output COMPLETED_RUN --supplement-statistics NEW_BASELINE_DIR
+```
+
+该模式验证原候选及产品摘要，用只读事务读取四个已完成构建，并先证明全部统计值仍与原始
+记录精确一致，再生成新的基准和八个压缩逐行数值文件；不重建、删除或覆盖原记录。
+非对数字段仍精确比较，仅 log_median、log_mad 逐行绝对差不超过 1e-12，NULL 必须一致。
+把新基准和同目录数值文件一起交付，分别记录摘要；原基准与补采来源摘要保留用于追溯。

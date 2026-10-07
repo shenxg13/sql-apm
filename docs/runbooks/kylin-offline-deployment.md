@@ -78,7 +78,11 @@ export APM_SSH_PORT=22
 
 ```bash
 sudo install -d -m 0755 -o "$(id -un)" -g "$(id -gn)" "$APM_ROOT" "$APM_ROOT/setup"
-sudo yum install -y tar
+if command -v tar >/dev/null 2>&1; then
+  rpm -q tar
+else
+  sudo yum install -y tar
+fi
 tar --version
 ```
 
@@ -444,7 +448,8 @@ selected_batches 是本次整批入选数，excluded_batches 是两者之差；w
 本九任务均应没有排除和回退。选择只看文件 last_log_at 与窗口起点，事件再按完整窗口过滤。
 
 先把交付记录中的开发机基准文件保存到 APM_ROOT/config/v020-development-baseline.json，
-并按交付记录核对摘要。它不替换原 Alma 基准，只补充新字段和配置示例预期。
+同时将随基准交付的八个统计数值 `.jsonl.gz` 文件放在同一 config 目录，并核对交付记录的摘要。
+它不替换原 Alma 基准，只补充新字段和配置示例预期；指南工具在重新构建前核对数值文件摘要。
 下面两个循环只执行一次；set -e 保证任一步失败时停止。
 
 ```bash
@@ -508,7 +513,12 @@ done
 ```
 
 预期分别为排除批次、仅充足性标记数量变化、模板排除计数、时段排除计数；四项结果与开发机
-同候选同命令逐项比较。模板原文不输出到公开记录。完成后 119 有 9 个版本，120 仍为 4 个。
+相同产品文件候选、相同命令逐项比较。业务计数、选批、排除原因、样本不足计数和两张统计表的
+非对数字段精确相同（排除每次生成的 build_id、partition_id）。log_median、log_mad 逐行
+比较，允许绝对差不超过 1e-12，NULL 状态必须相同；这是本轮已确认的跨系统数学库舍入口径，
+不是产品计算参数。结果记录每列最大差、差异行数、NULL 差异和越界数；越界或其他字段差异均失败。
+门槛修改前后仍在各自机器上精确比较全部统计值，清理前后也不使用此跨机误差界限。
+模板原文不输出到公开记录。完成后 119 有 9 个版本，120 仍为 4 个。
 遇到差异停止，保留文件；不要再次运行已成功的 rebuild 增加版本。
 
 ## 12. 空闲时合成清理验证

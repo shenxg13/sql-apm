@@ -20,7 +20,7 @@
   },
   "candidate_commit": "3e563e21eb4c431bc34a2f4d0d0b231d32727997",
   "checks": {
-    "deployment_regressions": 26,
+    "deployment_regressions": 30,
     "installed_candidate": {
       "cleanup": 23,
       "database_passes": 276,
@@ -39,8 +39,552 @@
     "synthetic_helper_examples": 7,
     "synthetic_natural_cleanup": true
   },
+  "confirmed_statistics_supplement": {
+    "baseline_sha256": "8671b370f1781ff2065078f2170f86a22a0faa5b1a37921f59679d38cd678588",
+    "log_sha256": "f3b52da26d20797171befe146313268ff3589f0a4252cf71924cd8e9d39f6dbb",
+    "private_database_stopped": true,
+    "readonly": true,
+    "rows": 1682941,
+    "synthetic_compared": {
+      "examples": [
+        {
+          "example": "window",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 14,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 14,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "threshold",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "template",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "exclusion",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "retention",
+          "helper_passed": true
+        },
+        {
+          "example": "workers",
+          "helper_passed": true
+        },
+        {
+          "example": "import",
+          "helper_passed": true
+        },
+        {
+          "example": "window",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "threshold",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "template",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "exclusion",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "retention",
+          "literal_executed": true,
+          "state": "preview"
+        },
+        {
+          "example": "import",
+          "literal_executed": true,
+          "state": "complete"
+        }
+      ],
+      "natural_cleanup_passed": true,
+      "passed": true
+    },
+    "synthetic_reference": {
+      "examples": [
+        {
+          "example": "window",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 14,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 14,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "threshold",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "template",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "exclusion",
+          "helper_passed": true,
+          "statistics_comparison": {
+            "absolute_limit": "1E-12",
+            "format": "sql-apm-guide-statistics/1",
+            "passed": true,
+            "tables": {
+              "mpp_observation_statistic": {
+                "actual_rows": 0,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 0,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              },
+              "mpp_statistic": {
+                "actual_rows": 42,
+                "different_rows": 0,
+                "exact_fields_equal": true,
+                "expected_rows": 42,
+                "key_mismatches": 0,
+                "metrics": {
+                  "log_mad": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0",
+                    "null_mismatches": 0
+                  },
+                  "log_median": {
+                    "different": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16",
+                    "null_mismatches": 0
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        {
+          "example": "retention",
+          "helper_passed": true
+        },
+        {
+          "example": "workers",
+          "helper_passed": true
+        },
+        {
+          "example": "import",
+          "helper_passed": true
+        },
+        {
+          "example": "window",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "threshold",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "template",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "exclusion",
+          "literal_executed": true,
+          "state": "succeeded"
+        },
+        {
+          "example": "retention",
+          "literal_executed": true,
+          "state": "preview"
+        },
+        {
+          "example": "import",
+          "literal_executed": true,
+          "state": "complete"
+        }
+      ],
+      "natural_cleanup_passed": true,
+      "passed": true
+    }
+  },
   "cross_platform_math_probe": {
-    "comparison_change_confirmed": false,
+    "comparison_change_confirmed": true,
+    "confirmation": "https://github.com/shenxg13/sql-apm/issues/45#issuecomment-6029975202",
     "evidence": "measured; bounded synthetic read-only calls and count-only query of developer original build",
     "logs": {
       "math-development.json": "e825be640c5a7fe7253ee3444b0a325ea787af7102900185761f39c3f9e81172",

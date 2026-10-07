@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Bounded release regressions; run with the locked build Python environment."""
 import json
+import gzip
+import hashlib
 from pathlib import Path
 import shutil
 import subprocess
@@ -18,6 +20,83 @@ from verify_package import digest, verify
 import rehearsal
 from acceptance import verify_baseline
 from verify_release_full import collect_baseline
+from statistic_comparison import TABLES, compare_statistics, verify_values
+
+
+class StatisticComparisonTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory(prefix='sql-apm-statistic-compare-')
+        self.addCleanup(self.temporary.cleanup)
+        self.root=Path(self.temporary.name)
+
+    def fixture(self, folder, values):
+        directory=self.root/folder;directory.mkdir()
+        evidence={}
+        for table in TABLES:
+            path=directory/(table+'.jsonl.gz')
+            keys=[format(i+1,'064x') for i in range(len(values))]
+            with gzip.open(path,'wt') as stream:
+                for key,row in zip(keys,values):
+                    stream.write(json.dumps([key,*row])+'\n')
+            evidence[table]=dict(rows=len(values),sha256=hashlib.sha256(''.join(keys).encode()).hexdigest(),
+                                log_values=dict(file=path.name,sha256=digest(path)))
+        return evidence,directory
+
+    def test_exact_limit_tiny_difference_and_null_are_compared(self):
+        original,old=self.fixture('old',[('1','2'),(None,None),('1.0581374561023915','0')])
+        current,new=self.fixture('new',[('1.000000000001','2'),(None,None),('1.0581374561023913','0')])
+        result=compare_statistics(current,new,original,old)
+        self.assertTrue(result['passed'])
+        for table in result['tables'].values():
+            self.assertEqual(table['different_rows'],2)
+            self.assertEqual(table['metrics']['log_median']['max_absolute'],'1E-12')
+
+    def test_excess_null_missing_row_and_non_log_changes_fail(self):
+        original,old=self.fixture('old',[('1','2'),(None,None)])
+        for name,values in [('median',[('1.0000000000010000001','2'),(None,None)]),
+                            ('mad',[('1','2.000000000002'),(None,None)]),
+                            ('null',[('1','2'),('0',None)]),('missing',[('1','2')])]:
+            current,new=self.fixture(name,values)
+            with self.subTest(name=name):
+                self.assertFalse(compare_statistics(current,new,original,old)['passed'])
+        current,new=self.fixture('non-log',[('1','2'),(None,None)])
+        current[TABLES[0]]['sha256']='0'*64
+        self.assertFalse(compare_statistics(current,new,original,old)['passed'])
+
+    def test_corrupt_or_external_values_are_rejected(self):
+        evidence,directory=self.fixture('values',[('1','2')])
+        table=evidence[TABLES[0]]
+        name=table['log_values']['file']
+        table['log_values']['file']='../'+name
+        with self.assertRaisesRegex(ValueError,'local basename'):
+            verify_values(directory,evidence)
+        table['log_values']['file']=name
+        with (directory/name).open('ab') as stream:
+            stream.write(b'corrupt')
+        with self.assertRaisesRegex(ValueError,'checksum differs'):
+            verify_values(directory,evidence)
+
+    def test_collected_baseline_carries_verified_portable_value_files(self):
+        metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
+        (self.root/'tasks').mkdir();(self.root/'guide').mkdir()
+        for cluster,total in [('119',5),('120',4)]:
+            for step in range(total):
+                (self.root/'tasks'/(cluster+'-'+str(step)+'.json')).write_text(json.dumps(
+                    dict(passed=True,program_verification=dict(commit='tested'),selection={})))
+        for case in ('window','threshold','template','exclusion','retention','workers','import'):
+            values=None
+            if case in ('window','threshold','template','exclusion'):
+                values,folder=self.fixture(case,[('1','2')])
+                for value in values.values():
+                    name=value['log_values']['file'];new=case+'-'+name
+                    shutil.copyfile(folder/name,self.root/'guide'/new)
+                    value['log_values']['file']=new
+            (self.root/'guide'/(case+'.json')).write_text(json.dumps(dict(passed=True,
+                program_commit='tested',comparable={},statistics_values=values)))
+        result=collect_baseline(metadata,self.root)
+        for values in result['statistics_values'].values():
+            verify_values(self.root,values)
+        self.assertEqual(result['statistics_comparison'],'sql-apm-guide-statistics/1')
 
 
 class PackageTests(unittest.TestCase):

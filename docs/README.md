@@ -58,6 +58,14 @@
 | [数据契约设计范围](../.project-wiki/decisions/project-scope.md#已确认的数据契约设计范围) | 需求说明 | 逻辑数据契约的交付边界及关联 Issue；具体设计以该任务的交付为准。 |
 | [通用工程原则](../.project-wiki/decisions/engineering-principles.md) | 设计说明 | 数据正确性、恢复、资源成本与证据边界等设计约束。 |
 
+## SQL检索开发与试用
+
+| 文档 | 类型 | 用途 |
+| --- | --- | --- |
+| [检索查询层开发说明](design/sql-search.md) | 设计说明 | 数据库函数、JSON命令、升级、只读和清理并发契约，供Grafana后续开发。 |
+| [开发机检索试用](runbooks/sql-search-trial.md) | 测试步骤 | 准备专用副本、自选SQL和关键词、必做／选做用例及结果记录。 |
+| [检索验收报告](reports/sql-search-2026-10-07.md) | 验证报告 | 真实升级、独立匹配核对、最坏／随机性能及证据边界。 |
+
 ## 开发与操作
 
 | 文档 | 类型 | 读它了解什么 |

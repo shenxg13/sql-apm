@@ -9543,6 +9543,59 @@
     "seconds": 1.037,
     "simulated_date": false
   },
+  "target_authentication": {
+    "correct_password_readonly_connection": true,
+    "logs": {
+      "tcp-correct-password.log": "6046231beb50c4d5985b4a5c3f77f14b994973628972cbcdbbde237152109866",
+      "tcp-wrong-password.log": "23356a99ee025fab2d3d715280d055f6c938bb8beb40de3827d7b1c156fafb7b"
+    },
+    "wrong_password_exitcode": 2,
+    "wrong_password_rejected": true
+  },
+  "target_initial_checks": {
+    "database": {
+      "pass_lines": 276,
+      "sha256": "1987d079c6a4da41733c4e41447b8ffc9ba278960f3e29f7eaa6fe6f11946874"
+    },
+    "pg-configure.log": {
+      "sha256": "2a93e6208dd69bcd5b00013b87f7377bff9967f3e73ac159bf59bdd03ef7d0f5"
+    },
+    "pg-install.log": {
+      "sha256": "42f0e1fda7ac79f65d05857ac863d63fea51efb135a0552a937b6188671eb084"
+    },
+    "pg-make.log": {
+      "sha256": "c7dcb040631604fdb699762be70af23502fb37e38cc4018c5cdb605ec0bc7a92"
+    },
+    "publication": {
+      "pass_lines": 33,
+      "sha256": "2ca025630bcd4a0fbd24c04350ea10edd7a67b77037f6090adedfe39906eb64e"
+    },
+    "python-configure.log": {
+      "sha256": "fc287866830198a0d84c787b9586568ca1a63d6a39686b256ba7640787815e00"
+    },
+    "python-install.log": {
+      "sha256": "40eed0a1f93163aa9dee1f70e90086b27e656d216bd7ffc0326215173ec40a95"
+    },
+    "python-make.log": {
+      "sha256": "5ae1119861524dec6687dd6f24e3e9deaf6ed797e14247022256ce72a67a955a"
+    },
+    "smoke": {
+      "pass_lines": 0,
+      "sha256": "df3da8906f65d5363c95df66b1326e7a5d6910d6196fa3a7d161cca84942588c"
+    },
+    "unit": {
+      "pass_lines": 0,
+      "sha256": "54350f3ffd1bf974273e1a7f7c798cc39f186d6ee3a92b5219a4d9da41fc5686",
+      "tests": 72
+    }
+  },
+  "target_input_checks": {
+    "baseline_files": 9,
+    "batches": 8,
+    "source_check_log_sha256": "f8aca9998f173738a9171a54455ccd52b239e77f97912773c22e6d9628afc187",
+    "target_baseline_check_log_sha256": "07f761757463513b12734e683a21d75534434e884d462de87f7ae4fec981cbf4",
+    "verified_files": 55
+  },
   "target_installation_steps": {
     "00-tools": {
       "finished_at_development_utc": "2026-10-07T03:10:13.210616+00:00",
@@ -9583,6 +9636,56 @@
       "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
       "stage": "03-python",
       "started_at_development_utc": "2026-10-07T03:11:45.773821+00:00"
+    },
+    "04-postgres-verification": {
+      "finished_at_development_utc": "2026-10-07T03:15:55.555535+00:00",
+      "log_sha256": "5163e6aefcaa98663ba820bfc35196ddd1b4dc70b4fb3d830d8c06c61207b58f",
+      "returncode": 0,
+      "script_sha256": "f97aa9eeeeab4121a4497595873762297f16df62ef757eb0d5ece2eefae2d793",
+      "seconds": 123.736,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "04-postgres-verification",
+      "started_at_development_utc": "2026-10-07T03:13:51.819290+00:00"
+    },
+    "05-database": {
+      "finished_at_development_utc": "2026-10-07T03:16:53.841361+00:00",
+      "log_sha256": "c5397180af8e5b2a3a70edae65d023ab69c1bb9b5f4fb9f74e4b04b08d82b8dd",
+      "returncode": 0,
+      "script_sha256": "cfa6aca0e2537302952c44cc8861520676c4912da0d400e9979fd5ba7421d291",
+      "seconds": 1.054,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "05-database",
+      "started_at_development_utc": "2026-10-07T03:16:52.787812+00:00"
+    },
+    "06-access": {
+      "finished_at_development_utc": "2026-10-07T03:17:16.144801+00:00",
+      "log_sha256": "59e397ad00f6af7873ef293910b3af312d7f8576b9bf670a62edcb23e4884302",
+      "returncode": 0,
+      "script_sha256": "05a43f10c1c7a720c7e51c64d2319865c1a18f6a7221844197172f9f65a1d5a7",
+      "seconds": 0.733,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "06-access",
+      "started_at_development_utc": "2026-10-07T03:17:15.412183+00:00"
+    },
+    "07-restart": {
+      "finished_at_development_utc": "2026-10-07T03:17:48.474367+00:00",
+      "log_sha256": "891fd4ed7bf2c5ac15a39c3a192437eac09350425e4a66d8a0611af7f88997d2",
+      "returncode": 0,
+      "script_sha256": "16e401d5ed143ad4190f2a8ce16b2c0799b4662379d1da555e03839f8065ff7c",
+      "seconds": 0.468,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "07-restart",
+      "started_at_development_utc": "2026-10-07T03:17:48.006459+00:00"
+    },
+    "08-input-check": {
+      "finished_at_development_utc": "2026-10-07T03:26:39.130581+00:00",
+      "log_sha256": "6de6d718e9eef20a6aa253a5cbb2d90c785b916e07dbb0775f3d6735c0b99c27",
+      "returncode": 0,
+      "script_sha256": "97914f34e3bbd5d8a37e0058061aa4ae0362e68ca5cde42a7ed3ad6e6057afac",
+      "seconds": 18.98,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "08-input-check",
+      "started_at_development_utc": "2026-10-07T03:26:20.150307+00:00"
     }
   },
   "target_start_record": "https://github.com/shenxg13/sql-apm/issues/45#issuecomment-6030098438",

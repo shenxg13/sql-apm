@@ -8592,7 +8592,7 @@
       "title": "发布说明与文档入口"
     }
   },
-  "evidence": "measured; implementation preparation and developer rehearsal",
+  "evidence": "measured; developer and target rehearsal; each completed stage recorded separately",
   "execution_candidate": {
     "artifacts": {
       "bundle": {
@@ -9556,6 +9556,123 @@
     "wrong_password_exitcode": 2,
     "wrong_password_rejected": true
   },
+  "target_cleanup_summary": {
+    "month_seconds_method": "finished_at minus started_at; persisted audit timestamps",
+    "months": {
+      "119": {
+        "after_database_bytes": 59618285235,
+        "before_database_bytes": 62881445555,
+        "exclusive_seconds": 0.03508984400104964,
+        "formal_groups_deleted": 438058,
+        "group_seconds": 5.453869210992707,
+        "month_seconds": 5.568181,
+        "observation_groups_deleted": 241,
+        "released_bytes": 3263160320
+      },
+      "120": {
+        "after_database_bytes": 46029026995,
+        "before_database_bytes": 59618285235,
+        "exclusive_seconds": 0.20230833099776646,
+        "formal_groups_deleted": 2563049,
+        "group_seconds": 37.390252964003594,
+        "month_seconds": 37.989024,
+        "observation_groups_deleted": 3382,
+        "released_bytes": 13589438464
+      }
+    },
+    "simulated_date": true
+  },
+  "target_clock_preconditions": {
+    "active_tasks": {
+      "returncode": 0,
+      "stdout": "BEGIN\nSET\n0\nCOMMIT"
+    },
+    "natural_time_local": "2026-10-07T13:43:38.133100+08:00",
+    "services": {
+      "chronyd": {
+        "returncode": 0,
+        "stdout": "active"
+      },
+      "ntpd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      },
+      "systemd-timesyncd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      },
+      "vmtoolsd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      }
+    },
+    "time_sync": {
+      "returncode": 0,
+      "stdout": "NTP=yes\nNTPSynchronized=yes"
+    }
+  },
+  "target_final_state": {
+    "clock-before.txt": {
+      "sha256": "3beb3bbc1381ace925d632922e6d32245ce1dcec2e3789772546aea36a7e7d8f"
+    },
+    "clock-simulated.txt": {
+      "sha256": "25de09e0b359604440e3175bfb9b59b850f68d3fe19aa1ce5dac83f28ef1bbc0"
+    },
+    "services": {
+      "chronyd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      },
+      "ntpd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      },
+      "systemd-timesyncd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      },
+      "vmtoolsd": {
+        "returncode": 3,
+        "stdout": "inactive"
+      }
+    },
+    "simulated_date": true,
+    "time-sync-before.txt": {
+      "sha256": "53691f45bc089fde57ef335be3a2473102effdb318bf8539988d6ef632e1b63d"
+    },
+    "time_local": "2027-01-15T12:29:41.134922+08:00",
+    "time_sync": {
+      "returncode": 0,
+      "stdout": "NTP=no\nNTPSynchronized=no"
+    },
+    "verification_logs": {
+      "unittest.log": {
+        "bytes": 6673,
+        "pass_lines": 0,
+        "sha256": "54350f3ffd1bf974273e1a7f7c798cc39f186d6ee3a92b5219a4d9da41fc5686"
+      },
+      "verify-cleanup.log": {
+        "bytes": 2564,
+        "pass_lines": 23,
+        "sha256": "7fa755eab147fd2799538727dc773b323d6ab94a4446dcc02739d66b6d33b5d9"
+      },
+      "verify-publication.log": {
+        "bytes": 3465,
+        "pass_lines": 33,
+        "sha256": "2ca025630bcd4a0fbd24c04350ea10edd7a67b77037f6090adedfe39906eb64e"
+      },
+      "verify-smoke.log": {
+        "bytes": 351,
+        "pass_lines": 0,
+        "sha256": "df3da8906f65d5363c95df66b1326e7a5d6910d6196fa3a7d161cca84942588c"
+      },
+      "verify.log": {
+        "bytes": 20003,
+        "pass_lines": 276,
+        "sha256": "1987d079c6a4da41733c4e41447b8ffc9ba278960f3e29f7eaa6fe6f11946874"
+      }
+    }
+  },
   "target_initial_checks": {
     "database": {
       "pass_lines": 276,
@@ -9700,6 +9817,66 @@
       "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
       "stage": "09-nine-tasks",
       "started_at_development_utc": "2026-10-07T03:28:02.622988+00:00"
+    },
+    "10-guide": {
+      "finished_at_development_utc": "2026-10-07T05:32:50.405078+00:00",
+      "log_sha256": "be1b5c849e9e4255aab7e572b7a2e6d6a902c97d7f79e29e756eb2eaa68ddbe6",
+      "returncode": 0,
+      "script_sha256": "1e890766b1da273b97585813dc0e3285d4efa0200d73c573ca8d82fcc69ae3ba",
+      "seconds": 771.489,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "10-guide",
+      "started_at_development_utc": "2026-10-07T05:19:58.915897+00:00"
+    },
+    "11-synthetic-cleanup": {
+      "finished_at_development_utc": "2026-10-07T05:34:40.804620+00:00",
+      "log_sha256": "b98fc19f2c93701a2c25a2d7886fe80e39c8ed7af7fda33084094cab1de3d59b",
+      "returncode": 0,
+      "script_sha256": "94905a8a884ead9feaa906572384b46ba6dec13a92023facd1db55d5a852f6ed",
+      "seconds": 48.115,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "11-synthetic-cleanup",
+      "started_at_development_utc": "2026-10-07T05:33:52.690021+00:00"
+    },
+    "12-natural-cleanup": {
+      "finished_at_development_utc": "2026-10-07T05:43:20.242708+00:00",
+      "log_sha256": "0464faad57280f769713c8349f4d2506c6e4502b9b2d23532f395c8e28cdea83",
+      "returncode": 0,
+      "script_sha256": "f6a5b764dcff8fb37325cf305a07851cc850e012f0259600da9874c5c8f06708",
+      "seconds": 493.852,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "12-natural-cleanup",
+      "started_at_development_utc": "2026-10-07T05:35:06.391010+00:00"
+    },
+    "13-clock": {
+      "finished_at_development_utc": "2026-10-07T05:43:59.187258+00:00",
+      "log_sha256": "6eeaa2c5edfb3530536d8de75f5cf52c2d13df43ef8b1b3500e0e7b56f32faf4",
+      "returncode": 0,
+      "script_sha256": "e630c488fb80f92a7ac1a3d02e218699505ef203a2689a8709ae973ac8621f7d",
+      "seconds": 5.483,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "13-clock",
+      "started_at_development_utc": "2026-10-07T05:43:53.704605+00:00"
+    },
+    "14-protected-cleanup": {
+      "finished_at_development_utc": "2026-10-07T05:52:29.072708+00:00",
+      "log_sha256": "2bc4a298f5e5ffe1b3f1ac8554692321b89074570ce9402872e25ad8a7a425df",
+      "returncode": 0,
+      "script_sha256": "ea9b0c737fab2a424116cd320e1b1558843613f846afef026a9397f14bdc85dc",
+      "seconds": 493.038,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "14-protected-cleanup",
+      "started_at_development_utc": "2026-10-07T05:44:16.035054+00:00"
+    },
+    "15-expired-cleanup": {
+      "finished_at_development_utc": "2026-10-07T06:11:46.635363+00:00",
+      "log_sha256": "0055445a8bc4596ed5633b6fea45db25c3ac90b90448ea905472d83e4eedd90f",
+      "returncode": 0,
+      "script_sha256": "42e36f755ad8ea087dcc2df9a79b442d75e546e1da5145c015afe20696b47716",
+      "seconds": 1122.671,
+      "source_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+      "stage": "15-expired-cleanup",
+      "started_at_development_utc": "2026-10-07T05:53:03.964596+00:00"
     }
   },
   "target_nine_task_summary": {
@@ -9709,9 +9886,3082 @@
     "rebuild_tasks_without_import": 1,
     "tasks": 9
   },
+  "target_private_records_archive": {
+    "bytes": 85434608,
+    "mode": "0600",
+    "private_only": true,
+    "sha256": "dd264ab00c66d2e1b36ac7f434bf271af4382a8b52d30bfd7a9bb5c1453e9e5a"
+  },
   "target_results": {
-    "cleanup": {},
-    "guides": {},
+    "cleanup": {
+      "execute": {
+        "after_database_bytes": 46029026995,
+        "before_database_bytes": 57827317427,
+        "clusters": {
+          "119": {
+            "after_database_bytes": 59618285235,
+            "before_database_bytes": 62881445555,
+            "expired": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "expired_months": 1,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 1204224,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "retention_expired",
+                  "state": "expired",
+                  "statistic_bytes": 3261956096,
+                  "total_bytes": 3263160320,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 253952,
+                  "partition_id": 291276785818903542,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 387833856,
+                  "total_bytes": 388087808,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 496713140546100982,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "preview"
+            },
+            "history": {
+              "versions": [
+                {
+                  "at": "2027-01-15 12:12:08.890035+08:00",
+                  "build_id": "B:20270115T120929:c90434bdd89f43e9a38612acaeb6a412",
+                  "cleaned_at": null,
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T132928:6028977f15d54cb4931040d6776d2b96",
+                  "publication_id": "PUB:a14a94ca90b242ceaeab093a10a9a862",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": false,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 13:32:13.361880+08:00",
+                  "build_id": "B:20261007T132928:6028977f15d54cb4931040d6776d2b96",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T132555:d17eb1ebd9bd431086d35fc08a98f099",
+                  "publication_id": "PUB:fb2b4d92468248efa148c537adff9aa2",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 13:28:37.415294+08:00",
+                  "build_id": "B:20261007T132555:d17eb1ebd9bd431086d35fc08a98f099",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T132122:741914037c414861b7eb90d5bfbb2dc4",
+                  "publication_id": "PUB:9520bec4a20747c79ce9673ae8059e5b",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 13:23:55.604490+08:00",
+                  "build_id": "B:20261007T132122:741914037c414861b7eb90d5bfbb2dc4",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T132029:4256ab5770e64b38be831eb3b3ada37b",
+                  "publication_id": "PUB:b42820816d6e46d59d8f3a94b42c7a6d",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 13:20:53.838503+08:00",
+                  "build_id": "B:20261007T132029:4256ab5770e64b38be831eb3b3ada37b",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T115715:94d24bc5f30a468391440be2a280ed00",
+                  "publication_id": "PUB:a9e85b67f41f459290a4460adbd2c6f3",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-30 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 11:58:56.766335+08:00",
+                  "build_id": "B:20261007T115715:94d24bc5f30a468391440be2a280ed00",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T115531:bd815c28dc39448295b6aad2c0db9d88",
+                  "publication_id": "PUB:e380b02390654232a9a22773d8cd403d",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 11:57:13.289736+08:00",
+                  "build_id": "B:20261007T115531:bd815c28dc39448295b6aad2c0db9d88",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-31",
+                  "previous_build_id": "B:20261007T115116:ac4bfd86271d4449b43566f3180cb534",
+                  "publication_id": "PUB:55e7e4702add4affb19fadbb482a7bac",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-08-01 00:00:00+08:00",
+                  "window_start": "2026-07-02 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 11:54:44.805478+08:00",
+                  "build_id": "B:20261007T115116:ac4bfd86271d4449b43566f3180cb534",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-30",
+                  "previous_build_id": "B:20261007T114715:2c35c2e80c09420caa8f8402fe1d97d0",
+                  "publication_id": "PUB:86a23e420570493099cffaa54a28b28d",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-07-31 00:00:00+08:00",
+                  "window_start": "2026-07-01 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 11:50:34.614121+08:00",
+                  "build_id": "B:20261007T114715:2c35c2e80c09420caa8f8402fe1d97d0",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-29",
+                  "previous_build_id": "B:20261007T114312:24df30fe7c284263a2a66cb5e5363ada",
+                  "publication_id": "PUB:03b404f952514497a5149f0e6fb61188",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-07-30 00:00:00+08:00",
+                  "window_start": "2026-06-30 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 11:46:35.328356+08:00",
+                  "build_id": "B:20261007T114312:24df30fe7c284263a2a66cb5e5363ada",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "cutoff_date": "2026-07-28",
+                  "previous_build_id": null,
+                  "publication_id": "PUB:1052b6f448c044daa6afde5dbbf145ed",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-07-29 00:00:00+08:00",
+                  "window_start": "2026-06-29 00:00:00+08:00"
+                }
+              ]
+            },
+            "new_build_id": "B:20270115T120929:c90434bdd89f43e9a38612acaeb6a412",
+            "rebuild_resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 87556096,
+              "peak_used_bytes": 1808818176,
+              "returncode": 0,
+              "samples": 714,
+              "seconds": 178.888
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 99352576,
+              "peak_used_bytes": 1263325184,
+              "returncode": 0,
+              "samples": 24,
+              "seconds": 5.776
+            },
+            "result": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "months": [
+                {
+                  "after_bytes": 0,
+                  "before_bytes": 3263160320,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": "2027-01-15 12:25:56.128898+08:00",
+                  "exclusive_seconds": 0.03508984400104964,
+                  "finished_at": "2027-01-15 12:26:01.686906+08:00",
+                  "formal_groups_deleted": 438058,
+                  "group_seconds": 5.453869210992707,
+                  "observation_groups_deleted": 241,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "results_cleaned",
+                  "released_bytes": 3263160320,
+                  "started_at": "2027-01-15 12:25:56.118725+08:00",
+                  "state": "succeeded",
+                  "task_id": "T:42b369ebadf04a828bce6d8a58379574",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:01.687180+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:01.687180+08:00",
+                  "state": "retained",
+                  "task_id": "T:42b369ebadf04a828bce6d8a58379574",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 388087808,
+                  "before_bytes": 388087808,
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:01.687473+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 291276785818903542,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:01.687473+08:00",
+                  "state": "retained",
+                  "task_id": "T:42b369ebadf04a828bce6d8a58379574",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:01.687750+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 496713140546100982,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:01.687750+08:00",
+                  "state": "retained",
+                  "task_id": "T:42b369ebadf04a828bce6d8a58379574",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "succeeded",
+              "task_id": "T:42b369ebadf04a828bce6d8a58379574"
+            },
+            "retained": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "expired_months": 0,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 1204224,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 3261956096,
+                  "total_bytes": 3263160320,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 253952,
+                  "partition_id": 291276785818903542,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 387833856,
+                  "total_bytes": 388087808,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 496713140546100982,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 12,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "preview"
+            }
+          },
+          "120": {
+            "after_database_bytes": 46029026995,
+            "before_database_bytes": 59618285235,
+            "expired": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "expired_months": 1,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 18227200,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "retention_expired",
+                  "state": "expired",
+                  "statistic_bytes": 13571211264,
+                  "total_bytes": 13589438464,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 5480448,
+                  "partition_id": 558675212093140504,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 4316807168,
+                  "total_bytes": 4322287616,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 512449826793783618,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "preview"
+            },
+            "history": {
+              "versions": [
+                {
+                  "at": "2027-01-15 12:24:38.267647+08:00",
+                  "build_id": "B:20270115T121226:06cca60f91fa4eff97f3b6abb1634d8f",
+                  "cleaned_at": null,
+                  "cutoff_date": "2026-09-19",
+                  "previous_build_id": "B:20261007T130612:1bb1b740c42b432c948ab3743a3e1263",
+                  "publication_id": "PUB:f9582c81055141159cd547ffa663118a",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": false,
+                  "window_end": "2026-09-20 00:00:00+08:00",
+                  "window_start": "2026-08-21 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 13:19:17.814291+08:00",
+                  "build_id": "B:20261007T130612:1bb1b740c42b432c948ab3743a3e1263",
+                  "cleaned_at": "2027-01-15 12:26:02.751819+08:00",
+                  "cutoff_date": "2026-09-19",
+                  "previous_build_id": "B:20261007T125046:0e8451a16428404da1e200c12e548532",
+                  "publication_id": "PUB:6c2291b2b0964282b1848479ae63e04c",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-09-20 00:00:00+08:00",
+                  "window_start": "2026-08-21 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 12:57:41.447251+08:00",
+                  "build_id": "B:20261007T125046:0e8451a16428404da1e200c12e548532",
+                  "cleaned_at": "2027-01-15 12:26:02.751819+08:00",
+                  "cutoff_date": "2026-09-18",
+                  "previous_build_id": "B:20261007T123706:e8655421ce8c4f538d1f8d931df74918",
+                  "publication_id": "PUB:d2917db277ea42529f2826a8c1b4fcad",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-09-19 00:00:00+08:00",
+                  "window_start": "2026-08-20 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 12:43:34.073169+08:00",
+                  "build_id": "B:20261007T123706:e8655421ce8c4f538d1f8d931df74918",
+                  "cleaned_at": "2027-01-15 12:26:02.751819+08:00",
+                  "cutoff_date": "2026-09-17",
+                  "previous_build_id": "B:20261007T122314:6ee82a3b828947ad9da0875df002676d",
+                  "publication_id": "PUB:3aa8c1d953534f979da225144215e3a0",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-09-18 00:00:00+08:00",
+                  "window_start": "2026-08-19 00:00:00+08:00"
+                },
+                {
+                  "at": "2026-10-07 12:27:31.914784+08:00",
+                  "build_id": "B:20261007T122314:6ee82a3b828947ad9da0875df002676d",
+                  "cleaned_at": "2027-01-15 12:26:02.751819+08:00",
+                  "cutoff_date": "2026-09-16",
+                  "previous_build_id": null,
+                  "publication_id": "PUB:04f6f8cf6a7b4c9ca08cf1488412ba94",
+                  "reason": null,
+                  "request_baseline_missing": false,
+                  "result": "published",
+                  "results_cleaned": true,
+                  "window_end": "2026-09-17 00:00:00+08:00",
+                  "window_start": "2026-08-18 00:00:00+08:00"
+                }
+              ]
+            },
+            "new_build_id": "B:20270115T121226:06cca60f91fa4eff97f3b6abb1634d8f",
+            "rebuild_resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 100401152,
+              "peak_used_bytes": 13493063680,
+              "returncode": 0,
+              "samples": 2989,
+              "seconds": 749.423
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 99352576,
+              "peak_used_bytes": 1267240960,
+              "returncode": 0,
+              "samples": 153,
+              "seconds": 38.134
+            },
+            "result": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "months": [
+                {
+                  "after_bytes": 0,
+                  "before_bytes": 13589438464,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": "2027-01-15 12:26:02.751819+08:00",
+                  "exclusive_seconds": 0.20230833099776646,
+                  "finished_at": "2027-01-15 12:26:40.733297+08:00",
+                  "formal_groups_deleted": 2563049,
+                  "group_seconds": 37.390252964003594,
+                  "observation_groups_deleted": 3382,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "results_cleaned",
+                  "released_bytes": 13589438464,
+                  "started_at": "2027-01-15 12:26:02.744273+08:00",
+                  "state": "succeeded",
+                  "task_id": "T:b5fc5cfa22114340a2b89c98a55d952d",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:40.733774+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:40.733774+08:00",
+                  "state": "retained",
+                  "task_id": "T:b5fc5cfa22114340a2b89c98a55d952d",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 4322287616,
+                  "before_bytes": 4322287616,
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:40.734192+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 558675212093140504,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:40.734192+08:00",
+                  "state": "retained",
+                  "task_id": "T:b5fc5cfa22114340a2b89c98a55d952d",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:26:40.734537+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 512449826793783618,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:26:40.734537+08:00",
+                  "state": "retained",
+                  "task_id": "T:b5fc5cfa22114340a2b89c98a55d952d",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "succeeded",
+              "task_id": "T:b5fc5cfa22114340a2b89c98a55d952d"
+            },
+            "retained": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2027-01-01",
+              "expired_months": 0,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 18227200,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 13571211264,
+                  "total_bytes": 13589438464,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-01-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 5480448,
+                  "partition_id": 558675212093140504,
+                  "published_builds": 1,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 4316807168,
+                  "total_bytes": 4322287616,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2027-02-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 512449826793783618,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 12,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "preview"
+            }
+          }
+        },
+        "current_month": "2027-01-01",
+        "current_rows_after": {
+          "119": {
+            "mpp_observation_statistic": {
+              "rows": 180,
+              "sha256": "5b71803be856707b6850358328bcf472e7bccff94ef42cfa2a54d67bd961ebf0"
+            },
+            "mpp_statistic": {
+              "rows": 537198,
+              "sha256": "3be2959fde9b3745c4638b9c7276cb76f31fff695bfa3d6bb334118ccc28208d"
+            }
+          },
+          "120": {
+            "mpp_observation_statistic": {
+              "rows": 6748,
+              "sha256": "70b751edb8cc245cd02d7c77292ab3b6e8a4f97974c9019b2701a338d4ad03af"
+            },
+            "mpp_statistic": {
+              "rows": 5850925,
+              "sha256": "c9276f86a29b9124b05e882832fa327f5b8c96ecb0279182909de171b2f8a1fb"
+            }
+          }
+        },
+        "current_rows_before": {
+          "119": {
+            "mpp_observation_statistic": {
+              "rows": 180,
+              "sha256": "5b71803be856707b6850358328bcf472e7bccff94ef42cfa2a54d67bd961ebf0"
+            },
+            "mpp_statistic": {
+              "rows": 537198,
+              "sha256": "3be2959fde9b3745c4638b9c7276cb76f31fff695bfa3d6bb334118ccc28208d"
+            }
+          },
+          "120": {
+            "mpp_observation_statistic": {
+              "rows": 6748,
+              "sha256": "70b751edb8cc245cd02d7c77292ab3b6e8a4f97974c9019b2701a338d4ad03af"
+            },
+            "mpp_statistic": {
+              "rows": 5850925,
+              "sha256": "c9276f86a29b9124b05e882832fa327f5b8c96ecb0279182909de171b2f8a1fb"
+            }
+          }
+        },
+        "evidence_sha256": "641603071c9dee43494535cf14ad27669fe1c42fc44d09b6fea2345642173e0f",
+        "original_month": "2026-10-01",
+        "passed": true,
+        "phase": "execute",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "seconds": 1121.835,
+        "simulated_date": true
+      },
+      "natural": {
+        "after_database_bytes": 57827317427,
+        "before_database_bytes": 57827301043,
+        "clusters": {
+          "119": {
+            "preview": {
+              "current_month": "2026-10-01",
+              "current_version_month": "2026-10-01",
+              "expired_months": 0,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 1204224,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 3261956096,
+                  "total_bytes": 3263160320,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "preview"
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 73662464,
+              "peak_used_bytes": 1219723264,
+              "returncode": 0,
+              "samples": 2,
+              "seconds": 0.259
+            },
+            "result": {
+              "current_month": "2026-10-01",
+              "current_version_month": "2026-10-01",
+              "months": [
+                {
+                  "after_bytes": 3263160320,
+                  "before_bytes": 3263160320,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2026-10-07 13:39:13.221643+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2026-10-07 13:39:13.221643+08:00",
+                  "state": "retained",
+                  "task_id": "T:fab30e304fe346b98f214481e9d3bc20",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2026-10-07 13:39:13.222218+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2026-10-07 13:39:13.222218+08:00",
+                  "state": "retained",
+                  "task_id": "T:fab30e304fe346b98f214481e9d3bc20",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "succeeded",
+              "task_id": "T:fab30e304fe346b98f214481e9d3bc20"
+            }
+          },
+          "120": {
+            "preview": {
+              "current_month": "2026-10-01",
+              "current_version_month": "2026-10-01",
+              "expired_months": 0,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 18227200,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 13571211264,
+                  "total_bytes": 13589438464,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "preview"
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 73662464,
+              "peak_used_bytes": 1219706880,
+              "returncode": 0,
+              "samples": 2,
+              "seconds": 0.258
+            },
+            "result": {
+              "current_month": "2026-10-01",
+              "current_version_month": "2026-10-01",
+              "months": [
+                {
+                  "after_bytes": 13589438464,
+                  "before_bytes": 13589438464,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2026-10-07 13:39:13.764131+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2026-10-07 13:39:13.764131+08:00",
+                  "state": "retained",
+                  "task_id": "T:0432fc4734384efc84870f23d81a8878",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2026-10-07 13:39:13.764629+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2026-10-07 13:39:13.764629+08:00",
+                  "state": "retained",
+                  "task_id": "T:0432fc4734384efc84870f23d81a8878",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "succeeded",
+              "task_id": "T:0432fc4734384efc84870f23d81a8878"
+            }
+          }
+        },
+        "current_month": "2026-10-01",
+        "evidence_sha256": "79ba080cf76536b4cf6fa61779db0935943d6003d6ca6e728edb2f8942509684",
+        "original_month": "2026-10-01",
+        "passed": true,
+        "phase": "natural",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "result_rows_after": {
+          "mpp_build_group": {
+            "rows": 3001107,
+            "sha256": "219919f56203968e407f6aa96ef71829a649d8f274f64a4b98ec58e6ba89c5cc"
+          },
+          "mpp_build_observation_group": {
+            "rows": 3623,
+            "sha256": "2141bcc799bd956beb04026a99424d741286de6b85edd0dce23bc109af020048"
+          },
+          "mpp_observation_statistic": {
+            "rows": 23096,
+            "sha256": "a4b7a8c3f2d0c83b5f2d0b6299c9ac6eafa05527b3e7878f10fe8b5c80f6a0d3"
+          },
+          "mpp_statistic": {
+            "rows": 21727049,
+            "sha256": "69cd4cce30289c9496323f14c6067d245f1f3e31d75a45b2fc7f692f5d1f8236"
+          }
+        },
+        "result_rows_before": {
+          "mpp_build_group": {
+            "rows": 3001107,
+            "sha256": "219919f56203968e407f6aa96ef71829a649d8f274f64a4b98ec58e6ba89c5cc"
+          },
+          "mpp_build_observation_group": {
+            "rows": 3623,
+            "sha256": "2141bcc799bd956beb04026a99424d741286de6b85edd0dce23bc109af020048"
+          },
+          "mpp_observation_statistic": {
+            "rows": 23096,
+            "sha256": "a4b7a8c3f2d0c83b5f2d0b6299c9ac6eafa05527b3e7878f10fe8b5c80f6a0d3"
+          },
+          "mpp_statistic": {
+            "rows": 21727049,
+            "sha256": "69cd4cce30289c9496323f14c6067d245f1f3e31d75a45b2fc7f692f5d1f8236"
+          }
+        },
+        "seconds": 493.561,
+        "simulated_date": false
+      },
+      "protected": {
+        "after_database_bytes": 57827317427,
+        "before_database_bytes": 57827317427,
+        "clusters": {
+          "119": {
+            "preview": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2026-10-01",
+              "expired_months": 1,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 1204224,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "current_version_month",
+                  "state": "protected",
+                  "statistic_bytes": 3261956096,
+                  "total_bytes": 3263160320,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "preview"
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 71565312,
+              "peak_used_bytes": 1243791360,
+              "returncode": 0,
+              "samples": 2,
+              "seconds": 0.253
+            },
+            "result": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2026-10-01",
+              "months": [
+                {
+                  "after_bytes": 3263160320,
+                  "before_bytes": 3263160320,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:04:28.451269+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 594693963537055769,
+                  "published_builds": 9,
+                  "reason": "current_version_month",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:04:28.451269+08:00",
+                  "state": "protected",
+                  "task_id": "T:d6860049d49a462c8a64761b2f202371",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:04:28.451754+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 1104237901969524100,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:04:28.451754+08:00",
+                  "state": "retained",
+                  "task_id": "T:d6860049d49a462c8a64761b2f202371",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:f7d722c7a05b454d2296f34c54af25317b71b7e2ee8d9dc838a3c3ecba25ac94",
+              "state": "succeeded",
+              "task_id": "T:d6860049d49a462c8a64761b2f202371"
+            }
+          },
+          "120": {
+            "preview": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2026-10-01",
+              "expired_months": 1,
+              "months": [
+                {
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 18227200,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "current_version_month",
+                  "state": "protected",
+                  "statistic_bytes": 13571211264,
+                  "total_bytes": 13589438464,
+                  "unpublished_builds": 0
+                },
+                {
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "groups_pending": false,
+                  "observation_bytes": 24576,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "state": "retained",
+                  "statistic_bytes": 24576,
+                  "total_bytes": 49152,
+                  "unpublished_builds": 0
+                }
+              ],
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "preview"
+            },
+            "resources": {
+              "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+              "oom_kills": 0,
+              "peak_swap_used_bytes": 71565312,
+              "peak_used_bytes": 1243799552,
+              "returncode": 0,
+              "samples": 2,
+              "seconds": 0.257
+            },
+            "result": {
+              "current_month": "2027-01-01",
+              "current_version_month": "2026-10-01",
+              "months": [
+                {
+                  "after_bytes": 13589438464,
+                  "before_bytes": 13589438464,
+                  "build_month": "2026-10-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:04:29.005387+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 974329813721629853,
+                  "published_builds": 4,
+                  "reason": "current_version_month",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:04:29.005387+08:00",
+                  "state": "protected",
+                  "task_id": "T:ceb5c39f28b548a2b0bd8f6aaa4aa39e",
+                  "unpublished_builds": 0
+                },
+                {
+                  "after_bytes": 49152,
+                  "before_bytes": 49152,
+                  "build_month": "2026-11-01",
+                  "cleaned_at": null,
+                  "exclusive_seconds": 0.0,
+                  "finished_at": "2027-01-15 12:04:29.005893+08:00",
+                  "formal_groups_deleted": 0,
+                  "group_seconds": 0.0,
+                  "observation_groups_deleted": 0,
+                  "partition_id": 456575920272075899,
+                  "published_builds": 0,
+                  "reason": "within_retention",
+                  "released_bytes": 0,
+                  "started_at": "2027-01-15 12:04:29.005893+08:00",
+                  "state": "retained",
+                  "task_id": "T:ceb5c39f28b548a2b0bd8f6aaa4aa39e",
+                  "unpublished_builds": 0
+                }
+              ],
+              "reason": null,
+              "retention_months": 2,
+              "scope": "scope:25c31de92e6dcd20f991271f523e829c370ae76a745094350ab4af0d70429426",
+              "state": "succeeded",
+              "task_id": "T:ceb5c39f28b548a2b0bd8f6aaa4aa39e"
+            }
+          }
+        },
+        "current_month": "2027-01-01",
+        "evidence_sha256": "099be5d0b8d750519c792c05168978cc29425fc0fac9851b49c96d2a864cea0d",
+        "original_month": "2026-10-01",
+        "passed": true,
+        "phase": "protected",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "result_rows_after": {
+          "mpp_build_group": {
+            "rows": 3001107,
+            "sha256": "219919f56203968e407f6aa96ef71829a649d8f274f64a4b98ec58e6ba89c5cc"
+          },
+          "mpp_build_observation_group": {
+            "rows": 3623,
+            "sha256": "2141bcc799bd956beb04026a99424d741286de6b85edd0dce23bc109af020048"
+          },
+          "mpp_observation_statistic": {
+            "rows": 23096,
+            "sha256": "a4b7a8c3f2d0c83b5f2d0b6299c9ac6eafa05527b3e7878f10fe8b5c80f6a0d3"
+          },
+          "mpp_statistic": {
+            "rows": 21727049,
+            "sha256": "69cd4cce30289c9496323f14c6067d245f1f3e31d75a45b2fc7f692f5d1f8236"
+          }
+        },
+        "result_rows_before": {
+          "mpp_build_group": {
+            "rows": 3001107,
+            "sha256": "219919f56203968e407f6aa96ef71829a649d8f274f64a4b98ec58e6ba89c5cc"
+          },
+          "mpp_build_observation_group": {
+            "rows": 3623,
+            "sha256": "2141bcc799bd956beb04026a99424d741286de6b85edd0dce23bc109af020048"
+          },
+          "mpp_observation_statistic": {
+            "rows": 23096,
+            "sha256": "a4b7a8c3f2d0c83b5f2d0b6299c9ac6eafa05527b3e7878f10fe8b5c80f6a0d3"
+          },
+          "mpp_statistic": {
+            "rows": 21727049,
+            "sha256": "69cd4cce30289c9496323f14c6067d245f1f3e31d75a45b2fc7f692f5d1f8236"
+          }
+        },
+        "seconds": 492.75,
+        "simulated_date": true
+      }
+    },
+    "guides": {
+      "exclusion": {
+        "baseline_equal": true,
+        "case": "exclusion",
+        "comparable": {
+          "build": {
+            "count_scopes": [
+              [
+                "batch",
+                "excluded",
+                24195
+              ],
+              [
+                "batch",
+                "unresolved",
+                51432
+              ],
+              [
+                "group",
+                "excluded",
+                915219
+              ],
+              [
+                "group",
+                "included",
+                1802181
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ]
+            ],
+            "groups": 53786,
+            "layers": {
+              "day": 235223,
+              "hour": 69471,
+              "overall": 53786,
+              "week": 82356,
+              "weekday": 96362
+            },
+            "observations": {
+              "groups": 30,
+              "layers": {
+                "day": 46,
+                "hour": 32,
+                "overall": 30,
+                "week": 36,
+                "weekday": 36
+              },
+              "observation_only": true,
+              "rules": {
+                "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                  "excluded": 3,
+                  "groups": 30,
+                  "included": 43,
+                  "reasons": {
+                    "excluded_interval": 3
+                  }
+                }
+              },
+              "scopes": [
+                [
+                  "approximate_unavailable",
+                  21739
+                ],
+                [
+                  "group",
+                  46
+                ],
+                [
+                  "outside_window",
+                  1972
+                ],
+                [
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  30
+                ]
+              ],
+              "sql_states": [
+                [
+                  "incomplete",
+                  4
+                ],
+                [
+                  "missing",
+                  33151
+                ],
+                [
+                  "uncertain",
+                  22501
+                ]
+              ],
+              "ungrouped_reasons": [
+                [
+                  "approximate_unavailable",
+                  "duration_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "excluded_interval",
+                  791
+                ],
+                [
+                  "approximate_unavailable",
+                  "execution_failed",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "sql_uncertain",
+                  21739
+                ],
+                [
+                  "approximate_unavailable",
+                  "start_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "timing_unknown",
+                  1
+                ],
+                [
+                  "sql_missing",
+                  "excluded_interval",
+                  1428
+                ],
+                [
+                  "sql_missing",
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  "duration_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "execution_failed",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "sql_incomplete",
+                  4
+                ],
+                [
+                  "start_unknown",
+                  "sql_uncertain",
+                  26
+                ],
+                [
+                  "start_unknown",
+                  "start_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "timing_unknown",
+                  30
+                ]
+              ]
+            },
+            "reasons": [
+              [
+                "batch",
+                "association_unreliable",
+                1
+              ],
+              [
+                "batch",
+                "duration_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "excluded_interval",
+                2222
+              ],
+              [
+                "batch",
+                "execution_cancelled",
+                36
+              ],
+              [
+                "batch",
+                "execution_failed",
+                21893
+              ],
+              [
+                "batch",
+                "execution_timed_out",
+                44
+              ],
+              [
+                "batch",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "batch",
+                "sql_missing",
+                31869
+              ],
+              [
+                "batch",
+                "sql_uncertain",
+                21811
+              ],
+              [
+                "batch",
+                "start_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "timing_unknown",
+                21974
+              ],
+              [
+                "group",
+                "blacklist_category",
+                848453
+              ],
+              [
+                "group",
+                "excluded_interval",
+                97420
+              ],
+              [
+                "none",
+                "blacklist_category",
+                15480
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ],
+              [
+                "none",
+                "sql_missing",
+                1282
+              ],
+              [
+                "none",
+                "sql_uncertain",
+                690
+              ]
+            ],
+            "results_saved": true,
+            "state": "calculated",
+            "states": [
+              [
+                "excluded",
+                939414
+              ],
+              [
+                "included",
+                1802181
+              ],
+              [
+                "outside_window",
+                55808
+              ],
+              [
+                "unresolved",
+                51432
+              ]
+            ],
+            "timings": {
+              "bind": [
+                410645,
+                235421
+              ],
+              "execute_fetch": [
+                11674,
+                734
+              ],
+              "execute_first": [
+                410591,
+                235421
+              ],
+              "parse": [
+                407161,
+                226292
+              ],
+              "request": [
+                562110,
+                217351
+              ]
+            }
+          },
+          "selection": {
+            "completed_batches": 4,
+            "excluded_batches": 0,
+            "selected_batches": 4,
+            "window_fallback": false
+          },
+          "statistics": {
+            "mpp_observation_statistic": {
+              "rows": 180,
+              "sha256": "00e72d01b6088b6b54f4ce0b6f3a329acd62229032bcb6401d5a2c38d9916bc9"
+            },
+            "mpp_statistic": {
+              "rows": 537198,
+              "sha256": "59524dfa3bb821fb18d1c50519984d0e899ac3c83fc312d43e1fa8c78f090535"
+            }
+          },
+          "sufficiency": [
+            [
+              "day",
+              "basic",
+              230238
+            ],
+            [
+              "day",
+              "p95",
+              234557
+            ],
+            [
+              "day",
+              "p99",
+              234737
+            ],
+            [
+              "hour",
+              "basic",
+              66292
+            ],
+            [
+              "hour",
+              "p95",
+              68601
+            ],
+            [
+              "hour",
+              "p99",
+              69056
+            ],
+            [
+              "overall",
+              "basic",
+              52583
+            ],
+            [
+              "overall",
+              "p95",
+              53361
+            ],
+            [
+              "overall",
+              "p99",
+              53674
+            ],
+            [
+              "week",
+              "basic",
+              80128
+            ],
+            [
+              "week",
+              "p95",
+              81734
+            ],
+            [
+              "week",
+              "p99",
+              82200
+            ],
+            [
+              "weekday",
+              "basic",
+              94030
+            ],
+            [
+              "weekday",
+              "p95",
+              95823
+            ],
+            [
+              "weekday",
+              "p99",
+              96241
+            ]
+          ],
+          "template_fingerprint": null
+        },
+        "evidence_sha256": "d1b1e239da0a4d2e8a2a8704300eba4258ff766abf38bc210731b2b15dc931c3",
+        "output_sha256": "86b80811f35d77d4b570d8dc20f153884cd3b4a08b8046608286b3bc856ec9dc",
+        "passed": true,
+        "program_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "resources": {
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "oom_kills": 0,
+          "peak_swap_used_bytes": 76283904,
+          "peak_used_bytes": 1688956928,
+          "returncode": 0,
+          "samples": 713,
+          "seconds": 178.631
+        },
+        "statistics_comparison": {
+          "absolute_limit": "1E-12",
+          "format": "sql-apm-guide-statistics/1",
+          "passed": true,
+          "tables": {
+            "mpp_observation_statistic": {
+              "actual_rows": 180,
+              "different_rows": 0,
+              "exact_fields_equal": true,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            },
+            "mpp_statistic": {
+              "actual_rows": 537198,
+              "different_rows": 15,
+              "exact_fields_equal": true,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 11,
+                  "exceeded": 0,
+                  "max_absolute": "8.9E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 11,
+                  "exceeded": 0,
+                  "max_absolute": "1E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            }
+          }
+        },
+        "statistics_exact": {
+          "mpp_observation_statistic": {
+            "rows": 180,
+            "sha256": "83164c3dda57ab2761f8e6d74a06376222c417d8ae5e338bb9eac35b42eec9ca"
+          },
+          "mpp_statistic": {
+            "rows": 537198,
+            "sha256": "01083f2b2ad02d470e8be73d3bfca418b2f14ad1431f4a34bc15f42842c752f3"
+          }
+        },
+        "statistics_values": {
+          "mpp_observation_statistic": {
+            "log_values": {
+              "file": "exclusion-mpp_observation_statistic.jsonl.gz",
+              "sha256": "3d8b50e84dc49a7886124d6ad894b2dbc57031fc490c524dd62b240ecbcecc10"
+            },
+            "rows": 180,
+            "sha256": "00e72d01b6088b6b54f4ce0b6f3a329acd62229032bcb6401d5a2c38d9916bc9"
+          },
+          "mpp_statistic": {
+            "log_values": {
+              "file": "exclusion-mpp_statistic.jsonl.gz",
+              "sha256": "cd4ef57ce90d2a64c62835f25f512b7e56e139cb9ebc33d85a8666e2ddd319b3"
+            },
+            "rows": 537198,
+            "sha256": "59524dfa3bb821fb18d1c50519984d0e899ac3c83fc312d43e1fa8c78f090535"
+          }
+        }
+      },
+      "template": {
+        "baseline_equal": true,
+        "case": "template",
+        "comparable": {
+          "build": {
+            "count_scopes": [
+              [
+                "batch",
+                "excluded",
+                21973
+              ],
+              [
+                "batch",
+                "unresolved",
+                53654
+              ],
+              [
+                "group",
+                "excluded",
+                1216685
+              ],
+              [
+                "group",
+                "included",
+                1500715
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ]
+            ],
+            "groups": 53786,
+            "layers": {
+              "day": 235223,
+              "hour": 69471,
+              "overall": 53786,
+              "week": 82356,
+              "weekday": 96362
+            },
+            "observations": {
+              "groups": 30,
+              "layers": {
+                "day": 46,
+                "hour": 32,
+                "overall": 30,
+                "week": 36,
+                "weekday": 36
+              },
+              "observation_only": true,
+              "rules": {
+                "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                  "excluded": 0,
+                  "groups": 30,
+                  "included": 46,
+                  "reasons": {}
+                }
+              },
+              "scopes": [
+                [
+                  "approximate_unavailable",
+                  21739
+                ],
+                [
+                  "group",
+                  46
+                ],
+                [
+                  "outside_window",
+                  1972
+                ],
+                [
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  30
+                ]
+              ],
+              "sql_states": [
+                [
+                  "incomplete",
+                  4
+                ],
+                [
+                  "missing",
+                  33151
+                ],
+                [
+                  "uncertain",
+                  22501
+                ]
+              ],
+              "ungrouped_reasons": [
+                [
+                  "approximate_unavailable",
+                  "duration_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "execution_failed",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "sql_uncertain",
+                  21739
+                ],
+                [
+                  "approximate_unavailable",
+                  "start_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "timing_unknown",
+                  1
+                ],
+                [
+                  "sql_missing",
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  "duration_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "execution_failed",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "sql_incomplete",
+                  4
+                ],
+                [
+                  "start_unknown",
+                  "sql_uncertain",
+                  26
+                ],
+                [
+                  "start_unknown",
+                  "start_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "timing_unknown",
+                  30
+                ]
+              ]
+            },
+            "reasons": [
+              [
+                "batch",
+                "association_unreliable",
+                1
+              ],
+              [
+                "batch",
+                "duration_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "execution_cancelled",
+                36
+              ],
+              [
+                "batch",
+                "execution_failed",
+                21893
+              ],
+              [
+                "batch",
+                "execution_timed_out",
+                44
+              ],
+              [
+                "batch",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "batch",
+                "sql_missing",
+                31869
+              ],
+              [
+                "batch",
+                "sql_uncertain",
+                21811
+              ],
+              [
+                "batch",
+                "start_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "timing_unknown",
+                21974
+              ],
+              [
+                "group",
+                "blacklist_category",
+                848453
+              ],
+              [
+                "group",
+                "blacklist_template",
+                368232
+              ],
+              [
+                "none",
+                "blacklist_category",
+                15480
+              ],
+              [
+                "none",
+                "blacklist_template",
+                6606
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ],
+              [
+                "none",
+                "sql_missing",
+                1282
+              ],
+              [
+                "none",
+                "sql_uncertain",
+                690
+              ]
+            ],
+            "results_saved": true,
+            "state": "calculated",
+            "states": [
+              [
+                "excluded",
+                1238658
+              ],
+              [
+                "included",
+                1500715
+              ],
+              [
+                "outside_window",
+                55808
+              ],
+              [
+                "unresolved",
+                53654
+              ]
+            ],
+            "timings": {
+              "bind": [
+                303020,
+                343046
+              ],
+              "execute_fetch": [
+                12408,
+                0
+              ],
+              "execute_first": [
+                302966,
+                343046
+              ],
+              "parse": [
+                299371,
+                334082
+              ],
+              "request": [
+                582950,
+                196511
+              ]
+            }
+          },
+          "selection": {
+            "completed_batches": 4,
+            "excluded_batches": 0,
+            "selected_batches": 4,
+            "window_fallback": false
+          },
+          "statistics": {
+            "mpp_observation_statistic": {
+              "rows": 180,
+              "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+            },
+            "mpp_statistic": {
+              "rows": 537198,
+              "sha256": "fd45405483892746106e151a736c495cbfa16a28c7d058f9b64e7c852da4b450"
+            }
+          },
+          "sufficiency": [
+            [
+              "day",
+              "basic",
+              230131
+            ],
+            [
+              "day",
+              "p95",
+              234616
+            ],
+            [
+              "day",
+              "p99",
+              234803
+            ],
+            [
+              "hour",
+              "basic",
+              66224
+            ],
+            [
+              "hour",
+              "p95",
+              68610
+            ],
+            [
+              "hour",
+              "p99",
+              69066
+            ],
+            [
+              "overall",
+              "basic",
+              52536
+            ],
+            [
+              "overall",
+              "p95",
+              53354
+            ],
+            [
+              "overall",
+              "p99",
+              53672
+            ],
+            [
+              "week",
+              "basic",
+              80069
+            ],
+            [
+              "week",
+              "p95",
+              81714
+            ],
+            [
+              "week",
+              "p99",
+              82207
+            ],
+            [
+              "weekday",
+              "basic",
+              93612
+            ],
+            [
+              "weekday",
+              "p95",
+              95753
+            ],
+            [
+              "weekday",
+              "p99",
+              96242
+            ]
+          ],
+          "template_fingerprint": "struct:sql-normalization/5:31d2b213f36d3c324a355cafd4171eae68e639382063f1a2c8fd0ede08d29475"
+        },
+        "evidence_sha256": "3c941f2078b6882b8290df564b3caff37165847814e14e6293c373e01b091839",
+        "output_sha256": "880e366c215f6979ddb10f66073c7d2166169fe53915ebf4a96371c20e7f0007",
+        "passed": true,
+        "program_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "resources": {
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "oom_kills": 0,
+          "peak_swap_used_bytes": 76283904,
+          "peak_used_bytes": 3883343872,
+          "returncode": 0,
+          "samples": 970,
+          "seconds": 243.058
+        },
+        "statistics_comparison": {
+          "absolute_limit": "1E-12",
+          "format": "sql-apm-guide-statistics/1",
+          "passed": true,
+          "tables": {
+            "mpp_observation_statistic": {
+              "actual_rows": 180,
+              "different_rows": 0,
+              "exact_fields_equal": true,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            },
+            "mpp_statistic": {
+              "actual_rows": 537198,
+              "different_rows": 17,
+              "exact_fields_equal": true,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 13,
+                  "exceeded": 0,
+                  "max_absolute": "8.9E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 12,
+                  "exceeded": 0,
+                  "max_absolute": "1E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            }
+          }
+        },
+        "statistics_exact": {
+          "mpp_observation_statistic": {
+            "rows": 180,
+            "sha256": "4c615391099b0039faf5405f1be282f5b9cea30e179c4efa8f73a6624a0854ee"
+          },
+          "mpp_statistic": {
+            "rows": 537198,
+            "sha256": "349b14bba5b00f87c0ecc59367382f6ffcbf641fc0ddab01891277bd55e0abf6"
+          }
+        },
+        "statistics_values": {
+          "mpp_observation_statistic": {
+            "log_values": {
+              "file": "template-mpp_observation_statistic.jsonl.gz",
+              "sha256": "f8aad1c095cd31c3dc6b78750636d0d96221f926c90982785b4ee6c7a2bee5fa"
+            },
+            "rows": 180,
+            "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+          },
+          "mpp_statistic": {
+            "log_values": {
+              "file": "template-mpp_statistic.jsonl.gz",
+              "sha256": "66488912a7fa6004a2a34946fe55b77938963a72c4d2c2180bd6015ecf467560"
+            },
+            "rows": 537198,
+            "sha256": "fd45405483892746106e151a736c495cbfa16a28c7d058f9b64e7c852da4b450"
+          }
+        }
+      },
+      "threshold": {
+        "baseline_equal": true,
+        "case": "threshold",
+        "comparable": {
+          "build": {
+            "count_scopes": [
+              [
+                "batch",
+                "excluded",
+                21973
+              ],
+              [
+                "batch",
+                "unresolved",
+                53654
+              ],
+              [
+                "group",
+                "excluded",
+                848453
+              ],
+              [
+                "group",
+                "included",
+                1868947
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ]
+            ],
+            "groups": 53786,
+            "layers": {
+              "day": 235223,
+              "hour": 69471,
+              "overall": 53786,
+              "week": 82356,
+              "weekday": 96362
+            },
+            "observations": {
+              "groups": 30,
+              "layers": {
+                "day": 46,
+                "hour": 32,
+                "overall": 30,
+                "week": 36,
+                "weekday": 36
+              },
+              "observation_only": true,
+              "rules": {
+                "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                  "excluded": 0,
+                  "groups": 30,
+                  "included": 46,
+                  "reasons": {}
+                }
+              },
+              "scopes": [
+                [
+                  "approximate_unavailable",
+                  21739
+                ],
+                [
+                  "group",
+                  46
+                ],
+                [
+                  "outside_window",
+                  1972
+                ],
+                [
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  30
+                ]
+              ],
+              "sql_states": [
+                [
+                  "incomplete",
+                  4
+                ],
+                [
+                  "missing",
+                  33151
+                ],
+                [
+                  "uncertain",
+                  22501
+                ]
+              ],
+              "ungrouped_reasons": [
+                [
+                  "approximate_unavailable",
+                  "duration_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "execution_failed",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "sql_uncertain",
+                  21739
+                ],
+                [
+                  "approximate_unavailable",
+                  "start_unknown",
+                  1
+                ],
+                [
+                  "approximate_unavailable",
+                  "timing_unknown",
+                  1
+                ],
+                [
+                  "sql_missing",
+                  "sql_missing",
+                  31869
+                ],
+                [
+                  "start_unknown",
+                  "duration_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "execution_failed",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "sql_incomplete",
+                  4
+                ],
+                [
+                  "start_unknown",
+                  "sql_uncertain",
+                  26
+                ],
+                [
+                  "start_unknown",
+                  "start_unknown",
+                  30
+                ],
+                [
+                  "start_unknown",
+                  "timing_unknown",
+                  30
+                ]
+              ]
+            },
+            "reasons": [
+              [
+                "batch",
+                "association_unreliable",
+                1
+              ],
+              [
+                "batch",
+                "duration_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "execution_cancelled",
+                36
+              ],
+              [
+                "batch",
+                "execution_failed",
+                21893
+              ],
+              [
+                "batch",
+                "execution_timed_out",
+                44
+              ],
+              [
+                "batch",
+                "sql_incomplete",
+                4
+              ],
+              [
+                "batch",
+                "sql_missing",
+                31869
+              ],
+              [
+                "batch",
+                "sql_uncertain",
+                21811
+              ],
+              [
+                "batch",
+                "start_unknown",
+                21973
+              ],
+              [
+                "batch",
+                "timing_unknown",
+                21974
+              ],
+              [
+                "group",
+                "blacklist_category",
+                848453
+              ],
+              [
+                "none",
+                "blacklist_category",
+                15480
+              ],
+              [
+                "none",
+                "outside_window",
+                55808
+              ],
+              [
+                "none",
+                "sql_missing",
+                1282
+              ],
+              [
+                "none",
+                "sql_uncertain",
+                690
+              ]
+            ],
+            "results_saved": true,
+            "state": "calculated",
+            "states": [
+              [
+                "excluded",
+                870426
+              ],
+              [
+                "included",
+                1868947
+              ],
+              [
+                "outside_window",
+                55808
+              ],
+              [
+                "unresolved",
+                53654
+              ]
+            ],
+            "timings": {
+              "bind": [
+                425764,
+                220302
+              ],
+              "execute_fetch": [
+                12408,
+                0
+              ],
+              "execute_first": [
+                425710,
+                220302
+              ],
+              "parse": [
+                422115,
+                211338
+              ],
+              "request": [
+                582950,
+                196511
+              ]
+            }
+          },
+          "selection": {
+            "completed_batches": 4,
+            "excluded_batches": 0,
+            "selected_batches": 4,
+            "window_fallback": false
+          },
+          "statistics": {
+            "mpp_observation_statistic": {
+              "rows": 180,
+              "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+            },
+            "mpp_statistic": {
+              "rows": 537198,
+              "sha256": "0cc350fd44b3866622ae888a33171bc5170d1da289e531156812fe3aaefc6946"
+            }
+          },
+          "sufficiency": [
+            [
+              "day",
+              "basic",
+              230047
+            ],
+            [
+              "day",
+              "p95",
+              234532
+            ],
+            [
+              "day",
+              "p99",
+              234719
+            ],
+            [
+              "hour",
+              "basic",
+              66209
+            ],
+            [
+              "hour",
+              "p95",
+              68595
+            ],
+            [
+              "hour",
+              "p99",
+              69054
+            ],
+            [
+              "overall",
+              "basic",
+              53786
+            ],
+            [
+              "overall",
+              "p95",
+              53351
+            ],
+            [
+              "overall",
+              "p99",
+              53669
+            ],
+            [
+              "week",
+              "basic",
+              80057
+            ],
+            [
+              "week",
+              "p95",
+              81702
+            ],
+            [
+              "week",
+              "p99",
+              82195
+            ],
+            [
+              "weekday",
+              "basic",
+              93591
+            ],
+            [
+              "weekday",
+              "p95",
+              95732
+            ],
+            [
+              "weekday",
+              "p99",
+              96221
+            ]
+          ],
+          "template_fingerprint": null
+        },
+        "evidence_sha256": "dec3a07de354b8c8d15fac9e8603d30513c71b50bd20d1fc50ff80238e485195",
+        "output_sha256": "22d34bcdbd5c2015e9dcecbc0140dc77fad42562d02f14e20ad7b928f83adc90",
+        "passed": true,
+        "program_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "resources": {
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "oom_kills": 0,
+          "peak_swap_used_bytes": 77070336,
+          "peak_used_bytes": 1796259840,
+          "returncode": 0,
+          "samples": 688,
+          "seconds": 172.298
+        },
+        "statistics_comparison": {
+          "absolute_limit": "1E-12",
+          "format": "sql-apm-guide-statistics/1",
+          "passed": true,
+          "tables": {
+            "mpp_observation_statistic": {
+              "actual_rows": 180,
+              "different_rows": 0,
+              "exact_fields_equal": true,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            },
+            "mpp_statistic": {
+              "actual_rows": 537198,
+              "different_rows": 17,
+              "exact_fields_equal": true,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 13,
+                  "exceeded": 0,
+                  "max_absolute": "8.9E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 12,
+                  "exceeded": 0,
+                  "max_absolute": "1E-15",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            }
+          }
+        },
+        "statistics_exact": {
+          "mpp_observation_statistic": {
+            "rows": 180,
+            "sha256": "4c615391099b0039faf5405f1be282f5b9cea30e179c4efa8f73a6624a0854ee"
+          },
+          "mpp_statistic": {
+            "rows": 537198,
+            "sha256": "9116dd089f4b6a9812b7ba366aeb7613c01dcc55fde9b25b60d56b0906d37e09"
+          }
+        },
+        "statistics_values": {
+          "mpp_observation_statistic": {
+            "log_values": {
+              "file": "threshold-mpp_observation_statistic.jsonl.gz",
+              "sha256": "f8aad1c095cd31c3dc6b78750636d0d96221f926c90982785b4ee6c7a2bee5fa"
+            },
+            "rows": 180,
+            "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+          },
+          "mpp_statistic": {
+            "log_values": {
+              "file": "threshold-mpp_statistic.jsonl.gz",
+              "sha256": "a6511c5fced07f8b8d83c0802177bbd1d6dbf972e63d4b704f08fcf973ad9eae"
+            },
+            "rows": 537198,
+            "sha256": "0cc350fd44b3866622ae888a33171bc5170d1da289e531156812fe3aaefc6946"
+          }
+        }
+      },
+      "window": {
+        "baseline_equal": true,
+        "case": "window",
+        "comparable": {
+          "build": {
+            "count_scopes": [
+              [
+                "batch",
+                "excluded",
+                1535
+              ],
+              [
+                "batch",
+                "unresolved",
+                4498
+              ],
+              [
+                "group",
+                "excluded",
+                61600
+              ],
+              [
+                "group",
+                "included",
+                134377
+              ]
+            ],
+            "groups": 10388,
+            "layers": {
+              "day": 17127,
+              "hour": 15751,
+              "overall": 10388,
+              "week": 10388,
+              "weekday": 17127
+            },
+            "observations": {
+              "groups": 4,
+              "layers": {
+                "day": 6,
+                "hour": 6,
+                "overall": 4,
+                "week": 4,
+                "weekday": 6
+              },
+              "observation_only": true,
+              "rules": {
+                "sql-approximate/2:17410ace173a79cbaa8d090839853792372ef1905e8ebf8fa84b9679e3527556": {
+                  "excluded": 0,
+                  "groups": 4,
+                  "included": 6,
+                  "reasons": {}
+                }
+              },
+              "scopes": [
+                [
+                  "approximate_unavailable",
+                  1578
+                ],
+                [
+                  "group",
+                  6
+                ],
+                [
+                  "sql_missing",
+                  2914
+                ]
+              ],
+              "sql_states": [
+                [
+                  "missing",
+                  2914
+                ],
+                [
+                  "uncertain",
+                  1584
+                ]
+              ],
+              "ungrouped_reasons": [
+                [
+                  "approximate_unavailable",
+                  "sql_uncertain",
+                  1578
+                ],
+                [
+                  "sql_missing",
+                  "sql_missing",
+                  2914
+                ]
+              ]
+            },
+            "reasons": [
+              [
+                "batch",
+                "duration_unknown",
+                1535
+              ],
+              [
+                "batch",
+                "execution_cancelled",
+                3
+              ],
+              [
+                "batch",
+                "execution_failed",
+                1530
+              ],
+              [
+                "batch",
+                "execution_timed_out",
+                2
+              ],
+              [
+                "batch",
+                "sql_missing",
+                2914
+              ],
+              [
+                "batch",
+                "sql_uncertain",
+                1584
+              ],
+              [
+                "batch",
+                "start_unknown",
+                1535
+              ],
+              [
+                "batch",
+                "timing_unknown",
+                1535
+              ],
+              [
+                "group",
+                "blacklist_category",
+                61600
+              ]
+            ],
+            "results_saved": true,
+            "state": "calculated",
+            "states": [
+              [
+                "excluded",
+                63135
+              ],
+              [
+                "included",
+                134377
+              ],
+              [
+                "unresolved",
+                4498
+              ]
+            ],
+            "timings": {
+              "bind": [
+                30629,
+                16048
+              ],
+              "execute_fetch": [
+                1091,
+                0
+              ],
+              "execute_first": [
+                30627,
+                16048
+              ],
+              "parse": [
+                30327,
+                15328
+              ],
+              "request": [
+                41703,
+                14176
+              ]
+            }
+          },
+          "selection": {
+            "completed_batches": 4,
+            "excluded_batches": 2,
+            "selected_batches": 2,
+            "window_fallback": false
+          },
+          "statistics": {
+            "mpp_observation_statistic": {
+              "rows": 26,
+              "sha256": "c41df8fd37db74e2d5f643432c8f7aa488dc2243ec04a54c66c7fc7fe194c392"
+            },
+            "mpp_statistic": {
+              "rows": 70781,
+              "sha256": "c1e4f18a96c39b41d0e810a7869bcdcd6c33f6b1f68b17b793791ed6623f9cd1"
+            }
+          },
+          "sufficiency": [
+            [
+              "day",
+              "basic",
+              16737
+            ],
+            [
+              "day",
+              "p95",
+              17075
+            ],
+            [
+              "day",
+              "p99",
+              17091
+            ],
+            [
+              "hour",
+              "basic",
+              15751
+            ],
+            [
+              "hour",
+              "p95",
+              15751
+            ],
+            [
+              "hour",
+              "p99",
+              15751
+            ],
+            [
+              "overall",
+              "basic",
+              10388
+            ],
+            [
+              "overall",
+              "p95",
+              10388
+            ],
+            [
+              "overall",
+              "p99",
+              10388
+            ],
+            [
+              "week",
+              "basic",
+              10388
+            ],
+            [
+              "week",
+              "p95",
+              10388
+            ],
+            [
+              "week",
+              "p99",
+              10388
+            ],
+            [
+              "weekday",
+              "basic",
+              17127
+            ],
+            [
+              "weekday",
+              "p95",
+              17127
+            ],
+            [
+              "weekday",
+              "p99",
+              17127
+            ]
+          ],
+          "template_fingerprint": null
+        },
+        "evidence_sha256": "e07a7acde6c82bcf45d991b011b50e750d079ad5866744665d07978b2f375230",
+        "output_sha256": "29a4ee3492cbea28ab92476e5a54c2336f097c2ddeab1728f0743206e31f218e",
+        "passed": true,
+        "program_commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+        "program_verification": {
+          "commit": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
+          "files": 86,
+          "kind": "candidate",
+          "passed": true,
+          "version": "v0.2.0"
+        },
+        "resources": {
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "oom_kills": 0,
+          "peak_swap_used_bytes": 71303168,
+          "peak_used_bytes": 1392721920,
+          "returncode": 0,
+          "samples": 147,
+          "seconds": 36.626
+        },
+        "statistics_comparison": {
+          "absolute_limit": "1E-12",
+          "format": "sql-apm-guide-statistics/1",
+          "passed": true,
+          "tables": {
+            "mpp_observation_statistic": {
+              "actual_rows": 26,
+              "different_rows": 0,
+              "exact_fields_equal": true,
+              "expected_rows": 26,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-14",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            },
+            "mpp_statistic": {
+              "actual_rows": 70781,
+              "different_rows": 5,
+              "exact_fields_equal": true,
+              "expected_rows": 70781,
+              "key_mismatches": 0,
+              "metrics": {
+                "log_mad": {
+                  "different": 5,
+                  "exceeded": 0,
+                  "max_absolute": "2.23E-16",
+                  "null_mismatches": 0
+                },
+                "log_median": {
+                  "different": 5,
+                  "exceeded": 0,
+                  "max_absolute": "2E-16",
+                  "null_mismatches": 0
+                }
+              },
+              "passed": true
+            }
+          }
+        },
+        "statistics_exact": {
+          "mpp_observation_statistic": {
+            "rows": 26,
+            "sha256": "b1e3c8adaecf4a562286e8762a27aed55a0bfa30baf4d9464c7a41296c07a0fb"
+          },
+          "mpp_statistic": {
+            "rows": 70781,
+            "sha256": "aea255012d292675d6129250c0f93b68a099e5163db3863a6984e970afef137b"
+          }
+        },
+        "statistics_values": {
+          "mpp_observation_statistic": {
+            "log_values": {
+              "file": "window-mpp_observation_statistic.jsonl.gz",
+              "sha256": "d66dacc22a77bd8fa0f0abca3fe11c6a7c7369cd2ce9c39414ca3e36e0ec4375"
+            },
+            "rows": 26,
+            "sha256": "c41df8fd37db74e2d5f643432c8f7aa488dc2243ec04a54c66c7fc7fe194c392"
+          },
+          "mpp_statistic": {
+            "log_values": {
+              "file": "window-mpp_statistic.jsonl.gz",
+              "sha256": "8811216163abe171fe5f32f8348f23ff6a1e739d44cebf58dc85b8aac53fec4b"
+            },
+            "rows": 70781,
+            "sha256": "c1e4f18a96c39b41d0e810a7869bcdcd6c33f6b1f68b17b793791ed6623f9cd1"
+          }
+        }
+      }
+    },
     "target_program_verification": "2a7c1e57dc8c8f9e1310cbe9457621cc4532fdb3",
     "tasks": {
       "119-0": {
@@ -15993,7 +19243,7 @@
     }
   },
   "target_start_record": "https://github.com/shenxg13/sql-apm/issues/45#issuecomment-6030098438",
-  "target_validation_completed": false,
+  "target_validation_completed": true,
   "user_html_confirmation": false,
   "v010_unchanged": {
     "release": {

@@ -47,20 +47,27 @@ read -r -p '输入连续片段（可有逗号、等号、空白）：' APM_PHRAS
 例子生成器只读基础表，写入本地文件。已有 `trial` 目录时保留它，使用另一个目录或直接复用文件，
 不要为了重跑覆盖既有记录。行数快照会读取全部表，等待其结束后再测试。
 
-定义记录函数，每次保留 JSON、实际耗时和退出码：
+定义记录函数，每次保留 JSON、实际耗时和退出码。
+使用 Bash 内置的 `time`，无需安装 `/usr/bin/time`；命令的错误输出仍显示在终端。
 
 ```bash
 trial() {
   local case_name="$1"
   shift
-  /usr/bin/time -f '%e seconds' -o "var/issue47/trial/$case_name.time" \
-    .venv/bin/python -m sql_apm search "$@" > "var/issue47/trial/$case_name.json"
+  local TIMEFORMAT='%R seconds'
+  {
+    time .venv/bin/python -m sql_apm search "$@" \
+      > "var/issue47/trial/$case_name.json" 2>&3
+  } 3>&2 2> "var/issue47/trial/$case_name.time"
   local result_code=$?
   jq . "var/issue47/trial/$case_name.json"
   cat "var/issue47/trial/$case_name.time"
   printf 'exit=%s\n' "$result_code"
 }
 ```
+
+若此前因缺少 `/usr/bin/time` 得到 `exit=127`，搜索尚未执行；重新粘贴上面的完整函数，
+再重跑失败的 `trial ...` 命令即可，无需重新准备数据库或示例文件。
 
 ## 模糊入口（必做）
 

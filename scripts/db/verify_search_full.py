@@ -2,13 +2,11 @@
 """Explicit full-data query audit. Private originals/results never enter reports."""
 import argparse
 from collections import Counter
-from contextlib import contextmanager
 import hashlib
 import io
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import time
@@ -244,12 +242,50 @@ def audit(args):
         if (directory/'pgdata/postmaster.pid').exists():stop(directory,args.pg_bin)
 
 
+def exact_cli(args):
+    """Measure the complete command, including process/connect/normalization/JSON."""
+    directory=args.directory.resolve();report=json.loads((directory/'report.json').read_text())
+    start(directory,args.pg_bin);db=None
+    try:
+        db=connection(directory)
+        samples=directory/'exact-inputs';samples.mkdir(mode=0o700,exist_ok=True)
+        norm='N:'+identity(Normalizer().context)
+        hashes=[x['structure_sha256'] for x in report['precise_oracles']]
+        with db,db.cursor() as c:
+            c.execute("""SELECT DISTINCT ON(f.value) f.value,t.text FROM mpp_fingerprint f JOIN mpp_sql_text t USING(sql_id)
+                WHERE f.normalization_id=%s AND encode(sha256(convert_to(f.value,'UTF8')),'hex')=ANY(%s)
+                ORDER BY f.value,f.sql_id""",(norm,hashes))
+            originals=c.fetchall()
+        db.close();db=None;timings=[]
+        for index,(fp,original) in enumerate(originals):
+            path=samples/(str(index)+'.sql');path.write_text(original);path.chmod(0o600)
+            stop(directory,args.pg_bin);start(directory,args.pg_bin)
+            seconds=[]
+            for _ in range(2):
+                began=time.monotonic()
+                process=subprocess.run([sys.executable,'-m','sql_apm','search','exact','--file',str(path)],
+                    cwd=ROOT,env=dict(os.environ,SQL_APM_DSN='host='+str(directory/'socket')+' port=55474 dbname=sql_apm user=sql_apm'),
+                    capture_output=True,text=True,timeout=120)
+                seconds.append(round(time.monotonic()-began,6))
+                value=json.loads(process.stdout)
+                assert process.returncode==0 and value['fingerprint']==fp and value['hits'],'exact_cli_mismatch'
+            sha=hashlib.sha256(fp.encode()).hexdigest()
+            timings.append(dict(structure_sha256=sha,source_sha256=hashlib.sha256(original.encode()).hexdigest(),
+                cases=[x['case'] for x in report['precise_oracles'] if x['structure_sha256']==sha],
+                pg_cold_seconds=seconds[0],warm_seconds=seconds[1]))
+            print('exact_cli',index,seconds,flush=True)
+        (directory/'exact-cli.json').write_text(json.dumps(timings,indent=2))
+    finally:
+        if db is not None:db.close()
+        stop(directory,args.pg_bin)
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('command',choices=['prepare','audit'])
+    p.add_argument('command',choices=['prepare','audit','exact'])
     p.add_argument('--directory',type=Path,required=True)
     p.add_argument('--source-data',type=Path)
     p.add_argument('--pg-bin',type=Path,default=Path('/usr/pgsql-17/bin'))
     a=p.parse_args()
     if a.command=='prepare' and a.source_data is None:p.error('--source-data required for prepare')
-    (prepare if a.command=='prepare' else audit)(a)
+    {'prepare':prepare,'audit':audit,'exact':exact_cli}[a.command](a)

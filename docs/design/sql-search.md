@@ -111,7 +111,7 @@ WHERE timing_type IN ('request','execute_first');
 长查询可能使清理在该月共享的10秒等待预算内退出为 `lock_timeout`；释放读取后可重试，已保存结果不变。
 直接数据库消费者也应及时提交／回滚，避免空闲事务长持锁。合成验收覆盖实际长读锁和清理重试。
 
-`verify_search.py` 是合成验收；`verify_search_full.py prepare/audit` 是显式全量核对，使用关闭的真实库副本。
+`verify_search.py` 是合成验收；`verify_search_full.py prepare/audit/exact` 是显式全量核对，使用关闭的真实库副本。
 全量核对会扫描原文和全部原有表并占用副本空间；摘要逐行在服务器计算，公开输出只含数量、哈希和耗时。
 不自动加入日常 Harness。测试文档见[开发机试用步骤](../runbooks/sql-search-trial.md)。
 

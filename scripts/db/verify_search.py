@@ -48,6 +48,8 @@ def verify(pg_bin):
                    row('2843', text=sql_text, message='duration: 1 ms'),
                    row('2843', text=sql_text, message='duration: 1 ms')]
         records += [row(text='SELECT a FROM table_'+str(i), message='duration: 1 ms') for i in range(60)]
+        records.append(row(text='SELECT a FROM recent_only', message='duration: 1 ms', **{'0':'2026-07-23 13:00:00 CST'}))
+        records += [row(text='SELECT a FROM paging',message='duration: 1 ms') for _ in range(110)]
         write_csv(path, records)
         config_path.write_text(json.dumps(configuration(config_path,[path])))
         config = dict(version=1, clusters=['C1'], window=dict(cutoff_date='2026-07-31'))
@@ -90,7 +92,8 @@ def verify(pg_bin):
         assert find('demo',user='second_user')['rows'][0]['record_count']==1
         assert find('demo',scope='absent')['total_structures']==0
         assert find('demo',start='2030-01-01')['total_structures']==0
-        assert find('demo',order='recent')['rows']
+        assert find('select',order='recent')['rows'][0]['fingerprint']==fp('SELECT a FROM recent_only')
+        assert find('select')['rows'][0]['fingerprint']==fp('SELECT a FROM paging')
         v.require(True,'S3/S4: literal symbols, AND/phrase ordering, folded matches, grouping/counts/filtering/order and 50 cap')
         hit=call('mpp_query_exact',norm,fingerprint)
         assert hit['state']=='has_baseline' and len(hit['hits'])==2
@@ -152,6 +155,10 @@ def verify(pg_bin):
         assert {x['outcome'] for x in unknown}=={'success','cancelled','timed_out'}
         assert any(x['training']['decision']=='included' for x in flat)
         assert any(x['training']['decision']=='excluded' for x in flat)
+        many_args=[norm,fp('SELECT a FROM paging'),'C1','synthetic_db','synthetic_user']
+        many_page=call('mpp_query_history',*many_args)
+        assert sum(len(g['rows']) for g in many_page['groups'])==100 and many_page['next_cursor']
+        assert sum(len(g['rows']) for g in call('mpp_query_history',*many_args,None,None,1000)['groups'])==110
         page1=call('mpp_query_history',*hist_args,None,None,3)
         page2=call('mpp_query_history',*hist_args,None,None,3,Json(page1['next_cursor']))
         ids=lambda p:{(x['analysis_id'],x['occurrence_id']) for g in p['groups'] for x in g['rows']}
@@ -204,6 +211,7 @@ def verify(pg_bin):
         rejects('mpp_query_baseline','normalization_version_mismatch','different','C1','synthetic_db','synthetic_user',fingerprint)
         versions=rows('SELECT to_jsonb(v) FROM mpp_query_versions(%s,%s) v',(norm,'C1'))
         assert any(r[0]['build_id']=='search-old' and r[0]['results_cleaned'] for r in versions)
+        assert all(not r[0] for r in rows("SELECT rules_match FROM mpp_query_versions('different','C1')"))
         assert rows('SELECT build_id FROM current_version')[0][0]==build
         v.require(True,'S11/S13: old decisions unavailable, published history listed, clean/mismatched reference refused; cleanup deadline/retry, pointer unchanged')
         v.init('check')

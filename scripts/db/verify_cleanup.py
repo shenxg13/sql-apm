@@ -9,8 +9,9 @@ import select
 import subprocess
 import sys
 
-ROOT=Path(__file__).resolve().parents[2]
-sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
+RESOURCE_ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(os.environ.get('SQL_APM_APP_ROOT',str(RESOURCE_ROOT))).resolve()
+sys.path[:0]=[str(ROOT),str(RESOURCE_ROOT/'tests')]
 from verify import instance,Verification
 from database.retention import clone_build,contents,digest
 from database.retention_edges import verify_edges,month_seconds

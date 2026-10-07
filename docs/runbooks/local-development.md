@@ -4,7 +4,7 @@
 [交付范围](../../.project-wiki/decisions/project-scope.md)、
 [运行环境与组件](../../.project-wiki/decisions/runtime-and-components.md)。
 当前以可联网 Alma 环境开展开发；Kylin V10 SP2 演练使用
-[离线部署与验证手册](kylin-offline-deployment.md)，用户独立执行使用
+[离线部署与验证手册](kylin-offline-deployment.md)，验证结果使用
 [记录模板](kylin-validation-record.md)。演练结论不能替代生产部署验收。
 
 ## 相关操作契约
@@ -19,7 +19,7 @@
 
 离线业务 CLI 已交付，展示功能另行实施；数据库初始化／物理结构见下文，
 下列质量命令用于仓库 Harness。
-开发日志样本位于本地忽略目录 `raw/inbox/mpp/`，不是既定生产接收目录。
+开发日志样本位于本地忽略目录 `raw/inbox/hashdata/`（历史目录名，来源语义为 MPP），不是既定生产接收目录。
 
 ## Python 项目环境
 
@@ -109,12 +109,38 @@ GitHub 目标为公开仓库 shenxg13/sql-apm。
 ## 精简交付的本地验证
 
 [程序发布说明](program-release.md)定义独立构建环境、精简包与独立验收目录的检查方式。
-构建期 Markdown 工具不进入应用依赖。新包在开发机隔离目录验证通过后，仍须在用户
-明确确认并恢复快照后开展 Kylin 重走；开发机通过不等同于目标机验证完成。
-已完成的新候选包安装、自检和解析并发实测见
-[Kylin 试跑报告](../reports/slim-release-kylin-trial-2026-10-03.md)；
-四进程发布成功不等于归一化完整，按报告区分超时、Alma 等值与待完成的用户独立验收。
-用户九任务已通过[独立结果核对](../reports/kylin-manual-validation-2026-10-04.md)，
-当时实际取到早期候选；随后完成[候选对齐与补验](../reports/kylin-delivery-alignment-2026-10-04.md)，
-实施方完整 66 项通过，用户确认新版 HTML Chrome 检查正常，业务结果保留且没有全量重跑。
-继续交接独立评审，正式发布按发布说明的合并与确认步骤进行。
+构建期 Markdown 工具不进入应用依赖。v0.2.0 的本地检查和目标机开始条件见
+[程序发布说明](program-release.md)；Issue #45 已确认本轮目标机执行授权，先完成本地门禁并
+留下开始记录，不重复请求确认。开发机通过不能代替目标机实测和用户 HTML 检查。
+
+```bash
+.venv/bin/python scripts/deployment/check_documents.py
+var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
+.venv/bin/python scripts/deployment/verify_release_examples.py --app-root APP --output NEW_DIR
+.venv/bin/python scripts/deployment/verify_release_full.py \
+  --app-root APP --verification-root KIT --logs raw/inbox/hashdata --output NEW_DIR
+```
+
+第一项检查配置键集合、每个 JSON 示例、57 张表及所列列名、手册引用的随包命令；
+第二项覆盖漏键、坏例、漏表、错列及缺少命令的反例，并检查三个 HTML。
+第三项在私有 PG17 用已安装候选包实际执行全部指南 JSON 示例、七个辅助命令及自然日期清理，
+最后一项用同一候选在私有 PG17 串行运行真实九任务及七个示例，生成目标机比较基准；
+结束时停止实例并保留数据库和受保护输出，失败不自动重试已完成的构建。
+若全部任务与示例已成功，仅最后的基准汇总失败，可执行
+`verify_release_full.py --app-root APP --output EXISTING_DIR --collect-only`。
+该模式只核对包身份并读取固定九任务／七示例记录，失败、缺失或不同候选的记录会被拒绝，
+不连接数据库、不重复构建，也不覆盖已有基准。原始失败输出仍须保留并在报告说明。
+历史 v0.1.0 的独立九任务与候选对齐证据保留在原报告中，不作为 v0.2.0 已通过的证明。
+
+用户确认需要在保留库补采跨机比较数据时，先用原端口／socket 启动该私有实例，设置
+SQL_APM_DSN 指向它，再执行下面的开发机专用命令，结束后停止实例：
+
+```bash
+.venv/bin/python scripts/deployment/verify_release_full.py \
+  --app-root ORIGINAL_APP --output COMPLETED_RUN --supplement-statistics NEW_BASELINE_DIR
+```
+
+该模式验证原候选及产品摘要，用只读事务读取四个已完成构建，并先证明全部统计值仍与原始
+记录精确一致，再生成新的基准和八个压缩逐行数值文件；不重建、删除或覆盖原记录。
+非对数字段仍精确比较，仅 log_median、log_mad 逐行绝对差不超过 1e-12，NULL 必须一致。
+把新基准和同目录数值文件一起交付，分别记录摘要；原基准与补采来源摘要保留用于追溯。

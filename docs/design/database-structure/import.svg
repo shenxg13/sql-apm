@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="650" viewBox="0 0 1290 650" role="img" aria-labelledby="title desc">
+<title id="title">导入主链：文件、证据、执行和指纹</title><desc id="desc">箭头从引用方指向被引用方；只画主链 11 表，其他关联见正文</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#738397"/></marker></defs>
+<rect width="1290" height="650" fill="white"/>
+<text x="28" y="40" font-family="sans-serif" font-size="25" font-weight="bold" fill="#172c43">导入主链：文件、证据、执行和指纹</text>
+<text x="28" y="70" font-family="sans-serif" font-size="17" fill="#4a5968">箭头从引用方指向被引用方；只画主链 11 表，其他关联见正文</text>
+<path d="M 345 160 H 300" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 665 160 H 620" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 940 160 H 985" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 160 290 V 215" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 345 342 H 205 V 215" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 620 342 H 665" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 160 490 V 395" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 300 540 H 345" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 665 540 H 620" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 940 540 H 985" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 205 490 V 440 H 800 V 395" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="25" y="110" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="162.5" y="140" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">source_file</text>
+<text x="162.5" y="167" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">文件与 SHA-256</text>
+<text x="162.5" y="190" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">first_log_at / last_log_at</text>
+<rect x="345" y="110" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="482.5" y="140" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">import_attempt</text>
+<text x="482.5" y="167" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">每次导入尝试</text>
+<rect x="665" y="110" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="802.5" y="140" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">batch_entry</text>
+<text x="802.5" y="167" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">批次成员与最终尝试</text>
+<rect x="985" y="110" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="1122.5" y="140" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">import_batch</text>
+<text x="1122.5" y="167" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">批次与完成状态</text>
+<rect x="25" y="290" width="275" height="105" rx="10" fill="#e9f3ff" stroke="#2675bd" stroke-width="2"/>
+<text x="162.5" y="320" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">evidence_record</text>
+<text x="162.5" y="347" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">每条证据记录</text>
+<rect x="345" y="290" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="482.5" y="320" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">analysis_file</text>
+<text x="482.5" y="347" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">解释对应的文件</text>
+<rect x="665" y="290" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="802.5" y="320" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">analysis</text>
+<text x="802.5" y="347" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">一次解释的版本</text>
+<rect x="25" y="490" width="275" height="105" rx="10" fill="#e9f3ff" stroke="#2675bd" stroke-width="2"/>
+<text x="162.5" y="520" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_occurrence</text>
+<text x="162.5" y="547" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">执行事件</text>
+<rect x="345" y="490" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="482.5" y="520" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_sql_text</text>
+<text x="482.5" y="547" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">去重的可靠 SQL 原文</text>
+<rect x="665" y="490" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="802.5" y="520" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_fingerprint</text>
+<text x="802.5" y="547" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">可靠结构指纹</text>
+<rect x="985" y="490" width="275" height="105" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="1122.5" y="520" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">mpp_normalization</text>
+<text x="1122.5" y="547" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">归一化规则上下文</text>
+</svg>

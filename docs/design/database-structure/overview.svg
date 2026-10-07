@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1250" height="790" viewBox="0 0 1250 790" role="img" aria-labelledby="title desc">
+<title id="title">full 五阶段与独立清理流程</title><desc id="desc">task 贯穿任务；rebuild 从 snapshot 开始；cleanup 不由 full 自动触发</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#738397"/></marker></defs>
+<rect width="1250" height="790" fill="white"/>
+<text x="28" y="40" font-family="sans-serif" font-size="25" font-weight="bold" fill="#172c43">full 五阶段与独立清理流程</text>
+<text x="28" y="70" font-family="sans-serif" font-size="17" fill="#4a5968">task 贯穿任务；rebuild 从 snapshot 开始；cleanup 不由 full 自动触发</text>
+<path d="M 410 200 V 232" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 410 332 V 364" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 410 464 V 496" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 410 596 V 628" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 790 414 H 830" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 790 680 H 1025 V 535" fill="none" stroke="#738397" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="30" y="100" width="760" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="410.0" y="130" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">import 导入</text>
+<text x="410.0" y="157" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">文件 → 证据 → 执行／SQL 原文／指纹</text>
+<text x="410.0" y="180" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">source_file 新增 first_log_at / last_log_at</text>
+<rect x="30" y="232" width="760" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="410.0" y="262" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">snapshot 快照</text>
+<text x="410.0" y="289" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">按窗口起点选完整批次，必要时回退；封存 input_id + config_id</text>
+<text x="410.0" y="312" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">保留输入清单、窗口、规则和门槛</text>
+<rect x="30" y="364" width="760" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="410.0" y="394" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">build 构建</text>
+<text x="410.0" y="421" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">build → 正式／观察分组及五层统计</text>
+<text x="410.0" y="444" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">两套统计按集群与构建月份分区</text>
+<rect x="30" y="496" width="760" height="100" rx="10" fill="#f7f9fb" stroke="#b9c5cf" stroke-width="2"/>
+<text x="410.0" y="526" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">check 检查</text>
+<text x="410.0" y="553" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">build_check 六项检查</text>
+<text x="410.0" y="576" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">完成批次、规则、结果和计数守恒</text>
+<rect x="30" y="628" width="760" height="100" rx="10" fill="#e9f3ff" stroke="#2675bd" stroke-width="2"/>
+<text x="410.0" y="658" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">publish 发布</text>
+<text x="410.0" y="685" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">publication 记录决定；current_version 切换</text>
+<text x="410.0" y="708" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">仅检查通过且有纳入样本时切换</text>
+<rect x="830" y="340" width="390" height="195" rx="10" fill="#fff0dc" stroke="#b47826" stroke-width="2"/>
+<text x="1025.0" y="370" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#172c43">cleanup 独立命令</text>
+<text x="1025.0" y="397" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">默认只预览；显式执行才删除</text>
+<text x="1025.0" y="420" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">保护当前版本整月</text>
+<text x="1025.0" y="443" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">两张月分区 → 两张分组关联</text>
+<text x="1025.0" y="466" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">mpp_cleanup_month 记录每月结果</text>
+<text x="1025.0" y="489" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#4a5968">不删除明细、原文、快照和版本</text>
+</svg>

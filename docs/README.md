@@ -51,6 +51,7 @@
 | [统计计算设计](design/baseline-statistics.md) | 设计／已实现接口 | 正式及观察五层统计、分区自然键、原子保存与失败恢复。 |
 | [训练样本判定设计](design/training-decisions.md) | 设计／已实现接口 | 不可变快照、原文缓存、数据库统一推导及物理边界。 |
 | [日志导入设计](design/log-ingestion.md) | 设计说明 | 文件事务、Execute 单次配对、原文和近似入库、恢复与冲突检测边界。 |
+| [数据库结构说明（按流程）](design/database-structure.md) | 随包结构说明 | 结构 1.9.0 的 57 张表、四张 SVG、选批及清理流程。 |
 | [PostgreSQL 物理结构](design/postgresql-storage.md) | 设计说明 | 逻辑映射、MPP 专属表、独立统计存储及版本迁移边界。 |
 | [PostgreSQL 存储知识](../.project-wiki/architecture/postgresql-storage.md) | 设计说明 | 已实现结构、初始化边界和维护入口。 |
 | [数据契约设计验证](design/offline-data-contract/verification.md) | 分析证据 | 文档及合成样例的实际检查结果和未覆盖的产品运行边界。 |
@@ -64,8 +65,10 @@
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [Kylin 离线部署与九任务验证](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线包、项目自带解释器、PG17.10、SCRAM、日志传输及 Alma 比对。 |
+| [配置指南](runbooks/configuration-guide.md) | 随包操作说明 | 按“想改什么”查全部配置键、默认值、影响及可执行示例。 |
+| [v0.2.0 发布说明](releases/v0.2.0.md) | 随包入口 | 版本变化、兼容性、三份文档入口和实测结论。 |
 | [精简程序包与预发布交付](runbooks/program-release.md) | 操作说明 | 必要文件打包、离线 HTML、独立验收及用户确认后发布。 |
-| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 快照恢复后的独立执行、DBA 查询、每步实际输出与结论。 |
+| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 实施方裸机演练、指南示例、模拟日期清理及用户三份 HTML 检查。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |
 | [统计计算操作](runbooks/baseline-statistics.md) | 操作说明 | 快照计算、观察诊断、重试引用、分区维护和真实验收。 |
@@ -88,6 +91,7 @@
 | [构建编排与完整离线流程验收](reports/build-publication-2026-10-01.md) | 实施验证报告 | 九次真实任务、原子发布、覆盖迁移、独立复算与每版资源实测。 |
 | [文件时间与窗口选批验证](reports/window-batches-2026-10-05.md) | 分析证据 | 1.8.0 迁移、整批选入、九任务等价及每日分批对照。 |
 | [版本结果留存验证](reports/result-retention-2026-10-06.md) | 验证报告 | 清理语义、带数据升级、互斥与中断、真实数据库副本空间及持锁成本。 |
+| [v0.2.0 离线交付验证](reports/v020-offline-release-2026-10-07.md) | 验证报告 | 三份离线文档、固定候选、本地与目标机实测证据及尚未完成的验收边界。 |
 | [Kylin 离线部署验证](reports/kylin-offline-deployment-2026-10-02.md) | 实施验证报告 | 离线编译、自检、认证和与 Alma 比对的实测及未完成验收边界。 |
 | [精简候选包与 HTML 准备验证](reports/slim-release-preparation-2026-10-03.md) | 实施验证报告 | 程序精简、逐文件证据继承、隔离验证、HTML 检查及目标机确认点。 |
 | [精简候选包 Kylin 试跑](reports/slim-release-kylin-trial-2026-10-03.md) | 实施验证报告 | 快照恢复后的完整重装、独立验收、四进程超时与单进程复跑、性能对照。 |

@@ -1,12 +1,16 @@
-"""SQL boundary preservation and public JSON error handling."""
+"""Runtime search checks; the host-Python dictionary CI has no product wheels."""
 import contextlib
+import importlib.util
 import io
 import json
 import unittest
 
-from sql_apm.cli.search import main, statement_inputs
+RUNTIME_AVAILABLE = all(importlib.util.find_spec(name) is not None for name in ('psycopg2', 'pglast'))
+if RUNTIME_AVAILABLE:
+    from sql_apm.cli.search import main, statement_inputs
 
 
+@unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
 class SearchTests(unittest.TestCase):
     def test_statement_hints_keep_quoted_semicolons_and_comments(self):
         source = "/*+hint*/ SELECT ';'; -- tail\nSELECT $$a;b$$; /* tail */"

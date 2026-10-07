@@ -56,7 +56,7 @@ Python3.9.5／PostgreSQL17.10，shared_buffers=512MB、work_mem=16MB，TCP关闭
 - `.venv/bin/python scripts/db/verify_search.py`：合成查询、只读摘要、版本守卫及真实清理等待／重试通过。
 - `verify_search_full.py audit --directory var/issue47`：上述全量核对通过；`exact` 补测整条精确命令。
 - `var/issue31/build-venv/bin/python scripts/tests/test_deployment.py`：30项制包／文档边界检查通过。
-- 完整Harness通过（使用已安装 `var/harness-tools/bin`）；隔离随包与在线PR契约证据在交接时补齐。
+- 完整Harness及在线PR契约通过（使用已安装 `var/harness-tools/bin`）；隔离随包六入口全部通过。
 
 规模解释（推断，以代码路径与当前测量为依据）：模糊匹配扫描全部保留原文，计数还取决于匹配记录量，
 不是只随指定时间范围增长。精确检索命中列表覆盖全保留历史，也受同结构原文／记录及当前查询计划影响。
@@ -64,6 +64,18 @@ Python3.9.5／PostgreSQL17.10，shared_buffers=512MB、work_mem=16MB，TCP关闭
 明细和时间汇总的核心聚合随选中时间内记录量增长，但默认窗口边界要查该身份最后时间，且每次历史
 警告要核对全库原文的规则覆盖；因此本实现的历史请求也不能声称只随7天内记录量增长。
 累计规模增大时须重新测量；当前读锁可能使同月清理按10秒预算退出，释放后重试。
+
+## 隔离随包与CI边界
+
+固定候选从独立目录运行unit／database／publication／smoke／cleanup／search六入口：
+74项普通测试、86项存储检查、旧迁移／56项FK兼容检查、33项发布检查、烟测、23项清理检查和检索验收全部通过。
+产品文件79个与全量测量时的候选逐文件摘要相同；后续变更只有测试、验收工具和文档。
+本地试用例子生成、前后57张表行数核对及真实副本最终结构检查也实际通过，结束时两个数据目录均关闭。
+
+GitHub首次CI在宿主Python函数字典检查失败：宿主没有psycopg2／pglast，新增测试在导入时失败。
+修正为仅在这两个产品依赖存在时加载两项检索测试：宿主74项中72执行、2明确跳过；
+锁定Python3.9.5产品运行时仍74项全部执行。随包unit入口拒绝任何跳过，未降低产品验收要求。
+在线PR契约初次因缺“命令或方法／结果”固定字段失败，修正正文后完整入口通过。
 
 ## 限制与交接
 

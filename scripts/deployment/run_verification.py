@@ -53,6 +53,8 @@ def unit():
     if suite.countTestCases() != 74:
         raise ValueError('MPP verification kit must retain all 74 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if result.skipped:
+        raise ValueError('product verification must execute every ordinary test without skips')
     return 0 if result.wasSuccessful() else 1
 
 

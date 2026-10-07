@@ -2777,5 +2777,45 @@
       "pg_cold_seconds": 1.045433,
       "warm_seconds": 1.042124
     }
-  ]
+  ],
+  "actual_database_settings": {
+    "server_version": "17.10",
+    "shared_buffers": "512MB",
+    "work_mem": "16MB",
+    "maintenance_work_mem": "128MB",
+    "max_connections": "30",
+    "max_wal_size": "2GB",
+    "min_wal_size": "256MB",
+    "listen_addresses": ""
+  },
+  "verification": {
+    "ordinary_tests": 74,
+    "ordinary_skipped": 0,
+    "host_dictionary_tests": 72,
+    "host_runtime_skipped": 2,
+    "storage_checks": 86,
+    "foreign_key_compatibility_checks": 56,
+    "publication_checks": 33,
+    "cleanup_checks": 23,
+    "deployment_tests": 30,
+    "isolated_checks": [
+      "unit",
+      "database",
+      "publication",
+      "smoke",
+      "cleanup",
+      "search"
+    ],
+    "isolated_all_passed": true,
+    "trial_helpers_passed": true,
+    "real_final_structure_check_passed": true,
+    "harness_passed": true,
+    "live_pr_contract_passed": true
+  },
+  "package": {
+    "tested_commit": "f8a845b001f13f3ee9279d54b6f6202be8af5bcd",
+    "sha256": "742129a72c6e633a2e85c20e851da51d54391b4f007bb34c304082b59afae234",
+    "product_files": 79,
+    "all_product_files_equal_to_full_audit": true
+  }
 }

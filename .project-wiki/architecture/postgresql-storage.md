@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-07
+updated: 2026-10-08
 sources:
+  - path: docs/reports/python313-upgrade-2026-10-08.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
@@ -113,6 +115,16 @@ confidence: high
 沿用同一集群／构建月份登记，新增第三张分区父表，不另存观察覆盖索引。
 1.4.0→1.5.0 为增量迁移，已有统计、覆盖、分区和历史 receipt 均保留；
 [统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)记录未知时刻和身份的诊断归属。
+
+### 观察组代表引用的跨库边界（observed，2026-10-08）
+
+`observations.py` 从同组近似结果按 `result_id` 排序选取一个代表，冲突时保留首次引用。
+该身份依赖导入时生成的随机近似输入身份；从该机制推断，独立新建库不保证选中同一原文的代表。
+这两处逻辑在解释器升级前已经存在，不是本次新增行为。
+[#49 实测](../../docs/reports/python313-upgrade-2026-10-08.md#逐表差异定位measured--inferred)
+发现 1,074 组中有 11 个代表引用映射至不同原文；分组其余字段、代表结果的非标识字段及
+全部统计摘要一致。没有据此认定解释器是原因，也没有确认可以忽略引用差异；
+跨库代表引用的验收口径仍须在对应在线 Issue 明确，既有逻辑契约不因本观察自动改变。
 
 ### 编排结构 1.6.0（2026-10-01）
 

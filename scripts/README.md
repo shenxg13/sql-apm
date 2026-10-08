@@ -194,6 +194,11 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全码位差分和固定 CSV
 扫描，`verify_python_runtime.py` 在独立新旧程序包上串行运行九任务并按 `python_comparison.py`
 逐表精确比较。`scripts/db/verify_python_comparison.py` 在合成私有库验证比较器反例。
+内存峰值按 #49 已确认变更只记录，总用时、零超时及精确结果比较仍为条件；
+`scripts/tests/test_python_runtime.py` 用小型记录验证这些条件。
+首次停止库的有界续跑使用 `resume_python_runtime.py` 在提交 `28b31ad798f347011f6f66a6d7bde93cadd0cb5e`
+的版本；它先核对原脚本摘要、完整备份停止现场和复核输入，再执行剩余三项，不支持自动重试。
+须使用该不可变工具提交复核当时的续跑，不能把当前控制脚本的摘要冒充首次运行的摘要。
 这些是显式高成本验收入口，不自动加入 Harness；输入、停止条件、内存采样与未完成边界见
 [升级报告](../docs/reports/python313-upgrade-2026-10-08.md)。
 

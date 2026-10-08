@@ -137,8 +137,8 @@ def main():
         print(structure_dumps(worker(json.load(sys.stdin))))
         return
     from importlib.metadata import version
-    if platform.python_version() != '3.9.5' or version('pglast') != '7.18':
-        ap.error('requires Python 3.9.5 and pglast 7.18')
+    if platform.python_version() != '3.13.16' or version('pglast') != '7.18':
+        ap.error('requires Python 3.13.16 and pglast 7.18')
     cache = args.cache.resolve()
     if (ROOT / 'var').resolve() not in cache.parents:
         ap.error('raw cache must stay under repository ignored var/')

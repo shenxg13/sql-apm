@@ -2,6 +2,7 @@
 """Offline interpreter smoke checks, without reading any real input or database."""
 import bz2
 import ctypes
+from contextlib import closing
 from decimal import Decimal
 import gzip
 import hashlib
@@ -24,7 +25,7 @@ def child(queue):
 
 
 def main():
-    assert sys.version_info[:3] == (3, 9, 5), 'requires exact Python 3.9.5'
+    assert sys.version_info[:3] == (3, 13, 16), 'requires exact Python 3.13.16'
     assert sys.prefix != sys.base_prefix, 'requires project venv'
     modules = ['ssl', '_ssl', 'hashlib', '_hashlib', 'bz2', 'lzma', 'zlib', 'sqlite3',
                'ctypes', 'readline', 'decimal', 'uuid', 'zoneinfo', 'multiprocessing',
@@ -37,7 +38,7 @@ def main():
     assert hashlib.sha256(b'abc').hexdigest() == 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'
     assert Decimal('0.1') + Decimal('0.2') == Decimal('0.3')
     assert json.loads(json.dumps({'中文': '值'})) == {'中文': '值'}
-    with sqlite3.connect(':memory:') as db:
+    with closing(sqlite3.connect(':memory:')) as db, db:
         db.execute('CREATE TABLE test (value TEXT)')
         db.execute('INSERT INTO test VALUES (?)', ('中文',))
         assert db.execute('SELECT value FROM test').fetchone()[0] == '中文'

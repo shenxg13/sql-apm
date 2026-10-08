@@ -1,7 +1,7 @@
 # 完整流程、重新构建与版本查询
 
 业务规则见[构建与版本](../../.project-wiki/features/baseline-versions.md)，
-连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.9.5、PG17 和结构 1.9.0；
+连接、事务及成本见[设计](../design/build-publication.md)。使用 Python 3.13.16、PG17 和结构 1.9.0；
 连接通过既有 `SQL_APM_DSN` 提供，不把凭据写进命令参数或报告。
 
 ## 显式运行

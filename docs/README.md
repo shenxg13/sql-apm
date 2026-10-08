@@ -144,6 +144,7 @@
 | [MPP duration 源码位置核查（2026-09-24）](reports/hashdata-duration-source-mapping-2026-09-24.md) | 分析证据 | 请求、Execute、Parse、Bind 的计时解释及上游源码对照边界。 |
 | [生产 SQL 日志样本分析（2026-09-23）](reports/production-log-analysis-2026-09-23.md) | 分析证据 | 早期生产样本的覆盖范围、文本缺失、编码和多语句现象。 |
 | [测试日志文本与绑定参数核查（2026-09-23）](reports/sql-log-text-verification.md) | 分析证据 | 两份测试日志中的 SQL 文本、占位参数和相关记录。 |
+| [Python 3.13.16 升级验证（2026-10-08）](reports/python313-upgrade-2026-10-08.md) | 实施验证报告 | 源码及 wheel 核验、Unicode 与真实输入检查、新旧九任务比较、目标机离线安装及未完成边界；附[目标机机器记录](reports/data/python313-target-2026-10-08.json)。 |
 | [Python 3.9.5 环境验证（2026-09-25）](reports/python-environment-2026-09-25.md) | 分析证据 | 本地解释器、虚拟环境及标准库检查的实测记录。 |
 | [函数字典覆盖与验证（2026-09-25）](reports/function-dictionary-2026-09-25.md) | 分析证据 | 首次字典实施的来源、覆盖和验证范围。 |
 | [函数字典 R1 整改验证（2026-09-25）](reports/function-dictionary-r1-remediation-2026-09-25.md) | 分析证据 | 对象身份与多态匹配问题的修复证据及复核边界。 |

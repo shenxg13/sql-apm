@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-07
+updated: 2026-10-08
 sources:
+  - path: docs/reports/python313-upgrade-2026-10-08.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
@@ -113,6 +115,27 @@ confidence: high
 沿用同一集群／构建月份登记，新增第三张分区父表，不另存观察覆盖索引。
 1.4.0→1.5.0 为增量迁移，已有统计、覆盖、分区和历史 receipt 均保留；
 [统计设计](../../docs/design/baseline-statistics.md#观察统计实施计划与边界)记录未知时刻和身份的诊断归属。
+
+### 观察组代表引用的跨库边界（observed，2026-10-08）
+
+`observations.py` 从同组近似结果按 `result_id` 排序选取一个代表，冲突时保留首次引用。
+该身份依赖导入时生成的随机近似输入身份；从该机制推断，独立新建库不保证选中同一原文的代表。
+这两处逻辑在解释器升级前已经存在，不是本次新增行为。
+[#49 实测](../../docs/reports/python313-upgrade-2026-10-08.md#逐表差异定位measured--inferred)
+发现 1,074 组中有 11 个代表引用映射至不同原文；分组其余字段、代表结果的非标识字段及
+全部统计摘要一致。没有据此认定解释器是原因。
+
+2026-10-08 用户选择“采纳实施方建议”，[#49 已确认契约](https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6056030974)
+只对 `mpp_observation_group.result_id` 采用等价比较，三项须同时成立：
+
+- 两库引用均真实存在、available、规则／近似值与组相同，并关联到同组维度下的真实近似事件。
+- 被引用近似结果除 `result_id`、`input_id` 外的全部字段相同。
+- 该表其余八列及其他 56 表继续精确比较；原文、近似输入／结果及事件关联仍按原文身份对应。
+
+不得删列或仅检查外键。比较器须有正反例，记录代表不同的组数及各组候选数，并保留首次失败。
+此规则仅用于本次升级的跨库验收，不改变产品代表选取逻辑或其他逻辑契约。
+候选数按保留事件与组的集群、profile、数据库、用户、规则、近似值和计时类型关联后统计不同结果；
+未知事件计时对应 `unknown`。该数量不回溯首次构建时的候选集，实测结果见上述报告。
 
 ### 编排结构 1.6.0（2026-10-01）
 

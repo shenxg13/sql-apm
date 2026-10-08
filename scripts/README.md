@@ -32,7 +32,7 @@ provisioner requires a CI environment; local setup follows the tool runbook.
 
 ## 函数字典工具
 
-Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
+Python 3.13.16 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
 以下产品检查独立于 Harness，实施／评审时分别运行：
 
 ```bash
@@ -190,6 +190,23 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 先验证覆盖逐行一致再升级。真实输入、私有连接和详细输出均保留本地忽略目录。
 
 ## Kylin 离线演练
+
+Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全码位差分和固定 CSV
+扫描，`verify_python_runtime.py` 在独立新旧程序包上串行运行九任务并按 `python_comparison.py`
+逐表比较。#49 已确认的唯一例外是观察组代表引用：须为同组真实事件关联的可用结果，
+并比较其全部非标识字段；其余列、原文及事件引用保持精确比较。
+`scripts/db/verify_python_comparison.py` 在合成私有库验证比较器正反例。
+内存峰值按 #49 已确认变更只记录，总用时、零超时及精确结果比较仍为条件；
+`scripts/tests/test_python_runtime.py` 用小型记录验证这些条件。
+首次停止库的有界续跑使用 `resume_python_runtime.py` 在提交 `28b31ad798f347011f6f66a6d7bde93cadd0cb5e`
+的版本；它先核对原脚本摘要、完整备份停止现场和复核输入，再执行剩余三项，不支持自动重试。
+须使用该不可变工具提交复核当时的续跑，不能把当前控制脚本的摘要冒充首次运行的摘要。
+确认代表等价规则后，用 `reexport_python_runtime.py --run STOPPED_RUN --output NEW_DIR`
+在两份保留库分别重新导出，再用 `verify_python_runtime.py compare` 比较新目录。
+该入口只启动已完成九任务的私有库，只读产品表、写事务临时表后回滚，最后停库；
+保留原报告，记录新导出代码摘要，并断言其他 56 表与原摘要相同，不执行任务或自动重试。
+这些是显式高成本验收入口，不自动加入 Harness；输入、停止条件、内存采样与未完成边界见
+[升级报告](../docs/reports/python313-upgrade-2026-10-08.md)。
 
 [离线部署手册](../docs/runbooks/kylin-offline-deployment.md)与
 [人工验证模板](../docs/runbooks/kylin-validation-record.md)覆盖源码构建、认证、日志传输和九任务核对。

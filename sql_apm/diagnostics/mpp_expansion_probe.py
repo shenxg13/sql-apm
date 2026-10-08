@@ -205,8 +205,8 @@ def main():
     ap.add_argument('--output', type=Path, required=True)
     args = ap.parse_args()
     from importlib.metadata import version
-    if platform.python_version() != '3.9.5' or version('pglast') != '7.18':
-        ap.error('requires Python 3.9.5 and pglast 7.18')
+    if platform.python_version() != '3.13.16' or version('pglast') != '7.18':
+        ap.error('requires Python 3.13.16 and pglast 7.18')
     cache, output = args.cache.resolve(), args.output.resolve()
     if (ROOT / 'var').resolve() not in cache.parents:
         ap.error('cache must stay under ignored var/')

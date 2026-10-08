@@ -2,14 +2,14 @@
 
 本入口实现“只导入”。先按[数据库说明](database-initialization.md)初始化或核对 PostgreSQL 17
 结构 1.9.0。导入器按允许的版本历史识别当前结构，支持两个迁移版本时间戳相同的情况；
-未知或不完整版本历史会拒绝。再用 Python 3.9.5 安装根目录锁定依赖：
+未知或不完整版本历史会拒绝。再用 Python 3.13.16 安装根目录锁定依赖：
 
 ```bash
 .venv/bin/python -m pip install --require-hashes -r requirements.txt
 ```
 
 离线环境先准备与锁定哈希一致的两个 wheel，再使用 `--no-index --find-links WHEEL_DIR`。
-开发环境 CPython 3.9／Linux x86_64 验证不代替 Kylin 部署验证。
+开发环境 CPython 3.13／Linux x86_64 验证不代替 Kylin 部署验证。
 
 ## 登记与调用
 

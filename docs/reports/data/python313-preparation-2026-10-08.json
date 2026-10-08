@@ -1,0 +1,301 @@
+{
+  "format": "python-runtime-upgrade/1",
+  "evidence": "measured",
+  "date": "2026-10-08",
+  "base_commit": "6d74a949ef6bae0f5ab21b109ec075e5ddb11f11",
+  "candidate_commit": "3acf30484e96f9938ede3a8e7fe693b4a2c879e4",
+  "python_source_sha256": "cfac63bddf956deafb1172ca131ae5dcaafd6f95056086e233fca205593ed427",
+  "environment": {
+    "passed": true,
+    "python": "3.13.16",
+    "modules": [
+      "ssl",
+      "_ssl",
+      "hashlib",
+      "_hashlib",
+      "bz2",
+      "lzma",
+      "zlib",
+      "sqlite3",
+      "ctypes",
+      "readline",
+      "decimal",
+      "uuid",
+      "zoneinfo",
+      "multiprocessing",
+      "pglast",
+      "psycopg2"
+    ],
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026",
+    "sqlite": "3.34.1",
+    "network_checks": false
+  },
+  "normalization_id": "N:f23687fc078493779805508ea7db4713a586b1da575cf3460e1a2bd55ffceae0",
+  "program_product_changed_paths": [
+    "requirements.txt"
+  ],
+  "archives": {
+    "sql-apm-v0.2.0.tar.gz": {
+      "sha256": "19ec568cb03b9b0c4f537311f9a48c94f966966e48d0daf2b33c790a46095c99",
+      "bytes": 289433,
+      "reproducible": true
+    },
+    "sql-apm-verification-v0.2.0.tar.gz": {
+      "sha256": "405ff60ba5f9cb866b7393eb90ca7f4cbc1e1eb4f95c2949aa4041efd9fc67e5",
+      "bytes": 269292,
+      "reproducible": true
+    }
+  },
+  "offline_bundle": {
+    "commit": "3acf30484e96f9938ede3a8e7fe693b4a2c879e4",
+    "sha256": "0d25ad7bf4f17e1d82a03351a30922468495681c15484785328fb40753760c0b",
+    "bytes": 488258554,
+    "files": 417,
+    "reproducible": true,
+    "python_sources": [
+      "sources/Python-3.13.16.tgz"
+    ],
+    "wheels": [
+      "wheels/pglast-7.18-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "wheels/psycopg2_binary-2.9.10-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+    ]
+  },
+  "checks": {
+    "unit": 74,
+    "deployment": 30,
+    "ingestion": 125,
+    "training": 300,
+    "statistics": 32,
+    "observations": 11,
+    "publication": 33,
+    "cleanup": 23,
+    "schema_and_migrations": "passed",
+    "search": "passed",
+    "mpp_naming": "passed",
+    "window": "passed",
+    "comparison_synthetic": {
+      "passed": true,
+      "tables": 57,
+      "independent_runs": 2,
+      "negative_cases": 4,
+      "representative_negative_cases": [
+        "missing",
+        "unavailable",
+        "rule",
+        "value",
+        "scope",
+        "profile",
+        "database",
+        "user",
+        "timing",
+        "no_event",
+        "other_group_event",
+        "different_diagnostics",
+        "different_replacements",
+        "other_group_column",
+        "event_reference_remains_exact"
+      ],
+      "representative_positive_cases": [
+        "different_equivalent_source",
+        "unknown_timing"
+      ]
+    },
+    "offline_harness": "passed",
+    "live_pr_contract": "passed",
+    "statistics_after_resource_fix": "passed",
+    "packaged_warnings": 0,
+    "deployment_after_tar_filter_fix": 30,
+    "runtime_contract": 8,
+    "comparison_synthetic_log_sha256": "2fd9cc271b2d26a5aeb8c796bc063d3393ab50842a766a17211078f928f562f9",
+    "runtime_contract_log_sha256": "322e9bec5d6bbde47d6476008f309469c1e42048ed96320a3bae52af8811e27a",
+    "comparison_test_environment_note": "Initial read-only-transaction trial rejected CREATE TEMP TABLE AS; retained log, then used original temporary-table write/rollback method. Product tables only SELECTed.",
+    "comparison_initial_readonly_trial_log_sha256": "6ac1c33f96cadee739834ca0d42d4b50ce4a8b5c2e1d248121d0ecb81e172f0c"
+  },
+  "target_validation": "not_run; unavailable per user",
+  "nine_task_comparison": "passed_under_confirmed_representative_equivalence",
+  "existing_db_verifiers": [
+    {
+      "path": "scripts/db/verify.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_approximate.py",
+      "status": "not_run",
+      "boundary": "本轮未重新生成匹配当前源码的 v5 拒绝快照，也未单独执行逐条 PG 往返专项。",
+      "preconditions": "完整原文 SQLite 索引和 sql-normalization/5 的全量拒绝快照；须核对源码、规则、输入摘要和拒绝分布。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_cleanup.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_cleanup_full.py",
+      "status": "not_run",
+      "boundary": "当前初始化器继续升级至 1.10.0，而历史完整行比较不排除新增 search_text，不能直接复用当前九任务库代替其旧结构前提。",
+      "preconditions": "冻结结构 1.8.0 checkout、55 文件和九版本数据库 dump，再恢复副本验证 1.9.0 清理迁移。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_coverage_migration_full.py",
+      "status": "not_run",
+      "boundary": "现行初始化器不支持该带数据旧库直接升级；未准备历史冻结实例。",
+      "preconditions": "来自 #29 冻结源码的带数据 1.5.0 私有实例，逐行核对后迁移至 1.6.0。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_ingestion.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_ingestion_full.py",
+      "status": "not_run",
+      "boundary": "本轮未另建该全导／重复导入专项的实例与索引对账；九任务采用首批加逐日输入。",
+      "preconditions": "55 个日志、固定清单、历史原文索引和全新私有 PG17；先全导，再重复导入并核对原文集合。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming_full.py",
+      "status": "not_run",
+      "boundary": "本轮未复演 #33 标识迁移的独立两轮专项；解释器对照采用本 Issue 同一标识体系。",
+      "preconditions": "固定 55 文件、明确新旧 app-root 和各自全新 PG17；两份报告对齐全部稳定来源成员和指标。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_observations.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_observations_full.py",
+      "status": "not_run",
+      "boundary": "未另行构造正式统计旧实现与当前观察实现的对照和重复计算；九任务不替代该独立 oracle。",
+      "preconditions": "55 文件全导的专用实例，及 f038932fe0d5453450b91a59d5239c95bacb0078 的冻结统计实现。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_publication.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_publication_full.py",
+      "status": "not_run",
+      "boundary": "本轮使用 rehearsal 九任务与新旧 57 表比较，没有重复该带额外 oracle 的发布专项。",
+      "preconditions": "55 文件和全新私有 PG17；九任务中额外执行正式统计／观察 oracle 与冻结实现对照。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_scanning_full.py",
+      "status": "not_run",
+      "boundary": "本轮已在新旧九任务分别执行 119 首批，但未另行运行 #34 的独立实例和扫描性能专项。",
+      "preconditions": "干净私有 PG17、固定清单和 119 首批日志，按 #34 专项参数运行并与 Alma 业务计数比较。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_search.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_search_full.py",
+      "status": "not_run",
+      "boundary": "本轮未准备迁移前全量副本和独立检索审计状态；全新 1.10.0 九任务库不能替代迁移前后核对。",
+      "preconditions": "prepare 复制已关闭的迁移前真实 PG 数据目录；audit/exact 使用由该流程准备的专用副本。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_search_plans.py",
+      "status": "not_run",
+      "boundary": "本轮未创建或启动该专项副本，没有执行其稀疏／密集输入、20 条完整命令及长输入切分测量。",
+      "preconditions": "已升级、已停止的专用全量副本，诊断账号可加载 PG17 auto_explain，用于嵌套计划与冷热性能审计。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_statistics.py",
+      "status": "passed",
+      "boundary": "32 checks passed again after closing exited child stdout."
+    },
+    {
+      "path": "scripts/db/verify_statistics_full.py",
+      "status": "not_run",
+      "boundary": "本轮未另行准备全导快照或执行千组 oracle／重复构建专项；九任务精确比较不记作该脚本通过。",
+      "preconditions": "55 文件重新全导或专用已导入实例；两集群守恒、千组独立复算和同快照重复构建。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_training.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_training_aliases.py",
+      "status": "helper_without_entrypoint",
+      "boundary": "Imported by verify_training_full.py --compare-aliases; not a standalone check."
+    },
+    {
+      "path": "scripts/db/verify_training_category_delta.py",
+      "status": "not_run",
+      "boundary": "只读预检确认当前 mpp_parser.py 不满足冻结源码前提；未改历史断言或执行类别 v1/v2 回放。",
+      "source_preconditions": [
+        {
+          "path": "sql_apm/sql/lexical.py",
+          "reference_commit": "b0cc66a495e27b071d25a171c9f517f095841658",
+          "required_equal": true,
+          "observed_equal": true,
+          "reference_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+          "current_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f"
+        },
+        {
+          "path": "sql_apm/sql/mpp_parser.py",
+          "reference_commit": "b0cc66a495e27b071d25a171c9f517f095841658",
+          "required_equal": true,
+          "observed_equal": false,
+          "reference_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+          "current_sha256": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339"
+        }
+      ],
+      "preconditions": "固定 SHA-256 的历史原文索引，且 lexical.py、mpp_parser.py 须与 b0cc66a495e27b071d25a171c9f517f095841658 字节相同。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_training_full.py",
+      "status": "not_run",
+      "boundary": "本轮未另行准备该全导训练状态或执行类别别名专项；九任务选批方式不同。",
+      "preconditions": "55 文件、全新 PG17、两集群全导快照和重复推导；可选 --compare-aliases 对照冻结类别 v2/v3。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_window.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_window_full.py",
+      "status": "not_run",
+      "boundary": "本轮未选择 #35 历史参考和准备每日／7 天场景；不能把相同当前实现的解释器对照视为窗口改动验收。",
+      "preconditions": "明确窗口改动前 reference 与 candidate checkout，各自执行真实九任务及 119 每日一批／7 天窗口，然后比较两份报告。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    },
+    {
+      "path": "scripts/db/verify_window_replay.py",
+      "status": "not_run",
+      "boundary": "虽使用合成日志，但依赖窗口改动前后两种行为；本轮未准备该历史 reference，按已确认清单列入十五个未执行入口。",
+      "preconditions": "明确 --reference 历史 checkout；合成日志验证 #35 的九任务／每日选批对照工具链和指标变化拒绝。",
+      "acceptance_scope": "excluded_by_confirmed_P4; not executed, not passed"
+    }
+  ],
+  "packaged_entrypoints": {
+    "unit": "passed",
+    "database": "passed",
+    "publication": "passed",
+    "smoke": "passed",
+    "cleanup": "passed",
+    "search": "passed"
+  },
+  "published_v020_unchanged": true,
+  "P4_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054215812",
+  "P4_passed": true,
+  "memory_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090",
+  "representative_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6056030974",
+  "P6_passed": true
+}

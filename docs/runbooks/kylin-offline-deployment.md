@@ -1,7 +1,7 @@
 # Kylin V10 SP2 离线部署与验证
 
 本手册交付 SQL APM `v0.2.0` 预发布，**不用于生产**。目标为已恢复初始快照的
-Kylin V10 SP2 x86_64 专用演练机，Python 3.9.5、PostgreSQL 17.10、结构 1.9.0。
+Kylin V10 SP2 x86_64 专用演练机，Python 3.13.16、PostgreSQL 17.10、结构 1.9.0。
 候选提交见 PROGRAM_COMMIT，全部原稿与文件摘要见 RELEASE.json；应用版本不等于结构版本。
 v0.1.0 的数据库必须重建；后续 0.x 之间不承诺兼容。
 
@@ -27,7 +27,7 @@ export APM_ROOT=/data/sql-apm
 export APM_RUN_USER=sfmon
 export APM_RUN_GROUP="$(id -gn "$APM_RUN_USER")"
 test "$(id -un)" = "$APM_RUN_USER"
-export APM_PYTHON="$APM_ROOT/python-3.9.5/bin/python3.9"
+export APM_PYTHON="$APM_ROOT/python-3.13.16/bin/python3.13"
 export APM_PG_BIN="$APM_ROOT/postgresql-17.10/bin"
 export APM_APP="$APM_ROOT/app"
 export APM_VERIFY="$APM_ROOT/verification"
@@ -108,13 +108,14 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
   --output "$APM_DELIVERY_DIR/offline-bundle" \
   --release-dir "$APM_DELIVERY_DIR/release" \
   --rpm-collection var/issue31/rpm-collection \
-  --python-source var/issue33/delivery-final/offline-bundle/sources/Python-3.9.5.tgz \
+  --python-source var/issue49/downloads/Python-3.13.16.tgz \
   --postgres-source var/issue33/delivery-final/offline-bundle/sources/postgresql-17.10.tar.gz \
-  --wheel-dir var/issue33/delivery-final/offline-bundle/wheels \
-  --source-manifest var/issue33/delivery-final/offline-bundle/manifest.json
+  --wheel-dir var/issue49/downloads/wheels
 ```
 
-`--source-manifest` 复用已记录的官方来源，仍逐项核对固定摘要和 RPM 签名证据，不联网。
+首次组装从官方元数据核对两个 cp313 wheel 的来源和摘要。后续可增加
+`--source-manifest 本次完整包目录/manifest.json` 离线复用已核对来源，仍逐项检查摘要和
+RPM 签名证据；旧 cp39 包的清单不能提供新 wheel 的来源。
 <!-- developer-only:end -->
 
 按本次交付记录填写外部摘要和精确提交，不用包内自行声明的值替代。在开发机传输：
@@ -187,8 +188,8 @@ test "$(cat "$APM_APP/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
 test "$(cat "$APM_VERIFY/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
 mkdir -p "$APM_ROOT/build" "$APM_ROOT/records"
 cd "$APM_ROOT/build"
-tar -xzf "$APM_BUNDLE/sources/Python-3.9.5.tgz"
-cd Python-3.9.5
+tar -xzf "$APM_BUNDLE/sources/Python-3.13.16.tgz"
+cd Python-3.13.16
 ./configure --prefix="$(dirname "$(dirname "$APM_PYTHON")")" --with-ensurepip=install \
   > "$APM_ROOT/records/python-configure.log" 2>&1
 make -j4 > "$APM_ROOT/records/python-make.log" 2>&1
@@ -203,7 +204,7 @@ PIP_CONFIG_FILE=/dev/null .venv/bin/python -m pip --isolated --disable-pip-versi
 .venv/bin/python scripts/deployment/verify_package.py --installed
 ```
 
-预期：精确 Python 3.9.5，pip 由源码内 ensurepip 提供，两个锁定 wheel 安装成功，
+预期：精确 Python 3.13.16，pip 由源码内 ensurepip 提供，两个锁定 wheel 安装成功，
 `pip check` 无冲突，模块与离线功能自检输出 passed=true。不使用系统 Python 运行项目。
 失败：查构建日志中的 missing modules／编译错误；缺 bz2、lzma、sqlite3、ssl 等必须补齐依赖
 并重建，不能忽略。HTTP 可达性不属于离线解释器检查；可选 tkinter、nis、dbm 不作为门槛。
@@ -228,14 +229,16 @@ cd "$APM_APP"
   --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
 ```
 
-再运行 smoke；合成清理入口在第 12 节空闲时运行。
+再运行 smoke 和 search；合成清理入口在第 12 节空闲时运行。
 
 ```bash
 .venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
   --pg-bin "$APM_PG_BIN" smoke > "$APM_ROOT/records/verify-smoke.log" 2>&1
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  --pg-bin "$APM_PG_BIN" search > "$APM_ROOT/records/verify-search.log" 2>&1
 ```
 
-预期：PG17.10，各入口退出 0；普通测试 72 项、数据库验证 276 个 PASS、发布检查 33 项、smoke 通过。
+预期：PG17.10，各入口退出 0；普通测试 74 项、数据库验证 277 个 PASS、发布检查 33 项、smoke 和 search 通过。
 合成清理检查 23 项；实际项数及输出摘要保存在机器记录。
 开头 APPLICATION 应指向 APM_APP，不能只检查输出文件存在。测试在 verification 中，
 核心代码从 app 加载；数据库检查各自创建禁用 TCP 的私有临时实例，退出后停止清理，

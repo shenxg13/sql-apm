@@ -45,7 +45,7 @@ PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 另外必须执行全部指南示例，不把 JSON 校验等同于真实命令通过。
 重复制包使用同一固定提交、同一输入和不同输出目录；程序、验收和完整包应字节相同。
 
-在仓库外或隔离目录解压程序和验收包，用精确 Python 3.9.5 建立全新 venv，
+在仓库外或隔离目录解压程序和验收包，用精确 Python 3.13.16 建立全新 venv，
 从离线 wheels 按 requirements.txt 安装。令 APM_APP、APM_VERIFY 指向这两个目录：
 
 ```bash

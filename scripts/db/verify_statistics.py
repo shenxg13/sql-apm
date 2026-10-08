@@ -145,6 +145,7 @@ s.calculate('C1',os.environ['TEST_INPUT'],os.environ['TEST_CONFIG'],progress=pro
                     evidence=json.loads(child.stdout.readline())
                     killed=evidence['build_id'];assert killed.startswith('B:')
                     child.send_signal(sig);child.wait(timeout=10)
+                    child.stdout.close()
                     for _ in range(100):
                         state=v.sql("SELECT state FROM build WHERE build_id='"+killed+"'")
                         if state=='interrupted':break

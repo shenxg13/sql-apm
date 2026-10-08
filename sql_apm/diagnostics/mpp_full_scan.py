@@ -385,8 +385,8 @@ def main():
     ap.add_argument('--workers', type=int, default=4)
     ap.add_argument('--record-dates', action='store_true', help='index actual CSV record dates')
     args = ap.parse_args()
-    if platform.python_version() != '3.9.5' or version('pglast') != '7.18':
-        ap.error('requires Python 3.9.5 and pglast 7.18')
+    if platform.python_version() != '3.13.16' or version('pglast') != '7.18':
+        ap.error('requires Python 3.13.16 and pglast 7.18')
     database, output, root = args.database.resolve(), args.output.resolve(), args.root.resolve()
     if not 1 <= args.workers <= 8:
         ap.error('workers must be between 1 and 8')

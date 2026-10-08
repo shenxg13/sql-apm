@@ -103,7 +103,7 @@ def build(args):
             for member in tar.getmembers():
                 if member.name.startswith('/') or '..' in Path(member.name).parts or not (member.isfile() or member.isdir()):
                     raise ValueError('unsupported repository archive member')
-            tar.extractall(source)
+            tar.extractall(source, filter='data')
         # Never report a builder revision different from the code executing here.
         for name in ('build_release.py', 'render_manual.py', 'verify_package.py', 'package-files.json', 'build-requirements.txt'):
             relative = 'scripts/deployment/' + name

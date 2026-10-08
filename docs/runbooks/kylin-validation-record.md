@@ -24,7 +24,7 @@
 | --- | --- |
 | 基础工具与完整离线包身份、全文件校验 | 未执行 |
 | 离线 RPM 签名与禁用网络源安装 | 未执行 |
-| Python 配置／源码编译、3.9.5、venv、离线 wheel、pip check | 未执行 |
+| Python 配置／源码编译、3.13.16、venv、离线 wheel、pip check | 未执行 |
 | PostgreSQL 配置／源码编译、17.10 | 未执行 |
 | 已安装程序包清单与环境检查 | 未执行 |
 | unit／database／publication／smoke | 未执行 |

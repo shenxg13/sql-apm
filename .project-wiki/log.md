@@ -407,3 +407,9 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 修正精确命中计划和导入验证，统一未来时间窗口的空结果、指纹首尾空白及长文本切分行为。
 相邻引号片段仍拼接的限制保留，正文与来源见[检索主题](features/sql-search-and-views.md#检索与查询层2026-10-07)；
 执行计划与增长方式见[开发说明](../docs/design/sql-search.md#查询计划与累积规模)。
+| 2026-10-08 | 按 [#49](https://github.com/shenxg13/sql-apm/issues/49) 确认项目自行维护 Python，选定 3.13.16，保留被取代的版本决定；开发机先行、目标机验收仍为合并前要求。见[运行约束](decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)、[Unicode 限制](../docs/design/sql-normalization.md#unicode-已知限制)及[升级验证记录](../docs/reports/python313-upgrade-2026-10-08.md)。 |
+| 2026-10-08 | 用户确认 #49 内存峰值改为只记录，保留首次停止证据，其余等价与耗时条件不变；同步[运行决定](decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)。P4 检查范围已在在线 Issue 确认，未执行专项的逐项前提和边界见[升级验证记录](../docs/reports/python313-upgrade-2026-10-08.md)。 |
+| 2026-10-08 | #49 剩余三项续跑完成，九任务总用时条件通过；57 表精确比较在 11 个观察组代表引用上发现差异并停止。记录[既有选择机制与跨库边界](architecture/postgresql-storage.md#观察组代表引用的跨库边界observed2026-10-08)，保留完整失败与只读定位证据，不把等价性处理建议提升为确认。 |
+| 2026-10-08 | 用户确认 #49 仅对观察组代表引用采用三项等价约束，正文见[存储主题](architecture/postgresql-storage.md#观察组代表引用的跨库边界observed2026-10-08)；补正反例并从保留两库重新导出后，57 表比较通过，11 个不同代表均符合约束，原失败记录保留。未重跑任务或修改产品选取逻辑，目标机要求继续保留；证据见[升级报告](../docs/reports/python313-upgrade-2026-10-08.md)。 |
+| 2026-10-08 | #49 目标机初始快照完成离线安装、六个随包入口及默认四进程 119 首批；GCC 7.3.0 首次构建 Python 3.13.16 用时 47.638 秒，首批 CLI 1,013.741 秒、零超时且基准一致。更新[运行事实](decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)及[升级报告](../docs/reports/python313-upgrade-2026-10-08.md#目标机安装measured)，保留原候选和开发机证据；开发机 TCP 认证仍待凭据复制授权。 |
+| 2026-10-08 | 用户明确授权 #49 凭据复制后，开发机 TCP 正确密码只读查询及错误密码拒绝均通过，目标机验收记录完整。同步[运行事实](decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)和[升级报告](../docs/reports/python313-upgrade-2026-10-08.md#目标机安装measured)；未重跑安装或首批，凭据未显示或提交，后续独立评审与合并另行交接。 |

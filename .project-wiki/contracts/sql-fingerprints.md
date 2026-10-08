@@ -4,7 +4,7 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-fingerprints.md
-updated: 2026-10-05
+updated: 2026-10-08
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/33
     status: current
@@ -116,7 +116,7 @@ confidence: high
   这项诊断扩展已同步在线Issue正文，未增加全量性能门槛或改变归一化规则；临时本地
   索引只服务诊断，不代表产品日志导入或持久化缓存已实现。
 - 解析器、哈希算法、占位编码、具体接口及文件划分由实施阶段按上述要求选择和
-  验证，不要求用户逐项决定。依赖遵守 Python 3.9.5 约束；语法支持、Hint 识别或
+  验证，不要求用户逐项决定。依赖遵守[当前 Python 运行约束](../decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)；语法支持、Hint 识别或
   实现限制若会改变已确认范围，仍须先按在线契约的范围变更流程处理。
 
 ### 已确认的观察用近似指纹

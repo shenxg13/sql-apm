@@ -8,17 +8,29 @@
 
 ## 依赖与调用
 
-Python 3.9.5、pglast 7.18；[运行依赖](../../requirements.txt)锁定 CPython 3.9 Linux x86_64
+Python 3.13.16、pglast 7.18；[运行依赖](../../requirements.txt)锁定 CPython 3.13 Linux x86_64
 wheel 摘要。SQLGlot 仅用于旧候选解析实验，不是产品模块依赖。首次在仓库根目录安装：
 
 ```bash
 .venv/bin/python -m pip install --require-hashes -r requirements.txt
 ```
 
-无网络且已有本地 wheel 时可用 `--no-index --find-links var/parser-probe/wheels`。
-本次验证另装于忽略的 `var/normalization-runtime`，命令通过
-`PYTHONPATH=var/normalization-runtime` 使用；这不是正式部署路径。
+无网络且已有本地 cp313 wheel 时可用 `--no-index --find-links var/issue49/downloads/wheels`。
+历史验证使用过忽略目录 `var/normalization-runtime`；当前环境按
+[开发说明](../runbooks/local-development.md)创建，不复用旧解释器的扩展安装目录。
 当前提供仓库内 Python 包与命令，尚未打包发布安装制品。
+
+### Unicode 已知限制
+
+Python 3.9.5 使用 Unicode 13.0.0，3.13.16 使用 15.1.0。产品的 `.lower()`、`.upper()`、
+`.isalpha()`、`.isalnum()`、`.isdigit()`、默认空白裁剪和 Unicode 正则依赖这些属性。
+全码位差分发现 5,535 个码位有操作结果变化，完整清单见
+[机器记录](../reports/data/python313-unicode-delta-2026-10-08.json)。
+55 个固定日志文件的 14,816,626 条非空 SQL 原文字段均不含这些码位，额外扫描其他 CSV
+字段也未命中，见[扫描记录](../reports/data/python313-unicode-scan-2026-10-08.json)。
+这只证明该固定输入不受这些字符属性变化影响，不能外推到未来日志。
+`normalization_id` 不包含解释器版本；今后出现清单中的字符时，新旧解释器可能在相同
+规则标识下处理不同，应保留原文和运行版本供核查，不能假定指纹等价。
 
 ```python
 from sql_apm.sql.normalization import Normalizer

@@ -32,7 +32,7 @@ provisioner requires a CI environment; local setup follows the tool runbook.
 
 ## 函数字典工具
 
-Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
+Python 3.13.16 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
 以下产品检查独立于 Harness，实施／评审时分别运行：
 
 ```bash
@@ -190,6 +190,12 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 先验证覆盖逐行一致再升级。真实输入、私有连接和详细输出均保留本地忽略目录。
 
 ## Kylin 离线演练
+
+Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全码位差分和固定 CSV
+扫描，`verify_python_runtime.py` 在独立新旧程序包上串行运行九任务并按 `python_comparison.py`
+逐表精确比较。`scripts/db/verify_python_comparison.py` 在合成私有库验证比较器反例。
+这些是显式高成本验收入口，不自动加入 Harness；输入、停止条件、内存采样与未完成边界见
+[升级报告](../docs/reports/python313-upgrade-2026-10-08.md)。
 
 [离线部署手册](../docs/runbooks/kylin-offline-deployment.md)与
 [人工验证模板](../docs/runbooks/kylin-validation-record.md)覆盖源码构建、认证、日志传输和九任务核对。

@@ -287,7 +287,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     from importlib.metadata import version
     versions = {name: version(name) for name in PARSERS}
-    if versions != EXPECTED_VERSIONS or platform.python_version() != '3.9.5':
+    if versions != EXPECTED_VERSIONS or platform.python_version() != '3.13.16':
         raise ValueError('probe version contract mismatch')
     from pglast import parser as pg_parser
     started = time.monotonic()

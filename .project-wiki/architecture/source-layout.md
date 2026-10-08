@@ -10,7 +10,7 @@ owners:
   - scripts/db/
   - tests/database/
   - scripts/deployment/
-updated: 2026-10-06
+updated: 2026-10-08
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
@@ -310,7 +310,7 @@ Issue #43 将纯日历判断放在 `sql_apm/baseline/retention.py`，不依赖�
 1. 新模块按职责选择所属子包，先检查现有模块和直接依赖，避免重复抽象。
 2. 仅在对应功能实施时创建目录与文件，新增接口遵循已确认数据契约。
 3. 目录迁移同步内部导入、模块命令、测试、CI、维护文档及受影响的在线契约。
-4. 使用 Python 3.9.5 重跑现有产品回归、字典和覆盖检查，执行 Harness；核对
+4. 使用 Python 3.13.16 重跑现有产品回归、字典和覆盖检查，执行 Harness；核对
    模块搬迁前后字节及规则摘要，保证结构调整不夹带语义变化。
 5. 更新在线 PR 证据；路径或提交变化后的评审使用新的固定提交和契约。
 

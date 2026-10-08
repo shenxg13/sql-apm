@@ -23,10 +23,36 @@ def memory():
                 oom_kills=int(vm['oom_kill']))
 
 
+def process_memory(pid):
+    """Linux RSS sum of this CLI and its descendants; PostgreSQL is separate.
+
+    Shared pages can be counted in multiple processes. A 250ms sample is a
+    sampled peak, not a kernel high-water mark; both runtimes use this method.
+    Exited children may disappear between reads and contribute zero then.
+    """
+    pending, visited, total = [pid], set(), 0
+    while pending:
+        current = pending.pop()
+        if current in visited:
+            continue
+        visited.add(current)
+        try:
+            status = Path('/proc') / str(current) / 'status'
+            for line in status.read_text().splitlines():
+                if line.startswith('VmRSS:'):
+                    total += int(line.split()[1]) * 1024
+            children = Path('/proc') / str(current) / 'task' / str(current) / 'children'
+            pending.extend(int(value) for value in children.read_text().split())
+        except (FileNotFoundError, ProcessLookupError):
+            pass
+    return total
+
+
 def command(app, log, words):
     """Sample host memory every 250ms while the actual delivered CLI runs."""
     initial = memory()
     peak, swap_peak, samples = initial['used_bytes'], initial['swap_used_bytes'], 1
+    process_peak = 0
     tick = time.monotonic()
     with log.open('x') as stream:
         child = subprocess.Popen([sys.executable, '-m', 'sql_apm'] + words, cwd=app,
@@ -36,6 +62,7 @@ def command(app, log, words):
                 current = memory()
                 peak = max(peak, current['used_bytes'])
                 swap_peak = max(swap_peak, current['swap_used_bytes'])
+                process_peak = max(process_peak, process_memory(child.pid))
                 samples += 1
                 time.sleep(0.25)
         finally:
@@ -45,6 +72,8 @@ def command(app, log, words):
     final = memory()
     resources = dict(seconds=round(time.monotonic()-tick, 3), returncode=child.returncode,
         memory_method='host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL',
+        process_peak_rss_bytes=process_peak,
+        process_memory_method='sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL',
         peak_used_bytes=max(peak,final['used_bytes']),peak_swap_used_bytes=max(swap_peak,final['swap_used_bytes']),
         samples=samples,oom_kills=final['oom_kills']-initial['oom_kills'])
     save(log.with_suffix('.resources.json'), resources)

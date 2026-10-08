@@ -91,7 +91,7 @@ Greenplum v6 官方资料补充 4 条明确保留关系 OID 的规则；另有 5
 
 ## 使用和验证
 
-在仓库根目录、Python 3.9.5 环境执行：
+在仓库根目录、Python 3.13.16 环境执行：
 
 ```bash
 .venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.2.json

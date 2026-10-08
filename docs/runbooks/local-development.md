@@ -23,12 +23,13 @@
 
 ## Python 项目环境
 
-项目运行及兼容验证使用精确版本 **Python 3.9.5**，与用户确认的现网版本一致。
-2026-09-25 已从官方源码构建独立解释器至 `var/python-3.9.5/`，并创建 `.venv/`。
-虚拟环境实际版本已核对为 3.9.5，不包含系统 site-packages；系统 Python 保持 3.9.25。
-两个本地目录均由 Git 忽略。
+项目运行及兼容验证目标为精确版本 **Python 3.13.16**，版本由项目自行维护，
+再次变更须另行确认，见[运行约束](../../.project-wiki/decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)。
+从官方源码构建至 `var/python-3.13.16/`，再重建 `.venv/`；不包含系统 site-packages，
+不改动系统 Python。旧解释器保留在 `var/python-3.9.5/` 供 #49 基准运行，
+Issue 关闭后是否删除由用户决定。这些本地目录均由 Git 忽略。
 
-Alma 环境引导工具为 pip 26.0.1、setuptools 82.0.1、wheel 0.48.0、packaging 26.0。
+venv 使用源码自带 ensurepip 引导；Python 3.13.16 源码自带 pip 26.2.1。
 业务依赖 pglast 7.18 和 psycopg2-binary 2.9.10 已在根 requirements.txt 锁定版本与 wheel 摘要。
 Kylin 使用源码内 ensurepip 引导，不要求与 Alma 的包工具版本相同。
 
@@ -45,10 +46,23 @@ python -m pip check
 `venv` 沿用创建它的解释器版本，不能通过创建虚拟环境切换 Python 补丁版本。
 仓库迁移到其他路径或其他机器时应重新创建环境，不要移动现有虚拟环境后继续使用。
 
-bz2、lzma、sqlite3、SSL、时区和多进程等本机功能验证已通过。
-构建依赖、引导工具版本、重建方法及未构建的可选模块见
-[Python 环境验证记录](../reports/python-environment-2026-09-25.md)。
-上述记录属于 Alma 本机；Kylin 的独立源码构建、自检及真实流程按部署手册另行记录。
+bz2、lzma 的开发头文件沿用本地 `var/python-build/deps/include/`，库搜索路径为
+`var/python-build/deps/lib/`，无需安装系统软件。保持默认构建，命令如下：
+
+```bash
+APM_REPO="$PWD"
+cd "$APM_REPO/var/issue49/python-build/Python-3.13.16"
+CPPFLAGS="-I$APM_REPO/var/python-build/deps/include" \
+LDFLAGS="-L$APM_REPO/var/python-build/deps/lib" \
+  ./configure --prefix="$APM_REPO/var/python-3.13.16" --with-ensurepip=install
+make -j4
+make install
+```
+
+以上从仓库根目录开始，在独立源码构建目录执行，不使用系统解释器安装业务依赖。
+旧环境的开发包来源见[历史验证记录](../reports/python-environment-2026-09-25.md)。
+新环境执行 `scripts/deployment/check_environment.py` 核对标准库及依赖；
+Alma 本机验证不能替代 Kylin 的独立源码构建、自检及真实流程。
 正式部署的解释器随项目安装到项目目录，不依赖主机已有的 Python；不得搬运 Alma 的解释器目录。
 
 ## PostgreSQL 项目环境
@@ -61,7 +75,7 @@ Baseline 存储采用 **PostgreSQL 17**，保存执行记录、SQL 指纹和基�
 查询状态、开始时间和锁等待等基础接口。MPP 特有字段需结合现场字段定义
 和脱敏样本验证，再补充真实环境联调；普通 PostgreSQL 测试不代表完整兼容验证。
 
-数据库驱动使用已锁定的 psycopg2-binary 2.9.10，兼容 Python 3.9.5。
+数据库驱动使用已锁定的 psycopg2-binary 2.9.10，使用 CPython 3.13 Linux x86_64 wheel。
 本机 PG17.10 工具位于 /usr/pgsql-17/bin；已有[项目初始化、版本升级与临时实例验证入口](database-initialization.md)，
 初版业务物理结构随之交付。验证使用自动停止／清理的私有临时实例，未部署生产项目实例；
 Kylin 演练从源码离线构建同一 17.10 补丁版本，使用项目目录中的工具路径、专用 postgres

@@ -1,4 +1,4 @@
-# Runtime parser: CPython 3.9 / Linux x86_64; validated on Python 3.9.5.
-pglast==7.18 --hash=sha256:31873776e947e00cbdd8c04ae2e7783d52719d93a45a010796a9c14d69b867c2
-# PostgreSQL writer, CPython 3.9 / Linux x86_64 wheel.
-psycopg2-binary==2.9.10 --hash=sha256:6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648
+# Runtime parser: CPython 3.13 / Linux x86_64; target Python 3.13.16.
+pglast==7.18 --hash=sha256:6c3c4ca0d88e2f5dc9d261a1a718be02426f14758c13b1665c431f756e6e5f1e
+# PostgreSQL writer, CPython 3.13 / Linux x86_64 wheel.
+psycopg2-binary==2.9.10 --hash=sha256:8608c078134f0b3cbd9f89b34bd60a943b23fd33cc5f065e8d5f840061bd0673

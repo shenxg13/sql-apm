@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-07
+updated: 2026-10-08
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/49
+    status: current
   - path: docs/reports/v020-offline-release-2026-10-07.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/45
@@ -63,6 +65,25 @@ confidence: high
 
 ## Contracts
 
+### 项目自行维护 Python 版本（2026-10-08）
+
+来源：[Issue #49](https://github.com/shenxg13/sql-apm/issues/49) 的已确认契约。
+用户提出：“现在的路径……使用我们项目目录自己的python，这样python版本实际上也是由我们自己维护了，
+我在想，有没有必要升级我们项目的python版本”，随后同意独立升级至 3.13，
+并在核对契约后回复“转到planned状态”。2026-10-08 授权“开始实施issue49，目前验证机不可用，可以先实施其他部分”。
+
+版本由项目自行选定和维护，当前选定 **Python 3.13.16**，再次变更须另行确认。
+它取代下文 2026-09-22 的精确 3.9.5 约束，以及 2026-10-02 部署决定中的版本号；
+项目目录内源码构建、隔离 venv、不依赖或改动主机 Python 的方式继续有效。
+默认构建，不启用自由线程或 JIT；pglast 7.18、psycopg2-binary 2.9.10 版本不变，
+使用 cp313 Linux x86_64 wheel；PostgreSQL、规则、指纹算法及数据库结构均不变。
+
+上述是已确认目标，实施与验证状态以在线 Issue 和报告为准。开发机新旧解释器各跑九任务，
+结果精确对比且不设容差；先完成全 Unicode 码位差异及 55 文件真实输入检查。
+旧解释器目录保留到 Issue 关闭，其后是否删除由用户决定。
+目标机不可用期间仅推进开发机部分，裸机安装、随包检查和 119 首批仍为合并前要求。
+本次不发版、不新增版本号，已发布的 v0.2.0 与历史验证材料保持原样。
+
 ### v0.2.0 预发布交付与本轮演练（2026-10-07）
 
 来源：[Issue #45](https://github.com/shenxg13/sql-apm/issues/45) 已确认契约。
@@ -97,6 +118,7 @@ GitHub 自定义附件仍只有程序包和 SHA-256 文件，验收包和完整�
 ### 已确认的 Kylin 演练与项目自带解释器（2026-10-02）
 
 来源：[Issue #31](https://github.com/shenxg13/sql-apm/issues/31) 的已确认契约及范围变更评论。
+本节保留历史决定与实测；其中 3.9.5 版本号已由上文 Issue #49 取代，部署方式继续有效。
 Python 3.9.5 解释器属于正式部署流程，从离线源码包构建并安装在项目目录，
 不依赖主机已有的 Python，也不使用 Alma 构建目录作为可搬运发行包。
 若将来希望改用生产已有解释器路径，另开 follow-up Issue，不恢复此前的路径假设。
@@ -234,8 +256,8 @@ R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包
   `/etc/os-release` 得到 **AlmaLinux 9.8 (Olive Jaguar)**，`uname -m` 得到
   **x86_64**；当时仅由用户提供可联网条件，后续 Python 环境准备已验证官方
   下载源访问及 HTTPS 证书校验，详见下述环境记录。
-- Python **3.9.5**、项目本地 `.venv/` 和 Baseline 存储 **PostgreSQL 17** 的
-  已确认安排不变，不因采用 Alma 而改用系统默认 Python 版本。
+- Python 按上文项目自行维护的版本约束，使用项目本地 `.venv/` 和 Baseline 存储
+  **PostgreSQL 17**，不因采用 Alma 而改用系统默认 Python 版本。
 - 生产环境 **Kylin V10 SP2、完全离线** 作为用户提供的事实记录。其 CPU 架构
   尚未提供，不能由开发机架构推定；相关生产安装细节留待后续专项工作核实。
 - Kylin 离线安装及适配方案由用户后续通过专门 Issue 实施，不作为当前 Alma
@@ -269,12 +291,14 @@ R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包
 
 ### 已确认的 Python 运行约束
 
+本节保留 2026-09-22 的历史决定和随后环境记录；精确版本约束已由上文 Issue #49 取代。
+
 - 确认日期：2026-09-22。
 - 来源：用户在本项目需求讨论中的明确确认，按原话记录：
 
   > 现网的基线是3.9.5，所有服务器都是这个版本，我们后续需要在项目的venv中建立一个3.9.5的环境
 
-- 来源状态：current；这是已确认的环境约束。现网服务器版本为用户提供的事实，
+- 来源状态：historical；这是当时已确认的环境约束。现网服务器版本为用户提供的事实，
   尚未逐台核验。
 - 项目采用 Python，运行及兼容验证目标为精确版本 **3.9.5**。
 - 使用仓库根目录的 `.venv/` 隔离项目依赖，由 Python 3.9.5 解释器创建。
@@ -306,16 +330,17 @@ R1 补齐共享 `$` 的重叠美元标签回退后，从修复提交重新制包
   实例，测试旧版查询状态、开始时间和锁等待等基础接口。
 - 普通 PostgreSQL 的验证不能覆盖 MPP 的特有字段和行为；相关字段映射
   使用现场字段定义及脱敏样本验证，后续补充真实环境联调。
-- Python 仍固定为 3.9.5；数据库驱动需同时满足 Python 兼容约束和对应数据库的
+- Python 遵循上文项目自行维护的版本约束；数据库驱动需同时满足 Python 兼容约束和对应数据库的
   连接要求，具体依赖版本另行验证并锁定。
 
-2026-09-29，#18 锁定 `psycopg2-binary==2.9.10` 的 CPython 3.9 Linux x86_64 wheel，
+历史记录：2026-09-29，#18 锁定 `psycopg2-binary==2.9.10` 的 CPython 3.9 Linux x86_64 wheel，
 SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`。
 该版本提供兼容 Python 3.9 的预编译 libpq 驱动，避免增加本地编译工具链；官方依据见
 [PyPI 文件](https://pypi.org/project/psycopg2-binary/2.9.10/)和
 [2.9.10 发布记录](https://www.psycopg.org/docs/news.html#what-s-new-in-psycopg-2-9-10)。
 实际验证使用 Python 3.9.5 与 PostgreSQL 17.10 私有临时实例；生产部署与 Kylin 离线适配
-仍未完成。驱动只连接 Baseline 存储库，不执行源日志 SQL。
+当时未完成。#49 保持驱动版本，仅更新 cp313 wheel 哈希，以根 requirements.txt 为准。
+驱动只连接 Baseline 存储库，不执行源日志 SQL。
 
 关联条款：[已确认的当前开发环境与生产部署安排](runtime-and-components.md#已确认的当前开发环境与生产部署安排)。
 
@@ -366,7 +391,7 @@ SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`�
 
 | 组件 | 首期职责 |
 | --- | --- |
-| 自研 Python 3.9.5 程序 | 日志解析、SQL 指纹和 Baseline 计算 |
+| 自研 Python 程序（版本见本页运行约束） | 日志解析、SQL 指纹和 Baseline 计算 |
 | PostgreSQL 17 | 保存执行明细、SQL 指纹和基线结果 |
 | Grafana | 直接查询 PostgreSQL，展示基线总览、单条 SQL 历史执行曲线、耗时分布与基线对比 |
 | MPP 现有监控 | 按用户说明继续复用已有的 activity 和数据库运行指标监控 |

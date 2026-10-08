@@ -407,3 +407,4 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 修正精确命中计划和导入验证，统一未来时间窗口的空结果、指纹首尾空白及长文本切分行为。
 相邻引号片段仍拼接的限制保留，正文与来源见[检索主题](features/sql-search-and-views.md#检索与查询层2026-10-07)；
 执行计划与增长方式见[开发说明](../docs/design/sql-search.md#查询计划与累积规模)。
+| 2026-10-08 | 按 [#49](https://github.com/shenxg13/sql-apm/issues/49) 确认项目自行维护 Python，选定 3.13.16，保留被取代的版本决定；开发机先行、目标机验收仍为合并前要求。见[运行约束](decisions/runtime-and-components.md#项目自行维护-python-版本2026-10-08)及[Unicode 限制](../docs/design/sql-normalization.md#unicode-已知限制)。 |

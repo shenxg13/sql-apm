@@ -8,7 +8,7 @@
 
 ## 可调用接口
 
-[sql_apm/sql/approximate.py](../../sql_apm/sql/approximate.py)支持 Python 3.9.5。
+[sql_apm/sql/approximate.py](../../sql_apm/sql/approximate.py)支持 Python 3.13.16。
 `fingerprint` 只依赖标准库；`analyze` 延迟导入现有 MPP 解析器，需要已锁定的 pglast 7.18。
 解析依赖已提升至[运行依赖文件](../../requirements.txt)，旧候选对比另有实验依赖；
 尚未交付安装包或生产部署配置。

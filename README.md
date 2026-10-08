@@ -2,7 +2,7 @@
 
 SQL APM 使用 Python 和 PostgreSQL 构建离线 SQL 基线；当前交付边界见[项目范围](.project-wiki/decisions/project-scope.md)。
 [SQL Baseline 原始资料](.project-wiki/raw/sql-baseline.md)是后续讨论的输入；
-运行环境为 Python 3.9.5 和项目 `.venv/`，
+运行环境为 Python 3.13.16 和项目 `.venv/`，
 Baseline 存储采用 PostgreSQL 17，后续 Grafana 按已确认范围直接查询该库展示基线和 SQL 执行历史。
 首期不引入 Prometheus，复用 MPP 已有监控，平台状态先通过任务记录和日志保留。
 日志首期手动拷贝至基线服务器，不引入流式读取组件；后续通过定时 SCP 每天传输一次。

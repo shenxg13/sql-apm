@@ -15,7 +15,7 @@ from verify_package import verify
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = '6451d140d44f4e06cc34862c3e5aff7593d7afeb'
-PY_SHA = 'e0fbd5b6e1ee242524430dee3c91baf4cbbaba4a72dd1674b90fda87b713c7ab'
+PY_SHA = 'cfac63bddf956deafb1172ca131ae5dcaafd6f95056086e233fca205593ed427'
 PG_SHA = 'e4b43025f32ea3d271be64365d284c8462cffd41d80db0c3df6fc62417a2d9dc'
 PG_URL = 'https://ftp.postgresql.org/pub/source/v17.10/postgresql-17.10.tar.gz'
 
@@ -67,8 +67,8 @@ def main():
         entries.append(dict(path=relative, version=version, source=origin, sha256=checksum,
                             bytes=destination.stat().st_size))
 
-    add(args.python_source, 'sources/Python-3.9.5.tgz', '3.9.5',
-        'https://www.python.org/ftp/python/3.9.5/Python-3.9.5.tgz', PY_SHA)
+    add(args.python_source, 'sources/Python-3.13.16.tgz', '3.13.16',
+        'https://www.python.org/ftp/python/3.13.16/Python-3.13.16.tgz', PY_SHA)
     pg = args.postgres_source
     if pg is None:
         pg = out / 'postgresql-download.tmp'

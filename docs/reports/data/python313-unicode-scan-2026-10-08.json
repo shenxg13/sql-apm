@@ -1,0 +1,510 @@
+{
+  "manifest_sha256": "def3475a99401d0815669f0d2d110ec5f4942e32fca79533cb547c90e3375895",
+  "delta_sha256": "219580b44bdca980de3b0b056a0e086d70e0aa475d62a0d9806b91f1d0c36760",
+  "files": [
+    {
+      "cluster": "119",
+      "sha256": "237b8fe5a5eac889d7f765a23cf571dc7cd8ed9525c12d2a22ecaa0c0d6748c9",
+      "records": 117152,
+      "bytes": 147939173,
+      "sql_rows": 102435,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "3cdf4c040cb5b8d4314ae85139491f35da2ae1e6321dc9f674d5fa6c87328970",
+      "records": 189535,
+      "bytes": 116179145,
+      "sql_rows": 162111,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "90468cc573678d3894877282b15d90f894ec3f2ab8e1c5277e564d4dd8ee6a06",
+      "records": 188238,
+      "bytes": 116282276,
+      "sql_rows": 161024,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "8a99adb8c1015e9183cc22cc0f9fc64b82dfea1a84c365d5c4ee6e3d3fc1587b",
+      "records": 215732,
+      "bytes": 191838741,
+      "sql_rows": 185452,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "0fd4e7e8f6959ef532114854f4a70e2c8f6da35bd30686f8d48c524b6369c047",
+      "records": 202277,
+      "bytes": 150247477,
+      "sql_rows": 173016,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "a8351e2f48568318147d430da6ee051d3505dd71818f3a6f257d35180ae65041",
+      "records": 206678,
+      "bytes": 167933596,
+      "sql_rows": 177125,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "9d0d80fea45f030fa3317930807a8a69b5b5d7bba30e681ea3fe65451e40d409",
+      "records": 205229,
+      "bytes": 158832781,
+      "sql_rows": 175847,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "addd8194894834a321ce94c08200b049c249da3b3860b8d78b5b00eba2c85eff",
+      "records": 203152,
+      "bytes": 143693751,
+      "sql_rows": 173888,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "72a80324e325e418bde02d66d286f844aa02cb58016994c1bc489fff59be32b2",
+      "records": 192913,
+      "bytes": 118325562,
+      "sql_rows": 165671,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "691aa60f82de544aed532088fc9e13b223c19c192ce9feb806ff7b00f5a8f9cc",
+      "records": 190601,
+      "bytes": 116002893,
+      "sql_rows": 163428,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "bc12d7631606187fb0141402a26a30caf9597345b9e47a2481e21119cd90bf2c",
+      "records": 204155,
+      "bytes": 163016278,
+      "sql_rows": 174572,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "e06a3e57679cd285afa5e7ab5d9556b40071d039fb61ce5c08a79805d5726eea",
+      "records": 199881,
+      "bytes": 144909604,
+      "sql_rows": 170835,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "a8787801e05bfa1b0dcd3a0e5685ba8250f012eb0c4bfd7a9f87bdf96c81d8f5",
+      "records": 201547,
+      "bytes": 147642320,
+      "sql_rows": 172328,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "0c8262bc96dd52491427e71fcb136323e374ad95a093ff2acd13b8687071738d",
+      "records": 207207,
+      "bytes": 153670772,
+      "sql_rows": 177909,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "f3e9cc75cf757fa9dab2f682e485792c284467eabfcb5a7594b7dd2ff6d4d6e3",
+      "records": 204907,
+      "bytes": 148633328,
+      "sql_rows": 175489,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "596f7e6378bea7bbde5af191504d546adb76c6033adbb6c1235eec0f876b038b",
+      "records": 187224,
+      "bytes": 114233125,
+      "sql_rows": 160042,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "7ca8becad6cdda595b7960506a9464aa73e5cc0757a562e5bfba061e12de2d7a",
+      "records": 187752,
+      "bytes": 114870764,
+      "sql_rows": 160482,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "d3656130438ecafa0274b43b13d772c5a38c3d0fab7042feffb31b27d0e4b19b",
+      "records": 206209,
+      "bytes": 173200913,
+      "sql_rows": 176330,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "30651e53b9ca302dcb403694d3e400b4c118b516a439d1a9ffb5c1b317ecd91b",
+      "records": 207074,
+      "bytes": 159448460,
+      "sql_rows": 177488,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "d59bd5eb4b21676d9c7f4b36a3c47747a82a3e768624284182dc789105eb5558",
+      "records": 212876,
+      "bytes": 164437354,
+      "sql_rows": 183322,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "b190504ca809afc200434bc6c3fdb640214c697225850bfc1e7d163b144f89c0",
+      "records": 201436,
+      "bytes": 154211029,
+      "sql_rows": 172347,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "a7ef3eba3b26f5cbcc9d109a889f1f45546b071bf9b2969b7b06a05823b73357",
+      "records": 200927,
+      "bytes": 174226350,
+      "sql_rows": 171771,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "d503ead82c9a108c7044216a74cda433678da827e27f4dc06deb1a0e4a947749",
+      "records": 191289,
+      "bytes": 116745476,
+      "sql_rows": 164120,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "6dbe13ca39a53a0b172881fe696dba5d83965e760a710832aceca55ccfa60154",
+      "records": 187195,
+      "bytes": 114340538,
+      "sql_rows": 160030,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "aa4c3c5af5a709911d49800873db27a2448177cef57ef3cd2f1e3fd2c5c6ac47",
+      "records": 207270,
+      "bytes": 191535524,
+      "sql_rows": 177002,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "8fcf4d70c23093b292a85cddd0924563bfbe0c3459104bc143716f759eb82081",
+      "records": 206230,
+      "bytes": 162575016,
+      "sql_rows": 176600,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "bf8f3784b34f3b11afaa942fbafefcf952f57cb4b42cb42bff54fa80fa2eaf8e",
+      "records": 157799,
+      "bytes": 135254466,
+      "sql_rows": 136684,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "88e2570ee869fa6027702d9ad71107e137838aaa81753b34215423bbe4fa8234",
+      "records": 41365,
+      "bytes": 17589465,
+      "sql_rows": 33553,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "c9fe13a9ae28f20170ec571b693e82063da15d7631474d2488c7e28bfbb165b4",
+      "records": 203063,
+      "bytes": 160491551,
+      "sql_rows": 173738,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "119",
+      "sha256": "bd39c77cfac7a603d03cd269048090dbc3b678e40f0e34f000e72e2fe7e1fc39",
+      "records": 201727,
+      "bytes": 164320624,
+      "sql_rows": 172533,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "7637211ed5d2a85952a6d8b77efbb370d53e3a3ccc94ada577678c8f29eb20db",
+      "records": 668674,
+      "bytes": 529475791,
+      "sql_rows": 620609,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "8210741a0a6c174e4daef192a748f0f35cf2a29dc0abc9f1dcc72a55ef285f25",
+      "records": 183401,
+      "bytes": 526755139,
+      "sql_rows": 175422,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "91285a731f21cca24e3634be3eecaf8c915dbb310473ac067742f499f76c5603",
+      "records": 594218,
+      "bytes": 528150833,
+      "sql_rows": 552457,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "4951fe869607d30300a769d32480d647b4dd13780a9c914f1338f6376ac1c560",
+      "records": 163273,
+      "bytes": 124666079,
+      "sql_rows": 148551,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "890505ac82d6b1b6cf21ca756796d4f463e53735c741146377b8dfec6f84ddc6",
+      "records": 688482,
+      "bytes": 524732770,
+      "sql_rows": 661210,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "6dba60e5bf29a498ecc80f7b109af3408ce40b443e1b84e54262e63f84bc9e7d",
+      "records": 196968,
+      "bytes": 525793242,
+      "sql_rows": 189612,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "f3171ea36c87fec1bdec194927948f136b7ee02dfb896336f69f1587b0496b12",
+      "records": 619381,
+      "bytes": 524770216,
+      "sql_rows": 576655,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "0f3de2f89abe906fea23f849390ea55279f9af299020a46575894a1b7ba2d1e6",
+      "records": 517573,
+      "bytes": 373615414,
+      "sql_rows": 479388,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "b4716eba07d4440f78a896bfd356c146358ffc921c65ed5209f073f5b2dc6a19",
+      "records": 519178,
+      "bytes": 524439546,
+      "sql_rows": 474298,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "390df0cc11a0bcfee65e72b8175ebc98be2ed5c424108bfbb8133ac51d056c3c",
+      "records": 178287,
+      "bytes": 527328017,
+      "sql_rows": 170079,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "387d41e98567013cff091171a3f583aca4909785f89f8a1aed715e95c1845451",
+      "records": 587981,
+      "bytes": 525499344,
+      "sql_rows": 544835,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "965cb9f643f0a4780464964812e7bfe60a175524977e82755648ade1b8cc209d",
+      "records": 214498,
+      "bytes": 161216033,
+      "sql_rows": 195188,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "eb359163f0408f5a1bdf8b3188ef589399fce4f7c7dfebd014c60e60a13a57d2",
+      "records": 790132,
+      "bytes": 524322867,
+      "sql_rows": 739767,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "22679be64278796011410abd1f9bd1490078f08391d04a6290d7e4a4a3a81277",
+      "records": 237515,
+      "bytes": 527561226,
+      "sql_rows": 226850,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "ef64b490933002d1bbb5ee980647289423aae84bf8167777d328952785f950b9",
+      "records": 560928,
+      "bytes": 568743370,
+      "sql_rows": 518257,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "f159b5e17c152b434a5b58d7b703f50eb974eb3d9ad79c8c19bf6cd72ea2ebc5",
+      "records": 9640,
+      "bytes": 5131812,
+      "sql_rows": 8332,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "3f727a1861065e67e6d2d4061cbc54c6fabed59ec824622f668f6e72b28da8e1",
+      "records": 477828,
+      "bytes": 379521071,
+      "sql_rows": 430441,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "8e74410a23a94766a98af0a40f3b694c4d45c14a51d3225186ba8f030bcbe4d9",
+      "records": 172718,
+      "bytes": 525321293,
+      "sql_rows": 164238,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "42b8093a1b4ceddae68f52cb5efd4c37f1f81c5d82bba609957be5befdc06eae",
+      "records": 572926,
+      "bytes": 531873447,
+      "sql_rows": 532308,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "40409bc24cf85f7f284654d398c87a654d6bbd692f2ae21af0bae4d19756fe47",
+      "records": 585845,
+      "bytes": 418231488,
+      "sql_rows": 533675,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "d031bdae3ef6be951cb2efc5a1aeda30f7389d1b1842268fcf39fba316590d55",
+      "records": 219815,
+      "bytes": 526404305,
+      "sql_rows": 208328,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "cc1c46ccbc4b28b36f696e2abc6890f1ee59f17e1fe890af2d5415168d32e426",
+      "records": 513403,
+      "bytes": 549603512,
+      "sql_rows": 476463,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "5c863903abfe9d3787faaf7a043233c6524312172d74cb19215554f500c81ec2",
+      "records": 594390,
+      "bytes": 446859529,
+      "sql_rows": 541938,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "04458f051353c037c8c84305d9222c2b3793bd02936153841129017a532c54c9",
+      "records": 226034,
+      "bytes": 526720979,
+      "sql_rows": 213203,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    },
+    {
+      "cluster": "120",
+      "sha256": "bd4ae5e017992f6f8cef88b4f462b787c0f1312c0da1241a0510836da1c99215",
+      "records": 568418,
+      "bytes": 586828138,
+      "sql_rows": 527350,
+      "sql_affected_rows": 0,
+      "other_affected_rows": 0
+    }
+  ],
+  "sql_rows": 14816626,
+  "sql_affected_rows": 0,
+  "other_affected_rows": 0,
+  "sql_codepoints": {},
+  "other_codepoints": {},
+  "complete": true,
+  "passed": true,
+  "published_delta_sha256": "245b2cf13ccfeaecc7303467b343a609431bf701c8e04d59d528bdc4858f541a",
+  "published_delta_equivalent": true
+}

@@ -229,14 +229,16 @@ cd "$APM_APP"
   --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
 ```
 
-再运行 smoke；合成清理入口在第 12 节空闲时运行。
+再运行 smoke 和 search；合成清理入口在第 12 节空闲时运行。
 
 ```bash
 .venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
   --pg-bin "$APM_PG_BIN" smoke > "$APM_ROOT/records/verify-smoke.log" 2>&1
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  --pg-bin "$APM_PG_BIN" search > "$APM_ROOT/records/verify-search.log" 2>&1
 ```
 
-预期：PG17.10，各入口退出 0；普通测试 72 项、数据库验证 276 个 PASS、发布检查 33 项、smoke 通过。
+预期：PG17.10，各入口退出 0；普通测试 74 项、数据库验证 277 个 PASS、发布检查 33 项、smoke 和 search 通过。
 合成清理检查 23 项；实际项数及输出摘要保存在机器记录。
 开头 APPLICATION 应指向 APM_APP，不能只检查输出文件存在。测试在 verification 中，
 核心代码从 app 加载；数据库检查各自创建禁用 TCP 的私有临时实例，退出后停止清理，

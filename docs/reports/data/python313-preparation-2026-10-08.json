@@ -1,0 +1,219 @@
+{
+  "format": "python-runtime-upgrade/1",
+  "evidence": "measured",
+  "date": "2026-10-08",
+  "base_commit": "6d74a949ef6bae0f5ab21b109ec075e5ddb11f11",
+  "candidate_commit": "3acf30484e96f9938ede3a8e7fe693b4a2c879e4",
+  "python_source_sha256": "cfac63bddf956deafb1172ca131ae5dcaafd6f95056086e233fca205593ed427",
+  "environment": {
+    "passed": true,
+    "python": "3.13.16",
+    "modules": [
+      "ssl",
+      "_ssl",
+      "hashlib",
+      "_hashlib",
+      "bz2",
+      "lzma",
+      "zlib",
+      "sqlite3",
+      "ctypes",
+      "readline",
+      "decimal",
+      "uuid",
+      "zoneinfo",
+      "multiprocessing",
+      "pglast",
+      "psycopg2"
+    ],
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026",
+    "sqlite": "3.34.1",
+    "network_checks": false
+  },
+  "normalization_id": "N:f23687fc078493779805508ea7db4713a586b1da575cf3460e1a2bd55ffceae0",
+  "program_product_changed_paths": [
+    "requirements.txt"
+  ],
+  "archives": {
+    "sql-apm-v0.2.0.tar.gz": {
+      "sha256": "19ec568cb03b9b0c4f537311f9a48c94f966966e48d0daf2b33c790a46095c99",
+      "bytes": 289433,
+      "reproducible": true
+    },
+    "sql-apm-verification-v0.2.0.tar.gz": {
+      "sha256": "405ff60ba5f9cb866b7393eb90ca7f4cbc1e1eb4f95c2949aa4041efd9fc67e5",
+      "bytes": 269292,
+      "reproducible": true
+    }
+  },
+  "offline_bundle": {
+    "commit": "3acf30484e96f9938ede3a8e7fe693b4a2c879e4",
+    "sha256": "0d25ad7bf4f17e1d82a03351a30922468495681c15484785328fb40753760c0b",
+    "bytes": 488258554,
+    "files": 417,
+    "reproducible": true,
+    "python_sources": [
+      "sources/Python-3.13.16.tgz"
+    ],
+    "wheels": [
+      "wheels/pglast-7.18-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "wheels/psycopg2_binary-2.9.10-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+    ]
+  },
+  "checks": {
+    "unit": 74,
+    "deployment": 30,
+    "ingestion": 125,
+    "training": 300,
+    "statistics": 32,
+    "observations": 11,
+    "publication": 33,
+    "cleanup": 23,
+    "schema_and_migrations": "passed",
+    "search": "passed",
+    "mpp_naming": "passed",
+    "window": "passed",
+    "comparison_synthetic": {
+      "tables": 57,
+      "independent_runs": 2,
+      "negative_cases": 4
+    },
+    "offline_harness": "passed",
+    "live_pr_contract": "passed",
+    "statistics_after_resource_fix": "passed",
+    "packaged_warnings": 0
+  },
+  "target_validation": "not_run; unavailable per user",
+  "nine_task_comparison": "old nine tasks and 57-table export complete; new replay running",
+  "existing_db_verifiers": [
+    {
+      "path": "scripts/db/verify.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_approximate.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_cleanup.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_cleanup_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_coverage_migration_full.py",
+      "status": "not_run",
+      "boundary": "Historical 1.5.0 to 1.6.0 full migration; scripts/README.md requires frozen Issue #29 source."
+    },
+    {
+      "path": "scripts/db/verify_ingestion.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_ingestion_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_mpp_naming_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_observations.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_observations_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_publication.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_publication_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_scanning_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_search.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_search_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_search_plans.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_statistics.py",
+      "status": "passed",
+      "boundary": "32 checks passed again after closing exited child stdout."
+    },
+    {
+      "path": "scripts/db/verify_statistics_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_training.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_training_aliases.py",
+      "status": "helper_without_entrypoint",
+      "boundary": "Imported by verify_training_full.py --compare-aliases; not a standalone check."
+    },
+    {
+      "path": "scripts/db/verify_training_category_delta.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_training_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_window.py",
+      "status": "passed"
+    },
+    {
+      "path": "scripts/db/verify_window_full.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    },
+    {
+      "path": "scripts/db/verify_window_replay.py",
+      "status": "not_run",
+      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+    }
+  ],
+  "packaged_entrypoints": {
+    "unit": "passed",
+    "database": "passed",
+    "publication": "passed",
+    "smoke": "passed",
+    "cleanup": "passed",
+    "search": "passed"
+  }
+}

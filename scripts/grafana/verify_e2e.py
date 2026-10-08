@@ -224,8 +224,16 @@ class Browser:
         self.page.get_by_test_id('data-testid radio-button-option ' + mode).click(force=True)
         self.results.clear()
         del self.services[:]
+        before = self.page.url
         self.page.get_by_test_id(SUBMIT).click()
         self.settle(1500)
+        # A slow search is still running after the page looked idle: wait for both panels.
+        if self.page.url != before:
+            wanted = [('mpp-search', 'panel ' + str(self.env.panel('mpp-search.json', title)['id']), 'A') for title in ('这次检索', '结果')]
+            for _ in range(600):
+                if all(key in self.results or key in [failed for failed, _ in self.failures] for key in wanted):
+                    break
+                self.page.wait_for_timeout(200)
 
     def close(self):
         self.browser.close()

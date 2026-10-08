@@ -241,7 +241,7 @@ def timing(args):
         start(directory, args.pg_bin)
     owner, reader = connection(directory), connection(directory, 'sql_apm_ro')
     _, norm = rules(owner)
-    settings = dict(fetch(owner, "SELECT name,setting||coalesce(unit,'') FROM pg_settings WHERE name IN ('shared_buffers','work_mem','max_parallel_workers_per_gather','max_worker_processes')"))
+    settings = dict(fetch(owner, "SELECT name,current_setting(name) FROM pg_settings WHERE name IN ('shared_buffers','work_mem','max_parallel_workers_per_gather','max_worker_processes')"))
     sizes = fetch(owner, "SELECT (SELECT count(*) FROM mpp_occurrence),(SELECT count(*) FROM mpp_sql_text),(SELECT count(*) FROM mpp_statistic),pg_database_size(current_database())")[0]
 
     def measure(label, statement, values, repeats=3):

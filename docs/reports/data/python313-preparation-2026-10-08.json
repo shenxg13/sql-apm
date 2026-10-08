@@ -81,10 +81,11 @@
     "offline_harness": "passed",
     "live_pr_contract": "passed",
     "statistics_after_resource_fix": "passed",
-    "packaged_warnings": 0
+    "packaged_warnings": 0,
+    "deployment_after_tar_filter_fix": 30
   },
   "target_validation": "not_run; unavailable per user",
-  "nine_task_comparison": "old nine tasks and 57-table export complete; new replay running",
+  "nine_task_comparison": "stopped_by_contract",
   "existing_db_verifiers": [
     {
       "path": "scripts/db/verify.py",
@@ -102,7 +103,7 @@
     {
       "path": "scripts/db/verify_cleanup_full.py",
       "status": "not_run",
-      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+      "boundary": "Historical 1.8.0 to 1.9.0 full-copy migration; current initializer also applies 1.10.0, while this historical preservation comparison does not omit the newly added mpp_sql_text.search_text column. Not executed or labeled passed."
     },
     {
       "path": "scripts/db/verify_coverage_migration_full.py",
@@ -157,7 +158,7 @@
     {
       "path": "scripts/db/verify_search_full.py",
       "status": "not_run",
-      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+      "boundary": "Prepare/audit require a stopped pre-1.10.0 database copy; a fresh 1.10.0 nine-task database cannot substitute for that migration precondition. Not separately executed."
     },
     {
       "path": "scripts/db/verify_search_plans.py",
@@ -186,7 +187,25 @@
     {
       "path": "scripts/db/verify_training_category_delta.py",
       "status": "not_run",
-      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+      "boundary": "Historical category v1/v2 replay requires parser dependency bytes equal to b0cc66a; current mpp_parser.py fails that source precondition. Script not executed.",
+      "source_preconditions": [
+        {
+          "path": "sql_apm/sql/lexical.py",
+          "reference_commit": "b0cc66a495e27b071d25a171c9f517f095841658",
+          "required_equal": true,
+          "observed_equal": true,
+          "reference_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f",
+          "current_sha256": "65ee73408cb60f439a16a167d81bc3dc84339922e59a4d10f397259bc329314f"
+        },
+        {
+          "path": "sql_apm/sql/mpp_parser.py",
+          "reference_commit": "b0cc66a495e27b071d25a171c9f517f095841658",
+          "required_equal": true,
+          "observed_equal": false,
+          "reference_sha256": "ec3f2fcf9593c35db5cfc4aebe00817733bdf1a78de42548426106002b806f39",
+          "current_sha256": "ed8499a082d3db071a45959cc17a643ceae73f01fd16394a7012b442ea672339"
+        }
+      ]
     },
     {
       "path": "scripts/db/verify_training_full.py",
@@ -200,12 +219,12 @@
     {
       "path": "scripts/db/verify_window_full.py",
       "status": "not_run",
-      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+      "boundary": "Historical pre-window reference and current candidate must be selected explicitly for the paired nine-task/daily-window comparison. Not separately executed."
     },
     {
       "path": "scripts/db/verify_window_replay.py",
       "status": "not_run",
-      "boundary": "Explicit full-data or historical scenario; not covered by the completed synthetic checks."
+      "boundary": "Historical pre-window reference and current candidate must be selected explicitly for the paired nine-task/daily-window comparison. Not separately executed."
     }
   ],
   "packaged_entrypoints": {
@@ -215,5 +234,6 @@
     "smoke": "passed",
     "cleanup": "passed",
     "search": "passed"
-  }
+  },
+  "published_v020_unchanged": true
 }

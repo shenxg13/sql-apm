@@ -84,6 +84,10 @@ confidence: high
 [2026-10-08 已确认决定](https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090)
 将本次升级的内存峰值改为逐任务记录，不再作为停止条件；业务等价、零超时及总用时条件不变。
 这不改变归一化工作进程的 512 MiB 地址空间上限，也不是对其他任务设定通用资源政策。
+随后用户对观察组代表引用的验收建议回复“采纳实施方建议”；
+[#49 的确认](https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6056030974)
+仅为该列定义严格等价规则，其他列和表继续精确比较，不修改产品选取逻辑。
+完整三项约束及边界由[存储主题](../architecture/postgresql-storage.md#观察组代表引用的跨库边界observed2026-10-08)维护。
 实际构建、资源测量及未完成边界见[升级验证记录](../../docs/reports/python313-upgrade-2026-10-08.md)，
 已确认的版本选择不等同于全部环境验收已经通过。
 旧解释器目录保留到 Issue 关闭，其后是否删除由用户决定。

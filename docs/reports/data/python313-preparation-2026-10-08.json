@@ -74,19 +74,45 @@
     "mpp_naming": "passed",
     "window": "passed",
     "comparison_synthetic": {
+      "passed": true,
       "tables": 57,
       "independent_runs": 2,
-      "negative_cases": 4
+      "negative_cases": 4,
+      "representative_negative_cases": [
+        "missing",
+        "unavailable",
+        "rule",
+        "value",
+        "scope",
+        "profile",
+        "database",
+        "user",
+        "timing",
+        "no_event",
+        "other_group_event",
+        "different_diagnostics",
+        "different_replacements",
+        "other_group_column",
+        "event_reference_remains_exact"
+      ],
+      "representative_positive_cases": [
+        "different_equivalent_source",
+        "unknown_timing"
+      ]
     },
     "offline_harness": "passed",
     "live_pr_contract": "passed",
     "statistics_after_resource_fix": "passed",
     "packaged_warnings": 0,
     "deployment_after_tar_filter_fix": 30,
-    "runtime_contract": 6
+    "runtime_contract": 8,
+    "comparison_synthetic_log_sha256": "2fd9cc271b2d26a5aeb8c796bc063d3393ab50842a766a17211078f928f562f9",
+    "runtime_contract_log_sha256": "322e9bec5d6bbde47d6476008f309469c1e42048ed96320a3bae52af8811e27a",
+    "comparison_test_environment_note": "Initial read-only-transaction trial rejected CREATE TEMP TABLE AS; retained log, then used original temporary-table write/rollback method. Product tables only SELECTed.",
+    "comparison_initial_readonly_trial_log_sha256": "6ac1c33f96cadee739834ca0d42d4b50ce4a8b5c2e1d248121d0ecb81e172f0c"
   },
   "target_validation": "not_run; unavailable per user",
-  "nine_task_comparison": "stopped_by_contract",
+  "nine_task_comparison": "passed_under_confirmed_representative_equivalence",
   "existing_db_verifiers": [
     {
       "path": "scripts/db/verify.py",
@@ -269,5 +295,7 @@
   "published_v020_unchanged": true,
   "P4_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054215812",
   "P4_passed": true,
-  "memory_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090"
+  "memory_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090",
+  "representative_scope_decision": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6056030974",
+  "P6_passed": true
 }

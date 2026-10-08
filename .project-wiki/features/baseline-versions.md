@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/baseline-versions.md
-updated: 2026-10-06
+updated: 2026-10-07
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/47
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/35
@@ -119,8 +121,8 @@ confidence: high
   相应统计与构建信息，不重复复制执行明细或 SQL 原文。
 - 本条要求按新规则生成下一次构建的新版本，不要求自动重算全部历史窗口或
   改写历史版本；因事后补录故障／维护时段而追溯重算的流程继续暂缓。
-- 具体版本标识、规则保存方式、原文与各版本指纹的关联、历史版本检索衔接及
-  构建性能仍待实施前落实和验证；此处不选定表结构或迁移方案。函数名单及
+- 具体版本标识、规则保存和原文关联已由后续存储实现；历史版本检索衔接由
+  2026-10-07 的 #47 明确，见下节。构建性能按各次实测解释；此处不另选迁移方案。函数名单及
   逐参数规则继续在既有 Issue 中细化，该 Issue 不扩展为基线重建器的交付任务。
 
 关联条款：[首版函数参数归一化字典的后续维护](../contracts/sql-fingerprints.md#首版函数参数归一化字典的后续维护)；[已确认的 SQL 原文存储方式](../contracts/sql-storage.md#已确认的-sql-原文存储方式)。
@@ -395,6 +397,15 @@ cleanup --execute 是第六种占用集群的写入入口，与五种构建／�
 及忙时拒绝都保留任务，status 的最近任务可见。移除统计和标记原子完成，分组关联
 收尾中断后重跑继续。残留任务仍须在数据库会话退出、下次成功取得占用后记为中断。
 无自动清理、恢复已清理结果、单个构建删除或旧版本回退命令。
+
+### 历史版本检索衔接（2026-10-07）
+
+[Issue #47](https://github.com/shenxg13/sql-apm/issues/47) 已确认并实现：基线默认当前已生效版本，
+用 build_id 选择保留的已发布历史版本，不重算也不切换当前指针。规则不同和已清理版本仍列出，
+分别标明 rules_match=false 和 results_cleaned=true，不能选作此次检索参照。
+SQL始终按当前安装的归一化规则检索；原文尚无当前规则结果时提示历史缺失份数。
+本次不改变指纹生成方式；将来首次更新字典／指纹算法的任务须覆盖全部保留原文补算，避免历史不可达。
+查询字段与守卫见[检索说明](../../docs/design/sql-search.md)。
 
 ## Workflows
 

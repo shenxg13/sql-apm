@@ -4,8 +4,10 @@ type: contract
 status: active
 owners:
   - .project-wiki/contracts/sql-storage.md
-updated: 2026-10-06
+updated: 2026-10-07
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/47
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/35
@@ -193,6 +195,15 @@ confidence: high
 真实副本实测以[验收报告](../../docs/reports/result-retention-2026-10-06.md)为准；
 120 三十天单版本 16–18 GiB 是按 1.6.0 删除覆盖表后的比例折算，仍是 inferred，
 不是实测，不能以此替代生产首批的预览空间校准。
+
+### 原文检索预处理列（2026-10-07）
+
+[Issue #47](https://github.com/shenxg13/sql-apm/issues/47) 明确授权新增 `mpp_sql_text.search_text` 存储生成列：
+只做ASCII小写和六类ASCII空白删除，原文字节／摘要及精确去重规则不变，导入仍写原有字段。
+该列由数据库在新写入和带数据升级时生成，不产生另一套SQL身份；模糊候选最终归入当前结构指纹。
+结构1.10.0不新增表、扩展或其他表列／约束；原文与执行明细保留期限仍待定。
+检索契约见[主题](../features/sql-search-and-views.md#检索与查询层2026-10-07)，
+函数及升级责任见[开发说明](../../docs/design/sql-search.md)。
 
 ## Workflows
 

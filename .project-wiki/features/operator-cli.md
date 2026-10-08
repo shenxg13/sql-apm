@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-06
+updated: 2026-10-07
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/47
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/41
@@ -169,6 +171,15 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 月份；full／rebuild 均不执行清理。具体示例、等待和恢复见
 [操作说明](../../docs/runbooks/build-publication.md#版本结果清理)，配置校验见
 [训练配置](../../docs/runbooks/training-decisions.md#结果保留配置)。
+
+### 检索与详情命令（2026-10-07）
+
+[Issue #47](https://github.com/shenxg13/sql-apm/issues/47) 实现 `python -m sql_apm search`：
+`find` 为文本／完整指纹入口，`exact --sql/--file` 为完整SQL或批次，`baseline` 为摘要或指定层次／版本，
+`executions` 为明细／翻页或小时／天汇总，`versions` 列可见版本，`text --sql-id` 按需取原文。
+全部输出JSON，不写任务或回填指纹；环境连接沿用SQL_APM_DSN。
+字段、参数及退出码由[开发说明](../../docs/design/sql-search.md)维护；匹配和展示规则见
+[检索主题](sql-search-and-views.md#检索与查询层2026-10-07)。用户试用另有步骤，Grafana待后续交付。
 
 ## Workflows
 

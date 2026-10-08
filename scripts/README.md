@@ -55,7 +55,7 @@ Python 3.9.5 环境及准备步骤见[本地开发说明](../docs/runbooks/local
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0；1.7.0／1.8.0 可带数据升级且不回填，更早非空库须重建。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0 → 1.10.0；1.7.0／1.8.0／1.9.0 可带数据升级且不回填，更早非空库须重建。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
@@ -212,7 +212,7 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `verify_mpp_naming.py` 在合成私有 PG17 实例核对新标识并检查等价比较器对统计变化的敏感性。
 `verify_mpp_naming_full.py` 显式重导固定 55 文件，以文件摘要／记录定位核对所有分组成员
 及五层全部指标；运行方法和资源边界见[验收报告](../docs/reports/mpp-naming-2026-10-05.md)。
-当前结构为 1.9.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
+当前结构为 1.10.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
 验证至 1.6.0，不支持已有数据进入新标识上下文。历史 `verify_coverage_migration_full.py`
 须从 #29 对应提交运行，不能用当前初始化器对含数据旧库执行升级。
 
@@ -248,3 +248,18 @@ SQLGlot 仍仅用于候选实验。生产原文和缓存留在
 `guide_examples.py` 执行单项配置示例，`cleanup_rehearsal.py` 验证自然／模拟日期清理。
 后两个入口仅对明确指定的专用演练库运行，参数及操作顺序见[部署手册](../docs/runbooks/kylin-offline-deployment.md)。
 高成本真实验收不自动加入 Harness。
+
+## SQL检索与查询层
+
+`verify_search_plans.py --directory PRIVATE_COPY` 对已升级、已停止的专用全量副本核对嵌套执行计划，
+补测稀疏／密集结构、20条语句完整命令和长输入切分；原始SQL与计划仅留在该私有目录。
+它需要副本内 `apm_test_admin` 诊断身份加载 PG17 自带 `auto_explain`，不新增扩展，
+不用于生产库；耗时与其他全量验证串行测量，避免并发互相干扰。
+
+`python -m sql_apm search find/exact/baseline/executions/versions/text` 输出JSON，使用数据库查询积木。
+[开发说明](../docs/design/sql-search.md)定义函数、字段与并发行为；
+[试用步骤](../docs/runbooks/sql-search-trial.md)提供用户自选输入及可复制命令。
+`verify_search.py` 自动创建私有PG17做合成验收，`verify.py` 包含1.9.0带数据升级；
+`verify_search_full.py prepare/audit` 显式复制关闭的真实库、逐表摘要对照并做独立查询和冷／热测量。
+`prepare_search_trial.py` 只读准备本地例子和前后行数快照。全量验证不自动加入Harness；
+真实SQL和身份保留忽略目录。新增查询验收通过独立随包入口 `run_verification.py search` 执行。

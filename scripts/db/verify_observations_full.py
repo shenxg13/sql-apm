@@ -140,7 +140,7 @@ def validate(dsn,output):
     training=TrainingStore(dsn);store=StatisticsStore(dsn)
     Baseline,baseline_sha=frozen_store();baseline=Baseline(dsn)
     imported=json.loads((output/'import-report.json').read_text())
-    report=dict(schema_version='1.9.0',method='measured; private PG17; 55-file fresh import',clusters={},
+    report=dict(schema_version='1.10.0',method='measured; private PG17; 55-file fresh import',clusters={},
         input_manifest_sha256=imported['manifest_sha256'],input_files=sum(len(r['files']) for r in imported['first_runs']),
         import_seconds=imported['import_seconds'],baseline_ref=BASELINE_REF,baseline_statistics_sha256=baseline_sha,
         decision_version=DECISION_VERSION,normalization_context=training.context)

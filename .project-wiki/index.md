@@ -20,7 +20,7 @@
 | [统计指标、训练窗口与样本门槛](contracts/baseline-statistics.md) | 实现聚合、统计公式、窗口或样本不足判断时阅读。 |
 | [基线构建、版本与发布](features/baseline-versions.md) | 实现构建、规则更新、任务串行、失败重试或版本发布时阅读。 |
 | [命令行与本地配置操作](features/operator-cli.md) | 设计导入、构建、状态或诊断命令及本地配置时阅读。 |
-| [SQL 检索、Grafana 与历史展示](features/sql-search-and-views.md) | 实现 SQL 检索、基线／历史展示，或讨论后续 activity 参照时阅读。 |
+| [SQL 检索、Grafana 与历史展示](features/sql-search-and-views.md) | 实现模糊／精确检索、查询积木、基线／历史展示，或讨论后续 activity 参照时阅读。 |
 
 ## 流程、操作与来源
 

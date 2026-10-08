@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.9.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.10.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.9.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.10.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -374,3 +374,10 @@ mpp_read_statistics 用于传入 group_id 的单组读取；不传分组时会�
 不改字节。旧迁移的 schema.sql 相对引用在临时目录绑定到对应版本，临时源 catalog 使用
 savepoint 回滚释放锁；实际连续升级保持单事务。清理中断、互斥、升级、真实副本及成本
 证据由[验证报告](../reports/result-retention-2026-10-06.md)维护。
+
+## 1.10.0 检索查询层
+
+新增 `mpp_sql_text.search_text` 存储生成列，只折叠ASCII大小写及六类空白，原文和导入字段不变。
+新增查询函数，没有新表／扩展／其他表列约束；稳定名称、列和调用方式见[检索开发说明](sql-search.md)。
+1.9.0 DDL冻结；带数据升级重写原文表，保留旧列数据和版本回执。版本排序采用数字语义，
+更早版本沿既有链升级。用户查询文档本次仍为v0.2.0／1.9.0，不作为当前DDL的完整说明。

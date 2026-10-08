@@ -392,3 +392,18 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 结果与适用基准一致，当前结果在旧月份删除前后精确不变。结束时保留模拟日期并暂停时间同步；
 适用边界见[运行环境主题](decisions/runtime-and-components.md)，测量和包身份见
 [验证报告](../docs/reports/v020-offline-release-2026-10-07.md)。用户文档检查、独立评审与发布仍按在线契约执行。
+
+## 2026-10-07：SQL检索与数据库查询层（Issue #47）
+
+按已确认契约实现[文本／精确检索与详情](features/sql-search-and-views.md#检索与查询层2026-10-07)、
+[历史版本衔接](features/baseline-versions.md#历史版本检索衔接2026-10-07)、
+[JSON命令](features/operator-cli.md#检索与详情命令2026-10-07)及
+[1.10.0查询结构](architecture/postgresql-storage.md#检索查询结构11002026-10-07)。
+原文存储新增数据库生成的预处理列，候选文本匹配不改变结构身份；用户试用与独立评审按在线契约交接。
+
+## 2026-10-08：SQL检索 R1 整改约定（Issue #47）
+
+按维护者[逐项决定](https://github.com/shenxg13/sql-apm/issues/47#issuecomment-6041514525)，
+修正精确命中计划和导入验证，统一未来时间窗口的空结果、指纹首尾空白及长文本切分行为。
+相邻引号片段仍拼接的限制保留，正文与来源见[检索主题](features/sql-search-and-views.md#检索与查询层2026-10-07)；
+执行计划与增长方式见[开发说明](../docs/design/sql-search.md#查询计划与累积规模)。

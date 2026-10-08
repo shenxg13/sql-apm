@@ -50,9 +50,11 @@ def unit():
             sys.modules[qualified] = module
             spec.loader.exec_module(module)
     suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'))
-    if suite.countTestCases() != 72:
-        raise ValueError('MPP verification kit must retain all 72 ordinary tests')
+    if suite.countTestCases() != 74:
+        raise ValueError('MPP verification kit must retain all 74 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if result.skipped:
+        raise ValueError('product verification must execute every ordinary test without skips')
     return 0 if result.wasSuccessful() else 1
 
 
@@ -100,7 +102,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root', type=Path, required=True)
     parser.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
-    parser.add_argument('check', choices=['unit', 'database', 'publication', 'smoke', 'cleanup'])
+    parser.add_argument('check', choices=['unit', 'database', 'publication', 'smoke', 'cleanup', 'search'])
     args = parser.parse_args()
     app = setup(args.app_root)
     if args.check == 'unit':
@@ -109,7 +111,7 @@ def main():
         smoke(app, args.pg_bin)
     else:
         name = {'database': 'verify.py', 'publication': 'verify_publication.py',
-                'cleanup': 'verify_cleanup.py'}[args.check]
+                'cleanup': 'verify_cleanup.py', 'search': 'verify_search.py'}[args.check]
         path = RESOURCES / 'scripts/db' / name
         sys.argv = [str(path), '--pg-bin', str(args.pg_bin)]
         runpy.run_path(str(path), run_name='__main__')

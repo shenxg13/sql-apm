@@ -55,6 +55,61 @@ COMMON = {'task_id': 'task', 'busy_task_id': 'task', 'build_id': 'build', 'previ
           'final_attempt_id': 'attempt', 'duplicate_of': 'attempt', 'sql_id': 'sql',
           'fingerprint_id': 'fingerprint', 'result_id': 'approximate_result', 'problem_id': 'problem'}
 
+REPRESENTATIVE_CONTRACT = {
+    'version': 'observation-representative/1',
+    'decision': 'https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6056030974',
+    'column': 'mpp_observation_group.result_id',
+    'comparison': 'complete referenced result except result_id and input_id',
+    'candidates': 'distinct available results linked to stored events with the same scope, profile, database, execution_user, rule, approximate value and timing type; NULL event timing means unknown',
+    'boundary': 'stored same-dimension events, not reconstruction of the first build candidate set',
+}
+
+
+def observation_references(db):
+    """Validate every representative before permitting semantic substitution.
+
+    Count actual event-linked candidates, not all results sharing a value. The
+    source-specific result mapping is retained everywhere else, including the
+    complete input/result sets and every event/evidence relationship.
+    """
+    with db.cursor() as cur:
+        cur.execute('''CREATE TEMP TABLE cmp_observation_candidate ON COMMIT DROP AS
+            SELECT DISTINCT g.group_id,r.result_id
+            FROM mpp_observation_group g
+            JOIN scope s ON (s.scope_id,s.profile)=(g.scope_id,g.profile)
+            JOIN mpp_approximate_result r ON (r.rule_id,r.value)=(g.rule_id,g.approximate_value)
+            JOIN mpp_occurrence_approximate a
+              ON (a.result_id,a.rule_id,a.scope_id)=(r.result_id,r.rule_id,g.scope_id)
+            JOIN mpp_occurrence o
+              ON (o.analysis_id,o.occurrence_id,o.scope_id)=(a.analysis_id,a.occurrence_id,a.scope_id)
+            WHERE r.state='available'
+              AND (o.database,o.execution_user,coalesce(o.timing_type,'unknown'))
+                  =(g.database,g.execution_user,g.timing_type)''')
+        cur.execute('CREATE UNIQUE INDEX ON cmp_observation_candidate (group_id,result_id)')
+        cur.execute('ANALYZE cmp_observation_candidate')
+        cur.execute('''SELECT count(*) FROM mpp_observation_group g
+            LEFT JOIN mpp_approximate_result r ON r.result_id=g.result_id
+            LEFT JOIN cmp_observation_candidate c ON (c.group_id,c.result_id)=(g.group_id,g.result_id)
+            WHERE r.result_id IS NULL OR r.state IS DISTINCT FROM 'available'
+              OR (r.rule_id,r.value) IS DISTINCT FROM (g.rule_id,g.approximate_value)
+              OR c.result_id IS NULL''')
+        if cur.fetchone()[0]:
+            raise ValueError('invalid observation representative: missing, unavailable, mismatched or unrelated to group events')
+        cur.execute('''CREATE TEMP TABLE cmp_observation_representative ON COMMIT DROP AS
+            SELECT g.group_id id,
+                encode(sha256(convert_to((to_jsonb(r)-ARRAY['result_id','input_id'])::text,'UTF8')),'hex') stable,
+                encode(sha256(convert_to(m.stable,'UTF8')),'hex') source_reference_sha256,
+                (SELECT count(*) FROM cmp_observation_candidate c WHERE c.group_id=g.group_id) candidates
+            FROM mpp_observation_group g
+            JOIN mpp_approximate_result r ON r.result_id=g.result_id
+            JOIN cmp_approximate_result m ON m.id=r.result_id''')
+        cur.execute('CREATE UNIQUE INDEX ON cmp_observation_representative (id)')
+        cur.execute('''SELECT encode(sha256(convert_to(id,'UTF8')),'hex'),
+                      stable,source_reference_sha256,candidates
+                       FROM cmp_observation_representative ORDER BY id''')
+        return {gid: dict(semantics_sha256=semantics, source_reference_sha256=source, candidates=count)
+                for gid, semantics, source, count in cur}
+
 
 def column_mapping(table, column):
     if column == 'input_id':
@@ -100,7 +155,9 @@ def export(db):
     if len(tables) != 57:
         raise ValueError('unexpected table set; review comparison coverage')
     report = dict(tables={}, omitted=OMITTED, mapped_identifiers={},
-                  method='PG17 JSONB complete rows, sorted per-row SHA-256; exact values, no numeric tolerance')
+                  method='PG17 JSONB complete rows, sorted per-row SHA-256; exact values, no numeric tolerance',
+                  representative_contract=REPRESENTATIVE_CONTRACT,
+                  representatives=observation_references(db))
     for table, columns in tables.items():
         omitted = list(OMITTED.get(table, {}))
         if not set(omitted) <= set(columns):
@@ -108,6 +165,12 @@ def export(db):
         base = sql.SQL('to_jsonb(t)-%s::text[]')
         joins, replacements, mappings, missing = [], [], {}, []
         for column in columns:
+            if table == 'mpp_observation_group' and column == 'result_id':
+                joins.append(sql.SQL(' LEFT JOIN cmp_observation_representative representative ON representative.id=t.group_id'))
+                replacements.extend((sql.Literal(column), sql.SQL('representative.stable')))
+                mappings[column] = REPRESENTATIVE_CONTRACT['comparison']
+                missing.append(sql.SQL('representative.id IS NULL'))
+                continue
             mapping = column_mapping(table, column)
             if not mapping:
                 continue
@@ -144,6 +207,17 @@ def export(db):
 def compare(left, right):
     if left['omitted'] != right['omitted'] or left['mapped_identifiers'] != right['mapped_identifiers']:
         raise ValueError('comparison contract differs')
+    if left.get('representative_contract') != right.get('representative_contract'):
+        raise ValueError('representative comparison contract differs')
     names = sorted(set(left['tables']) | set(right['tables']))
     differences = [name for name in names if left['tables'].get(name) != right['tables'].get(name)]
-    return dict(passed=not differences, compared_tables=len(names), different_tables=differences)
+    result = dict(passed=not differences, compared_tables=len(names), different_tables=differences)
+    if left.get('representative_contract'):
+        a, b = left['representatives'], right['representatives']
+        changed = [dict(group_sha256=gid, old_candidates=a[gid]['candidates'], new_candidates=b[gid]['candidates'],
+                        nonidentity_fields_equal=a[gid]['semantics_sha256']==b[gid]['semantics_sha256'])
+                   for gid in sorted(a.keys() & b.keys())
+                   if a[gid]['source_reference_sha256'] != b[gid]['source_reference_sha256']]
+        result['representative_equivalence'] = dict(contract=left['representative_contract'],
+            old_groups=len(a), new_groups=len(b), changed_groups=len(changed), differences=changed)
+    return result

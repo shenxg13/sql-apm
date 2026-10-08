@@ -81,6 +81,25 @@ class RuntimeContractTests(unittest.TestCase):
             self.compare()
         self.assertFalse(self.output.exists())
 
+    def test_reexport_provenance_retained(self):
+        self.report['reexport'] = dict(comparison_sha256='exporter', driver_sha256='driver', decision='confirmed',
+                                      original_report_sha256='old-report')
+        self.write(self.old, self.report)
+        self.report['reexport']['original_report_sha256'] = 'new-report'
+        self.compare()
+        result = json.loads(self.output.read_text())
+        self.assertTrue(result['passed'])
+        self.assertEqual(result['reexport']['old']['original_report_sha256'], 'old-report')
+        self.assertEqual(result['reexport']['new']['original_report_sha256'], 'new-report')
+
+    def test_mixed_reexport_code_refused(self):
+        self.report['reexport'] = dict(comparison_sha256='exporter', driver_sha256='driver', decision='confirmed')
+        self.write(self.old, self.report)
+        self.report['reexport']['comparison_sha256'] = 'different-exporter'
+        with self.assertRaisesRegex(ValueError, 're-export input differs'):
+            self.compare()
+        self.assertFalse(self.output.exists())
+
 
 if __name__ == '__main__':
     unittest.main()

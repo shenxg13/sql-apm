@@ -31,6 +31,10 @@ def compare_runs(old, new, output):
     for key in ('postgres_configuration', 'manifest_sha256', 'verification_sha256'):
         if left[key] != right[key]:
             raise ValueError('measurement input differs: '+key)
+    if 'reexport' in left or 'reexport' in right:
+        for key in ('comparison_sha256', 'driver_sha256', 'decision'):
+            if key not in left.get('reexport', {}) or left['reexport'][key] != right.get('reexport', {}).get(key):
+                raise ValueError('re-export input differs: '+key)
     result = compare(left['contents'], right['contents'])
     tasks = {}
     for key in left['tasks']:
@@ -56,6 +60,8 @@ def compare_runs(old, new, output):
     # measurement/comparison sources recorded when each replay was started.
     result['memory_decision'] = 'https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090'
     result['comparison_driver_sha256'] = digest(Path(__file__))
+    if 'reexport' in left:
+        result['reexport'] = dict(old=left['reexport'], new=right['reexport'])
     result['passed'] = result['passed'] and result['elapsed_gate'] and result['timeout_gate']
     save(output, result)
     print(json.dumps({k: v for k, v in result.items() if k != 'tasks'}))

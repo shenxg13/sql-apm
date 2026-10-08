@@ -292,7 +292,13 @@
       "pgdata_writable": false
     },
     "restart": true,
-    "tcp_verification": null
+    "tcp_verification": {
+      "tcp_readonly_query": true,
+      "wrong_password_rejected": true,
+      "server_version": "17.10",
+      "credential_file_mode": "0o600",
+      "credentials_displayed": false
+    }
   },
   "packaged_checks": {
     "unit": {
@@ -1900,7 +1906,7 @@
     "verify-smoke.log": "1ffe0f493a2ebb280c34b2c659917f677a4fcb6ec3ef3cab57732872241edaf1",
     "verify.log": "4834e63ff79901f567cc636130c3e844e68a4f2bb6887b54ec84bf6be1b98749"
   },
-  "complete": false,
+  "complete": true,
   "input_transfer": {
     "files": 26,
     "bytes": 3824972246,
@@ -1932,9 +1938,18 @@
   "authorization": {
     "progress_record": "https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6058526621",
     "first119_logs_transfer_explicitly_approved": true,
-    "credential_copy_approved": false
+    "credential_copy_approved": true
   },
-  "pending": [
-    "developer_tcp_authentication"
-  ]
+  "tcp_verification_audit": {
+    "evidence": "measured",
+    "recorded_at": "2026-10-08T11:47:14.124817+00:00",
+    "script_sha256": "f33043e61ab38a6f13bdee4a019017d65a7e399faa372416ac5f92d590f2cbe5",
+    "private_result_sha256": "baf9168c72492b9406aa13dbc0c9d30d80b55a41ce92a26ca1866ae8fad0a3d6",
+    "private_wrong_password_log_sha256": "75d0fb7a2bc10591207efab7e15838e71a0900c20e2569cab0033ac5a79745c2",
+    "credential_parent_mode": "0700",
+    "credential_file_mode": "0600",
+    "user_authorization": "2026-10-08 用户明确回复“允许拷贝”",
+    "credential_values_exported": false
+  },
+  "pending": []
 }

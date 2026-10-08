@@ -47,10 +47,16 @@ def compare_runs(old, new, output):
     new_seconds = sum(t['new_seconds'] for t in tasks.values())
     result.update(tasks=tasks, old_seconds=old_seconds, new_seconds=new_seconds,
                   elapsed_ratio=new_seconds/old_seconds,
-                  memory_gate=all(t['memory_ratio'] <= 1.10 for t in tasks.values()),
+                  memory_policy='record_only',
+                  memory_over_legacy_threshold=[key for key, t in tasks.items() if t['memory_ratio'] > 1.10],
                   elapsed_gate=new_seconds <= old_seconds*1.10,
                   timeout_gate=all(t['old_timeouts'] == t['new_timeouts'] == 0 for t in tasks.values()))
-    result['passed'] = result['passed'] and result['memory_gate'] and result['elapsed_gate'] and result['timeout_gate']
+    # The confirmed contract removed the memory stop, retaining every reading.
+    # Keep the revised control code identifiable separately from the unchanged
+    # measurement/comparison sources recorded when each replay was started.
+    result['memory_decision'] = 'https://github.com/shenxg13/sql-apm/issues/49#issuecomment-6054199090'
+    result['comparison_driver_sha256'] = digest(Path(__file__))
+    result['passed'] = result['passed'] and result['elapsed_gate'] and result['timeout_gate']
     save(output, result)
     print(json.dumps({k: v for k, v in result.items() if k != 'tasks'}))
     if not result['passed']:
@@ -119,11 +125,6 @@ log_min_error_statement='panic'
                         '--program-commit', metadata['commit']])
                 report['tasks'][key] = json.loads((out/'tasks'/(key+'.json')).read_text())
                 save(out/('checkpoint-'+key+'.json'), report)
-                if args.reference:
-                    before = json.loads((args.reference/'tasks'/(key+'.json')).read_text())
-                    after = report['tasks'][key]
-                    if after['resources']['process_peak_rss_bytes'] > before['resources']['process_peak_rss_bytes']*1.10:
-                        raise ValueError('Issue #49 per-task memory exceeds 10%; stop and preserve evidence')
         if args.reference:
             reference = json.loads((args.reference/'report.json').read_text())
             old_seconds = sum(t['resources']['seconds'] for t in reference['tasks'].values())

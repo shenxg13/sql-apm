@@ -76,7 +76,7 @@ trial() {
 ```bash
 trial fuzzy-one find "$APM_TERM"
 trial fuzzy-many find "$APM_TERM $APM_TERM2"
-trial fuzzy-phrase find "\"$APM_PHRASE\""
+trial fuzzy-phrase find "$APM_PHRASE" --mode passage
 trial fuzzy-recent find "$APM_TERM" --order recent
 trial fuzzy-none find zz_no_search_match_47
 trial fuzzy-empty find ''
@@ -84,7 +84,8 @@ trial fuzzy-too-many find 'a a a a a a a a a a a a a a a a a a a a a'
 ```
 
 预期：前几项 `match_kind=text`，各结构一行，最多50行且有 `total_structures`；默认记录数倒序，
-recent 按最近时间倒序。多词可分散出现；引号片段去空白后需连续匹配，逗号／等号按字面。
+recent 按最近时间倒序。多词可分散出现；`--mode passage` 把整个输入当作一段，去空白后需连续匹配，逗号／等号按字面。
+引号在两种方式下都是普通字符（[#51](https://github.com/shenxg13/sql-apm/issues/51) 起，原“引号表示整段”的写法作废）。
 无匹配为零结构；空输入与21项退出1，原因分别为 `empty_search_input`、`too_many_search_terms`。
 请按需 `search text --sql-id` 查看候选原文，判断含符号片段是否符合自己的输入。
 

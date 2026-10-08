@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-08
+updated: 2026-10-09
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/51
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/49
     status: current
   - path: docs/reports/v020-offline-release-2026-10-07.md
@@ -97,6 +99,30 @@ confidence: high
 该单批结论不替代目标机完整九任务或生产验证，
 详见[目标机证据](../../docs/reports/python313-upgrade-2026-10-08.md#目标机安装measured)。
 本次不发版、不新增版本号，已发布的 v0.2.0 与历史验证材料保持原样。
+
+### 两个数据库账号、指纹服务与 Grafana（2026-10-08）
+
+来源：[Issue #51](https://github.com/shenxg13/sql-apm/issues/51) 的已确认契约及其
+[插件范围变更的确认](https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6063830442)；来源状态 current。
+本轮已实现并在开发机验证；离线安装和目标机实测由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 交付。
+
+- **数据库账号由一个改为两个。** 新增只读账号：只能查询各表和调用查询函数，不能修改数据和结构；
+  设置单条查询超时，默认 2 分钟，可配置。Grafana 的数据源和指纹服务使用它，使用者从其他机器做日常查看时
+  也用它。项目账号不变，继续用于导入、构建、清理和管理。这修改了下文 2026-09-26
+  “全部使用一个账户”的决定，原因是 Grafana 会原样执行已登录用户发来的查询，查看账号也不例外。
+- 只读账号由 PostgreSQL 管理员创建一次，方式与创建项目账号一致，对原地升级的已有库同样执行一次；
+  密码由操作者设定，保存方式沿用受保护的文件。Grafana 和指纹服务经 127.0.0.1 以密码认证连接。
+- **指纹服务**是产品的第一个常驻进程：只做一件事，接收完整 SQL，按当前安装的规则计算结构指纹，
+  返回与命令行精确检索相同的结果，并在库里有一字不差的原文时给出它的标识。只读，不写库；
+  只监听本机，由 Grafana 后端转发请求，访问控制依靠 Grafana 的登录，因此与 Grafana 同机部署；
+  由 systemd 管理；日志不记 SQL 原文；输入上限 512 KB；它停止时其余功能照常；规则更新后须重启。
+- **Grafana。** 用 13 系列，实施时取最新的次版本和补丁（13.2.3）；Grafana 和三个插件
+  （Business Forms、Infinity、官方 PostgreSQL 数据源）的版本、下载地址和摘要固定在一份清单里。
+  解压即用，不编译；端口默认 3000；界面中文，时间按北京时间；自己的数据用自带的文件数据库；
+  数据源和随包看板由配置文件装入；必须登录，关闭匿名，只用本地账号：`admin` 加一个只用于查看的账号；默认 HTTP。
+  关闭启动时的自动下载，保持签名校验。每个次版本官方只支持 9 个月，离线环境靠产品后续发版升级。
+- 事实（observed，2026-10-08，开发机）：Grafana 13.2.3 的安装包不含 PostgreSQL 数据源，
+  联网时由 Grafana 在启动时自动下载，因此离线环境须把官方数据源插件作为固定组件。
 
 ### v0.2.0 预发布交付与本轮演练（2026-10-07）
 
@@ -373,6 +399,8 @@ SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`�
   [Issue #7：数据库初始化与物理结构实现](https://github.com/shenxg13/sql-apm/issues/7)
   落实完整任务契约；执行状态以在线标签为准，创建 Issue 时数据库对象尚未实现。
 - 项目统一使用一个数据库账号，同时承担 schema owner、应用运行及管理职责。
+  （2026-10-08 修订：查询和 Grafana 访问改用新增的只读账号，见
+  [两个数据库账号、指纹服务与 Grafana](#两个数据库账号指纹服务与-grafana2026-10-08)；项目账号的职责不变。）
   后续查询／Grafana 访问也沿用同一项目账号；不采用此前建议的结构维护、
   程序读写、查询只读三类账号拆分。
 - 用户与角色采用同一个可登录角色表达，不额外建立权限分组或角色继承体系；
@@ -418,7 +446,9 @@ SHA-256 为 `6b269105e59ac96aba877c1707c600ae55711d9dcd3fc4b5012e4af68e30c648`�
 后续基于自建基线的 SQL 异常判断由自研部分完成，异常事件保存到 PostgreSQL。
 通知需求和实现方式另行确认；Grafana Alerting 是可评估方案，尚未选定。
 原始资料中 Prometheus / Alertmanager 的建议保留来源语境，不自动成为首期依赖。
-Grafana 的版本、部署方式和具体面板设计尚待后续落实。
+Grafana 的版本、配置方式和面板约定已于 2026-10-08 确认，见
+[两个数据库账号、指纹服务与 Grafana](#两个数据库账号指纹服务与-grafana2026-10-08)和
+[检索主题](../features/sql-search-and-views.md#grafana-检索与看板2026-10-08)；生产部署位置仍待落实。
 
 关联条款：[已确认的首期统一入口展示范围](../features/sql-search-and-views.md#已确认的首期统一入口展示范围)。
 

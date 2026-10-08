@@ -26,3 +26,10 @@ class SearchTests(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             self.assertEqual(main(['exact', '--secret-sql', 'PRIVATE_TEXT']), 1)
         self.assertEqual(json.loads(out.getvalue()), {'state': 'failed', 'reason': 'invalid_arguments'})
+
+    def test_text_search_has_two_modes_and_complete_sql_is_not_one_of_them(self):
+        for words in (['find', 'x', '--mode', 'exact'], ['find', 'x', '--mode'], ['find', '--mode', 'passage']):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(main(words), 1)
+            self.assertEqual(json.loads(out.getvalue()), {'state': 'failed', 'reason': 'invalid_arguments'})

@@ -1,0 +1,17 @@
+# Rendered by scripts/grafana/install.py; copy to /etc/systemd/system as root.
+[Unit]
+Description=SQL APM Grafana
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@GRAFANA@
+ExecStart=@GRAFANA@/bin/grafana server --homepath @GRAFANA@ --config @HOME@/conf/grafana.ini
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

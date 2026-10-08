@@ -1,6 +1,8 @@
 # SQL 检索与查询层开发说明
 
-本说明服务开发与评审，不随程序包交付。已确认范围以 [Issue #47](https://github.com/shenxg13/sql-apm/issues/47) 为准。
+本说明服务开发与评审，不随程序包交付。已确认范围以 [Issue #47](https://github.com/shenxg13/sql-apm/issues/47) 为准；
+切词规则、整段方式和候选的补充列按 [Issue #51](https://github.com/shenxg13/sql-apm/issues/51) 修订（结构 1.11.0）。
+看板用的 `mpp_view_*` 函数、指纹服务和只读账号见 [Grafana 检索与看板开发说明](grafana-dashboards.md)。
 
 ## 实施与验证顺序
 
@@ -28,10 +30,11 @@
 | 函数 | 参数（按顺序；方括号内有默认值） | 返回列与含义 |
 | --- | --- | --- |
 | `mpp_search_fold` | `value text` | ASCII A–Z 转小写；删除空格、TAB、LF、CR、FF、VT，其他字符原样。 |
-| `mpp_search_terms` | `value text` | `text[]`；双引号配对部分为连续短语，不配对的引号作普通字符；拼接相邻片段后按六类空白切词；空结果／超过20项报错。 |
+| `mpp_search_terms` | `value text` | `text[]`；按词：只按六类空白切开，引号是普通字符；空结果／超过20项报错。 |
+| `mpp_search_passage` | `value text` | `text[]`，只有一项；整段：整个输入去掉六类空白后作为一段，不受20项限制；空结果报错。 |
 | `mpp_query_occurrences` | `normalization, [fingerprint, scope, database, user, start, end]` | `analysis_id, occurrence_id` 联合标识记录；`scope_id, database, execution_user, fingerprint` 为身份；`timing_type, unit, request_shape, outcome, end_at, estimated_start_at, duration_ms` 为执行事实；`sql_id, file_id, record_no, line_start, line_end` 为原文及来源定位。 |
 | `mpp_query_hits` | `normalization, fingerprint, [scope, database, user]` | 每身份一行；`record_count, first_at, last_at, timing_types, has_unknown_timing, has_baseline, current_build, current_rules_match`。基线存在不等于达到样本门槛。 |
-| `mpp_query_fuzzy` | `normalization, input, [scope, database, user, start, end, order='count']` | `fingerprint, example_sql_id, matched_texts, record_count, scopes, databases, execution_users, last_at, total_structures`；按结构聚合，最多50行，最后一列为限量前结构总数。无匹配返回零行。 |
+| `mpp_query_fuzzy` | `normalization, input, [scope, database, user, start, end, order='count', mode='words']` | `fingerprint, example_sql_id, matched_texts, record_count, scopes, databases, execution_users, last_at, total_structures, structure_texts, identities, top_scope, top_database, top_user, top_records, top_last_at`；按结构聚合，最多50行，`total_structures` 为限量前结构总数。`mode` 可选 `words/passage`。无匹配返回零行。 |
 | `mpp_query_versions` | `normalization, [scope]` | 仅已发布版本；`scope_id, build_id, built_at, published_at, window_start, window_end, window_days, normalization_id, algorithm_version, parser_version, dictionary_rules_version, is_current, results_cleaned, cleaned_at, rules_match`。 |
 | `mpp_query_statistics` | `normalization, scope, database, user, fingerprint, [build, layer='overall']` | 每计时／桶一行；身份、版本、桶和范围，加下面的统计列。无该计时的存储结果时返回 `no_samples`；其余层次已有桶以保存结果为准，无结果的计时给空桶标记。 |
 | `mpp_query_timeline` | `normalization, fingerprint, scope, database, user, start, end, [bucket='hour']` | 每计时和结束时间桶一行；`timing_type, bucket_at, record_count, status_counts, known_duration_count, p50_ms, p95_ms, max_ms`。`bucket` 可选 `hour/day`；分位数仅使用已知耗时。 |
@@ -45,11 +48,12 @@
 匹配文本先物化，再和保留记录统一聚合；只有匹配原文在筛选内的记录参与计数。
 原文仅匹配但没有相应记录时不产生候选。
 
-引号相邻片段保持拼接，例如 `"a"."b"` 切成一项 `a.b`，`"a",` 切成一项 `a,`。
-这不等于按 SQL 标识符语法解析；原样粘贴带引号的限定名可能查不到原文中的同段文本。
-这是[维护者确认保留的限制](https://github.com/shenxg13/sql-apm/issues/47#issuecomment-6041514525)，
-后续 Grafana 任务再确定交互和文档；完整 SQL 可使用精确检索。
-切分采用一次正则片段流和缓冲聚合，保留原有相邻拼接及不配对引号语义，不另设输入长度限制。
+两种文本方式用同一套比较：ASCII 字母转小写、去掉六类空白后按字面比较，符号不作通配符或正则。
+按词要求每个词都出现，位置和顺序不限；整段要求整个输入连续出现。引号在两种方式下都是普通字符，
+例如 `"a"."b"` 就是一个含四个引号的词。#47 的“英文双引号表示整段”已按
+[#51 的确认](https://github.com/shenxg13/sql-apm/issues/51)作废；检索尚未随任何版本发布，没有已发布的行为被改变。
+`structure_texts` 是该结构的原文总数；`identities`、`top_*` 是命中原文在筛选范围内的记录所涉及的身份数，
+以及其中记录最多的身份、它的记录数和最近时间。
 没有可靠指纹、未进入原文表的输入不在模糊检索范围内，这是既有存储边界。
 
 统计列包括 `sample_state, included_count, active_days, excluded_count, exclusions_by_reason,
@@ -60,7 +64,7 @@ p75_ms, p90_ms, p95_ms, p99_ms, stddev_ms, cv, mad_ms, iqr_ms, log_median, log_m
 
 ## JSON 适配与命令
 
-`mpp_query_search` 包装模糊结果，零行时仍给 `total_structures=0`；输入完整 `struct:算法:64位十六进制摘要`
+`mpp_query_search` 包装文本检索结果（末尾参数 `mode`，输出含所用方式），零行时仍给 `total_structures=0`；输入完整 `struct:算法:64位十六进制摘要`
 时转调精确命中列表；数据库入口先去掉首尾六类 ASCII 空白再判断，内部空白不删除。
 指纹直查采用精确检索的身份筛选，时间／文本排序参数不参与直查。
 `mpp_query_exact` 接收 Python 已算出的指纹和可选近似值，返回 `has_baseline`、
@@ -85,7 +89,8 @@ cursor jsonb, build, bucket])` 提供明细或便利时间汇总的 JSON 包装�
 无可靠时间的记录在基础函数不设时间筛选时可读；基于时间的历史窗口无法归入这些记录。
 
 ```bash
-python -m sql_apm search find 'orders "where x ="' --order count
+python -m sql_apm search find 'orders status' --order count
+python -m sql_apm search find 'where x = 1 and' --mode passage
 python -m sql_apm search exact --file /tmp/query.sql
 python -m sql_apm search versions --cluster C1
 python -m sql_apm search baseline --cluster C1 --database demo --user analyst --fingerprint "$FP"
@@ -121,6 +126,9 @@ WHERE timing_type IN ('request','execute_first');
 长查询可能使清理在该月共享的10秒等待预算内退出为 `lock_timeout`；释放读取后可重试，已保存结果不变。
 直接数据库消费者也应及时提交／回滚，避免空闲事务长持锁。合成验收覆盖实际长读锁和清理重试。
 
+结构 1.11.0 只增改函数并给只读账号授权（见 [Grafana 开发说明](grafana-dashboards.md#只读账号)）；1.10.0 带数据原地升级，
+不重写任何表。升级前须由管理员再执行一次 `bootstrap` 创建只读账号。
+
 `verify_search.py` 是合成验收；`verify_search_full.py prepare/audit/exact` 是显式全量核对，使用关闭的真实库副本。
 全量核对会扫描原文和全部原有表并占用副本空间；摘要逐行在服务器计算，公开输出只含数量、哈希和耗时。
 不自动加入日常 Harness。测试文档见[开发机试用步骤](../runbooks/sql-search-trial.md)。
@@ -131,6 +139,9 @@ WHERE timing_type IN ('request','execute_first');
 来源证据表。基线存在性及统计分组查找都给齐 `profile='mpp-csv/1'`，允许使用现有分组索引。
 `mpp_query_hits`、模糊聚合、历史、时间边界、时间汇总及统计函数局部设置
 `plan_cache_mode=force_custom_plan`，让 PostgreSQL 按本次参数化简可选条件并估算选择率。
+按这种方式规划时，模糊检索扫描原文的一步不会选用并行；1.11.0 起 `mpp_query_fuzzy` 另在函数上把
+`parallel_setup_cost` 和 `parallel_tuple_cost` 设为零，使它在长连接下也使用并行，其他设置不变。
+数字见 [Grafana 实测报告](../reports/grafana-dashboards-2026-10-09.md)。
 设置只在函数内生效，不改变调用者会话；没有禁用顺序扫描或强制某个索引。
 依据见 [PG17 计划缓存说明](https://www.postgresql.org/docs/17/runtime-config-query.html#GUC-PLAN-CACHE-MODE)。
 
@@ -151,4 +162,4 @@ WHERE timing_type IN ('request','execute_first');
 不安装扩展；SQL 和原始计划只保留在指定私有目录，公开摘要不含业务原文或身份。
 
 数据库函数名、参数和列是供后续 Grafana 消费的契约；未来变化须修改本说明并进入之后的发布说明。
-本次不发版；随包三份用户文档仍对应 v0.2.0／1.9.0，由后续 Grafana 工作补齐查询说明。
+本次不发版；随包三份用户文档仍对应 v0.2.0／1.9.0，由 [Issue #52](https://github.com/shenxg13/sql-apm/issues/52) 补齐查询说明。

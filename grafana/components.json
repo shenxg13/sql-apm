@@ -1,0 +1,32 @@
+{
+  "grafana": {
+    "version": "13.2.3",
+    "file": "grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+    "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+    "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+    "directory": "grafana-13.2.3"
+  },
+  "plugins": [
+    {
+      "id": "grafana-postgresql-datasource",
+      "version": "13.0.4",
+      "file": "grafana-postgresql-datasource-13.0.4.linux_amd64.zip",
+      "url": "https://grafana.com/api/plugins/grafana-postgresql-datasource/versions/13.0.4/download?os=linux&arch=amd64",
+      "sha256": "d34f44bd13213502de4394955fcc170d70fb822531c181bff0179f216c35a0e0"
+    },
+    {
+      "id": "volkovlabs-form-panel",
+      "version": "6.3.5",
+      "file": "volkovlabs-form-panel-6.3.5.zip",
+      "url": "https://grafana.com/api/plugins/volkovlabs-form-panel/versions/6.3.5/download",
+      "sha256": "6ccab1571d1188c58a309f57336b90a59af5173f0439a0acf565bd859dc0885b"
+    },
+    {
+      "id": "yesoreyeram-infinity-datasource",
+      "version": "4.1.1",
+      "file": "yesoreyeram-infinity-datasource-4.1.1.linux_amd64.zip",
+      "url": "https://grafana.com/api/plugins/yesoreyeram-infinity-datasource/versions/4.1.1/download?os=linux&arch=amd64",
+      "sha256": "e24f6030e998cf5dd76c70bb26a5bcb56a34bc530446358e21ae0164f21af3d5"
+    }
+  ]
+}

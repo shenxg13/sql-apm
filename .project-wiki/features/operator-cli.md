@@ -4,7 +4,7 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-07
+updated: 2026-10-09
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/47
     status: current
@@ -181,6 +181,12 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 字段、参数及退出码由[开发说明](../../docs/design/sql-search.md)维护；匹配和展示规则见
 [检索主题](sql-search-and-views.md#检索与查询层2026-10-07)。用户试用另有步骤，Grafana待后续交付。
 
+2026-10-08 修订（[Issue #51](https://github.com/shenxg13/sql-apm/issues/51)，已实现）：`search find` 增加
+`--mode words|passage`，默认按词；按词只按空白切、引号是普通字符，原“引号表示整段”的写法作废，
+连续片段用 `--mode passage`。新增常驻的 `python -m sql_apm fingerprint-service`（只监听本机，供 Grafana 的
+完整 SQL 检索使用），规则见[检索主题](sql-search-and-views.md#grafana-检索与看板2026-10-08)，接口见
+[开发说明](../../docs/design/grafana-dashboards.md#指纹服务)。导入、构建、清理和状态查询仍只用命令行。
+
 ## Workflows
 
 按任务涉及的边界补读：
@@ -203,4 +209,4 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 ## Open Questions
 
 完整流程、重新构建和查询参数见上述操作说明；未增加自动调度或网页管理。
-SQL 检索与 Grafana 展示继续按后续交付安排落实。
+Grafana 的离线安装、使用者文档和目标机实测由 #52 交付。

@@ -77,8 +77,10 @@ def main(argv=None):
     parser = Parser(description='SQL 检索、基线与执行历史（JSON）')
     parser.add_argument('--schema', default='sql_apm')
     subs = parser.add_subparsers(dest='action', required=True, parser_class=Parser)
-    fuzzy = subs.add_parser('find', help='文本模糊检索（主入口）；完整指纹值直查')
+    fuzzy = subs.add_parser('find', help='按词或整段的文本检索（主入口）；完整指纹值直查')
     fuzzy.add_argument('input')
+    fuzzy.add_argument('--mode', choices=['words', 'passage'], default='words',
+                       help='words：只按空白切词，每个词都要出现，引号是普通字符；passage：整个输入连续出现')
     fuzzy.add_argument('--order', choices=['count', 'recent'], default='count')
     precise = subs.add_parser('exact', help='完整 SQL 或完整批次的结构检索')
     source = precise.add_mutually_exclusive_group(required=True)
@@ -116,7 +118,7 @@ def main(argv=None):
             if args.action in ('find', 'exact'):
                 filters = [args.cluster, args.database, args.user]
                 if args.action == 'find':
-                    result = query(cur, 'mpp_query_search', [norm, args.input] + filters + [args.start, args.end, args.order])
+                    result = query(cur, 'mpp_query_search', [norm, args.input] + filters + [args.start, args.end, args.order, args.mode])
                 else:
                     if args.file:
                         with args.file.open('rb') as stream:
@@ -150,7 +152,7 @@ def main(argv=None):
         result = dict(state='failed', reason='input_unavailable')
     except psycopg2.Error as error:
         reason = getattr(error.diag, 'message_primary', None)
-        allowed = {'empty_search_input', 'too_many_search_terms', 'invalid_search_order', 'invalid_time_range',
+        allowed = {'empty_search_input', 'too_many_search_terms', 'invalid_search_order', 'invalid_search_mode', 'invalid_time_range',
                    'results_cleaned', 'no_current_baseline', 'published_version_not_found',
                    'normalization_version_mismatch', 'invalid_baseline_layer', 'invalid_time_bucket',
                    'invalid_page_size', 'invalid_page_cursor', 'invalid_training_records', 'occurrence_not_found'}

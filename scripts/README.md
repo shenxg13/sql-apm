@@ -55,7 +55,8 @@ Python 3.13.16 环境及准备步骤见[本地开发说明](../docs/runbooks/loc
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0 → 1.10.0；1.7.0／1.8.0／1.9.0 可带数据升级且不回填，更早非空库须重建。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0 → 1.10.0 → 1.11.0；1.7.0／1.8.0／1.9.0／1.10.0 可带数据升级且不回填，更早非空库须重建。
+  `bootstrap` 同时创建只读角色（`--readonly-role`、`--readonly-timeout`），升级旧库前须先执行一次。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
 - `.venv/bin/python scripts/db/verify_statistics.py`：统计构建与门槛两路径的一致性回归。
@@ -229,7 +230,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 `verify_mpp_naming.py` 在合成私有 PG17 实例核对新标识并检查等价比较器对统计变化的敏感性。
 `verify_mpp_naming_full.py` 显式重导固定 55 文件，以文件摘要／记录定位核对所有分组成员
 及五层全部指标；运行方法和资源边界见[验收报告](../docs/reports/mpp-naming-2026-10-05.md)。
-当前结构为 1.10.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
+当前结构为 1.11.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
 验证至 1.6.0，不支持已有数据进入新标识上下文。历史 `verify_coverage_migration_full.py`
 须从 #29 对应提交运行，不能用当前初始化器对含数据旧库执行升级。
 
@@ -280,3 +281,23 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 `verify_search_full.py prepare/audit` 显式复制关闭的真实库、逐表摘要对照并做独立查询和冷／热测量。
 `prepare_search_trial.py` 只读准备本地例子和前后行数快照。全量验证不自动加入Harness；
 真实SQL和身份保留忽略目录。新增查询验收通过独立随包入口 `run_verification.py search` 执行。
+
+## Grafana 检索与看板
+
+[开发说明](../docs/design/grafana-dashboards.md)定义组件清单、安装步骤、指纹服务接口、看板函数和跳转变量；
+[试用步骤](../docs/runbooks/grafana-trial.md)供用户在浏览器里查看效果。
+
+- `scripts/grafana/install.py files|accounts`：核对清单里四个安装文件的摘要、解压、生成配置和单元文件；
+  启动后创建查看账号和“用户自定义”文件夹。不联网，随程序包交付。
+- `scripts/grafana/readonly_password.py`：把操作者设定的只读账号密码以 SCRAM 校验值写入数据库，并生成指纹服务用的 passfile。
+- `python -m sql_apm fingerprint-service`：只监听本机的指纹服务。
+- `scripts/grafana/fetch.py`：按 `grafana/components.json` 下载并核对安装文件（联网）。
+- `scripts/grafana/setup_dev.py synthetic|existing|stop|status`：开发机一条命令搭好 PostgreSQL、只读账号、
+  指纹服务和 Grafana；全部内容在 `--directory` 指定的忽略目录里。
+- `scripts/grafana/build_dashboards.py [--check]`：三个随包看板的生成程序；改看板改这里再重新生成。
+- `scripts/grafana/prepare_browser.sh` 与 `verify_e2e.py`：在开发机准备无界面浏览器并做界面端到端检查。
+  浏览器只用于验证，放在忽略目录，不进任何包。真实数据的环境下它核对抽样身份的页面数值并记录每页的查询数和耗时。
+- `scripts/db/verify_views.py`：合成验收，覆盖只读账号、指纹服务和看板函数对独立计算。
+- `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
+  升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
+- `scripts/tests/test_grafana.py`：看板与生成结果一致、安装程序拒绝缺失或摘要不符的文件。

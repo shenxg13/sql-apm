@@ -1,0 +1,3245 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "enable": true,
+        "filter": {
+          "exclude": false,
+          "ids": [
+            21
+          ]
+        },
+        "hide": false,
+        "iconColor": "red",
+        "mappings": {
+          "tags": {
+            "source": "field",
+            "value": "tags"
+          },
+          "text": {
+            "source": "field",
+            "value": "text"
+          },
+          "time": {
+            "source": "field",
+            "value": "time"
+          }
+        },
+        "name": "失败、取消、超时",
+        "target": {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail annotation */ SELECT min(o.end_at) AS time,mpp_view_label('outcome',o.outcome)||' '||count(*)||' 次' AS text,mpp_view_label('outcome',o.outcome) AS tags\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') o WHERE o.outcome IN ('failed','cancelled','timed_out')\nGROUP BY o.outcome,floor(extract(epoch FROM o.end_at)*200/greatest(extract(epoch FROM ($__timeTo()::timestamptz-$__timeFrom()::timestamptz)),1))\nORDER BY 1",
+          "refId": "Anno"
+        }
+      }
+    ]
+  },
+  "description": "一条 SQL 的原文、基线、与基线的对比、执行历史和按原文拆开（随包看板 r1）",
+  "editable": true,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "search",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "SQL 检索",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/mpp-search/sql-search"
+    },
+    {
+      "asDropdown": false,
+      "icon": "list-ul",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "SQL 列表",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/mpp-list/sql-list"
+    }
+  ],
+  "panels": [
+    {
+      "description": "选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。",
+      "gridPos": {
+        "h": 9,
+        "w": 14,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "code": {
+          "language": "sql",
+          "showLineNumbers": true,
+          "showMiniMap": false
+        },
+        "content": "${sql_text:raw}",
+        "mode": "code"
+      },
+      "title": "SQL 原文：${sql_note}",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "时间范围只影响对比、执行历史、按原文拆开和明细，不影响基线。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "seq"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "item"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              },
+              {
+                "id": "displayName",
+                "value": "项目"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "content"
+            },
+            "properties": [
+              {
+                "id": "custom.wrapText",
+                "value": true
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "打开",
+                    "url": "${__data.fields.url:raw}"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "内容"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "url"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 2 A */ SELECT * FROM (\nSELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}') content,NULL::text url\nUNION ALL SELECT 2,'计时类别',mpp_view_label('timing','${timing}')||CASE WHEN '${timing}' IN ('request','unknown') THEN '' ELSE '：是阶段或调用的记录，不加总成执行次数' END,NULL\nUNION ALL SELECT 3,'原文范围',CASE WHEN '${sqlid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'\n  ELSE '只看一份原文 ${sqlid}；点这里回到全部原文' END,CASE WHEN '${sqlid}'<>'' THEN '/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=' END\nUNION ALL SELECT 4,'时间范围','点这里设为这条 SQL 最近一次执行往前 7 天',\n  (SELECT '/d/mpp-detail/sql-detail?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${sqlid:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'\n     ||'&from='||(extract(epoch FROM i.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM i.last_at+interval '1 millisecond')*1000)::bigint\n   FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}')\nUNION ALL SELECT 5,'失败、取消、超时','没有计时类别和耗时，在每个计时类别下都列出',NULL\nUNION ALL SELECT 6,'提示',m.n||' 份原文尚未按当前规则生成指纹，其执行记录不在结果中',NULL\n  FROM (SELECT mpp_query_missing_rules('${norm}') n) m WHERE m.n>0\nUNION ALL SELECT 7,'返回','回到 SQL 检索（填回上一次的输入）','/d/mpp-search/sql-search'\n) x WHERE x.content IS NOT NULL ORDER BY x.seq",
+          "refId": "A"
+        }
+      ],
+      "title": "当前查看的内容",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "panels": [],
+      "title": "基线（取决于所选的基线版本，与右上角的时间范围无关）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "P50 和最大跟随基础样本条件，P95、P99 各自跟随自己的样本条件。条件不满足时数值变灰并标明，仅供参考。没有数值表示所选版本里没有这一计时类别的基线。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 4 A */ SELECT m.name||CASE WHEN m.met THEN '' ELSE '（样本不足，仅供参考）' END AS name,m.value,m.unit,\n  CASE WHEN m.met THEN 'text' ELSE '#8e8e8e' END AS color\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s CROSS JOIN LATERAL (VALUES\n  (1,'样本数',s.included_count::numeric,'none',true),(2,'活跃天数',s.active_days::numeric,'none',true),\n  (3,'P50',s.p50_ms,'ms',(s.sufficiency->'basic'->>'met')::boolean),(4,'P95',s.p95_ms,'ms',(s.sufficiency->'p95'->>'met')::boolean),\n  (5,'P99',s.p99_ms,'ms',(s.sufficiency->'p99'->>'met')::boolean),(6,'最大',s.max_ms,'ms',(s.sufficiency->'basic'->>'met')::boolean)\n) m(ord,name,value,unit,met) WHERE s.timing_type='${timing}' AND s.sample_state='available' ORDER BY m.ord",
+          "refId": "A"
+        }
+      ],
+      "title": "关键数值：${timing} 的整体基线",
+      "transformations": [
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "unit",
+                "handlerKey": "unit"
+              },
+              {
+                "fieldName": "color",
+                "handlerKey": "color"
+              }
+            ],
+            "nameField": "name",
+            "valueField": "value"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "三项条件各自决定对应的数值能不能作参照：基础条件对应 P50 等，P95、P99 条件对应各自的分位值。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "condition"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "条件"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "met"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "不满足": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "满足": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "是否满足"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "samples"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "样本数：实际 / 要求"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "coverage"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "活跃天数：实际 / 要求"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reason"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "不满足的原因"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 11,
+        "x": 0,
+        "y": 14
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 5 A */ SELECT mpp_view_label('condition',c.name) condition,\n  CASE WHEN (c.detail->>'met')::boolean THEN '满足' ELSE '不满足' END met,\n  (c.detail->>'actual_count')||' / '||(c.detail->>'required_count') samples,\n  CASE c.detail->>'coverage_kind' WHEN 'none' THEN '不要求' ELSE (c.detail->>'actual_coverage')||' / '||(c.detail->>'required_coverage')\n    ||CASE c.detail->>'coverage_kind' WHEN 'active_weeks' THEN ' 周' ELSE ' 天' END END coverage,\n  CASE WHEN (c.detail->>'met')::boolean THEN '' ELSE (SELECT string_agg(mpp_view_label('reason',r),'、') FROM jsonb_array_elements_text(c.detail->'reasons') r) END reason\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s CROSS JOIN LATERAL (VALUES ('basic',s.sufficiency->'basic'),('p95',s.sufficiency->'p95'),('p99',s.sufficiency->'p99')) c(name,detail)\nWHERE s.timing_type='${timing}'",
+          "refId": "A"
+        }
+      ],
+      "title": "三项样本条件",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "所选版本整体基线保存的分位值。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 13,
+        "x": 11,
+        "y": 14
+      },
+      "id": 6,
+      "options": {
+        "displayMode": "basic",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "minVizHeight": 14,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 6 A */ SELECT s.min_ms AS \"最小\",s.p25_ms AS \"P25\",s.p50_ms AS \"P50\",s.p75_ms AS \"P75\",s.p90_ms AS \"P90\",\n  s.p95_ms AS \"P95\",s.p99_ms AS \"P99\",s.max_ms AS \"最大\" FROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s WHERE s.timing_type='${timing}' AND s.sample_state='available'",
+          "refId": "A"
+        }
+      ],
+      "title": "耗时分位：${timing} 的整体基线",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "有样本的计时类别各一行；没有样本的类别合成最后一行文字。扩展协议的 SQL 没有“请求整体”，各阶段不相加。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "切换到这一计时类别",
+              "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${version:queryparam}&${sqlid:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-timing=${__data.fields.code}"
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timing"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              },
+              {
+                "id": "custom.wrapText",
+                "value": true
+              },
+              {
+                "id": "displayName",
+                "value": "计时类别"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "included_count"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "样本数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "active_days"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "活跃天数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p50_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "P50"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p95_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "P95"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p99_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "P99"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "最大"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "conditions"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "样本条件"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "code"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 7 A */ SELECT mpp_view_label('timing',s.timing_type)||CASE WHEN s.timing_type='request' THEN '' ELSE '（阶段或调用）' END timing,\n  s.included_count,s.active_days,s.p50_ms,s.p95_ms,s.p99_ms,s.max_ms,\n  CASE WHEN (s.sufficiency->'p99'->>'met')::boolean THEN '三项都满足' WHEN (s.sufficiency->'p95'->>'met')::boolean THEN 'P99 样本不足'\n    WHEN (s.sufficiency->'basic'->>'met')::boolean THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,s.timing_type code\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s WHERE s.sample_state='available'\nUNION ALL\nSELECT '没有样本的类别：'||string_agg(mpp_view_label('timing',s.timing_type),'、' ORDER BY array_position(ARRAY['request','execute_first','execute_fetch','parse','bind'],s.timing_type)),\n  NULL,NULL,NULL,NULL,NULL,NULL,NULL,'${timing}'\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s WHERE s.sample_state='no_samples' HAVING count(*)>0",
+          "refId": "A"
+        }
+      ],
+      "title": "五类计时一览（整体基线；点一行切换计时类别）",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "默认查看当前生效的版本。已清理的版本和规则版本不同的版本列在这里，但不能在顶部选作参照。查看不改变当前生效版本，也不重算。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "chosen"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "displayName",
+                "value": "查看"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "published_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "发布时间"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_start"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "训练窗口开始"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_end"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "训练窗口结束"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_days"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              },
+              {
+                "id": "displayName",
+                "value": "窗口天数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rules"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "规则版本"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "能否选作参照"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "build_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "版本标识"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 8 A */ SELECT CASE WHEN v.build_id='${version}' THEN '● 正在查看' ELSE '' END chosen,v.published_at,v.window_start,v.window_end,\n  v.window_days,v.rules,v.status,v.build_id FROM mpp_view_versions('${norm}','${identity}') v",
+          "refId": "A"
+        }
+      ],
+      "title": "这个集群已发布的版本",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "训练窗口内按开始时间的小时归并，共 24 个分桶。来自所选版本，不随时间范围变化。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {},
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bucket"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 9,
+      "options": {
+        "barWidth": 0.9,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "bucket",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 9 A */ SELECT lpad(s.bucket_number::text,2,'0')||' 时' AS bucket,s.p50_ms AS \"P50\",s.p95_ms AS \"P95\"\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}','hour') s WHERE s.timing_type='${timing}' AND s.included_count>0\nORDER BY s.bucket_date,s.bucket_number",
+          "refId": "A"
+        }
+      ],
+      "title": "一天内各小时的规律：P50 和 P95",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "训练窗口内每个日期各一个分桶。来自所选版本，不随时间范围变化。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {},
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bucket"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "id": 10,
+      "options": {
+        "barWidth": 0.9,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "bucket",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 10 A */ SELECT to_char(s.bucket_date,'MM-DD') AS bucket,s.p50_ms AS \"P50\",s.p95_ms AS \"P95\"\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}','day') s WHERE s.timing_type='${timing}' AND s.included_count>0\nORDER BY s.bucket_date,s.bucket_number",
+          "refId": "A"
+        }
+      ],
+      "title": "训练窗口内每一天：P50 和 P95",
+      "type": "barchart"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "id": 11,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "训练窗口内所有周一、所有周二……各归并成一个分桶。",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {},
+              "min": 0,
+              "unit": "ms"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "bucket"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "string"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 42
+          },
+          "id": 12,
+          "options": {
+            "barWidth": 0.9,
+            "groupWidth": 0.75,
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "never",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xField": "bucket",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 100
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 12 A */ SELECT (ARRAY['周一','周二','周三','周四','周五','周六','周日'])[s.bucket_number] AS bucket,s.p50_ms AS \"P50\",s.p95_ms AS \"P95\"\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}','weekday') s WHERE s.timing_type='${timing}' AND s.included_count>0\nORDER BY s.bucket_date,s.bucket_number",
+              "refId": "A"
+            }
+          ],
+          "title": "星期几的规律：P50 和 P95",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "每个自然周（周一起）一个分桶。",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {},
+              "min": 0,
+              "unit": "ms"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "bucket"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "string"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 42
+          },
+          "id": 13,
+          "options": {
+            "barWidth": 0.9,
+            "groupWidth": 0.75,
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "never",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xField": "bucket",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 100
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 13 A */ SELECT to_char(s.bucket_date,'MM-DD')||' 起' AS bucket,s.p50_ms AS \"P50\",s.p95_ms AS \"P95\"\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}','week') s WHERE s.timing_type='${timing}' AND s.included_count>0\nORDER BY s.bucket_date,s.bucket_number",
+              "refId": "A"
+            }
+          ],
+          "title": "每周：P50 和 P95",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": true,
+                "minWidth": 60
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "reason"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "排除原因"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "samples"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "样本数"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 42
+          },
+          "id": 14,
+          "options": {
+            "cellHeight": "sm",
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 14 A */ SELECT coalesce(mpp_view_label('reason',e.key),e.key) reason,e.value::bigint samples\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s CROSS JOIN LATERAL jsonb_each_text(s.exclusions_by_reason) e WHERE s.timing_type='${timing}'\nUNION ALL SELECT '（没有被排除的样本）',0 FROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s WHERE s.timing_type='${timing}' AND s.exclusions_by_reason='{}'\nORDER BY 2 DESC",
+              "refId": "A"
+            }
+          ],
+          "title": "被排除的样本及原因：${timing} 的整体基线",
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "耗时类指标的单位是毫秒；比值、变异系数和对数指标没有单位。没有样本的计时类别显示“无样本”。",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": true,
+                "minWidth": 60
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "label"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 180
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "指标"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "request"
+                },
+                "properties": [
+                  {
+                    "id": "noValue",
+                    "value": "无样本"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "请求整体"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "execute_first"
+                },
+                "properties": [
+                  {
+                    "id": "noValue",
+                    "value": "无样本"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "Execute 首次"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "execute_fetch"
+                },
+                "properties": [
+                  {
+                    "id": "noValue",
+                    "value": "无样本"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "Execute 续取"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "parse"
+                },
+                "properties": [
+                  {
+                    "id": "noValue",
+                    "value": "无样本"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "Parse"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "bind"
+                },
+                "properties": [
+                  {
+                    "id": "noValue",
+                    "value": "无样本"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "Bind"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 50
+          },
+          "id": 15,
+          "options": {
+            "cellHeight": "sm",
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 15 A */ SELECT m.label,\n  max(m.value) FILTER (WHERE s.timing_type='request') AS \"request\",\n  max(m.value) FILTER (WHERE s.timing_type='execute_first') AS \"execute_first\",\n  max(m.value) FILTER (WHERE s.timing_type='execute_fetch') AS \"execute_fetch\",\n  max(m.value) FILTER (WHERE s.timing_type='parse') AS \"parse\",\n  max(m.value) FILTER (WHERE s.timing_type='bind') AS \"bind\"\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}') s CROSS JOIN LATERAL (VALUES\n  (0,'样本数',s.included_count::numeric),\n  (1,'活跃天数',s.active_days::numeric),\n  (2,'被排除的样本数',s.excluded_count::numeric),\n  (3,'最小',s.min_ms::numeric),\n  (4,'P25',s.p25_ms::numeric),\n  (5,'P50',s.p50_ms::numeric),\n  (6,'P75',s.p75_ms::numeric),\n  (7,'P90',s.p90_ms::numeric),\n  (8,'P95',s.p95_ms::numeric),\n  (9,'P99',s.p99_ms::numeric),\n  (10,'最大',s.max_ms::numeric),\n  (11,'平均',s.mean_ms::numeric),\n  (12,'标准差',s.stddev_ms::numeric),\n  (13,'变异系数',s.cv::numeric),\n  (14,'绝对中位差',s.mad_ms::numeric),\n  (15,'四分位距',s.iqr_ms::numeric),\n  (16,'对数中位数',s.log_median::numeric),\n  (17,'对数绝对中位差',s.log_mad::numeric),\n  (18,'P95 与 P50 之比',s.p95_p50::numeric),\n  (19,'P99 与 P50 之比',s.p99_p50::numeric)\n) m(ord,label,value) GROUP BY m.ord,m.label ORDER BY m.ord",
+              "refId": "A"
+            }
+          ],
+          "title": "五类计时 × 全部指标（整体基线）",
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": true,
+                "minWidth": 60
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "bucket"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "分桶"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "basic"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "基础条件"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p95"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "P95 条件"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p99"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "P99 条件"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "included_count"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "样本数"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "active_days"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "活跃天数"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "excluded_count"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "被排除的样本数"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "min_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "最小"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p25_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P25"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p50_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P50"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p75_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P75"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p90_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P90"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p95_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P95"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p99_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "P99"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "max_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "最大"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "mean_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "平均"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "stddev_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "标准差"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "cv"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "变异系数"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "mad_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "绝对中位差"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "iqr_ms"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "四分位距"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "log_median"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "对数中位数"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "log_mad"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "对数绝对中位差"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p95_p50"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "P95 与 P50 之比"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p99_p50"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "P99 与 P50 之比"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 61
+          },
+          "id": 16,
+          "options": {
+            "cellHeight": "sm",
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 16 A */ SELECT CASE s.layer WHEN 'overall' THEN '整体' WHEN 'day' THEN to_char(s.bucket_date,'YYYY-MM-DD')\n    WHEN 'week' THEN to_char(s.bucket_date,'YYYY-MM-DD')||' 起的一周' WHEN 'weekday' THEN (ARRAY['周一','周二','周三','周四','周五','周六','周日'])[s.bucket_number]\n    ELSE lpad(s.bucket_number::text,2,'0')||' 时' END bucket,\n  CASE WHEN (s.sufficiency->'basic'->>'met')::boolean THEN '满足' ELSE '不满足：'||(SELECT string_agg(mpp_view_label('reason',r),'、')\n    FROM jsonb_array_elements_text(s.sufficiency->'basic'->'reasons') r) END basic,\n  CASE WHEN (s.sufficiency->'p95'->>'met')::boolean THEN '满足' ELSE '不满足：'||(SELECT string_agg(mpp_view_label('reason',r),'、')\n    FROM jsonb_array_elements_text(s.sufficiency->'p95'->'reasons') r) END p95,\n  CASE WHEN (s.sufficiency->'p99'->>'met')::boolean THEN '满足' ELSE '不满足：'||(SELECT string_agg(mpp_view_label('reason',r),'、')\n    FROM jsonb_array_elements_text(s.sufficiency->'p99'->'reasons') r) END p99,\n  s.included_count,s.active_days,s.excluded_count,s.min_ms,s.p25_ms,s.p50_ms,s.p75_ms,s.p90_ms,s.p95_ms,s.p99_ms,s.max_ms,s.mean_ms,s.stddev_ms,s.cv,s.mad_ms,s.iqr_ms,s.log_median,s.log_mad,s.p95_p50,s.p99_p50\nFROM mpp_view_statistics('${norm}','${fp}','${identity}','${version}','${layer}') s WHERE s.timing_type='${timing}' AND s.included_count+s.excluded_count>0\nORDER BY s.bucket_date,s.bucket_number",
+              "refId": "A"
+            }
+          ],
+          "title": "分层明细：${timing}，${layer}（每个分桶一行）",
+          "type": "table"
+        }
+      ],
+      "title": "基线明细（展开后查询：星期几和每周的规律、被排除的样本、全部指标和分层明细）",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 17,
+      "panels": [],
+      "title": "对比（所选时间范围内的执行，对所选版本的整体基线）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "如实比较，不下“异常”的结论。某项样本条件不满足时，对应的一行不计算，并写明“基线样本不足，不作参照”。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reference"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "参照"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "baseline_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "基线值"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "known_executions"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "范围内有耗时的次数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "above"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "超过基线值的次数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "above_share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "displayName",
+                "value": "占比"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "expected_share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "displayName",
+                "value": "正常时的大致占比"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "note"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              },
+              {
+                "id": "displayName",
+                "value": "说明"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "id": 18,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 18 A */ SELECT c.reference,c.baseline_ms,c.known_executions,c.above,c.above_share,c.expected_share,coalesce(c.note,'') note\nFROM mpp_view_compare('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') c",
+          "refId": "A"
+        }
+      ],
+      "title": "超过基线的执行：${timing}",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 78
+      },
+      "id": 19,
+      "panels": [],
+      "title": "执行历史（只看右上角所选的时间范围）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "计时类别是“请求整体”时，这是执行次数；是 Execute、Parse、Bind 时，这是阶段或调用的记录数，不等于执行次数。失败、取消、超时的记录没有计时类别，在每个类别下都计入。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 79
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 20 A */ SELECT count(*) AS \"合计\",count(*) FILTER (WHERE o.outcome='success') AS \"成功\",\n  count(*) FILTER (WHERE o.outcome='failed') AS \"失败\",count(*) FILTER (WHERE o.outcome='cancelled') AS \"取消\",\n  count(*) FILTER (WHERE o.outcome='timed_out') AS \"超时\",count(*) FILTER (WHERE o.outcome='unknown') AS \"结果未知\"\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') o",
+          "refId": "A"
+        }
+      ],
+      "title": "范围内的记录：${timing}",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "每个点都是一次真实的执行，画在它的结束时间上。点密时按图的宽度自动分格，每格只画最慢和最快各一次；在图上横向拖动可以放大，格子变小，直到每次执行都是单独的点；双击缩小。水平虚线是所选版本整体基线的 P50、P95、P99，只在对应样本条件满足时画出。失败、取消、超时没有耗时，画成竖线标记。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "耗时",
+            "drawStyle": "points",
+            "lineWidth": 1,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false
+          },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/基线/"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    6
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/P50 基线/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/P95 基线/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/P99 基线/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/最慢/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/最快/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 83
+      },
+      "id": 21,
+      "interval": "1ms",
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 21 A */ SELECT p.end_at AS time,\n  CASE p.kind WHEN 'slowest' THEN p.duration_ms END AS \"每格最慢的一次（一格只有一次时就是它）\",\n  CASE p.kind WHEN 'fastest' THEN p.duration_ms END AS \"同一格里最快的一次\"\nFROM mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sqlid}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric) p ORDER BY 1",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 21 B */ SELECT t.at AS time,c.reference||' 基线' AS metric,c.baseline_ms AS value\nFROM mpp_view_compare('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz) c\nCROSS JOIN (VALUES ($__timeFrom()::timestamptz),($__timeTo()::timestamptz)) t(at)\nWHERE c.condition_met ORDER BY 1,2",
+          "refId": "B"
+        }
+      ],
+      "title": "每次执行的耗时：${timing}（每格 $__interval；一格里画最慢和最快各一次）",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "与上图使用同一个步长。“耗时不低于／不高于”两个筛选不作用于这张图。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "记录数",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "min": 0,
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/成功/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/失败/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/取消/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/超时/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/结果未知/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "gray",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 94
+      },
+      "id": 22,
+      "interval": "1ms",
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 22 A */ SELECT c.slot_at AS time,mpp_view_label('outcome',c.outcome) AS metric,c.record_count AS value\nFROM mpp_view_counts('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sqlid}') c ORDER BY 1,2",
+          "refId": "A"
+        }
+      ],
+      "title": "记录数：${timing}（每格 $__interval，按状态堆叠）",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 100
+      },
+      "id": 23,
+      "panels": [],
+      "title": "按原文拆开（所选时间范围内，同一结构下取值不同的原文）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "从检索页带过来的输入命中的原文排在最前并标出。“取值不同的那一段”是比较所列原文的文本、去掉共同的开头和结尾后剩下的部分，是近似值。只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "只看这一份原文",
+              "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rank"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 50
+              },
+              {
+                "id": "displayName",
+                "value": "#"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hit"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 70
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "命中": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "检索"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "differing"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 420
+              },
+              {
+                "id": "displayName",
+                "value": "取值不同的那一段"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "executions"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "执行次数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "median_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "中位耗时"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "slowest_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "displayName",
+                "value": "最慢一次"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "above_p95_share"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 170
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "noValue",
+                "value": "基线样本不足，不作参照"
+              },
+              {
+                "id": "displayName",
+                "value": "高于基线 P95 的占比"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "range_texts"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "范围内原文数"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sql_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "原文标识"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 101
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 24 A */ SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,\n  t.above_p95_share,t.range_texts,t.sql_id\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t",
+          "refId": "A"
+        }
+      ],
+      "title": "范围内出现过的原文，按${text_order}排，取前 10 份（点一行只看这一份原文）",
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 110
+      },
+      "id": 25,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "description": "与原文表的前 10 份对应，每份原文一种颜色。点很密时不容易看清，可以先在原文表里点一行只看一份。",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "耗时",
+                "drawStyle": "points",
+                "pointSize": 4,
+                "showPoints": "always"
+              },
+              "min": 0,
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 111
+          },
+          "id": 26,
+          "interval": "1ms",
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "sql-apm-pg"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "rawQuery": true,
+              "rawSql": "/* mpp-detail panel 26 A */ SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t\nCROSS JOIN LATERAL mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,t.sql_id) p\nWHERE p.kind='slowest' ORDER BY 1",
+              "refId": "A"
+            }
+          ],
+          "title": "每格最慢的一次，按原文着色（前 10 份原文）",
+          "type": "timeseries"
+        }
+      ],
+      "title": "按原文着色的点图（展开后查询）",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 121
+      },
+      "id": 27,
+      "panels": [],
+      "title": "明细（所选时间范围内，每次执行一行）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "默认最新的在前，可在顶部改为最慢的在前；两种排序都是先在整个时间范围内排好再取前 200 条。耗时未知的显示“未知”，不补零。可按状态筛选；“耗时不低于／不高于”同时作用于这张表和上面的耗时图。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "end_at"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 190
+              },
+              {
+                "id": "displayName",
+                "value": "结束时间"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "duration_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "noValue",
+                "value": "未知"
+              },
+              {
+                "id": "displayName",
+                "value": "耗时"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "outcome"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "状态"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "comparison"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "与基线的比较"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shape"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "单条或整批"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sql_id"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "只看这一份原文",
+                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "原文"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "source_file"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "来源文件"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "source_lines"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "行号"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "training"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              },
+              {
+                "id": "displayName",
+                "value": "训练判定（所选版本）"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "matching"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "符合筛选的条数"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 122
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 28 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
+          "refId": "A"
+        }
+      ],
+      "title": "明细：${timing}，${list_order}，最多 200 条",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "sql-apm",
+    "mpp"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable norm */ SELECT mpp_view_rules()",
+        "hide": 2,
+        "includeAll": false,
+        "label": "norm",
+        "multi": false,
+        "name": "norm",
+        "options": [],
+        "query": "/* mpp-detail variable norm */ SELECT mpp_view_rules()",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "指纹",
+        "name": "fp",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable identity */ SELECT label AS __text, identity AS __value FROM mpp_view_identities('${norm}','${fp}')",
+        "hide": 0,
+        "includeAll": false,
+        "label": "身份",
+        "multi": false,
+        "name": "identity",
+        "options": [],
+        "query": "/* mpp-detail variable identity */ SELECT label AS __text, identity AS __value FROM mpp_view_identities('${norm}','${fp}')",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable timing */ SELECT label AS __text, timing AS __value FROM mpp_view_timings('${norm}','${fp}','${identity}')",
+        "hide": 0,
+        "includeAll": false,
+        "label": "计时类别",
+        "multi": false,
+        "name": "timing",
+        "options": [],
+        "query": "/* mpp-detail variable timing */ SELECT label AS __text, timing AS __value FROM mpp_view_timings('${norm}','${fp}','${identity}')",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable version */ SELECT label AS __text, build_id AS __value FROM mpp_view_versions('${norm}','${identity}') WHERE selectable",
+        "hide": 0,
+        "includeAll": false,
+        "label": "基线版本",
+        "multi": false,
+        "name": "version",
+        "options": [],
+        "query": "/* mpp-detail variable version */ SELECT label AS __text, build_id AS __value FROM mpp_view_versions('${norm}','${identity}') WHERE selectable",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": "",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": "状态",
+        "multi": true,
+        "name": "status",
+        "options": [
+          {
+            "selected": true,
+            "text": "成功",
+            "value": "success"
+          },
+          {
+            "selected": false,
+            "text": "失败",
+            "value": "failed"
+          },
+          {
+            "selected": false,
+            "text": "取消",
+            "value": "cancelled"
+          },
+          {
+            "selected": false,
+            "text": "超时",
+            "value": "timed_out"
+          },
+          {
+            "selected": false,
+            "text": "结果未知",
+            "value": "unknown"
+          }
+        ],
+        "query": "成功 : success,失败 : failed,取消 : cancelled,超时 : timed_out,结果未知 : unknown",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "耗时不低于（毫秒）",
+        "name": "dmin",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "耗时不高于（毫秒）",
+        "name": "dmax",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "最新的在前",
+          "value": "latest"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "明细排序",
+        "multi": false,
+        "name": "list_order",
+        "options": [
+          {
+            "selected": true,
+            "text": "最新的在前",
+            "value": "latest"
+          },
+          {
+            "selected": false,
+            "text": "最慢的在前",
+            "value": "slowest"
+          }
+        ],
+        "query": "最新的在前 : latest,最慢的在前 : slowest",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "执行次数",
+          "value": "count"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "原文排序",
+        "multi": false,
+        "name": "text_order",
+        "options": [
+          {
+            "selected": true,
+            "text": "执行次数",
+            "value": "count"
+          },
+          {
+            "selected": false,
+            "text": "中位耗时",
+            "value": "median"
+          },
+          {
+            "selected": false,
+            "text": "最慢一次",
+            "value": "slowest"
+          }
+        ],
+        "query": "执行次数 : count,中位耗时 : median,最慢一次 : slowest",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "整体",
+          "value": "overall"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "分层明细",
+        "multi": false,
+        "name": "layer",
+        "options": [
+          {
+            "selected": true,
+            "text": "整体",
+            "value": "overall"
+          },
+          {
+            "selected": false,
+            "text": "逐天",
+            "value": "day"
+          },
+          {
+            "selected": false,
+            "text": "逐周",
+            "value": "week"
+          },
+          {
+            "selected": false,
+            "text": "星期几",
+            "value": "weekday"
+          },
+          {
+            "selected": false,
+            "text": "各小时",
+            "value": "hour"
+          }
+        ],
+        "query": "整体 : overall,逐天 : day,逐周 : week,星期几 : weekday,各小时 : hour",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "sqlid",
+        "name": "sqlid",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "mode",
+        "name": "mode",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "q",
+        "name": "q",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "hit",
+        "name": "hit",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable sql_text */ SELECT CASE WHEN length(t.sql_text)>200000 THEN left(t.sql_text,200000)||E'\\n-- （原文共 '||length(t.sql_text)||' 个字符，这里只显示前 200000 个）' ELSE t.sql_text END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "hide": 2,
+        "includeAll": false,
+        "label": "sql_text",
+        "multi": false,
+        "name": "sql_text",
+        "options": [],
+        "query": "/* mpp-detail variable sql_text */ SELECT CASE WHEN length(t.sql_text)>200000 THEN left(t.sql_text,200000)||E'\\n-- （原文共 '||length(t.sql_text)||' 个字符，这里只显示前 200000 个）' ELSE t.sql_text END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable sql_note */ SELECT CASE WHEN t.selected THEN '所选的一份原文 '||t.sql_id ELSE '同一结构的一份示例（共 '||t.structure_texts||' 份原文）' END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "hide": 2,
+        "includeAll": false,
+        "label": "sql_note",
+        "multi": false,
+        "name": "sql_note",
+        "options": [],
+        "query": "/* mpp-detail variable sql_note */ SELECT CASE WHEN t.selected THEN '所选的一份原文 '||t.sql_id ELSE '同一结构的一份示例（共 '||t.structure_texts||' 份原文）' END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Shanghai",
+  "title": "SQL 详情",
+  "uid": "mpp-detail",
+  "version": 1
+}

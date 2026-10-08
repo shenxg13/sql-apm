@@ -1,4 +1,4 @@
-"""Populated 1.9 -> 1.10 preserves every old column; fold is database generated."""
+"""Populated 1.9 -> 1.11 preserves every old column; fold is database generated."""
 import hashlib
 from database.fixture import statements
 
@@ -25,4 +25,4 @@ def verify_search_migration(v, root):
     for mode in ('schema', 'all', 'upgrade', 'check'):
         v.init(mode)
     assert before == state()
-    v.require(True, 'populated 1.9 -> 1.10: old values, tables and receipts preserved; generated text complete; reruns safe')
+    v.require(True, 'populated 1.9 -> 1.11: old values, tables and receipts preserved; generated text complete; reruns safe')

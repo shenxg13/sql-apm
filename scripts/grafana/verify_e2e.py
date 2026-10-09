@@ -92,6 +92,14 @@ class Environment:
     def one(self, statement):
         return self.sql(statement)[0][0]
 
+    def cli(self, words):
+        """The search command with the read-only account of this environment; returns (exit code, JSON)."""
+        runner = "import json,sys;from sql_apm.cli.search import main;sys.exit(main(json.load(sys.stdin)))"
+        dsn = 'host=127.0.0.1 port=%d dbname=%s user=%s' % (self.state['pg_port'], self.state['database'], self.state['readonly_role'])
+        done = subprocess.run([self.state['python'], '-c', runner], cwd=ROOT, input=json.dumps(words), text=True, capture_output=True, timeout=180,
+                              env=dict(os.environ, SQL_APM_DSN=dsn, PGPASSFILE=str(Path(self.state['directory']) / 'private/service-pgpass')))
+        return done.returncode, json.loads(done.stdout)
+
     def panel(self, board, title):
         found = []
         for panel in self.dashboards[board]['panels']:
@@ -220,6 +228,13 @@ class Browser:
         if then:
             self.page.keyboard.type(then)
 
+    def editor_text(self, title):
+        """The text of the read-only editor in the panel with this title."""
+        return self.page.evaluate("""(title) => {
+            const root = document.querySelector('[data-testid^="data-testid Panel header ' + title + '"]');
+            return window.monaco.editor.getEditors().filter((item) => root && root.contains(item.getDomNode())).map((item) => item.getValue()).join('');
+        }""", title)
+
     def editor_value(self):
         # Only the search form's editor; other pages leave read-only editors behind.
         return self.page.evaluate('''() => {
@@ -233,18 +248,26 @@ class Browser:
     def search(self, text, mode, then=None):
         self.type_sql(text, then)
         self.page.get_by_test_id('data-testid radio-button-option ' + mode).click(force=True)
+        note, listed = [('mpp-search', 'panel ' + str(self.env.panel('mpp-search.json', title)['id']), 'A') for title in ('这次检索', '结果')]
+        shown = self.results.get(listed)
         self.results.clear()
         del self.services[:]
         before = self.page.url
         self.page.get_by_test_id(SUBMIT).click()
         self.settle(1500)
-        # A slow search is still running after the page looked idle: wait for both panels.
+        # A slow search is still running after the page looked idle: wait for both panels. The result list is
+        # asked again only when something it depends on changed; otherwise the page keeps showing what it had.
         if self.page.url != before:
-            wanted = [('mpp-search', 'panel ' + str(self.env.panel('mpp-search.json', title)['id']), 'A') for title in ('这次检索', '结果')]
+            answered = lambda key: key in self.results or key in [failed for failed, _ in self.failures]
+            waited = 0
             for _ in range(600):
-                if all(key in self.results or key in [failed for failed, _ in self.failures] for key in wanted):
+                if answered(note) and (answered(listed) or waited >= 15):
                     break
+                waited += 1 if answered(note) else 0
                 self.page.wait_for_timeout(200)
+            if not answered(listed) and shown is not None:
+                self.results[listed] = shown
+            self.page.wait_for_timeout(300)
 
     def close(self):
         self.browser.close()
@@ -333,10 +356,21 @@ def arrival(env, play):
         assert status == 200 and received == dict(bytes=len(final.encode()), sha256=expected), (label, received)
         assert browser.variables()['q'] == '' and browser.editor_value() == [final]
         digests.append((label, len(final.encode()), expected[:12]))
-    # The editor keeps one line-break form: a pasted CR LF arrives as LF, nothing else changes.
-    browser.search('SELECT 1,\r\n2\r\nFROM t', 'exact')
-    received = browser.services[-1][1]['frames'][0]['schema']['meta']['custom']['data']['input']
-    assert received['sha256'] == hashlib.sha256(b'SELECT 1,\n2\nFROM t').hexdigest()
+    # The input box keeps one line-break form: CR LF and a lone CR arrive as LF, also inside a string
+    # constant and in a mixture; the place and number of the breaks and every other character stay.
+    for label, text in (('CR LF', "SELECT 1,\r\n2\r\nFROM t WHERE note = 'a\r\nb'"), ('a lone CR', "SELECT 1,\r2\rFROM t WHERE note = 'a\rb'"),
+                        ('mixed line breaks', "SELECT 'a\r\nb' AS x,\n  'c\rd' AS y\r\nFROM t\rWHERE z = 1\n")):
+        plain = re.sub('\r\n?', '\n', text)
+        expected = hashlib.sha256(plain.encode()).hexdigest()
+        assert plain != text and plain.count('\n') == len(re.findall('\r\n|\r|\n', text))
+        for mode in ('words', 'passage'):
+            browser.search(text, mode)
+            note = dict(browser.rows('mpp-search', '这次检索'))
+            assert note['到达数据库的输入'] == '%d 个字符，SHA-256 %s' % (len(plain), expected), (label, mode)
+        browser.search(text, 'exact')
+        received = browser.services[-1][1]['frames'][0]['schema']['meta']['custom']['data']['input']
+        assert received == dict(bytes=len(plain.encode()), sha256=expected), (label, received)
+        digests.append((label + ' (compared after turning them into LF)', len(plain.encode()), expected[:12]))
     log = Path(env.state['service_log']).read_text()
     assert '中文' not in log and 'SELECT' not in log.upper().replace('"RESULT"', '') and str(len(data.LONG.encode())) in log
     browser.close()
@@ -350,7 +384,7 @@ def arrival(env, play):
     windows.search(multi, 'passage')
     assert dict(windows.rows('mpp-search', '这次检索'))['到达数据库的输入'].endswith(hashlib.sha256(multi.encode()).hexdigest())
     windows.close()
-    env.ok('G10: %d fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest: %s'
+    env.ok('G10: %d fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest, line breaks as LF: %s'
            % (len(digests), '; '.join('%s %d bytes %s' % item for item in digests)))
 
 
@@ -642,7 +676,8 @@ def search(env, play):
     assert browser.editor_value() == [chosen_text] and browser.mode() == 'exact' and browser.variables()['fp'] == busy
     browser.search('select  O.ID, o.amount\nfrom orders o where o.status = 99 and o.created_at >= \'2000-01-01\'', 'exact')
     assert browser.variables()['xsql'] == '' and browser.variables()['fp'] == busy
-    assert dict(browser.rows('mpp-search', '这次检索'))['一字不差的原文'] == '库里没有与输入一字不差的原文'
+    said = dict(browser.rows('mpp-search', '这次检索'))['一字不差的原文']
+    assert said.startswith('库里没有与输入一字不差的原文。') and said.endswith('三种换行（CR LF、单独的 CR、LF）视为相同，其余字符逐一比较'), said
     # the other outcomes
     for text, state, phrase in ((data.FAILING, 'records_without_baseline', '当前版本没有它的基线'), ('SELECT never FROM seen_e2e', 'not_seen', '库里没有这个结构'),
                                 ('SELECT ?', 'unreliable_fingerprint', '无法生成可靠指纹')):
@@ -1169,6 +1204,288 @@ def listing(env, play):
            '"set as time range" moves to the last day of data; a row opens the detail page')
 
 
+def boundaries(env, play):
+    """Boundary cases: the filters of a complete-SQL search, empty and oversized input, a pasted fingerprint, the
+    identical text across line-break forms, identities without a baseline, a stale choice of text, failure marks
+    without any duration, and a text longer than one segment of the text panel."""
+    def fingerprint(text):
+        return env.one("SELECT f.value FROM mpp_fingerprint f JOIN mpp_sql_text t USING(sql_id) WHERE t.text=" + literal(text))
+
+    def stored(text):
+        return env.one("SELECT sql_id FROM mpp_sql_text WHERE text=" + literal(text))
+
+    def identity(*parts):
+        return base64.urlsafe_b64encode(json.dumps(list(parts)).encode()).decode().rstrip('=')
+
+    def note(page):
+        return dict(page.rows('mpp-search', '这次检索'))
+
+    def found(page):
+        """Fingerprints in the result list as the page shows it now (it is not asked again when nothing it depends on changed)."""
+        drawn = page.page.locator('[data-testid^="data-testid Panel header 结果"] .rdg-row').count()
+        frame = page.results.get(('mpp-search', 'panel %d' % env.panel('mpp-search.json', '结果')['id'], 'A'))
+        if frame is None:
+            assert drawn == 0, drawn
+            return []
+        rows = frame[0]['rows'] if frame else []
+        assert (drawn > 0) == bool(rows), (drawn, len(rows))
+        return [row[frame[0]['names'].index('fingerprint')] for row in rows]
+
+    label = dict(env.sql("SELECT s,mpp_view_label('state',s) FROM unnest(ARRAY['not_seen','has_baseline','records_without_baseline','unreliable_fingerprint']) s"))
+    modes = (('words', '按词'), ('passage', '整段'), ('exact', '完整 SQL'))
+    search = Browser(play, env, height=1700)
+
+    # ---- an empty input is refused with its reason, also after an earlier search; "not searched yet" shows nothing
+    search.open('/d/mpp-search/sql-search')
+    assert search.rows('mpp-search', '这次检索') == []
+    for mode, name in modes:
+        for text in ('', ' \t\n\r\f\x0b '):
+            search.search(text, mode)
+            said = note(search)
+            assert list(said) == ['检索方式', '没有检索'] and said['检索方式'] == name and said['没有检索'].startswith('输入为空'), (mode, said)
+            assert found(search) == [] and search.rows('mpp-search', '整批没有命中') == []
+    search.search('orders status', 'words')
+    assert found(search) and '切出的词' in note(search)
+    search.search('', 'words')
+    assert note(search)['没有检索'].startswith('输入为空') and found(search) == []
+    search.search(' '.join('w%d' % n for n in range(21)), 'words')
+    assert '超过 20 个' in note(search)['没有检索']
+
+    # ---- words and passages: 256 KB at both entries, the same candidates at the limit and the same refusal over it
+    for (mode, name), start in zip(modes[:2], ('orders status', 'FROM orders o WHERE')):
+        edge = start + ' ' * (262144 - len(start))
+        code, answer = env.cli(['find', edge, '--mode', mode])
+        search.search(edge, mode)
+        assert code == 0 and answer['rows'] and found(search) == [row['fingerprint'] for row in answer['rows']], mode
+        assert note(search)['到达数据库的输入'].startswith('262144 个字符')
+        assert env.cli(['find', edge + ' ', '--mode', mode]) == (1, dict(state='failed', reason='search_input_too_large'))
+        search.search(edge + ' ', mode)
+        said = note(search)
+        assert said['检索方式'] == name and '256 KB' in said['没有检索'] and found(search) == [], (mode, said)
+
+    # ---- exactly one fingerprint value is looked up as it is in every mode, with the chosen filters
+    quoted = fingerprint(data.QUOTED)
+    for mode, _ in modes:
+        search.search(quoted, mode)
+        assert found(search) == [quoted], mode
+    assert note(search)['结果'] == label['has_baseline'] and note(search)['结构指纹'] == quoted
+    assert env.cli(['exact', '--sql', quoted])[1]['state'] == 'has_baseline'
+    search.search(quoted[:-1], 'exact')
+    assert note(search)['结果'].startswith(label['unreliable_fingerprint']) and found(search) == []
+    search.open('/d/mpp-search/sql-search?var-cluster=' + b64('C2'))
+    for mode, _ in modes:
+        search.search(quoted, mode)
+        assert found(search) == [], mode
+    assert note(search)['结果'] == label['not_seen'] and env.cli(['exact', '--sql', quoted, '--cluster', 'C2'])[1]['state'] == 'not_seen'
+
+    # ---- complete SQL: the state and the per-statement hints are those of the chosen cluster, database and user
+    hints_panel = '[data-testid^="data-testid Panel header 整批没有命中"]'
+    for chosen in (dict(cluster='C2'), dict(database='crm'), dict(user='report_user')):
+        search.open('/d/mpp-search/sql-search?' + '&'.join('var-%s=%s' % (name, b64(value)) for name, value in chosen.items()))
+        search.search(data.BATCH, 'exact')
+        code, answer = env.cli(['exact', '--sql', data.BATCH] + [part for name, value in chosen.items() for part in ('--' + name, value)])
+        assert code == 0 and answer['state'] == 'not_seen' and len(answer['statement_hints']) == 2, chosen
+        assert note(search)['结果'] == label['not_seen'] and '逐条提示' not in note(search)
+        assert [(row[0], row[3], row[1]) for row in search.rows('mpp-search', '整批没有命中')] == \
+            [(hint['statement'], hint['fingerprint'], label[hint['state']]) for hint in answer['statement_hints']], chosen
+    address = search.page.url.replace(env.base, '')  # the search with user=report_user
+    # a hint opens that statement and keeps the filter
+    search.page.locator(hints_panel + ' a').first.click()
+    search.settle(2500)
+    kept = search.variables()
+    assert kept['user'] == b64('report_user') and kept['mode'] == 'exact' and kept['fp'] == answer['statement_hints'][0]['fingerprint']
+    assert note(search)['结果'] == label['not_seen'] and found(search) == [] and len(search.rows('mpp-search', '整批没有命中')) == 2
+    # the filter is changed after the search: the state follows it, the hints of the other filter are not kept
+    search.open(address.replace('var-user=' + b64('report_user'), 'var-user=' + b64('app_user')))
+    said = note(search)
+    assert said['结果'] == label['has_baseline'] and '再点一次“检索”' in said['逐条提示'] and search.rows('mpp-search', '整批没有命中') == []
+    assert len(found(search)) == 1 and env.cli(['exact', '--sql', data.BATCH, '--user', 'app_user'])[1]['state'] == 'has_baseline'
+    search.open(address)
+    assert '逐条提示' not in note(search) and len(search.rows('mpp-search', '整批没有命中')) == 2
+    search.open('/d/mpp-search/sql-search')
+    search.search(data.BATCH, 'exact')
+    assert note(search)['结果'] == label['has_baseline'] and search.rows('mpp-search', '整批没有命中') == []
+
+    # ---- the identical text: the three line-break forms count as the same, nothing else does
+    for text in (data.BREAK_CRLF, data.BREAK_CR, data.BREAK_MIXED):
+        plain, wanted = re.sub('\r\n?', '\n', text), stored(text)
+        for form in (text, plain):
+            search.search(form, 'exact')
+            said = note(search)['一字不差的原文']
+            assert search.variables()['xsql'] == wanted and wanted in said and '三种换行' in said, (text[:16], said[:40])
+        search.search(plain.replace('FROM', 'FROM '), 'exact')
+        assert search.variables()['xsql'] == '' and note(search)['一字不差的原文'].startswith('库里没有') and found(search) == [fingerprint(text)]
+    # a string constant kept in the structure: the statement is another structure in the form the page sends; it
+    # is found in the form of the stored text, the page says which form that is, and nothing else is taken for it
+    for text, form, name in ((data.KEPT_CRLF, 'crlf', ' CR LF'), (data.KEPT_CR, 'cr', '单独的 CR')):
+        plain, wanted = re.sub('\r\n?', '\n', text), stored(text)
+        assert env.cli(['exact', '--sql', plain])[1]['state'] == 'not_seen'
+        search.search(text, 'exact')
+        state, said = search.variables(), note(search)
+        assert (state['xsql'], state['xbreak'], state['fp'], state['xstate']) == (wanted, form, fingerprint(text), 'has_baseline'), state
+        assert said['结果'] == label['has_baseline'] and wanted in said['一字不差的原文'], said
+        assert said['一字不差的原文'].endswith('页面送出的是 LF，库里这份原文用的是' + name + '，结果按库里的形式给出'), said['一字不差的原文'][-60:]
+        assert found(search) == [fingerprint(text)]
+        search.search(plain.replace('cleaned', 'cleaned '), 'exact')
+        state, said = search.variables(), note(search)
+        assert (state['xsql'], state['xbreak'], state['xstate']) == ('', '', 'not_seen') and said['结果'] == label['not_seen'], state
+        assert '库里这份原文' not in ''.join(said.values()) and found(search) == []
+    # kept constants in two different forms are not found as a complete SQL from the page; a passage finds the statement
+    search.search(data.KEPT_TWO, 'exact')
+    state = search.variables()
+    assert (state['xsql'], state['xbreak'], state['xstate']) == ('', '', 'not_seen') and found(search) == []
+    search.search(data.KEPT_TWO, 'passage')
+    assert found(search) == [fingerprint(data.KEPT_TWO)]
+    # the text found in another form is the chosen text on the detail page, and the way back keeps the note
+    search.search(data.KEPT_CR, 'exact')
+    search.page.locator('[data-testid^="data-testid Panel header 结果"] a').first.click()
+    search.settle(3000)
+    assert search.variables()['sqlid'] == stored(data.KEPT_CR) and search.variable('mpp-detail', 'sid') == [(stored(data.KEPT_CR),)]
+    search.page.get_by_text('回到 SQL 检索').click()
+    search.settle(3000)
+    assert search.variables()['xbreak'] == 'cr' and '单独的 CR，结果按库里的形式给出' in note(search)['一字不差的原文']
+    search.search(re.sub('\r\n?', '\n', data.BREAK_MIXED), 'exact')
+    search.page.locator('[data-testid^="data-testid Panel header 结果"] a').first.click()
+    search.settle(3000)
+    assert search.variables()['sqlid'] == stored(data.BREAK_MIXED) and search.variable('mpp-detail', 'sid') == [(stored(data.BREAK_MIXED),)]
+
+    # ---- databases and users without a baseline can be chosen on both pages
+    databases = [row[0] for row in env.sql("SELECT DISTINCT database FROM mpp_occurrence WHERE database IS NOT NULL ORDER BY 1")]
+    users = [row[0] for row in env.sql("SELECT DISTINCT execution_user FROM mpp_occurrence WHERE execution_user IS NOT NULL ORDER BY 1")]
+    based = {row[0] for row in env.sql("SELECT DISTINCT database FROM mpp_baseline_group")}
+    assert 'ledger' in databases and 'ledger' not in based and 'night_user' in users  # failures only
+    assert 'fresh_db' in databases and 'fresh_db' not in based and 'fresh_user' in users  # successful, imported after the last build
+    for board, path in (('mpp-search', '/d/mpp-search/sql-search'), ('mpp-list', '/d/mpp-list/sql-list?from=%d&to=%d' % env.last_day)):
+        search.open(path)
+        assert [row[0] for row in search.variable(board, 'database')] == ['全部'] + databases, board
+        assert [row[0] for row in search.variable(board, 'user')] == ['全部'] + users, board
+    search.open('/d/mpp-search/sql-search?var-database=%s&var-user=%s' % (b64('ledger'), b64('night_user')))
+    search.search(data.UNBASED, 'exact')
+    assert note(search)['结果'] == label['records_without_baseline'] and found(search) == [fingerprint(data.UNBASED)]
+    search.search('ledger_entries', 'words')
+    assert found(search) == [fingerprint(data.UNBASED)]
+    search.open('/d/mpp-list/sql-list?from=%d&to=%d&var-database=%s' % (env.last_day + (b64('ledger'),)), extra=2500)
+    ranked = search.rows('mpp-list', 'SQL 身份排行：所选时间范围内')
+    assert {(row[0], row[1], row[2], row[3]) for row in ranked} == {('C2', 'ledger', 'night_user', '无计时类别')} and len(ranked) == 4
+    assert sorted(row[10] for row in ranked) == sorted(fingerprint(text) for text in (data.UNBASED, data.UNBASED_CANCELLED, data.UNBASED_TIMED_OUT, data.UNBASED_MIXED))
+    # successful executions that no build has seen yet: found by both searches, listed, and their history opens
+    later = fingerprint(data.LATER)
+    assert env.one("SELECT count(*) FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) WHERE f.value=%s AND o.outcome='success' AND o.duration_ms IS NOT NULL" % literal(later)) == 2
+    search.open('/d/mpp-search/sql-search?var-database=%s&var-user=%s' % (b64('fresh_db'), b64('fresh_user')))
+    search.search(data.LATER, 'exact')
+    assert note(search)['结果'] == label['records_without_baseline'] and found(search) == [later]
+    search.search('fresh_orders', 'words')
+    assert found(search) == [later]
+    search.open('/d/mpp-list/sql-list?from=%d&to=%d&var-database=%s' % (env.last_day + (b64('fresh_db'),)), extra=2500)
+    ranked = search.rows('mpp-list', 'SQL 身份排行：所选时间范围内')
+    assert [(row[0], row[1], row[2], row[10]) for row in ranked] == [('C2', 'fresh_db', 'fresh_user', later)], ranked
+    # the same database and user in two clusters: both without the cluster filter, one with it
+    search.open('/d/mpp-list/sql-list?from=%d&to=%d&var-database=%s&var-user=%s' % (env.last_day + (b64('shop'), b64('app_user'))), extra=2500)
+    assert {(row[0], row[1], row[2]) for row in search.rows('mpp-list', 'SQL 身份排行：所选时间范围内')} == {('C1', 'shop', 'app_user'), ('C2', 'shop', 'app_user')}
+    search.open('/d/mpp-list/sql-list?from=%d&to=%d&var-database=%s&var-user=%s&var-cluster=%s' % (env.last_day + (b64('shop'), b64('app_user'), b64('C2'))), extra=2500)
+    assert {(row[0], row[1], row[2]) for row in search.rows('mpp-list', 'SQL 身份排行：所选时间范围内')} == {('C2', 'shop', 'app_user')}
+    search.open('/d/mpp-list/sql-list?from=%d&to=%d&var-user=%s' % (env.last_day + (b64('report_user'),)), extra=2500)
+    assert {row[2] for row in search.rows('mpp-list', 'SQL 身份排行：所选时间范围内')} == {'report_user'}
+    search.close()
+
+    # ---- a text chosen for one structure does not empty the history of another structure typed at the top
+    week = (env.last_day[0] - 6 * 86400000, env.last_day[1])
+    span = "o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0)" % week
+    detail = Browser(play, env, height=5200)
+    sparse, chosen = fingerprint(data.SPARSE), stored(data.QUOTED)
+    detail.open('/d/mpp-detail/sql-detail?var-fp=%s&var-identity=%s&var-sqlid=%s&from=%d&to=%d' % ((quoted, identity('C1', 'shop', 'app_user'), chosen) + week), extra=3000)
+    assert detail.variable('mpp-detail', 'sid') == [(chosen,)] and detail.rows('mpp-detail', '范围内的记录')[0][0] == 7
+    box = detail.page.get_by_test_id('data-testid Dashboard template variables submenu Label 指纹').locator('xpath=following::input[1]')
+    box.click()
+    box.fill(sparse)
+    box.press('Enter')
+    detail.settle(4000)
+    assert not detail.failures, detail.failures[:2]
+    expected = env.one("SELECT count(*) FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) WHERE f.value=%s AND o.scope_id='C1' AND o.database='crm' "
+                       "AND o.execution_user='app_user' AND o.timing_type='request' AND %s" % (literal(sparse), span))
+    assert expected == 7 and detail.variables()['sqlid'] == chosen and detail.variable('mpp-detail', 'sid') == [('',)]
+    assert detail.rows('mpp-detail', '范围内的记录')[0][0] == expected and len(detail.rows('mpp-detail', '明细：')) == expected
+    assert len([row for row in detail.rows('mpp-detail', '每次执行的耗时') if row[1] is not None]) == expected
+    scope = [row[2] for row in detail.rows('mpp-detail', '当前查看的内容') if row[1] == '原文范围']
+    assert scope and scope[0].startswith('同一结构的全部原文'), scope
+    box.click()
+    box.fill('struct:sql-normalization/5:' + '0' * 64)
+    box.press('Enter')
+    detail.settle(3000)
+    assert not detail.failures and '没有找到这个指纹' in detail.text()
+    busy_text = stored(data.BUSY.format(status=3, day='2026-06-28'))
+    detail.open(env.detail + '&var-sqlid=' + busy_text, extra=2500)
+    assert detail.variable('mpp-detail', 'sid') == [(busy_text,)] and {row[5] for row in detail.rows('mpp-detail', '明细：')} == {busy_text}
+    detail.open(env.detail, extra=2500)
+    assert detail.variable('mpp-detail', 'sid') == [('',)] and len({row[5] for row in detail.rows('mpp-detail', '明细：')}) > 1
+
+    # ---- failures, cancellations and timeouts are marked on the duration chart even when nothing has a duration
+    chart = '[data-testid^="data-testid Panel header 每次执行的耗时"]'
+    cases = ((data.FAILING, ('C1', 'shop', 'app_user'), {'失败'}), (data.UNBASED_CANCELLED, ('C2', 'ledger', 'night_user'), {'取消'}),
+             (data.UNBASED_TIMED_OUT, ('C2', 'ledger', 'night_user'), {'超时'}), (data.UNBASED_MIXED, ('C2', 'ledger', 'night_user'), {'失败', '取消', '超时'}))
+    for text, who, kind in cases:
+        detail.open('/d/mpp-detail/sql-detail?var-fp=%s&var-identity=%s&from=%d&to=%d' % ((fingerprint(text), identity(*who)) + week), extra=3500)
+        panel = detail.page.locator(chart).first
+        panel.scroll_into_view_if_needed()
+        detail.page.wait_for_timeout(1200)
+        marks = detail.results[('mpp-detail', 'annotation', '')][0]['rows']
+        tiles = detail.rows('mpp-detail', '范围内的记录')[0]
+        assert not detail.failures and marks and {row[2] for row in marks} == kind and tiles[0] == len(marks) and tiles[1] == 0, (kind, tiles)
+        assert detail.rows('mpp-detail', '每次执行的耗时') == [] and detail.rows('mpp-detail', '每次执行的耗时', ref='B') == []
+        frame = detail.rows('mpp-detail', '每次执行的耗时', ref='C')
+        assert len(frame) == 2 and all(row[1] is None for row in frame)  # the plot is kept without any value, not with a zero
+        assert panel.locator('canvas').count() >= 1 and '无数据' not in panel.inner_text()
+        assert panel.get_by_test_id('data-testid annotation-marker').count() == len(marks), kind
+    # successful executions without a baseline (imported after the last build): the history is drawn, no reference lines
+    detail.open('/d/mpp-detail/sql-detail?var-fp=%s&var-identity=%s&from=%d&to=%d' % ((later, identity('C2', 'fresh_db', 'fresh_user')) + env.last_day), extra=3500)
+    assert not detail.failures and detail.rows('mpp-detail', '范围内的记录')[0][0] == 2 and len(detail.rows('mpp-detail', '明细：')) == 2
+    assert len([row for row in detail.rows('mpp-detail', '每次执行的耗时') if row[1] is not None]) == 2
+    assert detail.rows('mpp-detail', '每次执行的耗时', ref='B') == []
+    detail.open(env.detail, extra=3500)  # with durations as well: marks, both kinds of point and the reference lines
+    panel = detail.page.locator(chart).first
+    panel.scroll_into_view_if_needed()
+    detail.page.wait_for_timeout(1200)
+    marks = detail.results[('mpp-detail', 'annotation', '')][0]['rows']
+    points = detail.rows('mpp-detail', '每次执行的耗时')
+    assert {row[2] for row in marks} <= {'失败', '取消', '超时'} and len({row[2] for row in marks}) >= 2
+    assert panel.get_by_test_id('data-testid annotation-marker').count() == len(marks) > 0
+    assert [row for row in points if row[1] is not None] and [row for row in points if row[2] is not None]
+    assert len(detail.rows('mpp-detail', '每次执行的耗时', ref='B')) == 2 and '时间范围' not in panel.inner_text().replace('所选时间范围', '')
+
+    # ---- a text longer than one segment is shown whole, a segment at a time
+    longest, parts = stored(data.LONGEST), []
+    assert len(data.LONGEST) > boards.SEGMENT and len(data.LONGEST.encode()) < 512 * 1024
+    address = '/d/mpp-detail/sql-detail?var-fp=%s&var-identity=%s&var-sqlid=%s' % (fingerprint(data.LONGEST), identity('C2', 'shop', 'app_user'), longest) + '&from=%d&to=%d' % week
+    detail.open(address, extra=3000)
+    title = detail.page.locator('[data-testid^="data-testid Panel header SQL 原文"]').first.get_attribute('data-testid')
+    paging = [row for row in detail.rows('mpp-detail', '当前查看的内容') if row[1] == '原文较长']
+    assert '共 %d 个字符，第 1／2 段' % len(data.LONGEST) in title and len(paging) == 1 and paging[0][2].endswith('下一段')
+    parts.append(detail.variable('mpp-detail', 'sql_text')[0][0])
+    detail.page.get_by_text('点这里看下一段').first.click()
+    detail.settle(3000)
+    assert detail.variables()['part'] == '2' and detail.variables()['sqlid'] == longest
+    parts.append(detail.variable('mpp-detail', 'sql_text')[0][0])
+    paging = [row for row in detail.rows('mpp-detail', '当前查看的内容') if row[1] == '原文较长']
+    assert len(paging) == 1 and paging[0][2].endswith('上一段')
+    assert ''.join(parts) == data.LONGEST and len(parts[0]) == boards.SEGMENT and parts[1].endswith('AS tail_marker FROM long_text')
+    assert 'tail_marker' in detail.editor_text('SQL 原文')
+    detail.open(address + '&var-part=9', extra=2500)  # a number outside the range is the last segment
+    assert detail.variable('mpp-detail', 'sql_text')[0][0] == parts[1]
+    detail.open(address + '&var-part=x', extra=2500)  # anything else is the first
+    assert detail.variable('mpp-detail', 'sql_text')[0][0] == parts[0]
+    detail.open(env.detail + '&var-part=2', extra=2500)  # an ordinary text is one segment, whatever is asked for
+    shown = detail.variable('mpp-detail', 'sql_text')[0][0]
+    assert shown.startswith('SELECT o.id') and len(shown) < 200 and not [row for row in detail.rows('mpp-detail', '当前查看的内容') if row[1] == '原文较长']
+    detail.close()
+    env.ok('R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode; '
+           'a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; '
+           'the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form '
+           'is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported '
+           'after the last build) can be chosen and their records found; a text chosen for another structure is not applied; '
+           'failure, cancellation and timeout marks, alone or mixed, show without any duration; '
+           'a text longer than one segment can be read to its end')
+
+
 def real(env, play):
     """G21/G26 on the full real data: page numbers of sampled identities against the base tables, and what each page costs."""
     report = dict(samples=[], pages=[])
@@ -1312,7 +1629,8 @@ def main():
     with sync_playwright() as play:
         steps = [('configuration', lambda: configuration(env)), ('login', lambda: login(env, play)), ('folders', lambda: folders(env)),
                  ('arrival', lambda: arrival(env, play)), ('search', lambda: search(env, play)), ('service', lambda: service_down(env, play)),
-                 ('detail', lambda: detail(env, play)), ('listing', lambda: listing(env, play))]
+                 ('detail', lambda: detail(env, play)), ('listing', lambda: listing(env, play)),
+                 ('boundaries', lambda: boundaries(env, play))]
         for name, step in steps:
             if not args.only or args.only in name:
                 step()

@@ -120,7 +120,7 @@
           }
         ],
         "initial": {
-          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\n// Fill the box again: from the address when it carries a search, otherwise from\n// the last search of this browser tab (the way back from the detail page).\nconst kept = remembered();\nconst inAddress = variables.q !== '' || variables.fp !== '' || variables.xstate !== '';\nlet text = '';\nlet mode = variables.mode || 'words';\nif (inAddress) {\n  if (variables.q !== '') {\n    text = fromToken(variables.q);\n  } else if (kept && kept.qd !== '' && kept.qd === variables.qd) {\n    text = kept.text || '';\n  }\n} else if (kept && typeof kept.text === 'string' && kept.text !== '') {\n  text = kept.text;\n  mode = kept.mode || 'words';\n  apply(kept);\n}\nfill(text, mode);\ncontext.panel.enableSubmit();\n",
+          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\n// xfor: the filters the complete-SQL answer was computed for; sent: set by every click on the button;\n// xbreak: the line-break form of the stored text when the answer was found in another form than the one sent.\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints', 'xfor', 'xbreak', 'sent'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\n// Fill the box again: from the address when it carries a search, otherwise from\n// the last search of this browser tab (the way back from the detail page).\nconst kept = remembered();\nconst inAddress = variables.q !== '' || variables.fp !== '' || variables.xstate !== '' || variables.sent !== '';\nlet text = '';\nlet mode = variables.mode || 'words';\nif (inAddress) {\n  if (variables.q !== '') {\n    text = fromToken(variables.q);\n  } else if (kept && kept.qd !== '' && kept.qd === variables.qd) {\n    text = kept.text || '';\n  }\n} else if (kept && typeof kept.text === 'string' && kept.text !== '') {\n  text = kept.text;\n  mode = kept.mode || 'words';\n  apply(kept);\n}\nfill(text, mode);\ncontext.panel.enableSubmit();\n",
           "contentType": "application/json",
           "getPayload": "return {}",
           "header": [],
@@ -144,7 +144,7 @@
           "variant": "secondary"
         },
         "resetAction": {
-          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\ntry {\n  window.sessionStorage.removeItem('sql-apm-search');\n} catch (error) {\n  // nothing to forget\n}\nfill('', 'words');\napply({ mode: 'words' });\ncontext.panel.enableSubmit();\n",
+          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\n// xfor: the filters the complete-SQL answer was computed for; sent: set by every click on the button;\n// xbreak: the line-break form of the stored text when the answer was found in another form than the one sent.\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints', 'xfor', 'xbreak', 'sent'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\ntry {\n  window.sessionStorage.removeItem('sql-apm-search');\n} catch (error) {\n  // nothing to forget\n}\nfill('', 'words');\napply({ mode: 'words' });\ncontext.panel.enableSubmit();\n",
           "confirm": false,
           "getPayload": "return {}",
           "mode": "custom",
@@ -164,7 +164,7 @@
         },
         "sync": false,
         "update": {
-          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\n// The editor keeps one line-break form for the whole text, and which one depends\n// on the browser's platform. Line breaks are therefore always sent as LF.\nconst text = String(element('sql').value || '').replace(/\\r\\n/g, '\\n');\nconst mode = String(element('mode').value || 'words');\nconst bytes = new TextEncoder().encode(text);\nconst state = { mode: mode, text: text, q: '', qd: '', fp: '', xstate: '', xreason: '', xsql: '', xhints: '' };\nconst finish = () => {\n  remember(state);\n  apply(state);\n  context.panel.enableSubmit();\n};\nif (mode !== 'exact') {\n  if (bytes.length > 262144) {\n    context.grafana.notifyError(['输入太长', '按词和整段方式的输入不能超过 256 KB；更长的完整语句请用“完整 SQL”方式。']);\n    context.panel.enableSubmit();\n    return;\n  }\n  state.q = toToken(bytes);\n  finish();\n  return;\n}\n// Complete SQL: at most one byte over the 512 KB limit is sent, which is enough\n// for the service to answer exactly like the command line does.\nconst body = JSON.stringify({ sql_b64: toToken(bytes.length > 524288 ? bytes.subarray(0, 524289) : bytes) });\nstate.qd = String(Date.now()) + '-' + String(bytes.length);\nreturn context.grafana.backendService\n  .post('/api/ds/query', {\n    from: 'now-1m',\n    to: 'now',\n    queries: [{\n      refId: 'A',\n      datasource: { type: 'yesoreyeram-infinity-datasource', uid: 'sql-apm-fingerprint' },\n      type: 'json', source: 'url', format: 'table', parser: 'backend', root_selector: '', columns: [],\n      url: '/v1/exact',\n      url_options: { method: 'POST', body_type: 'raw', body_content_type: 'application/json', data: body },\n    }],\n  }, { showErrorAlert: false })\n  .then((response) => {\n    const frame = response && response.results && response.results.A && response.results.A.frames && response.results.A.frames[0];\n    const result = frame && frame.schema && frame.schema.meta && frame.schema.meta.custom && frame.schema.meta.custom.data;\n    if (!result || typeof result.state !== 'string' || result.state === 'failed') {\n      throw new Error('unexpected service answer');\n    }\n    state.fp = result.fingerprint || '';\n    state.xstate = result.state;\n    state.xreason = result.reason || '';\n    state.xsql = result.exact_sql_id || '';\n    if (Array.isArray(result.statement_hints) && result.statement_hints.length > 0) {\n      const hints = result.statement_hints.filter((item) => item.fingerprint).map((item) => ({ statement: item.statement, fingerprint: item.fingerprint }));\n      state.xhints = toToken(new TextEncoder().encode(JSON.stringify(hints)));\n    }\n    if (result.rules && result.rules.normalization_id !== variables.norm && variables.norm !== '') {\n      context.grafana.notifyWarning(['规则不一致', '指纹服务使用的规则与库里当前版本的规则不同：产品升级后需要重启指纹服务，并发布一个新版本。']);\n    }\n    finish();\n  })\n  .catch(() => {\n    state.xstate = 'service_unavailable';\n    context.grafana.notifyError(['指纹服务不可用', '无法按完整 SQL 检索；按词和整段不受影响。请联系管理员检查指纹服务。']);\n    finish();\n  });\n",
+          "code": "\nconst element = (id) => context.panel.elements.find((item) => item.id === id);\nconst variables = {};\ncontext.grafana.templateService.getVariables().forEach((item) => {\n  variables[item.name] = item.current && typeof item.current.value === 'string' ? item.current.value : '';\n});\nconst toToken = (bytes) => {\n  let binary = '';\n  for (let start = 0; start < bytes.length; start += 32768) {\n    binary += String.fromCharCode.apply(null, bytes.subarray(start, start + 32768));\n  }\n  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');\n};\nconst fromToken = (token) => {\n  const binary = atob(token.replace(/-/g, '+').replace(/_/g, '/'));\n  const bytes = new Uint8Array(binary.length);\n  for (let index = 0; index < binary.length; index += 1) {\n    bytes[index] = binary.charCodeAt(index);\n  }\n  return new TextDecoder().decode(bytes);\n};\nconst remembered = () => {\n  try {\n    return JSON.parse(window.sessionStorage.getItem('sql-apm-search') || 'null');\n  } catch (error) {\n    return null;\n  }\n};\nconst remember = (state) => {\n  try {\n    window.sessionStorage.setItem('sql-apm-search', JSON.stringify(state));\n  } catch (error) {\n    // Without session storage only the refill after a complete-SQL search is lost.\n  }\n};\n// Set the box and the switch directly: the plugin's patchFormValue rewrites every\n// line break of a code element into a backslash and an n.\nconst fill = (text, mode) => {\n  context.panel.onChangeElements(context.panel.elements.map((item) => {\n    if (item.id === 'sql') {\n      return Object.assign({}, item, { value: text });\n    }\n    if (item.id === 'mode') {\n      return Object.assign({}, item, { value: mode });\n    }\n    return item;\n  }));\n};\n// xfor: the filters the complete-SQL answer was computed for; sent: set by every click on the button;\n// xbreak: the line-break form of the stored text when the answer was found in another form than the one sent.\nconst STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints', 'xfor', 'xbreak', 'sent'];\nconst apply = (state) => {\n  const query = {};\n  STATE.forEach((name) => {\n    query['var-' + name] = state[name] || '';\n  });\n  context.grafana.locationService.partial(query, true);\n};\n\n// The editor keeps one line-break form for the whole text, and which one depends\n// on the browser's platform; a lone CR is a line break to it as well. Line breaks\n// are therefore always sent as LF.\nconst text = String(element('sql').value || '').replace(/\\r\\n?/g, '\\n');\nconst mode = String(element('mode').value || 'words');\nconst bytes = new TextEncoder().encode(text);\nconst state = { mode: mode, text: text, q: '', qd: '', fp: '', xstate: '', xreason: '', xsql: '', xhints: '', xfor: '', xbreak: '', sent: String(Date.now()) };\nconst finish = () => {\n  remember(state);\n  apply(state);\n  context.panel.enableSubmit();\n};\n// Nothing but the six ASCII blanks is an empty input in every mode; it is refused here, with the reason on the page.\nif (text.replace(/[ \\t\\n\\r\\f\\v]/g, '') === '') {\n  state.xreason = 'empty_input';\n  finish();\n  return;\n}\nif (mode !== 'exact') {\n  // The same limit as the command line: words and passages travel in the address of the page.\n  if (bytes.length > 262144) {\n    state.xreason = 'input_too_large';\n    finish();\n    return;\n  }\n  state.q = toToken(bytes);\n  finish();\n  return;\n}\n// Complete SQL: at most one byte over the 512 KB limit is sent, which is enough\n// for the service to answer exactly like the command line does. The chosen\n// cluster, database and user go with it, as they do on the command line.\nconst request = { sql_b64: toToken(bytes.length > 524288 ? bytes.subarray(0, 524289) : bytes) };\n['cluster', 'database', 'user'].forEach((name) => {\n  if (variables[name] !== '' && variables[name] !== '*') {\n    request[name] = fromToken(variables[name]);\n  }\n});\nstate.xfor = [variables.cluster || '*', variables.database || '*', variables.user || '*'].join('|');\nconst body = JSON.stringify(request);\nstate.qd = String(Date.now()) + '-' + String(bytes.length);\nreturn context.grafana.backendService\n  .post('/api/ds/query', {\n    from: 'now-1m',\n    to: 'now',\n    queries: [{\n      refId: 'A',\n      datasource: { type: 'yesoreyeram-infinity-datasource', uid: 'sql-apm-fingerprint' },\n      type: 'json', source: 'url', format: 'table', parser: 'backend', root_selector: '', columns: [],\n      url: '/v1/exact',\n      url_options: { method: 'POST', body_type: 'raw', body_content_type: 'application/json', data: body },\n    }],\n  }, { showErrorAlert: false })\n  .then((response) => {\n    const frame = response && response.results && response.results.A && response.results.A.frames && response.results.A.frames[0];\n    const result = frame && frame.schema && frame.schema.meta && frame.schema.meta.custom && frame.schema.meta.custom.data;\n    if (!result || typeof result.state !== 'string' || result.state === 'failed') {\n      throw new Error('unexpected service answer');\n    }\n    state.fp = result.fingerprint || '';\n    state.xstate = result.state;\n    state.xreason = result.reason || '';\n    state.xsql = result.exact_sql_id || '';\n    state.xbreak = result.line_breaks || '';\n    if (Array.isArray(result.statement_hints) && result.statement_hints.length > 0) {\n      const hints = result.statement_hints.filter((item) => item.fingerprint).map((item) => ({ statement: item.statement, fingerprint: item.fingerprint }));\n      state.xhints = toToken(new TextEncoder().encode(JSON.stringify(hints)));\n    }\n    if (result.rules && result.rules.normalization_id !== variables.norm && variables.norm !== '') {\n      context.grafana.notifyWarning(['规则不一致', '指纹服务使用的规则与库里当前版本的规则不同：产品升级后需要重启指纹服务，并发布一个新版本。']);\n    }\n    finish();\n  })\n  .catch(() => {\n    state.xstate = 'service_unavailable';\n    context.grafana.notifyError(['指纹服务不可用', '无法按完整 SQL 检索；按词和整段不受影响。请联系管理员检查指纹服务。']);\n    finish();\n  });\n",
           "confirm": false,
           "contentType": "application/json",
           "getPayload": "return {}",
@@ -249,7 +249,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。",
+      "description": "写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索（输入为空、超过上限、超过 20 个词）。完整 SQL 方式写明四种结果中的哪一种；判断库里有没有一字不差的原文时，三种换行视为相同：输入框只能保留一种换行，页面一律以 LF 发送。保留在结构里的字符串常量或带引号的名字含换行时，结构随换行形式变化；库里的原文用的是另一种换行时，结果按库里的形式给出，并在这里写明。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -324,7 +324,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 4 A */ SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),'${fp}','${xstate}','${xreason}','${xsql}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
+          "rawSql": "/* mpp-search panel 4 A */ SELECT x.item,x.content FROM (\n  SELECT n.seq,n.item,CASE WHEN n.seq=4 AND coalesce(nullif('${mode}',''),'words')='exact'\n      THEN n.content||'。比较时三种换行（CR LF、单独的 CR、LF）视为相同，其余字符逐一比较'||CASE WHEN '${xsql}'<>'' AND '${xbreak}' IN ('crlf','cr','lf') THEN '。这条 SQL 的结构随换行形式变化（换行在保留于结构里的字符串常量或带引号的名字里）：页面送出的是 LF，库里这份原文用的是'||CASE '${xbreak}' WHEN 'crlf' THEN ' CR LF' WHEN 'cr' THEN '单独的 CR' ELSE ' LF' END||'，结果按库里的形式给出' ELSE '' END ELSE n.content END content\n  FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),\n      '${fp}','${xstate}','${xreason}','${xsql}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) n WHERE NOT '${xreason}' IN ('empty_input','input_too_large')\n  UNION ALL SELECT 1,'检索方式',CASE '${mode}' WHEN 'exact' THEN '完整 SQL' WHEN 'passage' THEN '整段' ELSE '按词' END WHERE '${xreason}' IN ('empty_input','input_too_large')\n  UNION ALL SELECT 2,'没有检索',CASE '${xreason}' WHEN 'empty_input' THEN '输入为空：请先在输入框里填写要找的内容'\n      ELSE '输入超过 256 KB：按词和整段的输入上限是 256 KB，命令行相同；更长的完整语句请用“完整 SQL”方式（上限 512 KB）' END WHERE '${xreason}' IN ('empty_input','input_too_large')\n  UNION ALL SELECT 9,'逐条提示','筛选在这次检索之后改过：结果已按现在的筛选重新查询；多条语句整批没有命中时的逐条提示需要再点一次“检索”'\n    WHERE '${mode}'='exact' AND '${fp}${xstate}'<>'' AND '${xfor}'<>'${cluster}|${database}|${user}') x\nWHERE '${q}${fp}${xstate}${sent}'<>'' ORDER BY x.seq",
           "refId": "A"
         }
       ],
@@ -646,7 +646,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "粘贴的是多条语句、整体没有命中时，这里列出每条语句单独查的结果（最多前 20 条）。逐条命中不等于整批命中。",
+      "description": "粘贴的是多条语句、整体没有命中时，这里列出每条语句单独查的结果（最多前 20 条）。逐条命中不等于整批命中。状态和提示都按检索时所选的集群、数据库和执行用户计算；检索之后改了筛选，这里会清空，需要再点一次“检索”。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -765,7 +765,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 5 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h",
+          "rawSql": "/* mpp-search panel 5 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint\n    ||'&var-cluster=${cluster}&var-database=${database}&var-user=${user}&var-xfor=${xfor}&var-sent=${sent}&var-timefilter=${timefilter}&var-order=${order}&from=${__from}&to=${__to}' AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h\nWHERE '${xfor}'='${cluster}|${database}|${user}'",
           "refId": "A"
         }
       ],
@@ -946,6 +946,60 @@
       },
       {
         "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "xfor",
+        "name": "xfor",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "xbreak",
+        "name": "xbreak",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 2,
+        "label": "sent",
+        "name": "sent",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
           "text": "全部",
           "value": "*"
         },
@@ -953,14 +1007,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "sql-apm-pg"
         },
-        "definition": "/* mpp-search variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT scope_id, mpp_view_encode(scope_id), 1 FROM scope WHERE scope_id IS NOT NULL ORDER BY 3, 1",
+        "definition": "/* mpp-search variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT scope_id AS name FROM scope WHERE scope_id IS NOT NULL) x ORDER BY 3, 1",
         "hide": 0,
         "includeAll": false,
         "label": "集群",
         "multi": false,
         "name": "cluster",
         "options": [],
-        "query": "/* mpp-search variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT scope_id, mpp_view_encode(scope_id), 1 FROM scope WHERE scope_id IS NOT NULL ORDER BY 3, 1",
+        "query": "/* mpp-search variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT scope_id AS name FROM scope WHERE scope_id IS NOT NULL) x ORDER BY 3, 1",
         "refresh": 1,
         "sort": 0,
         "type": "query"
@@ -974,14 +1028,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "sql-apm-pg"
         },
-        "definition": "/* mpp-search variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT database, mpp_view_encode(database), 1 FROM mpp_baseline_group WHERE database IS NOT NULL ORDER BY 3, 1",
+        "definition": "/* mpp-search variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT database AS name FROM mpp_occurrence WHERE database IS NOT NULL) x ORDER BY 3, 1",
         "hide": 0,
         "includeAll": false,
         "label": "数据库",
         "multi": false,
         "name": "database",
         "options": [],
-        "query": "/* mpp-search variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT database, mpp_view_encode(database), 1 FROM mpp_baseline_group WHERE database IS NOT NULL ORDER BY 3, 1",
+        "query": "/* mpp-search variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT database AS name FROM mpp_occurrence WHERE database IS NOT NULL) x ORDER BY 3, 1",
         "refresh": 1,
         "sort": 0,
         "type": "query"
@@ -995,14 +1049,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "sql-apm-pg"
         },
-        "definition": "/* mpp-search variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT execution_user, mpp_view_encode(execution_user), 1 FROM mpp_baseline_group WHERE execution_user IS NOT NULL ORDER BY 3, 1",
+        "definition": "/* mpp-search variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT execution_user AS name FROM mpp_occurrence WHERE execution_user IS NOT NULL) x ORDER BY 3, 1",
         "hide": 0,
         "includeAll": false,
         "label": "执行用户",
         "multi": false,
         "name": "user",
         "options": [],
-        "query": "/* mpp-search variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT DISTINCT execution_user, mpp_view_encode(execution_user), 1 FROM mpp_baseline_group WHERE execution_user IS NOT NULL ORDER BY 3, 1",
+        "query": "/* mpp-search variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT execution_user AS name FROM mpp_occurrence WHERE execution_user IS NOT NULL) x ORDER BY 3, 1",
         "refresh": 1,
         "sort": 0,
         "type": "query"

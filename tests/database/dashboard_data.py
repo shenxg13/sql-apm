@@ -18,6 +18,25 @@ QUOTED = 'SELECT "Id", "a"."b" FROM "Order Items" WHERE "Id" = 7'
 BATCH = 'SELECT 1 AS one; SELECT 2 AS two'
 SPECIAL = "SELECT '中文 备注', E'tab\\tline\\n', '$name', \"quoted col\" FROM special_chars WHERE note = 'it''s'"
 LONG = 'SELECT id FROM big_list WHERE id IN (' + ', '.join(str(1000000 + n) for n in range(7600)) + ')'
+# Second cluster only. A text longer than one segment of the detail page's text panel; texts whose line
+# breaks are CR LF, a lone CR and a mixture (also inside a string constant); and an identity that never
+# gets a baseline because every one of its records failed.
+LONGEST = "SELECT '" + 'q' * 210000 + "' AS tail_marker FROM long_text"
+BREAK_CRLF = "SELECT 'first\r\nsecond' AS crlf_note\r\nFROM break_forms"
+BREAK_CR = "SELECT 1 AS one\rFROM break_forms_cr"
+BREAK_MIXED = "SELECT 'a\r\nb' AS x,\n  'c\rd' AS y\r\nFROM break_forms_mixed"
+# A string constant outside WHERE and the select list stays in the structure, line breaks
+# included: these statements are other structures once their line breaks are all LF.
+KEPT_CRLF = "SELECT replace(note, 'kept\r\nconstant', '') AS cleaned\nFROM kept_breaks\nWHERE id = 1"
+KEPT_CR = "SELECT replace(note, 'kept\rconstant', '') AS cleaned\nFROM kept_breaks_cr\nWHERE id = 2"
+KEPT_TWO = "SELECT replace(replace(note, 'one\r\ntwo', ''), 'three\rfour', '') AS cleaned\nFROM kept_breaks_two"
+KEPT_LF = "SELECT replace(note, 'kept\nconstant', '') AS cleaned\r\nFROM kept_breaks_lf"
+UNBASED = 'SELECT n FROM ledger_entries WHERE closed'
+UNBASED_CANCELLED = 'SELECT n FROM ledger_cancelled'
+UNBASED_TIMED_OUT = 'SELECT n FROM ledger_timeouts'
+UNBASED_MIXED = 'SELECT n FROM ledger_mixed'
+# Imported after the last build: successful executions of a database and a user that no baseline knows.
+LATER = 'SELECT n FROM fresh_orders WHERE n > 5'
 EXCLUSION = dict(id='E1', cluster='C1', start='2026-07-10T02:00:00+08:00', end='2026-07-10T03:00:00+08:00',
                  reason='synthetic maintenance')
 
@@ -119,15 +138,34 @@ def second_cluster():
             lines += session.request(day + timedelta(hours=10, seconds=rng.uniform(0, 3600)),
                                      BUSY.format(status=2, day='2026-06-26'), rng.lognormvariate(4.8, 0.3))
         lines += session.request(day + timedelta(hours=11), SPARSE, rng.lognormvariate(5.5, 0.2))
+    last = FIRST_DAY + timedelta(days=DAYS - 1)
+    for minute, text in enumerate((LONGEST, BREAK_CRLF, BREAK_CR, BREAK_MIXED, KEPT_CRLF, KEPT_CR, KEPT_TWO, KEPT_LF)):
+        lines += session.request(last + timedelta(hours=12, minutes=minute), text, 20.0 + minute)
+    night = Session(10, 'night_user', 'ledger')
+    for index in range(3):
+        lines += night.request(last - timedelta(days=index) + timedelta(hours=23), UNBASED, failure='failed')
+        lines += night.request(last - timedelta(days=index) + timedelta(hours=22), UNBASED_CANCELLED, failure='cancelled')
+        lines += night.request(last - timedelta(days=index) + timedelta(hours=21), UNBASED_TIMED_OUT, failure='timed_out')
+        for minute, failure in enumerate(('failed', 'cancelled', 'timed_out')):
+            lines += night.request(last - timedelta(days=index) + timedelta(hours=20, minutes=10 * minute), UNBASED_MIXED, failure=failure)
+    lines.sort(key=lambda item: item[0])
+    return [values for _, values in lines]
+
+
+def later():
+    session, last, lines = Session(11, 'fresh_user', 'fresh_db'), FIRST_DAY + timedelta(days=DAYS - 1), []
+    for minute in (0, 5):
+        lines += session.request(last + timedelta(hours=23, minutes=30 + minute), LATER, 40.0 + minute)
     lines.sort(key=lambda item: item[0])
     return [values for _, values in lines]
 
 
 def write(directory):
-    """Write both clusters' files and the import configuration; return its path."""
-    first, second, path = directory / 'c1.csv', directory / 'c2.csv', directory / 'import.json'
+    """Write the clusters' files and the import configuration; return its path."""
+    first, second, third, path = directory / 'c1.csv', directory / 'c2.csv', directory / 'c2-later.csv', directory / 'import.json'
     write_csv(first, events())
     write_csv(second, second_cluster())
+    write_csv(third, later())
     declaration = dict(build='HashData Warehouse 3.13.13', timezone='UTC+08:00', declaration='synthetic')
     dates = [(FIRST_DAY + timedelta(days=n)).strftime('%Y-%m-%d') for n in range(DAYS)]
     path.write_text(json.dumps({'version': 1, 'clusters': ['C1', 'C2'],
@@ -135,7 +173,9 @@ def write(directory):
         'batches': {'B1': {'source': 'S1', 'files_confirmed_complete': True, 'dates': dates,
                            'files': [{'path': str(first), 'closed_and_copied': True}]},
                     'B2': {'source': 'S2', 'files_confirmed_complete': True, 'dates': dates[-10:],
-                           'files': [{'path': str(second), 'closed_and_copied': True}]}}}))
+                           'files': [{'path': str(second), 'closed_and_copied': True}]},
+                    'B2-later': {'source': 'S2', 'files_confirmed_complete': True, 'dates': dates[-1:],
+                           'files': [{'path': str(third), 'closed_and_copied': True}]}}}))
     return path
 
 
@@ -144,13 +184,22 @@ def training(cutoff=CUTOFF, days=DAYS):
 
 
 def load(dsn, directory, schema='sql_apm'):
-    """Import both clusters and publish: an earlier and the current version for C1, one for C2."""
+    """Import both clusters and publish: an earlier and the current version for C1, one for C2.
+
+    A last batch of C2 is imported without a build, so its records have no baseline.
+    """
     from sql_apm.baseline.workflow import run
     from sql_apm.ingestion.config import load_config
+    from sql_apm.ingestion.importer import Importer
     from sql_apm.training.config import validate
     path = write(directory)
     older = run(dsn, schema, validate(training('2026-07-16', 21), 'C1'), load_config(path, 'S1', 'B1'), workers=1)
     current = run(dsn, schema, validate(training(), 'C1'), workers=1)
     second = run(dsn, schema, validate(training(), 'C2'), load_config(path, 'S2', 'B2'), workers=1)
+    importer = Importer(dsn, schema, 1, lambda **row: None)
+    try:
+        assert importer.run(load_config(path, 'S2', 'B2-later'))['state'] == 'complete'
+    finally:
+        importer.close()
     return dict(older=older['build']['build_id'], current=current['build']['build_id'],
                 second=second['build']['build_id'])

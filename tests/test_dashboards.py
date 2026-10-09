@@ -176,6 +176,50 @@ class DeliveredGrafanaFiles(unittest.TestCase):
             self.assertIn("'" + label + "'", sql)
         self.assertRegex(sql, r'bar_none,e\.matching\n')  # the total stays the last column
 
+    def test_pages_follow_the_chosen_filters_and_the_chosen_text(self):
+        search, listing, detail = (self.boards[name] for name in ('mpp-search.json', 'mpp-list.json', 'mpp-detail.json'))
+        # databases and users come from the execution records, so identities without a baseline can be chosen
+        for board in (search, listing):
+            options = {item['name']: item['query'] for item in board['templating']['list'] if item['name'] in ('database', 'user')}
+            self.assertEqual(set(options), {'database', 'user'})
+            for query in options.values():
+                self.assertIn('FROM mpp_occurrence', query)
+                self.assertNotIn('mpp_baseline_group', query)
+        # complete SQL: the filters go to the service, and hints are shown only for the filters they were computed for
+        form = [panel for panel in panels(search) if panel['type'] == 'volkovlabs-form-panel'][0]
+        code = form['options']['update']['code']
+        for part in ("['cluster', 'database', 'user'].forEach", 'request[name] = fromToken(variables[name])', 'state.xfor =',
+                     "state.xreason = 'empty_input'", "state.xreason = 'input_too_large'", 'bytes.length > 262144', ".replace(/\\r\\n?/g, '\\n')",
+                     "state.xbreak = result.line_breaks || ''"):
+            self.assertIn(part, code)
+        hidden = {item['name'] for item in search['templating']['list'] if item.get('hide') == 2}
+        self.assertLessEqual({'xfor', 'sent', 'xhints', 'xstate', 'xreason', 'xsql', 'xbreak', 'q', 'qd', 'fp'}, hidden)
+        note = [panel for panel in panels(search) if panel['title'] == '这次检索'][0]['targets'][0]['rawSql']
+        for part in ("'${q}${fp}${xstate}${sent}'<>''", '输入为空', '256 KB', "'${xfor}'<>'${cluster}|${database}|${user}'", '三种换行',
+                     "'${xsql}'<>'' AND '${xbreak}' IN ('crlf','cr','lf')", '结果按库里的形式给出'):
+            self.assertIn(part, note)
+        hints = [panel for panel in panels(search) if panel['title'].startswith('整批没有命中')][0]['targets'][0]['rawSql']
+        self.assertIn("WHERE '${xfor}'='${cluster}|${database}|${user}'", hints)
+        self.assertIn('&var-cluster=${cluster}&var-database=${database}&var-user=${user}', hints)
+        # detail: only a text of the structure in view is applied; the raw choice appears in one place
+        names = {item['name']: item for item in detail['templating']['list']}
+        self.assertIn("mpp_view_sql_text('${norm}','${fp}','${sqlid}') t WHERE t.selected", names['sid']['query'])
+        queries = [target['rawSql'] for panel in panels(detail) for target in panel.get('targets', []) if 'rawSql' in target]
+        queries += [item['target']['rawSql'] for item in detail['annotations']['list'] if 'target' in item]
+        queries += [names[name]['query'] for name in ('sql_text', 'sql_note')]
+        self.assertGreater(len([query for query in queries if "'${sid}'" in query]), 6)
+        self.assertEqual([query for query in queries if '${sqlid' in query], [])
+        # the text panel shows the whole text a segment at a time, and nothing but characters of the text
+        self.assertIn('substr(x.sql_text,(x.part-1)*200000+1,200000)', names['sql_text']['query'])
+        self.assertNotIn('只显示前', names['sql_text']['query'])
+        self.assertEqual((names['part']['type'], names['part']['hide']), ('textbox', 2))
+        # the duration chart keeps its plot without any duration: two rows with no value, hidden from legend and tooltip
+        chart = [panel for panel in panels(detail) if panel['title'].startswith('每次执行的耗时')][0]
+        self.assertEqual([target['refId'] for target in chart['targets']], ['A', 'B', 'C'])
+        self.assertIn('NULL::double precision AS "时间范围"', chart['targets'][2]['rawSql'])
+        kept = [item for item in chart['fieldConfig']['overrides'] if item['matcher'].get('options') == '时间范围']
+        self.assertEqual(kept[0]['properties'][0]['value'], {'legend': True, 'tooltip': True, 'viz': False})
+
     def test_search_page_is_laid_out_for_a_1080p_screen(self):
         board = self.boards['mpp-search.json']
         placed = {panel['title'].split('：')[0].split('（')[0]: tuple(panel['gridPos'][key] for key in 'xywh') for panel in panels(board)}
@@ -226,3 +270,42 @@ class DeliveredGrafanaFiles(unittest.TestCase):
                 main(['--host', host, '--port', '0'])
             self.assertEqual(stopped.exception.code, 2)
             self.assertIn('loopback', output.getvalue())
+
+    @unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
+    def test_another_line_break_form_is_taken_only_with_a_stored_text_as_proof(self):
+        from sql_apm.service.fingerprint import other_form
+        from sql_apm.sql.normalization import Normalizer
+
+        class Stored:
+            """Stands for the lookup of a stored text by structure and by content with its line breaks as LF."""
+            def __init__(self, texts):
+                self.texts, self.asked, self.row = texts, [], None
+
+            def execute(self, statement, values):
+                rules, fingerprint, low, high, plain = values
+                self.asked.append(fingerprint)
+                self.row = ('stored',) if self.texts.get(fingerprint) == plain and low <= high else None
+
+            def fetchone(self):
+                return self.row
+
+        normalizer = Normalizer()
+        value = lambda text: normalizer.normalize(text)['fingerprint']['value']
+        # a constant that stays in the structure: the statement is another structure in another line-break form
+        kept = "SELECT replace(note, 'kept{}constant', '') AS cleaned{}FROM kept_breaks"
+        sent, crlf, cr = (kept.format(mark, mark) for mark in ('\n', '\r\n', '\r'))
+        self.assertEqual(len({value(sent), value(crlf), value(cr)}), 3)
+        for stored_as, form, other in ((kept.format('\r\n', '\n'), 'crlf', crlf), (kept.format('\r', '\n'), 'cr', cr)):
+            cursor = Stored({value(stored_as): sent})
+            self.assertEqual(other_form(cursor, normalizer, 'N', value(sent), sent), (form, other.encode(), 'stored'))
+            # the structure fits but another character differs: nothing is taken
+            self.assertIsNone(other_form(Stored({value(stored_as): sent + ' '}), normalizer, 'N', value(sent), sent))
+        # the input's own form is not tried again; a sender of CR LF finds a text stored with LF
+        cursor = Stored({value(sent): sent})
+        self.assertEqual(other_form(cursor, normalizer, 'N', value(crlf), crlf), ('lf', sent.encode(), 'stored'))
+        self.assertEqual(cursor.asked, [value(sent)])
+        # where the forms are one structure, and without any line break, nothing is asked
+        for text in ("SELECT a\nFROM t WHERE b = 'x\ny'", 'SELECT a FROM t'):
+            cursor = Stored({})
+            self.assertIsNone(other_form(cursor, normalizer, 'N', value(text), text))
+            self.assertEqual(cursor.asked, [])

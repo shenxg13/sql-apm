@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 
 import psycopg2
 from pglast.parser import ParseError
@@ -15,8 +16,25 @@ from sql_apm.sql.scanning import scan
 from sql_apm.storage.ingestion import connect
 
 
+# Words and passages: the same limit at both entries (the search page carries them in its address).
+TEXT_MAX_BYTES = 256 * 1024
+# Exactly one structure fingerprint value, as the database's text search recognises it.
+FINGERPRINT = re.compile(r'struct:[a-zA-Z0-9_./-]+:[0-9a-f]{64}')
+BLANKS = ' \t\n\r\f\x0b'
+
+
 class SearchError(ValueError):
     pass
+
+
+def fingerprint_input(raw):
+    """The fingerprint when the whole input is one structure fingerprint value, else None."""
+    try:
+        text = raw.decode('utf-8') if isinstance(raw, bytes) else raw
+    except UnicodeError:
+        return None
+    text = text.strip(BLANKS)
+    return text if FINGERPRINT.fullmatch(text) else None
 
 
 class Parser(argparse.ArgumentParser):
@@ -52,9 +70,13 @@ def query(cur, name, values):
 
 
 def exact(cur, normalizer, raw, filters):
+    norm = 'N:' + identity(normalizer.context)
+    direct = fingerprint_input(raw)
+    if direct:
+        # A pasted fingerprint is looked up as it is, in every mode and at both entries.
+        return query(cur, 'mpp_query_exact', [norm, direct, None] + filters + [None])
     normalized = normalizer.normalize(raw)
     fp, near = normalized['fingerprint'], normalized['approximate']
-    norm = 'N:' + identity(normalizer.context)
     result = query(cur, 'mpp_query_exact', [norm, fp['value'],
         near['value'] if near and near['state'] == 'available' else None] + filters + [fp['reason']])
     if result['state'] in ('not_seen', 'unreliable_fingerprint') and fp['reason'] != 'input_size_limit':
@@ -77,12 +99,12 @@ def main(argv=None):
     parser = Parser(description='SQL 检索、基线与执行历史（JSON）')
     parser.add_argument('--schema', default='sql_apm')
     subs = parser.add_subparsers(dest='action', required=True, parser_class=Parser)
-    fuzzy = subs.add_parser('find', help='按词或整段的文本检索（主入口）；完整指纹值直查')
+    fuzzy = subs.add_parser('find', help='按词或整段的文本检索（主入口）；完整指纹值直查；输入不超过 256 KB')
     fuzzy.add_argument('input')
     fuzzy.add_argument('--mode', choices=['words', 'passage'], default='words',
                        help='words：只按空白切词，每个词都要出现，引号是普通字符；passage：整个输入连续出现')
     fuzzy.add_argument('--order', choices=['count', 'recent'], default='count')
-    precise = subs.add_parser('exact', help='完整 SQL 或完整批次的结构检索')
+    precise = subs.add_parser('exact', help='完整 SQL 或完整批次的结构检索；完整指纹值直查')
     source = precise.add_mutually_exclusive_group(required=True)
     source.add_argument('--sql')
     source.add_argument('--file', type=Path)
@@ -109,6 +131,8 @@ def main(argv=None):
     db = None
     try:
         args = parser.parse_args(argv)
+        if args.action == 'find' and len(args.input.encode('utf-8', 'surrogateescape')) > TEXT_MAX_BYTES:
+            raise SearchError('search_input_too_large')
         normalizer = Normalizer()
         norm = 'N:' + identity(normalizer.context)
         # All query calls share a read-only, consistent snapshot and short transaction.

@@ -21,6 +21,7 @@ SHARED = dict(type='datasource', uid='-- Dashboard --')  # built in: reuse anoth
 # (a line longer than HOVER_WRAP width units wraps; a non-ASCII character counts as two).
 HOVER_CHARS, HOVER_LINES, HOVER_WRAP = 1600, 24, 75
 EDITOR = 110  # pixels of the search input; more text scrolls inside it or is read enlarged
+FRAME = '时间范围'  # name of the valueless series that keeps the duration chart's plot in place
 # A duration is written with its unit ("3.16 mins", "1.04 hours") and stands at the right edge of its cell,
 # so a column too narrow for it hides the leading digits. No duration column gets narrower than this many
 # pixels; a table with more columns than the window holds scrolls sideways instead.
@@ -249,19 +250,26 @@ def filters():
     """Cluster, database and user dropdowns. Values are tokens; '*' means all.
 
     Grafana quotes the values of a variable that offers "All", so the choice is
-    an ordinary first option instead.
+    an ordinary first option instead. Databases and users come from the execution
+    records, so that an identity without a baseline (new, or with failures only)
+    can be chosen as well; this scans the records once per dropdown when a page opens.
+    The distinct values are found first and encoded afterwards: encoding every record
+    made the scan several times slower.
     """
     def one(name, label, column, source):
         return variable('query', name, label, current=dict(text='全部', value='*'),
                         sql="SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL "
-                            "SELECT DISTINCT {0}, mpp_view_encode({0}), 1 FROM {1} WHERE {0} IS NOT NULL ORDER BY 3, 1".format(column, source))
+                            "SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT {0} AS name FROM {1} WHERE {0} IS NOT NULL) x "
+                            "ORDER BY 3, 1".format(column, source))
     return [one('cluster', '集群', 'scope_id', 'scope'),
-            one('database', '数据库', 'database', 'mpp_baseline_group'),
-            one('user', '执行用户', 'execution_user', 'mpp_baseline_group')]
+            one('database', '数据库', 'database', 'mpp_occurrence'),
+            one('user', '执行用户', 'execution_user', 'mpp_occurrence')]
 
 
 FILTER_ARGS = ("mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),"
                "mpp_view_decode(nullif('${user}','*'))")
+# The three choices as one text, to tell whether an answer was computed for the filters chosen now.
+FILTER_TOKEN = "'${cluster}|${database}|${user}'"
 
 
 def tag(uid, panels, variables, annotations):
@@ -380,14 +388,28 @@ FROM mpp_query_versions('${norm}',mpp_view_decode(nullif('${cluster}','*'))) v O
 
 # --------------------------------------------------------------------------- SQL 详情
 ARGS = "'${norm}','${fp}','${identity}'"
-RECORDS = ARGS + ",'${timing}'," + RANGE + ",'${sqlid}'"
-KEPT = ['fp', 'identity', 'timing', 'version', 'sqlid', 'status', 'dmin', 'dmax', 'list_order', 'text_order',
+# `sqlid` is what the address asks for; `sid` is that text when it belongs to the structure in `fp`, else
+# empty. Every query uses `sid`, so a fingerprint typed over an earlier selection shows all of its texts
+# instead of an empty history, and links carry `sid` so that a stale choice does not travel on.
+RECORDS = ARGS + ",'${timing}'," + RANGE + ",'${sid}'"
+KEPT = ['fp', 'identity', 'timing', 'version', 'sqlid', 'part', 'status', 'dmin', 'dmax', 'list_order', 'text_order',
         'layer', 'mode', 'q', 'hit']
+CARRIED = dict(sqlid='var-sqlid=${sid}')
+SEGMENT = 200000  # characters of an original text shown at a time in the text panel
+# The text shown in the text panel with its length, how many segments it has and which one is asked for;
+# a number outside the range, or anything that is not a number, means the nearest valid segment.
+SEGMENTS = ("SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,"
+            "greatest(1,ceil(length(t.sql_text)/%d.0)::int) parts,\n"
+            "    least(greatest(1,ceil(length(t.sql_text)/%d.0)::int),"
+            "greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n"
+            "  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t" % (SEGMENT, SEGMENT))
 
 
 def same_page(**changed):
     """Link to the detail page itself with the current state except the given variables."""
-    parts = ['${__url_time_range}'] + ['${' + name + ':queryparam}' for name in KEPT if name not in changed]
+    if 'sqlid' in changed:
+        changed.setdefault('part', '1')  # another text starts at its first segment
+    parts = ['${__url_time_range}'] + [CARRIED.get(name, '${' + name + ':queryparam}') for name in KEPT if name not in changed]
     parts += ['var-' + name + '=' + value for name, value in changed.items()]
     return DETAIL + '?' + '&'.join(parts)
 
@@ -437,17 +459,23 @@ def detail_dashboard():
     layout = Layout()
     layout.line(9,
         (text('SQL 原文：${sql_note}', '${sql_text:raw}', mode='code',
-              description='选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。'), 14),
+              description='选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。'
+                          '超过 ' + str(SEGMENT) + ' 个字符的原文分段显示，每段都是原文里连续的一段，不加任何字符；'
+                          '标题写明现在是第几段，在右边“当前查看的内容”里换段。'), 14),
         (table('当前查看的内容', """SELECT * FROM (
 SELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}') content,NULL::text url
 UNION ALL SELECT 2,'计时类别',mpp_view_label('timing','${timing}')||CASE WHEN '${timing}' IN ('request','unknown') THEN '' ELSE '：是阶段或调用的记录，不加总成执行次数' END,NULL
-UNION ALL SELECT 3,'原文范围',CASE WHEN '${sqlid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'
-  ELSE '只看一份原文 ${sqlid}；点这里回到全部原文' END,CASE WHEN '${sqlid}'<>'' THEN '""" + same_page(sqlid='') + """' END
+UNION ALL SELECT 3,'原文范围',CASE WHEN '${sid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'
+  ELSE '只看一份原文 ${sid}；点这里回到全部原文' END,CASE WHEN '${sid}'<>'' THEN '""" + same_page(sqlid='') + """' END
 UNION ALL SELECT 4,'时间范围','点这里设为这条 SQL 最近一次执行往前 7 天',
-  (SELECT '""" + DETAIL + """?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${sqlid:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'
+  (SELECT '""" + DETAIL + """?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&var-sqlid=${sid}&${part:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'
      ||'&from='||""" + MS.format("i.last_at-interval '7 days'") + """||'&to='||""" + MS.format("i.last_at+interval '1 millisecond'") + """
    FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}')
 UNION ALL SELECT 5,'失败、取消、超时','没有计时类别和耗时，在每个计时类别下都列出',NULL
+UNION ALL SELECT 7,'原文较长','共 '||g.chars||' 个字符，分 '||g.parts||' 段显示，左边是第 '||g.part||' 段；点这里看'||CASE WHEN g.step>0 THEN '下一段' ELSE '上一段' END,
+  '""" + same_page(part="'||(g.part+g.step)||'") + """'
+  FROM (SELECT x.chars,x.parts,x.part,d.step FROM (""" + SEGMENTS + """) x CROSS JOIN (VALUES (1),(-1)) d(step)
+        WHERE x.parts>1 AND x.part+d.step BETWEEN 1 AND x.parts) g
 UNION ALL SELECT 6,'提示',m.n||' 份原文尚未按当前规则生成指纹，其执行记录不在结果中',NULL
   FROM (SELECT mpp_query_missing_rules('${norm}') n) m WHERE m.n>0
 UNION ALL SELECT 7,'返回','回到 SQL 检索（填回上一次的输入）','""" + SEARCH + """'
@@ -545,7 +573,7 @@ ORDER BY s.bucket_date,s.bucket_number""",
 
     layout.row('对比（所选时间范围内的执行，对所选版本的整体基线）')
     layout.line(5, (table('超过基线的执行：${timing}', """SELECT c.reference,c.baseline_ms,c.known_executions,c.above,c.above_share,c.expected_share,coalesce(c.note,'') note
-FROM mpp_view_compare(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sqlid}') c",
+FROM mpp_view_compare(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sid}') c",
         [('reference', '参照'), ('baseline_ms', '基线值', dict(unit='ms')), ('known_executions', '范围内有耗时的次数'),
          ('above', '超过基线值的次数'), ('above_share', '占比', dict(unit='percentunit', decimals=2)),
          ('expected_share', '正常时的大致占比', dict(unit='percentunit', decimals=0)), ('note', '说明', dict(custom__width=300))],
@@ -560,7 +588,7 @@ FROM mpp_view_records(""" + RECORDS + ") o",
     main = chart('timeseries', '每次执行的耗时：${timing}（每格 $__interval；一格里画最慢和最快各一次）', """SELECT p.end_at AS time,
   CASE p.kind WHEN 'slowest' THEN p.duration_ms END AS "每格最慢的一次（一格只有一次时就是它）",
   CASE p.kind WHEN 'fastest' THEN p.duration_ms END AS "同一格里最快的一次"
-FROM mpp_view_points(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${sqlid}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ") p ORDER BY 1",
+FROM mpp_view_points(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${sid}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ") p ORDER BY 1",
         description='每个点都是一次真实的执行，画在它的结束时间上。点密时按图的宽度自动分格，每格只画最慢和最快各一次；在图上横向拖动可以放大，格子变小，直到每次执行都是单独的点；双击缩小。'
                     '水平虚线是所选版本整体基线的 P50、P95、P99，只在对应样本条件满足时画出。失败、取消、超时没有耗时，画成竖线标记。',
         interval='1ms')
@@ -568,6 +596,11 @@ FROM mpp_view_points(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${
 FROM mpp_view_compare(""" + ARGS + ",'${timing}','${version}'," + RANGE + """) c
 CROSS JOIN (VALUES ($__timeFrom()::timestamptz),($__timeTo()::timestamptz)) t(at)
 WHERE c.condition_met ORDER BY 1,2""", ref='B', form='time_series'))
+    # Marks are drawn on the plot, and Grafana draws no plot for a panel without rows: with failures only and
+    # no usable baseline the marks would be missing. Two rows without a value keep the plot there; they are no
+    # executions and no durations, and they are hidden from the legend and the tooltip.
+    main['targets'].append(target('SELECT t.at AS time,NULL::double precision AS "' + FRAME + '"\n'
+                                  'FROM (VALUES ($__timeFrom()::timestamptz),($__timeTo()::timestamptz)) t(at) ORDER BY 1', ref='C'))
     main['fieldConfig']['defaults']['custom'] = dict(drawStyle='points', pointSize=4, showPoints='always', lineWidth=1,
                                                      axisLabel='耗时', scaleDistribution=dict(type='linear'), spanNulls=False)
     main['fieldConfig']['overrides'] = [
@@ -578,11 +611,12 @@ WHERE c.condition_met ORDER BY 1,2""", ref='B', form='time_series'))
         dict(matcher=dict(id='byRegexp', options='/P95 基线/'), properties=[dict(id='color', value=dict(mode='fixed', fixedColor='orange'))]),
         dict(matcher=dict(id='byRegexp', options='/P99 基线/'), properties=[dict(id='color', value=dict(mode='fixed', fixedColor='red'))]),
         dict(matcher=dict(id='byRegexp', options='/最慢/'), properties=[dict(id='color', value=dict(mode='fixed', fixedColor='blue'))]),
+        dict(matcher=dict(id='byName', options=FRAME), properties=[dict(id='custom.hideFrom', value=dict(legend=True, tooltip=True, viz=False))]),
         dict(matcher=dict(id='byRegexp', options='/最快/'), properties=[dict(id='color', value=dict(mode='fixed', fixedColor='light-blue'))])]
     layout.line(11, (main, 24))
     main_id = main['id']
     counts = chart('timeseries', '记录数：${timing}（每格 $__interval，按状态堆叠）', """SELECT c.slot_at AS time,mpp_view_label('outcome',c.outcome) AS metric,c.record_count AS value
-FROM mpp_view_counts(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${sqlid}') c ORDER BY 1,2",
+FROM mpp_view_counts(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${sid}') c ORDER BY 1,2",
         description='与上图使用同一个步长。“耗时不低于／不高于”两个筛选不作用于这张图。', unit='none', form='time_series', interval='1ms')
     counts['fieldConfig']['defaults']['custom'] = dict(drawStyle='bars', fillOpacity=80, lineWidth=0, showPoints='never',
                                                        stacking=dict(mode='normal', group='A'), axisLabel='记录数')
@@ -628,7 +662,7 @@ ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种
   """ + ",\n  ".join("CASE WHEN e.comparison IN (%s) THEN e.duration_ms END %s" % (",".join("'%s'" % label for label in labels), name)
                         for name, _, _, labels in BARS if labels) + """,
   CASE WHEN e.duration_ms IS NULL THEN 1 END bar_none,e.matching
-FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sqlid}','${status:csv}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ",'${list_order}',200) e",
+FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sid}','${status:csv}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ",'${list_order}',200) e",
         [('end_at', '结束时间', dict(custom__width=190)), ('duration_ms', '耗时', dict(unit='ms', noValue='未知')), ('outcome', '状态'),
          ('comparison', '与基线的比较'), ('shape', '单条或整批'),
          ('sql_id', '原文', dict(custom__width=300, links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}')))),
@@ -670,11 +704,18 @@ FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'
         variable('custom', 'layer', '分层明细', pairs=[('整体', 'overall'), ('逐天', 'day'), ('逐周', 'week'), ('星期几', 'weekday'), ('各小时', 'hour')]),
         variable('textbox', 'sqlid', hide=2), variable('textbox', 'mode', hide=2), variable('textbox', 'q', hide=2),
         variable('textbox', 'hit', hide=2),
-        variable('query', 'sql_text', hide=2, skipUrlSync=True, sql="""SELECT CASE WHEN length(t.sql_text)>200000 THEN left(t.sql_text,200000)||E'\\n-- （原文共 '||length(t.sql_text)||' 个字符，这里只显示前 200000 个）' ELSE t.sql_text END
-FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t
-UNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))"""),
-        variable('query', 'sql_note', hide=2, skipUrlSync=True, sql="""SELECT CASE WHEN t.selected THEN '所选的一份原文 '||t.sql_id ELSE '同一结构的一份示例（共 '||t.structure_texts||' 份原文）' END
-FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))""")]
+        variable('textbox', 'part', hide=2, value='1'),
+        variable('query', 'sid', hide=2, skipUrlSync=True,
+                 sql="SELECT coalesce((SELECT t.sql_id FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t WHERE t.selected),'')"),
+        variable('query', 'sql_text', hide=2, skipUrlSync=True,
+                 sql="SELECT substr(x.sql_text,(x.part-1)*%d+1,%d) FROM (" % (SEGMENT, SEGMENT) + SEGMENTS + ") x\n"
+                     "UNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' "
+                     "WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))"),
+        variable('query', 'sql_note', hide=2, skipUrlSync=True,
+                 sql="SELECT CASE WHEN x.selected THEN '所选的一份原文 '||x.sql_id ELSE '同一结构的一份示例（共 '||x.structure_texts||' 份原文）' END\n"
+                     "  ||CASE WHEN x.parts>1 THEN '，共 '||x.chars||' 个字符，第 '||x.part||'／'||x.parts||' 段' ELSE '' END\n"
+                     "FROM (" + SEGMENTS + ") x UNION ALL SELECT '没有找到这个指纹' "
+                     "WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))")]
     marks = dict(datasource=PG, enable=True, hide=False, name='失败、取消、超时', iconColor='red',
                  filter=dict(exclude=False, ids=[main_id]),
                  target=target("""SELECT min(o.end_at) AS time,mpp_view_label('outcome',o.outcome)||' '||count(*)||' 次' AS text,mpp_view_label('outcome',o.outcome) AS tags
@@ -741,7 +782,9 @@ const fill = (text, mode) => {
     return item;
   }));
 };
-const STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints'];
+// xfor: the filters the complete-SQL answer was computed for; sent: set by every click on the button;
+// xbreak: the line-break form of the stored text when the answer was found in another form than the one sent.
+const STATE = ['mode', 'q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints', 'xfor', 'xbreak', 'sent'];
 const apply = (state) => {
   const query = {};
   STATE.forEach((name) => {
@@ -754,7 +797,7 @@ FORM_INITIAL = FORM_COMMON + r"""
 // Fill the box again: from the address when it carries a search, otherwise from
 // the last search of this browser tab (the way back from the detail page).
 const kept = remembered();
-const inAddress = variables.q !== '' || variables.fp !== '' || variables.xstate !== '';
+const inAddress = variables.q !== '' || variables.fp !== '' || variables.xstate !== '' || variables.sent !== '';
 let text = '';
 let mode = variables.mode || 'words';
 if (inAddress) {
@@ -773,20 +816,28 @@ context.panel.enableSubmit();
 """
 FORM_UPDATE = FORM_COMMON + r"""
 // The editor keeps one line-break form for the whole text, and which one depends
-// on the browser's platform. Line breaks are therefore always sent as LF.
-const text = String(element('sql').value || '').replace(/\r\n/g, '\n');
+// on the browser's platform; a lone CR is a line break to it as well. Line breaks
+// are therefore always sent as LF.
+const text = String(element('sql').value || '').replace(/\r\n?/g, '\n');
 const mode = String(element('mode').value || 'words');
 const bytes = new TextEncoder().encode(text);
-const state = { mode: mode, text: text, q: '', qd: '', fp: '', xstate: '', xreason: '', xsql: '', xhints: '' };
+const state = { mode: mode, text: text, q: '', qd: '', fp: '', xstate: '', xreason: '', xsql: '', xhints: '', xfor: '', xbreak: '', sent: String(Date.now()) };
 const finish = () => {
   remember(state);
   apply(state);
   context.panel.enableSubmit();
 };
+// Nothing but the six ASCII blanks is an empty input in every mode; it is refused here, with the reason on the page.
+if (text.replace(/[ \t\n\r\f\v]/g, '') === '') {
+  state.xreason = 'empty_input';
+  finish();
+  return;
+}
 if (mode !== 'exact') {
+  // The same limit as the command line: words and passages travel in the address of the page.
   if (bytes.length > 262144) {
-    context.grafana.notifyError(['输入太长', '按词和整段方式的输入不能超过 256 KB；更长的完整语句请用“完整 SQL”方式。']);
-    context.panel.enableSubmit();
+    state.xreason = 'input_too_large';
+    finish();
     return;
   }
   state.q = toToken(bytes);
@@ -794,8 +845,16 @@ if (mode !== 'exact') {
   return;
 }
 // Complete SQL: at most one byte over the 512 KB limit is sent, which is enough
-// for the service to answer exactly like the command line does.
-const body = JSON.stringify({ sql_b64: toToken(bytes.length > 524288 ? bytes.subarray(0, 524289) : bytes) });
+// for the service to answer exactly like the command line does. The chosen
+// cluster, database and user go with it, as they do on the command line.
+const request = { sql_b64: toToken(bytes.length > 524288 ? bytes.subarray(0, 524289) : bytes) };
+['cluster', 'database', 'user'].forEach((name) => {
+  if (variables[name] !== '' && variables[name] !== '*') {
+    request[name] = fromToken(variables[name]);
+  }
+});
+state.xfor = [variables.cluster || '*', variables.database || '*', variables.user || '*'].join('|');
+const body = JSON.stringify(request);
 state.qd = String(Date.now()) + '-' + String(bytes.length);
 return context.grafana.backendService
   .post('/api/ds/query', {
@@ -819,6 +878,7 @@ return context.grafana.backendService
     state.xstate = result.state;
     state.xreason = result.reason || '';
     state.xsql = result.exact_sql_id || '';
+    state.xbreak = result.line_breaks || '';
     if (Array.isArray(result.statement_hints) && result.statement_hints.length > 0) {
       const hints = result.statement_hints.filter((item) => item.fingerprint).map((item) => ({ statement: item.statement, fingerprint: item.fingerprint }));
       state.xhints = toToken(new TextEncoder().encode(JSON.stringify(hints)));
@@ -891,16 +951,31 @@ def form():
 SEARCH_FILTERS = (FILTER_ARGS + ","
                   "CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END")
 SEARCH_INPUT = "CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END"
+# The service found the pasted statement in another line-break form than the one the page sent.
+BREAK_NOTE = ("CASE WHEN '${xsql}'<>'' AND '${xbreak}' IN ('crlf','cr','lf') THEN '。这条 SQL 的结构随换行形式变化（换行在保留于结构里的字符串常量或带引号的名字里）："
+              "页面送出的是 LF，库里这份原文用的是'||CASE '${xbreak}' WHEN 'crlf' THEN ' CR LF' WHEN 'cr' THEN '单独的 CR' ELSE ' LF' END||'，结果按库里的形式给出' ELSE '' END")
 
 
 def search_dashboard():
     # Laid out for a 1920x1080 screen with the browser's own bars: the input, this search's note,
     # the total and the result list (21 grid lines) are all visible without scrolling the page.
     layout = Layout()
-    note = table('这次检索', "SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),"
-        "'${fp}','${xstate}','${xreason}','${xsql}'," + FILTER_ARGS + ") n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
+    refused = "'${xreason}' IN ('empty_input','input_too_large')"
+    note = table('这次检索', """SELECT x.item,x.content FROM (
+  SELECT n.seq,n.item,CASE WHEN n.seq=4 AND coalesce(nullif('${mode}',''),'words')='exact'
+      THEN n.content||'。比较时三种换行（CR LF、单独的 CR、LF）视为相同，其余字符逐一比较'||""" + BREAK_NOTE + """ ELSE n.content END content
+  FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),
+      '${fp}','${xstate}','${xreason}','${xsql}',""" + FILTER_ARGS + """) n WHERE NOT """ + refused + """
+  UNION ALL SELECT 1,'检索方式',CASE '${mode}' WHEN 'exact' THEN '完整 SQL' WHEN 'passage' THEN '整段' ELSE '按词' END WHERE """ + refused + """
+  UNION ALL SELECT 2,'没有检索',CASE '${xreason}' WHEN 'empty_input' THEN '输入为空：请先在输入框里填写要找的内容'
+      ELSE '输入超过 256 KB：按词和整段的输入上限是 256 KB，命令行相同；更长的完整语句请用“完整 SQL”方式（上限 512 KB）' END WHERE """ + refused + """
+  UNION ALL SELECT 9,'逐条提示','筛选在这次检索之后改过：结果已按现在的筛选重新查询；多条语句整批没有命中时的逐条提示需要再点一次“检索”'
+    WHERE '${mode}'='exact' AND '${fp}${xstate}'<>'' AND '${xfor}'<>""" + FILTER_TOKEN + """) x
+WHERE '${q}${fp}${xstate}${sent}'<>'' ORDER BY x.seq""",
         [('item', '项目', dict(custom__width=150)), ('content', '内容', dict(custom__cellOptions=dict(type='auto', wrapText=True)))],
-        description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。')
+        description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索（输入为空、超过上限、超过 20 个词）。完整 SQL 方式写明四种结果中的哪一种；'
+                    '判断库里有没有一字不差的原文时，三种换行视为相同：输入框只能保留一种换行，页面一律以 LF 发送。'
+                    '保留在结构里的字符串常量或带引号的名字含换行时，结构随换行形式变化；库里的原文用的是另一种换行时，结果按库里的形式给出，并在这里写明。')
     results = layout.identify(table('结果：一行是一个 SQL 结构，最多 50 个（点一行进入 SQL 详情）', """SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,
   array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,
   left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,
@@ -927,13 +1002,16 @@ WHERE '${q}${fp}'<>''""",
                   (note, 5))
     layout.line(13, (results, 24))
     layout.line(7, (table('整批没有命中时的逐条提示（点一行改为查看这条语句）', """SELECT h.statement,h.state_label,h.record_count,h.fingerprint,
-  '""" + SEARCH + """?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url
-FROM mpp_view_hints('${norm}','${xhints}',""" + FILTER_ARGS + ") h",
+  '""" + SEARCH + """?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint
+    ||'&var-cluster=${cluster}&var-database=${database}&var-user=${user}&var-xfor=${xfor}&var-sent=${sent}&var-timefilter=${timefilter}&var-order=${order}&from=${__from}&to=${__to}' AS url
+FROM mpp_view_hints('${norm}','${xhints}',""" + FILTER_ARGS + """) h
+WHERE '${xfor}'=""" + FILTER_TOKEN,
         [('statement', '第几条语句', dict(custom__width=110)), ('state_label', '这条语句单独查的结果'), ('record_count', '记录数'),
          ('fingerprint', '结构指纹'), ('url', None)],
-        description='粘贴的是多条语句、整体没有命中时，这里列出每条语句单独查的结果（最多前 20 条）。逐条命中不等于整批命中。',
+        description='粘贴的是多条语句、整体没有命中时，这里列出每条语句单独查的结果（最多前 20 条）。逐条命中不等于整批命中。'
+                    '状态和提示都按检索时所选的集群、数据库和执行用户计算；检索之后改了筛选，这里会清空，需要再点一次“检索”。',
         links=link('查看这条语句', '${__data.fields.url:raw}')), 24))
-    hidden = [variable('textbox', name, hide=2) for name in ('q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints')]
+    hidden = [variable('textbox', name, hide=2) for name in ('q', 'qd', 'fp', 'xstate', 'xreason', 'xsql', 'xhints', 'xfor', 'xbreak', 'sent')]
     variables = [variable('query', 'norm', hide=2, skipUrlSync=True, sql='SELECT mpp_view_rules()'),
                  variable('textbox', 'mode', hide=2, value='words')] + hidden + filters() + [
         variable('custom', 'timefilter', '时间', pairs=[('不限时间', 'off'), ('只看右上角所选的时间范围', 'on')]),

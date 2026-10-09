@@ -50,8 +50,8 @@ def unit():
             sys.modules[qualified] = module
             spec.loader.exec_module(module)
     suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'))
-    if suite.countTestCases() != 86:
-        raise ValueError('MPP verification kit must retain all 86 ordinary tests')
+    if suite.countTestCases() != 90:
+        raise ValueError('MPP verification kit must retain all 90 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if result.skipped:
         raise ValueError('product verification must execute every ordinary test without skips')

@@ -50,7 +50,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail annotation */ SELECT min(o.end_at) AS time,mpp_view_label('outcome',o.outcome)||' '||count(*)||' 次' AS text,mpp_view_label('outcome',o.outcome) AS tags\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') o WHERE o.outcome IN ('failed','cancelled','timed_out')\nGROUP BY o.outcome,floor(extract(epoch FROM o.end_at)*200/greatest(extract(epoch FROM ($__timeTo()::timestamptz-$__timeFrom()::timestamptz)),1))\nORDER BY 1",
+          "rawSql": "/* mpp-detail annotation */ SELECT min(o.end_at) AS time,mpp_view_label('outcome',o.outcome)||' '||count(*)||' 次' AS text,mpp_view_label('outcome',o.outcome) AS tags\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sid}') o WHERE o.outcome IN ('failed','cancelled','timed_out')\nGROUP BY o.outcome,floor(extract(epoch FROM o.end_at)*200/greatest(extract(epoch FROM ($__timeTo()::timestamptz-$__timeFrom()::timestamptz)),1))\nORDER BY 1",
           "refId": "Anno"
         }
       }
@@ -87,7 +87,7 @@
   ],
   "panels": [
     {
-      "description": "选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。",
+      "description": "选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。超过 200000 个字符的原文分段显示，每段都是原文里连续的一段，不加任何字符；标题写明现在是第几段，在右边“当前查看的内容”里换段。",
       "gridPos": {
         "h": 9,
         "w": 14,
@@ -218,7 +218,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 2 A */ SELECT * FROM (\nSELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}') content,NULL::text url\nUNION ALL SELECT 2,'计时类别',mpp_view_label('timing','${timing}')||CASE WHEN '${timing}' IN ('request','unknown') THEN '' ELSE '：是阶段或调用的记录，不加总成执行次数' END,NULL\nUNION ALL SELECT 3,'原文范围',CASE WHEN '${sqlid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'\n  ELSE '只看一份原文 ${sqlid}；点这里回到全部原文' END,CASE WHEN '${sqlid}'<>'' THEN '/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=' END\nUNION ALL SELECT 4,'时间范围','点这里设为这条 SQL 最近一次执行往前 7 天',\n  (SELECT '/d/mpp-detail/sql-detail?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${sqlid:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'\n     ||'&from='||(extract(epoch FROM i.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM i.last_at+interval '1 millisecond')*1000)::bigint\n   FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}')\nUNION ALL SELECT 5,'失败、取消、超时','没有计时类别和耗时，在每个计时类别下都列出',NULL\nUNION ALL SELECT 6,'提示',m.n||' 份原文尚未按当前规则生成指纹，其执行记录不在结果中',NULL\n  FROM (SELECT mpp_query_missing_rules('${norm}') n) m WHERE m.n>0\nUNION ALL SELECT 7,'返回','回到 SQL 检索（填回上一次的输入）','/d/mpp-search/sql-search'\n) x WHERE x.content IS NOT NULL ORDER BY x.seq",
+          "rawSql": "/* mpp-detail panel 2 A */ SELECT * FROM (\nSELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}') content,NULL::text url\nUNION ALL SELECT 2,'计时类别',mpp_view_label('timing','${timing}')||CASE WHEN '${timing}' IN ('request','unknown') THEN '' ELSE '：是阶段或调用的记录，不加总成执行次数' END,NULL\nUNION ALL SELECT 3,'原文范围',CASE WHEN '${sid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'\n  ELSE '只看一份原文 ${sid}；点这里回到全部原文' END,CASE WHEN '${sid}'<>'' THEN '/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=&var-part=1' END\nUNION ALL SELECT 4,'时间范围','点这里设为这条 SQL 最近一次执行往前 7 天',\n  (SELECT '/d/mpp-detail/sql-detail?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&var-sqlid=${sid}&${part:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'\n     ||'&from='||(extract(epoch FROM i.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM i.last_at+interval '1 millisecond')*1000)::bigint\n   FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}')\nUNION ALL SELECT 5,'失败、取消、超时','没有计时类别和耗时，在每个计时类别下都列出',NULL\nUNION ALL SELECT 7,'原文较长','共 '||g.chars||' 个字符，分 '||g.parts||' 段显示，左边是第 '||g.part||' 段；点这里看'||CASE WHEN g.step>0 THEN '下一段' ELSE '上一段' END,\n  '/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&var-sqlid=${sid}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-part='||(g.part+g.step)||''\n  FROM (SELECT x.chars,x.parts,x.part,d.step FROM (SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,greatest(1,ceil(length(t.sql_text)/200000.0)::int) parts,\n    least(greatest(1,ceil(length(t.sql_text)/200000.0)::int),greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t) x CROSS JOIN (VALUES (1),(-1)) d(step)\n        WHERE x.parts>1 AND x.part+d.step BETWEEN 1 AND x.parts) g\nUNION ALL SELECT 6,'提示',m.n||' 份原文尚未按当前规则生成指纹，其执行记录不在结果中',NULL\n  FROM (SELECT mpp_query_missing_rules('${norm}') n) m WHERE m.n>0\nUNION ALL SELECT 7,'返回','回到 SQL 检索（填回上一次的输入）','/d/mpp-search/sql-search'\n) x WHERE x.content IS NOT NULL ORDER BY x.seq",
           "refId": "A"
         }
       ],
@@ -566,7 +566,7 @@
             {
               "targetBlank": false,
               "title": "切换到这一计时类别",
-              "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${version:queryparam}&${sqlid:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-timing=${__data.fields.code}"
+              "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${version:queryparam}&var-sqlid=${sid}&${part:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-timing=${__data.fields.code}"
             }
           ]
         },
@@ -2151,7 +2151,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 18 A */ SELECT c.reference,c.baseline_ms,c.known_executions,c.above,c.above_share,c.expected_share,coalesce(c.note,'') note\nFROM mpp_view_compare('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') c",
+          "rawSql": "/* mpp-detail panel 18 A */ SELECT c.reference,c.baseline_ms,c.known_executions,c.above,c.above_share,c.expected_share,coalesce(c.note,'') note\nFROM mpp_view_compare('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sid}') c",
           "refId": "A"
         }
       ],
@@ -2229,7 +2229,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 20 A */ SELECT count(*) AS \"合计\",count(*) FILTER (WHERE o.outcome='success') AS \"成功\",\n  count(*) FILTER (WHERE o.outcome='failed') AS \"失败\",count(*) FILTER (WHERE o.outcome='cancelled') AS \"取消\",\n  count(*) FILTER (WHERE o.outcome='timed_out') AS \"超时\",count(*) FILTER (WHERE o.outcome='unknown') AS \"结果未知\"\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}') o",
+          "rawSql": "/* mpp-detail panel 20 A */ SELECT count(*) AS \"合计\",count(*) FILTER (WHERE o.outcome='success') AS \"成功\",\n  count(*) FILTER (WHERE o.outcome='failed') AS \"失败\",count(*) FILTER (WHERE o.outcome='cancelled') AS \"取消\",\n  count(*) FILTER (WHERE o.outcome='timed_out') AS \"超时\",count(*) FILTER (WHERE o.outcome='unknown') AS \"结果未知\"\nFROM mpp_view_records('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sid}') o",
           "refId": "A"
         }
       ],
@@ -2355,6 +2355,22 @@
           },
           {
             "matcher": {
+              "id": "byName",
+              "options": "时间范围"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
               "id": "byRegexp",
               "options": "/最快/"
             },
@@ -2398,7 +2414,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 21 A */ SELECT p.end_at AS time,\n  CASE p.kind WHEN 'slowest' THEN p.duration_ms END AS \"每格最慢的一次（一格只有一次时就是它）\",\n  CASE p.kind WHEN 'fastest' THEN p.duration_ms END AS \"同一格里最快的一次\"\nFROM mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sqlid}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric) p ORDER BY 1",
+          "rawSql": "/* mpp-detail panel 21 A */ SELECT p.end_at AS time,\n  CASE p.kind WHEN 'slowest' THEN p.duration_ms END AS \"每格最慢的一次（一格只有一次时就是它）\",\n  CASE p.kind WHEN 'fastest' THEN p.duration_ms END AS \"同一格里最快的一次\"\nFROM mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sid}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric) p ORDER BY 1",
           "refId": "A"
         },
         {
@@ -2411,6 +2427,17 @@
           "rawQuery": true,
           "rawSql": "/* mpp-detail panel 21 B */ SELECT t.at AS time,c.reference||' 基线' AS metric,c.baseline_ms AS value\nFROM mpp_view_compare('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz) c\nCROSS JOIN (VALUES ($__timeFrom()::timestamptz),($__timeTo()::timestamptz)) t(at)\nWHERE c.condition_met ORDER BY 1,2",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-detail panel 21 C */ SELECT t.at AS time,NULL::double precision AS \"时间范围\"\nFROM (VALUES ($__timeFrom()::timestamptz),($__timeTo()::timestamptz)) t(at) ORDER BY 1",
+          "refId": "C"
         }
       ],
       "title": "每次执行的耗时：${timing}（每格 $__interval；一格里画最慢和最快各一次）",
@@ -2547,7 +2574,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 22 A */ SELECT c.slot_at AS time,mpp_view_label('outcome',c.outcome) AS metric,c.record_count AS value\nFROM mpp_view_counts('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sqlid}') c ORDER BY 1,2",
+          "rawSql": "/* mpp-detail panel 22 A */ SELECT c.slot_at AS time,mpp_view_label('outcome',c.outcome) AS metric,c.record_count AS value\nFROM mpp_view_counts('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,'${sid}') c ORDER BY 1,2",
           "refId": "A"
         }
       ],
@@ -2866,7 +2893,7 @@
                   {
                     "targetBlank": false,
                     "title": "只看这一份原文",
-                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
+                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}&var-part=1"
                   }
                 ]
               }
@@ -3391,7 +3418,7 @@
                   {
                     "targetBlank": false,
                     "title": "只看这一份原文",
-                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
+                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}&var-part=1"
                   }
                 ]
               },
@@ -3567,7 +3594,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 29 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,\n  to_char(e.end_at AT TIME ZONE 'Asia/Shanghai','MM-DD HH24:MI:SS.MS')||'｜'||mpp_view_label('outcome',e.outcome) bar,\n  CASE WHEN e.comparison IN ('不高于 P50') THEN e.duration_ms END bar_p50,\n  CASE WHEN e.comparison IN ('高于 P50') THEN e.duration_ms END bar_over50,\n  CASE WHEN e.comparison IN ('高于 P95') THEN e.duration_ms END bar_over95,\n  CASE WHEN e.comparison IN ('高于 P99') THEN e.duration_ms END bar_over99,\n  CASE WHEN e.comparison IN ('没有基线','基线样本不足，不作参照') THEN e.duration_ms END bar_plain,\n  CASE WHEN e.duration_ms IS NULL THEN 1 END bar_none,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
+          "rawSql": "/* mpp-detail panel 29 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,\n  to_char(e.end_at AT TIME ZONE 'Asia/Shanghai','MM-DD HH24:MI:SS.MS')||'｜'||mpp_view_label('outcome',e.outcome) bar,\n  CASE WHEN e.comparison IN ('不高于 P50') THEN e.duration_ms END bar_p50,\n  CASE WHEN e.comparison IN ('高于 P50') THEN e.duration_ms END bar_over50,\n  CASE WHEN e.comparison IN ('高于 P95') THEN e.duration_ms END bar_over95,\n  CASE WHEN e.comparison IN ('高于 P99') THEN e.duration_ms END bar_over99,\n  CASE WHEN e.comparison IN ('没有基线','基线样本不足，不作参照') THEN e.duration_ms END bar_plain,\n  CASE WHEN e.duration_ms IS NULL THEN 1 END bar_none,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
           "refId": "A"
         }
       ],
@@ -3923,19 +3950,37 @@
         "type": "textbox"
       },
       {
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "hide": 2,
+        "label": "part",
+        "name": "part",
+        "options": [
+          {
+            "selected": true,
+            "text": "1",
+            "value": "1"
+          }
+        ],
+        "query": "1",
+        "type": "textbox"
+      },
+      {
         "current": {},
         "datasource": {
           "type": "grafana-postgresql-datasource",
           "uid": "sql-apm-pg"
         },
-        "definition": "/* mpp-detail variable sql_text */ SELECT CASE WHEN length(t.sql_text)>200000 THEN left(t.sql_text,200000)||E'\\n-- （原文共 '||length(t.sql_text)||' 个字符，这里只显示前 200000 个）' ELSE t.sql_text END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "definition": "/* mpp-detail variable sid */ SELECT coalesce((SELECT t.sql_id FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t WHERE t.selected),'')",
         "hide": 2,
         "includeAll": false,
-        "label": "sql_text",
+        "label": "sid",
         "multi": false,
-        "name": "sql_text",
+        "name": "sid",
         "options": [],
-        "query": "/* mpp-detail variable sql_text */ SELECT CASE WHEN length(t.sql_text)>200000 THEN left(t.sql_text,200000)||E'\\n-- （原文共 '||length(t.sql_text)||' 个字符，这里只显示前 200000 个）' ELSE t.sql_text END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "query": "/* mpp-detail variable sid */ SELECT coalesce((SELECT t.sql_id FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t WHERE t.selected),'')",
         "refresh": 1,
         "skipUrlSync": true,
         "sort": 0,
@@ -3947,14 +3992,33 @@
           "type": "grafana-postgresql-datasource",
           "uid": "sql-apm-pg"
         },
-        "definition": "/* mpp-detail variable sql_note */ SELECT CASE WHEN t.selected THEN '所选的一份原文 '||t.sql_id ELSE '同一结构的一份示例（共 '||t.structure_texts||' 份原文）' END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "definition": "/* mpp-detail variable sql_text */ SELECT substr(x.sql_text,(x.part-1)*200000+1,200000) FROM (SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,greatest(1,ceil(length(t.sql_text)/200000.0)::int) parts,\n    least(greatest(1,ceil(length(t.sql_text)/200000.0)::int),greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t) x\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))",
+        "hide": 2,
+        "includeAll": false,
+        "label": "sql_text",
+        "multi": false,
+        "name": "sql_text",
+        "options": [],
+        "query": "/* mpp-detail variable sql_text */ SELECT substr(x.sql_text,(x.part-1)*200000+1,200000) FROM (SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,greatest(1,ceil(length(t.sql_text)/200000.0)::int) parts,\n    least(greatest(1,ceil(length(t.sql_text)/200000.0)::int),greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t) x\nUNION ALL SELECT '-- 请在顶部“指纹”里粘贴一个结构指纹值，或从 SQL 检索、SQL 列表进入' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-detail variable sql_note */ SELECT CASE WHEN x.selected THEN '所选的一份原文 '||x.sql_id ELSE '同一结构的一份示例（共 '||x.structure_texts||' 份原文）' END\n  ||CASE WHEN x.parts>1 THEN '，共 '||x.chars||' 个字符，第 '||x.part||'／'||x.parts||' 段' ELSE '' END\nFROM (SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,greatest(1,ceil(length(t.sql_text)/200000.0)::int) parts,\n    least(greatest(1,ceil(length(t.sql_text)/200000.0)::int),greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t) x UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))",
         "hide": 2,
         "includeAll": false,
         "label": "sql_note",
         "multi": false,
         "name": "sql_note",
         "options": [],
-        "query": "/* mpp-detail variable sql_note */ SELECT CASE WHEN t.selected THEN '所选的一份原文 '||t.sql_id ELSE '同一结构的一份示例（共 '||t.structure_texts||' 份原文）' END\nFROM mpp_view_sql_text('${norm}','${fp}','${sqlid}') t UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sqlid}'))",
+        "query": "/* mpp-detail variable sql_note */ SELECT CASE WHEN x.selected THEN '所选的一份原文 '||x.sql_id ELSE '同一结构的一份示例（共 '||x.structure_texts||' 份原文）' END\n  ||CASE WHEN x.parts>1 THEN '，共 '||x.chars||' 个字符，第 '||x.part||'／'||x.parts||' 段' ELSE '' END\nFROM (SELECT t.sql_id,t.sql_text,t.selected,t.structure_texts,length(t.sql_text) chars,greatest(1,ceil(length(t.sql_text)/200000.0)::int) parts,\n    least(greatest(1,ceil(length(t.sql_text)/200000.0)::int),greatest(1,coalesce(nullif(left(regexp_replace('${part}','[^0-9]','','g'),6),'')::int,1))) part\n  FROM mpp_view_sql_text('${norm}','${fp}','${sid}') t) x UNION ALL SELECT '没有找到这个指纹' WHERE NOT EXISTS (SELECT FROM mpp_view_sql_text('${norm}','${fp}','${sid}'))",
         "refresh": 1,
         "skipUrlSync": true,
         "sort": 0,

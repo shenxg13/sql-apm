@@ -10,6 +10,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -160,18 +161,71 @@ def service(v, owner, cli):
             assert status == 200 and code == 0
             stored = owner.rows('SELECT sql_id FROM mpp_sql_text WHERE text=%s', (text,))
             assert answer.pop('exact_sql_id') == (stored[0][0] if stored else None), text[:20]
+            assert answer.pop('line_breaks') is None
             assert answer.pop('input') == dict(bytes=len(text.encode()), sha256=hashlib.sha256(text.encode()).hexdigest())
             assert answer == expected, (answer, expected)
-        # One line-break form per text in a browser editor: CR LF and LF count as the same text.
-        with owner.db, owner.db.cursor() as cur:
-            cur.execute("INSERT INTO mpp_sql_text(sql_id,text,content_sha256) VALUES ('crlf',%s,sha256(convert_to(%s,'UTF8')))", ('SELECT 1,\r\n2',) * 2)
-        assert post(running.port, dict(sql_b64=sql_b64('SELECT 1,\n2')))[1]['exact_sql_id'] == 'crlf'
-        assert post(running.port, dict(sql_b64=sql_b64('SELECT 1,\r\n2')))[1]['exact_sql_id'] == 'crlf'
-        assert post(running.port, dict(sql_b64=sql_b64('SELECT 1, 2')))[1]['exact_sql_id'] is None
-        multi = data.SPARSE.replace(' FROM', '\nFROM')
-        assert post(running.port, dict(sql_b64=sql_b64(multi)))[1]['exact_sql_id'] is None
-        with owner.db, owner.db.cursor() as cur:
-            cur.execute("DELETE FROM mpp_sql_text WHERE sql_id='crlf'")
+        # A line break more than the stored text has is another text.
+        multi = post(running.port, dict(sql_b64=sql_b64(data.SPARSE.replace(' FROM', '\nFROM'))))[1]
+        assert multi['exact_sql_id'] is None and multi['line_breaks'] is None and multi['state'] == 'has_baseline'
+        # The three line-break forms (CR LF, a lone CR, LF) count as the same text, mixtures and breaks inside
+        # a string constant included; any other difference, also one more or one fewer break, is another text.
+        for text in (data.BREAK_CRLF, data.BREAK_CR, data.BREAK_MIXED):
+            stored = owner.rows('SELECT sql_id FROM mpp_sql_text WHERE text=%s', (text,))[0][0]
+            plain = re.sub('\r\n?', '\n', text)
+            assert plain != text and plain.count('\n') >= 1
+            for form in (text, plain, plain.replace('\n', '\r\n'), plain.replace('\n', '\r'), plain.replace('\n', '\r\n', 1)):
+                answer = post(running.port, dict(sql_b64=sql_b64(form)))[1]
+                assert answer['exact_sql_id'] == stored and answer['state'] == 'has_baseline' and answer['line_breaks'] is None, (text[:20], form[:30])
+            for other in (plain.replace('\n', '\n\n', 1), plain.replace('\n', ' ', 1), plain + '\n', plain.replace('FROM', 'from')):
+                answer = post(running.port, dict(sql_b64=sql_b64(other)))[1]
+                assert answer['exact_sql_id'] is None and answer['line_breaks'] is None, other[:30]
+        # A string constant that the rules keep in the structure takes its line breaks into the fingerprint: the
+        # statement is another structure in another form. The service tries the other forms and takes one only when
+        # a stored text is the input apart from the line-break forms; the answer is the command line's for that form.
+        marks = dict(lf='\n', crlf='\r\n', cr='\r')
+        for text, sent, form in ((data.KEPT_CRLF, 'lf', 'crlf'), (data.KEPT_CR, 'lf', 'cr'), (data.KEPT_LF, 'crlf', 'lf'), (data.KEPT_LF, 'cr', 'lf')):
+            stored = owner.rows('SELECT sql_id FROM mpp_sql_text WHERE text=%s', (text,))[0][0]
+            plain = re.sub('\r\n?', '\n', text)
+            arrives, adopted = plain.replace('\n', marks[sent]), plain.replace('\n', marks[form])
+            assert cli(['exact', '--sql', arrives])[1]['state'] == 'not_seen', (text[:30], sent)
+            for filters in ({}, dict(cluster='C1'), dict(cluster='C2'), dict(database='shop', user='nobody_51')):
+                answer = post(running.port, dict(filters, sql_b64=sql_b64(arrives)))[1]
+                expected = cli(['exact', '--sql', adopted] + [word for name, value in filters.items() for word in ('--' + name, value)])[1]
+                assert answer.pop('exact_sql_id') == stored and answer.pop('line_breaks') == form, (text[:30], sent, filters)
+                assert answer.pop('input') == dict(bytes=len(arrives.encode()), sha256=hashlib.sha256(arrives.encode()).hexdigest())
+                assert answer == expected, (answer, expected)
+            states = {post(running.port, dict(cluster=scope, sql_b64=sql_b64(arrives)))[1]['state'] for scope in ('C1', 'C2')}
+            assert states == {'has_baseline', 'not_seen'}, states
+            # the stored bytes and the uniform form of the stored structure need no other form
+            for same in (text, adopted):
+                answer = post(running.port, dict(sql_b64=sql_b64(same)))[1]
+                assert answer['exact_sql_id'] == stored and answer['line_breaks'] is None and answer['state'] == 'has_baseline'
+            # a structure that fits is not enough: any other character, or one break more, and nothing is taken
+            for other in (arrives.replace('kept', 'kepT'), arrives + marks[sent], arrives.replace('cleaned', 'cleaned ')):
+                answer, expected = post(running.port, dict(sql_b64=sql_b64(other)))[1], cli(['exact', '--sql', other])[1]
+                assert answer.pop('exact_sql_id') is None and answer.pop('line_breaks') is None and answer.pop('input')['bytes'] == len(other.encode())
+                assert answer == expected and answer['state'] == 'not_seen', other[:30]
+        # Kept constants in two different forms: no uniform form is the stored structure. The stored bytes still find it.
+        stored = owner.rows('SELECT sql_id FROM mpp_sql_text WHERE text=%s', (data.KEPT_TWO,))[0][0]
+        for form in marks.values():
+            answer = post(running.port, dict(sql_b64=sql_b64(re.sub('\r\n?', '\n', data.KEPT_TWO).replace('\n', form))))[1]
+            assert answer['exact_sql_id'] is None and answer['line_breaks'] is None and answer['state'] == 'not_seen'
+        answer = post(running.port, dict(sql_b64=sql_b64(data.KEPT_TWO)))[1]
+        assert answer['exact_sql_id'] == stored and answer['line_breaks'] is None and answer['state'] == 'has_baseline'
+        # Exactly one fingerprint value is looked up as it is, at both entries, with the chosen filters.
+        value = owner.rows('SELECT f.value FROM mpp_fingerprint f JOIN mpp_sql_text t USING(sql_id) WHERE t.text=%s', (data.QUOTED,))[0][0]
+        for form in (value, ' \t' + value + '\r\n'):
+            status, answer = post(running.port, dict(sql_b64=sql_b64(form)))
+            code, expected = cli(['exact', '--sql', form])
+            assert status == 200 and code == 0 and answer.pop('exact_sql_id') is None and answer.pop('input')['bytes'] == len(form.encode())
+            assert answer.pop('line_breaks') is None
+            assert answer == expected and answer['state'] == 'has_baseline' and answer['fingerprint'] == value
+            assert [hit['scope_id'] for hit in answer['hits']] == ['C1']
+        assert post(running.port, dict(sql_b64=sql_b64(value), cluster='C2'))[1]['state'] == 'not_seen'
+        assert cli(['exact', '--sql', value, '--cluster', 'C2'])[1]['state'] == 'not_seen'
+        for broken in (value[:-1], value + '0', value + ' ' + value):
+            assert post(running.port, dict(sql_b64=sql_b64(broken)))[1]['state'] == 'unreliable_fingerprint', broken[-8:]
+            assert cli(['exact', '--sql', broken])[1]['state'] == 'unreliable_fingerprint'
         states = [post(running.port, dict(sql_b64=sql_b64(text)))[1]['state'] for text in cases[:4]]
         assert states == ['has_baseline', 'has_baseline', 'not_seen', 'unreliable_fingerprint']
         assert post(running.port, dict(sql_b64=sql_b64(data.FAILING)))[1]['state'] == 'records_without_baseline'
@@ -179,7 +233,9 @@ def service(v, owner, cli):
         assert hints['state'] == 'not_seen' and [h['state'] for h in hints['statement_hints']] == ['not_seen', 'has_baseline']
         filtered = post(running.port, dict(sql_b64=sql_b64(data.SPARSE), cluster='C2'))[1]
         assert [h['scope_id'] for h in filtered['hits']] == ['C2']
-        v.require(True, 'G5: four outcomes, batch hints and filters equal the command line; identical stored text reported')
+        v.require(True, 'G5: four outcomes, batch hints and filters equal the command line; a pasted fingerprint is looked up directly at both entries; '
+                        'the identical stored text is reported, with the three line-break forms counted as the same and nothing else; '
+                        'a statement whose structure depends on the form is found in the form of the stored text and the answer says so')
         over = b'x' * (MAX_BYTES + 1)
         status, answer = post(running.port, dict(sql_b64=sql_b64(over)))
         assert status == 200 and answer['state'] == 'unreliable_fingerprint' and answer['reason'] == 'input_size_limit'
@@ -432,7 +488,7 @@ def views(v, owner, reader, builds):
         assert sorted((r[:9] for r in timed_rows)) == sorted(direct)
         assert all(r[9] == errors.get(r[:4], 0) and abs(float(r[10]) - float(r[7] / r[6])) < 0.0006 for r in timed_rows)
         only_errors = [r for r in ranked if r[4] is None]
-        assert [(r[:4], r[9]) for r in only_errors] == [(k, n) for k, n in errors.items() if k not in {r[:4] for r in direct}] and only_errors
+        assert sorted((r[:4], r[9]) for r in only_errors) == sorted((k, n) for k, n in errors.items() if k not in {r[:4] for r in direct}) and only_errors
         assert all(r[11] == len(ranked) and r[12] == token(r[0], r[1], r[2]) for r in ranked)
         values = [key(r[:9]) for r in timed_rows] if order != 'not_success' else [r[9] for r in ranked]
         assert values == sorted(values, reverse=True), order

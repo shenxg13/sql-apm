@@ -183,7 +183,8 @@ Issue #27 将独立观察统计纳入同一命令和事务；输出增加 `obser
 
 2026-10-08 修订（[Issue #51](https://github.com/shenxg13/sql-apm/issues/51)，已实现）：`search find` 增加
 `--mode words|passage`，默认按词；按词只按空白切、引号是普通字符，原“引号表示整段”的写法作废，
-连续片段用 `--mode passage`。新增常驻的 `python -m sql_apm fingerprint-service`（只监听本机，供 Grafana 的
+连续片段用 `--mode passage`；按词和整段的输入超过 256 KB 时以 `search_input_too_large` 拒绝；`search exact`
+的输入恰好是一个结构指纹值时直接按该指纹查（2026-10-09，R1 评审后）。新增常驻的 `python -m sql_apm fingerprint-service`（只监听本机，供 Grafana 的
 完整 SQL 检索使用），规则见[检索主题](sql-search-and-views.md#grafana-检索与看板2026-10-08)，接口见
 [开发说明](../../docs/design/grafana-dashboards.md#指纹服务)。导入、构建、清理和状态查询仍只用命令行。
 

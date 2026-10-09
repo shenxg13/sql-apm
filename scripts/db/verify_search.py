@@ -6,6 +6,9 @@ import json
 import os
 from pathlib import Path
 import random
+import contextlib
+import io
+import unittest.mock
 import subprocess
 import sys
 
@@ -201,7 +204,27 @@ def verify(pg_bin):
         assert cli(['find',spaced])==(1,dict(state='failed',reason='too_many_search_terms'))
         assert cli(['find',' ','--mode','passage'])==(1,dict(state='failed',reason='empty_search_input'))
         assert cli(['find','demo','--mode','exact'])==(1,dict(state='failed',reason='invalid_arguments'))
-        v.require(True,'G2/S1/S6/S7/S8/S16: JSON CLI and DB agree in both text modes; exact outcomes/observations, parameter and file input, batch hints capped')
+        # Words and passages: 256 KB at both entries. One argument of that size cannot be passed to a
+        # process, so the command's entry point is called directly.
+        from sql_apm.cli.search import TEXT_MAX_BYTES,main as entry
+        def direct(words):
+            out=io.StringIO()
+            with contextlib.redirect_stdout(out),unittest.mock.patch.dict(os.environ,{'SQL_APM_DSN':dsn}):
+                code=entry(words)
+            return code,json.loads(out.getvalue())
+        for mode,start in (('words','DEMO a,b'),('passage','WHERE x =')):
+            edge=start+' '*(TEXT_MAX_BYTES-len(start))
+            code,obj=direct(['find',edge,'--mode',mode]);obj.pop('rules')
+            assert len(edge.encode())==TEXT_MAX_BYTES and code==0 and obj==find(edge,mode=mode) and obj['rows'],mode
+            assert direct(['find',edge+' ','--mode',mode])==(1,dict(state='failed',reason='search_input_too_large'))
+            assert direct(['find','中'*(TEXT_MAX_BYTES//3+1),'--mode',mode])==(1,dict(state='failed',reason='search_input_too_large'))
+        # Exactly one fingerprint value is looked up as it is by the complete-SQL entry as well.
+        for form in (fingerprint,' \t'+fingerprint+'\n'):
+            code,obj=cli(['exact','--sql',form]);obj.pop('rules')
+            assert code==0 and obj==hit,form
+        assert cli(['exact','--sql',fingerprint[:-1]])[1]['state']=='unreliable_fingerprint'
+        v.require(True,'G2/S1/S6/S7/S8/S16: JSON CLI and DB agree in both text modes, with the 256 KB limit on either side of it; exact outcomes/observations, '
+                       'direct lookup of a pasted fingerprint, parameter and file input, batch hints capped')
         args=[norm,'C1','synthetic_db','synthetic_user',fingerprint]
         summary=call('mpp_query_baseline',*args)
         assert len(summary['rows'])==5 and summary['version']['build_id']==build

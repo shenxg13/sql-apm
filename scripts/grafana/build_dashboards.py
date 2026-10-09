@@ -196,13 +196,15 @@ def detail_url(fingerprint, identity, start, end, extra=''):
 # --------------------------------------------------------------------------- SQL 列表
 def list_dashboard():
     layout = Layout()
-    layout.line(5, (table('数据的时间范围', """SELECT s.scope_id,min(f.first_log_at) first_at,max(f.last_log_at) last_at,count(*) files,
+    # The link target sits in its own hidden column: a value mapping on the linked
+    # field would replace the address itself with the mapped text.
+    layout.line(5, (table('数据的时间范围', """SELECT s.scope_id,min(f.first_log_at) first_at,max(f.last_log_at) last_at,count(*) files,'设为时间范围' AS action,
   '""" + LIST + """?from='||""" + MS.format("max(f.last_log_at)-interval '24 hours'") + """||'&to='||""" + MS.format("max(f.last_log_at)+interval '1 second'") + """ AS url
 FROM scope s JOIN source_file f USING(scope_id) GROUP BY s.scope_id ORDER BY s.scope_id""",
         [('scope_id', '集群'), ('first_at', '日志最早时间'), ('last_at', '日志最晚时间'), ('files', '已导入文件数'),
-         ('url', '看最后 24 小时', dict(links=link('把时间范围设为该集群日志的最后 24 小时', '${__data.fields.url:raw}'),
-                                 mappings=[dict(type='regex', options=dict(pattern='.*', result=dict(text='设为时间范围', index=0)))]))],
-        description='导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到有数据的一天。'), 24))
+         ('action', '看最后 24 小时', dict(links=link('把时间范围设为该集群日志的最后 24 小时', '${__data.fields.url:raw}'))),
+         ('url', None)],
+        description='导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到该集群有数据的最后一天。'), 24))
     layout.row('按时间范围现算的排行（右上角所选时间范围内的执行记录）')
     layout.line(13, (table('SQL 身份排行：所选时间范围内（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',coalesce(r.timing_type,'unknown')) timing,
   r.record_count,r.not_success,r.total_ms,r.mean_ms,r.slowest_ms,r.last_at,r.fingerprint,r.ranked_rows,
@@ -485,7 +487,7 @@ WHERE p.kind='slowest' ORDER BY 1""", description='与原文表的前 10 份对�
 FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sqlid}','${status:csv}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ",'${list_order}',200) e",
         [('end_at', '结束时间', dict(custom__width=190)), ('duration_ms', '耗时', dict(unit='ms', noValue='未知')), ('outcome', '状态'),
          ('comparison', '与基线的比较'), ('shape', '单条或整批'),
-         ('sql_id', '原文', dict(custom__width=150, links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}')))),
+         ('sql_id', '原文', dict(custom__width=300, links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}')))),
          ('source_file', '来源文件'), ('source_lines', '行号'), ('training', '训练判定（所选版本）', dict(custom__width=260)), ('matching', '符合筛选的条数')],
         description='默认最新的在前，可在顶部改为最慢的在前；两种排序都是先在整个时间范围内排好再取前 200 条。耗时未知的显示“未知”，不补零。'
                     '可按状态筛选；“耗时不低于／不高于”同时作用于这张表和上面的耗时图。'), 24))

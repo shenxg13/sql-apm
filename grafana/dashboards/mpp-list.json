@@ -38,7 +38,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到有数据的一天。",
+      "description": "导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到该集群有数据的最后一天。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -103,7 +103,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "url"
+              "options": "action"
             },
             "properties": [
               {
@@ -117,23 +117,20 @@
                 ]
               },
               {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "pattern": ".*",
-                      "result": {
-                        "index": 0,
-                        "text": "设为时间范围"
-                      }
-                    },
-                    "type": "regex"
-                  }
-                ]
-              },
-              {
                 "id": "displayName",
                 "value": "看最后 24 小时"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "url"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           }
@@ -159,7 +156,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-list panel 1 A */ SELECT s.scope_id,min(f.first_log_at) first_at,max(f.last_log_at) last_at,count(*) files,\n  '/d/mpp-list/sql-list?from='||(extract(epoch FROM max(f.last_log_at)-interval '24 hours')*1000)::bigint||'&to='||(extract(epoch FROM max(f.last_log_at)+interval '1 second')*1000)::bigint AS url\nFROM scope s JOIN source_file f USING(scope_id) GROUP BY s.scope_id ORDER BY s.scope_id",
+          "rawSql": "/* mpp-list panel 1 A */ SELECT s.scope_id,min(f.first_log_at) first_at,max(f.last_log_at) last_at,count(*) files,'设为时间范围' AS action,\n  '/d/mpp-list/sql-list?from='||(extract(epoch FROM max(f.last_log_at)-interval '24 hours')*1000)::bigint||'&to='||(extract(epoch FROM max(f.last_log_at)+interval '1 second')*1000)::bigint AS url\nFROM scope s JOIN source_file f USING(scope_id) GROUP BY s.scope_id ORDER BY s.scope_id",
           "refId": "A"
         }
       ],

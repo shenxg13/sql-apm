@@ -834,6 +834,23 @@ def detail(env, play):
     assert [row[1] for row in other.variable('mpp-detail', 'timing')] == ['unknown'] and other.rows('mpp-detail', '关键数值') == []
     tiles = other.rows('mpp-detail', '范围内的记录')[0]
     assert tiles[0] == tiles[2] > 0 and tiles[1] == 0 and {r[1] for r in other.rows('mpp-detail', '明细：')} == {None}
+    # links inside the page: the time-range hint, a row of the five-category overview, the original-text cell
+    extended_url = env.detail_of('products category_id')
+    last_ms = int(extended_url.rsplit('&to=', 1)[1]) - 1
+    other.open(extended_url.split('&from=')[0] + '&from=%d&to=%d' % (last_ms - 40 * 86400000, last_ms - 39 * 86400000), extra=2500)
+    assert other.rows('mpp-detail', '范围内的记录')[0][0] == 0
+    other.page.get_by_text('点这里设为这条 SQL 最近一次执行往前 7 天').click()
+    other.settle(2500)
+    moved = other.variables()
+    assert (ms(moved['from']), ms(moved['to'])) == (last_ms - 7 * 86400000, last_ms + 1) and other.rows('mpp-detail', '范围内的记录')[0][0] > 0
+    other.page.locator('[data-testid^="data-testid Panel header 五类计时一览"] a', has_text='Parse').first.click()
+    other.settle(2500)
+    assert other.variables()['timing'] == 'parse' and {row[0] for row in other.rows('mpp-detail', '关键数值')} >= {'样本数', 'P50'}
+    cell = other.page.locator('[data-testid^="data-testid Panel header 明细："] a').first
+    wanted = cell.inner_text()
+    cell.click(position=dict(x=20, y=10))
+    other.settle(2500)
+    assert wanted.startswith('S:') and other.variables()['sqlid'] == wanted and {row[5] for row in other.rows('mpp-detail', '明细：')} == {wanted}
     # a fingerprint pasted into the top box is enough
     other.open('/d/mpp-detail/sql-detail?var-fp=' + busy, extra=3000)
     assert other.rows('mpp-detail', '关键数值') and 'FROM orders o' in other.text()
@@ -841,7 +858,7 @@ def detail(env, play):
     assert '没有找到这个指纹' in other.text() and not other.failures
     other.close()
     env.ok('G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line '
-           'and are not compared; a failure-only SQL is shown under the untimed records; a pasted fingerprint opens the page')
+           'and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page')
 
 
 def listing(env, play):
@@ -871,6 +888,16 @@ def listing(env, play):
     assert {row[7] for row in versions} == {'保留'} and {row[8] for row in versions} == {'与当前规则相同'}
     spans = browser.rows('mpp-list', '数据的时间范围')
     assert [row[0] for row in spans] == ['C1', 'C2'] and '设为时间范围' in browser.text()
+    # "set as time range" moves to the last 24 hours of that cluster's logs
+    expected = env.sql("SELECT (extract(epoch FROM max(f.last_log_at)-interval '24 hours')*1000)::bigint,"
+                       "(extract(epoch FROM max(f.last_log_at)+interval '1 second')*1000)::bigint FROM source_file f WHERE f.scope_id='C1'")[0]
+    browser.open('/d/mpp-list/sql-list', extra=2000)
+    assert browser.rows('mpp-list', 'SQL 身份排行：所选时间范围内') == []
+    browser.page.locator('[data-testid^="data-testid Panel header 数据的时间范围"] a').first.click()
+    browser.settle(2500)
+    moved = browser.variables()
+    assert urllib.parse.urlparse(browser.page.url).path.startswith('/d/mpp-list') and (ms(moved['from']), ms(moved['to'])) == expected
+    assert browser.rows('mpp-list', 'SQL 身份排行：所选时间范围内')
     # sort orders and filters
     for order, column in (('total', 6), ('slowest', 8), ('not_success', 5)):
         browser.open('/d/mpp-list/sql-list?from=%d&to=%d&var-rank_order=%s' % (env.last_day + (order,)), extra=2000)
@@ -889,7 +916,8 @@ def listing(env, play):
     assert (ms(opened['from']), ms(opened['to'])) == env.last_day and browser.rows('mpp-detail', '关键数值')
     browser.shot('list-to-detail')
     browser.close()
-    env.ok('G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; a row opens the detail page')
+    env.ok('G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; '
+           '"set as time range" moves to the last day of data; a row opens the detail page')
 
 
 def real(env, play):

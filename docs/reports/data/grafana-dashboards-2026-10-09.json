@@ -2091,5 +2091,24 @@
   "development machine only; target machine results belong to Issue #52",
   "the first call after start-up reads from the operating-system cache, not from cold disks",
   "local data: cluster 119 has 31 days, cluster 120 has 7 days; production accumulates more records and versions"
- ]
+ ],
+ "final_real_data_page_audit": {
+  "commit": "0dda73a68df09ea506505d1e82017d54fff02679",
+  "script": "scripts/grafana/verify_e2e.py --directory <real-data environment>",
+  "result": "passed",
+  "sampled_identities": 7,
+  "kinds": [
+   "most records",
+   "most original texts",
+   "failed records only",
+   "extended protocol",
+   "insufficient samples",
+   "random with requests (2)"
+  ],
+  "note": "rerun after the user finished the trial and after a restart of the development machine (cold cache); its page times are not the G21 figures",
+  "cold_cache_examples": {
+   "detail_slowest_panel_seconds": 1.97,
+   "widest_words_search_seconds": 7.3
+  }
+ }
 }

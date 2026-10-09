@@ -445,7 +445,7 @@
  },
  "synthetic": {
   "unit_tests": {
-   "count": 90,
+   "count": 91,
    "result": "ok"
   },
   "development_tests": {
@@ -478,7 +478,7 @@
   "end_to_end": {
    "script": "scripts/grafana/verify_e2e.py",
    "groups": 17,
-   "seconds": 656.8,
+   "seconds": 674.7,
    "labels": [
     "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
     "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
@@ -496,9 +496,9 @@
     "G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; unknown durations stay unknown; training decisions under the chosen version are shown as they are; the chart above the list draws the same executions, one bar each in the colour of its comparison with the baseline, and marks those without a duration",
     "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
     "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page",
-    "R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode; a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported after the last build) can be chosen and their records found; a text chosen for another structure is not applied; failure, cancellation and timeout marks, alone or mixed, show without any duration; a text longer than one segment can be read to its end"
+    "R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode, in complete SQL only within the 512 KB limit; a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported after the last build) can be chosen and their records found; a text chosen for another structure is not applied; failure, cancellation and timeout marks, alone or mixed, show without any duration; a text longer than one segment can be read to its end"
    ],
-   "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5"
+   "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb"
   },
   "dataset": {
    "clusters": 2,
@@ -513,7 +513,7 @@
   "program_files": 104,
   "verify_package": "passed",
   "kit_entries": {
-   "unit": "90 tests, no skips",
+   "unit": "91 tests, no skips",
    "database": "278 PASS lines",
    "publication": "33 PASS lines",
    "smoke": "passed",
@@ -522,7 +522,7 @@
   },
   "packaged_documents_changed": false,
   "offline_bundle_changed": false,
-  "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5"
+  "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb"
  },
  "real_data": {
   "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",
@@ -2360,6 +2360,98 @@
     "script": "scripts/grafana/verify_e2e.py --directory <real-data environment>",
     "result": "passed",
     "sampled_identities": 7
+   }
+  }
+ },
+ "r2_remediation": {
+  "review": "https://github.com/shenxg13/sql-apm/pull/53#issuecomment-6084652183",
+  "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb",
+  "findings": [
+   "F-51-010"
+  ],
+  "finding": "the direct lookup of a pasted fingerprint value in complete-SQL mode came before the 512 KB input limit; introduced by the R1 remediation",
+  "change": "sql_apm/cli/search.py exact(): the byte count is checked first; an input over the limit is answered as input_size_limit whatever it holds",
+  "contract_changed": false,
+  "unchanged": [
+   "structure",
+   "query functions",
+   "dashboards",
+   "installer and configuration files",
+   "offline bundle and packaged documents"
+  ],
+  "regression": {
+   "unit": "one new test (91); fails without the fix",
+   "command_line_file_entry": "scripts/db/verify_search.py: 512 KB - 1 and 512 KB found, 512 KB + 1, longer and the kept prefix of a longer input refused; fails without the fix",
+   "service": "scripts/db/verify_views.py: the same sizes answered like the command line; fails without the fix",
+   "search_page": "scripts/grafana/verify_e2e.py boundaries: pasted in the browser, found at 512 KB, refused with the reason over it"
+  },
+  "rerun": [
+   "unit tests (91)",
+   "Grafana tooling tests (5)",
+   "packaging tests (30)",
+   "scripts/db/verify.py (278)",
+   "scripts/db/verify_search.py (8 groups)",
+   "scripts/db/verify_views.py (16 groups)",
+   "generated dashboards equal the committed ones",
+   "harness checks",
+   "end-to-end 17 groups",
+   "candidate package rebuilt and all six kit entries"
+  ],
+  "not_rerun": [
+   "real-data page audit (dashboards and query functions unchanged)",
+   "real database upgrade",
+   "real-data search audit",
+   "timings of the performance section"
+  ],
+  "real_data": {
+   "evidence": "measured; states and counts only",
+   "service_answers": {
+    "fingerprints": 20,
+    "cases": [
+     {
+      "input": "bare value",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 15
+     },
+     {
+      "input": "blanks up to 512 KB - 1",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 21
+     },
+     {
+      "input": "blanks up to 512 KB",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 21
+     },
+     {
+      "input": "blanks up to 512 KB + 1",
+      "states": {
+       "unreliable_fingerprint/input_size_limit": 20
+      },
+      "answers_with_hits": 0,
+      "median_ms": 8
+     },
+     {
+      "input": "first 512 KB + 1 bytes of a longer input",
+      "states": {
+       "unreliable_fingerprint/input_size_limit": 20
+      },
+      "answers_with_hits": 0,
+      "median_ms": 8
+     }
+    ]
    }
   }
  }

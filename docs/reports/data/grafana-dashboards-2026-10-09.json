@@ -186,6 +186,52 @@
     "real-data search and page audits",
     "other timings"
    ]
+  },
+  {
+   "commit": "ff2373b47dff7cf863c2311fe23f214ff8be5353",
+   "change": "detail page: the chart coloured by original text draws the fastest execution of every slot as well as the slowest, as the main chart does; no selector was added (user decision)",
+   "files": "the detail dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, one document",
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (84)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "range_days": 7,
+    "step": "5m",
+    "samples": [
+     {
+      "kind": "one original text executed repeatedly",
+      "texts_drawn": 1,
+      "points_drawn": 4033,
+      "independent_count": 4033,
+      "slowest_only_would_be": 2017
+     },
+     {
+      "kind": "many original texts, few executions each",
+      "texts_drawn": 10,
+      "points_drawn": 20,
+      "independent_count": 20,
+      "slowest_only_would_be": 18
+     },
+     {
+      "kind": "many original texts, one execution each",
+      "texts_drawn": 10,
+      "points_drawn": 10,
+      "independent_count": 10,
+      "slowest_only_would_be": 10
+     }
+    ]
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
   }
  ],
  "schema_sha256": "7de034a904f27cba90e0829048ae13d72426f65a0bb1c43ec303cfa026b68f7a",
@@ -234,7 +280,7 @@
  },
  "synthetic": {
   "unit_tests": {
-   "count": 83,
+   "count": 84,
    "result": "ok"
   },
   "development_tests": {
@@ -267,7 +313,7 @@
   "end_to_end": {
    "script": "scripts/grafana/verify_e2e.py",
    "groups": 16,
-   "seconds": 318.9,
+   "seconds": 318.7,
    "labels": [
     "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
     "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
@@ -280,13 +326,13 @@
     "G13: the identity list holds exactly the combinations that occurred, the timing category defaults correctly, only usable versions can be chosen; the SQL text panel shows an example of the structure; the page states no anomaly verdict",
     "G14: key numbers, percentile bars, the five-category overview with the no-sample line, sample conditions and both pattern charts equal the stored statistics and do not follow the time range",
     "G17: a linear axis; when dense, each slot shows its slowest and fastest execution and the title states the step; zoomed in, every execution is one point; dragging zooms; failures, cancellations and timeouts are marks, never zero; the duration filters act on the chart and the list; counts equal an independent count",
-    "G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it while the baseline stays; the coloured chart is collapsed and queries only when opened",
+    "G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it while the baseline stays; the coloured chart is collapsed, queries only when opened and draws, for each text, the slowest and the fastest execution of every slot",
     "G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, and the exclusion reasons equal the stored statistics",
     "G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; unknown durations stay unknown; training decisions under the chosen version are shown as they are",
     "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
     "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page"
    ],
-   "commit": "83c8e5572c3994968c0f7fdd88c514537cb674b4"
+   "commit": "ff2373b47dff7cf863c2311fe23f214ff8be5353"
   },
   "dataset": {
    "clusters": 2,
@@ -301,7 +347,7 @@
   "program_files": 104,
   "verify_package": "passed",
   "kit_entries": {
-   "unit": "83 tests, no skips",
+   "unit": "84 tests, no skips",
    "database": "278 PASS lines",
    "publication": "33 PASS lines",
    "smoke": "passed",
@@ -310,7 +356,7 @@
   },
   "packaged_documents_changed": false,
   "offline_bundle_changed": false,
-  "commit": "83c8e5572c3994968c0f7fdd88c514537cb674b4"
+  "commit": "ff2373b47dff7cf863c2311fe23f214ff8be5353"
  },
  "real_data": {
   "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",

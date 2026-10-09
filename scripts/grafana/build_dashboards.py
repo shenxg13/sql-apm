@@ -418,6 +418,13 @@ def chart(kind, title, sql, description='', x=None, unit='ms', form='table', **e
     return panel
 
 
+# The chart of the execution list: column, name in the legend, colour, and the comparisons it holds.
+# The colours are those of the three baseline lines in the duration chart; the last one marks executions without a duration.
+BARS = [('bar_p50', '不高于 P50', 'green', ['不高于 P50']), ('bar_over50', '高于 P50', 'yellow', ['高于 P50']), ('bar_over95', '高于 P95', 'orange', ['高于 P95']),
+        ('bar_over99', '高于 P99', 'red', ['高于 P99']), ('bar_plain', '没有可比的基线', '#8e8e8e', ['没有基线', '基线样本不足，不作参照']),
+        ('bar_none', '没有耗时：失败、取消、超时等（整格标记）', 'purple', [])]
+
+
 def pattern(title, layer, label, description):
     """P50 and P95 per bucket of one stored layer; never depends on the time range."""
     return chart('barchart', title, "SELECT " + label + """ AS bucket,s.p50_ms AS "P50",s.p95_ms AS "P95"
@@ -613,16 +620,40 @@ ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种
     colored['fieldConfig']['defaults']['custom'] = dict(drawStyle='points', pointSize=4, showPoints='always', axisLabel='耗时')
     layout.line(10, (colored, 24))
     layout.row('明细（所选时间范围内，每次执行一行）')
+    # The list feeds the chart above it: one more column per colour of bar, hidden in the table. A row has a
+    # value in exactly one of them, so each execution is one bar and the legend names what the colours mean.
     listed = layout.identify(table('明细：${timing}，${list_order}，最多 200 条', """SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,
-  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching
+  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,
+  to_char(e.end_at AT TIME ZONE 'Asia/Shanghai','MM-DD HH24:MI:SS.MS')||'｜'||mpp_view_label('outcome',e.outcome) bar,
+  """ + ",\n  ".join("CASE WHEN e.comparison IN (%s) THEN e.duration_ms END %s" % (",".join("'%s'" % label for label in labels), name)
+                        for name, _, _, labels in BARS if labels) + """,
+  CASE WHEN e.duration_ms IS NULL THEN 1 END bar_none,e.matching
 FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sqlid}','${status:csv}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ",'${list_order}',200) e",
         [('end_at', '结束时间', dict(custom__width=190)), ('duration_ms', '耗时', dict(unit='ms', noValue='未知')), ('outcome', '状态'),
          ('comparison', '与基线的比较'), ('shape', '单条或整批'),
          ('sql_id', '原文', dict(custom__width=300, links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}')))),
-         ('source_file', '来源文件'), ('source_lines', '行号'), ('training', '训练判定（所选版本）', dict(custom__width=260)), ('matching', None)],
+         ('source_file', '来源文件'), ('source_lines', '行号'), ('training', '训练判定（所选版本）', dict(custom__width=260)), ('matching', None),
+         ('bar', None)] + [(name, None) for name, _, _, _ in BARS],
         description='默认最新的在前，可在顶部改为最慢的在前；两种排序都是先在整个时间范围内排好再取前 200 条。耗时未知的显示“未知”，不补零。'
                     '可按状态筛选；“耗时不低于／不高于”同时作用于这张表和上面的耗时图。'))
     layout.line(3, (total('所选时间范围内，符合状态和耗时筛选的一共有多少条（下表最多显示 200 条）', listed, 'matching'), 24))
+    bars = dict(type='barchart', title='明细图：下表里的每次执行一根柱子，从左到右就是下表从上到下；柱高是耗时，颜色是与基线的比较',
+        description='画的就是下表列出的那些执行（最多 200 条），顺序、状态筛选和耗时筛选都与下表相同，不另外查询。'
+                    '颜色与上面耗时图里三条基线的颜色对应：绿色不高于 P50，黄色高于 P50，橙色高于 P95，红色高于 P99；灰色是所选版本没有可比的基线。'
+                    '失败、取消、超时等没有耗时，画成一根浅紫色的整格标记，它的高度没有含义。图例里每种颜色后面 Count 的数字是这种执行的条数，点图例可以只看一种。'
+                    '要看某一次执行的原文和来源，在下表里找同一个结束时间。',
+        datasource=SHARED, targets=[dict(datasource=SHARED, panelId=listed['id'], refId='A', withTransforms=False)],
+        transformations=[dict(id='filterFieldsByName', options=dict(include=dict(names=['bar'] + [name for name, _, _, _ in BARS])))],
+        fieldConfig=dict(defaults=dict(unit='ms', min=0, color=dict(mode='fixed', fixedColor='gray'), custom=dict(fillOpacity=85, lineWidth=0, axisLabel='耗时')),
+            overrides=[dict(matcher=dict(id='byName', options=name), properties=[dict(id='displayName', value=label), dict(id='color', value=dict(mode='fixed', fixedColor=color))]
+                # no duration: a faint bar over the whole height, on a scale of its own (0 to 1) that is not drawn
+                + ([] if labels else [dict(id='custom.fillOpacity', value=30), dict(id='unit', value='none'), dict(id='min', value=0), dict(id='max', value=1),
+                                      dict(id='custom.axisPlacement', value='hidden')]))
+                for name, label, color, labels in BARS]),
+        options=dict(xField='bar', orientation='vertical', stacking='normal', barWidth=0.92, groupWidth=1, showValue='never', xTickLabelRotation=0,
+                     xTickLabelSpacing=120, xTickLabelMaxLength=14, legend=dict(displayMode='list', placement='bottom', showLegend=True, calcs=['count']),
+                     tooltip=dict(mode='single', sort='none')))
+    layout.line(8, (bars, 24))
     layout.line(13, (listed, 24))
 
     variables = [

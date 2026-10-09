@@ -61,7 +61,7 @@ class DeliveredGrafanaFiles(unittest.TestCase):
             self.assertEqual(len(numbered), len(list(panels(board))))
             for panel in panels(board):
                 for target in panel.get('targets', []):
-                    if 'panelId' not in target:
+                    if 'panelId' not in target or panel['type'] == 'barchart':  # the chart of the execution list has its own test
                         continue
                     self.assertEqual((panel['type'], target['datasource']['uid']), ('stat', '-- Dashboard --'))
                     source = numbered[target['panelId']]
@@ -155,6 +155,26 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         linked = [item for item in texts['fieldConfig']['overrides'] if item['matcher']['id'] == 'byRegexp']
         self.assertEqual(len(linked), 1)
         self.assertIsNone(re.compile(linked[0]['matcher']['options'].strip('/')).match('differing_more'))
+
+    def test_chart_of_the_execution_list_reuses_the_list(self):
+        flat = list(panels(self.boards['mpp-detail.json']))
+        listed = [panel for panel in flat if panel['title'].startswith('明细：')][0]
+        chart = [panel for panel in flat if panel['title'].startswith('明细图')][0]
+        self.assertEqual((chart['type'], chart['datasource']['uid'], chart['targets'][0]['panelId']), ('barchart', '-- Dashboard --', listed['id']))
+        self.assertLess(chart['gridPos']['y'], listed['gridPos']['y'])
+        drawn = chart['transformations'][0]['options']['include']['names']
+        self.assertEqual(drawn, ['bar', 'bar_p50', 'bar_over50', 'bar_over95', 'bar_over99', 'bar_plain', 'bar_none'])
+        self.assertEqual((chart['options']['xField'], chart['options']['stacking']), ('bar', 'normal'))
+        hidden = {item['matcher']['options'] for item in listed['fieldConfig']['overrides']
+                  if any(entry['id'] == 'custom.hideFrom.viz' and entry['value'] for entry in item['properties'])}
+        self.assertLessEqual(set(drawn), hidden)  # the list itself looks as before
+        colours = {item['matcher']['options']: {entry['id']: entry['value'] for entry in item['properties']} for item in chart['fieldConfig']['overrides']}
+        self.assertEqual([colours[name]['color']['fixedColor'] for name in drawn[1:5]], ['green', 'yellow', 'orange', 'red'])
+        self.assertEqual((colours['bar_none']['custom.axisPlacement'], colours['bar_none']['max']), ('hidden', 1))
+        sql = listed['targets'][0]['rawSql']
+        for label in ('不高于 P50', '高于 P50', '高于 P95', '高于 P99', '没有基线', '基线样本不足，不作参照'):
+            self.assertIn("'" + label + "'", sql)
+        self.assertRegex(sql, r'bar_none,e\.matching\n')  # the total stays the last column
 
     def test_search_page_is_laid_out_for_a_1080p_screen(self):
         board = self.boards['mpp-search.json']

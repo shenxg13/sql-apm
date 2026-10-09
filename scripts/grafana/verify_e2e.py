@@ -1000,16 +1000,47 @@ def detail(env, play):
     assert [None if r[1] is None else float(r[1]) for r in table] == [None if r[1] is None else float(r[1]) for r in latest]
     assert {r[4] for r in table} == {'单条'} and {r[6] for r in table} == {'c1.csv'} and all(r[7].isdigit() for r in table)
     assert {r[8] for r in table} >= {'参与训练'} and {r[3] for r in table} <= {'耗时未知', '高于 P99', '高于 P95', '高于 P50', '不高于 P50'}
+
+    def bars(page_browser, listed):
+        """The chart above the list draws the listed executions, one bar each, coloured by an independent comparison with the stored baseline."""
+        names = page_browser.results[('mpp-detail', 'panel %d' % env.panel('mpp-detail.json', '明细：')['id'], 'A')][0]['names']
+        kinds = names[names.index('bar') + 1:names.index('matching')]
+        assert kinds == [item[0] for item in boards.BARS] and len({row[names.index('bar')] for row in listed}) == len(listed)
+        counted = dict.fromkeys(kinds, 0)
+        for row in listed:
+            filled = [name for name in kinds if row[names.index(name)] is not None]
+            if row[1] is None:
+                wanted = 'bar_none'
+            else:  # the three conditions of this baseline are met, so each percentile is a reference
+                wanted = ('bar_over99' if float(row[1]) > float(stored[4]) else 'bar_over95' if float(row[1]) > float(stored[3])
+                          else 'bar_over50' if float(row[1]) > float(stored[2]) else 'bar_p50')
+            assert filled == [wanted] and float(row[names.index(wanted)]) == (1 if row[1] is None else float(row[1])), (row[1], filled)
+            counted[wanted] += 1
+        panel = page_browser.page.locator('[data-testid^="data-testid Panel header 明细图"]').first
+        panel.scroll_into_view_if_needed()
+        page_browser.page.wait_for_timeout(1500)
+        drawn = panel.inner_text().replace('\u00a0', ' ')
+        assert [int(number) for number in re.findall(r'Count: (\d+)', drawn)] == [counted[name] for name in kinds], (drawn[-300:], counted)
+        assert all(item[1] in drawn for item in boards.BARS) and panel.locator('canvas').count() > 0
+        return counted
+
+    assert all(float(stored[index]) > 0 for index in (2, 3, 4))
+    shown = bars(browser, table)
+    assert sum(shown.values()) == 200 and sum(1 for count in shown.values() if count) >= 3
     slow = Browser(play, env, height=5200)
     slow.open(env.detail + '&var-list_order=slowest', extra=2500)
     slowest_rows = slow.rows('mpp-detail', '明细：')
     expected = env.sql("SELECT o.duration_ms " + facts + " AND o.duration_ms IS NOT NULL ORDER BY o.duration_ms DESC LIMIT 200")
     assert [float(r[1]) for r in slowest_rows] == [float(r[0]) for r in expected]
     assert '最多 200 条' in slow.text() and '最慢的在前' in slow.text()
+    slowest_shown = bars(slow, slowest_rows)  # the chart follows the order of the list: the slowest are above the high percentiles
+    assert slowest_shown['bar_p50'] == 0 and slowest_shown['bar_over99'] > shown['bar_over99']
     slow.open(env.detail + '&var-status=failed&var-status=timed_out', extra=2500)
     filtered = slow.rows('mpp-detail', '明细：')
     assert len(filtered) == by_outcome.get('failed', 0) + by_outcome.get('timed_out', 0) and {r[2] for r in filtered} <= {'失败', '超时'}
     assert all(r[1] is None and r[3] == '耗时未知' and r[8].startswith('被排除：') for r in filtered)
+    marks = bars(slow, filtered)  # executions without a duration are marks, none of them a bar with a height
+    assert marks['bar_none'] == len(filtered) > 0 and sum(marks.values()) == len(filtered)
     slow.shot('detail-status')
     assert '未知' in slow.text()
     slow.close()
@@ -1024,7 +1055,7 @@ def detail(env, play):
     browser.shot('detail')
     browser.close()
     env.ok('G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; '
-           'unknown durations stay unknown; training decisions under the chosen version are shown as they are')
+           'unknown durations stay unknown; training decisions under the chosen version are shown as they are; the chart above the list draws the same executions, one bar each in the colour of its comparison with the baseline, and marks those without a duration')
     # ---- other shapes of SQL
     other = Browser(play, env, height=5200)
     other.open(env.detail_of('products category_id'), extra=3000)

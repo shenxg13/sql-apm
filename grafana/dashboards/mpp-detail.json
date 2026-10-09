@@ -3051,6 +3051,225 @@
     },
     {
       "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "画的就是下表列出的那些执行（最多 200 条），顺序、状态筛选和耗时筛选都与下表相同，不另外查询。颜色与上面耗时图里三条基线的颜色对应：绿色不高于 P50，黄色高于 P50，橙色高于 P95，红色高于 P99；灰色是所选版本没有可比的基线。失败、取消、超时等没有耗时，画成一根浅紫色的整格标记，它的高度没有含义。图例里每种颜色后面 Count 的数字是这种执行的条数，点图例可以只看一种。要看某一次执行的原文和来源，在下表里找同一个结束时间。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "gray",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisLabel": "耗时",
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "min": 0,
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_p50"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "不高于 P50"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over50"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "高于 P50"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over95"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "高于 P95"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over99"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "高于 P99"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_plain"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "没有可比的基线"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_none"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "没有耗时：失败、取消、超时等（整格标记）"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 128
+      },
+      "id": 31,
+      "options": {
+        "barWidth": 0.92,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [
+            "count"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "bar",
+        "xTickLabelMaxLength": 14,
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 120
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 29,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "明细图：下表里的每次执行一根柱子，从左到右就是下表从上到下；柱高是耗时，颜色是与基线的比较",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "bar",
+                "bar_p50",
+                "bar_over50",
+                "bar_over95",
+                "bar_over99",
+                "bar_plain",
+                "bar_none"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
@@ -3241,6 +3460,90 @@
                 "value": true
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_p50"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over50"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over95"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_over99"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_plain"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bar_none"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
           }
         ]
       },
@@ -3248,7 +3551,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 128
+        "y": 136
       },
       "id": 29,
       "options": {
@@ -3264,7 +3567,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 29 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
+          "rawSql": "/* mpp-detail panel 29 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,\n  to_char(e.end_at AT TIME ZONE 'Asia/Shanghai','MM-DD HH24:MI:SS.MS')||'｜'||mpp_view_label('outcome',e.outcome) bar,\n  CASE WHEN e.comparison IN ('不高于 P50') THEN e.duration_ms END bar_p50,\n  CASE WHEN e.comparison IN ('高于 P50') THEN e.duration_ms END bar_over50,\n  CASE WHEN e.comparison IN ('高于 P95') THEN e.duration_ms END bar_over95,\n  CASE WHEN e.comparison IN ('高于 P99') THEN e.duration_ms END bar_over99,\n  CASE WHEN e.comparison IN ('没有基线','基线样本不足，不作参照') THEN e.duration_ms END bar_plain,\n  CASE WHEN e.duration_ms IS NULL THEN 1 END bar_none,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
           "refId": "A"
         }
       ],

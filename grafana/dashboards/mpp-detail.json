@@ -2346,6 +2346,70 @@
     },
     {
       "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 101
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^range_texts$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 24,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "所选时间范围内一共出现过多少份不同的原文（下表只显示前 10 份）",
+      "type": "stat"
+    },
+    {
+      "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
@@ -2517,8 +2581,8 @@
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "范围内原文数"
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           },
@@ -2540,7 +2604,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 101
+        "y": 104
       },
       "id": 24,
       "options": {
@@ -2569,9 +2633,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 110
+        "y": 113
       },
-      "id": 25,
+      "id": 26,
       "panels": [
         {
           "datasource": {
@@ -2599,9 +2663,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 111
+            "y": 114
           },
-          "id": 26,
+          "id": 27,
           "interval": "1ms",
           "options": {
             "legend": {
@@ -2623,7 +2687,7 @@
               "editorMode": "code",
               "format": "time_series",
               "rawQuery": true,
-              "rawSql": "/* mpp-detail panel 26 A */ SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t\nCROSS JOIN LATERAL mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,t.sql_id) p\nWHERE p.kind='slowest' ORDER BY 1",
+              "rawSql": "/* mpp-detail panel 27 A */ SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t\nCROSS JOIN LATERAL mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,t.sql_id) p\nWHERE p.kind='slowest' ORDER BY 1",
               "refId": "A"
             }
           ],
@@ -2640,12 +2704,76 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 121
+        "y": 124
       },
-      "id": 27,
+      "id": 28,
       "panels": [],
       "title": "明细（所选时间范围内，每次执行一行）",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 125
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^matching$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 29,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "所选时间范围内，符合状态和耗时筛选的一共有多少条（下表最多显示 200 条）",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -2811,8 +2939,8 @@
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "符合筛选的条数"
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           }
@@ -2822,9 +2950,9 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 122
+        "y": 128
       },
-      "id": 28,
+      "id": 29,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -2838,7 +2966,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 28 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
+          "rawSql": "/* mpp-detail panel 29 A */ SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,\n  mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching\nFROM mpp_view_executions('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${sqlid}','${status:csv}',nullif(btrim('${dmin}'),'')::numeric,nullif(btrim('${dmax}'),'')::numeric,'${list_order}',200) e",
           "refId": "A"
         }
       ],

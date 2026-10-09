@@ -165,6 +165,12 @@ python scripts/grafana/install.py accounts --admin-password-file PRIVATE/admin-p
 每条看板查询都以注释开头，写明来源，例如 `/* mpp-detail panel 7 A */`、
 `/* mpp-detail variable identity */`，便于在数据库里辨认，也供端到端检查对应面板。
 
+列表只显示前若干行时，“一共有多少行”不作为表里的一列（那样每行都是同一个值），而是在表的上方
+单独显示一次：检索页的“命中的 SQL 结构总数”、列表页两个排行各自的总行数、详情页的原文份数和明细
+条数。这个数字取自那张表自己的查询结果（Grafana 内置的 `-- Dashboard --` 数据源，按面板编号引用），
+不另发查询；表的查询仍返回这一列（`total_structures`、`ranked_rows`、`range_texts`、`matching`），
+只是在表里隐藏。生成脚本里用 `total(标题, 表, 列名)`，被引用的表先用 `layout.identify` 取得编号。
+
 ## 文本传输：防止内容被悄悄改动
 
 - **按词和整段**：表单脚本把输入编码成无填充的 URL 安全 base64，写进变量 `q`；面板的 SQL 用

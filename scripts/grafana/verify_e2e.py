@@ -195,6 +195,17 @@ class Browser:
     def shot(self, name):
         self.page.screenshot(path=str(self.env.output / (name + '.png')))
 
+    def total(self, title):
+        """The number a total panel displays on the page (it takes it from a table's result, not from a query of its own)."""
+        box = self.page.locator('[data-testid^="data-testid Panel header %s"]' % title).first
+        box.scroll_into_view_if_needed()
+        for _ in range(100):
+            lines = [line.strip() for line in box.inner_text().replace('\u00a0', ' ').split('\n') if line.strip()]
+            if len(lines) > 1 and lines[-1].replace(',', '').isdigit():
+                return int(lines[-1].replace(',', ''))
+            self.page.wait_for_timeout(200)
+        raise AssertionError(('no number displayed', title, lines))
+
     # ---- search form
     def type_sql(self, text, then=None):
         editor = self.page.locator('.monaco-editor').first
@@ -443,6 +454,9 @@ def search(env, play):
     rows = browser.rows('mpp-search', '结果')
     names = [field for field in browser.results[('mpp-search', 'panel %d' % env.panel('mpp-search.json', '结果')['id'], 'A')][0]['names']]
     assert len(rows) == 50 and {row[names.index('total_structures')] for row in rows} == {60}
+    # the total is shown once beside the explanation, not as a column repeated in every row
+    assert browser.total('命中的 SQL 结构总数') == 60
+    assert '结构总数' not in browser.page.locator('[data-testid^="data-testid Panel header 结果"]').first.inner_text()
     note = dict(browser.rows('mpp-search', '这次检索'))
     assert note['检索方式'].startswith('按词') and note['切出的词'] == '共 2 个：wide_  ｜  select'
     assert urllib.parse.urlparse(browser.page.url).path.startswith('/d/mpp-search')
@@ -707,6 +721,7 @@ def detail(env, play):
     assert shown and all(300 <= value <= 600 for value in shown)
     table = limited.rows('mpp-detail', '明细：')
     assert table[0][-1] == between and all(300 <= float(r[1]) <= 600 for r in table) and len(table) == min(between, 200)
+    assert limited.total('所选时间范围内，符合状态和耗时筛选的一共有多少条') == between
     assert list(limited.rows('mpp-detail', '范围内的记录')[0]) == list(tiles)
     limited.close()
     env.ok('G17: a linear axis; when dense, each slot shows its slowest and fastest execution and the title states the step; zoomed in, every execution is one point; '
@@ -716,6 +731,7 @@ def detail(env, play):
     direct = env.sql("SELECT o.sql_id,count(*),max(o.duration_ms),count(*) FILTER (WHERE o.duration_ms>%s),count(o.duration_ms) " % stored[3] + facts + " GROUP BY 1 ORDER BY 2 DESC,1 LIMIT 10")
     assert [(r[8], r[3], float(r[5])) for r in texts] == [(r[0], r[1], float(r[2])) for r in direct]
     assert all(abs(float(t[6]) - d[3] / d[4]) < 0.00006 for t, d in zip(texts, direct)) and {t[7] for t in texts} == {env.one("SELECT count(DISTINCT o.sql_id) " + facts)}
+    assert browser.total('所选时间范围内一共出现过多少份不同的原文') == texts[0][7] and '范围内原文数' not in browser.text()
     colored = env.panel('mpp-detail.json', '每格最慢的一次，按原文着色')
     extra = [env.panel('mpp-detail.json', name)['id'] for name in ('星期几的规律', '每周', '被排除的样本及原因', '五类计时 × 全部指标', '分层明细')]
     assert not [key for key in browser.requests if key[1] in {'panel %d' % colored['id']} | {'panel %d' % n for n in extra}]
@@ -784,6 +800,8 @@ def detail(env, play):
     table = browser.rows('mpp-detail', '明细：')
     latest = env.sql("SELECT o.analysis_id||o.occurrence_id,o.duration_ms,o.outcome,o.sql_id " + facts + " ORDER BY o.end_at DESC,o.analysis_id DESC,o.occurrence_id DESC LIMIT 200")
     assert len(table) == 200 and [r[5] for r in table] == [r[3] for r in latest] and table[0][-1] == sum(by_outcome.values())
+    assert browser.total('所选时间范围内，符合状态和耗时筛选的一共有多少条') == sum(by_outcome.values())
+    assert '符合筛选的条数' not in browser.text()
     assert [None if r[1] is None else float(r[1]) for r in table] == [None if r[1] is None else float(r[1]) for r in latest]
     assert {r[4] for r in table} == {'单条'} and {r[6] for r in table} == {'c1.csv'} and all(r[7].isdigit() for r in table)
     assert {r[8] for r in table} >= {'参与训练'} and {r[3] for r in table} <= {'耗时未知', '高于 P99', '高于 P95', '高于 P50', '不高于 P50'}
@@ -871,6 +889,8 @@ def listing(env, play):
                      "WHERE o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0) AND o.timing_type IN ('request','execute_first') GROUP BY 1,2,3,4,8 ORDER BY 5 DESC" % env.last_day)
     timed = [row for row in ranked if row[3] != '无计时类别']
     assert [row[4] for row in timed] == [row[4] for row in direct] and len(ranked) == ranked[0][11]
+    # each ranking's total is shown once above its table, not as a column repeated in every row
+    assert browser.total('所选时间范围内，符合筛选的一共有多少行') == len(ranked) and '符合条件的行数' not in browser.text()
     assert (timed[0][0], timed[0][1], timed[0][2], timed[0][3], float(timed[0][6]), float(timed[0][8]), timed[0][10]) == \
         (direct[0][0], direct[0][1], direct[0][2], '请求整体', float(direct[0][5]), float(direct[0][6]), direct[0][7])
     errors = env.one("SELECT count(*) FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) WHERE o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0) "
@@ -880,6 +900,7 @@ def listing(env, play):
     stored = env.sql("SELECT g.scope_id,g.database,g.execution_user,s.included_count,s.p95_ms,g.fingerprint_value FROM mpp_statistic s JOIN mpp_baseline_group g USING(group_id) "
                      "JOIN current_version v USING(build_id) WHERE s.layer='overall' AND s.included_count>0 AND g.timing_type IN ('request','execute_first') ORDER BY s.p95_ms DESC,s.group_id")
     assert [float(row[7]) for row in baseline] == [float(row[4]) for row in stored] and baseline[0][13] == len(stored)
+    assert browser.total('当前基线版本里，符合筛选的一共有多少行') == len(stored)
     assert (baseline[0][0], baseline[0][1], baseline[0][2], baseline[0][4], baseline[0][12]) == (stored[0][0], stored[0][1], stored[0][2], stored[0][3], stored[0][5])
     versions = browser.rows('mpp-list', '已发布的基线版本')
     published = env.sql("SELECT b.scope_id,b.build_id,c.window_days,(v.build_id IS NOT NULL) FROM build b JOIN publication p USING(build_id) JOIN config_snapshot c USING(config_id) "
@@ -893,6 +914,7 @@ def listing(env, play):
                        "(extract(epoch FROM max(f.last_log_at)+interval '1 second')*1000)::bigint FROM source_file f WHERE f.scope_id='C1'")[0]
     browser.open('/d/mpp-list/sql-list', extra=2000)
     assert browser.rows('mpp-list', 'SQL 身份排行：所选时间范围内') == []
+    assert browser.total('所选时间范围内，符合筛选的一共有多少行') == 0
     browser.page.locator('[data-testid^="data-testid Panel header 数据的时间范围"] a').first.click()
     browser.settle(2500)
     moved = browser.variables()

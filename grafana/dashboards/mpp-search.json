@@ -253,11 +253,11 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 24,
+        "w": 18,
         "x": 0,
         "y": 11
       },
-      "id": 3,
+      "id": 4,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -271,12 +271,76 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 3 A */ SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),'${fp}','${xstate}','${xreason}','${xsql}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
+          "rawSql": "/* mpp-search panel 4 A */ SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),'${fp}','${xstate}','${xreason}','${xsql}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
           "refId": "A"
         }
       ],
       "title": "这次检索",
       "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^total_structures$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "命中的 SQL 结构总数",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -311,12 +375,8 @@
             },
             "properties": [
               {
-                "id": "custom.width",
-                "value": 90
-              },
-              {
-                "id": "displayName",
-                "value": "结构总数"
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           },
@@ -536,7 +596,7 @@
         "x": 0,
         "y": 17
       },
-      "id": 4,
+      "id": 3,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -550,7 +610,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 4 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace((SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t),'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nWHERE '${q}${fp}'<>''",
+          "rawSql": "/* mpp-search panel 3 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace((SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t),'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nWHERE '${q}${fp}'<>''",
           "refId": "A"
         }
       ],
@@ -655,7 +715,7 @@
         "x": 0,
         "y": 31
       },
-      "id": 5,
+      "id": 6,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -669,7 +729,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 5 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h",
+          "rawSql": "/* mpp-search panel 6 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h",
           "refId": "A"
         }
       ],

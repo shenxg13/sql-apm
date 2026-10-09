@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / 'grafana/dashboards'
 PG = dict(type='grafana-postgresql-datasource', uid='sql-apm-pg')
 SERVICE = dict(type='yesoreyeram-infinity-datasource', uid='sql-apm-fingerprint')
+SHARED = dict(type='datasource', uid='-- Dashboard --')  # built in: reuse another panel's result
 REVISION = 1
 SEARCH, LIST, DETAIL = '/d/mpp-search/sql-search', '/d/mpp-list/sql-list', '/d/mpp-detail/sql-detail'
 RANGE = '$__timeFrom()::timestamptz,$__timeTo()::timestamptz'
@@ -31,9 +32,16 @@ class Layout:
     def __init__(self):
         self.panels, self.y, self.next_id, self.collapsed = [], 0, 1, None
 
+    def identify(self, panel):
+        """Give the panel its number now, so that another panel can refer to it before it is placed."""
+        if 'id' not in panel:
+            panel['id'] = self.next_id
+            self.next_id += 1
+        return panel
+
     def add(self, panel, x, w, h):
-        panel.update(id=self.next_id, gridPos=dict(x=x, y=self.y, w=w, h=h))
-        self.next_id += 1
+        self.identify(panel)
+        panel['gridPos'] = dict(x=x, y=self.y, w=w, h=h)
         (self.collapsed['panels'] if self.collapsed is not None else self.panels).append(panel)
         return panel
 
@@ -88,6 +96,21 @@ def stat(title, sql, description='', color_mode='none', transformations=None):
                 options=dict(reduceOptions=dict(values=False, calcs=['lastNotNull'], fields=''), orientation='auto',
                              textMode='value_and_name', colorMode=color_mode, graphMode='none', justifyMode='center',
                              wideLayout=True, showPercentChange=False))
+
+
+def total(title, source, field, description=''):
+    """One number shown once, taken from another panel's result so that nothing is queried twice.
+
+    A total of the whole list does not belong in every row of it; the field stays
+    in that panel's result and is only hidden from its table.
+    """
+    return dict(type='stat', title=title, description=description, datasource=SHARED,
+                targets=[dict(datasource=SHARED, panelId=source['id'], refId='A', withTransforms=False)],
+                fieldConfig=dict(defaults=dict(color=dict(mode='fixed', fixedColor='text'), unit='locale', noValue='0', mappings=[],
+                                               thresholds=dict(mode='absolute', steps=[dict(color='text', value=None)])), overrides=[]),
+                options=dict(reduceOptions=dict(values=False, calcs=['lastNotNull'], fields='/^' + field + '$/'), orientation='auto',
+                             textMode='value', colorMode='none', graphMode='none', justifyMode='center', wideLayout=True,
+                             showPercentChange=False))
 
 
 def text(title, content, mode='markdown', **extra):
@@ -206,7 +229,7 @@ FROM scope s JOIN source_file f USING(scope_id) GROUP BY s.scope_id ORDER BY s.s
          ('url', None)],
         description='导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到该集群有数据的最后一天。'), 24))
     layout.row('按时间范围现算的排行（右上角所选时间范围内的执行记录）')
-    layout.line(13, (table('SQL 身份排行：所选时间范围内（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',coalesce(r.timing_type,'unknown')) timing,
+    ranking = layout.identify(table('SQL 身份排行：所选时间范围内（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',coalesce(r.timing_type,'unknown')) timing,
   r.record_count,r.not_success,r.total_ms,r.mean_ms,r.slowest_ms,r.last_at,r.fingerprint,r.ranked_rows,
   """ + detail_url('r.fingerprint', 'r.identity', '$__timeFrom()::timestamptz', '$__timeTo()::timestamptz',
                    "||'&var-timing='||coalesce(r.timing_type,'unknown')") + """ AS url
@@ -215,12 +238,15 @@ FROM mpp_view_ranking('${norm}',""" + RANGE + "," + FILTER_ARGS + """,'${timings
          ('record_count', '次数'), ('not_success', '未成功次数'), ('total_ms', '总耗时', dict(unit='ms')),
          ('mean_ms', '平均耗时', dict(unit='ms')), ('slowest_ms', '最慢一次', dict(unit='ms')),
          ('last_at', '范围内最近一次'), ('fingerprint', '结构指纹', dict(custom__width=260)),
-         ('ranked_rows', '符合条件的行数'), ('url', None)],
+         ('ranked_rows', None), ('url', None)],
         description='一行是一个 SQL 身份（集群＋数据库＋执行用户＋SQL 结构）的一类计时。“次数”是这一类计时的记录数；Execute、Parse、Bind 是阶段或调用，不相加成执行次数。'
                     '失败、取消、超时的记录没有计时类别，“未成功次数”按 SQL 身份统计。点一行进入详情。',
-        links=link('进入 SQL 详情', '${__data.fields.url:raw}')), 24))
+        links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
+    layout.line(3, (total('所选时间范围内，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）', ranking, 'ranked_rows',
+                          '一行是一个 SQL 身份的一类计时。这个数随时间范围和顶部的筛选变化。'), 24))
+    layout.line(13, (ranking, 24))
     layout.row('按当前基线版本统计的排行（各集群当前生效版本里已算好的整体基线，与时间范围无关）')
-    layout.line(13, (table('SQL 身份排行：当前基线版本（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,
+    baseline = layout.identify(table('SQL 身份排行：当前基线版本（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,
   r.included_count,r.active_days,r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,
   CASE WHEN r.p99_met THEN '三项都满足' WHEN r.p95_met THEN 'P99 样本不足' WHEN r.basic_met THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,
   r.fingerprint,r.ranked_rows,
@@ -232,9 +258,12 @@ CROSS JOIN LATERAL (SELECT max(x.last_at) last_at FROM mpp_query_hits('${norm}',
          ('included_count', '样本数'), ('active_days', '活跃天数'), ('p50_ms', 'P50', dict(unit='ms')),
          ('p95_ms', 'P95', dict(unit='ms')), ('p99_ms', 'P99', dict(unit='ms')), ('max_ms', '最大', dict(unit='ms')),
          ('mean_ms', '平均', dict(unit='ms')), ('conditions', '样本条件'),
-         ('fingerprint', '结构指纹', dict(custom__width=260)), ('ranked_rows', '符合条件的行数'), ('url', None)],
+         ('fingerprint', '结构指纹', dict(custom__width=260)), ('ranked_rows', None), ('url', None)],
         description='数值来自各集群当前生效版本保存的整体基线，不重新计算。某项样本条件不满足时，对应的数值仅供参考。点一行进入详情，时间范围为该 SQL 最近一次执行往前 7 天。',
-        links=link('进入 SQL 详情', '${__data.fields.url:raw}')), 24))
+        links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
+    layout.line(3, (total('当前基线版本里，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）', baseline, 'ranked_rows',
+                          '一行是一个 SQL 身份的一类计时。这个数随顶部的筛选变化，与时间范围无关。'), 24))
+    layout.line(13, (baseline, 24))
     layout.row('版本列表')
     layout.line(8, (table('已发布的基线版本', """SELECT v.scope_id,v.published_at,v.built_at,v.window_start,v.window_end,v.window_days,
   CASE WHEN v.is_current THEN '当前生效' ELSE '历史版本' END current,
@@ -462,17 +491,19 @@ FROM mpp_view_counts(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${
     layout.line(6, (counts, 24))
 
     layout.row('按原文拆开（所选时间范围内，同一结构下取值不同的原文）')
-    layout.line(9, (table('范围内出现过的原文，按${text_order}排，取前 10 份（点一行只看这一份原文）', """SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,
+    texts = layout.identify(table('范围内出现过的原文，按${text_order}排，取前 10 份（点一行只看这一份原文）', """SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,
   t.above_p95_share,t.range_texts,t.sql_id
 FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t",
         [('rank', '#', dict(custom__width=50)), ('hit', '检索', dict(custom__width=70, custom__cellOptions=dict(type='color-text'),
             mappings=[dict(type='value', options={'命中': dict(color='green', index=0)})])),
          ('differing', '取值不同的那一段', dict(custom__width=420)), ('executions', '执行次数'), ('median_ms', '中位耗时', dict(unit='ms')),
          ('slowest_ms', '最慢一次', dict(unit='ms')), ('above_p95_share', '高于基线 P95 的占比', dict(custom__width=170, unit='percentunit', decimals=1, noValue='基线样本不足，不作参照')),
-         ('range_texts', '范围内原文数'), ('sql_id', '原文标识')],
+         ('range_texts', None), ('sql_id', '原文标识')],
         description='从检索页带过来的输入命中的原文排在最前并标出。“取值不同的那一段”是比较所列原文的文本、去掉共同的开头和结尾后剩下的部分，是近似值。'
                     '只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。',
-        links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}'))), 24))
+        links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}'))))
+    layout.line(3, (total('所选时间范围内一共出现过多少份不同的原文（下表只显示前 10 份）', texts, 'range_texts'), 24))
+    layout.line(9, (texts, 24))
     layout.row('按原文着色的点图（展开后查询）', collapsed=True)
     colored = chart('timeseries', '每格最慢的一次，按原文着色（前 10 份原文）', """SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value
 FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + """,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t
@@ -482,15 +513,17 @@ WHERE p.kind='slowest' ORDER BY 1""", description='与原文表的前 10 份对�
     colored['fieldConfig']['defaults']['custom'] = dict(drawStyle='points', pointSize=4, showPoints='always', axisLabel='耗时')
     layout.line(10, (colored, 24))
     layout.row('明细（所选时间范围内，每次执行一行）')
-    layout.line(13, (table('明细：${timing}，${list_order}，最多 200 条', """SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,
+    listed = layout.identify(table('明细：${timing}，${list_order}，最多 200 条', """SELECT e.end_at,e.duration_ms,mpp_view_label('outcome',e.outcome) outcome,e.comparison,
   mpp_view_label('shape',e.request_shape) shape,e.sql_id,e.source_file,e.source_lines,e.training,e.matching
 FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${sqlid}','${status:csv}'," + NUMBER.format('${dmin}') + "," + NUMBER.format('${dmax}') + ",'${list_order}',200) e",
         [('end_at', '结束时间', dict(custom__width=190)), ('duration_ms', '耗时', dict(unit='ms', noValue='未知')), ('outcome', '状态'),
          ('comparison', '与基线的比较'), ('shape', '单条或整批'),
          ('sql_id', '原文', dict(custom__width=300, links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}')))),
-         ('source_file', '来源文件'), ('source_lines', '行号'), ('training', '训练判定（所选版本）', dict(custom__width=260)), ('matching', '符合筛选的条数')],
+         ('source_file', '来源文件'), ('source_lines', '行号'), ('training', '训练判定（所选版本）', dict(custom__width=260)), ('matching', None)],
         description='默认最新的在前，可在顶部改为最慢的在前；两种排序都是先在整个时间范围内排好再取前 200 条。耗时未知的显示“未知”，不补零。'
-                    '可按状态筛选；“耗时不低于／不高于”同时作用于这张表和上面的耗时图。'), 24))
+                    '可按状态筛选；“耗时不低于／不高于”同时作用于这张表和上面的耗时图。'))
+    layout.line(3, (total('所选时间范围内，符合状态和耗时筛选的一共有多少条（下表最多显示 200 条）', listed, 'matching'), 24))
+    layout.line(13, (listed, 24))
 
     variables = [
         variable('query', 'norm', hide=2, skipUrlSync=True, sql='SELECT mpp_view_rules()'),
@@ -725,17 +758,17 @@ SEARCH_INPUT = "CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('$
 def search_dashboard():
     layout = Layout()
     layout.line(11, (form(), 16), (text('三种方式', MODE_HELP), 8))
-    layout.line(6, (table('这次检索', "SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),"
+    note = table('这次检索', "SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),"
         "'${fp}','${xstate}','${xreason}','${xsql}'," + FILTER_ARGS + ") n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
         [('item', '项目', dict(custom__width=180)), ('content', '内容', dict(custom__cellOptions=dict(type='auto', wrapText=True)))],
-        description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。'), 24))
-    layout.line(14, (table('结果：一行是一个 SQL 结构，最多 50 个（点一行进入 SQL 详情）', """SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,
+        description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。')
+    results = layout.identify(table('结果：一行是一个 SQL 结构，最多 50 个（点一行进入 SQL 详情）', """SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,
   array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,
   left(regexp_replace((SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t),'\\s+',' ','g'),160) example,r.fingerprint,
   """ + detail_url('r.fingerprint', 'r.top_identity', "r.top_last_at-interval '7 days'", "r.top_last_at+interval '1 millisecond'",
                    "||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}'") + """ AS url
 FROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),""" + SEARCH_INPUT + "," + SEARCH_FILTERS + ",'${order}','${xsql}') r\nWHERE '${q}${fp}'<>''",
-        [('total_structures', '结构总数', dict(custom__width=90)), ('record_count', '记录数', dict(custom__width=90)),
+        [('total_structures', None), ('record_count', '记录数', dict(custom__width=90)),
          ('matched_texts', '命中原文数', dict(custom__width=100, noValue='按结构')),
          ('structure_texts', '结构的原文总数', dict(custom__width=120)), ('identities', '身份数', dict(custom__width=80)),
          ('top_label', '记录最多的身份（集群 / 数据库 / 执行用户）', dict(custom__width=300)), ('top_records', '该身份记录数', dict(custom__width=110)),
@@ -744,7 +777,9 @@ FROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),""" + SEAR
          ('example', '原文示例（开头）', dict(custom__width=420)), ('fingerprint', '结构指纹', dict(custom__width=240)), ('url', None)],
         description='三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。'
                     '点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。',
-        links=link('进入 SQL 详情', '${__data.fields.url:raw}')), 24))
+        links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
+    layout.line(6, (note, 18), (total('命中的 SQL 结构总数', results, 'total_structures', '符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。'), 6))
+    layout.line(14, (results, 24))
     layout.line(7, (table('整批没有命中时的逐条提示（点一行改为查看这条语句）', """SELECT h.statement,h.state_label,h.record_count,h.fingerprint,
   '""" + SEARCH + """?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url
 FROM mpp_view_hints('${norm}','${xhints}',""" + FILTER_ARGS + ") h",

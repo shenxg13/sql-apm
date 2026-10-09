@@ -178,6 +178,70 @@
     },
     {
       "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "一行是一个 SQL 身份的一类计时。这个数随时间范围和顶部的筛选变化。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ranked_rows$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "所选时间范围内，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）",
+      "type": "stat"
+    },
+    {
+      "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
@@ -357,8 +421,8 @@
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "符合条件的行数"
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           },
@@ -380,7 +444,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 9
       },
       "id": 3,
       "options": {
@@ -409,12 +473,76 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 22
       },
-      "id": 4,
+      "id": 5,
       "panels": [],
       "title": "按当前基线版本统计的排行（各集群当前生效版本里已算好的整体基线，与时间范围无关）",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "一行是一个 SQL 身份的一类计时。这个数随顶部的筛选变化，与时间范围无关。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ranked_rows$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 6,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "当前基线版本里，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -629,8 +757,8 @@
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "符合条件的行数"
+                "id": "custom.hideFrom.viz",
+                "value": true
               }
             ]
           },
@@ -652,9 +780,9 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 26
       },
-      "id": 5,
+      "id": 6,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -668,7 +796,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-list panel 5 A */ SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,\n  r.included_count,r.active_days,r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,\n  CASE WHEN r.p99_met THEN '三项都满足' WHEN r.p95_met THEN 'P99 样本不足' WHEN r.basic_met THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,\n  r.fingerprint,r.ranked_rows,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.identity||'&from='||(extract(epoch FROM h.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM h.last_at+interval '1 millisecond')*1000)::bigint||'&var-timing='||r.timing_type AS url\nFROM mpp_view_baseline_ranking('${norm}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),'${timings:csv}','${base_order}',nullif('${min_samples}','')::bigint,${limit}) r\nCROSS JOIN LATERAL (SELECT max(x.last_at) last_at FROM mpp_query_hits('${norm}',r.fingerprint,r.scope_id,r.database,r.execution_user) x) h",
+          "rawSql": "/* mpp-list panel 6 A */ SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,\n  r.included_count,r.active_days,r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,\n  CASE WHEN r.p99_met THEN '三项都满足' WHEN r.p95_met THEN 'P99 样本不足' WHEN r.basic_met THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,\n  r.fingerprint,r.ranked_rows,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.identity||'&from='||(extract(epoch FROM h.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM h.last_at+interval '1 millisecond')*1000)::bigint||'&var-timing='||r.timing_type AS url\nFROM mpp_view_baseline_ranking('${norm}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),'${timings:csv}','${base_order}',nullif('${min_samples}','')::bigint,${limit}) r\nCROSS JOIN LATERAL (SELECT max(x.last_at) last_at FROM mpp_query_hits('${norm}',r.fingerprint,r.scope_id,r.database,r.execution_user) x) h",
           "refId": "A"
         }
       ],
@@ -681,9 +809,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 39
       },
-      "id": 6,
+      "id": 8,
       "panels": [],
       "title": "版本列表",
       "type": "row"
@@ -833,9 +961,9 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 40
       },
-      "id": 7,
+      "id": 9,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -849,7 +977,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-list panel 7 A */ SELECT v.scope_id,v.published_at,v.built_at,v.window_start,v.window_end,v.window_days,\n  CASE WHEN v.is_current THEN '当前生效' ELSE '历史版本' END current,\n  CASE WHEN v.results_cleaned THEN '已清理（'||to_char(v.cleaned_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD')||'）' ELSE '保留' END cleaned,\n  CASE WHEN v.rules_match THEN '与当前规则相同' ELSE '规则版本不同' END rules,v.build_id\nFROM mpp_query_versions('${norm}',mpp_view_decode(nullif('${cluster}','*'))) v ORDER BY v.scope_id,v.published_at DESC",
+          "rawSql": "/* mpp-list panel 9 A */ SELECT v.scope_id,v.published_at,v.built_at,v.window_start,v.window_end,v.window_days,\n  CASE WHEN v.is_current THEN '当前生效' ELSE '历史版本' END current,\n  CASE WHEN v.results_cleaned THEN '已清理（'||to_char(v.cleaned_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD')||'）' ELSE '保留' END cleaned,\n  CASE WHEN v.rules_match THEN '与当前规则相同' ELSE '规则版本不同' END rules,v.build_id\nFROM mpp_query_versions('${norm}',mpp_view_decode(nullif('${cluster}','*'))) v ORDER BY v.scope_id,v.published_at DESC",
           "refId": "A"
         }
       ],

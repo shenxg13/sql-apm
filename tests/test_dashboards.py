@@ -45,12 +45,35 @@ class DeliveredGrafanaFiles(unittest.TestCase):
             self.assertLessEqual(sources, {'sql-apm-pg', 'sql-apm-fingerprint'})
             for panel in panels(board):
                 for target in panel.get('targets', []):
+                    if 'panelId' in target:
+                        continue  # a total taken from another panel's result, checked below
                     self.assertTrue(target['rawSql'].startswith('/* ' + board['uid'] + ' panel ' + str(panel['id']) + ' '))
             for variable in board['templating']['list']:
                 if variable['type'] == 'query':
                     self.assertTrue(variable['query'].startswith('/* ' + board['uid'] + ' variable ' + variable['name'] + ' */'))
         detail = {item['name'] for item in self.boards['mpp-detail.json']['templating']['list']}
         self.assertLessEqual({'fp', 'identity', 'timing', 'version', 'sqlid', 'mode', 'q', 'hit'}, detail)
+
+    def test_a_total_of_the_whole_list_is_shown_once_and_not_in_every_row(self):
+        found = {}
+        for name, board in self.boards.items():
+            numbered = {panel['id']: panel for panel in panels(board)}
+            self.assertEqual(len(numbered), len(list(panels(board))))
+            for panel in panels(board):
+                for target in panel.get('targets', []):
+                    if 'panelId' not in target:
+                        continue
+                    self.assertEqual((panel['type'], target['datasource']['uid']), ('stat', '-- Dashboard --'))
+                    source = numbered[target['panelId']]
+                    field = panel['options']['reduceOptions']['fields'].strip('/^$')
+                    self.assertEqual(source['type'], 'table')
+                    self.assertRegex(source['targets'][0]['rawSql'], r'\b[a-z]\.' + field + r'\b')
+                    hidden = [item for item in source['fieldConfig']['overrides'] if item['matcher']['options'] == field
+                              and any(entry['id'] == 'custom.hideFrom.viz' and entry['value'] for entry in item['properties'])]
+                    self.assertEqual(len(hidden), 1, field)
+                    found.setdefault(name, []).append(field)
+        self.assertEqual(found, {'mpp-search.json': ['total_structures'], 'mpp-list.json': ['ranked_rows', 'ranked_rows'],
+                                 'mpp-detail.json': ['range_texts', 'matching']})
 
     def test_form_code_survives_variable_substitution_and_keeps_text_unescaped(self):
         form = [panel for panel in panels(self.boards['mpp-search.json']) if panel['type'] == 'volkovlabs-form-panel']

@@ -107,6 +107,28 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         modes = [element for element in options['elements'] if element['id'] == 'mode'][0]
         self.assertEqual(([option['value'] for option in modes['options']], modes['value']), (['words', 'passage', 'exact'], 'words'))
 
+    def test_search_page_is_laid_out_for_a_1080p_screen(self):
+        board = self.boards['mpp-search.json']
+        placed = {panel['title'].split('：')[0].split('（')[0]: tuple(panel['gridPos'][key] for key in 'xywh') for panel in panels(board)}
+        # 21 grid lines (38 px each) fit under the bars of a 1920x1080 browser window: input, note, total and results
+        self.assertEqual({name: placed[name] for name in ('输入', '命中的 SQL 结构总数', '这次检索', '结果')},
+                         {'输入': (0, 0, 12, 8), '命中的 SQL 结构总数': (12, 0, 12, 3), '这次检索': (12, 3, 12, 5), '结果': (0, 8, 24, 13)})
+        self.assertNotIn('三种方式', placed)  # its content moved onto the switch and the panel description
+        form = [panel for panel in panels(board) if panel['type'] == 'volkovlabs-form-panel'][0]
+        modes = [element for element in form['options']['elements'] if element['id'] == 'mode'][0]
+        for text in (form['description'], modes['tooltip']):
+            for rule in ('只按空白', '最多 20 个词', '不受 20 个词的限制', '连续出现', '结构指纹相同', '不区分英文字母大小写', '粘贴一个结构指纹值'):
+                self.assertIn(rule, text)
+        self.assertEqual([option['label'] for option in modes['options']], ['按词：每个词都要出现', '整段：整个输入连续出现', '完整 SQL：结构相同即命中'])
+        # the result list does not scroll sideways at that width: fixed widths leave the example at least its minimum
+        results = [panel for panel in panels(board) if panel['title'].startswith('结果')][0]
+        fields = {item['matcher']['options']: {entry['id']: entry['value'] for entry in item['properties']}
+                  for item in results['fieldConfig']['overrides'] if item['matcher']['id'] == 'byName'}
+        shown = {name: config for name, config in fields.items() if not config.get('custom.hideFrom.viz')}
+        fixed = sum(config.get('custom.width', 0) for config in shown.values())
+        self.assertEqual([name for name, config in shown.items() if 'custom.width' not in config], ['example'])
+        self.assertLessEqual(fixed + shown['example']['custom.minWidth'], 1780)
+
     def test_configuration_templates_keep_the_agreed_protections(self):
         ini = (ROOT / 'grafana.ini.template').read_text()
         for line in ('[auth.anonymous]\nenabled = false', 'allow_loading_unsigned_plugins =\n', 'preinstall_disabled = true',

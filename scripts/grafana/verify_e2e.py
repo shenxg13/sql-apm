@@ -496,6 +496,34 @@ def search(env, play):
     browser.page.wait_for_timeout(500)
     assert box.count() == 0 or not box.first.is_visible()
     assert panel.locator('a').count() > 0  # the cells of the row still lead to the detail page
+    # a 1920x1080 screen with the browser's own bars: input, note, total and the whole result list in one screen
+    small = Browser(play, env, width=1920, height=920)
+    small.open('/d/mpp-search/sql-search?var-mode=words&var-q=%s' % b64('wide_ SELECT'), extra=2500)
+    assert len(small.rows('mpp-search', '结果')) == 50 and small.total('命中的 SQL 结构总数') == 60
+    for title in ('输入', '命中的 SQL 结构总数', '这次检索', '结果'):
+        place = small.page.locator('[data-testid^="data-testid Panel header %s"]' % title).first.bounding_box()
+        assert place['y'] >= 100 and place['y'] + place['height'] <= 920, (title, place)
+    fits = small.page.evaluate('''() => {
+        const form = document.querySelector('[data-testid^="data-testid Panel header 输入"]');
+        const list = document.querySelector('[data-testid^="data-testid Panel header 结果"] .rdg');
+        const inner = Array.from(form.querySelectorAll('*')).filter((node) => !node.closest('.monaco-editor') && node.scrollHeight > node.clientHeight + 1
+            && ['auto', 'scroll'].includes(getComputedStyle(node).overflowY)).length;
+        return [inner, list.scrollWidth - list.clientWidth, Array.from(document.querySelectorAll('*')).filter((node) => node.scrollTop > 0 && !node.closest('.rdg')).length];
+    }''')
+    assert fits[0] == 0 and fits[1] <= 2 and fits[2] == 0, fits  # the form does not scroll inside, the list not sideways, the page not at all
+    assert '三种方式' not in small.text()
+    # the fuller rules of the three modes are one pointer movement away, beside the switch
+    marks = small.page.locator('[data-testid^="data-testid Panel header 输入"]').first.locator('[data-testid="icon-info-circle"]')
+    assert marks.count() == 2
+    for index, wanted in ((1, ('不受 20 个词的限制', '结构指纹相同即命中')), (0, ('不自动判断方式', '输入怎么切', '命中条件'))):
+        small.page.mouse.move(5, 700)
+        small.page.wait_for_timeout(400)
+        spot = marks.nth(index).bounding_box()
+        small.page.mouse.move(spot['x'] + spot['width'] / 2, spot['y'] + spot['height'] / 2)
+        small.page.wait_for_timeout(1000)
+        help_text = small.page.locator('[role="tooltip"]').first.inner_text()
+        assert all(part in help_text for part in wanted), (index, help_text[:80])
+    small.close()
     browser.search(' '.join('w%d' % n for n in range(21)), 'words')
     note = dict(browser.rows('mpp-search', '这次检索'))
     assert '超过 20 个；请改用“整段”方式' in note['没有检索'] and browser.rows('mpp-search', '结果') == []
@@ -513,7 +541,7 @@ def search(env, play):
     assert browser.rows('mpp-search', '结果')[0][names.index('record_count')] == env.one(
         "SELECT count(*) FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) WHERE f.value='%s' AND o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0)"
         % ((busy,) + env.last_day))
-    env.ok('G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; stays on the list')
+    env.ok('G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; input, note, total and the whole list fit a 1920x1080 screen; stays on the list')
     # entering the detail page from a words search
     browser.open('/d/mpp-search/sql-search')
     browser.search("status '2026-06-28'", 'words')

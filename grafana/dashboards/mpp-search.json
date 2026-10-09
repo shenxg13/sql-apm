@@ -38,14 +38,14 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "先选方式，再点“检索”。不自动判断方式：同一段内容在不同方式下都可能有效，结果不同。",
+      "description": "先选方式，再点“检索”。不自动判断方式：同一段内容在不同方式下都可能有效，结果不同。\n\n| 方式 | 输入怎么切 | 命中条件 |\n| --- | --- | --- |\n| **按词** | 只按空白切成若干个词，引号是普通字符；最多 20 个词 | 每个词都出现在原文里，位置和顺序不限 |\n| **整段** | 不切，整个输入算一段；不受 20 个词的限制 | 这一段在原文里连续出现 |\n| **完整 SQL** | 不切，当作一个完整的请求解析 | 结构指纹相同，取值可以不同 |\n\n按词和整段都不区分英文字母大小写，比较时忽略空白，符号按字面比较。单独的数字或很短的词会匹配到很多原文，需要精确时用整段。也可以直接粘贴一个结构指纹值。\n\n输入框只显示几行，内容多时在框里滚动，或点框左上角的图标放大。",
       "gridPos": {
-        "h": 11,
-        "w": 16,
+        "h": 8,
+        "w": 12,
         "x": 0,
         "y": 0
       },
-      "id": 1,
+      "id": 2,
       "options": {
         "buttonGroup": {
           "orientation": "left",
@@ -71,7 +71,7 @@
         "elementValueChanged": "",
         "elements": [
           {
-            "height": 200,
+            "height": 110,
             "id": "sql",
             "isEscaping": false,
             "labelWidth": null,
@@ -87,7 +87,7 @@
           },
           {
             "id": "mode",
-            "labelWidth": 8,
+            "labelWidth": 10,
             "options": [
               {
                 "id": "words",
@@ -111,7 +111,7 @@
             "optionsSource": "Custom",
             "section": "",
             "title": "方式",
-            "tooltip": "",
+            "tooltip": "按词：只按空白把输入切成若干个词，引号是普通字符，最多 20 个词；每个词都要出现在原文里，位置和顺序不限。整段：不切，整个输入算一段，不受 20 个词的限制；这一段要在原文里连续出现。完整 SQL：不切，把输入当作一个完整的请求来解析；结构指纹相同即命中，取值可以不同。按词和整段都不区分英文字母大小写，比较时忽略空白，符号按字面比较。单独的数字或很短的词会匹配到很多原文，需要精确时用整段。也可以直接粘贴一个结构指纹值。",
             "type": "radio",
             "uid": "mode",
             "unit": "",
@@ -181,19 +181,68 @@
       "type": "volkovlabs-form-panel"
     },
     {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 11,
-        "w": 8,
-        "x": 16,
+        "h": 3,
+        "w": 12,
+        "x": 12,
         "y": 0
       },
-      "id": 2,
+      "id": 3,
       "options": {
-        "content": "| 方式 | 输入怎么切 | 命中条件 |\n| --- | --- | --- |\n| **按词** | 只按空白切成若干个词，引号是普通字符；最多 20 个词 | 每个词都出现在原文里，位置和顺序不限 |\n| **整段** | 不切，整个输入算一段；不受 20 个词的限制 | 这一段在原文里连续出现 |\n| **完整 SQL** | 不切，当作一个完整的请求解析 | 结构指纹相同，取值可以不同 |\n\n按词和整段都不区分英文字母大小写，比较时忽略空白，符号按字面比较。\n单独的数字或很短的词会匹配到很多原文，需要精确时用整段。\n也可以直接粘贴一个结构指纹值。",
-        "mode": "markdown"
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^total_structures$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
       },
-      "title": "三种方式",
-      "type": "text"
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 1,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "命中的 SQL 结构总数",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -222,7 +271,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 150
               },
               {
                 "id": "displayName",
@@ -252,10 +301,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 18,
-        "x": 0,
-        "y": 11
+        "h": 5,
+        "w": 12,
+        "x": 12,
+        "y": 3
       },
       "id": 4,
       "options": {
@@ -277,70 +326,6 @@
       ],
       "title": "这次检索",
       "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
-      },
-      "description": "符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "text",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 11
-      },
-      "id": 5,
-      "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "/^total_structures$/",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "value",
-        "wideLayout": true
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
-          },
-          "panelId": 3,
-          "refId": "A",
-          "withTransforms": false
-        }
-      ],
-      "title": "命中的 SQL 结构总数",
-      "type": "stat"
     },
     {
       "datasource": {
@@ -381,7 +366,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 90
+                "value": 80
               },
               {
                 "id": "displayName",
@@ -397,7 +382,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 100
+                "value": 95
               },
               {
                 "id": "noValue",
@@ -417,7 +402,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 120
+                "value": 115
               },
               {
                 "id": "displayName",
@@ -433,7 +418,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 80
+                "value": 70
               },
               {
                 "id": "displayName",
@@ -449,11 +434,11 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 300
+                "value": 250
               },
               {
                 "id": "displayName",
-                "value": "记录最多的身份（集群 / 数据库 / 执行用户）"
+                "value": "记录最多的身份（集群/库/用户）"
               }
             ]
           },
@@ -465,7 +450,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 110
+                "value": 105
               },
               {
                 "id": "displayName",
@@ -481,7 +466,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 90
+                "value": 75
               },
               {
                 "id": "displayName",
@@ -497,7 +482,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 110
+                "value": 105
               },
               {
                 "id": "displayName",
@@ -513,7 +498,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 130
+                "value": 125
               },
               {
                 "id": "displayName",
@@ -529,7 +514,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 170
+                "value": 160
               },
               {
                 "id": "displayName",
@@ -544,8 +529,8 @@
             },
             "properties": [
               {
-                "id": "custom.width",
-                "value": 420
+                "id": "custom.minWidth",
+                "value": 320
               },
               {
                 "id": "custom.tooltip.field",
@@ -557,7 +542,7 @@
               },
               {
                 "id": "displayName",
-                "value": "原文示例（开头；鼠标移到格子左上角的小三角看更多）"
+                "value": "原文示例（开头；左上角小三角看更多）"
               }
             ]
           },
@@ -569,7 +554,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 240
+                "value": 170
               },
               {
                 "id": "displayName",
@@ -626,12 +611,12 @@
         ]
       },
       "gridPos": {
-        "h": 14,
+        "h": 13,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 8
       },
-      "id": 3,
+      "id": 1,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -645,7 +630,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 3 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url,\n  CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nLEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(x.sql_text)>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(left(x.sql_text,1600),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true\nWHERE '${q}${fp}'<>''",
+          "rawSql": "/* mpp-search panel 1 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url,\n  CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nLEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(x.sql_text)>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(left(x.sql_text,1600),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true\nWHERE '${q}${fp}'<>''",
           "refId": "A"
         }
       ],
@@ -748,9 +733,9 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 21
       },
-      "id": 6,
+      "id": 5,
       "options": {
         "cellHeight": "sm",
         "showHeader": true
@@ -764,7 +749,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 6 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h",
+          "rawSql": "/* mpp-search panel 5 A */ SELECT h.statement,h.state_label,h.record_count,h.fingerprint,\n  '/d/mpp-search/sql-search?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url\nFROM mpp_view_hints('${norm}','${xhints}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*'))) h",
           "refId": "A"
         }
       ],

@@ -20,6 +20,7 @@ SHARED = dict(type='datasource', uid='-- Dashboard --')  # built in: reuse anoth
 # what fits a small screen: so many characters, and so many lines as they will be drawn
 # (a line longer than HOVER_WRAP width units wraps; a non-ASCII character counts as two).
 HOVER_CHARS, HOVER_LINES, HOVER_WRAP = 1600, 24, 75
+EDITOR = 110  # pixels of the search input; more text scrolls inside it or is read enlarged
 REVISION = 1
 SEARCH, LIST, DETAIL = '/d/mpp-search/sql-search', '/d/mpp-list/sql-list', '/d/mpp-detail/sql-detail'
 RANGE = '$__timeFrom()::timestamptz,$__timeTo()::timestamptz'
@@ -57,6 +58,13 @@ class Layout:
             self.add(panel, x, width, height)
             x += width
         self.y += height
+
+    def beside(self, panel, width, *stacked):
+        """One panel on the left and, to its right, (panel, height) pairs stacked to the same total height."""
+        self.add(panel, 0, width, sum(height for _, height in stacked))
+        for other, height in stacked:
+            self.add(other, width, 24 - width, height)
+            self.y += height
 
     def row(self, title, collapsed=False):
         self.collapsed = None
@@ -728,31 +736,38 @@ fill('', 'words');
 apply({ mode: 'words' });
 context.panel.enableSubmit();
 """
-MODES = [('words', '按词：每个词都要出现'), ('passage', '整段：整个输入连续出现'), ('exact', '完整 SQL：结构相同即命中')]
-MODE_HELP = """| 方式 | 输入怎么切 | 命中条件 |
+# value, the label on the switch (it states the meaning), and the fuller rule shown on the mark beside the switch
+MODES = [('words', '按词：每个词都要出现', '只按空白把输入切成若干个词，引号是普通字符，最多 20 个词；每个词都要出现在原文里，位置和顺序不限。'),
+         ('passage', '整段：整个输入连续出现', '不切，整个输入算一段，不受 20 个词的限制；这一段要在原文里连续出现。'),
+         ('exact', '完整 SQL：结构相同即命中', '不切，把输入当作一个完整的请求来解析；结构指纹相同即命中，取值可以不同。')]
+MODE_NOTE = ('按词和整段都不区分英文字母大小写，比较时忽略空白，符号按字面比较。单独的数字或很短的词会匹配到很多原文，需要精确时用整段。'
+             '也可以直接粘贴一个结构指纹值。')
+MODE_HELP = """先选方式，再点“检索”。不自动判断方式：同一段内容在不同方式下都可能有效，结果不同。
+
+| 方式 | 输入怎么切 | 命中条件 |
 | --- | --- | --- |
 | **按词** | 只按空白切成若干个词，引号是普通字符；最多 20 个词 | 每个词都出现在原文里，位置和顺序不限 |
 | **整段** | 不切，整个输入算一段；不受 20 个词的限制 | 这一段在原文里连续出现 |
 | **完整 SQL** | 不切，当作一个完整的请求解析 | 结构指纹相同，取值可以不同 |
 
-按词和整段都不区分英文字母大小写，比较时忽略空白，符号按字面比较。
-单独的数字或很短的词会匹配到很多原文，需要精确时用整段。
-也可以直接粘贴一个结构指纹值。"""
+""" + MODE_NOTE + """
+
+输入框只显示几行，内容多时在框里滚动，或点框左上角的图标放大。"""
 
 
 def form():
     request = dict(method='-', contentType='application/json', getPayload='return {}', payload={}, header=[])
     return dict(type='volkovlabs-form-panel', pluginVersion='6.3.5', title='输入：粘贴一段 SQL，或输入关键词',
-        description='先选方式，再点“检索”。不自动判断方式：同一段内容在不同方式下都可能有效，结果不同。',
-        datasource=PG, targets=[],
+        description=MODE_HELP, datasource=PG, targets=[],
         options=dict(sync=False, updateEnabled='manual', elementValueChanged='',
             layout=dict(variant='single', orientation='vertical', padding=10, sectionVariant='default', sections=[]),
             elements=[
-                dict(uid='sql', id='sql', title='', type='code', language='sql', height=200, value='', isEscaping=False,
+                dict(uid='sql', id='sql', title='', type='code', language='sql', height=EDITOR, value='', isEscaping=False,
                      labelWidth=None, width=None, tooltip='', section='', unit=''),
                 dict(uid='mode', id='mode', title='方式', type='radio', value='words', optionsSource='Custom',
-                     options=[dict(id=value, type='string', value=value, label=label) for value, label in MODES],
-                     labelWidth=8, width=None, tooltip='', section='', unit='')],
+                     options=[dict(id=value, type='string', value=value, label=label) for value, label, _ in MODES],
+                     labelWidth=10, width=None, section='', unit='',
+                     tooltip=''.join(label.split('：')[0] + '：' + rule for _, label, rule in MODES) + MODE_NOTE)],
             initial=dict(request, code=FORM_INITIAL, highlight=False, highlightColor='red'),
             update=dict(request, code=FORM_UPDATE, confirm=False, payloadMode='all'),
             resetAction=dict(mode='custom', code=FORM_RESET, confirm=False, getPayload='return {}', payload={}),
@@ -771,11 +786,12 @@ SEARCH_INPUT = "CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('$
 
 
 def search_dashboard():
+    # Laid out for a 1920x1080 screen with the browser's own bars: the input, this search's note,
+    # the total and the result list (21 grid lines) are all visible without scrolling the page.
     layout = Layout()
-    layout.line(11, (form(), 16), (text('三种方式', MODE_HELP), 8))
     note = table('这次检索', "SELECT n.item,n.content FROM mpp_view_search_note('${norm}',coalesce(nullif('${mode}',''),'words'),mpp_view_decode('${q}'),"
         "'${fp}','${xstate}','${xreason}','${xsql}'," + FILTER_ARGS + ") n\nWHERE '${q}${fp}${xstate}'<>'' ORDER BY n.seq",
-        [('item', '项目', dict(custom__width=180)), ('content', '内容', dict(custom__cellOptions=dict(type='auto', wrapText=True)))],
+        [('item', '项目', dict(custom__width=150)), ('content', '内容', dict(custom__cellOptions=dict(type='auto', wrapText=True)))],
         description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。')
     results = layout.identify(table('结果：一行是一个 SQL 结构，最多 50 个（点一行进入 SQL 详情）', """SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,
   array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,
@@ -791,20 +807,21 @@ LEFT JOIN LATERAL (
   FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/""" + str(HOVER_WRAP) + """) OVER (ORDER BY s.n) used
         FROM regexp_split_to_table(left(x.sql_text,""" + str(HOVER_CHARS) + """),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true
 WHERE '${q}${fp}'<>''""",
-        [('total_structures', None), ('record_count', '记录数', dict(custom__width=90)),
-         ('matched_texts', '命中原文数', dict(custom__width=100, noValue='按结构')),
-         ('structure_texts', '结构的原文总数', dict(custom__width=120)), ('identities', '身份数', dict(custom__width=80)),
-         ('top_label', '记录最多的身份（集群 / 数据库 / 执行用户）', dict(custom__width=300)), ('top_records', '该身份记录数', dict(custom__width=110)),
-         ('scopes', '集群', dict(custom__width=90)), ('databases', '数据库', dict(custom__width=110)), ('users', '执行用户', dict(custom__width=130)),
-         ('last_at', '最近一次', dict(custom__width=170)),
-         ('example', '原文示例（开头；鼠标移到格子左上角的小三角看更多）', dict(custom__width=420, custom__tooltip__field='example_more', custom__tooltip__placement='left')),
-         ('fingerprint', '结构指纹', dict(custom__width=240)), ('url', None), ('example_more', None, dict(custom__width=760, plain=True))],
+        [('total_structures', None), ('record_count', '记录数', dict(custom__width=80)),
+         ('matched_texts', '命中原文数', dict(custom__width=95, noValue='按结构')),
+         ('structure_texts', '结构的原文总数', dict(custom__width=115)), ('identities', '身份数', dict(custom__width=70)),
+         ('top_label', '记录最多的身份（集群/库/用户）', dict(custom__width=250)), ('top_records', '该身份记录数', dict(custom__width=105)),
+         ('scopes', '集群', dict(custom__width=75)), ('databases', '数据库', dict(custom__width=105)), ('users', '执行用户', dict(custom__width=125)),
+         ('last_at', '最近一次', dict(custom__width=160)),
+         ('example', '原文示例（开头；左上角小三角看更多）', dict(custom__minWidth=320, custom__tooltip__field='example_more', custom__tooltip__placement='left')),
+         ('fingerprint', '结构指纹', dict(custom__width=170)), ('url', None), ('example_more', None, dict(custom__width=760, plain=True))],
         description='三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。'
                     '点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。'
                     '“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。看全文请点这一行进入详情。',
         links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
-    layout.line(6, (note, 18), (total('命中的 SQL 结构总数', results, 'total_structures', '符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。'), 6))
-    layout.line(14, (results, 24))
+    layout.beside(form(), 12, (total('命中的 SQL 结构总数', results, 'total_structures', '符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。'), 3),
+                  (note, 5))
+    layout.line(13, (results, 24))
     layout.line(7, (table('整批没有命中时的逐条提示（点一行改为查看这条语句）', """SELECT h.statement,h.state_label,h.record_count,h.fingerprint,
   '""" + SEARCH + """?var-mode=exact&var-qd=${qd}&var-xhints=${xhints}&var-xstate='||h.state||'&var-fp='||h.fingerprint AS url
 FROM mpp_view_hints('${norm}','${xhints}',""" + FILTER_ARGS + ") h",

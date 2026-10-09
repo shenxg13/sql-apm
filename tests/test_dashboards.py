@@ -107,6 +107,18 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         modes = [element for element in options['elements'] if element['id'] == 'mode'][0]
         self.assertEqual(([option['value'] for option in modes['options']], modes['value']), (['words', 'passage', 'exact'], 'words'))
 
+    def test_coloured_chart_draws_the_same_points_per_text_as_the_main_chart(self):
+        charts = {panel['title'].split('：')[0].split('，')[0]: panel for panel in panels(self.boards['mpp-detail.json']) if panel['type'] == 'timeseries'}
+        main, coloured = charts['每次执行的耗时'], charts['每格最慢和最快各一次']
+        self.assertIn("WHEN 'slowest'", main['targets'][0]['rawSql'])
+        self.assertIn("WHEN 'fastest'", main['targets'][0]['rawSql'])
+        # no filter on the kind of point: both the slowest and the fastest of a slot are drawn for each text
+        self.assertIn('mpp_view_points(', coloured['targets'][0]['rawSql'])
+        self.assertNotIn('p.kind', coloured['targets'][0]['rawSql'])
+        for panel in (main, coloured):
+            self.assertIn('每格 $__interval', panel['title'])
+            self.assertIn('$__interval_ms', panel['targets'][0]['rawSql'])
+
     def test_search_page_is_laid_out_for_a_1080p_screen(self):
         board = self.boards['mpp-search.json']
         placed = {panel['title'].split('：')[0].split('（')[0]: tuple(panel['gridPos'][key] for key in 'xywh') for panel in panels(board)}

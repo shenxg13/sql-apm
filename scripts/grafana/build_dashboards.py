@@ -528,10 +528,11 @@ FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${tex
     layout.line(3, (total('所选时间范围内一共出现过多少份不同的原文（下表只显示前 10 份）', texts, 'range_texts'), 24))
     layout.line(9, (texts, 24))
     layout.row('按原文着色的点图（展开后查询）', collapsed=True)
-    colored = chart('timeseries', '每格最慢的一次，按原文着色（前 10 份原文）', """SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value
+    colored = chart('timeseries', '每格最慢和最快各一次，按原文着色（前 10 份原文；每格 $__interval）', """SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value
 FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + """,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t
 CROSS JOIN LATERAL mpp_view_points(""" + ARGS + ",'${timing}'," + RANGE + """,$__interval_ms,t.sql_id) p
-WHERE p.kind='slowest' ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种颜色。点很密时不容易看清，可以先在原文表里点一行只看一份。',
+ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种颜色。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；'
+                              '这里是按每份原文分别取的，所以点比主图里属于这几份原文的要多。点很密时不容易看清，可以在图上拖动放大，或先在原文表里点一行只看一份。',
         form='time_series', interval='1ms')
     colored['fieldConfig']['defaults']['custom'] = dict(drawStyle='points', pointSize=4, showPoints='always', axisLabel='耗时')
     layout.line(10, (colored, 24))

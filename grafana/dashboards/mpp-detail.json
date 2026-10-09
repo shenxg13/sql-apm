@@ -2642,7 +2642,7 @@
             "type": "grafana-postgresql-datasource",
             "uid": "sql-apm-pg"
           },
-          "description": "与原文表的前 10 份对应，每份原文一种颜色。点很密时不容易看清，可以先在原文表里点一行只看一份。",
+          "description": "与原文表的前 10 份对应，每份原文一种颜色。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；这里是按每份原文分别取的，所以点比主图里属于这几份原文的要多。点很密时不容易看清，可以在图上拖动放大，或先在原文表里点一行只看一份。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2687,11 +2687,11 @@
               "editorMode": "code",
               "format": "time_series",
               "rawQuery": true,
-              "rawSql": "/* mpp-detail panel 27 A */ SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t\nCROSS JOIN LATERAL mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,t.sql_id) p\nWHERE p.kind='slowest' ORDER BY 1",
+              "rawSql": "/* mpp-detail panel 27 A */ SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t\nCROSS JOIN LATERAL mpp_view_points('${norm}','${fp}','${identity}','${timing}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,$__interval_ms,t.sql_id) p\nORDER BY 1",
               "refId": "A"
             }
           ],
-          "title": "每格最慢的一次，按原文着色（前 10 份原文）",
+          "title": "每格最慢和最快各一次，按原文着色（前 10 份原文；每格 $__interval）",
           "type": "timeseries"
         }
       ],

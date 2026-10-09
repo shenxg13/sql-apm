@@ -796,13 +796,27 @@ def detail(env, play):
     assert [(r[8], r[3], float(r[5])) for r in texts] == [(r[0], r[1], float(r[2])) for r in direct]
     assert all(abs(float(t[6]) - d[3] / d[4]) < 0.00006 for t, d in zip(texts, direct)) and {t[7] for t in texts} == {env.one("SELECT count(DISTINCT o.sql_id) " + facts)}
     assert browser.total('所选时间范围内一共出现过多少份不同的原文') == texts[0][7] and '范围内原文数' not in browser.text()
-    colored = env.panel('mpp-detail.json', '每格最慢的一次，按原文着色')
+    colored = env.panel('mpp-detail.json', '每格最慢和最快各一次，按原文着色')
     extra = [env.panel('mpp-detail.json', name)['id'] for name in ('星期几的规律', '每周', '被排除的样本及原因', '五类计时 × 全部指标', '分层明细')]
     assert not [key for key in browser.requests if key[1] in {'panel %d' % colored['id']} | {'panel %d' % n for n in extra}]
     browser.page.get_by_text('按原文着色的点图（展开后查询）').click()
     browser.settle(2500)
     frames = browser.results[('mpp-detail', 'panel %d' % colored['id'], 'A')]
     assert len(frames[0]['names']) == 11 and all(name.startswith('#') for name in frames[0]['names'][1:])
+    # like the main chart, each text shows the slowest and the fastest execution of every slot (one point when the slot holds one)
+    title = browser.page.locator('[data-testid^="data-testid Panel header 每格最慢和最快各一次，按原文着色"]').first.get_attribute('data-testid')
+    interval = re.search(r'每格 (\d+)(ms|s|m|h)', title)
+    assert interval, title
+    seconds = int(interval.group(1)) * dict(ms=0.001, s=1, m=60, h=3600)[interval.group(2)]
+    slots = env.sql("SELECT o.sql_id,count(*),max(o.duration_ms),min(o.duration_ms) " + facts + " AND o.duration_ms IS NOT NULL GROUP BY o.sql_id,floor(extract(epoch FROM o.end_at)/%s)" % seconds)
+    doubled = 0
+    for position, name in enumerate(frames[0]['names'][1:], 1):
+        own = [slot for slot in slots if slot[0] == texts[int(name[1:].split(' ')[0]) - 1][8]]
+        drawn = [float(row[position]) for row in frames[0]['rows'] if row[position] is not None]
+        assert own and len(drawn) == sum(1 if slot[1] == 1 else 2 for slot in own), (name, len(drawn))
+        assert max(drawn) == max(float(slot[2]) for slot in own) and min(drawn) == min(float(slot[3]) for slot in own), name
+        doubled += sum(1 for slot in own if slot[1] > 1)
+    assert doubled > 0  # the data does hold slots with more than one execution of the same text
     for order, column in (('median', 4), ('slowest', 5)):
         ordered = Browser(play, env, height=5200)
         ordered.open(env.detail + '&var-text_order=' + order, extra=2000)
@@ -826,7 +840,7 @@ def detail(env, play):
     browser.settle(3000)
     assert browser.variables()['sqlid'] == '' and browser.rows('mpp-detail', '范围内的记录')[0][0] == sum(by_outcome.values())
     env.ok('G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it '
-           'while the baseline stays; the coloured chart is collapsed and queries only when opened')
+           'while the baseline stays; the coloured chart is collapsed, queries only when opened and draws, for each text, the slowest and the fastest execution of every slot')
     # ---- G15: baseline details (collapsed until opened)
     browser.page.get_by_text('基线明细（展开后查询').click()
     browser.settle(3000)

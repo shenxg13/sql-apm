@@ -8,7 +8,8 @@ import unittest.mock
 
 RUNTIME_AVAILABLE = all(importlib.util.find_spec(name) is not None for name in ('psycopg2', 'pglast'))
 if RUNTIME_AVAILABLE:
-    from sql_apm.cli.search import TEXT_MAX_BYTES, fingerprint_input, main, statement_inputs
+    from sql_apm.cli.search import TEXT_MAX_BYTES, exact, fingerprint_input, main, statement_inputs
+    from sql_apm.sql.normalization import MAX_BYTES, Normalizer
 
 
 @unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
@@ -35,6 +36,41 @@ class SearchTests(unittest.TestCase):
         for given in (value[:-1], value + 'b', 'x ' + value, value + ' ' + value, value.upper(), '\u00a0' + value,
                       'SELECT 1', '', b'\xff' + value.encode()):
             self.assertIsNone(fingerprint_input(given), given)
+
+    def test_the_complete_sql_limit_comes_before_the_fingerprint_lookup(self):
+        class Asked:
+            """Stands for the exact-search function: records what it is asked and answers like it."""
+            def __init__(self):
+                self.values = None
+
+            def execute(self, statement, values):
+                self.values = list(values)
+
+            def fetchone(self):
+                fingerprint, reason = self.values[1], self.values[-1]
+                return (dict(state='has_baseline' if fingerprint else 'unreliable_fingerprint', fingerprint=fingerprint, reason=reason),)
+
+        normalizer, value = Normalizer(), 'struct:sql-normalization/5:' + 'a' * 64
+        filters = ['C2', None, 'someone']
+        for size, direct in ((len(value), True), (MAX_BYTES - 1, True), (MAX_BYTES, True), (MAX_BYTES + 1, False), (MAX_BYTES + 10, False)):
+            for padded in (value + ' ' * (size - len(value)), ' \t\n' + value + '\n' * (size - len(value) - 3)):
+                if len(padded) < len(value) + 3 and padded != value:
+                    continue  # the bare value has no room for blanks in front
+                for given in (padded, padded.encode()):
+                    asked = Asked()
+                    answer = exact(asked, normalizer, given, filters)
+                    self.assertEqual(asked.values[3:6], filters)
+                    if direct:
+                        self.assertEqual((asked.values[1], asked.values[-1], answer['state']), (value, None, 'has_baseline'), size)
+                    else:
+                        self.assertEqual((asked.values[1], asked.values[-1], answer['state']),
+                                         (None, 'input_size_limit', 'unreliable_fingerprint'), size)
+                        self.assertNotIn('statement_hints', answer)
+        # what an entry keeps of a longer input (its first MAX_BYTES + 1 bytes) is refused as well
+        longer = (value + ' ' * (MAX_BYTES + 1 - len(value)) + ' SELECT 2').encode()
+        asked = Asked()
+        self.assertEqual(exact(asked, normalizer, longer[:MAX_BYTES + 1], filters)['reason'], 'input_size_limit')
+        self.assertIsNone(asked.values[1])
 
     def test_words_and_passages_over_256_kb_are_refused_before_the_database(self):
         self.assertEqual(TEXT_MAX_BYTES, 256 * 1024)

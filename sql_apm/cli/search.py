@@ -71,7 +71,11 @@ def query(cur, name, values):
 
 def exact(cur, normalizer, raw, filters):
     norm = 'N:' + identity(normalizer.context)
-    direct = fingerprint_input(raw)
+    # The input limit comes before everything else. An input over it is refused whatever it
+    # holds, a fingerprint value followed by blanks included: an entry keeps only the first
+    # MAX_BYTES + 1 bytes of a longer input, and a prefix must never be answered as the input.
+    size = len(raw if isinstance(raw, bytes) else raw.encode('utf-8', 'surrogatepass'))
+    direct = fingerprint_input(raw) if size <= MAX_BYTES else None
     if direct:
         # A pasted fingerprint is looked up as it is, in every mode and at both entries.
         return query(cur, 'mpp_query_exact', [norm, direct, None] + filters + [None])

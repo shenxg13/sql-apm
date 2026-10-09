@@ -244,6 +244,24 @@ def service(v, owner, cli):
         assert cli(['exact', '--file', str(large)])[1]['reason'] == 'input_size_limit'
         status, answer = post(running.port, None, raw=b'{}', length=50 * 1024 * 1024)
         assert status == 200 and answer['reason'] == 'input_size_limit'
+        # The limit comes before the direct lookup of a fingerprint value: followed by blanks it is found up to the
+        # limit and refused over it, at both entries; so is the prefix that an entry keeps of a longer input.
+        whole = post(running.port, dict(sql_b64=sql_b64(value)))[1]
+        for size, found in ((MAX_BYTES - 1, True), (MAX_BYTES, True), (MAX_BYTES + 1, False), (MAX_BYTES + 2048, False)):
+            padded = value.encode() + b' ' * (size - len(value))
+            large.write_bytes(padded)
+            answer, told = post(running.port, dict(sql_b64=sql_b64(padded)))[1], cli(['exact', '--file', str(large)])[1]
+            assert answer.pop('input') == dict(bytes=size, sha256=hashlib.sha256(padded).hexdigest()), size
+            assert answer.pop('exact_sql_id') is None and answer.pop('line_breaks') is None and answer == told, size
+            if found:
+                assert answer == {key: whole[key] for key in answer} and answer['state'] == 'has_baseline' and answer['fingerprint'] == value, size
+            else:
+                assert (answer['state'], answer['reason'], answer['hits']) == ('unreliable_fingerprint', 'input_size_limit', []), size
+        kept = (value.encode() + b' ' * (MAX_BYTES + 1 - len(value)) + b' SELECT 2')[:MAX_BYTES + 1]  # what the search page sends of a longer input
+        assert post(running.port, dict(sql_b64=sql_b64(kept)))[1]['reason'] == 'input_size_limit'
+        edge = value.encode() + b'\n' * (MAX_BYTES - len(value))
+        for scope, state in (('C1', 'has_baseline'), ('C2', 'not_seen')):
+            assert post(running.port, dict(sql_b64=sql_b64(edge), cluster=scope))[1]['state'] == state, scope
         edge = 'SELECT ' + ','.join(['1'] * 200000)
         assert len(edge.encode()) <= MAX_BYTES and post(running.port, dict(sql_b64=sql_b64(edge)))[0] == 200
         for raw in (b'', b'not json', b'[]', b'{"sql":"x"}', b'{"sql_b64":5}', b'{"sql_b64":"***"}',

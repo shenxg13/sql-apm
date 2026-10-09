@@ -1272,6 +1272,19 @@ def boundaries(env, play):
     assert env.cli(['exact', '--sql', quoted])[1]['state'] == 'has_baseline'
     search.search(quoted[:-1], 'exact')
     assert note(search)['结果'].startswith(label['unreliable_fingerprint']) and found(search) == []
+    # the 512 KB limit of complete SQL comes before that lookup: a fingerprint value followed by blanks is found up to
+    # the limit and refused over it, and so is a longer input of which the page sends only the first 512 KB + 1 bytes
+    limit, over = 512 * 1024, label['unreliable_fingerprint'] + '：输入超过 512 KB 的上限'
+    search.search(quoted + ' ' * (limit - len(quoted)), 'exact')
+    assert search.variables()['xstate'] == 'has_baseline' and note(search)['结构指纹'] == quoted and found(search) == [quoted]
+    for text in (quoted + ' ' * (limit + 1 - len(quoted)), quoted + ' ' * (limit + 1 - len(quoted)) + ' SELECT 2',
+                 'SELECT 1 /* ' + 'x' * limit + ' */'):
+        search.search(text, 'exact')
+        state = search.variables()
+        assert (state['xstate'], state['xreason'], state['fp'], state['xsql']) == ('unreliable_fingerprint', 'input_size_limit', '', ''), state
+        assert note(search)['结果'] == over and found(search) == [] and search.rows('mpp-search', '整批没有命中') == []
+    search.search(quoted, 'exact')
+    assert found(search) == [quoted]
     search.open('/d/mpp-search/sql-search?var-cluster=' + b64('C2'))
     for mode, _ in modes:
         search.search(quoted, mode)
@@ -1477,7 +1490,8 @@ def boundaries(env, play):
     shown = detail.variable('mpp-detail', 'sql_text')[0][0]
     assert shown.startswith('SELECT o.id') and len(shown) < 200 and not [row for row in detail.rows('mpp-detail', '当前查看的内容') if row[1] == '原文较长']
     detail.close()
-    env.ok('R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode; '
+    env.ok('R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode, '
+           'in complete SQL only within the 512 KB limit; '
            'a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; '
            'the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form '
            'is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported '

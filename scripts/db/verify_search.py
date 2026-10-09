@@ -223,8 +223,30 @@ def verify(pg_bin):
             code,obj=cli(['exact','--sql',form]);obj.pop('rules')
             assert code==0 and obj==hit,form
         assert cli(['exact','--sql',fingerprint[:-1]])[1]['state']=='unreliable_fingerprint'
+        # The 512 KB limit of complete SQL comes before that lookup: a fingerprint value followed by blanks is found up to
+        # the limit and refused over it, and so is the prefix that the file entry keeps of a longer input.
+        padded=directory/'padded.sql'
+        refused=dict(state='unreliable_fingerprint',reason='input_size_limit')
+        value,tail=fingerprint.encode(),b' SELECT 2'
+        for content,expected in ((value+b' '*(MAX_BYTES-1-len(value)),'found'),(value+b' '*(MAX_BYTES-len(value)),'found'),
+                                 (value+b' '*(MAX_BYTES+1-len(value)),'refused'),(value+b' '*(MAX_BYTES+4096-len(value)),'refused'),
+                                 # the first MAX_BYTES + 1 bytes of this one are the value and blanks only
+                                 (value+b' '*(MAX_BYTES+1-len(value))+tail,'refused'),
+                                 # within the limit a value followed by something else is an ordinary input, not a fingerprint
+                                 (value+b' '*(MAX_BYTES-len(value)-len(tail))+tail,'ordinary')):
+            padded.write_bytes(content)
+            code,obj=cli(['exact','--file',str(padded)]);obj.pop('rules')
+            if expected=='found':
+                assert code==0 and obj==hit,len(content)
+            elif expected=='refused':
+                assert code==0 and {key:obj[key] for key in refused}==refused and not obj['hits'] and 'statement_hints' not in obj,len(content)
+            else:
+                assert len(content)==MAX_BYTES and code==0 and obj['state']=='unreliable_fingerprint' and obj['reason']!='input_size_limit' and not obj['hits'],obj['reason']
+        padded.write_bytes(fingerprint.encode()+b' '*(MAX_BYTES-len(fingerprint)))
+        for cluster,state in (('C1','has_baseline'),('C9','not_seen')):
+            assert cli(['exact','--file',str(padded),'--cluster',cluster])[1]['state']==cli(['exact','--sql',fingerprint,'--cluster',cluster])[1]['state']==state,cluster
         v.require(True,'G2/S1/S6/S7/S8/S16: JSON CLI and DB agree in both text modes, with the 256 KB limit on either side of it; exact outcomes/observations, '
-                       'direct lookup of a pasted fingerprint, parameter and file input, batch hints capped')
+                       'direct lookup of a pasted fingerprint within the 512 KB limit only, parameter and file input, batch hints capped')
         args=[norm,'C1','synthetic_db','synthetic_user',fingerprint]
         summary=call('mpp_query_baseline',*args)
         assert len(summary['rows'])==5 and summary['version']['build_id']==build

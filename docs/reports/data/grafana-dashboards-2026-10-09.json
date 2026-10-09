@@ -4,6 +4,39 @@
  "issue": 51,
  "evidence_owner": "implementation session (claude-issue51-20261008)",
  "product_commit": "9fa9f9ae2fa29d6b00600cee29a6f5a233ca4611",
+ "feedback_changes": [
+  {
+   "commit": "c5851def187596ca34232046f8a7cb2ca88cbe80",
+   "change": "list page: the \"set as time range\" link (a value mapping had replaced its address)",
+   "files": "two dashboards, their generator, the end-to-end check",
+   "rerun": [
+    "unit tests",
+    "generated dashboards equal the committed ones",
+    "harness checks",
+    "end-to-end 16 groups"
+   ]
+  },
+  {
+   "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6",
+   "change": "a total of the whole list is shown once above its table instead of as a column repeated in every row (five tables)",
+   "files": "three dashboards, their generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "extra_database_queries": 0,
+   "rerun": [
+    "unit tests (81)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries",
+    "real-data list page: both displayed totals equal the table results"
+   ],
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "timings"
+   ]
+  }
+ ],
  "schema_sha256": "7de034a904f27cba90e0829048ae13d72426f65a0bb1c43ec303cfa026b68f7a",
  "migration_sha256": "1028cca9110326973bae3b22a9fb9eefdfc7f62e7e86a521f177b946ba6a7809",
  "frozen_1_10_0_sha256": "20d2de8f9de5d318ca8ebb61817ecd858ced9c908fda8419042dab8e00e8c734",
@@ -50,7 +83,7 @@
  },
  "synthetic": {
   "unit_tests": {
-   "count": 80,
+   "count": 81,
    "result": "ok"
   },
   "development_tests": {
@@ -83,7 +116,7 @@
   "end_to_end": {
    "script": "scripts/grafana/verify_e2e.py",
    "groups": 16,
-   "seconds": 283.1,
+   "seconds": 300.2,
    "labels": [
     "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
     "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
@@ -99,9 +132,10 @@
     "G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it while the baseline stays; the coloured chart is collapsed and queries only when opened",
     "G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, and the exclusion reasons equal the stored statistics",
     "G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; unknown durations stay unknown; training decisions under the chosen version are shown as they are",
-    "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; a pasted fingerprint opens the page",
-    "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; a row opens the detail page"
-   ]
+    "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
+    "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page"
+   ],
+   "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6"
   },
   "dataset": {
    "clusters": 2,
@@ -116,7 +150,7 @@
   "program_files": 104,
   "verify_package": "passed",
   "kit_entries": {
-   "unit": "80 tests, no skips",
+   "unit": "81 tests, no skips",
    "database": "278 PASS lines",
    "publication": "33 PASS lines",
    "smoke": "passed",
@@ -124,7 +158,8 @@
    "search": "8 groups"
   },
   "packaged_documents_changed": false,
-  "offline_bundle_changed": false
+  "offline_bundle_changed": false,
+  "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6"
  },
  "real_data": {
   "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",

@@ -35,6 +35,47 @@
     "real-data search and page audits",
     "timings"
    ]
+  },
+  {
+   "commit": "fd8d7f14f42f23665814c2b0223589d7dd9d8e61",
+   "change": "search results: a mark on the example cell shows the beginning of that original text (line breaks kept), cut to what fits a small screen",
+   "files": "the search dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "limits": {
+    "characters": 1600,
+    "drawn_lines": 24,
+    "wrap_width_units": 75
+   },
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (82)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "inputs": 4,
+    "rows_compared": 166,
+    "equal_to_independent_rule": 166,
+    "shortened": 43,
+    "window_height_px": 950,
+    "tallest_box_px": 568,
+    "result_query_seconds": [
+     1.451,
+     1.47
+    ],
+    "search_function_alone_seconds": [
+     1.349,
+     1.436
+    ],
+    "extra_characters_for_50_rows": 40567
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
   }
  ],
  "schema_sha256": "7de034a904f27cba90e0829048ae13d72426f65a0bb1c43ec303cfa026b68f7a",
@@ -83,7 +124,7 @@
  },
  "synthetic": {
   "unit_tests": {
-   "count": 81,
+   "count": 82,
    "result": "ok"
   },
   "development_tests": {
@@ -116,14 +157,14 @@
   "end_to_end": {
    "script": "scripts/grafana/verify_e2e.py",
    "groups": 16,
-   "seconds": 300.2,
+   "seconds": 311.1,
    "labels": [
     "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
     "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
     "G8: anonymous requests and default passwords refused; the viewer uses search and all three dashboards, cannot save a dashboard or a folder, and its statements run as the read-only account",
     "G9: MPP holds the three packaged dashboards and 用户自定义; saving over or deleting a packaged dashboard is refused; a copy saved into 用户自定义, the accounts and the settings are unchanged after a new packaged version is loaded",
     "G10: 6 fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest: line breaks, tabs and double quotes 47 bytes 2a025209bc0d; backslashes and a literal \\n 42 bytes 72f14580812f; dollar names and template marks 77 bytes f13119ab0c8b; Chinese and other non-ASCII 72 bytes 226edfc99334; a statement of more than 60 KB 68436 bytes c98a5ccc5b7d; typing after a paste 18 bytes 878c15212b8d",
-    "G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; stays on the list",
+    "G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; stays on the list",
     "G12: a row opens the detail page on the identity with the most records and its last seven days; texts hit by the search come first and are marked; a single hit or an identical stored text opens on that text; batch hints can be selected one by one; coming back refills the input and the mode",
     "G5: the service listens on the loopback address only; while it is stopped complete-SQL search says so and words, passages and the other pages work",
     "G13: the identity list holds exactly the combinations that occurred, the timing category defaults correctly, only usable versions can be chosen; the SQL text panel shows an example of the structure; the page states no anomaly verdict",
@@ -135,7 +176,7 @@
     "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
     "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page"
    ],
-   "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6"
+   "commit": "fd8d7f14f42f23665814c2b0223589d7dd9d8e61"
   },
   "dataset": {
    "clusters": 2,
@@ -150,7 +191,7 @@
   "program_files": 104,
   "verify_package": "passed",
   "kit_entries": {
-   "unit": "81 tests, no skips",
+   "unit": "82 tests, no skips",
    "database": "278 PASS lines",
    "publication": "33 PASS lines",
    "smoke": "passed",
@@ -159,7 +200,7 @@
   },
   "packaged_documents_changed": false,
   "offline_bundle_changed": false,
-  "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6"
+  "commit": "fd8d7f14f42f23665814c2b0223589d7dd9d8e61"
  },
  "real_data": {
   "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",

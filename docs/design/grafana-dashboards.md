@@ -241,6 +241,12 @@ python scripts/grafana/install.py accounts --admin-password-file PRIVATE/admin-p
 - 按时间范围现算的排行要扫描范围内的执行记录，耗时随范围和累计数据量增长；本版没有为它新增索引。
 - 模糊检索的函数保留“每次重新规划”，并在函数上把并行的启动成本设为零，使它在长连接下使用并行；
   依据和数字见[实测报告](../reports/grafana-dashboards-2026-10-09.md)。
+- 浏览器版本。Grafana 的文档只说支持各浏览器的当前版本，没有给出最低版本号；它页面里自带的检查只对 Chrome 54
+  及更早的版本提示，不反映实际要求。2026-10-09 在开发机上用旧版 Chromium 实测 Grafana 13.2.3：98 不能启动（启动时调用
+  从 Chrome 99 才有的 `Intl.supportedValuesOf`，页面显示“Grafana has failed to load its application files”）；
+  101 和 109 上三个随包看板完整加载，浏览器没有报错。测的是“能加载并画出全部面板”，没有在旧版本上跑完整的端到端
+  操作；105 因测试工具与该版本不配合而没有得到完整结果。对使用者建议写 Chrome 109 及以上（109 是 Windows 7 和 8.1 上
+  能装的最后一个版本）；其他采用 Chromium 内核的浏览器按内核版本对照。写入使用者文档由 #52 完成。
 
 ## 验证入口
 

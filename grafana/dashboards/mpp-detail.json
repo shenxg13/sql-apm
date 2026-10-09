@@ -122,7 +122,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -333,7 +334,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -536,7 +538,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           },
           "links": [
             {
@@ -602,6 +605,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "P50"
               }
@@ -616,6 +623,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -634,6 +645,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "P99"
               }
@@ -648,6 +663,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -723,7 +742,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -1173,7 +1193,8 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60
+                "minWidth": 60,
+                "wrapHeaderText": true
               }
             },
             "overrides": [
@@ -1245,7 +1266,8 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60
+                "minWidth": 60,
+                "wrapHeaderText": true
               }
             },
             "overrides": [
@@ -1379,7 +1401,7 @@
             "type": "grafana-postgresql-datasource",
             "uid": "sql-apm-pg"
           },
-          "description": "在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。",
+          "description": "在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。列很多，窗口放不下时这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。",
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -1389,7 +1411,8 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60
+                "minWidth": 60,
+                "wrapHeaderText": true
               }
             },
             "overrides": [
@@ -1401,7 +1424,7 @@
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 150
+                    "value": 158
                   },
                   {
                     "id": "displayName",
@@ -1416,6 +1439,10 @@
                 },
                 "properties": [
                   {
+                    "id": "custom.minWidth",
+                    "value": 76
+                  },
+                  {
                     "id": "displayName",
                     "value": "基础条件"
                   }
@@ -1427,6 +1454,10 @@
                   "options": "p95"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 76
+                  },
                   {
                     "id": "displayName",
                     "value": "P95 条件"
@@ -1440,6 +1471,10 @@
                 },
                 "properties": [
                   {
+                    "id": "custom.minWidth",
+                    "value": 76
+                  },
+                  {
                     "id": "displayName",
                     "value": "P99 条件"
                   }
@@ -1451,6 +1486,10 @@
                   "options": "included_count"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
                   {
                     "id": "displayName",
                     "value": "样本数"
@@ -1464,6 +1503,10 @@
                 },
                 "properties": [
                   {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
+                  {
                     "id": "displayName",
                     "value": "活跃天数"
                   }
@@ -1475,6 +1518,10 @@
                   "options": "excluded_count"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
                   {
                     "id": "displayName",
                     "value": "被排除的样本数"
@@ -1490,6 +1537,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1508,6 +1559,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "P25"
                   }
@@ -1522,6 +1577,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1540,6 +1599,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "P75"
                   }
@@ -1554,6 +1617,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1572,6 +1639,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "P95"
                   }
@@ -1586,6 +1657,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1604,6 +1679,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "最大"
                   }
@@ -1618,6 +1697,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1636,6 +1719,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "标准差"
                   }
@@ -1647,6 +1734,10 @@
                   "options": "cv"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
                   {
                     "id": "displayName",
                     "value": "变异系数"
@@ -1662,6 +1753,10 @@
                   {
                     "id": "unit",
                     "value": "ms"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 88
                   },
                   {
                     "id": "displayName",
@@ -1680,6 +1775,10 @@
                     "value": "ms"
                   },
                   {
+                    "id": "custom.minWidth",
+                    "value": 88
+                  },
+                  {
                     "id": "displayName",
                     "value": "四分位距"
                   }
@@ -1691,6 +1790,10 @@
                   "options": "log_median"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
                   {
                     "id": "displayName",
                     "value": "对数中位数"
@@ -1704,6 +1807,10 @@
                 },
                 "properties": [
                   {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
+                  {
                     "id": "displayName",
                     "value": "对数绝对中位差"
                   }
@@ -1716,6 +1823,10 @@
                 },
                 "properties": [
                   {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
+                  {
                     "id": "displayName",
                     "value": "P95 与 P50 之比"
                   }
@@ -1727,6 +1838,10 @@
                   "options": "p99_p50"
                 },
                 "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 62
+                  },
                   {
                     "id": "displayName",
                     "value": "P99 与 P50 之比"
@@ -1744,6 +1859,9 @@
           "id": 16,
           "options": {
             "cellHeight": "sm",
+            "frozenColumns": {
+              "left": 1
+            },
             "showHeader": true
           },
           "targets": [
@@ -1794,7 +1912,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -1819,6 +1938,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -2413,7 +2536,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "从检索页带过来的输入命中的原文排在最前并标出。“取值不同的那一段”是比较所列原文的文本、去掉共同的开头和结尾后剩下的部分，是近似值。只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。",
+      "description": "从检索页带过来的输入命中的原文排在最前并标出。“取值不同的那一段”是比较所列原文的文本、去掉共同的开头和结尾后剩下的部分，是近似值。只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。把鼠标移到“取值不同的那一段”左上角的小三角上，弹出这一份原文：放得下就是整条；放不下时从各份原文开始不同的地方往前两行起显示一屏，点一下小三角可以固定住。很长而没有空格的一行会按宽度断开，断开处标“↵”。看全文请点这一行，页面顶部显示它的全文。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -2423,15 +2546,9 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
-          },
-          "links": [
-            {
-              "targetBlank": false,
-              "title": "只看这一份原文",
-              "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
-            }
-          ]
+            "minWidth": 60,
+            "wrapHeaderText": true
+          }
         },
         "overrides": [
           {
@@ -2497,8 +2614,16 @@
                 "value": 420
               },
               {
+                "id": "custom.tooltip.field",
+                "value": "differing_more"
+              },
+              {
+                "id": "custom.tooltip.placement",
+                "value": "right"
+              },
+              {
                 "id": "displayName",
-                "value": "取值不同的那一段"
+                "value": "取值不同的那一段（左上角小三角看这条 SQL）"
               }
             ]
           },
@@ -2525,6 +2650,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "中位耗时"
               }
@@ -2539,6 +2668,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -2597,6 +2730,40 @@
                 "value": "原文标识"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "differing_more"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 760
+              },
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(?!(differing_more)$).*$/"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "只看这一份原文",
+                    "url": "/d/mpp-detail/sql-detail?${__url_time_range}&${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&${status:queryparam}&${dmin:queryparam}&${dmax:queryparam}&${list_order:queryparam}&${text_order:queryparam}&${layer:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}&var-sqlid=${__data.fields.sql_id}"
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
@@ -2620,7 +2787,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-detail panel 24 A */ SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,\n  t.above_p95_share,t.range_texts,t.sql_id\nFROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t",
+          "rawSql": "/* mpp-detail panel 24 A */ SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,\n  t.above_p95_share,t.range_texts,t.sql_id,\n  CASE WHEN w.skip>0 THEN '……（前面 '||w.skip||' 个字符各份原文都相同，从略）'||E'\\n' ELSE '' END||h.head\n    ||CASE WHEN h.cut THEN E'\\n……（这份原文共 '||length(t.sql_text)||' 个字符，这里只是其中一段；点这一行只看这一份原文，页面顶部显示全文）' ELSE '' END differing_more\nFROM (SELECT r.*,count(*) OVER () listed,\n        least(mpp_view_common_prefix(min(r.sql_text COLLATE \"C\") OVER (),max(r.sql_text COLLATE \"C\") OVER ()),min(length(r.sql_text)) OVER ()) shared\n      FROM (SELECT m.*,x.sql_text FROM mpp_view_texts('${norm}','${fp}','${identity}','${timing}','${version}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') m\n            LEFT JOIN LATERAL (SELECT q.sql_text FROM mpp_query_text(m.sql_id) q) x ON true) r) t\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(t.sql_text)>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(regexp_replace(left(t.sql_text,1600),'([^ \\t\\r\\n]{80})(?=[^ \\t\\r\\n])',E'\\\\1↵\\n','g'),\n                                   E'\\r?\\n') WITH ORDINALITY s(line,n)) l) whole ON true\nCROSS JOIN LATERAL (SELECT CASE WHEN NOT whole.cut OR t.listed<2 OR t.shared=0 THEN 0 ELSE t.shared-(\n    SELECT CASE WHEN length(k.lines)<length(k.tail) OR t.shared<=400 THEN length(k.lines) ELSE 200 END\n    FROM (SELECT z.tail,substring(z.tail from '(?:[^\\n]*\\n){0,2}[^\\n]*$') lines\n          FROM (SELECT right(left(t.sql_text,t.shared),400) tail) z) k) END skip) w\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(substr(t.sql_text,w.skip+1))>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(regexp_replace(left(substr(t.sql_text,w.skip+1),1600),'([^ \\t\\r\\n]{80})(?=[^ \\t\\r\\n])',E'\\\\1↵\\n','g'),\n                                   E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true\nORDER BY t.rank",
           "refId": "A"
         }
       ],
@@ -2642,7 +2809,7 @@
             "type": "grafana-postgresql-datasource",
             "uid": "sql-apm-pg"
           },
-          "description": "与原文表的前 10 份对应，每份原文一种颜色。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；这里是按每份原文分别取的，所以点比主图里属于这几份原文的要多。点很密时不容易看清，可以在图上拖动放大，或先在原文表里点一行只看一份。",
+          "description": "与原文表的前 10 份对应，每份原文一种颜色；顶部的“原文排序”只决定画哪 10 份原文，不改变画法。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；这里是按每份原文分别取的，所以点比主图里属于这几份原文的要多。点很密时不容易看清，可以在图上拖动放大，或先在原文表里点一行只看一份。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2691,7 +2858,7 @@
               "refId": "A"
             }
           ],
-          "title": "每格最慢和最快各一次，按原文着色（前 10 份原文；每格 $__interval）",
+          "title": "每格最慢和最快各一次，按原文着色（按${text_order}取前 10 份原文；每格 $__interval）",
           "type": "timeseries"
         }
       ],
@@ -2790,7 +2957,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -2823,6 +2991,10 @@
               {
                 "id": "noValue",
                 "value": "未知"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",

@@ -21,6 +21,45 @@ SHARED = dict(type='datasource', uid='-- Dashboard --')  # built in: reuse anoth
 # (a line longer than HOVER_WRAP width units wraps; a non-ASCII character counts as two).
 HOVER_CHARS, HOVER_LINES, HOVER_WRAP = 1600, 24, 75
 EDITOR = 110  # pixels of the search input; more text scrolls inside it or is read enlarged
+# A duration is written with its unit ("3.16 mins", "1.04 hours") and stands at the right edge of its cell,
+# so a column too narrow for it hides the leading digits. No duration column gets narrower than this many
+# pixels; a table with more columns than the window holds scrolls sideways instead.
+DURATION = 88
+# In a list of original texts of one structure the beginnings are alike, so a text too long for the box is
+# shown from just before the place where the listed texts start to differ: from the start of the line two
+# lines above it when those lines begin within HOVER_LEAD characters, else HOVER_SHORT characters before it.
+HOVER_LEAD, HOVER_SHORT = 400, 200
+# The box breaks a line only at blanks, and what does not fit is hidden. A run of this many characters without
+# a blank (a list of values written without spaces) is therefore broken for display, and the break is marked.
+HOVER_RUN, HOVER_MARK = 80, '↵'
+
+
+def hover_cut(source, alias):
+    """LATERAL that cuts the SQL text expression to the box: `head` and whether something was left out (`cut`)."""
+    return ("""LEFT JOIN LATERAL (
+  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=%(lines)d OR l.n=1) head,
+         length(%(source)s)>%(chars)d OR bool_or(l.used>%(lines)d AND l.n>1) cut
+  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/%(wrap)d) OVER (ORDER BY s.n) used
+        FROM regexp_split_to_table(regexp_replace(left(%(source)s,%(chars)d),'([^ \\t\\r\\n]{%(run)d})(?=[^ \\t\\r\\n])',E'\\\\1%(mark)s\\n','g'),
+                                   E'\\r?\\n') WITH ORDINALITY s(line,n)) l) %(alias)s ON true"""
+            % dict(source=source, alias=alias, lines=HOVER_LINES, chars=HOVER_CHARS, wrap=HOVER_WRAP, run=HOVER_RUN, mark=HOVER_MARK))
+
+
+def hover_window(columns, rows, name):
+    """Query: `columns` of `rows` (a query giving sql_text among others, one row per listed text) and, as `name`,
+    the part of each text shown on its mark: all of it when it fits, else a boxful from near the first difference."""
+    return ("""SELECT """ + columns + """,
+  CASE WHEN w.skip>0 THEN '……（前面 '||w.skip||' 个字符各份原文都相同，从略）'||E'\\n' ELSE '' END||h.head
+    ||CASE WHEN h.cut THEN E'\\n……（这份原文共 '||length(t.sql_text)||' 个字符，这里只是其中一段；点这一行只看这一份原文，页面顶部显示全文）' ELSE '' END """ + name + """
+FROM (SELECT r.*,count(*) OVER () listed,
+        least(mpp_view_common_prefix(min(r.sql_text COLLATE "C") OVER (),max(r.sql_text COLLATE "C") OVER ()),min(length(r.sql_text)) OVER ()) shared
+      FROM (""" + rows + """) r) t
+""" + hover_cut('t.sql_text', 'whole') + """
+CROSS JOIN LATERAL (SELECT CASE WHEN NOT whole.cut OR t.listed<2 OR t.shared=0 THEN 0 ELSE t.shared-(
+    SELECT CASE WHEN length(k.lines)<length(k.tail) OR t.shared<=%(lead)d THEN length(k.lines) ELSE %(short)d END
+    FROM (SELECT z.tail,substring(z.tail from '(?:[^\\n]*\\n){0,2}[^\\n]*$') lines
+          FROM (SELECT right(left(t.sql_text,t.shared),%(lead)d) tail) z) k) END skip) w
+""" % dict(lead=HOVER_LEAD, short=HOVER_SHORT) + hover_cut('substr(t.sql_text,w.skip+1)', 'h'))
 REVISION = 1
 SEARCH, LIST, DETAIL = '/d/mpp-search/sql-search', '/d/mpp-list/sql-list', '/d/mpp-detail/sql-detail'
 RANGE = '$__timeFrom()::timestamptz,$__timeTo()::timestamptz'
@@ -78,7 +117,7 @@ def override(name, **properties):
                 properties=[dict(id=key.replace('__', '.'), value=value) for key, value in properties.items()])
 
 
-def table(title, sql, columns, description='', footer=None, links=None):
+def table(title, sql, columns, description='', footer=None, links=None, frozen=0):
     """columns: (field, display name, extra properties); a None display name hides the field.
 
     ``links`` makes every cell of a row a link. A column whose extra properties say
@@ -91,15 +130,20 @@ def table(title, sql, columns, description='', footer=None, links=None):
         properties = dict(extra[0]) if extra else {}
         if properties.pop('plain', False):
             plain.append(field)
+        if properties.get('unit') == 'ms' and 'custom__width' not in properties:
+            properties.setdefault('custom__minWidth', DURATION)
         if display is None:
             properties['custom__hideFrom__viz'] = True
         else:
             properties['displayName'] = display
         overrides.append(override(field, **properties))
     panel = dict(type='table', title=title, description=description, datasource=PG, targets=[target(sql)],
-                 fieldConfig=dict(defaults=dict(custom=dict(align='auto', cellOptions=dict(type='auto'), inspect=True, filterable=False, minWidth=60)),
+                 fieldConfig=dict(defaults=dict(custom=dict(align='auto', cellOptions=dict(type='auto'), inspect=True, filterable=False, minWidth=60,
+                                                            wrapHeaderText=True)),  # a header that does not fit wraps; it is never cut
                                   overrides=overrides),
                  options=dict(showHeader=True, cellHeight='sm'))
+    if frozen:
+        panel['options']['frozenColumns'] = dict(left=frozen)  # these columns stay in place while the rest scrolls sideways
     if links and plain:
         overrides.append(dict(matcher=dict(id='byRegexp', options='/^(?!(' + '|'.join(plain) + ')$).*$/'), properties=[dict(id='links', value=links)]))
     elif links:
@@ -460,9 +504,11 @@ FROM """ + STATISTIC + """) s CROSS JOIN LATERAL (VALUES
         + ",".join('s.' + column for column, _ in METRICS) + """
 FROM """ + STATISTIC + """,'${layer}') s WHERE s.timing_type='${timing}' AND s.included_count+s.excluded_count>0
 ORDER BY s.bucket_date,s.bucket_number""",
-        [('bucket', '分桶', dict(custom__width=150)), ('basic', '基础条件'), ('p95', 'P95 条件'), ('p99', 'P99 条件')]
-        + [(column, label, dict(unit='ms') if column.endswith('_ms') else {}) for column, label in METRICS],
-        description='在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。'), 24))
+        [('bucket', '分桶', dict(custom__width=158))] + [(name, label, dict(custom__minWidth=76)) for name, label in (('basic', '基础条件'), ('p95', 'P95 条件'), ('p99', 'P99 条件'))]
+        + [(column, label, dict(unit='ms') if column.endswith('_ms') else dict(custom__minWidth=62)) for column, label in METRICS],
+        description='在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。'
+                    '列很多，窗口放不下时这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。',
+        frozen=1), 24))
 
     layout.row('对比（所选时间范围内的执行，对所选版本的整体基线）')
     layout.line(5, (table('超过基线的执行：${timing}', """SELECT c.reference,c.baseline_ms,c.known_executions,c.above,c.above_share,c.expected_share,coalesce(c.note,'') note
@@ -514,24 +560,28 @@ FROM mpp_view_counts(""" + ARGS + ",'${timing}'," + RANGE + ",$__interval_ms,'${
     layout.line(6, (counts, 24))
 
     layout.row('按原文拆开（所选时间范围内，同一结构下取值不同的原文）')
-    texts = layout.identify(table('范围内出现过的原文，按${text_order}排，取前 10 份（点一行只看这一份原文）', """SELECT t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,
-  t.above_p95_share,t.range_texts,t.sql_id
-FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t",
+    texts = layout.identify(table('范围内出现过的原文，按${text_order}排，取前 10 份（点一行只看这一份原文）', hover_window(
+        "t.rank,CASE WHEN t.search_hit THEN '命中' ELSE '' END hit,t.differing,t.executions,t.median_ms,t.slowest_ms,\n  t.above_p95_share,t.range_texts,t.sql_id",
+        "SELECT m.*,x.sql_text FROM mpp_view_texts(" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') m\n"
+        "            LEFT JOIN LATERAL (SELECT q.sql_text FROM mpp_query_text(m.sql_id) q) x ON true", 'differing_more') + "\nORDER BY t.rank",
         [('rank', '#', dict(custom__width=50)), ('hit', '检索', dict(custom__width=70, custom__cellOptions=dict(type='color-text'),
             mappings=[dict(type='value', options={'命中': dict(color='green', index=0)})])),
-         ('differing', '取值不同的那一段', dict(custom__width=420)), ('executions', '执行次数'), ('median_ms', '中位耗时', dict(unit='ms')),
+         ('differing', '取值不同的那一段（左上角小三角看这条 SQL）', dict(custom__width=420, custom__tooltip__field='differing_more', custom__tooltip__placement='right')),
+         ('executions', '执行次数'), ('median_ms', '中位耗时', dict(unit='ms')),
          ('slowest_ms', '最慢一次', dict(unit='ms')), ('above_p95_share', '高于基线 P95 的占比', dict(custom__width=170, unit='percentunit', decimals=1, noValue='基线样本不足，不作参照')),
-         ('range_texts', None), ('sql_id', '原文标识')],
+         ('range_texts', None), ('sql_id', '原文标识'), ('differing_more', None, dict(custom__width=760, plain=True))],
         description='从检索页带过来的输入命中的原文排在最前并标出。“取值不同的那一段”是比较所列原文的文本、去掉共同的开头和结尾后剩下的部分，是近似值。'
-                    '只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。',
+                    '只有同一份原文重复出现时拆开才有意义；参数化的 SQL 拆不出信息。点一行后，汇总、对比、两张图和明细只算这一份原文，基线仍是整个结构的。'
+                    '把鼠标移到“取值不同的那一段”左上角的小三角上，弹出这一份原文：放得下就是整条；放不下时从各份原文开始不同的地方往前两行起显示一屏，'
+                    '点一下小三角可以固定住。很长而没有空格的一行会按宽度断开，断开处标“↵”。看全文请点这一行，页面顶部显示它的全文。',
         links=link('只看这一份原文', same_page(sqlid='${__data.fields.sql_id}'))))
     layout.line(3, (total('所选时间范围内一共出现过多少份不同的原文（下表只显示前 10 份）', texts, 'range_texts'), 24))
     layout.line(9, (texts, 24))
     layout.row('按原文着色的点图（展开后查询）', collapsed=True)
-    colored = chart('timeseries', '每格最慢和最快各一次，按原文着色（前 10 份原文；每格 $__interval）', """SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value
+    colored = chart('timeseries', '每格最慢和最快各一次，按原文着色（按${text_order}取前 10 份原文；每格 $__interval）', """SELECT p.end_at AS time,'#'||t.rank||' '||left(t.differing,40) AS metric,p.duration_ms AS value
 FROM mpp_view_texts(""" + ARGS + ",'${timing}','${version}'," + RANGE + """,'${text_order}','${mode}',mpp_view_decode('${q}'),'${hit}') t
 CROSS JOIN LATERAL mpp_view_points(""" + ARGS + ",'${timing}'," + RANGE + """,$__interval_ms,t.sql_id) p
-ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种颜色。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；'
+ORDER BY 1""", description='与原文表的前 10 份对应，每份原文一种颜色；顶部的“原文排序”只决定画哪 10 份原文，不改变画法。和上面的主图一样，每份原文在每一格里画最慢和最快各一次，一格里只有一次时画一个点；'
                               '这里是按每份原文分别取的，所以点比主图里属于这几份原文的要多。点很密时不容易看清，可以在图上拖动放大，或先在原文表里点一行只看一份。',
         form='time_series', interval='1ms')
     colored['fieldConfig']['defaults']['custom'] = dict(drawStyle='points', pointSize=4, showPoints='always', axisLabel='耗时')
@@ -802,11 +852,7 @@ def search_dashboard():
   CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more
 FROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),""" + SEARCH_INPUT + "," + SEARCH_FILTERS + """,'${order}','${xsql}') r
 LEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true
-LEFT JOIN LATERAL (
-  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=""" + str(HOVER_LINES) + """ OR l.n=1) head,
-         length(x.sql_text)>""" + str(HOVER_CHARS) + """ OR bool_or(l.used>""" + str(HOVER_LINES) + """ AND l.n>1) cut
-  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/""" + str(HOVER_WRAP) + """) OVER (ORDER BY s.n) used
-        FROM regexp_split_to_table(left(x.sql_text,""" + str(HOVER_CHARS) + """),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true
+""" + hover_cut('x.sql_text', 'h') + """
 WHERE '${q}${fp}'<>''""",
         [('total_structures', None), ('record_count', '记录数', dict(custom__width=80)),
          ('matched_texts', '命中原文数', dict(custom__width=95, noValue='按结构')),
@@ -818,7 +864,7 @@ WHERE '${q}${fp}'<>''""",
          ('fingerprint', '结构指纹', dict(custom__width=170)), ('url', None), ('example_more', None, dict(custom__width=760, plain=True))],
         description='三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。'
                     '点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。'
-                    '“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。看全文请点这一行进入详情。',
+                    '“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。很长而没有空格的一行会按宽度断开，断开处标“↵”。看全文请点这一行进入详情。',
         links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
     layout.beside(form(), 12, (total('命中的 SQL 结构总数', results, 'total_structures', '符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。'), 3),
                   (note, 5))

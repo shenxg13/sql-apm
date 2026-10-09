@@ -250,17 +250,56 @@ class Browser:
         self.browser.close()
 
 
-def hover_text(text):
-    """What the mark on an example cell shows for this original text, computed apart from the dashboard query."""
+def hover_parts(text):
+    """The lines of a text that fit the box of a mark, and whether something was left out; computed apart from the dashboard query."""
     kept, used, dropped = [], 0, False
-    for number, line in enumerate(re.split('\r?\n', text[:boards.HOVER_CHARS]), 1):
+    broken = re.sub('([^ \t\r\n]{%d})(?=[^ \t\r\n])' % boards.HOVER_RUN, '\\1' + boards.HOVER_MARK + '\n', text[:boards.HOVER_CHARS])
+    for number, line in enumerate(re.split('\r?\n', broken), 1):
         used += 1 + (len(line) + (len(line.encode()) - len(line)) // 2) // boards.HOVER_WRAP
         if used <= boards.HOVER_LINES or number == 1:
             kept.append(line)
         else:
             dropped = True
-    note = '\n……（这份原文共 %d 个字符，这里只是开头；点这一行进入详情看全文）' % len(text)
-    return '\n'.join(kept) + (note if dropped or len(text) > boards.HOVER_CHARS else '')
+    return '\n'.join(kept), dropped or len(text) > boards.HOVER_CHARS
+
+
+def hover_text(text):
+    """What the mark on an example cell of the search results shows for this original text."""
+    shown, cut = hover_parts(text)
+    return shown + ('\n……（这份原文共 %d 个字符，这里只是开头；点这一行进入详情看全文）' % len(text) if cut else '')
+
+
+def hover_window(texts, index):
+    """What the mark on the differing part shows for texts[index] among the listed texts of one structure."""
+    text, skip = texts[index], 0
+    if hover_parts(text)[1] and len(texts) > 1:
+        low, high = min(texts), max(texts)  # code-point order, the order of the "C" collation
+        shared = next((place for place, (one, other) in enumerate(zip(low, high)) if one != other), min(len(low), len(high)))
+        shared = min(shared, min(len(item) for item in texts))
+        if shared:
+            tail = text[:shared][-boards.HOVER_LEAD:]
+            lines = '\n'.join(tail.split('\n')[-3:])
+            skip = shared - (len(lines) if len(lines) < len(tail) or shared <= boards.HOVER_LEAD else boards.HOVER_SHORT)
+    shown, cut = hover_parts(text[skip:])
+    return (('……（前面 %d 个字符各份原文都相同，从略）\n' % skip if skip else '') + shown
+            + ('\n……（这份原文共 %d 个字符，这里只是其中一段；点这一行只看这一份原文，页面顶部显示全文）' % len(text) if cut else ''))
+
+
+def cut_headers(page):
+    """Column headers whose text does not fit its cell, over every table drawn on the page."""
+    return page.evaluate("""() => {
+        const cut = [];
+        document.querySelectorAll('[data-testid^="data-testid Panel header "] .rdg-header-row [role="columnheader"]').forEach((cell) => {
+            const text = cell.textContent.trim();
+            if (!text) return;
+            let inner = cell;
+            while (inner.firstElementChild && inner.firstElementChild.textContent.trim() === text) inner = inner.firstElementChild;
+            const style = getComputedStyle(cell), range = document.createRange();
+            range.selectNodeContents(inner);
+            if (range.getBoundingClientRect().width > cell.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) + 1) cut.push(text);
+        });
+        return cut;
+    }""")
 
 
 def fixed_inputs():
@@ -511,7 +550,7 @@ def search(env, play):
         return [inner, list.scrollWidth - list.clientWidth, Array.from(document.querySelectorAll('*')).filter((node) => node.scrollTop > 0 && !node.closest('.rdg')).length];
     }''')
     assert fits[0] == 0 and fits[1] <= 2 and fits[2] == 0, fits  # the form does not scroll inside, the list not sideways, the page not at all
-    assert '三种方式' not in small.text()
+    assert '三种方式' not in small.text() and cut_headers(small.page) == []
     # the fuller rules of the three modes are one pointer movement away, beside the switch
     marks = small.page.locator('[data-testid^="data-testid Panel header 输入"]').first.locator('[data-testid="icon-info-circle"]')
     assert marks.count() == 2
@@ -796,27 +835,86 @@ def detail(env, play):
     assert [(r[8], r[3], float(r[5])) for r in texts] == [(r[0], r[1], float(r[2])) for r in direct]
     assert all(abs(float(t[6]) - d[3] / d[4]) < 0.00006 for t, d in zip(texts, direct)) and {t[7] for t in texts} == {env.one("SELECT count(DISTINCT o.sql_id) " + facts)}
     assert browser.total('所选时间范围内一共出现过多少份不同的原文') == texts[0][7] and '范围内原文数' not in browser.text()
+    # the mark on the differing part shows that original text: all of it when it fits the box
+    more = browser.results[('mpp-detail', 'panel %d' % env.panel('mpp-detail.json', '范围内出现过的原文')['id'], 'A')][0]['names'].index('differing_more')
+    stored_texts = dict(env.sql("SELECT t.sql_id,t.text FROM mpp_sql_text t WHERE t.sql_id IN (%s)" % ','.join(literal(r[8]) for r in texts)))
+    listed_texts = [stored_texts[r[8]] for r in texts]
+    assert [r[more] for r in texts] == [hover_window(listed_texts, place) for place in range(10)] == listed_texts
+    table_panel = browser.page.locator('[data-testid^="data-testid Panel header 范围内出现过的原文"]').first
+    mark, box = table_panel.get_by_test_id('data-testid tableng tooltip caret'), browser.page.get_by_test_id('data-testid tableng tooltip wrapper')
+    assert mark.count() == 10
+    mark.first.hover()
+    browser.page.wait_for_timeout(800)
+    assert ' '.join(box.first.inner_text().split()) == ' '.join(listed_texts[0].split()) and box.first.locator('a').count() == 0
+    browser.page.mouse.move(5, 300)
+    browser.page.wait_for_timeout(400)
+    # a text too long for the box is shown from just before the place where the listed texts start to differ;
+    # the same query fragment as the panel, fed with made-up texts through the read-only data source
+    body = '\n'.join('  col_%03d + %d AS value_%03d,' % (n, n, n) for n in range(90))
+    cases = {
+        'short texts': ['SELECT a FROM t WHERE k = %d' % n for n in range(3)],
+        'many lines, late difference': ['SELECT\n' + body + "\n  1\nFROM wide_table\nWHERE day = '2026-07-%02d'\n  AND region = 'north'" % n for n in (1, 2, 3)],
+        'one long line': ['SELECT id FROM big WHERE id IN (' + ', '.join(str(1000000 + n) for n in range(700)) + ') AND tag = %d' % n for n in (7, 8)],
+        'non-ASCII and a difference in the middle': ['/* 说明：' + '按机构汇总，' * 60 + ' */\nSELECT 机构号, 金额\nFROM 明细表\nWHERE 日期 = %d\n' % n + '  AND 备注 <> \'无\'\n' * 80 for n in (20260701, 20260702)],
+        'difference at the very beginning': ['%d /* lead */ SELECT ' % n + ', '.join('c%d' % k for k in range(500)) for n in (1, 2)],
+        'one is the beginning of the other': ['SELECT ' + ', '.join('c%d' % k for k in range(400)), 'SELECT ' + ', '.join('c%d' % k for k in range(400)) + '\nFROM t\nWHERE x = 1'],
+        'a single text': ['SELECT ' + ', '.join('c%d' % k for k in range(600))],
+        'long runs without a blank': ["SELECT a FROM t WHERE k IN ('" + "','".join('%020d' % (10 ** 19 + k) for k in range(60)) + "')\n  AND d = %d" % n for n in (1, 2)],
+        'windows line ends': ['SELECT\r\n' + '\r\n'.join('  f%03d,' % n for n in range(120)) + '\r\n  %d AS marker\r\nFROM t' % n for n in (1, 2)]}
+    shortened = moved = 0
+    for label, made in cases.items():
+        rows = ' UNION ALL '.join('SELECT %d AS place,%s::text AS sql_text' % (place, literal(text)) for place, text in enumerate(made))
+        got = env.sql(boards.hover_window('t.place', rows, 'shown') + ' ORDER BY t.place')
+        want = [hover_window(made, place) for place in range(len(made))]
+        assert [row[1] for row in got] == want, label
+        shortened += sum(1 for text in want if '这里只是其中一段' in text)
+        moved += sum(1 for text in want if text.startswith('……（前面 '))
+    assert shortened >= 4 and moved >= 8, (shortened, moved)  # both notes do occur among the cases
+    late = hover_window(cases['many lines, late difference'], 1)
+    assert "WHERE day = '2026-07-02'" in late and 'col_000' not in late and late.count('\n') <= boards.HOVER_LINES + 2
+    runs = hover_window(cases['long runs without a blank'], 0)
+    assert boards.HOVER_MARK + '\n' in runs and max(len(line) for line in runs.split('\n')[:-1]) <= boards.HOVER_RUN + 31
+
+    def coloured(page_browser, listed, records):
+        """Each text shows the slowest and the fastest execution of every slot (one point when the slot holds one), whatever the order of the texts."""
+        page_browser.page.get_by_text('按原文着色的点图（展开后查询）').click()
+        page_browser.settle(2500)
+        frames = page_browser.results[('mpp-detail', 'panel %d' % colored['id'], 'A')]
+        assert len(frames[0]['names']) == 11 and all(name.startswith('#') for name in frames[0]['names'][1:])
+        title = page_browser.page.locator('[data-testid^="data-testid Panel header 每格最慢和最快各一次，按原文着色"]').first.get_attribute('data-testid')
+        interval = re.search(r'每格 (\d+)(ms|s|m|h)', title)
+        assert interval, title
+        seconds = int(interval.group(1)) * dict(ms=0.001, s=1, m=60, h=3600)[interval.group(2)]
+        slots = env.sql("SELECT o.sql_id,count(*),max(o.duration_ms),min(o.duration_ms) " + records + " AND o.duration_ms IS NOT NULL GROUP BY o.sql_id,floor(extract(epoch FROM o.end_at)/%s)" % seconds)
+        doubled = 0
+        for position, name in enumerate(frames[0]['names'][1:], 1):
+            own = [slot for slot in slots if slot[0] == listed[int(name[1:].split(' ')[0]) - 1][8]]
+            drawn = [float(row[position]) for row in frames[0]['rows'] if row[position] is not None]
+            assert own and len(drawn) == sum(1 if slot[1] == 1 else 2 for slot in own), (name, len(drawn))
+            assert max(drawn) == max(float(slot[2]) for slot in own) and min(drawn) == min(float(slot[3]) for slot in own), name
+            doubled += sum(1 for slot in own if slot[1] > 1)
+        return doubled
+
     colored = env.panel('mpp-detail.json', '每格最慢和最快各一次，按原文着色')
     extra = [env.panel('mpp-detail.json', name)['id'] for name in ('星期几的规律', '每周', '被排除的样本及原因', '五类计时 × 全部指标', '分层明细')]
     assert not [key for key in browser.requests if key[1] in {'panel %d' % colored['id']} | {'panel %d' % n for n in extra}]
-    browser.page.get_by_text('按原文着色的点图（展开后查询）').click()
-    browser.settle(2500)
-    frames = browser.results[('mpp-detail', 'panel %d' % colored['id'], 'A')]
-    assert len(frames[0]['names']) == 11 and all(name.startswith('#') for name in frames[0]['names'][1:])
-    # like the main chart, each text shows the slowest and the fastest execution of every slot (one point when the slot holds one)
-    title = browser.page.locator('[data-testid^="data-testid Panel header 每格最慢和最快各一次，按原文着色"]').first.get_attribute('data-testid')
-    interval = re.search(r'每格 (\d+)(ms|s|m|h)', title)
-    assert interval, title
-    seconds = int(interval.group(1)) * dict(ms=0.001, s=1, m=60, h=3600)[interval.group(2)]
-    slots = env.sql("SELECT o.sql_id,count(*),max(o.duration_ms),min(o.duration_ms) " + facts + " AND o.duration_ms IS NOT NULL GROUP BY o.sql_id,floor(extract(epoch FROM o.end_at)/%s)" % seconds)
-    doubled = 0
-    for position, name in enumerate(frames[0]['names'][1:], 1):
-        own = [slot for slot in slots if slot[0] == texts[int(name[1:].split(' ')[0]) - 1][8]]
-        drawn = [float(row[position]) for row in frames[0]['rows'] if row[position] is not None]
-        assert own and len(drawn) == sum(1 if slot[1] == 1 else 2 for slot in own), (name, len(drawn))
-        assert max(drawn) == max(float(slot[2]) for slot in own) and min(drawn) == min(float(slot[3]) for slot in own), name
-        doubled += sum(1 for slot in own if slot[1] > 1)
-    assert doubled > 0  # the data does hold slots with more than one execution of the same text
+    assert coloured(browser, texts, facts) > 0  # the data does hold slots with more than one execution of the same text
+    # The order of the texts only chooses which ten are drawn. Checked over the whole 28 days, where the slots
+    # are long enough to hold several executions of the same text under every order.
+    whole = (env.range[1] - 28 * 86400000, env.range[1])
+    everything = facts.replace('o.end_at>=to_timestamp(%d/1000.0)' % env.range[0], 'o.end_at>=to_timestamp(%d/1000.0)' % whole[0])
+    assert everything != facts
+    chosen = {}
+    for order, column in (('count', 3), ('median', 4), ('slowest', 5)):
+        ordered = Browser(play, env, height=5200)
+        ordered.open(env.detail.replace('from=%d' % env.range[0], 'from=%d' % whole[0]) + '&var-text_order=' + order, extra=2500)
+        reordered = ordered.rows('mpp-detail', '范围内出现过的原文')
+        values = [float(r[column]) for r in reordered]
+        assert values == sorted(values, reverse=True) and len(values) == 10
+        assert coloured(ordered, reordered, everything) > 0, order
+        chosen[order] = [r[8] for r in reordered]
+        ordered.close()
+    assert chosen['median'] != chosen['count'] and chosen['slowest'] != chosen['count']
     for order, column in (('median', 4), ('slowest', 5)):
         ordered = Browser(play, env, height=5200)
         ordered.open(env.detail + '&var-text_order=' + order, extra=2000)
@@ -840,7 +938,7 @@ def detail(env, play):
     browser.settle(3000)
     assert browser.variables()['sqlid'] == '' and browser.rows('mpp-detail', '范围内的记录')[0][0] == sum(by_outcome.values())
     env.ok('G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it '
-           'while the baseline stays; the coloured chart is collapsed, queries only when opened and draws, for each text, the slowest and the fastest execution of every slot')
+           'while the baseline stays; the coloured chart is collapsed, queries only when opened and draws, for each text and under every order of the texts, the slowest and the fastest execution of every slot; the mark on the differing part shows the text, a long one from near the first difference')
     # ---- G15: baseline details (collapsed until opened)
     browser.page.get_by_text('基线明细（展开后查询').click()
     browser.settle(3000)
@@ -872,8 +970,9 @@ def detail(env, play):
             assert (row[names.index('included_count')], number(row[names.index('p50_ms')]), number(row[names.index('p99_ms')])) == (expected[0], number(expected[1]), number(expected[2]))
             assert row[1].startswith(('满足', '不满足：')) and row[3].startswith(('满足', '不满足：'))
         layered.close()
+    assert cut_headers(browser.page) == []  # with every table of the page drawn: a header that does not fit wraps
     env.ok('G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, '
-           'and the exclusion reasons equal the stored statistics')
+           'and the exclusion reasons equal the stored statistics; no column header is cut')
     # ---- G19: execution list
     table = browser.rows('mpp-detail', '明细：')
     latest = env.sql("SELECT o.analysis_id||o.occurrence_id,o.duration_ms,o.outcome,o.sql_id " + facts + " ORDER BY o.end_at DESC,o.analysis_id DESC,o.occurrence_id DESC LIMIT 200")
@@ -962,6 +1061,7 @@ def listing(env, play):
     browser = Browser(play, env, height=2600)
     browser.open('/d/mpp-list/sql-list?from=%d&to=%d' % env.last_day, extra=2500)
     assert not browser.failures, browser.failures[:3]
+    assert cut_headers(browser.page) == []
     ranked = browser.rows('mpp-list', 'SQL 身份排行：所选时间范围内')
     direct = env.sql("SELECT o.scope_id,o.database,o.execution_user,o.timing_type,count(*),sum(o.duration_ms),max(o.duration_ms),f.value FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) "
                      "WHERE o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0) AND o.timing_type IN ('request','execute_first') GROUP BY 1,2,3,4,8 ORDER BY 5 DESC" % env.last_day)

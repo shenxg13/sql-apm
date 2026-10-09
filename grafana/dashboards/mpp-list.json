@@ -48,7 +48,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -255,7 +256,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           },
           "links": [
             {
@@ -349,6 +351,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "总耗时"
               }
@@ -365,6 +371,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "平均耗时"
               }
@@ -379,6 +389,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -559,7 +573,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           },
           "links": [
             {
@@ -653,6 +668,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "P50"
               }
@@ -667,6 +686,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -685,6 +708,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "P99"
               }
@@ -701,6 +728,10 @@
                 "value": "ms"
               },
               {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
                 "id": "displayName",
                 "value": "最大"
               }
@@ -715,6 +746,10 @@
               {
                 "id": "unit",
                 "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
               },
               {
                 "id": "displayName",
@@ -831,7 +866,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [

@@ -259,7 +259,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -332,7 +333,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。看全文请点这一行进入详情。",
+      "description": "三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。很长而没有空格的一行会按宽度断开，断开处标“↵”。看全文请点这一行进入详情。",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -342,7 +343,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           }
         },
         "overrides": [
@@ -630,7 +632,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-search panel 1 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url,\n  CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nLEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(x.sql_text)>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(left(x.sql_text,1600),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true\nWHERE '${q}${fp}'<>''",
+          "rawSql": "/* mpp-search panel 1 A */ SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,\n  array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,\n  left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.top_identity||'&from='||(extract(epoch FROM r.top_last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM r.top_last_at+interval '1 millisecond')*1000)::bigint||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}' AS url,\n  CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more\nFROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),CASE WHEN '${mode}'='exact' THEN '${fp}' ELSE mpp_view_decode('${q}') END,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),CASE WHEN '${timefilter}'='on' THEN $__timeFrom()::timestamptz END,CASE WHEN '${timefilter}'='on' THEN $__timeTo()::timestamptz END,'${order}','${xsql}') r\nLEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true\nLEFT JOIN LATERAL (\n  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=24 OR l.n=1) head,\n         length(x.sql_text)>1600 OR bool_or(l.used>24 AND l.n>1) cut\n  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/75) OVER (ORDER BY s.n) used\n        FROM regexp_split_to_table(regexp_replace(left(x.sql_text,1600),'([^ \\t\\r\\n]{80})(?=[^ \\t\\r\\n])',E'\\\\1↵\\n','g'),\n                                   E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true\nWHERE '${q}${fp}'<>''",
           "refId": "A"
         }
       ],
@@ -652,7 +654,8 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60
+            "minWidth": 60,
+            "wrapHeaderText": true
           },
           "links": [
             {

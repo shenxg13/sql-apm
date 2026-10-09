@@ -110,6 +110,7 @@ class DeliveredGrafanaFiles(unittest.TestCase):
     def test_coloured_chart_draws_the_same_points_per_text_as_the_main_chart(self):
         charts = {panel['title'].split('：')[0].split('，')[0]: panel for panel in panels(self.boards['mpp-detail.json']) if panel['type'] == 'timeseries'}
         main, coloured = charts['每次执行的耗时'], charts['每格最慢和最快各一次']
+        self.assertIn('按${text_order}取前 10 份原文', coloured['title'])
         self.assertIn("WHEN 'slowest'", main['targets'][0]['rawSql'])
         self.assertIn("WHEN 'fastest'", main['targets'][0]['rawSql'])
         # no filter on the kind of point: both the slowest and the fastest of a slot are drawn for each text
@@ -118,6 +119,33 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         for panel in (main, coloured):
             self.assertIn('每格 $__interval', panel['title'])
             self.assertIn('$__interval_ms', panel['targets'][0]['rawSql'])
+
+    def test_tables_wrap_headers_and_the_differing_part_carries_the_text(self):
+        tables = [panel for board in self.boards.values() for panel in panels(board) if panel['type'] == 'table']
+        self.assertGreater(len(tables), 15)
+        for panel in tables:  # a header that does not fit its column wraps, it is never cut
+            self.assertIs(panel['fieldConfig']['defaults']['custom']['wrapHeaderText'], True, panel['title'])
+        # a duration is right-aligned and carries its unit: every duration column is wide enough for "23.9 hours"
+        for panel in tables:
+            for item in panel['fieldConfig']['overrides']:
+                config = {entry['id']: entry['value'] for entry in item['properties']}
+                if config.get('unit') == 'ms':
+                    self.assertGreaterEqual(config.get('custom.width', config.get('custom.minWidth', 0)), 88, (panel['title'], item['matcher']['options']))
+        layers = [panel for panel in panels(self.boards['mpp-detail.json']) if panel['title'].startswith('分层明细')][0]
+        self.assertEqual(layers['options']['frozenColumns'], {'left': 1})  # 24 columns: the table scrolls sideways, the bucket stays
+        self.assertEqual(len(layers['fieldConfig']['overrides']), 24)
+        texts = [panel for panel in panels(self.boards['mpp-detail.json']) if panel['title'].startswith('范围内出现过的原文')][0]
+        fields = {item['matcher']['options']: {entry['id']: entry['value'] for entry in item['properties']}
+                  for item in texts['fieldConfig']['overrides'] if item['matcher']['id'] == 'byName'}
+        self.assertEqual((fields['differing']['custom.tooltip.field'], fields['differing']['custom.tooltip.placement']), ('differing_more', 'right'))
+        self.assertTrue(fields['differing_more']['custom.hideFrom.viz'])
+        self.assertIn('取前 10 份', texts['title'])
+        sql = texts['targets'][0]['rawSql']
+        for part in ('mpp_view_common_prefix(', 'differing_more', '各份原文都相同，从略', '这里只是其中一段'):
+            self.assertIn(part, sql)
+        linked = [item for item in texts['fieldConfig']['overrides'] if item['matcher']['id'] == 'byRegexp']
+        self.assertEqual(len(linked), 1)
+        self.assertIsNone(re.compile(linked[0]['matcher']['options'].strip('/')).match('differing_more'))
 
     def test_search_page_is_laid_out_for_a_1080p_screen(self):
         board = self.boards['mpp-search.json']

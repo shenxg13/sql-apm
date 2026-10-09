@@ -171,6 +171,19 @@ python scripts/grafana/install.py accounts --admin-password-file PRIVATE/admin-p
 不另发查询；表的查询仍返回这一列（`total_structures`、`ranked_rows`、`range_texts`、`matching`），
 只是在表里隐藏。生成脚本里用 `total(标题, 表, 列名)`，被引用的表先用 `layout.identify` 取得编号。
 
+检索结果的“原文示例”只显示开头 160 个字符。这一格左上角有一个小三角，鼠标移上去弹出这份原文的开头一段，
+点一下可以固定住。它用的是表格自带的“来自另一列的提示”：`example` 列设 `custom.tooltip.field`（值是隐藏列
+`example_more`）和 `custom.tooltip.placement`；这两个要分别写成覆盖项，写成一个 `custom.tooltip` 对象不生效。
+实现时要知道的三点：
+
+- 只有小三角能触发，鼠标停在文字上不弹出；弹出框没有高度上限，也没有滚动条，超出窗口的部分看不到。
+  所以查询把文本截到一屏以内：最多 1600 个字符，并按估算的显示行数最多 24 行（一行超过 75 个宽度单位
+  就折行，非 ASCII 字符算两个），截断时末尾写明原文共多少字符。常量是生成脚本里的 `HOVER_*`。
+- Grafana 对某一列给出的链接是加在全部列的链接之上，不是替换；给隐藏列写空的链接列表去不掉整行的链接。
+  所以这张表不用默认链接，改为按列名的正则把链接给除 `example_more` 以外的列（`table()` 里的 `plain=True`），
+  弹出的文字因此是普通文字，可以选中复制。
+- 文本由面板查询从 `mpp_query_text` 取，没有改查询函数。
+
 ## 文本传输：防止内容被悄悄改动
 
 - **按词和整段**：表单脚本把输入编码成无填充的 URL 安全 base64，写进变量 `q`；面板的 SQL 用

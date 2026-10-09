@@ -75,6 +75,23 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         self.assertEqual(found, {'mpp-search.json': ['total_structures'], 'mpp-list.json': ['ranked_rows', 'ranked_rows'],
                                  'mpp-detail.json': ['range_texts', 'matching']})
 
+    def test_search_result_example_shows_more_of_the_text_on_its_mark(self):
+        panel = [item for item in panels(self.boards['mpp-search.json']) if item.get('title', '').startswith('结果')][0]
+        fields = {item['matcher']['options']: {entry['id']: entry['value'] for entry in item['properties']}
+                  for item in panel['fieldConfig']['overrides'] if item['matcher']['id'] == 'byName'}
+        self.assertEqual((fields['example']['custom.tooltip.field'], fields['example']['custom.tooltip.placement']), ('example_more', 'left'))
+        self.assertTrue(fields['example_more']['custom.hideFrom.viz'])
+        self.assertRegex(panel['targets'][0]['rawSql'], r'END example_more\n')
+        # The row link goes to every field except that text: Grafana adds links given for one
+        # field to the links of all fields, so an empty list for it would not remove the link.
+        self.assertNotIn('links', panel['fieldConfig']['defaults'])
+        linked = [item for item in panel['fieldConfig']['overrides'] if item['matcher']['id'] == 'byRegexp']
+        self.assertEqual([[entry['id'] for entry in item['properties']] for item in linked], [['links']])
+        pattern = re.compile(linked[0]['matcher']['options'].strip('/'))
+        self.assertIsNone(pattern.match('example_more'))
+        for name in ('example', 'fingerprint', 'record_count', 'url', 'example_more_2'):
+            self.assertIsNotNone(pattern.match(name), name)
+
     def test_form_code_survives_variable_substitution_and_keeps_text_unescaped(self):
         form = [panel for panel in panels(self.boards['mpp-search.json']) if panel['type'] == 'volkovlabs-form-panel']
         self.assertEqual(len(form), 1)

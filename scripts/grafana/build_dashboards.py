@@ -15,6 +15,11 @@ TARGET = ROOT / 'grafana/dashboards'
 PG = dict(type='grafana-postgresql-datasource', uid='sql-apm-pg')
 SERVICE = dict(type='yesoreyeram-infinity-datasource', uid='sql-apm-fingerprint')
 SHARED = dict(type='datasource', uid='-- Dashboard --')  # built in: reuse another panel's result
+# The part of an original text shown when the pointer rests on the mark of its example cell.
+# The table gives that box neither a height limit nor a scroll bar, so the text is cut to
+# what fits a small screen: so many characters, and so many lines as they will be drawn
+# (a line longer than HOVER_WRAP width units wraps; a non-ASCII character counts as two).
+HOVER_CHARS, HOVER_LINES, HOVER_WRAP = 1600, 24, 75
 REVISION = 1
 SEARCH, LIST, DETAIL = '/d/mpp-search/sql-search', '/d/mpp-list/sql-list', '/d/mpp-detail/sql-detail'
 RANGE = '$__timeFrom()::timestamptz,$__timeTo()::timestamptz'
@@ -66,10 +71,18 @@ def override(name, **properties):
 
 
 def table(title, sql, columns, description='', footer=None, links=None):
-    """columns: (field, display name, extra properties); a None display name hides the field."""
-    overrides = []
+    """columns: (field, display name, extra properties); a None display name hides the field.
+
+    ``links`` makes every cell of a row a link. A column whose extra properties say
+    ``plain=True`` is left out of it: Grafana adds a link given for one field to the
+    links of all fields instead of replacing them, so the row link is then given to
+    every other field by name pattern.
+    """
+    overrides, plain = [], []
     for field, display, *extra in columns:
         properties = dict(extra[0]) if extra else {}
+        if properties.pop('plain', False):
+            plain.append(field)
         if display is None:
             properties['custom__hideFrom__viz'] = True
         else:
@@ -79,7 +92,9 @@ def table(title, sql, columns, description='', footer=None, links=None):
                  fieldConfig=dict(defaults=dict(custom=dict(align='auto', cellOptions=dict(type='auto'), inspect=True, filterable=False, minWidth=60)),
                                   overrides=overrides),
                  options=dict(showHeader=True, cellHeight='sm'))
-    if links:
+    if links and plain:
+        overrides.append(dict(matcher=dict(id='byRegexp', options='/^(?!(' + '|'.join(plain) + ')$).*$/'), properties=[dict(id='links', value=links)]))
+    elif links:
         panel['fieldConfig']['defaults']['links'] = links
     return panel
 
@@ -764,19 +779,29 @@ def search_dashboard():
         description='写明这次用的是哪种方式、输入是怎么切的，或者为什么没有检索。完整 SQL 方式写明四种结果中的哪一种。')
     results = layout.identify(table('结果：一行是一个 SQL 结构，最多 50 个（点一行进入 SQL 详情）', """SELECT r.total_structures,r.record_count,r.matched_texts,r.structure_texts,r.identities,r.top_label,r.top_records,
   array_to_string(r.scopes,'、') scopes,array_to_string(r.databases,'、') databases,array_to_string(r.execution_users,'、') users,r.last_at,
-  left(regexp_replace((SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t),'\\s+',' ','g'),160) example,r.fingerprint,
+  left(regexp_replace(x.sql_text,'\\s+',' ','g'),160) example,r.fingerprint,
   """ + detail_url('r.fingerprint', 'r.top_identity', "r.top_last_at-interval '7 days'", "r.top_last_at+interval '1 millisecond'",
-                   "||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}'") + """ AS url
-FROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),""" + SEARCH_INPUT + "," + SEARCH_FILTERS + ",'${order}','${xsql}') r\nWHERE '${q}${fp}'<>''",
+                   "||'&var-sqlid='||coalesce(r.only_sql_id,'')||'&var-mode=${mode}&var-q=${q}&var-hit=${xsql}'") + """ AS url,
+  CASE WHEN h.cut THEN h.head||E'\\n……（这份原文共 '||length(x.sql_text)||' 个字符，这里只是开头；点这一行进入详情看全文）' ELSE h.head END example_more
+FROM mpp_view_search('${norm}',coalesce(nullif('${mode}',''),'words'),""" + SEARCH_INPUT + "," + SEARCH_FILTERS + """,'${order}','${xsql}') r
+LEFT JOIN LATERAL (SELECT t.sql_text FROM mpp_query_text(r.example_sql_id) t) x ON true
+LEFT JOIN LATERAL (
+  SELECT string_agg(l.line,E'\\n' ORDER BY l.n) FILTER (WHERE l.used<=""" + str(HOVER_LINES) + """ OR l.n=1) head,
+         length(x.sql_text)>""" + str(HOVER_CHARS) + """ OR bool_or(l.used>""" + str(HOVER_LINES) + """ AND l.n>1) cut
+  FROM (SELECT s.line,s.n,sum(1+(length(s.line)+(octet_length(s.line)-length(s.line))/2)/""" + str(HOVER_WRAP) + """) OVER (ORDER BY s.n) used
+        FROM regexp_split_to_table(left(x.sql_text,""" + str(HOVER_CHARS) + """),E'\\r?\\n') WITH ORDINALITY s(line,n)) l) h ON true
+WHERE '${q}${fp}'<>''""",
         [('total_structures', None), ('record_count', '记录数', dict(custom__width=90)),
          ('matched_texts', '命中原文数', dict(custom__width=100, noValue='按结构')),
          ('structure_texts', '结构的原文总数', dict(custom__width=120)), ('identities', '身份数', dict(custom__width=80)),
          ('top_label', '记录最多的身份（集群 / 数据库 / 执行用户）', dict(custom__width=300)), ('top_records', '该身份记录数', dict(custom__width=110)),
          ('scopes', '集群', dict(custom__width=90)), ('databases', '数据库', dict(custom__width=110)), ('users', '执行用户', dict(custom__width=130)),
          ('last_at', '最近一次', dict(custom__width=170)),
-         ('example', '原文示例（开头）', dict(custom__width=420)), ('fingerprint', '结构指纹', dict(custom__width=240)), ('url', None)],
+         ('example', '原文示例（开头；鼠标移到格子左上角的小三角看更多）', dict(custom__width=420, custom__tooltip__field='example_more', custom__tooltip__placement='left')),
+         ('fingerprint', '结构指纹', dict(custom__width=240)), ('url', None), ('example_more', None, dict(custom__width=760, plain=True))],
         description='三种方式的结果都是同样的列表，检索后停在这里，不自动进入详情。“记录数”是命中原文的全部记录，包含各阶段的记录。'
-                    '点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。',
+                    '点一行进入 SQL 详情，显示记录最多的那个身份，时间范围是它最近一次执行往前 7 天；只命中一份原文时，进入后只看这一份。'
+                    '“原文示例”只显示开头；把鼠标移到这一格左上角的小三角上，弹出这份原文的开头一段（保留换行，长的只显示到一屏以内），点一下小三角可以把它固定住，再点别处收起。看全文请点这一行进入详情。',
         links=link('进入 SQL 详情', '${__data.fields.url:raw}')))
     layout.line(6, (note, 18), (total('命中的 SQL 结构总数', results, 'total_structures', '符合这次检索和顶部筛选的 SQL 结构一共有多少个；下表最多显示其中 50 个。'), 6))
     layout.line(14, (results, 24))

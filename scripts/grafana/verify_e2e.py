@@ -250,6 +250,19 @@ class Browser:
         self.browser.close()
 
 
+def hover_text(text):
+    """What the mark on an example cell shows for this original text, computed apart from the dashboard query."""
+    kept, used, dropped = [], 0, False
+    for number, line in enumerate(re.split('\r?\n', text[:boards.HOVER_CHARS]), 1):
+        used += 1 + (len(line) + (len(line.encode()) - len(line)) // 2) // boards.HOVER_WRAP
+        if used <= boards.HOVER_LINES or number == 1:
+            kept.append(line)
+        else:
+            dropped = True
+    note = '\n……（这份原文共 %d 个字符，这里只是开头；点这一行进入详情看全文）' % len(text)
+    return '\n'.join(kept) + (note if dropped or len(text) > boards.HOVER_CHARS else '')
+
+
 def fixed_inputs():
     """G10: characters that a careless transport changes without any error."""
     return [('line breaks, tabs and double quotes', 'select a,\n\t"b"  from "t" -- note\nwhere x = \'1\'\n'),
@@ -460,6 +473,29 @@ def search(env, play):
     note = dict(browser.rows('mpp-search', '这次检索'))
     assert note['检索方式'].startswith('按词') and note['切出的词'] == '共 2 个：wide_  ｜  select'
     assert urllib.parse.urlparse(browser.page.url).path.startswith('/d/mpp-search')
+    # the mark on an example cell shows more of that original text: unchanged when short, its beginning when long
+    more = names.index('example_more')
+    for words, text in (('special_chars', data.SPECIAL), ('big_list', data.LONG)):
+        browser.open('/d/mpp-search/sql-search?var-mode=words&var-q=%s' % b64(words), extra=2500)
+        found = browser.rows('mpp-search', '结果')
+        assert len(found) == 1 and found[0][more] == hover_text(text), words
+    assert found[0][more].startswith(data.LONG[:boards.HOVER_CHARS] + '\n……（这份原文共 %d 个字符' % len(data.LONG))
+    panel = browser.page.locator('[data-testid^="data-testid Panel header 结果"]').first
+    mark, box = panel.get_by_test_id('data-testid tableng tooltip caret'), browser.page.get_by_test_id('data-testid tableng tooltip wrapper')
+    assert mark.count() == 1 and box.count() == 0
+    mark.hover()
+    browser.page.wait_for_timeout(800)
+    shown = box.first.inner_text().replace('\u00a0', ' ')
+    assert ' '.join(shown.split()) == ' '.join(found[0][more].split()) and box.first.locator('a').count() == 0
+    assert box.first.bounding_box()['height'] < 620, box.first.bounding_box()
+    mark.click()  # a click keeps it while the pointer is elsewhere; a click elsewhere closes it; neither leaves the page
+    browser.page.mouse.move(300, 300)
+    browser.page.wait_for_timeout(500)
+    assert box.first.is_visible() and urllib.parse.urlparse(browser.page.url).path.startswith('/d/mpp-search')
+    browser.page.mouse.click(300, 300)
+    browser.page.wait_for_timeout(500)
+    assert box.count() == 0 or not box.first.is_visible()
+    assert panel.locator('a').count() > 0  # the cells of the row still lead to the detail page
     browser.search(' '.join('w%d' % n for n in range(21)), 'words')
     note = dict(browser.rows('mpp-search', '这次检索'))
     assert '超过 20 个；请改用“整段”方式' in note['没有检索'] and browser.rows('mpp-search', '结果') == []
@@ -477,7 +513,7 @@ def search(env, play):
     assert browser.rows('mpp-search', '结果')[0][names.index('record_count')] == env.one(
         "SELECT count(*) FROM mpp_occurrence o JOIN mpp_fingerprint f USING(sql_id) WHERE f.value='%s' AND o.end_at>=to_timestamp(%d/1000.0) AND o.end_at<to_timestamp(%d/1000.0)"
         % ((busy,) + env.last_day))
-    env.ok('G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; stays on the list')
+    env.ok('G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; stays on the list')
     # entering the detail page from a words search
     browser.open('/d/mpp-search/sql-search')
     browser.search("status '2026-06-28'", 'words')

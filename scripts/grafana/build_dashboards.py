@@ -117,8 +117,31 @@ def override(name, **properties):
                 properties=[dict(id=key.replace('__', '.'), value=value) for key, value in properties.items()])
 
 
+def header_width(label):
+    """Pixels a column needs to show its header on one line: 14 px text, estimated on the wide side, the cell's
+    padding, and the arrow that appears beside the name while the table is sorted by that column."""
+    width = 0.0
+    for char in label:
+        if ord(char) > 0x2E7F:  # ideographs and full-width punctuation
+            width += 14.3
+        elif char == ' ':
+            width += 4.5
+        elif char.isdigit():
+            width += 9.2
+        elif char.isupper():
+            width += 10.5
+        elif char.islower():
+            width += 8.4
+        else:
+            width += 9.0 if ord(char) > 0x7F else 6.5
+    return int(width) + 32
+
+
 def table(title, sql, columns, description='', footer=None, links=None, frozen=0):
     """columns: (field, display name, extra properties); a None display name hides the field.
+
+    A header is never cut and never wraps: every column is at least as wide as its header on one
+    line, and a table with more columns than the window holds scrolls sideways.
 
     ``links`` makes every cell of a row a link. A column whose extra properties say
     ``plain=True`` is left out of it: Grafana adds a link given for one field to the
@@ -136,10 +159,13 @@ def table(title, sql, columns, description='', footer=None, links=None, frozen=0
             properties['custom__hideFrom__viz'] = True
         else:
             properties['displayName'] = display
+            if 'custom__width' in properties:
+                properties['custom__width'] = max(properties['custom__width'], header_width(display))
+            else:
+                properties['custom__minWidth'] = max(properties.get('custom__minWidth', 60), header_width(display))
         overrides.append(override(field, **properties))
     panel = dict(type='table', title=title, description=description, datasource=PG, targets=[target(sql)],
-                 fieldConfig=dict(defaults=dict(custom=dict(align='auto', cellOptions=dict(type='auto'), inspect=True, filterable=False, minWidth=60,
-                                                            wrapHeaderText=True)),  # a header that does not fit wraps; it is never cut
+                 fieldConfig=dict(defaults=dict(custom=dict(align='auto', cellOptions=dict(type='auto'), inspect=True, filterable=False, minWidth=60)),
                                   overrides=overrides),
                  options=dict(showHeader=True, cellHeight='sm'))
     if frozen:
@@ -447,7 +473,7 @@ WHERE s.timing_type='${timing}'""",
             [('condition', '条件'), ('met', '是否满足', dict(custom__cellOptions=dict(type='color-text'),
                 mappings=[dict(type='value', options={'满足': dict(color='green', index=0), '不满足': dict(color='orange', index=1)})])),
              ('samples', '样本数：实际 / 要求'), ('coverage', '活跃天数：实际 / 要求'), ('reason', '不满足的原因')],
-            description='三项条件各自决定对应的数值能不能作参照：基础条件对应 P50 等，P95、P99 条件对应各自的分位值。'), 11),
+            description='三项条件各自决定对应的数值能不能作参照：基础条件对应 P50 等，P95、P99 条件对应各自的分位值。'), 12),
         (dict(type='bargauge', title='耗时分位：${timing} 的整体基线', datasource=PG, description='所选版本整体基线保存的分位值。',
               targets=[target("""SELECT s.min_ms AS "最小",s.p25_ms AS "P25",s.p50_ms AS "P50",s.p75_ms AS "P75",s.p90_ms AS "P90",
   s.p95_ms AS "P95",s.p99_ms AS "P99",s.max_ms AS "最大" FROM """ + STATISTIC + """) s WHERE s.timing_type='${timing}' AND s.sample_state='available'""")],
@@ -455,7 +481,7 @@ WHERE s.timing_type='${timing}'""",
                                              thresholds=dict(mode='absolute', steps=[dict(color='blue', value=None)])), overrides=[]),
               options=dict(reduceOptions=dict(values=False, calcs=['lastNotNull'], fields=''), orientation='horizontal',
                            displayMode='basic', valueMode='color', showUnfilled=True, minVizHeight=14, minVizWidth=8,
-                           namePlacement='left', sizing='auto', legend=dict(showLegend=False, displayMode='list', placement='bottom'))), 13))
+                           namePlacement='left', sizing='auto', legend=dict(showLegend=False, displayMode='list', placement='bottom'))), 12))
     layout.line(6, (table('五类计时一览（整体基线；点一行切换计时类别）', """SELECT mpp_view_label('timing',s.timing_type)||CASE WHEN s.timing_type='request' THEN '' ELSE '（阶段或调用）' END timing,
   s.included_count,s.active_days,s.p50_ms,s.p95_ms,s.p99_ms,s.max_ms,
   CASE WHEN (s.sufficiency->'p99'->>'met')::boolean THEN '三项都满足' WHEN (s.sufficiency->'p95'->>'met')::boolean THEN 'P99 样本不足'
@@ -507,7 +533,7 @@ ORDER BY s.bucket_date,s.bucket_number""",
         [('bucket', '分桶', dict(custom__width=158))] + [(name, label, dict(custom__minWidth=76)) for name, label in (('basic', '基础条件'), ('p95', 'P95 条件'), ('p99', 'P99 条件'))]
         + [(column, label, dict(unit='ms') if column.endswith('_ms') else dict(custom__minWidth=62)) for column, label in METRICS],
         description='在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。'
-                    '列很多，窗口放不下时这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。',
+                    '列很多，一屏放不下，这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。',
         frozen=1), 24))
 
     layout.row('对比（所选时间范围内的执行，对所选版本的整体基线）')

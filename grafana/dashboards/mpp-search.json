@@ -259,8 +259,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -296,6 +295,10 @@
               {
                 "id": "displayName",
                 "value": "内容"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           }
@@ -343,8 +346,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -384,7 +386,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 95
+                "value": 103
               },
               {
                 "id": "noValue",
@@ -404,7 +406,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 115
+                "value": 132
               },
               {
                 "id": "displayName",
@@ -420,7 +422,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 70
+                "value": 74
               },
               {
                 "id": "displayName",
@@ -452,7 +454,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 105
+                "value": 117
               },
               {
                 "id": "displayName",
@@ -654,8 +656,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           },
           "links": [
             {
@@ -691,6 +692,10 @@
               {
                 "id": "displayName",
                 "value": "这条语句单独查的结果"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 175
               }
             ]
           },
@@ -703,6 +708,10 @@
               {
                 "id": "displayName",
                 "value": "记录数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
               }
             ]
           },
@@ -715,6 +724,10 @@
               {
                 "id": "displayName",
                 "value": "结构指纹"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },

@@ -970,7 +970,25 @@ def detail(env, play):
             assert (row[names.index('included_count')], number(row[names.index('p50_ms')]), number(row[names.index('p99_ms')])) == (expected[0], number(expected[1]), number(expected[2]))
             assert row[1].startswith(('满足', '不满足：')) and row[3].startswith(('满足', '不满足：'))
         layered.close()
-    assert cut_headers(browser.page) == []  # with every table of the page drawn: a header that does not fit wraps
+    # With every table of the page drawn, no header is cut or wrapped, and it stays so in a narrow window:
+    # columns keep the width of their headers and the table scrolls sideways instead.
+    def headers_whole(page):
+        tall = page.evaluate('''() => Array.from(document.querySelectorAll('[data-testid^="data-testid Panel header "] .rdg-header-row'))
+            .filter((row) => row.getBoundingClientRect().height > 44).length''')
+        return cut_headers(page) == [] and tall == 0
+    assert headers_whole(browser.page)
+    size = browser.page.viewport_size
+    browser.page.set_viewport_size(dict(width=1366, height=size['height']))
+    browser.page.wait_for_timeout(1500)
+    layers = browser.page.locator('[data-testid^="data-testid Panel header 分层明细"] .rdg').first
+    assert headers_whole(browser.page) and layers.evaluate('(grid) => grid.scrollWidth - grid.clientWidth') > 300
+    browser.page.set_viewport_size(size)
+    browser.page.wait_for_timeout(1000)
+    # sorting by a column puts an arrow beside its name; the name is still whole
+    for name in ('被排除的样本数', '样本数'):
+        browser.page.locator('[data-testid^="data-testid Panel header 分层明细"]').first.get_by_role('columnheader', name=name, exact=True).click()
+        browser.page.wait_for_timeout(600)
+        assert headers_whole(browser.page), name
     env.ok('G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, '
            'and the exclusion reasons equal the stored statistics; no column header is cut')
     # ---- G19: execution list

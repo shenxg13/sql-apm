@@ -120,11 +120,20 @@ class DeliveredGrafanaFiles(unittest.TestCase):
             self.assertIn('每格 $__interval', panel['title'])
             self.assertIn('$__interval_ms', panel['targets'][0]['rawSql'])
 
-    def test_tables_wrap_headers_and_the_differing_part_carries_the_text(self):
+    def test_tables_keep_headers_whole_and_the_differing_part_carries_the_text(self):
         tables = [panel for board in self.boards.values() for panel in panels(board) if panel['type'] == 'table']
         self.assertGreater(len(tables), 15)
-        for panel in tables:  # a header that does not fit its column wraps, it is never cut
-            self.assertIs(panel['fieldConfig']['defaults']['custom']['wrapHeaderText'], True, panel['title'])
+        # A header stays on one line and is never cut: every shown column is at least as wide as its header
+        # (14 px for an ideograph or full-width mark, at least 4 px for anything else, 12 px of padding and
+        # 18 px for the arrow shown while the table is sorted by it), and a table too wide for the window scrolls sideways.
+        for panel in tables:
+            self.assertNotIn('wrapHeaderText', panel['fieldConfig']['defaults']['custom'], panel['title'])
+            for item in panel['fieldConfig']['overrides']:
+                config = {entry['id']: entry['value'] for entry in item['properties']}
+                if item['matcher']['id'] != 'byName' or config.get('custom.hideFrom.viz'):
+                    continue
+                least = sum(14 if ord(char) > 0x2E7F else 4 for char in config['displayName']) + 30
+                self.assertGreaterEqual(config.get('custom.width', config.get('custom.minWidth', 0)), least, (panel['title'], config['displayName']))
         # a duration is right-aligned and carries its unit: every duration column is wide enough for "23.9 hours"
         for panel in tables:
             for item in panel['fieldConfig']['overrides']:

@@ -122,8 +122,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -178,6 +177,10 @@
               {
                 "id": "displayName",
                 "value": "内容"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -334,8 +337,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -348,6 +350,10 @@
               {
                 "id": "displayName",
                 "value": "条件"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -384,6 +390,10 @@
               {
                 "id": "displayName",
                 "value": "是否满足"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -396,6 +406,10 @@
               {
                 "id": "displayName",
                 "value": "样本数：实际 / 要求"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 161
               }
             ]
           },
@@ -408,6 +422,10 @@
               {
                 "id": "displayName",
                 "value": "活跃天数：实际 / 要求"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 176
               }
             ]
           },
@@ -420,6 +438,10 @@
               {
                 "id": "displayName",
                 "value": "不满足的原因"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           }
@@ -427,7 +449,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 14
       },
@@ -480,8 +502,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 13,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 14
       },
       "id": 6,
@@ -538,8 +560,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           },
           "links": [
             {
@@ -579,6 +600,10 @@
               {
                 "id": "displayName",
                 "value": "样本数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
               }
             ]
           },
@@ -591,6 +616,10 @@
               {
                 "id": "displayName",
                 "value": "活跃天数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -683,6 +712,10 @@
               {
                 "id": "displayName",
                 "value": "样本条件"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -742,8 +775,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -772,6 +804,10 @@
               {
                 "id": "displayName",
                 "value": "发布时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -784,6 +820,10 @@
               {
                 "id": "displayName",
                 "value": "训练窗口开始"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -796,6 +836,10 @@
               {
                 "id": "displayName",
                 "value": "训练窗口结束"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -824,6 +868,10 @@
               {
                 "id": "displayName",
                 "value": "规则版本"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -836,6 +884,10 @@
               {
                 "id": "displayName",
                 "value": "能否选作参照"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -848,6 +900,10 @@
               {
                 "id": "displayName",
                 "value": "版本标识"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           }
@@ -1193,8 +1249,7 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60,
-                "wrapHeaderText": true
+                "minWidth": 60
               }
             },
             "overrides": [
@@ -1207,6 +1262,10 @@
                   {
                     "id": "displayName",
                     "value": "排除原因"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 89
                   }
                 ]
               },
@@ -1219,6 +1278,10 @@
                   {
                     "id": "displayName",
                     "value": "样本数"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 74
                   }
                 ]
               }
@@ -1266,8 +1329,7 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60,
-                "wrapHeaderText": true
+                "minWidth": 60
               }
             },
             "overrides": [
@@ -1300,6 +1362,10 @@
                   {
                     "id": "displayName",
                     "value": "请求整体"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 89
                   }
                 ]
               },
@@ -1316,6 +1382,10 @@
                   {
                     "id": "displayName",
                     "value": "Execute 首次"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 125
                   }
                 ]
               },
@@ -1332,6 +1402,10 @@
                   {
                     "id": "displayName",
                     "value": "Execute 续取"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 125
                   }
                 ]
               },
@@ -1348,6 +1422,10 @@
                   {
                     "id": "displayName",
                     "value": "Parse"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 76
                   }
                 ]
               },
@@ -1364,6 +1442,10 @@
                   {
                     "id": "displayName",
                     "value": "Bind"
+                  },
+                  {
+                    "id": "custom.minWidth",
+                    "value": 67
                   }
                 ]
               }
@@ -1401,7 +1483,7 @@
             "type": "grafana-postgresql-datasource",
             "uid": "sql-apm-pg"
           },
-          "description": "在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。列很多，窗口放不下时这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。",
+          "description": "在顶部“分层明细”里选时间层次。每个分桶列出保存的全部 17 个指标、样本数、活跃天数、被排除数和它自己的三项样本条件。列很多，一屏放不下，这张表横向滚动，“分桶”一列固定不动；样本条件不满足的原因较长，鼠标停在格子上显示完整内容。",
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -1411,8 +1493,7 @@
                 },
                 "filterable": false,
                 "inspect": true,
-                "minWidth": 60,
-                "wrapHeaderText": true
+                "minWidth": 60
               }
             },
             "overrides": [
@@ -1440,7 +1521,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 76
+                    "value": 89
                   },
                   {
                     "id": "displayName",
@@ -1456,7 +1537,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 76
+                    "value": 94
                   },
                   {
                     "id": "displayName",
@@ -1472,7 +1553,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 76
+                    "value": 94
                   },
                   {
                     "id": "displayName",
@@ -1488,7 +1569,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 74
                   },
                   {
                     "id": "displayName",
@@ -1504,7 +1585,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 89
                   },
                   {
                     "id": "displayName",
@@ -1520,7 +1601,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 132
                   },
                   {
                     "id": "displayName",
@@ -1736,7 +1817,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 89
                   },
                   {
                     "id": "displayName",
@@ -1756,7 +1837,7 @@
                   },
                   {
                     "id": "custom.minWidth",
-                    "value": 88
+                    "value": 103
                   },
                   {
                     "id": "displayName",
@@ -1776,7 +1857,7 @@
                   },
                   {
                     "id": "custom.minWidth",
-                    "value": 88
+                    "value": 89
                   },
                   {
                     "id": "displayName",
@@ -1792,7 +1873,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 103
                   },
                   {
                     "id": "displayName",
@@ -1808,7 +1889,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 132
                   },
                   {
                     "id": "displayName",
@@ -1824,7 +1905,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 146
                   },
                   {
                     "id": "displayName",
@@ -1840,7 +1921,7 @@
                 "properties": [
                   {
                     "id": "custom.minWidth",
-                    "value": 62
+                    "value": 146
                   },
                   {
                     "id": "displayName",
@@ -1912,8 +1993,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -1926,6 +2006,10 @@
               {
                 "id": "displayName",
                 "value": "参照"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -1958,6 +2042,10 @@
               {
                 "id": "displayName",
                 "value": "范围内有耗时的次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 160
               }
             ]
           },
@@ -1970,6 +2058,10 @@
               {
                 "id": "displayName",
                 "value": "超过基线值的次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 146
               }
             ]
           },
@@ -1990,6 +2082,10 @@
               {
                 "id": "displayName",
                 "value": "占比"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -2010,6 +2106,10 @@
               {
                 "id": "displayName",
                 "value": "正常时的大致占比"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 146
               }
             ]
           },
@@ -2546,8 +2646,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -2636,6 +2735,10 @@
               {
                 "id": "displayName",
                 "value": "执行次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -2651,7 +2754,7 @@
               },
               {
                 "id": "custom.minWidth",
-                "value": 88
+                "value": 89
               },
               {
                 "id": "displayName",
@@ -2671,7 +2774,7 @@
               },
               {
                 "id": "custom.minWidth",
-                "value": 88
+                "value": 89
               },
               {
                 "id": "displayName",
@@ -2728,6 +2831,10 @@
               {
                 "id": "displayName",
                 "value": "原文标识"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -2957,8 +3064,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -3011,6 +3117,10 @@
               {
                 "id": "displayName",
                 "value": "状态"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -3023,6 +3133,10 @@
               {
                 "id": "displayName",
                 "value": "与基线的比较"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -3035,6 +3149,10 @@
               {
                 "id": "displayName",
                 "value": "单条或整批"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 103
               }
             ]
           },
@@ -3073,6 +3191,10 @@
               {
                 "id": "displayName",
                 "value": "来源文件"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -3085,6 +3207,10 @@
               {
                 "id": "displayName",
                 "value": "行号"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },

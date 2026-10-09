@@ -48,8 +48,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -62,6 +61,10 @@
               {
                 "id": "displayName",
                 "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -74,6 +77,10 @@
               {
                 "id": "displayName",
                 "value": "日志最早时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -86,6 +93,10 @@
               {
                 "id": "displayName",
                 "value": "日志最晚时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -98,6 +109,10 @@
               {
                 "id": "displayName",
                 "value": "已导入文件数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -120,6 +135,10 @@
               {
                 "id": "displayName",
                 "value": "看最后 24 小时"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 130
               }
             ]
           },
@@ -256,8 +275,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           },
           "links": [
             {
@@ -277,6 +295,10 @@
               {
                 "id": "displayName",
                 "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -289,6 +311,10 @@
               {
                 "id": "displayName",
                 "value": "数据库"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
               }
             ]
           },
@@ -301,6 +327,10 @@
               {
                 "id": "displayName",
                 "value": "执行用户"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -313,6 +343,10 @@
               {
                 "id": "displayName",
                 "value": "计时类别"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -325,6 +359,10 @@
               {
                 "id": "displayName",
                 "value": "次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -337,6 +375,10 @@
               {
                 "id": "displayName",
                 "value": "未成功次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 103
               }
             ]
           },
@@ -372,7 +414,7 @@
               },
               {
                 "id": "custom.minWidth",
-                "value": 88
+                "value": 89
               },
               {
                 "id": "displayName",
@@ -392,7 +434,7 @@
               },
               {
                 "id": "custom.minWidth",
-                "value": 88
+                "value": 89
               },
               {
                 "id": "displayName",
@@ -409,6 +451,10 @@
               {
                 "id": "displayName",
                 "value": "范围内最近一次"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 132
               }
             ]
           },
@@ -573,8 +619,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           },
           "links": [
             {
@@ -594,6 +639,10 @@
               {
                 "id": "displayName",
                 "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -606,6 +655,10 @@
               {
                 "id": "displayName",
                 "value": "数据库"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
               }
             ]
           },
@@ -618,6 +671,10 @@
               {
                 "id": "displayName",
                 "value": "执行用户"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -630,6 +687,10 @@
               {
                 "id": "displayName",
                 "value": "计时类别"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -642,6 +703,10 @@
               {
                 "id": "displayName",
                 "value": "样本数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
               }
             ]
           },
@@ -654,6 +719,10 @@
               {
                 "id": "displayName",
                 "value": "活跃天数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -766,6 +835,10 @@
               {
                 "id": "displayName",
                 "value": "样本条件"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -866,8 +939,7 @@
             },
             "filterable": false,
             "inspect": true,
-            "minWidth": 60,
-            "wrapHeaderText": true
+            "minWidth": 60
           }
         },
         "overrides": [
@@ -880,6 +952,10 @@
               {
                 "id": "displayName",
                 "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -892,6 +968,10 @@
               {
                 "id": "displayName",
                 "value": "发布时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -904,6 +984,10 @@
               {
                 "id": "displayName",
                 "value": "构建完成时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -916,6 +1000,10 @@
               {
                 "id": "displayName",
                 "value": "训练窗口开始"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -928,6 +1016,10 @@
               {
                 "id": "displayName",
                 "value": "训练窗口结束"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -940,6 +1032,10 @@
               {
                 "id": "displayName",
                 "value": "窗口天数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           },
@@ -952,6 +1048,10 @@
               {
                 "id": "displayName",
                 "value": "是否当前生效"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
               }
             ]
           },
@@ -964,6 +1064,10 @@
               {
                 "id": "displayName",
                 "value": "结果是否已清理"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 132
               }
             ]
           },
@@ -976,6 +1080,10 @@
               {
                 "id": "displayName",
                 "value": "规则"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
               }
             ]
           },
@@ -988,6 +1096,10 @@
               {
                 "id": "displayName",
                 "value": "版本标识"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
               }
             ]
           }

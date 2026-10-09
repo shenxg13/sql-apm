@@ -445,7 +445,7 @@
  },
  "synthetic": {
   "unit_tests": {
-   "count": 86,
+   "count": 90,
    "result": "ok"
   },
   "development_tests": {
@@ -477,14 +477,14 @@
   },
   "end_to_end": {
    "script": "scripts/grafana/verify_e2e.py",
-   "groups": 16,
-   "seconds": 354.8,
+   "groups": 17,
+   "seconds": 656.8,
    "labels": [
     "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
     "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
     "G8: anonymous requests and default passwords refused; the viewer uses search and all three dashboards, cannot save a dashboard or a folder, and its statements run as the read-only account",
     "G9: MPP holds the three packaged dashboards and 用户自定义; saving over or deleting a packaged dashboard is refused; a copy saved into 用户自定义, the accounts and the settings are unchanged after a new packaged version is loaded",
-    "G10: 6 fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest: line breaks, tabs and double quotes 47 bytes 2a025209bc0d; backslashes and a literal \\n 42 bytes 72f14580812f; dollar names and template marks 77 bytes f13119ab0c8b; Chinese and other non-ASCII 72 bytes 226edfc99334; a statement of more than 60 KB 68436 bytes c98a5ccc5b7d; typing after a paste 18 bytes 878c15212b8d",
+    "G10: 9 fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest, line breaks as LF: line breaks, tabs and double quotes 47 bytes 2a025209bc0d; backslashes and a literal \\n 42 bytes 72f14580812f; dollar names and template marks 77 bytes f13119ab0c8b; Chinese and other non-ASCII 72 bytes 226edfc99334; a statement of more than 60 KB 68436 bytes c98a5ccc5b7d; typing after a paste 18 bytes 878c15212b8d; CR LF (compared after turning them into LF) 37 bytes 3c8dc5bb96cf; a lone CR (compared after turning them into LF) 37 bytes 3c8dc5bb96cf; mixed line breaks (compared after turning them into LF) 51 bytes aea37be389fe",
     "G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; input, note, total and the whole list fit a 1920x1080 screen; stays on the list",
     "G12: a row opens the detail page on the identity with the most records and its last seven days; texts hit by the search come first and are marked; a single hit or an identical stored text opens on that text; batch hints can be selected one by one; coming back refills the input and the mode",
     "G5: the service listens on the loopback address only; while it is stopped complete-SQL search says so and words, passages and the other pages work",
@@ -495,15 +495,16 @@
     "G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, and the exclusion reasons equal the stored statistics; no column header is cut",
     "G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; unknown durations stay unknown; training decisions under the chosen version are shown as they are; the chart above the list draws the same executions, one bar each in the colour of its comparison with the baseline, and marks those without a duration",
     "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
-    "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page"
+    "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page",
+    "R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode; a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported after the last build) can be chosen and their records found; a text chosen for another structure is not applied; failure, cancellation and timeout marks, alone or mixed, show without any duration; a text longer than one segment can be read to its end"
    ],
-   "commit": "59572e305815b3f8242f0c5e49175d008361dcb5"
+   "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5"
   },
   "dataset": {
    "clusters": 2,
    "days": 28,
-   "occurrences": 28770,
-   "original_texts": 148,
+   "occurrences": 28798,
+   "original_texts": 161,
    "note": "committed generator tests/database/dashboard_data.py; no real content"
   }
  },
@@ -512,7 +513,7 @@
   "program_files": 104,
   "verify_package": "passed",
   "kit_entries": {
-   "unit": "86 tests, no skips",
+   "unit": "90 tests, no skips",
    "database": "278 PASS lines",
    "publication": "33 PASS lines",
    "smoke": "passed",
@@ -521,7 +522,7 @@
   },
   "packaged_documents_changed": false,
   "offline_bundle_changed": false,
-  "commit": "59572e305815b3f8242f0c5e49175d008361dcb5"
+  "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5"
  },
  "real_data": {
   "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",
@@ -2090,7 +2091,8 @@
   "performance figures are targets, not gates",
   "development machine only; target machine results belong to Issue #52",
   "the first call after start-up reads from the operating-system cache, not from cold disks",
-  "local data: cluster 119 has 31 days, cluster 120 has 7 days; production accumulates more records and versions"
+  "local data: cluster 119 has 31 days, cluster 120 has 7 days; production accumulates more records and versions",
+  "a statement whose kept constants hold more than one line-break form is not found as a complete SQL from the page (none in the full real data); the passage mode and the command line find it"
  ],
  "final_real_data_page_audit": {
   "commit": "0dda73a68df09ea506505d1e82017d54fff02679",
@@ -2109,6 +2111,256 @@
   "cold_cache_examples": {
    "detail_slowest_panel_seconds": 1.97,
    "widest_words_search_seconds": 7.3
+  }
+ },
+ "r1_remediation": {
+  "review": "https://github.com/shenxg13/sql-apm/pull/53#issuecomment-6080930223",
+  "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5",
+  "findings": [
+   "F-51-001",
+   "F-51-002",
+   "F-51-003",
+   "F-51-004",
+   "F-51-005",
+   "F-51-006",
+   "F-51-007",
+   "F-51-008",
+   "F-51-009"
+  ],
+  "confirmed_scope_changes": [
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6081170840",
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6081571383",
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6082791528"
+  ],
+  "changed": [
+   "command-line search entry",
+   "fingerprint service",
+   "three dashboards and their generator",
+   "synthetic dataset and checks",
+   "documents"
+  ],
+  "unchanged": [
+   "structure",
+   "query functions",
+   "installer and configuration files",
+   "offline bundle and packaged documents"
+  ],
+  "rerun": [
+   "unit tests (90)",
+   "Grafana tooling tests (5)",
+   "packaging tests (30)",
+   "scripts/db/verify.py (278)",
+   "scripts/db/verify_search.py (8 groups)",
+   "scripts/db/verify_views.py (16 groups)",
+   "generated dashboards equal the committed ones",
+   "harness checks",
+   "end-to-end 17 groups",
+   "candidate package rebuilt and all six kit entries",
+   "real-data page audit"
+  ],
+  "not_rerun": [
+   "real database upgrade",
+   "real-data search audit of 15 inputs and 300 texts",
+   "timings of the performance section"
+  ],
+  "real_data": {
+   "evidence": "measured; counts and timings only",
+   "texts_with_cr": {
+    "total": 6906,
+    "cr_lf_only": 4477,
+    "lone_cr_only": 1785,
+    "mixed": 644,
+    "structure_depends_on_the_form": 119,
+    "of_these_lone_cr_in_a_kept_constant": 116,
+    "of_these_cr_lf_in_a_kept_constant": 3
+   },
+   "identical_text_lookup": {
+    "crlf_only": {
+     "texts": 4477,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 17.1,
+      "p95_ms": 32.7,
+      "max_ms": 96.5
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 16.9,
+      "p95_ms": 30.0,
+      "max_ms": 67.1
+     }
+    },
+    "cr_only": {
+     "texts": 1785,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 19.2,
+      "p95_ms": 24.5,
+      "max_ms": 26.3
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 17.9,
+      "p95_ms": 20.1,
+      "max_ms": 26.5
+     }
+    },
+    "mixed": {
+     "texts": 644,
+     "sampled": 644,
+     "found": 644,
+     "not_found": 0,
+     "found_in_another_form": {
+      "cr": 116,
+      "crlf": 3
+     },
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 644,
+      "median_ms": 23.7,
+      "p95_ms": 63.5,
+      "max_ms": 226.5
+     },
+     "service_ms_changed_input": {
+      "n": 644,
+      "median_ms": 22.3,
+      "p95_ms": 77.8,
+      "max_ms": 87.3
+     }
+    },
+    "lf_only": {
+     "texts": 537828,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 19.7,
+      "p95_ms": 327.7,
+      "max_ms": 1284.8
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 19.3,
+      "p95_ms": 365.2,
+      "max_ms": 390.6
+     }
+    },
+    "one_line": {
+     "texts": 841042,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 14.4,
+      "p95_ms": 313.5,
+      "max_ms": 420.3
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 13.0,
+      "p95_ms": 317.1,
+      "max_ms": 418.4
+     }
+    }
+   },
+   "changed_input": "the same text with one blank added at its end",
+   "changed_input_median_ms_before_the_retry": {
+    "crlf_only": 15.7,
+    "cr_only": 15.7,
+    "mixed": 21.2,
+    "lf_only": 16.6,
+    "one_line": 12.8
+   },
+   "failure_only_identity_duration_chart": {
+    "identity_records": 14643,
+    "records_with_duration": 0,
+    "ranges": [
+     {
+      "hours": 168,
+      "query_failures": 0,
+      "records_in_range": 14643,
+      "mark_rows": 155,
+      "marks_drawn": 155,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     },
+     {
+      "hours": 24,
+      "query_failures": 0,
+      "records_in_range": 2104,
+      "mark_rows": 75,
+      "marks_drawn": 75,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     },
+     {
+      "hours": 1,
+      "query_failures": 0,
+      "records_in_range": 150,
+      "mark_rows": 35,
+      "marks_drawn": 35,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     }
+    ]
+   },
+   "filter_options": {
+    "database": {
+     "options": 4,
+     "options_from_baselines_before": 4,
+     "runs_ms": [
+      298,
+      291,
+      290,
+      293,
+      295
+     ],
+     "median_ms": 293
+    },
+    "user": {
+     "options": 67,
+     "options_from_baselines_before": 67,
+     "runs_ms": [
+      310,
+      307,
+      302,
+      303,
+      304
+     ],
+     "median_ms": 304
+    },
+    "first_version_encoding_every_record_ms": "2200-2400 per dropdown"
+   },
+   "longest_text_characters": 80959,
+   "page_audit": {
+    "script": "scripts/grafana/verify_e2e.py --directory <real-data environment>",
+    "result": "passed",
+    "sampled_identities": 7
+   }
   }
  }
 }

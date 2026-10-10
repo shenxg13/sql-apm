@@ -2,13 +2,14 @@
 """Prepare copied real inputs and compare final manual/daily statistics, outside the app."""
 import argparse
 from contextlib import closing
+from decimal import Decimal
 import json
 import os
 from pathlib import Path
 import shutil
 
 from acceptance import save, verify_baseline
-from statistic_comparison import export_statistics, compare_statistics
+from statistic_comparison import LIMIT, export_statistics, compare_statistics
 from verify_package import digest, verify
 
 
@@ -77,14 +78,15 @@ def snapshot(app, schema, output):
     print(json.dumps(dict(exported=True, clusters=2)))
 
 
-def compare(manual, daily, output):
+def compare(manual, daily, output, cross_machine=False):
     left, right = [json.loads((path / 'results.json').read_text()) for path in (manual, daily)]
     verify_baseline(dict(commit=right['program_commit'], files=right['product_sha256']), left)
-    report = dict(passed=True, clusters={})
+    report = dict(passed=True, cross_machine=cross_machine, clusters={})
     for cluster in ('119', '120'):
         a, b = left['clusters'][cluster], right['clusters'][cluster]
         same = all(a[key] == b[key] for key in ('cutoff_date', 'window_start', 'window_end', 'configuration'))
-        stats = compare_statistics(b['statistics'], daily, a['statistics'], manual)
+        stats = compare_statistics(b['statistics'], daily, a['statistics'], manual,
+                                   absolute_limit=LIMIT if cross_machine else Decimal(0))
         report['clusters'][cluster] = dict(same_configuration_and_window=same, statistics=stats)
         report['passed'] &= same and stats['passed']
     save(output, report)
@@ -107,6 +109,8 @@ def main():
     p.add_argument('--manual', type=Path, required=True)
     p.add_argument('--daily', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--cross-machine', action='store_true',
+                   help='allow only the confirmed 1e-12 logarithmic rounding difference between machines')
     args = vars(parser.parse_args())
     action = args.pop('action')
     if action == 'snapshot':

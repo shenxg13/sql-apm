@@ -113,6 +113,25 @@ class StatisticComparisonTests(unittest.TestCase):
             copied.unlink()
             self.assertEqual(original.read_text(), 'synthetic log')
 
+    def test_daily_comparison_is_exact_unless_cross_machine_is_explicit(self):
+        for name, median in [('manual', '1'), ('daily', '1.0000000000001')]:
+            values, folder = self.fixture(name, [(median, None)])
+            doc = dict(program_commit='tested', product_sha256={'sql_apm/a.py': 'abc'},
+                clusters={c: dict(cutoff_date='2026-07-31', window_start='start', window_end='end',
+                    configuration=dict(window_days=30), statistics=values) for c in ('119', '120')})
+            (folder / 'results.json').write_text(json.dumps(doc))
+        args = (self.root / 'manual', self.root / 'daily', self.root / 'comparison.json')
+        with self.assertRaisesRegex(ValueError, 'final results differ'):
+            compare_daily(*args)
+        report = json.loads(args[2].read_text())
+        self.assertFalse(report['passed'])
+        self.assertEqual(report['clusters']['120']['statistics']['absolute_limit'], '0')
+        cross_output = self.root / 'cross-machine.json'
+        compare_daily(args[0], args[1], cross_output, cross_machine=True)
+        report = json.loads(cross_output.read_text())
+        self.assertTrue(report['passed'])
+        self.assertTrue(report['cross_machine'])
+
     def test_collected_baseline_carries_verified_portable_value_files(self):
         metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
         (self.root/'tasks').mkdir();(self.root/'guide').mkdir()

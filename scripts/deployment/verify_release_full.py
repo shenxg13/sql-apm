@@ -149,6 +149,8 @@ def main():
                 run('task-'+cluster+'-'+str(step),[python,kit/'scripts/deployment/rehearsal.py','run',
                     '--cluster',cluster,'--step',step,'--config',out/'config','--records',out/'tasks',
                     '--data-root',out,'--workers','4','--program-commit',metadata['commit']])
+        run('final-manual-results',[python,Path(__file__).with_name('daily_rehearsal.py'),
+            'snapshot','--app-root',app,'--output',out/'manual-results'])
         for case in ('window','threshold','template','exclusion','retention','workers','import'):
             run('guide-'+case,[python,kit/'scripts/deployment/guide_examples.py','--app-root',app,
                 '--config',out/'config','--records',out/'guide','run',case])

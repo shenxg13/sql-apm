@@ -22,6 +22,7 @@ import rehearsal
 from acceptance import verify_baseline
 from verify_release_full import collect_baseline
 from statistic_comparison import TABLES, compare_statistics, verify_values
+from daily_rehearsal import compare as compare_daily, prepare as prepare_daily
 
 
 class StatisticComparisonTests(unittest.TestCase):
@@ -76,6 +77,41 @@ class StatisticComparisonTests(unittest.TestCase):
             stream.write(b'corrupt')
         with self.assertRaisesRegex(ValueError,'checksum differs'):
             verify_values(directory,evidence)
+
+    def test_daily_comparison_checks_both_clusters_and_configuration(self):
+        for name in ('manual', 'daily'):
+            values, folder = self.fixture(name, [('1', '2')])
+            doc = dict(program_commit='tested', product_sha256={'sql_apm/a.py': 'abc'},
+                clusters={c: dict(cutoff_date='2026-07-31', window_start='start', window_end='end',
+                    configuration=dict(window_days=30), statistics=values) for c in ('119', '120')})
+            (folder / 'results.json').write_text(json.dumps(doc))
+        compare_daily(self.root / 'manual', self.root / 'daily', self.root / 'pass.json')
+        self.assertTrue(json.loads((self.root / 'pass.json').read_text())['passed'])
+        doc['clusters']['120']['configuration']['window_days'] = 7
+        (self.root / 'daily/results.json').write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ValueError, 'final results differ'):
+            compare_daily(self.root / 'manual', self.root / 'daily', self.root / 'fail.json')
+        self.assertFalse(json.loads((self.root / 'fail.json').read_text())['passed'])
+
+    def test_daily_prepare_copies_and_does_not_mark_or_delete_originals(self):
+        source = self.root / 'source'; source.mkdir()
+        config = self.root / 'config'; config.mkdir()
+        for cluster in ('119', '120'):
+            original = source / (cluster + '.csv'); original.write_text('synthetic log')
+            (config / ('training-' + cluster + '.json')).write_text(json.dumps(
+                dict(version=1, clusters=[cluster], window=dict(days=30))))
+            (config / ('import-' + cluster + '.json')).write_text(json.dumps(dict(
+                sources={cluster: dict(cluster=cluster)}, batches={'first': dict(files=[dict(path=str(original))])})))
+        output = self.root / 'replay'
+        prepare_daily(config, output)
+        self.assertFalse(list(output.rglob('*.complete')))
+        self.assertEqual(json.loads((output / 'daily.json').read_text())['raw_files']['retention_days'], 'off')
+        for cluster in ('119', '120'):
+            copied = output / 'inbox' / cluster / (cluster + '.csv')
+            original = source / (cluster + '.csv')
+            self.assertNotEqual(original.stat().st_ino, copied.stat().st_ino)
+            copied.unlink()
+            self.assertEqual(original.read_text(), 'synthetic log')
 
     def test_collected_baseline_carries_verified_portable_value_files(self):
         metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})

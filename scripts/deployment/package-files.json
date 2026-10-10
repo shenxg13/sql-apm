@@ -18,7 +18,7 @@
     "scripts/db/verify_views.py", "scripts/db/verify_daily.py", "scripts/db/verify_daily_recovery.py",
     "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
     "scripts/deployment/acceptance.py", "scripts/deployment/guide_examples.py",
-    "scripts/deployment/statistic_comparison.py",
+    "scripts/deployment/statistic_comparison.py", "scripts/deployment/daily_rehearsal.py",
     "scripts/deployment/cleanup_rehearsal.py",
     "scripts/deployment/verify_package.py",
     "scripts/functions/*.py", "rules/functions/*.json", "rules/functions/POSTGRESQL-LICENSE.txt",

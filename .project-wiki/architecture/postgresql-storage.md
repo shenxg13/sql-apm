@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-10
+updated: 2026-10-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/52
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
     status: current
   - path: docs/reports/python313-upgrade-2026-10-08.md
@@ -211,7 +213,7 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
 - 没有新增表、列、约束、索引和扩展；表总数仍为 57。实测未发现需要新增索引。
 
 1.10.0 可带数据原地升级：只执行函数定义和授权，不重写任何表；升级前须由管理员再执行一次 bootstrap 创建只读账号。
-既有内容、行数与回执保持不变。随包的用户结构说明仍为旧版本，由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 更新。
+既有内容、行数与回执保持不变。2026-10-11 已由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 将随包结构说明更新至 1.12.0；目标机验证另行记录。
 
 ### 每日运行记录结构 1.12.0（2026-10-10）
 
@@ -225,7 +227,8 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
   既有表、列、约束、索引和函数没有改动，任务的模式和阶段取值不变。
 - 同一时间只允许一个每日运行，用会话级咨询锁实现；仍标为运行中、却没有会话持有该锁的记录由查询函数显示为未正常结束。
 - 1.11.0 可带数据原地升级：只建新表、函数和授权，不重写、不回填任何既有表；既有内容、行数与回执保持不变。
-  随包的用户结构说明由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 更新，仓库里的表清单已补上这五张。
+  随包[结构说明](../../docs/design/database-structure.md)已包含 62 张表、更新后的总览与版本沿革，
+  [检索指南](../../docs/runbooks/search-guide.md)列出查询函数；自动检查核对表／列、55 个查询函数签名和反例。
   表和函数的口径由[开发说明](../../docs/design/daily-run.md)维护。
 
 ## Workflows

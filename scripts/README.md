@@ -256,16 +256,19 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 完整命令、月份构造、测量边界和机器记录见[验收报告](../docs/reports/result-retention-2026-10-06.md)。
 高成本真实数据验收不自动加入 Harness，数据库副本及原文均留在本地忽略目录。
 
-## v0.2.0 文档与完整演练验收
+## v0.3.0 文档与完整演练验收
 
-`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、62 张表／列名和随包命令；
-随 `scripts/tests/test_deployment.py` 运行并覆盖反例。
-`verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例，
-并在九任务加四个示例的版本形态下验证自然日期清理的空操作与数据不变。
-`rehearsal.py` 保存九任务的选批字段、每 250ms 主机内存采样与 OOM 计数；
-`guide_examples.py` 执行单项配置示例，`cleanup_rehearsal.py` 验证自然／模拟日期清理。
-后两个入口仅对明确指定的专用演练库运行，参数及操作顺序见[部署手册](../docs/runbooks/kylin-offline-deployment.md)。
-高成本真实验收不自动加入 Harness。
+`check_documents.py` 对照配置校验器与结构定义核对指南键／示例、62 张表／列名、55 个查询函数完整签名和随包命令；
+`scripts/tests/test_deployment.py` 覆盖配置、查询契约、摘要、重复构建和比较器反例。
+`build_release.py` 生成程序／验收包与四份 HTML；`build_bundle.py --grafana-files DIR` 将固定 Grafana／插件及其余离线依赖组装进完整包。
+隔离安装后 `run_verification.py` 的十个入口为 unit、database、publication、smoke、cleanup、search、views、grafana、daily、daily-recovery。
+
+`verify_release_full.py` 在同一固定候选上执行九任务和七个指南示例，生成 `development-baseline.json`、统计值文件和保留的私有数据库。
+`rehearsal.py` 保存九任务的选批字段、每 250ms 的主机内存／CLI 进程 RSS 与 OOM 计数；
+`guide_examples.py` 执行单项配置示例。`daily_rehearsal.py prepare|snapshot|compare` 复制真实日志（不建硬链接、不放齐全标记），
+导出并比较两个集群当前版本的配置、窗口和统计；用于九任务与独立 schema 每日回放的对照。
+参数、人工步骤和两轮独立验收见[部署手册](../docs/runbooks/kylin-offline-deployment.md)。
+本轮不改目标机时钟；旧 `cleanup_rehearsal.py` 的模拟日期入口仅保留历史复现用途。高成本真实验收不自动加入 Harness。
 
 ## SQL检索与查询层
 

@@ -303,19 +303,20 @@ history 根据月份标记显示结果已清理；results_saved 保留“曾完�
 | 表 | 一行代表 | 重点字段 | 关联 |
 | --- | --- | --- | --- |
 | `mpp_daily_run` | 每日运行命令的一次执行 | `run_id`、`started_by`、`state`、`failed`、`reason`、`started_at`、`finished_at`、`local_date`、`stale_after_hours` | 被下面的表引用 |
-| `mpp_daily_cluster` | 一次运行里的一个集群 | `run_id`、`scope_id`、`ordinal`、`state`、`failed`、`import_state`、`newest_imported`、`build_state`、`cutoff_date`、`build_id`、`publication_id`、`cleanup_state`、`months_cleaned`、`months_pending`、`released_bytes`、`raw_state`、`raw_days`、`raw_files`、`raw_bytes`、`stage_seconds` | → `mpp_daily_run` |
+| `mpp_daily_cluster` | 一次运行里的一个集群 | `run_id`、`scope_id`、`ordinal`、`state`、`failed`、`import_state`、`examined_days`、`newest_imported`、`build_state`、`cutoff_date`、`build_id`、`publication_id`、`cleanup_state`、`months_cleaned`、`months_pending`、`released_bytes`、`raw_state`、`raw_days`、`raw_files`、`raw_bytes`、`stage_seconds` | → `mpp_daily_run` |
 | `mpp_daily_day` | 一次运行里某个来源某一天的导入结果 | `source_id`、`log_date`、`state`、`reason`、`batch_id`、`file_count`、`byte_count`、`added_records`、`seconds`、`files` | → `mpp_daily_cluster` |
 | `mpp_daily_problem` | 一次运行处理完一个集群后留给人的一件事，或接收目录里一个不合命名的文件 | `kind`、`source_id`、`log_date`、`result_month`、`reason`、`file_name`、`file_count` | → `mpp_daily_cluster` |
-| `mpp_daily_file` | 已导入日期的一个文件名（不随运行重复） | `source_id`、`log_date`、`file_name`、`scope_id`、`batch_id`、`file_id`、`byte_count`、`device`、`inode`、`mtime_ns`、`ctime_ns`、`verified_at`、`verified_run_id`、`removing_at`、`removing_run_id`、`removed_at`、`removed_run_id` | `file_id` 对应 `source_file`，运行标识对应 `mpp_daily_run`，均无外键 |
+| `mpp_daily_file` | 已导入日期的一个文件名（不随运行重复） | `source_id`、`log_date`、`file_name`、`scope_id`、`batch_id`、`file_id`、`byte_count`、`device`、`inode`、`mtime_ns`、`ctime_ns`、`verified_at`、`verified_run_id`、`removing_at`、`removing_run_id`、`removed_at`、`removed_run_id`、`cleared_at`、`cleared_run_id` | `file_id` 对应 `source_file`，运行标识对应 `mpp_daily_run`，均无外键 |
 
 `mpp_daily_run.state` 为 running、finished、aborted、unfinished。同一时间只有一个每日运行；
 一个仍标为 running 却没有进程持有运行锁的记录就是被强制终止的，查询函数直接把它显示为 unfinished，
 下一次运行再把它改写为 unfinished。`mpp_daily_cluster.state` 为 pending、running、done、skipped、aborted；
-它的四个步骤各有自己的状态列，删除的天数、文件数和字节数随每个文件的删除在同一个事务里累加。
-`mpp_daily_problem.kind` 的六个取值是需要人处理的事，`nonconforming_file` 只是对接收目录的记录。
+它的四个步骤各有自己的状态列，每一步有了结果就写入；`examined_days` 记本次运行已经看过并有结论的日期。
+删除的文件数和字节数随每个文件的删除、天数随每一天删除完成，各在同一个事务里累加。
+`mpp_daily_problem.kind` 的六个取值是需要人处理的事，发现时即写入；`nonconforming_file` 只是对接收目录的记录。
 另有三类待处理问题不入表，由查询函数现算：最近一次轮到某个集群时它被跳过、最近一次运行没有正常结束、
-太久没有成功的运行。`mpp_daily_file` 记的是文件的内容对应关系和最近一次核对时的文件状态，
-以及删除的决定和进度；它使“删除被打断”和“文件被人改动”能够分清。字段含义和查询函数见[每日运行开发说明](daily-run.md)。
+太久没有成功的运行。`mpp_daily_file` 记的是文件的内容对应关系和最近一次核对时的文件状态（核对不符时为空），
+以及删除的决定、每个文件的删除和整天删除完成三步的进度；它使“删除被打断”和“文件被人改动”能够分清。字段含义和查询函数见[每日运行开发说明](daily-run.md)。
 
 ## 预留未写入的表
 

@@ -168,7 +168,7 @@
     "browser_errors": [],
     "documents": {
       "INSTALL": {
-        "code_blocks": 62,
+        "code_blocks": 64,
         "images": 0,
         "internal_navigation": true,
         "print_rendered": true
@@ -2306,5 +2306,43 @@
     "tests": 37,
     "log_sha256": "9a824797629997a35719260054ed2b2c4c357e9380a0fe3eb6c7a61eb1051fc6"
   },
-  "html_browser_source_commit": "c00b55c55565a784a22ce361c0acf37f0f30b2b2"
+  "html_browser_source_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+  "final_candidate_artifacts": {
+    "passed": true,
+    "commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+    "artifacts": {
+      "release/sql-apm-v0.3.0.tar.gz": {
+        "bytes": 482953,
+        "sha256": "285d98f6bd0d07535b292fe83227e6270f667dd73bc6b5eae830806716ed0b2e",
+        "byte_equal": true
+      },
+      "release/sql-apm-verification-v0.3.0.tar.gz": {
+        "bytes": 341907,
+        "sha256": "7d01c6afb7e95de37511d89319a8fa789044a06a1a5baf8f58df0bdf1a476fe9",
+        "byte_equal": true
+      },
+      "offline-bundle.tar.gz": {
+        "bytes": 972416723,
+        "sha256": "60525d98581ce951cae7b39aca9d06d928130870d9e58ce946102dd89823ddd2",
+        "byte_equal": true
+      }
+    },
+    "product_files_equal": 111,
+    "comparison_method": "streaming byte-for-byte; both completed builds retained",
+    "comparison_record_sha256": "833445956fae95e50b61305f835e8f9b30fd7b1e290ca257d25cca6ef65bd304",
+    "html_browser_record_sha256": "d35805fbf83ec07c0c18d9f55fb1a9f2d2c59b8798ec305b4d81d8f44a110a06",
+    "offline_harness": {
+      "passed": true,
+      "source_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+      "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
+    },
+    "evidence_only_followup": {
+      "paths": [
+        "docs/reports/v030-offline-release-2026-10-11.md",
+        "docs/reports/data/v030-offline-release-2026-10-11.json"
+      ],
+      "excluded_from_program_verification_and_html_sources": true,
+      "note": "Candidate remains the fixed commit above; a following report-only commit records post-build evidence without changing any package input."
+    }
+  }
 }

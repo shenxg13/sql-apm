@@ -4,7 +4,7 @@ from database.fixture import statements
 
 TABLES = ("SELECT relname FROM pg_class WHERE relnamespace='sql_apm'::regnamespace "
           "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname")
-DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem', 'mpp_daily_run']
+DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_file', 'mpp_daily_problem', 'mpp_daily_run']
 
 
 def verify_daily_migration(v, root):
@@ -29,8 +29,8 @@ def verify_daily_migration(v, root):
     assert v.sql("SELECT count(*) FROM pg_extension WHERE extname<>'plpgsql'") == '0'
     added = functions() - old_functions
     assert old_functions < functions() and {'mpp_daily_lock_key', 'mpp_daily_runs', 'mpp_daily_problems', 'mpp_daily_clusters',
-                                           'mpp_daily_recent', 'mpp_view_daily_clusters', 'mpp_view_daily_problems',
-                                           'mpp_view_daily_recent'} <= added and all(name.startswith(('mpp_daily_', 'mpp_view_daily_')) for name in added)
+                                           'mpp_daily_recent', 'mpp_view_daily_last', 'mpp_view_daily_clusters',
+                                           'mpp_view_daily_problems', 'mpp_view_daily_recent'} <= added and all(name.startswith(('mpp_daily_', 'mpp_view_daily_')) for name in added)
     assert all(v.sql('SELECT count(*) FROM ' + t) == '0' for t in DAILY)
     reader = lambda sql, ok=True: v.sql('SET ROLE sql_apm_ro; ' + sql, admin=True, database='sql_apm', ok=ok)
     assert reader("SET search_path=sql_apm,pg_catalog; SELECT count(*) FROM mpp_view_daily_recent(5)") == '0'
@@ -41,5 +41,5 @@ def verify_daily_migration(v, root):
     v.sql('REVOKE SELECT ON sql_apm.mpp_daily_run FROM sql_apm_ro')
     assert 'incompatible object: mpp_daily_run' in v.init('check', ok=False).stderr
     v.init('schema'); v.init('check')
-    v.require(True, 'populated 1.11 -> 1.12: every existing row, table, column and receipt preserved; only the four daily-run tables and their '
+    v.require(True, 'populated 1.11 -> 1.12: every existing row, table, column and receipt preserved; only the five daily-run tables and their '
                     'functions added; the read-only account reads them and cannot write; a lost grant is detected and restored; reruns safe')

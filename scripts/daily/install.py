@@ -47,6 +47,25 @@ def word(value, label):
     return value
 
 
+def refuse_password(dsn):
+    """Read the connection string the way libpq does, in either of its forms, and refuse any password in it.
+
+    Nothing of the string is repeated in the message: it may be the secret itself.
+    """
+    try:
+        from psycopg2.extensions import parse_dsn
+    except ImportError:
+        fail('run this with the project interpreter: the connection string is checked with the database driver')
+    try:
+        fields = parse_dsn(dsn)
+    except Exception:
+        fail('--dsn is not a valid connection string')
+    if not fields:
+        fail('--dsn is empty')
+    if any('password' in name.lower() for name in fields):
+        fail('--dsn must not contain a password; use --passfile')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--output', type=Path, required=True, help='生成的两个单元文件放到这个目录')
@@ -76,8 +95,7 @@ def main():
         fail('--check-seconds must be between 0 and 3600')
     if not re.fullmatch(r'[a-z][a-z0-9-]{0,62}', args.name):
         fail('--name must be lower-case letters, digits and hyphens')
-    if re.search(r'(^|\s)password\s*=', args.dsn):
-        fail('--dsn must not contain a password; use --passfile')
+    refuse_password(args.dsn)
     if not args.user_unit and not args.user:
         fail('--user is required for a system unit')
     for path, label in [(args.config, '--config'), (args.passfile, '--passfile'), (args.fetch_config, '--fetch-config')]:

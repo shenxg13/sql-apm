@@ -3,7 +3,7 @@ import hashlib
 from database.fixture import statements
 
 # 1.12.0 adds the daily-run records; every earlier table is kept as it was.
-DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem', 'mpp_daily_run']
+DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_file', 'mpp_daily_problem', 'mpp_daily_run']
 
 
 def verify_search_migration(v, root):

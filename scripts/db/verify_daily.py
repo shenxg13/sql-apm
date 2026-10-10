@@ -337,7 +337,7 @@ def verify_failures(v, site, db):
     last_day = TODAY + timedelta(days=6)
     site.put('S1', last_day, base=130)
     good = (site.directory / 'training.json').read_text()
-    def spoil(point, scope=None):
+    def spoil(point, scope=None, name=None):
         if point == 'before_build' and scope == 'C1':
             (site.directory / 'training.json').write_text(json.dumps(dict(site.training, thresholds=dict(nope={}))))
     code, clusters, _ = site.run(today=now, fault=spoil)
@@ -375,7 +375,7 @@ def verify_busy_and_single(v, site, db):
     v.require(True, 'D8 a busy cluster is skipped and recorded without waiting while the others finish; the next run makes it up')
     # A second daily run while one is active: exits at once, changes nothing.
     seen = {}
-    def second(point, scope=None):
+    def second(point, scope=None, name=None):
         if point == 'run_started':
             before = contents(db)
             out = site.cli('daily', 'run', '--config', site.path)
@@ -685,12 +685,12 @@ def verify_records(v, site, db):
     reader.close()
     # Nothing private in the records or in any output.
     everything = out.stdout + site.cli('daily', 'run', '--config', site.path).stdout
-    for table in ('mpp_daily_run', 'mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem'):
+    for table in ('mpp_daily_run', 'mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem', 'mpp_daily_file'):
         everything += json.dumps(many(db, 'SELECT to_jsonb(t) FROM ' + table + ' t'), default=str)
     assert not [word for word in PRIVATE if word in everything]
     v.require(True, 'D16 a run record holds times, trigger, result, per-cluster days, build, cleanup, deleted files and stage seconds; status is read-only, '
                     'needs no cluster and equals the database; the read-only account can read but not write; no SQL text, database or user name anywhere')
-    # Too long without a normally finished run.
+    # Too long without a successful run (the rule itself is checked in verify_daily_recovery.py).
     with db, db.cursor() as cur:
         cur.execute("UPDATE mpp_daily_run SET started_at=started_at-interval '50 hours',finished_at=finished_at-interval '50 hours'")
     assert [r[0] for r in problems(db)] == ['no_recent_success']
@@ -699,7 +699,7 @@ def verify_records(v, site, db):
     assert clear(db)
     labels = many(db, 'SELECT problem,hint FROM mpp_view_daily_problems()')
     assert labels == []
-    v.require(True, 'D16 no normally finished run for longer than the configured hours is listed as open, and clears when one finishes')
+    v.require(True, 'D16 no successful run for longer than the configured hours is listed as open, and is not listed while the last success is recent')
 
 
 def verify(pg_bin):

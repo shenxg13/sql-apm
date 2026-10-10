@@ -132,11 +132,14 @@ def verify(pg_bin, sshd_root):
                 assert '--trigger timer' in service and 'ExecStartPre' not in service
                 assert timer.count('OnCalendar=') == 2 and '\nOnCalendar=*-*-* 17:00:00\n' in timer and '\nPersistent=true\n' in timer
                 for words in (['--at', '25:00'], ['--at', '17:00', '--at', '17:00'], ['--max-hours', '0'], ['--dsn', 'host=x password=y'],
+                              ['--dsn', 'postgresql://sql_apm:y@db.example/sql_apm'], ['--dsn', 'postgresql://sql_apm@db.example/sql_apm?password=y'],
                               ['--name', 'Bad Name'], ['--check-seconds', '-1']):
-                    bad = subprocess.run([sys.executable, str(ROOT / 'scripts/daily/install.py'), '--output', temporary, '--config', str(site.path),
+                    refused = Path(temporary) / 'refused'
+                    bad = subprocess.run([sys.executable, str(ROOT / 'scripts/daily/install.py'), '--output', str(refused), '--config', str(site.path),
                                           '--dsn', dsn, '--user', 'apm-user'] + words, capture_output=True, text=True)
-                    assert bad.returncode == 1, words
-            ok('D13 the rendered system unit runs as the named user with the default 12-hour limit and daily times; wrong values are refused')
+                    assert bad.returncode == 1 and not refused.exists(), words
+            ok('D13 the rendered system unit runs as the named user with the default 12-hour limit and daily times; wrong values, and a '
+               'connection string with a password in keyword or URI form, are refused and no unit file is written')
 
             # A: starts at the set time, as the current user, and only runs the command.
             site.put('S1', next(day))
@@ -191,7 +194,7 @@ def verify(pg_bin, sshd_root):
             assert runs() == before + 2 and newest()[0] == 'timer'
             ok('D13 two times missed while the timer was stopped are made up by exactly one run when the timer is started again')
 
-            # D: a timer-started run that exceeds the limit is stopped and its cluster is freed.
+            # D: a timer-started run that exceeds the limit is stopped although its statement is waiting, and says so itself.
             site.put('S1', next(day))
             (moment,) = upcoming(1)
             units.install([moment], max_hours=20 / 3600)
@@ -199,14 +202,16 @@ def verify(pg_bin, sshd_root):
             before = runs()
             wait_until(moment)
             wait_for(lambda: one(db, LOCK) == 1, 30, 'run waiting behind the lock')
-            began = time.monotonic()
-            wait_for(lambda: units.show('ActiveState')['ActiveState'] == 'failed', 180, 'unit stopped by its time limit')
-            stopped = time.monotonic() - began
-            assert units.show('Result')['Result'] == 'timeout'
-            wait_for(lambda: one(db, LOCK) == 0, 10, 'cluster freed after the kill')
-            assert newest()[1] == 'unfinished' and runs() == before + 1
+            wait_for(lambda: units.show('ActiveState')['ActiveState'] == 'failed', 60, 'unit stopped by its time limit')
+            shown = units.show('Result', 'ExecMainStatus', 'ExecMainStartTimestampMonotonic', 'ExecMainExitTimestampMonotonic')
+            lasted = (int(shown['ExecMainExitTimestampMonotonic']) - int(shown['ExecMainStartTimestampMonotonic'])) / 1e6
+            assert (shown['Result'], shown['ExecMainStatus']) == ('timeout', '130') and 20 <= lasted < 25, shown
+            assert one(db, LOCK) == 0 and runs() == before + 1
+            assert many(db, 'SELECT state,reason FROM mpp_daily_run ORDER BY started_at DESC LIMIT 1') == [('aborted', 'operator_interrupt')]
+            assert [r[0] for r in problems(db)] == ['run_not_finished']
             release(holder)
-            ok('D13 a timer-started run over its limit (20 s here) is stopped by systemd %.0f s after it began to wait; its cluster is free within the check interval and the run shows as unfinished' % stopped)
+            ok('F008/D13 a timer-started run over its limit (20 s here) is stopped by systemd while its statement waits behind a lock: the '
+               'process ends %.1f s after its start with exit 130, the run is recorded as aborted and its cluster is free at once' % lasted)
 
             # E: a run started by hand has no such limit, with the short-limit unit still installed.
             holder = block()
@@ -219,8 +224,28 @@ def verify(pg_bin, sshd_root):
             child.stdout.close()
             child.stderr.close()
             assert code == 0 and newest()[:3] == ('manual', 'finished', False) and not problems(db), (code, newest(), problems(db))
-            assert one(db, "SELECT count(*) FROM mpp_daily_run WHERE state='unfinished' AND reason='owner_exited'") == 1
-            ok('D13 a run started by hand outlasts that limit (30 s here) and finishes; it also records the stopped run as unfinished and picks up its day')
+            ok('D13 a run started by hand outlasts that limit (30 s here) and finishes; it picks up the day the stopped run left')
+
+            # F: the service is stopped by hand while its statement waits.
+            site.put('S1', next(day))
+            units.install([datetime.now() + timedelta(hours=6)])
+            holder = block()
+            before = runs()
+            systemctl('start', '--no-block', units.name + '.service')
+            wait_for(lambda: one(db, LOCK) == 1, 30, 'service run waiting behind the lock')
+            began = time.monotonic()
+            systemctl('stop', units.name + '.service')
+            seconds = time.monotonic() - began
+            shown = units.show('ActiveState', 'Result', 'ExecMainStatus')
+            assert seconds < 10 and shown == dict(ActiveState='inactive', Result='success', ExecMainStatus='130'), (seconds, shown)
+            assert one(db, LOCK) == 0 and runs() == before + 1
+            assert many(db, 'SELECT started_by,state,reason FROM mpp_daily_run ORDER BY started_at DESC LIMIT 1') == [('timer', 'aborted', 'operator_interrupt')]
+            release(holder)
+            done = site.cli('daily', 'run', '--config', site.path)
+            assert done.returncode == 0 and newest()[:3] == ('manual', 'finished', False) and not problems(db), (done.stdout[-500:], problems(db))
+            assert one(db, "SELECT count(*) FROM mpp_daily_run WHERE state='aborted'") == 2 and one(db, "SELECT count(*) FROM mpp_daily_run WHERE state='unfinished'") == 0
+            ok('F008 systemctl stop while the statement of the run waits behind a lock returns after %.1f s: exit 130, the run recorded as '
+               'aborted, the cluster free, the unit not failed; the next run carries on' % seconds)
 
             if sshd_root is None:
                 print('SKIPPED: pull step of the service (no --sshd-root)', flush=True)

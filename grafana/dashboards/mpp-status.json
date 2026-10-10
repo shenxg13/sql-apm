@@ -115,7 +115,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "完成：所有集群都处理完，没有失败。完成，有失败：有日期导入失败、构建或发布失败，或有集群被跳过。被中止：收到停止信号。未正常结束：进程被强制终止或机器断电。",
+      "description": "完成：所有集群都处理完，没有失败。完成，有失败：有日期导入失败、构建或发布失败、清理或删除失败，或有集群被跳过。被中止：收到停止信号，包括定时启动的运行超过了最长运行时间。未正常结束：进程被强制终止或机器断电。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -180,7 +180,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "最近一次从头到尾跑完的运行的结束时间，不论其中有没有失败的日期。",
+      "description": "最近一次成功的运行的结束时间。成功是指从头到尾跑完，并且没有任何失败，也没有集群被跳过；“完成，有失败”的运行不算。超过配置的时间没有成功的运行时，下面的列表里出现“太久没有成功的运行”。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -188,7 +188,7 @@
             "mode": "fixed"
           },
           "mappings": [],
-          "noValue": "还没有运行记录",
+          "noValue": "还没有成功的运行",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -233,11 +233,11 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "/* mpp-status panel 3 A */ SELECT to_char(l.last_finished_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD HH24:MI:SS') AS finished FROM mpp_view_daily_last() l",
+          "rawSql": "/* mpp-status panel 3 A */ SELECT to_char(l.last_success_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD HH24:MI:SS') AS succeeded FROM mpp_view_daily_last() l",
           "refId": "A"
         }
       ],
-      "title": "上次正常结束的运行（北京时间）",
+      "title": "上次成功的运行（北京时间）",
       "type": "stat"
     },
     {
@@ -461,7 +461,7 @@
         "type": "grafana-postgresql-datasource",
         "uid": "sql-apm-pg"
       },
-      "description": "需要人看一眼的事。每个集群的问题取最近一次处理过该集群的运行所记录的；问题解决后，下一次运行不再记录它，这里随之消失。“全部”表示这一条不属于某个集群。这个页面只展示，不能在这里触发导入、构建或清理。",
+      "description": "需要人看一眼的事。每一类问题取最近一次真正做到那一步的运行所记录的：被跳过或中途停下的运行没有做到的步骤，不会让问题从这里消失；问题解决后，下一次做到那一步的运行不再记录它，这里随之消失。“全部”表示这一条不属于某个集群。这个页面只展示，不能在这里触发导入、构建或清理。",
       "fieldConfig": {
         "defaults": {
           "custom": {

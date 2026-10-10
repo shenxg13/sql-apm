@@ -246,6 +246,83 @@ def verify(sshd_root):
         assert done.returncode == 1 and 'reason=local_file_not_on_source' in done.stdout and back(2).isoformat() + '.complete' not in box.inbox()
         ok('D14 a local file of that day which the source does not have keeps the marker away')
 
+        # A marked day is sealed. However it is asked for and whatever the source shows by now,
+        # nothing of it is fetched again, replaced or removed, and its marker stays with the files it sealed.
+        box.clear()
+        sealed_day = back(12)
+        first, second = box.put(sealed_day, size=900), box.put(sealed_day, '_000000.csv.1', 1200)
+        done, _ = box.fetch('--date', sealed_day.isoformat())
+        assert done.returncode == 0 and 'state=complete files=2' in done.stdout, done.stdout
+        def exact(directory):
+            return {p.name: (hashlib.sha256(p.read_bytes()).hexdigest(), p.stat().st_ino, p.stat().st_mtime_ns, p.stat().st_ctime_ns)
+                    for p in sorted(directory.iterdir())}
+        kept = exact(box.directory / 'inbox')
+        calls = box.directory / 'scp-calls'
+        counting = box.directory / 'counting'
+        counting.mkdir()
+        (counting / 'ssh').write_text((box.directory / 'bin/ssh').read_text())
+        (counting / 'scp').write_text('#!/bin/sh\necho "$@" >> %s\nexit 1\n' % calls)   # any copy would be seen, and would fail
+        for name in ('ssh', 'scp'):
+            (counting / name).chmod(0o755)
+        asked = (['--date', sealed_day.isoformat()], ['--from', back(13).isoformat(), '--to', back(11).isoformat()])
+        def untouched(label, code, said):
+            for words in asked:
+                done, _ = box.fetch(*words, path=str(counting))
+                line = 'date=' + sealed_day.isoformat() + ' ' + said
+                assert done.returncode == code and line in done.stdout, (label, words, done.returncode, done.stdout, done.stderr)
+                assert exact(box.directory / 'inbox') == kept and not calls.exists(), (label, words)
+            # The daily way: other days of the period are tried (and fail here); the marked day is not even looked at.
+            done, _ = box.fetch('--backfill-days', '15', path=str(counting))
+            assert sealed_day.isoformat() not in done.stdout + calls.read_text() and back(1).isoformat() in calls.read_text(), label
+            assert exact(box.directory / 'inbox') == kept, label
+            calls.unlink()
+        untouched('as sealed', 0, 'state=already_complete')
+        original = first.read_bytes()
+        with first.open('ab') as stream:                       # a file of that day grew on the source
+            stream.write(b'more')
+        untouched('source file grew', 1, 'state=failed reason=marked_day_differs_from_source')
+        first.write_bytes(original)
+        slice_ = box.put(sealed_day, '_120000.csv', 300)       # a new slice of that day appeared on the source
+        untouched('new slice', 1, 'state=failed reason=marked_day_differs_from_source')
+        slice_.unlink()
+        second.chmod(0)                                        # a file that could not be copied if anything tried
+        untouched('source file unreadable', 0, 'state=already_complete')
+        second.chmod(0o644)
+        # The daily run has begun to delete the day (a file is gone, the marker is still there): it is not brought back.
+        gone = box.directory / 'inbox' / first.name
+        gone.unlink()
+        kept.pop(first.name)
+        untouched('deletion under way', 1, 'state=failed reason=marked_day_differs_from_source')
+        for path in (first, second):
+            path.unlink()
+        ok('F002 a marked day is never fetched again, replaced or removed: asked for with --date or inside --from/--to, with the source '
+           'as sealed, grown, with a new slice, unreadable, or with a local file already deleted, every local file keeps its content, inode '
+           'and times, no copy is started, and a difference from the source is reported with exit 1; without a date it is not looked at')
+
+        # The list of the day changes on the source while its files are being copied: no marker; the next run completes the day.
+        box.clear()
+        moving_day = back(13)
+        steady = box.put(moving_day, size=800)
+        late = box.directory / 'source' / names(moving_day, '_130000.csv')[0]
+        racing_list = box.directory / 'racing-list'
+        racing_list.mkdir()
+        (racing_list / 'ssh').write_text((box.directory / 'bin/ssh').read_text())
+        (racing_list / 'scp').write_text('#!/bin/sh\n[ -e %s ] || printf late > %s\n%s' % (
+            late, late, (box.directory / 'bin/scp').read_text().split('\n', 1)[1]))
+        for name in ('ssh', 'scp'):
+            (racing_list / name).chmod(0o755)
+        done, _ = box.fetch('--date', moving_day.isoformat(), path=str(racing_list))
+        assert done.returncode == 1 and 'reason=source_changed_during_copy' in done.stdout, (done.stdout, done.stderr)
+        assert box.inbox() == [steady.name], box.inbox()
+        done, _ = box.fetch('--date', moving_day.isoformat())
+        assert done.returncode == 0 and box.inbox() == sorted([steady.name, late.name, moving_day.isoformat() + '.complete'])
+        done, _ = box.fetch('--date', moving_day.isoformat())      # and again: sealed now
+        assert done.returncode == 0 and 'state=already_complete' in done.stdout
+        steady.unlink()
+        late.unlink()
+        ok('F002 when the list of the day changes on the source during the copy, no marker is placed; the next run fetches what is missing '
+           'and places it; asking once more changes nothing')
+
         # No key login, and an unknown host key: fail at once, never wait for input.
         box.clear()
         for client, label in [(box.write_client('stranger', known=True).name, 'a key the source does not accept'),

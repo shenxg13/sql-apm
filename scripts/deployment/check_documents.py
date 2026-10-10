@@ -145,7 +145,7 @@ def schema_columns(root):
     result = {}
     for name, body in re.findall(r'CREATE TABLE IF NOT EXISTS (\w+) \(\n(.*?)\n\)(?: PARTITION BY[^;]+)?;', source, re.S):
         result[name] = set(re.findall(r'^    ([a-z][a-z_0-9]*)\s+[a-z]', body, re.M))
-    if len(result) != 61 or any(not columns for columns in result.values()):
+    if len(result) != 62 or any(not columns for columns in result.values()):
         raise ValueError('schema inventory changed or unsupported CREATE TABLE syntax')
     return result
 

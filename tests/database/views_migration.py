@@ -4,7 +4,7 @@ from database.fixture import statements
 
 TABLES = ("SELECT relname FROM pg_class WHERE relnamespace='sql_apm'::regnamespace "
           "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname")
-DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem', 'mpp_daily_run']
+DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_file', 'mpp_daily_problem', 'mpp_daily_run']
 
 
 def verify_views_migration(v, root):

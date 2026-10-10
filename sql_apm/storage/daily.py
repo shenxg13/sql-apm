@@ -1,12 +1,15 @@
 """Records of the daily run. Small committed writes on the run's own connection."""
+from contextlib import contextmanager
 import json
-from pathlib import PurePath
 import uuid
 
 from psycopg2.extras import Json
 
+from sql_apm.daily import inbox
 from sql_apm.daily.inbox import batch_id
-from sql_apm.ingestion.config import identity
+
+# The key a cluster task holds (sql_apm.storage.tasks); looked at here, never redefined.
+CLUSTER_KEY = 'hashtextextended(%s,1835101)'
 
 
 class DailyStore:
@@ -47,10 +50,9 @@ class DailyStore:
                  Json([dict(name=name, size=size) for name, size in files] if state == 'complete' else [])))
 
     def cluster_finished(self, run_id, scope, record, problems):
-        fields = ('state', 'reason', 'failed', 'newest_imported', 'build_state', 'build_reason', 'cutoff_date',
+        fields = ('state', 'reason', 'failed', 'import_state', 'newest_imported', 'build_state', 'build_reason', 'cutoff_date',
                   'build_id', 'publication_id', 'cleanup_state', 'cleanup_reason', 'months_cleaned',
-                  'months_pending', 'released_bytes', 'raw_state', 'raw_reason', 'raw_days', 'raw_files',
-                  'raw_bytes', 'stage_seconds')
+                  'months_pending', 'released_bytes', 'raw_state', 'raw_reason', 'stage_seconds')
         values = [Json(record[name]) if name == 'stage_seconds' else record[name] for name in fields]
         with self.db, self.db.cursor() as cur:
             cur.execute('UPDATE mpp_daily_cluster SET ' + ','.join(name + '=%s' for name in fields) +
@@ -67,25 +69,96 @@ class DailyStore:
             cur.execute("""UPDATE mpp_daily_run SET state=%s,failed=%s,reason=%s,finished_at=clock_timestamp()
                 WHERE run_id=%s AND state='running'""", (state, failed, reason, run_id))
 
+    def cluster_busy(self, scope):
+        """Does any session hold this cluster right now? Looks only; takes nothing."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""SELECT EXISTS (SELECT FROM pg_locks l WHERE l.locktype='advisory' AND l.granted AND l.objsubid=1
+                AND l.database=(SELECT d.oid FROM pg_database d WHERE d.datname=current_database())
+                AND l.classid::bigint=((""" + CLUSTER_KEY + """>>32) & 4294967295)
+                AND l.objid::bigint=(""" + CLUSTER_KEY + """ & 4294967295))""", (scope, scope))
+            return cur.fetchone()[0]
+
+    @contextmanager
+    def cluster_held(self, scope):
+        """Hold the cluster for a step that opens no task of its own; yields False when it is taken."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute('SELECT pg_try_advisory_lock(' + CLUSTER_KEY + ')', (scope,))
+            held = cur.fetchone()[0]
+        try:
+            yield held
+        finally:
+            if held:
+                with self.db, self.db.cursor() as cur:
+                    cur.execute('SELECT pg_advisory_unlock(' + CLUSTER_KEY + ')', (scope,))
+
     def day_states(self, source_id, days):
-        """State of each day's batch, and the names and sizes kept from its successful import."""
+        """State of each day's batch, where one exists."""
         ids = {batch_id(source_id, day): day for day in days}
         with self.db, self.db.cursor() as cur:
             cur.execute('SELECT batch_id,state FROM import_batch WHERE batch_id=ANY(%s)', (list(ids),))
-            states = {ids[batch]: state for batch, state in cur}
-            cur.execute('''SELECT DISTINCT ON (d.log_date) d.log_date,d.files FROM mpp_daily_day d
-                JOIN mpp_daily_run r USING(run_id)
-                WHERE d.source_id=%s AND d.log_date=ANY(%s) AND d.state='complete'
-                ORDER BY d.log_date,r.started_at DESC,r.run_id DESC''', (source_id, list(days)))
-            recorded = {day: [(f['name'], f['size']) for f in files] for day, files in cur}
-            # A run killed between the import and its own record leaves only the frozen list.
-            for batch, day in ids.items():
-                if states.get(day) == 'complete' and day not in recorded:
-                    cur.execute('SELECT evidence_manifest FROM analysis WHERE analysis_id=%s', ('A:' + identity(batch),))
-                    row = cur.fetchone()
-                    if row:
-                        recorded[day] = [(PurePath(f['path']).name, None) for f in json.loads(row[0])['files']]
-        return states, recorded
+            return {ids[batch]: state for batch, state in cur}
+
+    def day_files(self, source_id, day):
+        """What the import stored for this day, by file name, with what was last proven about each file.
+
+        The names and contents come from the import's own committed rows, so they are there
+        even when the run was killed right after the import. The proof and the deletion
+        progress come from mpp_daily_file and may be missing for a name.
+        """
+        batch, known = batch_id(source_id, day), {}
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""SELECT f.file_id,f.checksum_value,f.byte_count,f.declaration_evidence
+                FROM batch_entry e JOIN source_file f USING(file_id)
+                JOIN import_attempt a ON a.attempt_id=e.final_attempt_id
+                WHERE e.batch_id=%s AND f.checksum_algorithm='sha256' AND a.state IN ('succeeded','duplicate_skipped')""",
+                (batch,))
+            for file_id, sha256, size, evidence in cur.fetchall():
+                declared = json.loads(evidence)
+                for name in set(declared.get('origin_keys', []) + [declared.get('origin_key')]):
+                    if name and inbox.log_day(name) == day:
+                        known[name] = dict(file_id=file_id, sha256=sha256, byte_count=size, stamp=None,
+                                           removing=False, removed=False)
+            cur.execute("""SELECT file_name,file_id,device,inode,byte_count,mtime_ns,ctime_ns,
+                    removing_at IS NOT NULL,removed_at IS NOT NULL
+                FROM mpp_daily_file WHERE source_id=%s AND log_date=%s""", (source_id, day))
+            for name, file_id, device, inode, size, mtime, ctime, removing, removed in cur:
+                if name in known and known[name]['file_id'] == file_id:
+                    known[name].update(stamp=(device, inode, size, mtime, ctime), removing=removing, removed=removed)
+        return known
+
+    def file_verified(self, run_id, scope, source_id, day, name, file_id, stamp):
+        """The file was just read and is the imported content; a file put back after its deletion lives again."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""INSERT INTO mpp_daily_file (source_id,log_date,file_name,scope_id,batch_id,file_id,
+                    device,inode,byte_count,mtime_ns,ctime_ns,verified_run_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (source_id,log_date,file_name) DO UPDATE SET file_id=excluded.file_id,device=excluded.device,
+                    inode=excluded.inode,byte_count=excluded.byte_count,mtime_ns=excluded.mtime_ns,ctime_ns=excluded.ctime_ns,
+                    verified_at=clock_timestamp(),verified_run_id=excluded.verified_run_id,
+                    removing_at=CASE WHEN mpp_daily_file.removed_at IS NULL THEN mpp_daily_file.removing_at END,
+                    removing_run_id=CASE WHEN mpp_daily_file.removed_at IS NULL THEN mpp_daily_file.removing_run_id END,
+                    removed_at=NULL,removed_run_id=NULL""",
+                (source_id, day, name, scope, batch_id(source_id, day), file_id, *stamp, run_id))
+
+    def removal_decided(self, run_id, source_id, day):
+        """Written before the first file of the day goes, so that a file missing afterwards is known to be ours."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""UPDATE mpp_daily_file SET removing_at=clock_timestamp(),removing_run_id=%s
+                WHERE source_id=%s AND log_date=%s AND removing_at IS NULL AND removed_at IS NULL""",
+                (run_id, source_id, day))
+
+    def file_removed(self, run_id, scope, source_id, day, name):
+        """The file is gone. The run's counts move in the same transaction: they are never written anywhere else."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""WITH gone AS (UPDATE mpp_daily_file SET removed_at=clock_timestamp(),removed_run_id=%s
+                    WHERE source_id=%s AND log_date=%s AND file_name=%s AND removed_at IS NULL RETURNING byte_count)
+                UPDATE mpp_daily_cluster c SET raw_state='deleted',raw_files=c.raw_files+1,raw_bytes=c.raw_bytes+gone.byte_count
+                FROM gone WHERE c.run_id=%s AND c.scope_id=%s""", (run_id, source_id, day, name, run_id, scope))
+
+    def day_removed(self, run_id, scope):
+        """The marker is gone: nothing of the day is left in the receiving directory."""
+        with self.db, self.db.cursor() as cur:
+            cur.execute("""UPDATE mpp_daily_cluster SET raw_state='deleted',raw_days=raw_days+1
+                WHERE run_id=%s AND scope_id=%s""", (run_id, scope))
 
     def newest_imported(self, scope):
         with self.db, self.db.cursor() as cur:

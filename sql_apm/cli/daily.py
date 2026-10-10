@@ -7,6 +7,7 @@ import psycopg2
 
 from sql_apm.cli.statistics import interrupted
 from sql_apm.daily.config import DailyError, load_config
+from sql_apm.daily.interrupt import Interrupter
 from sql_apm.daily.run import DailyRun
 from sql_apm.ingestion.config import IngestionError
 from sql_apm.ingestion.importer import emit
@@ -29,7 +30,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     dsn = os.environ.get('SQL_APM_DSN', '')
     previous = signal.signal(signal.SIGTERM, interrupted)
-    db = None
+    db = stop = None
     try:
         if args.action == 'status':
             db = connect(dsn, args.schema)
@@ -37,7 +38,10 @@ def main(argv=None):
             emit(**status(db, args.limit))
             return 0
         # Configuration is checked whole before the first connection: a bad value writes nothing.
-        return DailyRun(dsn, args.schema, load_config(args.config), args.trigger, emit).execute()
+        config = load_config(args.config)
+        # A stop signal must end the run even while it waits inside a statement.
+        with Interrupter() as stop:
+            return DailyRun(dsn, args.schema, config, args.trigger, emit, interrupter=stop).execute()
     except (DailyError, IngestionError, TrainingError) as error:
         emit(state='failed', reason=str(error))
         return 1
@@ -45,10 +49,16 @@ def main(argv=None):
         emit(state='interrupted', reason='operator_interrupt')
         return 130
     except psycopg2.OperationalError:
+        if stop is not None and stop.stop_requested():
+            emit(state='interrupted', reason='operator_interrupt')
+            return 130
         # Nothing could be recorded: the database was not reachable.
         emit(state='failed', reason='database_unavailable')
         return 1
     except Exception:
+        if stop is not None and stop.stop_requested():
+            emit(state='interrupted', reason='operator_interrupt')
+            return 130
         emit(state='failed', reason='daily_failed')
         return 1
     finally:

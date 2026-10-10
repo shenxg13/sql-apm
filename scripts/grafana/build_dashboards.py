@@ -1027,11 +1027,11 @@ BEIJING = "to_char({} AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD HH24:MI:SS')"
 MOMENT, SHORT_MOMENT = 'time:YYYY-MM-DD HH:mm:ss', 'time:MM-DD HH:mm:ss'
 
 
-def tile(title, sql, description='', steps=None):
+def tile(title, sql, description='', steps=None, empty='还没有运行记录'):
     """One value of the newest run. It describes every row of the lists below, so it is shown once, above them."""
     return dict(type='stat', title=title, description=description, datasource=PG, targets=[target(sql)],
                 fieldConfig=dict(defaults=dict(color=dict(mode='thresholds') if steps else dict(mode='fixed', fixedColor='text'),
-                                               mappings=[], noValue='还没有运行记录',
+                                               mappings=[], noValue=empty,
                                                thresholds=dict(mode='absolute', steps=steps or [dict(color='text', value=None)])),
                                  overrides=[]),
                 options=dict(reduceOptions=dict(values=False, calcs=['lastNotNull'], fields='/.*/'), orientation='auto',
@@ -1046,10 +1046,11 @@ def status_dashboard():
         (tile('上次运行开始于（北京时间）', 'SELECT ' + BEIJING.format('l.started_at') + ' AS started FROM mpp_view_daily_last() l',
               '最近一次每日运行的开始时间。定时器每天启动一次；手工执行同一条命令也算一次运行。'), 6),
         (tile('上次运行的结果', "SELECT l.result||'（'||l.started_by||'启动）' AS result FROM mpp_view_daily_last() l",
-              '完成：所有集群都处理完，没有失败。完成，有失败：有日期导入失败、构建或发布失败，或有集群被跳过。'
-              '被中止：收到停止信号。未正常结束：进程被强制终止或机器断电。'), 6),
-        (tile('上次正常结束的运行（北京时间）', 'SELECT ' + BEIJING.format('l.last_finished_at') + ' AS finished FROM mpp_view_daily_last() l',
-              '最近一次从头到尾跑完的运行的结束时间，不论其中有没有失败的日期。'), 6),
+              '完成：所有集群都处理完，没有失败。完成，有失败：有日期导入失败、构建或发布失败、清理或删除失败，或有集群被跳过。'
+              '被中止：收到停止信号，包括定时启动的运行超过了最长运行时间。未正常结束：进程被强制终止或机器断电。'), 6),
+        (tile('上次成功的运行（北京时间）', 'SELECT ' + BEIJING.format('l.last_success_at') + ' AS succeeded FROM mpp_view_daily_last() l',
+              '最近一次成功的运行的结束时间。成功是指从头到尾跑完，并且没有任何失败，也没有集群被跳过；“完成，有失败”的运行不算。'
+              '超过配置的时间没有成功的运行时，下面的列表里出现“太久没有成功的运行”。', empty='还没有成功的运行'), 6),
         (tile('待处理问题数', 'SELECT l.open_problems FROM mpp_view_daily_last() l',
               '下面“待处理问题列表”的行数。0 表示没有需要人处理的事。',
               [dict(color='text', value=None), dict(color='orange', value=1)]), 6))
@@ -1069,7 +1070,8 @@ ORDER BY p.placeholder,p.position""",
         [('problem', '问题', dict(custom__width=200)), ('cluster', '集群', dict(custom__width=80)), ('source', '日志来源', dict(custom__width=110)),
          ('subject', '日期或月份', dict(custom__width=110)), ('detail', '说明', dict(custom__width=260)),
          ('hint', '怎样处理', dict(custom__minWidth=480)), ('seen_at', '记录于', dict(unit=MOMENT, custom__width=170))],
-        description='需要人看一眼的事。每个集群的问题取最近一次处理过该集群的运行所记录的；问题解决后，下一次运行不再记录它，这里随之消失。'
+        description='需要人看一眼的事。每一类问题取最近一次真正做到那一步的运行所记录的：被跳过或中途停下的运行没有做到的步骤，不会让问题从这里消失；'
+                    '问题解决后，下一次做到那一步的运行不再记录它，这里随之消失。'
                     '“全部”表示这一条不属于某个集群。这个页面只展示，不能在这里触发导入、构建或清理。'), 24))
     layout.line(8, (table('最近的运行记录（最近 ${limit} 次运行，一行是一次运行里的一个集群）',
         """SELECT r.started_at,r.started_by,r.run_result,r.cluster,r.cluster_result,r.cluster_seconds,r.imported,r.failed,r.build,r.cleanup,

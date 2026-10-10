@@ -15,6 +15,8 @@ Usage: fetch-logs.sh --config FILE [--date YYYY-MM-DD | --from YYYY-MM-DD --to Y
 
 Without a date: yesterday, and every day of the last N days (default 7) that has
 no marker in the receiving directory yet. Only days before today are fetched.
+A day that already has its marker is never fetched again or changed, also when
+it is named with --date or lies in a range: remove the marker by hand first.
 
 Configuration file: one source per line, fields separated by blanks:
   NAME  LOGIN@HOST  REMOTE_LOG_DIRECTORY  LOCAL_RECEIVING_DIRECTORY  [SSH_PORT]
@@ -107,6 +109,21 @@ fetch_day() { # name login port remote local day
         say "source=$name date=$day state=failed reason=source_unreachable"
         return "$status"
     }
+    if [[ -e $local_dir/$day.complete ]]; then
+        # Sealed: whichever way the day was asked for, the files of a marked day are never
+        # touched again. Only say whether the source still shows what was sealed.
+        local sealed
+        sealed=$(for file in "$local_dir"/gpdb-"$day"_*; do
+            [[ -f $file && ! -L $file ]] || continue
+            printf '%s %s\n' "$(stat -c %s "$file")" "${file##*/}"
+        done | sort -k2)
+        if [[ $sealed == "$listing" ]]; then
+            say "source=$name date=$day state=already_complete"
+            return 0
+        fi
+        say "source=$name date=$day state=failed reason=marked_day_differs_from_source"
+        return 1
+    fi
     if [[ -z $listing ]]; then
         say "source=$name date=$day state=no_files"
         return 0

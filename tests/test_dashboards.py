@@ -58,7 +58,7 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         board = self.boards['mpp-status.json']
         listed = list(panels(board))
         self.assertEqual([(panel['type'], panel['title'].split('（')[0]) for panel in listed],
-                         [('stat', '上次运行开始于'), ('stat', '上次运行的结果'), ('stat', '上次正常结束的运行'), ('stat', '待处理问题数'),
+                         [('stat', '上次运行开始于'), ('stat', '上次运行的结果'), ('stat', '上次成功的运行'), ('stat', '待处理问题数'),
                           ('table', '各集群现状'), ('table', '待处理问题列表'), ('table', '最近的运行记录')])
         text = json.dumps(board, ensure_ascii=False)
         # Read through the read-only database source only; nothing on the page can act.

@@ -2357,6 +2357,7 @@ CREATE TABLE IF NOT EXISTS mpp_daily_cluster (
     state text NOT NULL CHECK (state IN ('pending','running','done','skipped','aborted')),
     reason text CHECK (reason <> ''),
     failed boolean NOT NULL DEFAULT false,
+    import_state text NOT NULL DEFAULT 'not_reached' CHECK (import_state IN ('not_reached','incomplete','done')),
     newest_imported date,
     build_state text NOT NULL DEFAULT 'not_reached' CHECK (build_state IN
         ('not_reached','disabled','no_data','not_due','published','no_samples','failed')),
@@ -2411,7 +2412,7 @@ CREATE TABLE IF NOT EXISTS mpp_daily_problem (
     scope_id text NOT NULL,
     seq integer NOT NULL CHECK (seq > 0),
     kind text NOT NULL CHECK (kind IN ('day_failed','files_without_marker','marker_without_files',
-        'marker_not_before_today','cleanup_pending','cluster_skipped','build_not_succeeded','nonconforming_file')),
+        'marker_not_before_today','cleanup_pending','build_not_succeeded','nonconforming_file')),
     source_id text CHECK (source_id <> ''),
     log_date date,
     result_month date,
@@ -2420,6 +2421,37 @@ CREATE TABLE IF NOT EXISTS mpp_daily_problem (
     file_count integer CHECK (file_count >= 0),
     PRIMARY KEY (run_id, scope_id, seq),
     FOREIGN KEY (run_id, scope_id) REFERENCES mpp_daily_cluster (run_id, scope_id)
+);
+
+-- One row per file name of an imported day. file_id is the content the import stored
+-- under that name; the stat values are those of the moment the file was last read
+-- and found to be that content, so a later run can tell an untouched file without
+-- reading it. removing_* says a run decided to delete the day's files, removed_*
+-- that this file is gone: a deletion cut short is told from a change of the input.
+-- raw_days, raw_files and raw_bytes of mpp_daily_cluster move in the transaction
+-- that sets removed_*, so the records of all runs add up to what was removed.
+CREATE TABLE IF NOT EXISTS mpp_daily_file (
+    source_id text NOT NULL CHECK (source_id <> ''),
+    log_date date NOT NULL,
+    file_name text NOT NULL CHECK (file_name <> ''),
+    scope_id text NOT NULL CHECK (scope_id <> ''),
+    batch_id text NOT NULL CHECK (batch_id <> ''),
+    file_id text NOT NULL CHECK (file_id <> ''),
+    byte_count bigint NOT NULL CHECK (byte_count >= 0),
+    device bigint NOT NULL,
+    inode bigint NOT NULL,
+    mtime_ns bigint NOT NULL,
+    ctime_ns bigint NOT NULL,
+    verified_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+    verified_run_id text NOT NULL CHECK (verified_run_id <> ''),
+    removing_at timestamptz,
+    removing_run_id text CHECK (removing_run_id <> ''),
+    removed_at timestamptz,
+    removed_run_id text CHECK (removed_run_id <> ''),
+    PRIMARY KEY (source_id, log_date, file_name),
+    CHECK ((removing_at IS NULL) = (removing_run_id IS NULL)),
+    CHECK ((removed_at IS NULL) = (removed_run_id IS NULL)),
+    CHECK (removed_at IS NULL OR removing_at IS NOT NULL)
 );
 
 -- Only one daily run at a time: the run holds this session lock for its whole life.
@@ -2447,10 +2479,13 @@ BEGIN ATOMIC
     FROM mpp_daily_run r CROSS JOIN held;
 END;
 
--- Open problems. For each cluster of the newest run they come from the newest
--- run that got through that cluster, so an aborted run hides nothing. Two kinds
--- are derived here: the newest run did not end normally, and no run has ended
--- normally for longer than the configured time.
+-- Open problems. A step that a run did not get to says nothing about that step, so
+-- each kind comes from the newest run that actually went through the step it belongs
+-- to: a skipped or aborted run hides nothing, and a problem goes when a later run has
+-- really dealt with it. Derived here: the newest run that got to the cluster skipped
+-- it, the newest run did not end normally, and no run has succeeded (finished without
+-- any failure) for longer than the configured time, counted from the first run when
+-- none has.
 CREATE OR REPLACE FUNCTION mpp_daily_problems()
 RETURNS TABLE(kind text,scope_id text,source_id text,log_date date,result_month date,
     reason text,file_count integer,run_id text,seen_at timestamptz)
@@ -2458,23 +2493,35 @@ LANGUAGE sql STABLE
 BEGIN ATOMIC
     WITH runs AS (SELECT * FROM mpp_daily_runs()),
     latest AS (SELECT * FROM runs r ORDER BY r.started_at DESC,r.run_id DESC LIMIT 1),
-    examined AS (SELECT DISTINCT ON (c.scope_id) c.scope_id,c.run_id,r.started_at
-        FROM mpp_daily_cluster c JOIN runs r USING(run_id)
-        WHERE c.state IN ('done','skipped')
-          AND c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id))
-        ORDER BY c.scope_id,r.started_at DESC,r.run_id DESC)
+    steps(step,kinds) AS (VALUES
+        ('import',ARRAY['day_failed','files_without_marker','marker_without_files','marker_not_before_today']),
+        ('build',ARRAY['build_not_succeeded']),
+        ('cleanup',ARRAY['cleanup_pending'])),
+    examined AS (SELECT DISTINCT ON (c.scope_id,s.step) c.scope_id,s.kinds,c.run_id,r.started_at
+        FROM mpp_daily_cluster c JOIN runs r USING(run_id) CROSS JOIN steps s
+        WHERE c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id))
+          AND CASE s.step WHEN 'import' THEN c.import_state='done'
+                          WHEN 'build' THEN c.build_state<>'not_reached'
+                          ELSE c.cleanup_state<>'not_reached' END
+        ORDER BY c.scope_id,s.step,r.started_at DESC,r.run_id DESC)
     SELECT p.kind,p.scope_id,p.source_id,p.log_date,p.result_month,p.reason,p.file_count,e.run_id,e.started_at
-    FROM mpp_daily_problem p JOIN examined e USING(run_id,scope_id)
-    WHERE p.kind<>'nonconforming_file'
+    FROM mpp_daily_problem p JOIN examined e ON e.run_id=p.run_id AND e.scope_id=p.scope_id AND p.kind=ANY(e.kinds)
+    UNION ALL
+    SELECT 'cluster_skipped',d.scope_id,NULL,NULL,NULL,d.reason,NULL,d.run_id,d.started_at
+    FROM (SELECT DISTINCT ON (c.scope_id) c.scope_id,c.state,c.reason,c.run_id,r.started_at
+          FROM mpp_daily_cluster c JOIN runs r USING(run_id)
+          WHERE c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id)) AND c.state<>'pending'
+          ORDER BY c.scope_id,r.started_at DESC,r.run_id DESC) d
+    WHERE d.state='skipped'
     UNION ALL
     SELECT 'run_not_finished',NULL,NULL,NULL,NULL,l.state,NULL,l.run_id,l.started_at
     FROM latest l WHERE l.state IN ('aborted','unfinished')
     UNION ALL
     SELECT 'no_recent_success',NULL,NULL,NULL,NULL,NULL,NULL,l.run_id,x.since
     FROM latest l CROSS JOIN LATERAL (SELECT coalesce(
-        (SELECT max(r.finished_at) FROM runs r WHERE r.state='finished'),
+        (SELECT max(r.finished_at) FROM runs r WHERE r.state='finished' AND NOT r.failed),
         (SELECT min(r.started_at) FROM runs r)) AS since) x
-    WHERE l.state<>'running' AND clock_timestamp()-x.since>make_interval(hours => l.stale_after_hours);
+    WHERE clock_timestamp()-x.since>make_interval(hours => l.stale_after_hours);
 END;
 
 -- One row per cluster of the newest run: where its data and version stand now.
@@ -2501,7 +2548,7 @@ CREATE OR REPLACE FUNCTION mpp_daily_recent(p_limit integer DEFAULT 20)
 RETURNS TABLE(run_id text,started_by text,run_state text,run_failed boolean,run_reason text,
     run_started_at timestamptz,run_finished_at timestamptz,
     scope_id text,ordinal integer,cluster_state text,cluster_failed boolean,cluster_reason text,
-    imported_days date[],failed_days jsonb,newest_imported date,
+    import_state text,imported_days date[],failed_days jsonb,newest_imported date,
     build_state text,build_reason text,cutoff_date date,build_id text,publication_id text,
     cleanup_state text,cleanup_reason text,months_cleaned integer,months_pending integer,released_bytes bigint,
     raw_state text,raw_reason text,raw_days integer,raw_files bigint,raw_bytes bigint,
@@ -2509,7 +2556,7 @@ RETURNS TABLE(run_id text,started_by text,run_state text,run_failed boolean,run_
 LANGUAGE sql STABLE
 BEGIN ATOMIC
     SELECT r.run_id,r.started_by,r.state,r.failed,r.reason,r.started_at,r.finished_at,
-        c.scope_id,c.ordinal,c.state,c.failed,c.reason,
+        c.scope_id,c.ordinal,c.state,c.failed,c.reason,c.import_state,
         ARRAY(SELECT d.log_date FROM mpp_daily_day d WHERE d.run_id=c.run_id AND d.scope_id=c.scope_id
             AND d.state='complete' ORDER BY d.log_date,d.source_id),
         (SELECT coalesce(jsonb_agg(jsonb_build_object('source',d.source_id,'date',d.log_date,'state',d.state,'reason',d.reason)
@@ -2547,9 +2594,9 @@ RETURN coalesce(CASE p_kind
         WHEN 'files_without_marker' THEN '有文件但没有齐全标记' WHEN 'marker_without_files' THEN '有齐全标记但没有文件'
         WHEN 'marker_not_before_today' THEN '标记日期不早于今天' WHEN 'cleanup_pending' THEN '等待清理的月份'
         WHEN 'cluster_skipped' THEN '上次运行跳过了这个集群' WHEN 'build_not_succeeded' THEN '构建或发布尚未成功'
-        WHEN 'run_not_finished' THEN '上次运行没有正常结束' WHEN 'no_recent_success' THEN '太久没有正常结束的运行' END
+        WHEN 'run_not_finished' THEN '上次运行没有正常结束' WHEN 'no_recent_success' THEN '太久没有成功的运行' END
     WHEN 'hint' THEN CASE p_code
-        WHEN 'day_failed' THEN '按原因处理后等下一次运行自动重试；多出或变化的文件移出接收目录'
+        WHEN 'day_failed' THEN '按原因处理后等下一次运行自动重试；多出或内容变了的文件移出接收目录'
         WHEN 'files_without_marker' THEN '确认文件齐全后放上齐全标记，或把文件移出接收目录'
         WHEN 'marker_without_files' THEN '把这一天的文件拷入接收目录，或删除这个标记'
         WHEN 'marker_not_before_today' THEN '撤掉这个标记；那一天结束并拷全文件后再放'
@@ -2557,11 +2604,11 @@ RETURN coalesce(CASE p_kind
         WHEN 'cluster_skipped' THEN '下一次运行会补上；查看当时占用集群的任务'
         WHEN 'build_not_succeeded' THEN '下一次运行会重试；用 status 命令查看未发布的原因'
         WHEN 'run_not_finished' THEN '下一次运行会接上；需要时手工执行一次每日运行命令'
-        WHEN 'no_recent_success' THEN '检查定时器是否启用、数据库是否在运行，再手工执行一次' END
+        WHEN 'no_recent_success' THEN '先处理列表里的其他问题；没有别的问题时检查定时器是否启用、数据库是否在运行，再手工执行一次' END
     WHEN 'reason' THEN CASE p_code
         WHEN 'cluster_busy' THEN '集群正被其他任务占用' WHEN 'operator_interrupt' THEN '被停止'
         WHEN 'owner_exited' THEN '进程意外退出' WHEN 'aborted' THEN '被中止' WHEN 'unfinished' THEN '未正常结束'
-        WHEN 'files_changed_after_import' THEN '导入之后文件有增减或大小变化'
+        WHEN 'files_changed_after_import' THEN '导入之后文件有增减或内容变化'
         WHEN 'batch_manifest_changed' THEN '首次登记之后文件清单变了' WHEN 'batch_member_changed' THEN '已导入的文件被替换或移走'
         WHEN 'origin_content_changed' THEN '同名文件的内容变了' WHEN 'record_edge_overlap' THEN '与已导入的文件内容重叠'
         WHEN 'file_unreadable' THEN '文件读不了' WHEN 'file_changed_during_read' THEN '读取期间文件在变化'
@@ -2588,16 +2635,17 @@ RETURN CASE WHEN p_bytes>=1073741824 THEN round(p_bytes/1073741824.0,1)||' GB'
     WHEN p_bytes>=1024 THEN round(p_bytes/1024.0,1)||' KB' ELSE p_bytes||' B' END;
 
 -- The newest run, once: its time and result describe every row of the cluster list.
+-- A successful run is one that finished without any failure or skipped cluster.
 CREATE OR REPLACE FUNCTION mpp_view_daily_last()
 RETURNS TABLE(started_at timestamptz,finished_at timestamptz,seconds double precision,started_by text,
-    result text,last_finished_at timestamptz,open_problems bigint)
+    result text,last_success_at timestamptz,open_problems bigint)
 LANGUAGE sql STABLE
 BEGIN ATOMIC
     SELECT r.started_at,r.finished_at,extract(epoch FROM r.finished_at-r.started_at)::double precision,
         mpp_view_daily_label('started_by',r.started_by),
         mpp_view_daily_label('run',CASE WHEN r.state='finished' THEN CASE WHEN r.failed THEN 'failed' ELSE 'ok' END
             ELSE r.state END),
-        (SELECT max(x.finished_at) FROM mpp_daily_runs() x WHERE x.state='finished'),
+        (SELECT max(x.finished_at) FROM mpp_daily_runs() x WHERE x.state='finished' AND NOT x.failed),
         (SELECT count(*) FROM mpp_daily_problems())
     FROM mpp_daily_runs() r ORDER BY r.started_at DESC,r.run_id DESC LIMIT 1;
 END;
@@ -2658,7 +2706,9 @@ BEGIN ATOMIC
                    WHEN r.cleanup_state='failed' THEN '：'||mpp_view_daily_label('reason',r.cleanup_reason) ELSE '' END END,
         CASE WHEN r.scope_id IS NULL THEN '' ELSE mpp_view_daily_label('raw',r.raw_state)
             ||CASE WHEN r.raw_state='deleted' THEN ' '||r.raw_days||' 天 '||r.raw_files||' 个文件，'||mpp_view_daily_bytes(r.raw_bytes)
-                   WHEN r.raw_state='failed' THEN '：'||mpp_view_daily_label('reason',r.raw_reason) ELSE '' END END,
+                   WHEN r.raw_state='failed' THEN '：'||mpp_view_daily_label('reason',r.raw_reason)
+                       ||CASE WHEN r.raw_files>0 THEN '，已删除 '||r.raw_files||' 个文件，'||mpp_view_daily_bytes(r.raw_bytes) ELSE '' END
+                   ELSE '' END END,
         r.nonconforming_files,
         extract(epoch FROM r.cluster_finished_at-r.cluster_started_at)::double precision
     FROM mpp_daily_recent(p_limit) r

@@ -29,6 +29,7 @@ from database.retention import clone_build
 from sql_apm.daily import inbox
 from sql_apm.daily.config import load_config
 from sql_apm.daily.run import DailyRun
+from sql_apm.storage.daily import status
 from sql_apm.storage.ingestion import connect
 from sql_apm.storage.tasks import Task
 
@@ -44,9 +45,13 @@ PROBLEM = dict(day_failed='导入失败或有冲突的日期', files_without_mar
                marker_without_files='有齐全标记但没有文件', marker_not_before_today='标记日期不早于今天',
                cleanup_pending='等待清理的月份', cluster_skipped='上次运行跳过了这个集群',
                build_not_succeeded='构建或发布尚未成功', run_not_finished='上次运行没有正常结束',
-               no_recent_success='太久没有正常结束的运行')
+               no_recent_success='太久没有成功的运行')
 REASON = dict(cluster_busy='集群正被其他任务占用', file_unreadable='文件读不了', cleanup_lock_timeout='拿不到锁',
-              invalid_thresholds='invalid_thresholds', aborted='被中止', unfinished='未正常结束')
+              invalid_thresholds='invalid_thresholds', aborted='被中止', unfinished='未正常结束', raw_delete_failed='删除原始文件失败',
+              files_changed_after_import='导入之后文件有增减或内容变化')
+# Which step of a run a stored kind of problem belongs to, and how a cluster row says the step was gone through.
+STEPS = (({'day_failed', 'files_without_marker', 'marker_without_files', 'marker_not_before_today'}, lambda c: c[22] == 'done'),
+         ({'build_not_succeeded'}, lambda c: c[7] != 'not_reached'), ({'cleanup_pending'}, lambda c: c[10] != 'not_reached'))
 STARTED = dict(timer='定时', manual='手工')
 
 
@@ -90,33 +95,43 @@ class Expectation:
                      for r in self.runs]
         self.clusters = many(db, '''SELECT run_id,scope_id,ordinal,state,failed,reason,newest_imported,build_state,build_reason,
             cutoff_date,cleanup_state,cleanup_reason,months_cleaned,months_pending,released_bytes,raw_state,raw_reason,raw_days,
-            raw_files,raw_bytes,started_at,finished_at FROM mpp_daily_cluster ORDER BY ordinal''')
+            raw_files,raw_bytes,started_at,finished_at,import_state FROM mpp_daily_cluster ORDER BY ordinal''')
 
     def problems(self):
+        """Each stored kind from the newest run that went through its step; the rest worked out from the runs themselves."""
         if not self.runs:
             return []
         latest, order = self.runs[0], {run[0]: index for index, run in enumerate(self.runs)}
+        started = {run[0]: run[5] for run in self.runs}
         rows = []
         for cluster in [c for c in self.clusters if c[0] == latest[0]]:
-            examined = sorted((order[c[0]], c[0]) for c in self.clusters if c[1] == cluster[1] and c[3] in ('done', 'skipped'))
-            if not examined:
-                continue
-            run_id = examined[0][1]
-            seen = [run[5] for run in self.runs if run[0] == run_id][0]
-            for kind, source, day, month, reason, count in many(self.db, '''SELECT kind,source_id,log_date,result_month,reason,file_count
-                    FROM mpp_daily_problem WHERE run_id=%s AND scope_id=%s AND kind<>'nonconforming_file' ''', (run_id, cluster[1])):
-                detail = REASON.get(reason, reason or '')
-                if count is not None:
-                    detail += ('，' if reason else '') + '%d 个文件' % count
-                rows.append((PROBLEM[kind], cluster[1], source or '', day.isoformat() if day else month.strftime('%Y-%m') if month else '',
-                             detail, stamp(seen)))
+            turns = sorted((c for c in self.clusters if c[1] == cluster[1]), key=lambda c: order[c[0]])
+            for kinds, gone_through in STEPS:
+                examined = [c for c in turns if gone_through(c)]
+                if not examined:
+                    continue
+                run_id = examined[0][0]
+                for kind, source, day, month, reason, count in many(self.db, '''SELECT kind,source_id,log_date,result_month,reason,file_count
+                        FROM mpp_daily_problem WHERE run_id=%s AND scope_id=%s AND kind=ANY(%s)''', (run_id, cluster[1], sorted(kinds))):
+                    detail = REASON.get(reason, reason or '')
+                    if count is not None:
+                        detail += ('，' if reason else '') + '%d 个文件' % count
+                    rows.append((PROBLEM[kind], cluster[1], source or '', day.isoformat() if day else month.strftime('%Y-%m') if month else '',
+                                 detail, stamp(started[run_id])))
+            reached = [c for c in turns if c[3] != 'pending']
+            if reached and reached[0][3] == 'skipped':
+                rows.append((PROBLEM['cluster_skipped'], cluster[1], '', '', REASON[reached[0][5]], stamp(started[reached[0][0]])))
         if latest[2] in ('aborted', 'unfinished'):
             rows.append((PROBLEM['run_not_finished'], '全部', '', '', REASON[latest[2]], stamp(latest[5])))
-        finished = [run[6] for run in self.runs if run[2] == 'finished']
-        since = max(finished) if finished else min(run[5] for run in self.runs)
-        if latest[2] != 'running' and one(self.db, 'SELECT clock_timestamp()-%s>make_interval(hours => %s)', (since, latest[7])):
+        since = self.last_success() or min(run[5] for run in self.runs)
+        if one(self.db, 'SELECT clock_timestamp()-%s>make_interval(hours => %s)', (since, latest[7])):
             rows.append((PROBLEM['no_recent_success'], '全部', '', '', '', stamp(since)))
         return rows
+
+    def last_success(self):
+        """End of the newest run that finished without any failure."""
+        succeeded = [run[6] for run in self.runs if run[2] == 'finished' and not run[3]]
+        return max(succeeded) if succeeded else None
 
     def cluster_rows(self):
         if not self.runs:
@@ -142,7 +157,9 @@ class Expectation:
                                        '：' + REASON.get(c[8], c[8]) if c[7] == 'failed' else '')
                 cleanup = CLEANUP[c[10]] + (' %d 个月，释放 %s' % (c[12], bytes_text(c[14])) if c[10] == 'cleaned' else
                                             '：%d 个月' % c[13] if c[10] == 'pending' else '')
-                raw = RAW[c[15]] + (' %d 天 %d 个文件，%s' % (c[17], c[18], bytes_text(c[19])) if c[15] == 'deleted' else '')
+                raw = RAW[c[15]] + (' %d 天 %d 个文件，%s' % (c[17], c[18], bytes_text(c[19])) if c[15] == 'deleted' else
+                                    '：' + REASON.get(c[16], c[16]) + ('，已删除 %d 个文件，%s' % (c[18], bytes_text(c[19])) if c[18] else '')
+                                    if c[15] == 'failed' else '')
                 code = run[2] if c[3] == 'running' else result_code(c[3], c[4])
                 other = one(self.db, "SELECT coalesce(sum(file_count),0) FROM mpp_daily_problem WHERE run_id=%s AND scope_id=%s AND kind='nonconforming_file'", (run[0], c[1]))
                 rows.append((stamp(run[5]), STARTED[run[1]], RUN[result_code(run[2], run[3])], c[1],
@@ -158,17 +175,19 @@ def compare(env, browser, db, label):
     assert not browser.failures, browser.failures[:3]
     expected = Expectation(db)
     latest = expected.runs[0] if expected.runs else None
-    tiles = {title: browser.rows(BOARD, title) for title in ('上次运行开始于', '上次运行的结果', '上次正常结束的运行', '待处理问题数')}
+    tiles = {title: browser.rows(BOARD, title) for title in ('上次运行开始于', '上次运行的结果', '上次成功的运行', '待处理问题数')}
     shown = [tuple(row[:5]) + (row[6],) for row in browser.rows(BOARD, '待处理问题列表')]
     wanted = expected.problems()
     if latest is None:
         assert all(rows == [] for rows in tiles.values()), tiles
     else:
-        finished = [run[6] for run in expected.runs if run[2] == 'finished']
         assert tiles['上次运行开始于'] == [(beijing(latest[5]),)], (tiles, latest)
         assert tiles['上次运行的结果'] == [(RUN[result_code(latest[2], latest[3])] + '（' + STARTED[latest[1]] + '启动）',)], tiles
-        assert tiles['上次正常结束的运行'] == [(beijing(max(finished)) if finished else None,)], tiles
+        assert tiles['上次成功的运行'] == [(beijing(expected.last_success()),)], tiles
         assert tiles['待处理问题数'] == [(len(wanted),)], (tiles, wanted)
+    # The read-only command reads the same list.
+    told = sorted((PROBLEM[p['kind']], p['scope_id'] or '全部') for p in status(db, 1)['problems'])
+    assert told == sorted(row[:2] for row in wanted), (label, told)
     if wanted:
         key = lambda row: tuple('' if value is None else str(value) for value in row)
         assert sorted(shown, key=key) == sorted(wanted, key=key), (label, sorted(shown, key=key), sorted(wanted, key=key))
@@ -270,6 +289,9 @@ def verify(env, play):
     shown = compare(env, browser, db, 'failed day')
     assert shown == [(PROBLEM['day_failed'], 'K1', 'KS1', back(2).isoformat(), '文件读不了，1 个文件', shown[0][5])], shown
     assert browser.rows(BOARD, '上次运行的结果') == [('完成，有失败（手工启动）',)]
+    # A run that finished with a failure is not a successful one: the third value still names the run before it.
+    ends = many(db, 'SELECT finished_at,failed FROM mpp_daily_run ORDER BY started_at')
+    assert [failed for _, failed in ends] == [False, True] and browser.rows(BOARD, '上次成功的运行') == [(beijing(ends[0][0]),)]
     assert [row[4] for row in browser.rows(BOARD, '各集群现状')] == ['完成，有失败', '完成', '完成']
     browser.shot('status-failed-day')
     broken.chmod(0o644)
@@ -292,7 +314,7 @@ def verify(env, play):
     old = clone_build(db, one(db, "SELECT build_id FROM current_version WHERE scope_id='K2'"), 'status-old', '2025-01-01', True)
     good = (work / 'training.json').read_text()
     reader = connect(dsn, state['schema'])
-    def fault(point, scope=None):
+    def fault(point, scope=None, name=None):
         if scope == 'K2' and point == 'before_build':
             (work / 'training.json').write_text(json.dumps(dict(site.training, thresholds=dict(nope={}))))
         if scope == 'K2' and point == 'before_cleanup':
@@ -308,7 +330,7 @@ def verify(env, play):
     assert code == 1
     site.settings['stale_after_hours'] = 1
     site.write()
-    def stop(point, scope=None):
+    def stop(point, scope=None, name=None):
         if point == 'cluster_started':
             raise KeyboardInterrupt
     try:

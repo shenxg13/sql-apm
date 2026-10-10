@@ -23,6 +23,10 @@ def connection_check_seconds():
     return int(value)
 
 
+# Sets that want to know every connection the product opens (weak, see sql_apm.daily.interrupt).
+WATCHERS = []
+
+
 def connect(dsn, schema):
     check = connection_check_seconds()
     connection = psycopg2.connect(dsn, connect_timeout=5)
@@ -42,6 +46,8 @@ def connect(dsn, schema):
             if versions not in [set(history[i:]) for i in range(len(history))]:
                 raise IngestionError('schema_1_12_0_required')
         connection.commit()
+        for watcher in WATCHERS:
+            watcher.add(connection)
         return connection
     except BaseException:
         connection.close()

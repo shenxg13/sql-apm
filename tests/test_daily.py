@@ -1,10 +1,15 @@
-"""Daily run rules that need no database: settings, receiving-directory reading and day sorting."""
+"""Daily run rules that need no database: settings, receiving-directory reading, day sorting,
+the stop signal and the connection string of the unit files."""
 from datetime import date
 import importlib.util
 import json
 import os
 from pathlib import Path
+import signal
+import subprocess
+import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -15,7 +20,10 @@ from sql_apm.training.config import TrainingError
 
 RUNTIME_AVAILABLE = all(importlib.util.find_spec(name) is not None for name in ('psycopg2', 'pglast'))
 if RUNTIME_AVAILABLE:
+    from sql_apm.daily.interrupt import Interrupter
     from sql_apm.storage.ingestion import connection_check_seconds
+
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', str(Path(__file__).resolve().parents[1])))
 
 TODAY = date(2026, 10, 10)
 D1, D2, D3 = date(2026, 10, 7), date(2026, 10, 8), date(2026, 10, 9)
@@ -46,8 +54,8 @@ class InboxTests(unittest.TestCase):
         self.assertEqual(inbox.batch_id('S1', D1), 'daily:S1:2026-10-07')
         self.assertEqual(inbox.marker_name(D1), '2026-10-07.complete')
 
-    def classify(self, days, markers, states=None, recorded=None):
-        return inbox.classify(dict(days=days, markers=set(markers)), TODAY, states or {}, recorded or {})
+    def classify(self, days, markers, states=None):
+        return inbox.classify(dict(days=days, markers=set(markers)), TODAY, states or {})
 
     def test_only_marked_earlier_days_are_imported_oldest_first(self):
         files = [('a', 1)]
@@ -66,21 +74,16 @@ class InboxTests(unittest.TestCase):
         # An imported day whose files were taken away by hand is not a problem; its marker may stay.
         self.assertEqual(self.classify({}, [D1], {D1: 'complete'}), ([], [D1], []))
 
-    def test_imported_day_is_compared_by_name_and_size(self):
-        kept = {D1: [('a', 1), ('b', 2)]}
+    def test_imported_day_is_left_to_the_content_check(self):
+        # Names and sizes say nothing about the content: whatever a marked, imported day
+        # holds now, it is handed on to be compared with what the import stored.
         state = {D1: 'complete'}
-        self.assertEqual(self.classify({D1: [('b', 2), ('a', 1)]}, [D1], state, kept), ([], [D1], []))
-        changed = ('day_failed', D1, 'files_changed_after_import', 2)
-        for files in ([('a', 1), ('b', 3)], [('a', 1), ('c', 2)]):
-            self.assertEqual(self.classify({D1: files}, [D1], state, kept), ([], [], [changed]))
-        self.assertEqual(self.classify({D1: [('a', 1), ('b', 2), ('c', 0)]}, [D1], state, kept)[2],
-                         [('day_failed', D1, 'files_changed_after_import', 3)])
-        # Only names are known when the run was killed before it could keep the sizes.
-        names = {D1: [('a', None), ('b', None)]}
-        self.assertEqual(self.classify({D1: [('a', 9), ('b', 9)]}, [D1], state, names), ([], [D1], []))
-        self.assertEqual(self.classify({D1: [('a', 9)]}, [D1], state, names)[2], [('day_failed', D1, 'files_changed_after_import', 1)])
+        for files in ([('a', 1), ('b', 2)], [('a', 1)], [('a', 1), ('b', 2), ('c', 0)], []):
+            self.assertEqual(self.classify({D1: files} if files else {}, [D1], state), ([], [D1], []))
         # Without a marker the files are left alone even when the day is imported.
-        self.assertEqual(self.classify({D1: [('a', 1)]}, [], state, kept), ([], [], [('files_without_marker', D1, None, 1)]))
+        self.assertEqual(self.classify({D1: [('a', 1)]}, [], state), ([], [], [('files_without_marker', D1, None, 1)]))
+        self.assertEqual(inbox.log_day('gpdb-2026-10-07_000000.csv.2'), D1)
+        self.assertIsNone(inbox.log_day('2026-10-07.complete'))
 
 
 class ConfigTests(unittest.TestCase):
@@ -161,6 +164,82 @@ class ConnectionCheckTests(unittest.TestCase):
                 with self.assertRaises(IngestionError) as raised:
                     connection_check_seconds()
                 self.assertEqual(str(raised.exception), 'invalid_connection_check_seconds')
+
+
+@unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
+class InterrupterTests(unittest.TestCase):
+    def test_signal_cancels_waiting_statements_until_the_run_has_left(self):
+        class Connection:
+            cancelled = 0
+
+            def cancel(self):
+                self.cancelled += 1
+        before = signal.getsignal(signal.SIGUSR1)
+        with Interrupter(signals=(signal.SIGUSR1,), pause=0.01) as stop:
+            waiting, recording = Connection(), Connection()
+            stop.connections.update((waiting, recording))
+            stop.leave_alone(recording)
+            self.assertFalse(stop.stop_requested())
+            with self.assertRaises(KeyboardInterrupt):
+                os.kill(os.getpid(), signal.SIGUSR1)
+                time.sleep(5)
+            deadline = time.monotonic() + 5
+            while waiting.cancelled < 3 and time.monotonic() < deadline:
+                time.sleep(0.01)
+            os.kill(os.getpid(), signal.SIGUSR1)       # a second signal does not cut the recording of the abort short
+            time.sleep(0.05)
+            self.assertTrue(stop.stop_requested())
+            self.assertGreaterEqual(waiting.cancelled, 3)
+            self.assertEqual(recording.cancelled, 0)
+        self.assertEqual(signal.getsignal(signal.SIGUSR1), before)
+
+
+@unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
+class UnitFileTests(unittest.TestCase):
+    """The unit files are readable by every local user: no form of the connection string may carry a password."""
+    def generate(self, dsn, passfile=False):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'daily.json').write_text('{}')
+            (root / 'pgpass').write_text('')
+            words = [sys.executable, str(ROOT / 'scripts/daily/install.py'), '--user-unit', '--output', str(root / 'units'),
+                     '--config', str(root / 'daily.json'), '--dsn', dsn]
+            done = subprocess.run(words + (['--passfile', str(root / 'pgpass')] if passfile else []),
+                                  capture_output=True, text=True)
+            written = sorted(path.name for path in (root / 'units').glob('*'))
+            service = (root / 'units' / 'sql-apm-daily.service').read_text() if written else ''
+        return done, written, service
+
+    def test_password_is_refused_in_every_form_of_the_connection_string(self):
+        secret = 'Zx9q7LmW'
+        encoded = ''.join('%%%02X' % ord(letter) for letter in secret)
+        for dsn in ('host=/run/pg dbname=sql_apm user=sql_apm password=' + secret,
+                    "host=/run/pg dbname=sql_apm user=sql_apm password = '" + secret + "'",
+                    'postgresql://sql_apm:' + secret + '@db.example/sql_apm',
+                    'postgres://sql_apm:' + encoded + '@db.example:5432/sql_apm',
+                    'postgresql://sql_apm@db.example/sql_apm?password=' + secret,
+                    'postgresql://sql_apm@db.example/sql_apm?sslmode=require&password=' + encoded,
+                    'postgresql:///sql_apm?host=/run/pg&sslpassword=' + secret):
+            done, written, _ = self.generate(dsn, passfile=True)
+            self.assertEqual((done.returncode, written), (1, []), dsn)
+            self.assertIn('--dsn must not contain a password', done.stderr)
+            for text in (secret, encoded):
+                self.assertNotIn(text, done.stdout + done.stderr)
+        for dsn, message in (('host=/run/pg dbname', 'not a valid connection string'), ('   ', '--dsn is empty'),
+                             ('postgresql://sql_apm@db.example/sql_apm?secret=' + secret, 'not a valid connection string')):
+            done, written, _ = self.generate(dsn)
+            self.assertEqual((done.returncode, written), (1, []), dsn)
+            self.assertIn(message, done.stderr)
+            self.assertNotIn(secret, done.stdout + done.stderr)
+
+    def test_connection_string_without_a_password_is_written_as_given(self):
+        for dsn in ('host=/run/pg port=5432 dbname=sql_apm user=sql_apm', 'postgresql://sql_apm@db.example:5432/sql_apm',
+                    'postgresql:///sql_apm?host=/run/pg&user=sql_apm'):
+            done, written, service = self.generate(dsn, passfile=True)
+            self.assertEqual((done.returncode, written), (0, ['sql-apm-daily.service', 'sql-apm-daily.timer']), done.stderr)
+            self.assertIn('SQL_APM_DSN=' + dsn + '"', service)
+            self.assertIn('PGPASSFILE=', service)
+            self.assertNotIn('password', service.lower().replace('pgpassfile', ''))
 
 
 if __name__ == '__main__':

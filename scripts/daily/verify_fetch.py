@@ -348,14 +348,18 @@ def verify(sshd_root):
         opened, peak, accepted = set(), 0, 0
         for line in box.log.read_text().splitlines():
             login = re.search(r'Accepted publickey for \S+ from 127\.0\.0\.1 port (\d+)', line)
-            gone = re.search(r'(?:(?:Disconnected from|Connection reset by|Connection closed by) user \S+|Read error from remote host) 127\.0\.0\.1 port (\d+)', line)
+            # A connection whose client was killed ends in one of several ways, with or without the user's name.
+            gone = re.search(r'(?:(?:Disconnected from|Connection reset by|Connection closed by)(?: user \S+)?|Read error from remote host'
+                             r'|Closing connection to) 127\.0\.0\.1 port (\d+)', line)
             if login:
                 opened.add(login.group(1))
                 accepted += 1
                 peak = max(peak, len(opened))
             elif gone:
                 opened.discard(gone.group(1))
-        assert accepted > 20 and peak == 1 and not opened, (accepted, peak, opened)
+        assert accepted > 20 and peak == 1 and not opened, (accepted, peak, opened, [
+            re.sub(r'for \S+ from|user \S+', 'USER', line) for line in box.log.read_text().splitlines()
+            if any('port ' + port in line for port in opened)][:12])
         ok('D14 the server log shows %d accepted logins and never more than one open at a time' % accepted)
     print('FETCH CHECKS:', len(passed))
 

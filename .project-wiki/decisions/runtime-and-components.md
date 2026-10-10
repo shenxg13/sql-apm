@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-10
+updated: 2026-10-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6100590479
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/51
@@ -125,6 +127,23 @@ confidence: high
   关闭启动时的自动下载，保持签名校验。每个次版本官方只支持 9 个月，离线环境靠产品后续发版升级。
 - 事实（observed，2026-10-08，开发机）：Grafana 13.2.3 的安装包不含 PostgreSQL 数据源，
   联网时由 Grafana 在启动时自动下载，因此离线环境须把官方数据源插件作为固定组件。
+
+### v0.3.0 的用户手动全流程验收（2026-10-11）
+
+来源：[Issue #52 的范围变更记录](https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6100590479)。
+用户明确要求：“我需要在这个issue里自己手动把流程再在验证机上走一遍”。
+本节是已确认的验收要求，不表示实施或验收已经完成。
+
+实施方完成目标机实测并保存证据后，用户再次恢复初始快照，亲自在验证机按随包手册完整操作：
+系统准备、离线安装、账号与访问配置、九任务、每日运行、定时器与模拟源端传输，
+以及三种检索和四个随包看板的查看。实施方提供逐步操作、检查清单、预期结果和记录模板，
+并协助排障；实际操作由用户执行，实施方原有自动化、故障恢复和资源测量验收继续保留。
+
+两轮开始前分别由用户恢复初始快照，实施方在传输前只读核对并记录初始状态；
+第二次恢复前保存首轮证据，两轮均不调整目标机时钟。分别记录包身份、步骤结果和问题，
+最终候选与两轮实测包的产品文件逐文件摘要相同；文档或验收资源修正后补验受影响步骤。
+用户完整执行并明确确认通过是合并前要求，完成前不合并、不发布。
+本要求替代 #52 原第 24 项中仅检查文档和浏览器页面的安排；不改写下文 v0.2.0 的历史范围。
 
 ### v0.2.0 预发布交付与本轮演练（2026-10-07）
 

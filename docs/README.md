@@ -87,9 +87,10 @@
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [Kylin 离线部署与九任务验证](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线包、项目自带解释器、PG17.10、SCRAM、日志传输及 Alma 比对。 |
 | [配置指南](runbooks/configuration-guide.md) | 随包操作说明 | 按“想改什么”查全部配置键、默认值、影响及可执行示例。 |
-| [v0.2.0 发布说明](releases/v0.2.0.md) | 随包入口 | 版本变化、兼容性、三份文档入口和实测结论。 |
+| [v0.3.0 发布说明](releases/v0.3.0.md) | 随包入口 | 全新安装、固定组件、每日运行、四份文档入口和验收边界；[v0.2.0](releases/v0.2.0.md) 保留历史记录。 |
+| [检索与看板使用指南](runbooks/search-guide.md) | 随包使用说明 | 三种检索、结果解释、查询函数契约与示例、自定义看板。 |
 | [精简程序包与预发布交付](runbooks/program-release.md) | 操作说明 | 必要文件打包、离线 HTML、独立验收及用户确认后发布。 |
-| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 实施方裸机演练、指南示例、模拟日期清理及用户三份 HTML 检查。 |
+| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 实施方与用户两轮完整安装、九任务、每日运行及四看板的独立记录。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |
 | [统计计算操作](runbooks/baseline-statistics.md) | 操作说明 | 快照计算、观察诊断、重试引用、分区维护和真实验收。 |

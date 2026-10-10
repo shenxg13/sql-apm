@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from build_release import archive, select, compare_product, version_number
 from render_manual import DOCUMENTS, inspect, render
-from check_documents import check, check_guide, check_structure, check_paths, GUIDE, STRUCTURE
+from check_documents import check, check_guide, check_structure, check_paths, check_queries, GUIDE, STRUCTURE, QUERIES
+from build_bundle import grafana_inputs
 from verify_package import digest, verify
 import rehearsal
 from acceptance import verify_baseline
@@ -125,6 +126,36 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'product hashes required'):
             verify_baseline(metadata,dict(program_commit='old'))
 
+    def test_deployment_assets_are_part_of_evidence_identity(self):
+        files = {name: 'original' for name in ('grafana/components.json',
+            'grafana/dashboards/daily.json', 'daily/fetch-logs.sh', 'scripts/grafana/install.py',
+            'scripts/daily/install.py', 'scripts/deployment/check_environment.py', 'requirements.txt')}
+        baseline = dict(program_commit='old', product_sha256=files)
+        verify_baseline(dict(commit='new', files=files), baseline)
+        for name in files:
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'product files differ'):
+                verify_baseline(dict(commit='new', files={**files, name: 'changed'}), baseline)
+
+    def test_grafana_cache_missing_corrupt_and_official_download(self):
+        (self.app / 'grafana').mkdir()
+        cache = self.root / 'downloads'
+        payload = b'fixed official artifact'
+        item = dict(file='grafana.tgz', url='https://example.invalid/official.tgz',
+                    version='pinned', sha256=hashlib.sha256(payload).hexdigest())
+        (self.app / 'grafana/components.json').write_text(json.dumps(dict(grafana=item, plugins=[])))
+        with self.assertRaisesRegex(ValueError, 'missing offline'):
+            grafana_inputs(self.app, cache, offline=True)
+        import io
+        with patch('build_bundle.urllib.request.urlopen', return_value=io.BytesIO(payload)) as download:
+            self.assertEqual(grafana_inputs(self.app, cache), [(cache / item['file'], item)])
+            download.assert_called_once_with(item['url'], timeout=60)
+        with patch('build_bundle.urllib.request.urlopen') as download:
+            grafana_inputs(self.app, cache, offline=True)
+            download.assert_not_called()
+        (cache / item['file']).write_bytes(b'corrupt')
+        with self.assertRaisesRegex(ValueError, 'input checksum mismatch'):
+            grafana_inputs(self.app, cache)
+
     def test_baseline_collection_ignores_sidecars_and_rejects_bad_evidence(self):
         metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
         for folder in ('tasks','guide'):
@@ -139,12 +170,12 @@ class PackageTests(unittest.TestCase):
         result=collect_baseline(metadata,self.root)
         self.assertEqual(len(result['selection']),9)
         self.assertEqual(result['product_sha256'],metadata['files'])
-        (self.root/'v020-development-baseline.json').unlink()
+        (self.root/'development-baseline.json').unlink()
         for passed,commit in ((False,'tested'),(True,'different')):
             (self.root/'tasks/119-0.json').write_text(json.dumps(dict(passed=passed,program_verification=dict(commit=commit),selection={})))
             with self.subTest(passed=passed,commit=commit),self.assertRaisesRegex(ValueError,'task evidence'):
                 collect_baseline(metadata,self.root)
-            self.assertFalse((self.root/'v020-development-baseline.json').exists())
+            self.assertFalse((self.root/'development-baseline.json').exists())
 
     def test_valid_tree(self):
         self.assertTrue(verify(self.app)['passed'])
@@ -293,6 +324,17 @@ class HtmlTests(unittest.TestCase):
 
 
 class DocumentTests(unittest.TestCase):
+    def test_query_contract_rejects_wrong_parameter_and_column(self):
+        source = (ROOT / QUERIES).read_text()
+        for old, new in [('p_normalization text', 'p_wrong text'), ('occurrence_id text', 'missing_column text')]:
+            with self.subTest(old=old), self.assertRaisesRegex(ValueError, 'differ from schema'):
+                check_queries(ROOT, source.replace(old, new, 1))
+
+    def test_missing_daily_configuration_key(self):
+        source = (ROOT / GUIDE).read_text().replace('"interval_days", "clusters"', '"interval_days"', 1)
+        with self.assertRaisesRegex(ValueError, 'key set differs'):
+            check_guide(ROOT, source)
+
     def test_current_documents(self):
         self.assertEqual(check()['structure']['tables'], 62)
 
@@ -320,7 +362,7 @@ class DocumentTests(unittest.TestCase):
     def test_missing_packaged_command(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md',
+            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
                          'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)

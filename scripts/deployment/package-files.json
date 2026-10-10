@@ -16,6 +16,7 @@
     "tests/test_*.py", "tests/baseline/*.py", "tests/database/*.py", "tests/database/legacy_160/*", "tests/ingestion/*.py",
     "scripts/db/verify.py", "scripts/db/verify_publication.py", "scripts/db/verify_cleanup.py", "scripts/db/verify_search.py",
     "scripts/db/verify_views.py", "scripts/db/verify_daily.py", "scripts/db/verify_daily_recovery.py",
+    "scripts/daily/verify_timer.py", "scripts/daily/verify_fetch.py",
     "scripts/deployment/run_verification.py", "scripts/deployment/rehearsal.py",
     "scripts/deployment/acceptance.py", "scripts/deployment/guide_examples.py",
     "scripts/deployment/statistic_comparison.py", "scripts/deployment/daily_rehearsal.py",

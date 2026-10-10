@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Check the rendered timer and service on a real systemd (units of the current user).
+"""Check the rendered timer and service on a real systemd.
 
 Installs temporary units under ~/.config/systemd/user with a name of their own, runs
 them against a private disposable PostgreSQL 17 instance and synthetic logs, and
-removes them again. Needs no root. Times are shortened: the timer is set to the next
+removes them again. The default user-unit mode needs no root. --system uses sudo
+to install uniquely named temporary system units, running as the current user.
+Times are shortened: the timer is set to the next
 minutes and the run-time limit to seconds. With --sshd-root the pull step of the
 service is exercised against a private sshd as well (see verify_fetch.py).
 
@@ -14,13 +16,15 @@ import argparse
 from datetime import date, datetime, timedelta
 import os
 from pathlib import Path
+import pwd
 import subprocess
 import sys
 import tempfile
 import time
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / 'tests'), str(ROOT / 'scripts/db'), str(ROOT / 'scripts/daily')]
+RESOURCES = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', RESOURCES)).resolve()
+sys.path[:0] = [str(ROOT), str(RESOURCES / 'tests'), str(RESOURCES / 'scripts/db'), str(RESOURCES / 'scripts/daily')]
 from verify import instance, Verification
 from verify_daily import Site, one, many, problems
 from verify_fetch import Sandbox
@@ -28,11 +32,13 @@ from sql_apm.daily import inbox
 from sql_apm.storage.ingestion import connect
 
 UNITS = Path.home() / '.config/systemd/user'
+SYSTEM = False
 LOCK = "SELECT count(*) FROM pg_locks WHERE locktype='advisory' AND granted AND objid::bigint=(hashtextextended('C1',1835101) & 4294967295)"
 
 
 def systemctl(*words, ok=True):
-    done = subprocess.run(['systemctl', '--user'] + list(words), capture_output=True, text=True)
+    prefix = ['sudo', '-n', 'systemctl'] if SYSTEM else ['systemctl', '--user']
+    done = subprocess.run(prefix + list(words), capture_output=True, text=True)
     assert not ok or done.returncode == 0, (words, done.stdout, done.stderr)
     return done.stdout.strip()
 
@@ -61,7 +67,8 @@ class Units:
 
     def install(self, times, max_hours=12.0, fetch=None, environment=None):
         self.remove()
-        words = [sys.executable, ROOT / 'scripts/daily/install.py', '--user-unit', '--output', UNITS, '--name', self.name,
+        identity = ['--user', pwd.getpwuid(os.getuid()).pw_name] if SYSTEM else ['--user-unit']
+        words = [sys.executable, ROOT / 'scripts/daily/install.py', *identity, '--output', UNITS, '--name', self.name,
                  '--config', self.site.path, '--dsn', self.site.dsn, '--max-hours', max_hours, '--check-seconds', 2]
         for moment in times:
             words += ['--at', moment.strftime('%H:%M')]
@@ -72,12 +79,24 @@ class Units:
         if environment:
             self.drop_in.mkdir()
             (self.drop_in / 'test.conf').write_text('[Service]\n' + ''.join('Environment="%s=%s"\n' % pair for pair in environment.items()))
+        if SYSTEM:
+            subprocess.run(['sudo', '-n', 'install', '-m', '0644', *map(str, self.files), '/etc/systemd/system/'], check=True)
+            if environment:
+                destination = '/etc/systemd/system/' + self.drop_in.name
+                subprocess.run(['sudo', '-n', 'install', '-d', '-m', '0755', destination], check=True)
+                subprocess.run(['sudo', '-n', 'install', '-m', '0644', str(self.drop_in / 'test.conf'), destination], check=True)
         systemctl('daemon-reload')
         systemctl('start', self.name + '.timer')
 
     def remove(self):
         systemctl('stop', self.name + '.timer', ok=False)
         systemctl('stop', self.name + '.service', ok=False)
+        if SYSTEM:
+            root = Path('/etc/systemd/system')
+            subprocess.run(['sudo', '-n', 'rm', '-f', '--', *[str(root / p.name) for p in self.files],
+                            str(root / self.drop_in.name / 'test.conf')], check=True)
+            subprocess.run(['sudo', '-n', 'rmdir', '--', str(root / self.drop_in.name)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for path in self.files:
             path.unlink(missing_ok=True)
         if self.drop_in.exists():
@@ -86,11 +105,14 @@ class Units:
         systemctl('daemon-reload')
         systemctl('reset-failed', self.name + '.service', ok=False)
         # The stamp of a persistent timer outlives the unit file.
-        for stamp in (Path.home() / '.local/share/systemd/timers').glob('stamp-' + self.name + '.timer'):
-            stamp.unlink()
+        if SYSTEM:
+            subprocess.run(['sudo', '-n', 'rm', '-f', '--', '/var/lib/systemd/timers/stamp-' + self.name + '.timer'], check=True)
+        else:
+            for stamp in (Path.home() / '.local/share/systemd/timers').glob('stamp-' + self.name + '.timer'):
+                stamp.unlink()
 
     def show(self, *properties):
-        text = systemctl('show', self.name + '.service', '-p', ','.join(properties))
+        text = systemctl('show', self.name + '.service', *[word for prop in properties for word in ('-p', prop)])
         return dict(line.split('=', 1) for line in text.splitlines())
 
 
@@ -297,5 +319,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
     parser.add_argument('--sshd-root', type=Path, help='unpacked openssh-server package; also checks the pull step')
+    parser.add_argument('--system', action='store_true', help='exercise system units via passwordless sudo, running as the current user')
     arguments = parser.parse_args()
+    if arguments.system:
+        SYSTEM = True
+        # Keep generated files private; only named test units enter /etc/systemd/system.
+        with tempfile.TemporaryDirectory(prefix='sql-apm-timer-units-') as temporary:
+            UNITS = Path(temporary)
+            verify(arguments.pg_bin, arguments.sshd_root)
+        raise SystemExit(0)
     verify(arguments.pg_bin, arguments.sshd_root and arguments.sshd_root.resolve())

@@ -505,6 +505,26 @@ systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
 等待 Grafana 启动后创建查看账号和“用户自定义”文件夹；此步骤可重复执行。
 
 ```bash
+.venv/bin/python - <<'PY'
+import json
+import os
+import time
+import urllib.error
+import urllib.request
+
+url = 'http://127.0.0.1:' + os.environ['APM_GRAFANA_PORT'] + '/api/health'
+for attempt in range(60):
+    try:
+        with urllib.request.urlopen(url, timeout=2) as response:
+            if json.load(response).get('database') == 'ok':
+                break
+    except (OSError, urllib.error.URLError):
+        pass
+    time.sleep(2)
+else:
+    raise SystemExit('Grafana 未就绪，请先检查服务日志。')
+print('Grafana 已就绪')
+PY
 .venv/bin/python scripts/grafana/install.py accounts --port "$APM_GRAFANA_PORT" \
   --admin-password-file "$APM_ROOT/private/grafana-admin-password" \
   --viewer-password-file "$APM_ROOT/private/grafana-viewer-password" --viewer-login viewer

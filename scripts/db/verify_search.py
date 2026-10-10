@@ -6,6 +6,9 @@ import json
 import os
 from pathlib import Path
 import random
+import contextlib
+import io
+import unittest.mock
 import subprocess
 import sys
 
@@ -27,23 +30,17 @@ from psycopg2.extras import Json
 
 
 def reference_terms(value):
-    """The original character scanner, kept as an independent bounded oracle."""
-    terms, token, i = [], [], 0
+    """Independent oracle for the 1.11.0 rule: split on six ASCII blanks, quotes are ordinary."""
     spaces = ' \t\n\r\f\v'
-    fold = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', spaces)
-    while i < len(value):
-        char = value[i]
-        if char == '"':
-            end = value.find('"', i + 1)
-            if end >= 0:
-                token.append(value[i + 1:end]); i = end + 1; continue
+    fold = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
+    terms, token = [], []
+    for char in value:
         if char in spaces:
             if token: terms.append(''.join(token)); token = []
         else:
             token.append(char)
-        i += 1
     if token: terms.append(''.join(token))
-    return [term.translate(fold) for term in terms if term.translate(fold)]
+    return [term.translate(fold) for term in terms]
 
 
 def verify(pg_bin):
@@ -59,6 +56,7 @@ def verify(pg_bin):
                    row(text='SELECT a FROM failure_only', message='failed', **{'16':'ERROR'}),
                    row(text='SELECT a FROM old_only', message='duration: 1 ms', **{'0':'2026-06-01 00:00:00 CST'}),
                    row(text='SELECT x FORM t', message='duration: 3 ms'),
+                   row(text='SELECT "a"."b" FROM "Order Items" t', message='duration: 5 ms'),
                    row(text=sql_text, message='canceling statement due to user request', **{'16':'ERROR','17':'57014'}),
                    row(text=sql_text, message='canceling statement due to statement timeout', **{'16':'ERROR','17':'57014'}),
                    row('2219', text=sql_text, message='duration: 1 ms'),
@@ -90,10 +88,13 @@ def verify(pg_bin):
             else:raise AssertionError(reason)
         assert call('mpp_search_fold','A B\tC\nD\rE\fF\vVÄ')=='abcdefvÄ'
 
-        assert call('mpp_search_terms',' a  " B c " d"')==['a','bc','d"']
-        assert call('mpp_search_terms','"a,b" x = 1')==['a,b','x','=','1']
-        for value in ('', ' \n\t', '""', '"  "'):
+        assert call('mpp_search_terms',' a  " B c " d"')==['a','"','b','c','"','d"']
+        assert call('mpp_search_terms','"a,b" x = 1')==['"a,b"','x','=','1']
+        assert call('mpp_search_terms','"a"."b"\n"Order Items"')==['"a"."b"','"order','items"']
+        assert call('mpp_search_terms','""')==['""']
+        for value in ('', ' \n\t', None):
             rejects('mpp_search_terms','empty_search_input',value)
+            rejects('mpp_search_passage','empty_search_input',value)
         rejects('mpp_search_terms','too_many_search_terms',' '.join(['x']*21))
         assert len(call('mpp_search_terms',' '.join(['x']*20)))==20
         rng = random.Random(47)
@@ -109,30 +110,50 @@ def verify(pg_bin):
                 rejects('mpp_search_terms','too_many_search_terms',value)
             else:
                 assert call('mpp_search_terms',value)==expected
+            whole = ''.join(expected)
+            if whole:
+                assert call('mpp_search_passage',value)==[whole]
+            else:
+                rejects('mpp_search_passage','empty_search_input',value)
         assert call('mpp_search_terms','A'*100000)==['a'*100000]
-        assert call('mpp_search_terms','"中 文"'*20000)==['中文'*20000]
         rejects('mpp_search_terms','too_many_search_terms','x '*50000)
-        rejects('mpp_search_terms','empty_search_input','""'*50000)
-        v.require(True,'S2/S3: six ASCII spaces, ASCII-only case, phrases, unmatched quote, empty/20-term boundary')
+        assert call('mpp_search_passage','x '*50000)==['x'*50000]
+        assert call('mpp_search_passage','"中 文"'*20000)==['"中文"'*20000]
+        v.require(True,'G1: one whitespace rule, quotes literal, ASCII-only case, empty/20-word boundary, passage is one piece without a word limit')
         before=contents(db)
-        def find(text,scope=None,database=None,user=None,start=None,end=None,order='count'):
-            return call('mpp_query_search',norm,text,scope,database,user,start,end,order)
-        found=find('DEMO "a,b"')
-        assert found['match_kind']=='text' and found['total_structures']==1
-        assert found['rows'][0]['matched_texts']==3
+        def find(text,scope=None,database=None,user=None,start=None,end=None,order='count',mode='words'):
+            return call('mpp_query_search',norm,text,scope,database,user,start,end,order,mode)
+        found=find('DEMO a,b')
+        assert found['match_kind']=='text' and found['mode']=='words' and found['total_structures']==1
+        first=found['rows'][0]
+        assert first['matched_texts']==3 and first['structure_texts']==3 and first['identities']==2
+        assert (first['top_scope'],first['top_database'],first['top_user'])==('C1','synthetic_db','synthetic_user')
+        assert first['top_records']==first['record_count']-1
         assert find('b a demo')['total_structures']==2
-        assert find('"b,a" demo')['total_structures']==1
-        assert find('"WHERE x ="')['total_structures']==2
-        assert find('demo "x = 2"')['rows'][0]['matched_texts']==1
-        for value in ('%', '_missing_', 'no_such_text', '"x=99"'):
+        assert find('b,a demo')['total_structures']==1
+        assert find('WHERE x =')['total_structures']==2
+        assert find('demo x=2')['rows'][0]['matched_texts']==1
+        # Quotes are ordinary characters in both modes; nothing is glued or stripped.
+        assert find('"a"."b"')['total_structures']==1 and find('"order items"')['total_structures']==1
+        for value in ('%', '_missing_', 'no_such_text', 'x=99', 'a.b', '"a,b"', '"demo"'):
             assert find(value)['total_structures']==0
+        whole=lambda text:find(text,mode='passage')
+        assert whole('WHERE x =')['total_structures']==2
+        assert whole('a,   b\n\nFROM   demo')['rows'][0]['matched_texts']==3
+        assert whole('"A"."B"  from\n "ORDER ITEMS"')['total_structures']==1
+        assert whole('from "a"."b"')['total_structures']==0 and whole('demo x')['total_structures']==0
+        spaced=' '.join('SELECTa,bFROMdemoWHEREx=1')
+        assert len(spaced.split())>20 and whole(spaced)['rows'][0]['matched_texts']==1
+        rejects('mpp_query_search','too_many_search_terms',norm,spaced)
+        rejects('mpp_query_search','empty_search_input',norm,' \n',None,None,None,None,None,'count','passage')
+        rejects('mpp_query_search','invalid_search_mode',norm,'demo',None,None,None,None,None,'count','exact')
         many=find('table_');assert len(many['rows'])==50 and many['total_structures']==60
         assert find('demo',user='second_user')['rows'][0]['record_count']==1
         assert find('demo',scope='absent')['total_structures']==0
         assert find('demo',start='2030-01-01')['total_structures']==0
         assert find('select',order='recent')['rows'][0]['fingerprint']==fp('SELECT a FROM recent_only')
         assert find('select')['rows'][0]['fingerprint']==fp('SELECT a FROM paging')
-        v.require(True,'S3/S4: literal symbols, AND/phrase ordering, folded matches, grouping/counts/filtering/order and 50 cap')
+        v.require(True,'G1: words and passage with positive and negative cases, quoted names, other layouts, over 20 words, grouping/counts/filtering/order and 50 cap')
         hit=call('mpp_query_exact',norm,fingerprint)
         assert hit['state']=='has_baseline' and len(hit['hits'])==2
         assert find(fingerprint)==hit
@@ -175,9 +196,57 @@ def verify(pg_bin):
         assert cli(['exact','--file',str(exact_file)])[1]['fingerprint']==fingerprint
         bad_file=directory/'bad.sql';bad_file.write_bytes(b'\xff')
         assert cli(['exact','--file',str(bad_file)])[1]['state']=='unreliable_fingerprint'
-        code,obj=cli(['find','DEMO "a,b"']);assert code==0
+        code,obj=cli(['find','DEMO a,b']);assert code==0
         obj.pop('rules');assert obj==found
-        v.require(True,'S1/S6/S7/S8/S16: JSON CLI and DB agree; exact outcomes/observations, parameter and file input, batch hints capped')
+        for text,mode in (('"a"."b"','words'),('"A"."B"  from\n "ORDER ITEMS"','passage'),('WHERE x =','passage'),(spaced,'passage'),('no_such_text','words')):
+            code,obj=cli(['find',text,'--mode',mode]);assert code==0
+            obj.pop('rules');assert obj==find(text,mode=mode),(text,mode)
+        assert cli(['find',spaced])==(1,dict(state='failed',reason='too_many_search_terms'))
+        assert cli(['find',' ','--mode','passage'])==(1,dict(state='failed',reason='empty_search_input'))
+        assert cli(['find','demo','--mode','exact'])==(1,dict(state='failed',reason='invalid_arguments'))
+        # Words and passages: 256 KB at both entries. One argument of that size cannot be passed to a
+        # process, so the command's entry point is called directly.
+        from sql_apm.cli.search import TEXT_MAX_BYTES,main as entry
+        def direct(words):
+            out=io.StringIO()
+            with contextlib.redirect_stdout(out),unittest.mock.patch.dict(os.environ,{'SQL_APM_DSN':dsn}):
+                code=entry(words)
+            return code,json.loads(out.getvalue())
+        for mode,start in (('words','DEMO a,b'),('passage','WHERE x =')):
+            edge=start+' '*(TEXT_MAX_BYTES-len(start))
+            code,obj=direct(['find',edge,'--mode',mode]);obj.pop('rules')
+            assert len(edge.encode())==TEXT_MAX_BYTES and code==0 and obj==find(edge,mode=mode) and obj['rows'],mode
+            assert direct(['find',edge+' ','--mode',mode])==(1,dict(state='failed',reason='search_input_too_large'))
+            assert direct(['find','中'*(TEXT_MAX_BYTES//3+1),'--mode',mode])==(1,dict(state='failed',reason='search_input_too_large'))
+        # Exactly one fingerprint value is looked up as it is by the complete-SQL entry as well.
+        for form in (fingerprint,' \t'+fingerprint+'\n'):
+            code,obj=cli(['exact','--sql',form]);obj.pop('rules')
+            assert code==0 and obj==hit,form
+        assert cli(['exact','--sql',fingerprint[:-1]])[1]['state']=='unreliable_fingerprint'
+        # The 512 KB limit of complete SQL comes before that lookup: a fingerprint value followed by blanks is found up to
+        # the limit and refused over it, and so is the prefix that the file entry keeps of a longer input.
+        padded=directory/'padded.sql'
+        refused=dict(state='unreliable_fingerprint',reason='input_size_limit')
+        value,tail=fingerprint.encode(),b' SELECT 2'
+        for content,expected in ((value+b' '*(MAX_BYTES-1-len(value)),'found'),(value+b' '*(MAX_BYTES-len(value)),'found'),
+                                 (value+b' '*(MAX_BYTES+1-len(value)),'refused'),(value+b' '*(MAX_BYTES+4096-len(value)),'refused'),
+                                 # the first MAX_BYTES + 1 bytes of this one are the value and blanks only
+                                 (value+b' '*(MAX_BYTES+1-len(value))+tail,'refused'),
+                                 # within the limit a value followed by something else is an ordinary input, not a fingerprint
+                                 (value+b' '*(MAX_BYTES-len(value)-len(tail))+tail,'ordinary')):
+            padded.write_bytes(content)
+            code,obj=cli(['exact','--file',str(padded)]);obj.pop('rules')
+            if expected=='found':
+                assert code==0 and obj==hit,len(content)
+            elif expected=='refused':
+                assert code==0 and {key:obj[key] for key in refused}==refused and not obj['hits'] and 'statement_hints' not in obj,len(content)
+            else:
+                assert len(content)==MAX_BYTES and code==0 and obj['state']=='unreliable_fingerprint' and obj['reason']!='input_size_limit' and not obj['hits'],obj['reason']
+        padded.write_bytes(fingerprint.encode()+b' '*(MAX_BYTES-len(fingerprint)))
+        for cluster,state in (('C1','has_baseline'),('C9','not_seen')):
+            assert cli(['exact','--file',str(padded),'--cluster',cluster])[1]['state']==cli(['exact','--sql',fingerprint,'--cluster',cluster])[1]['state']==state,cluster
+        v.require(True,'G2/S1/S6/S7/S8/S16: JSON CLI and DB agree in both text modes, with the 256 KB limit on either side of it; exact outcomes/observations, '
+                       'direct lookup of a pasted fingerprint within the 512 KB limit only, parameter and file input, batch hints capped')
         args=[norm,'C1','synthetic_db','synthetic_user',fingerprint]
         summary=call('mpp_query_baseline',*args)
         assert len(summary['rows'])==5 and summary['version']['build_id']==build

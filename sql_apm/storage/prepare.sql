@@ -14,7 +14,9 @@ SELECT set_config('apm.schema', :'project_schema', true),
        set_config('apm.v160_sha256', :'v160_sha256', true),
        set_config('apm.v170_sha256', :'v170_sha256', true),
        set_config('apm.v180_sha256', :'v180_sha256', true),
-       set_config('apm.v190_sha256', :'v190_sha256', true);
+       set_config('apm.v190_sha256', :'v190_sha256', true),
+       set_config('apm.v1100_sha256', :'v1100_sha256', true),
+       set_config('apm.readonly_role', :'readonly_role', true);
 DO $block$
 DECLARE r record; d record; n record;
 BEGIN
@@ -28,6 +30,16 @@ BEGIN
     IF r.rolsuper OR r.rolcreatedb OR r.rolcreaterole OR r.rolreplication OR r.rolbypassrls
         OR EXISTS (SELECT FROM pg_auth_members WHERE member=r.oid) THEN
         RAISE EXCEPTION 'incompatible project role attributes/membership';
+    END IF;
+    -- The administrator creates the read-only account once (bootstrap); the
+    -- project role only grants to it and never creates or alters roles.
+    SELECT * INTO n FROM pg_roles WHERE rolname=current_setting('apm.readonly_role');
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'read-only role % is missing; run bootstrap as administrator first', current_setting('apm.readonly_role');
+    END IF;
+    IF n.rolsuper OR n.rolcreatedb OR n.rolcreaterole OR n.rolreplication OR n.rolbypassrls
+        OR n.oid = r.oid OR EXISTS (SELECT FROM pg_auth_members WHERE member=n.oid) THEN
+        RAISE EXCEPTION 'incompatible read-only role attributes/membership';
     END IF;
     SELECT * INTO d FROM pg_database WHERE datname=current_database();
     IF d.datdba <> r.oid OR d.encoding <> pg_char_to_encoding('UTF8')

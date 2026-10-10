@@ -10,12 +10,15 @@ from sql_apm.cli.search import main as search
 
 def main():
     parser = argparse.ArgumentParser(prog='python -m sql_apm')
-    parser.add_argument('command', choices=['import','training','statistics','full','rebuild','status','history','cleanup','search'])
+    parser.add_argument('command', choices=['import','training','statistics','full','rebuild','status','history','cleanup','search','fingerprint-service'])
     parser.add_argument('arguments', nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
     args = parser.parse_args()
     remaining = args.arguments
     if args.command in ('full','rebuild','status','history'):
         return workflow(args.command,remaining)
+    if args.command == 'fingerprint-service':
+        from sql_apm.service.fingerprint import main as service
+        return service(remaining)
     return {'import': ingest, 'training': training, 'statistics': statistics, 'cleanup': cleanup, 'search': search}[args.command](remaining)
 
 

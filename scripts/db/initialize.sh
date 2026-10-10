@@ -6,11 +6,15 @@ usage() {
 Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
   --host HOST_OR_SOCKET --port PORT
   [--database sql_apm] [--schema sql_apm] [--role sql_apm]
+  [--readonly-role ROLE] [--readonly-timeout 120s]
   [--admin-user USER --admin-database DATABASE] [--pg-bin DIRECTORY]
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0/1.8.0/1.9.0, to 1.10.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0/1.8.0/1.9.0/1.10.0, to 1.11.0; stop writers first.
+bootstrap also creates the read-only LOGIN role (default: the project role plus _ro) and sets
+its per-statement timeout; schema/upgrade grant it SELECT. Before upgrading a database
+created by an earlier release, run bootstrap once more as administrator.
 Use a protected PGPASSFILE or configured local authentication; no password flags.
 bootstrap creates a LOGIN role without a password. If password authentication
 is required, set it using administrator psql \password, then run schema.
@@ -33,22 +37,27 @@ case "$mode" in all | bootstrap | schema | check | upgrade) ;; -h | --help)
 esac
 host='' port='' admin_user='' admin_database='' pg_bin=''
 database=sql_apm schema=sql_apm project_role=sql_apm
+readonly_role='' readonly_timeout=120s
 while (($#)); do
     [[ $# -ge 2 ]] || die "missing value for $1"
     case "$1" in
         --host) host=$2 ;; --port) port=$2 ;;
         --database) database=$2 ;; --schema) schema=$2 ;; --role) project_role=$2 ;;
         --admin-user) admin_user=$2 ;; --admin-database) admin_database=$2 ;;
+        --readonly-role) readonly_role=$2 ;; --readonly-timeout) readonly_timeout=$2 ;;
         --pg-bin) pg_bin=$2 ;; *) die "unknown option: $1" ;;
     esac
     shift 2
 done
 [[ -n $host && $port =~ ^[0-9]+$ ]] || die 'explicit --host and numeric --port required'
 ((10#$port >= 1 && 10#$port <= 65535)) || die 'invalid port'
-for name in "$database" "$schema" "$project_role"; do
+[[ -n $readonly_role ]] || readonly_role=${project_role}_ro
+[[ $readonly_timeout =~ ^[1-9][0-9]{0,8}(ms|s|min)$ ]] || die 'read-only timeout must be a positive number with unit ms, s or min'
+for name in "$database" "$schema" "$project_role" "$readonly_role"; do
     [[ $name =~ ^[a-z][a-z0-9_]{0,62}$ && $name != pg_* ]] || die 'project names must match [a-z][a-z0-9_]{0,62}, excluding pg_*'
     case "$name" in postgres | template0 | template1 | public | information_schema) die "reserved project name: $name" ;; esac
 done
+[[ $readonly_role != "$project_role" ]] || die 'read-only role must differ from the project role'
 if [[ $mode == all || $mode == bootstrap ]]; then
     [[ -n $admin_user && $admin_database =~ ^[a-z][a-z0-9_]{0,62}$ && $admin_user != "$project_role" ]] || die 'explicit, distinct administrator identity and database required'
 fi
@@ -60,7 +69,8 @@ command -v "$psql" >/dev/null || die 'psql not found'
 unset PGOPTIONS PGSERVICE PGSERVICEFILE PGHOSTADDR
 export PGCONNECT_TIMEOUT=10
 common=(-X -w -q --host="$host" --port="$port" --set=ON_ERROR_STOP=1
-    --set=project_database="$database" --set=project_schema="$schema" --set=project_role="$project_role")
+    --set=project_database="$database" --set=project_schema="$schema" --set=project_role="$project_role"
+    --set=readonly_role="$readonly_role" --set=readonly_timeout="$readonly_timeout")
 phase=preflight
 trap 'printf "ERROR: initialization failed at phase=%s (completed stages retained; see recovery guide)\n" "$phase" >&2' ERR
 if [[ $mode == all || $mode == bootstrap ]]; then
@@ -105,6 +115,9 @@ if [[ $mode != bootstrap ]]; then
     v190_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.9.0.sql")
     v190_sha256=${v190_sha256%% *}
     [[ $v190_sha256 == 9ac4648732cf8d002a52f464017ee241efa2d2095025b60d3f3256a996283597 ]] || die 'frozen 1.9.0 DDL checksum mismatch'
+    v1100_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.10.0.sql")
+    v1100_sha256=${v1100_sha256%% *}
+    [[ $v1100_sha256 == 20d2de8f9de5d318ca8ebb61817ecd858ced9c908fda8419042dab8e00e8c734 ]] || die 'frozen 1.10.0 DDL checksum mismatch'
     # Released migrations include ../schema.sql. Bind that include to their
     # frozen target without editing the released migration bytes.
     migration_dir=$(mktemp -d)
@@ -118,7 +131,7 @@ if [[ $mode != bootstrap ]]; then
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
         --set=migration_150_160="$migration_dir/1.5.0-to-1.6.0/migrations/step.sql" \
         --set=migration_160_170="$migration_dir/1.6.0-to-1.7.0/migrations/step.sql" \
-        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=v180_sha256="$v180_sha256" --set=v190_sha256="$v190_sha256" --set=check_only="$check_only" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=v180_sha256="$v180_sha256" --set=v190_sha256="$v190_sha256" --set=v1100_sha256="$v1100_sha256" --set=check_only="$check_only" \
         --file="$root/sql_apm/storage/$entry"
 fi
-printf 'OK: mode=%s database=%s schema=%s role=%s\n' "$mode" "$database" "$schema" "$project_role"
+printf 'OK: mode=%s database=%s schema=%s role=%s readonly_role=%s\n' "$mode" "$database" "$schema" "$project_role" "$readonly_role"

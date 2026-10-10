@@ -1,0 +1,1421 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "按时间范围现算的排行、按当前基线版本统计的排行和版本列表（随包看板 r1）",
+  "editable": true,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "search",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "SQL 检索",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/mpp-search/sql-search"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "导入的日志往往不是当前时间的。按时间范围现算的排行用右上角的时间范围，点“设为时间范围”可以直接跳到该集群有数据的最后一天。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "scope_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "first_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "日志最早时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "日志最晚时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "files"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "已导入文件数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "action"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "把时间范围设为该集群日志的最后 24 小时",
+                    "url": "${__data.fields.url:raw}"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "看最后 24 小时"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "url"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-list panel 1 A */ SELECT s.scope_id,min(f.first_log_at) first_at,max(f.last_log_at) last_at,count(*) files,'设为时间范围' AS action,\n  '/d/mpp-list/sql-list?from='||(extract(epoch FROM max(f.last_log_at)-interval '24 hours')*1000)::bigint||'&to='||(extract(epoch FROM max(f.last_log_at)+interval '1 second')*1000)::bigint AS url\nFROM scope s JOIN source_file f USING(scope_id) GROUP BY s.scope_id ORDER BY s.scope_id",
+          "refId": "A"
+        }
+      ],
+      "title": "数据的时间范围",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 2,
+      "panels": [],
+      "title": "按时间范围现算的排行（右上角所选时间范围内的执行记录）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "一行是一个 SQL 身份的一类计时。这个数随时间范围和顶部的筛选变化。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ranked_rows$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 3,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "所选时间范围内，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "一行是一个 SQL 身份（集群＋数据库＋执行用户＋SQL 结构）的一类计时。“次数”是这一类计时的记录数；Execute、Parse、Bind 是阶段或调用，不相加成执行次数。失败、取消、超时的记录没有计时类别，“未成功次数”按 SQL 身份统计。点一行进入详情。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "进入 SQL 详情",
+              "url": "${__data.fields.url:raw}"
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "scope_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "database"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "数据库"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "execution_user"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "执行用户"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timing"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "计时类别"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "record_count"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "not_success"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "未成功次数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 103
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "总耗时"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "mean_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              },
+              {
+                "id": "displayName",
+                "value": "平均耗时"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "slowest_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              },
+              {
+                "id": "displayName",
+                "value": "最慢一次"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "范围内最近一次"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 132
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "fingerprint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              },
+              {
+                "id": "displayName",
+                "value": "结构指纹"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ranked_rows"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "url"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-list panel 3 A */ SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',coalesce(r.timing_type,'unknown')) timing,\n  r.record_count,r.not_success,r.total_ms,r.mean_ms,r.slowest_ms,r.last_at,r.fingerprint,r.ranked_rows,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.identity||'&from='||(extract(epoch FROM $__timeFrom()::timestamptz)*1000)::bigint||'&to='||(extract(epoch FROM $__timeTo()::timestamptz)*1000)::bigint||'&var-timing='||coalesce(r.timing_type,'unknown') AS url\nFROM mpp_view_ranking('${norm}',$__timeFrom()::timestamptz,$__timeTo()::timestamptz,mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),'${timings:csv}','${rank_order}',${limit}) r",
+          "refId": "A"
+        }
+      ],
+      "title": "SQL 身份排行：所选时间范围内（最多 ${limit} 行）",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 5,
+      "panels": [],
+      "title": "按当前基线版本统计的排行（各集群当前生效版本里已算好的整体基线，与时间范围无关）",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "一行是一个 SQL 身份的一类计时。这个数随顶部的筛选变化，与时间范围无关。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ranked_rows$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 6,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "当前基线版本里，符合筛选的一共有多少行（下表只显示排在最前的 ${limit} 行）",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "数值来自各集群当前生效版本保存的整体基线，不重新计算。某项样本条件不满足时，对应的数值仅供参考。点一行进入详情，时间范围为该 SQL 最近一次执行往前 7 天。",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "进入 SQL 详情",
+              "url": "${__data.fields.url:raw}"
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "scope_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "database"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "数据库"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "execution_user"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "执行用户"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timing"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "计时类别"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "included_count"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "样本数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 74
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "active_days"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "活跃天数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p50_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "P50"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p95_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "P95"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p99_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "P99"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "最大"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "mean_ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 88
+              },
+              {
+                "id": "displayName",
+                "value": "平均"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "conditions"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "样本条件"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "fingerprint"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              },
+              {
+                "id": "displayName",
+                "value": "结构指纹"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ranked_rows"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "url"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-list panel 6 A */ SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,\n  r.included_count,r.active_days,r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,\n  CASE WHEN r.p99_met THEN '三项都满足' WHEN r.p95_met THEN 'P99 样本不足' WHEN r.basic_met THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,\n  r.fingerprint,r.ranked_rows,\n  '/d/mpp-detail/sql-detail?var-fp='||r.fingerprint||'&var-identity='||r.identity||'&from='||(extract(epoch FROM h.last_at-interval '7 days')*1000)::bigint||'&to='||(extract(epoch FROM h.last_at+interval '1 millisecond')*1000)::bigint||'&var-timing='||r.timing_type AS url\nFROM mpp_view_baseline_ranking('${norm}',mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),mpp_view_decode(nullif('${user}','*')),'${timings:csv}','${base_order}',nullif('${min_samples}','')::bigint,${limit}) r\nCROSS JOIN LATERAL (SELECT max(x.last_at) last_at FROM mpp_query_hits('${norm}',r.fingerprint,r.scope_id,r.database,r.execution_user) x) h",
+          "refId": "A"
+        }
+      ],
+      "title": "SQL 身份排行：当前基线版本（最多 ${limit} 行）",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "id": 8,
+      "panels": [],
+      "title": "版本列表",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "sql-apm-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": true,
+            "minWidth": 60
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "scope_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "集群"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "published_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "发布时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "built_at"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "构建完成时间"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_start"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "训练窗口开始"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_end"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "训练窗口结束"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "window_days"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "窗口天数"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "current"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "是否当前生效"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 117
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cleaned"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "结果是否已清理"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 132
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rules"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "规则"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 60
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "build_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "版本标识"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 89
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 9,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "sql-apm-pg"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "/* mpp-list panel 9 A */ SELECT v.scope_id,v.published_at,v.built_at,v.window_start,v.window_end,v.window_days,\n  CASE WHEN v.is_current THEN '当前生效' ELSE '历史版本' END current,\n  CASE WHEN v.results_cleaned THEN '已清理（'||to_char(v.cleaned_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD')||'）' ELSE '保留' END cleaned,\n  CASE WHEN v.rules_match THEN '与当前规则相同' ELSE '规则版本不同' END rules,v.build_id\nFROM mpp_query_versions('${norm}',mpp_view_decode(nullif('${cluster}','*'))) v ORDER BY v.scope_id,v.published_at DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "已发布的基线版本",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "sql-apm",
+    "mpp"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-list variable norm */ SELECT mpp_view_rules()",
+        "hide": 2,
+        "includeAll": false,
+        "label": "norm",
+        "multi": false,
+        "name": "norm",
+        "options": [],
+        "query": "/* mpp-list variable norm */ SELECT mpp_view_rules()",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "全部",
+          "value": "*"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-list variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT scope_id AS name FROM scope WHERE scope_id IS NOT NULL) x ORDER BY 3, 1",
+        "hide": 0,
+        "includeAll": false,
+        "label": "集群",
+        "multi": false,
+        "name": "cluster",
+        "options": [],
+        "query": "/* mpp-list variable cluster */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT scope_id AS name FROM scope WHERE scope_id IS NOT NULL) x ORDER BY 3, 1",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "全部",
+          "value": "*"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-list variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT database AS name FROM mpp_occurrence WHERE database IS NOT NULL) x ORDER BY 3, 1",
+        "hide": 0,
+        "includeAll": false,
+        "label": "数据库",
+        "multi": false,
+        "name": "database",
+        "options": [],
+        "query": "/* mpp-list variable database */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT database AS name FROM mpp_occurrence WHERE database IS NOT NULL) x ORDER BY 3, 1",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "全部",
+          "value": "*"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "sql-apm-pg"
+        },
+        "definition": "/* mpp-list variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT execution_user AS name FROM mpp_occurrence WHERE execution_user IS NOT NULL) x ORDER BY 3, 1",
+        "hide": 0,
+        "includeAll": false,
+        "label": "执行用户",
+        "multi": false,
+        "name": "user",
+        "options": [],
+        "query": "/* mpp-list variable user */ SELECT '全部' AS __text, '*' AS __value, 0 AS seq UNION ALL SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT execution_user AS name FROM mpp_occurrence WHERE execution_user IS NOT NULL) x ORDER BY 3, 1",
+        "refresh": 1,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "请求整体",
+            "Execute 首次"
+          ],
+          "value": [
+            "request",
+            "execute_first"
+          ]
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "计时类别",
+        "multi": true,
+        "name": "timings",
+        "options": [
+          {
+            "selected": true,
+            "text": "请求整体",
+            "value": "request"
+          },
+          {
+            "selected": true,
+            "text": "Execute 首次",
+            "value": "execute_first"
+          },
+          {
+            "selected": false,
+            "text": "Execute 续取",
+            "value": "execute_fetch"
+          },
+          {
+            "selected": false,
+            "text": "Parse",
+            "value": "parse"
+          },
+          {
+            "selected": false,
+            "text": "Bind",
+            "value": "bind"
+          }
+        ],
+        "query": "请求整体 : request,Execute 首次 : execute_first,Execute 续取 : execute_fetch,Parse : parse,Bind : bind",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "次数",
+          "value": "count"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "时间范围排行按",
+        "multi": false,
+        "name": "rank_order",
+        "options": [
+          {
+            "selected": true,
+            "text": "次数",
+            "value": "count"
+          },
+          {
+            "selected": false,
+            "text": "总耗时",
+            "value": "total"
+          },
+          {
+            "selected": false,
+            "text": "平均耗时",
+            "value": "mean"
+          },
+          {
+            "selected": false,
+            "text": "最慢一次",
+            "value": "slowest"
+          },
+          {
+            "selected": false,
+            "text": "未成功次数",
+            "value": "not_success"
+          }
+        ],
+        "query": "次数 : count,总耗时 : total,平均耗时 : mean,最慢一次 : slowest,未成功次数 : not_success",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "P95",
+          "value": "p95"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "基线排行按",
+        "multi": false,
+        "name": "base_order",
+        "options": [
+          {
+            "selected": true,
+            "text": "P95",
+            "value": "p95"
+          },
+          {
+            "selected": false,
+            "text": "P50",
+            "value": "p50"
+          },
+          {
+            "selected": false,
+            "text": "P99",
+            "value": "p99"
+          },
+          {
+            "selected": false,
+            "text": "最大",
+            "value": "max"
+          },
+          {
+            "selected": false,
+            "text": "平均",
+            "value": "mean"
+          },
+          {
+            "selected": false,
+            "text": "样本数",
+            "value": "samples"
+          }
+        ],
+        "query": "P95 : p95,P50 : p50,P99 : p99,最大 : max,平均 : mean,样本数 : samples",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "label": "基线样本数不少于",
+        "name": "min_samples",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "100",
+          "value": "100"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "行数",
+        "multi": false,
+        "name": "limit",
+        "options": [
+          {
+            "selected": false,
+            "text": "50",
+            "value": "50"
+          },
+          {
+            "selected": true,
+            "text": "100",
+            "value": "100"
+          },
+          {
+            "selected": false,
+            "text": "200",
+            "value": "200"
+          },
+          {
+            "selected": false,
+            "text": "500",
+            "value": "500"
+          }
+        ],
+        "query": "50 : 50,100 : 100,200 : 200,500 : 500",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Shanghai",
+  "title": "SQL 列表",
+  "uid": "mpp-list",
+  "version": 1
+}

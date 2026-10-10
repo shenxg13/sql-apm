@@ -1,0 +1,19 @@
+# Rendered by scripts/grafana/install.py; copy to /etc/systemd/system as root.
+# The service loads the fingerprint rules when it starts: restart it after a product upgrade.
+[Unit]
+Description=SQL APM fingerprint service (loopback only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@APP_ROOT@
+Environment="SQL_APM_DSN=host=127.0.0.1 port=@PG_PORT@ dbname=@DATABASE@ user=@READONLY_ROLE@"
+Environment="PGPASSFILE=@PGPASSFILE@"
+ExecStart=@PYTHON@ -m sql_apm fingerprint-service --port @SERVICE_PORT@ --schema @SCHEMA@
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

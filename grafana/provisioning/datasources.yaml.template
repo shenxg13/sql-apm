@@ -1,0 +1,32 @@
+# Rendered by scripts/grafana/install.py. Both data sources are fixed to the
+# loopback address; the database one logs in as the read-only account.
+apiVersion: 1
+datasources:
+  - name: SQL APM（只读）
+    uid: sql-apm-pg
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: 127.0.0.1:@PG_PORT@
+    user: @READONLY_ROLE@
+    isDefault: true
+    editable: false
+    jsonData:
+      database: @DATABASE@
+      sslmode: disable
+      postgresVersion: 1700
+      timescaledb: false
+      maxOpenConns: 10
+      maxIdleConns: 10
+      connMaxLifetime: 14400
+      timeInterval: 1s
+    secureJsonData:
+      password: $__file{@DB_PASSWORD_FILE@}
+  - name: SQL APM 指纹服务
+    uid: sql-apm-fingerprint
+    type: yesoreyeram-infinity-datasource
+    access: proxy
+    url: http://127.0.0.1:@SERVICE_PORT@
+    editable: false
+    jsonData:
+      allowedHosts:
+        - http://127.0.0.1:@SERVICE_PORT@

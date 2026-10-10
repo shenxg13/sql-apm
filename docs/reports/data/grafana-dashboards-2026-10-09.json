@@ -1,0 +1,2458 @@
+{
+ "format": "sql-apm-evidence/1",
+ "date": "2026-10-09",
+ "issue": 51,
+ "evidence_owner": "implementation session (claude-issue51-20261008)",
+ "product_commit": "9fa9f9ae2fa29d6b00600cee29a6f5a233ca4611",
+ "feedback_changes": [
+  {
+   "commit": "c5851def187596ca34232046f8a7cb2ca88cbe80",
+   "change": "list page: the \"set as time range\" link (a value mapping had replaced its address)",
+   "files": "two dashboards, their generator, the end-to-end check",
+   "rerun": [
+    "unit tests",
+    "generated dashboards equal the committed ones",
+    "harness checks",
+    "end-to-end 16 groups"
+   ]
+  },
+  {
+   "commit": "d0e9c4749091885e0fbfc64d209402d3a82204e6",
+   "change": "a total of the whole list is shown once above its table instead of as a column repeated in every row (five tables)",
+   "files": "three dashboards, their generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "extra_database_queries": 0,
+   "rerun": [
+    "unit tests (81)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries",
+    "real-data list page: both displayed totals equal the table results"
+   ],
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "timings"
+   ]
+  },
+  {
+   "commit": "fd8d7f14f42f23665814c2b0223589d7dd9d8e61",
+   "change": "search results: a mark on the example cell shows the beginning of that original text (line breaks kept), cut to what fits a small screen",
+   "files": "the search dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "limits": {
+    "characters": 1600,
+    "drawn_lines": 24,
+    "wrap_width_units": 75
+   },
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (82)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "inputs": 4,
+    "rows_compared": 166,
+    "equal_to_independent_rule": 166,
+    "shortened": 43,
+    "window_height_px": 950,
+    "tallest_box_px": 568,
+    "result_query_seconds": [
+     1.451,
+     1.47
+    ],
+    "search_function_alone_seconds": [
+     1.349,
+     1.436
+    ],
+    "extra_characters_for_50_rows": 40567
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  },
+  {
+   "commit": "83c8e5572c3994968c0f7fdd88c514537cb674b4",
+   "change": "search page: the panel explaining the three modes is removed (its content is on two help marks), and the page is laid out for a 1920x1080 screen",
+   "files": "the search dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "layout": {
+    "input": [
+     0,
+     0,
+     12,
+     8
+    ],
+    "total": [
+     12,
+     0,
+     12,
+     3
+    ],
+    "note": [
+     12,
+     3,
+     12,
+     5
+    ],
+    "results": [
+     0,
+     8,
+     24,
+     13
+    ],
+    "grid_line_px": 38,
+    "editor_px": 110
+   },
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (83)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries",
+    "real-data search page in a 1920x920 window: the four panels inside one screen"
+   ],
+   "window_sizes": [
+    {
+     "screen": "1920x1080 at 100%",
+     "window": [
+      1920,
+      920
+     ],
+     "grid_column_px": 75.9,
+     "filter_rows": {
+      "search": 1,
+      "list": 2,
+      "detail": 2
+     },
+     "search_first_screen_panels": 4,
+     "result_list_scrolls_sideways": false
+    },
+    {
+     "screen": "1920x1080 at 125% scaling",
+     "window": [
+      1536,
+      730
+     ],
+     "grid_column_px": 59.9,
+     "filter_rows": {
+      "search": 1,
+      "list": 2,
+      "detail": 3
+     },
+     "search_first_screen_panels": 3,
+     "result_list_scrolls_sideways": true
+    },
+    {
+     "screen": "1366x768",
+     "window": [
+      1366,
+      640
+     ],
+     "grid_column_px": 52.8,
+     "filter_rows": {
+      "search": 2,
+      "list": 2,
+      "detail": 4
+     },
+     "search_first_screen_panels": 3,
+     "result_list_scrolls_sideways": true
+    },
+    {
+     "screen": "2560x1440",
+     "window": [
+      2560,
+      1310
+     ],
+     "grid_column_px": 102.6,
+     "filter_rows": {
+      "search": 1,
+      "list": 1,
+      "detail": 2
+     },
+     "search_first_screen_panels": 5,
+     "result_list_scrolls_sideways": false
+    }
+   ],
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  },
+  {
+   "commit": "ff2373b47dff7cf863c2311fe23f214ff8be5353",
+   "change": "detail page: the chart coloured by original text draws the fastest execution of every slot as well as the slowest, as the main chart does; no selector was added (user decision)",
+   "files": "the detail dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, one document",
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (84)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "range_days": 7,
+    "step": "5m",
+    "samples": [
+     {
+      "kind": "one original text executed repeatedly",
+      "texts_drawn": 1,
+      "points_drawn": 4033,
+      "independent_count": 4033,
+      "slowest_only_would_be": 2017
+     },
+     {
+      "kind": "many original texts, few executions each",
+      "texts_drawn": 10,
+      "points_drawn": 20,
+      "independent_count": 20,
+      "slowest_only_would_be": 18
+     },
+     {
+      "kind": "many original texts, one execution each",
+      "texts_drawn": 10,
+      "points_drawn": 10,
+      "independent_count": 10,
+      "slowest_only_would_be": 10
+     }
+    ]
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  },
+  {
+   "commit": "3b592dea0c52c57e516bf51223bad42e25743d89",
+   "change": "detail page: a mark on the differing part shows that original text (a long one from near the first difference); headers wrap instead of being cut; duration columns keep a minimum width and the layer table scrolls sideways with its first column fixed; the coloured chart names the order that picks its texts",
+   "files": "three dashboards, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "query_functions_changed": false,
+   "limits": {
+    "per_text_rows": 10,
+    "lead_characters": 400,
+    "short_lead_characters": 200,
+    "run_without_blank": 80,
+    "duration_column_min_px": 88
+   },
+   "rerun": [
+    "unit tests (85)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "differing_mark": {
+     "inputs": 4,
+     "structures_per_input": 3,
+     "orders": 2,
+     "rows_compared": 240,
+     "equal_to_independent_rule": 240,
+     "started_near_first_difference": 20,
+     "cut_at_the_end": 50,
+     "with_broken_long_runs": 61,
+     "window_height_px": 950,
+     "tallest_box_px": 568
+    },
+    "search_mark_after_long_run_rule": {
+     "rows_compared": 166,
+     "equal_to_independent_rule": 166
+    },
+    "coloured_chart_by_order": {
+     "range_days": 7,
+     "step": "5m",
+     "count": {
+      "points": 26,
+      "independent": 26,
+      "fastest_of_slot": 13
+     },
+     "median": {
+      "points": 18,
+      "independent": 18,
+      "fastest_of_slot": 8
+     },
+     "slowest": {
+      "points": 21,
+      "independent": 21,
+      "fastest_of_slot": 10
+     }
+    },
+    "headers": {
+     "tables_checked": 16,
+     "before": {
+      "w1920": {
+       "layer_detail": 7
+      },
+      "w1536": {
+       "layer_detail": 11,
+       "sample_conditions": 2
+      }
+     },
+     "after": {
+      "w1920": 0,
+      "w1536": 0
+     },
+     "sideways_scrolling_after": {
+      "w1920": [
+       "layer detail"
+      ],
+      "w1536": [
+       "layer detail",
+       "search results"
+      ]
+     }
+    },
+    "layer_detail_numeric_cells_cut": {
+     "identity": "median above 90 s and maximum above one hour",
+     "before": 12,
+     "after": 0
+    }
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  },
+  {
+   "commit": "5c8daec9f039704a1727c001e38506e4312ed1d5",
+   "change": "table headers stay on one line and whole (the wrapping of the previous commit was found ugly by the user): every column is at least as wide as its header, including the arrow shown while sorted; tables too wide for the window scroll sideways",
+   "files": "three dashboards, the generator, the end-to-end check, the unit test, two documents",
+   "query_functions_changed": false,
+   "rerun": [
+    "unit tests (85)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "tables_checked": 16,
+    "headers_cut": {
+     "w1920": 0,
+     "w1536": 0,
+     "w1366": 0
+    },
+    "headers_cut_after_sorting_three_columns": 0,
+    "layer_detail_px": {
+     "window": 1780,
+     "content": 2418
+    },
+    "sideways_scrolling_tables": {
+     "w1920": 1,
+     "w1536": 5,
+     "w1366": 8
+    }
+   },
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  },
+  {
+   "commit": "59572e305815b3f8242f0c5e49175d008361dcb5",
+   "change": "detail page: a bar chart above the execution list draws the listed executions, one bar each, coloured by the comparison with the baseline; executions without a duration are faint full-height marks; the list itself is unchanged",
+   "files": "the detail dashboard, the generator, the end-to-end check, one new unit test, the pinned unit-test count of the verification kit, two documents",
+   "query_functions_changed": false,
+   "extra_database_queries": 0,
+   "rerun": [
+    "unit tests (86)",
+    "generated dashboards equal the committed ones",
+    "packaging tests (30)",
+    "harness checks",
+    "end-to-end 16 groups",
+    "candidate package rebuilt and all six kit entries"
+   ],
+   "real_data": {
+    "identity_samples": 1,
+    "rows": 200,
+    "rows_with_exactly_one_bar": 200,
+    "newest_first": {
+     "not_above_p50": 142,
+     "above_p50": 52,
+     "above_p95": 6
+    },
+    "slowest_first": {
+     "above_p95": 109,
+     "above_p99": 91
+    }
+   },
+   "user_statement": "the system is for the execution characteristics of single statements or classes of statements, not for system load; the load timeline, share bars and per-dimension breakdowns suggested after looking at Oracle Enterprise Manager are not wanted",
+   "not_rerun": [
+    "real database upgrade",
+    "real-data search and page audits",
+    "other timings"
+   ]
+  }
+ ],
+ "schema_sha256": "7de034a904f27cba90e0829048ae13d72426f65a0bb1c43ec303cfa026b68f7a",
+ "migration_sha256": "1028cca9110326973bae3b22a9fb9eefdfc7f62e7e86a521f177b946ba6a7809",
+ "frozen_1_10_0_sha256": "20d2de8f9de5d318ca8ebb61817ecd858ced9c908fda8419042dab8e00e8c734",
+ "machine": {
+  "kind": "development machine",
+  "cpus": 12,
+  "memory_gib": 23,
+  "postgresql": "17.10",
+  "python": "3.13.16",
+  "settings": {
+   "max_parallel_workers_per_gather": "2",
+   "max_worker_processes": "8",
+   "shared_buffers": "512MB",
+   "work_mem": "16MB"
+  },
+  "note": "shared machine; operating-system page cache not cleared"
+ },
+ "components": {
+  "grafana": "13.2.3",
+  "plugins": {
+   "grafana-postgresql-datasource": "13.0.4",
+   "volkovlabs-form-panel": "6.3.5",
+   "yesoreyeram-infinity-datasource": "4.1.1"
+  },
+  "sha256": {
+   "grafana_13.2.3_36482603486_linux_amd64.tar.gz": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+   "grafana-postgresql-datasource-13.0.4.linux_amd64.zip": "d34f44bd13213502de4394955fcc170d70fb822531c181bff0179f216c35a0e0",
+   "volkovlabs-form-panel-6.3.5.zip": "6ccab1571d1188c58a309f57336b90a59af5173f0439a0acf565bd859dc0885b",
+   "yesoreyeram-infinity-datasource-4.1.1.linux_amd64.zip": "e24f6030e998cf5dd76c70bb26a5bcb56a34bc530446358e21ae0164f21af3d5"
+  },
+  "bytes": {
+   "grafana_13.2.3_36482603486_linux_amd64.tar.gz": 460956549,
+   "grafana-postgresql-datasource-13.0.4.linux_amd64.zip": 11753881
+  }
+ },
+ "plugin_scope_finding": {
+  "evidence": "observed",
+  "without_start_up_downloads_and_two_plugins": "PostgreSQL data source not registered; queries answer \"Plugin not registered\"",
+  "with_pinned_official_plugin": "three plugins with valid signatures; query as the read-only account over 127.0.0.1 succeeds; no download at start-up",
+  "issue_comments": [
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6063622231",
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6063830442"
+  ]
+ },
+ "synthetic": {
+  "unit_tests": {
+   "count": 91,
+   "result": "ok"
+  },
+  "development_tests": {
+   "grafana_tooling": 5,
+   "packaging": 30,
+   "result": "ok"
+  },
+  "database_verification": {
+   "script": "scripts/db/verify.py",
+   "pass_lines": 278,
+   "result": "ok"
+  },
+  "search_verification": {
+   "script": "scripts/db/verify_search.py",
+   "groups": 8,
+   "result": "ok"
+  },
+  "view_verification": {
+   "script": "scripts/db/verify_views.py",
+   "groups": 16,
+   "result": "ok"
+  },
+  "setup": {
+   "script": "scripts/grafana/setup_dev.py synthetic",
+   "first_run_seconds": 26.7,
+   "second_run_seconds": 3.3,
+   "rendered_files_identical_on_second_run": true,
+   "downloads_cached": true
+  },
+  "end_to_end": {
+   "script": "scripts/grafana/verify_e2e.py",
+   "groups": 17,
+   "seconds": 674.7,
+   "labels": [
+    "G4/G6: Grafana 13.2.3 from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time",
+    "G7: exactly the three pinned plugins with valid signatures; unsigned plugins not allowed; nothing downloaded at start-up; packaged dashboards use only them and built-in panels",
+    "G8: anonymous requests and default passwords refused; the viewer uses search and all three dashboards, cannot save a dashboard or a folder, and its statements run as the read-only account",
+    "G9: MPP holds the three packaged dashboards and 用户自定义; saving over or deleting a packaged dashboard is refused; a copy saved into 用户自定义, the accounts and the settings are unchanged after a new packaged version is loaded",
+    "G10: 9 fixed inputs in three modes (and one under a Windows browser identity) reach the database and the service with the same digest, line breaks as LF: line breaks, tabs and double quotes 47 bytes 2a025209bc0d; backslashes and a literal \\n 42 bytes 72f14580812f; dollar names and template marks 77 bytes f13119ab0c8b; Chinese and other non-ASCII 72 bytes 226edfc99334; a statement of more than 60 KB 68436 bytes c98a5ccc5b7d; typing after a paste 18 bytes 878c15212b8d; CR LF (compared after turning them into LF) 37 bytes 3c8dc5bb96cf; a lone CR (compared after turning them into LF) 37 bytes 3c8dc5bb96cf; mixed line breaks (compared after turning them into LF) 51 bytes aea37be389fe",
+    "G11: mode switch with the meanings on it, default by words; filters; this-search note with the words or the refusal; one list for every mode, 50 of 60 with the total; the mark on an example cell shows more of that text; input, note, total and the whole list fit a 1920x1080 screen; stays on the list",
+    "G12: a row opens the detail page on the identity with the most records and its last seven days; texts hit by the search come first and are marked; a single hit or an identical stored text opens on that text; batch hints can be selected one by one; coming back refills the input and the mode",
+    "G5: the service listens on the loopback address only; while it is stopped complete-SQL search says so and words, passages and the other pages work",
+    "G13: the identity list holds exactly the combinations that occurred, the timing category defaults correctly, only usable versions can be chosen; the SQL text panel shows an example of the structure; the page states no anomaly verdict",
+    "G14: key numbers, percentile bars, the five-category overview with the no-sample line, sample conditions and both pattern charts equal the stored statistics and do not follow the time range",
+    "G17: a linear axis; when dense, each slot shows its slowest and fastest execution and the title states the step; zoomed in, every execution is one point; dragging zooms; failures, cancellations and timeouts are marks, never zero; the duration filters act on the chart and the list; counts equal an independent count",
+    "G18: the per-text table equals independent statistics in three orders, ten texts at most; selecting a text limits the tiles, comparison, charts and list to it while the baseline stays; the coloured chart is collapsed, queries only when opened and draws, for each text and under every order of the texts, the slowest and the fastest execution of every slot; the mark on the differing part shows the text, a long one from near the first difference",
+    "G15: with the details opened, five timing categories by twenty stored values, the five layers bucket by bucket with all 17 metrics and their own conditions, and the exclusion reasons equal the stored statistics; no column header is cut",
+    "G19: the list has every agreed field, newest first by default and slowest first on request, both over the whole range, 200 rows at most as its title says; unknown durations stay unknown; training decisions under the chosen version are shown as they are; the chart above the list draws the same executions, one bar each in the colour of its comparison with the baseline, and marks those without a duration",
+    "G13/G16: extended-protocol SQL defaults to Execute first and names stages as stages; unmet sample conditions grey the value and say so, draw no reference line and are not compared; a failure-only SQL is shown under the untimed records; the links inside the page work; a pasted fingerprint opens the page",
+    "G20: the time-range ranking and the current-baseline ranking equal independent statistics, with orders and filters; the version list is complete; \"set as time range\" moves to the last day of data; a row opens the detail page",
+    "R1 boundaries: empty input and input over 256 KB are refused with their reason at both entries; a pasted fingerprint is found in every mode, in complete SQL only within the 512 KB limit; a complete-SQL search uses the chosen cluster, database and user for its state and hints, and hints of other filters are not kept; the identical text is found across the three line-break forms and by nothing else; a statement whose structure depends on the form is found in the form of the stored text and the page says so; databases and users without a baseline (failures only, or imported after the last build) can be chosen and their records found; a text chosen for another structure is not applied; failure, cancellation and timeout marks, alone or mixed, show without any duration; a text longer than one segment can be read to its end"
+   ],
+   "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb"
+  },
+  "dataset": {
+   "clusters": 2,
+   "days": 28,
+   "occurrences": 28798,
+   "original_texts": 161,
+   "note": "committed generator tests/database/dashboard_data.py; no real content"
+  }
+ },
+ "package": {
+  "builder": "scripts/deployment/build_release.py (existing; candidate, default label v0.2.0, not published)",
+  "program_files": 104,
+  "verify_package": "passed",
+  "kit_entries": {
+   "unit": "91 tests, no skips",
+   "database": "278 PASS lines",
+   "publication": "33 PASS lines",
+   "smoke": "passed",
+   "cleanup": "23 PASS lines",
+   "search": "8 groups"
+  },
+  "packaged_documents_changed": false,
+  "offline_bundle_changed": false,
+  "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb"
+ },
+ "real_data": {
+  "source": "private copy of the retained 1.10.0 database (55 files, 2 clusters); originals and identities stay in the ignored directory",
+  "occurrences": 7424804,
+  "original_texts": 1385776,
+  "statistic_rows": 21727049,
+  "database_bytes": 58383685299,
+  "upgrade": {
+   "evidence": "measured",
+   "state": "ok",
+   "upgrade_seconds": 0.6,
+   "rows_and_contents_unchanged": true,
+   "tables": 57,
+   "rows": 63995950,
+   "database_bytes": [
+    58381588147,
+    58388174515
+   ],
+   "catalog_before_after": {
+    "tables": [
+     57,
+     57
+    ],
+    "columns": [
+     405,
+     405
+    ],
+    "indexes": [
+     111,
+     111
+    ],
+    "functions": [
+     31,
+     56
+    ],
+    "extensions": [
+     [
+      "plpgsql"
+     ],
+     [
+      "plpgsql"
+     ]
+    ],
+    "constraints": [
+     515,
+     515
+    ]
+   },
+   "only_functions_added": true
+  },
+  "search_audit": {
+   "evidence": "verified",
+   "texts_scanned": 1385776,
+   "oracle_seconds": 31.6,
+   "cases": [
+    {
+     "mode": "words",
+     "input": "select",
+     "rows": 50,
+     "total_structures": 591464,
+     "seconds": 5.03,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "select from",
+     "rows": 50,
+     "total_structures": 480769,
+     "seconds": 4.68,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "from select",
+     "rows": 50,
+     "total_structures": 480769,
+     "seconds": 4.64,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "=",
+     "rows": 50,
+     "total_structures": 209597,
+     "seconds": 3.72,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "order by",
+     "rows": 50,
+     "total_structures": 42348,
+     "seconds": 1.82,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "zz_no_search_match_51",
+     "rows": 0,
+     "total_structures": 0,
+     "seconds": 0.57,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "%_",
+     "rows": 10,
+     "total_structures": 10,
+     "seconds": 1.67,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "\"",
+     "rows": 50,
+     "total_structures": 6415,
+     "seconds": 1.34,
+     "equal": true
+    },
+    {
+     "mode": "words",
+     "input": "select * from where and",
+     "rows": 50,
+     "total_structures": 63192,
+     "seconds": 2.85,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "select *",
+     "rows": 50,
+     "total_structures": 26262,
+     "seconds": 1.52,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "order by",
+     "rows": 50,
+     "total_structures": 41968,
+     "seconds": 1.64,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "where 1=1",
+     "rows": 50,
+     "total_structures": 15775,
+     "seconds": 1.54,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "zz_no_search_match_51",
+     "rows": 0,
+     "total_structures": 0,
+     "seconds": 0.57,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "SELECT\n  *\tFROM",
+     "rows": 50,
+     "total_structures": 24805,
+     "seconds": 1.48,
+     "equal": true
+    },
+    {
+     "mode": "passage",
+     "input": "\" as \"",
+     "rows": 50,
+     "total_structures": 91,
+     "seconds": 1.45,
+     "equal": true
+    }
+   ],
+   "exact": {
+    "sample": 300,
+    "equal": true,
+    "states": {
+     "has_baseline": 297,
+     "records_without_baseline": 3
+    },
+    "service_seconds": {
+     "median": 0.013,
+     "p95": 0.323,
+     "slowest": 0.413
+    }
+   }
+  },
+  "pages": {
+   "evidence": "verified and measured",
+   "samples": [
+    {
+     "kind": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473,
+     "timing": "execute_first",
+     "range_records": 29232,
+     "range_texts": 14616,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 11.56,
+     "slowest_seconds": 1.7,
+     "wall_seconds": 5.35
+    },
+    {
+     "kind": "most original texts",
+     "identity_records": 374838,
+     "identity_texts": 62473,
+     "timing": "execute_first",
+     "range_records": 29232,
+     "range_texts": 14616,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 11.98,
+     "slowest_seconds": 1.74,
+     "wall_seconds": 5.21
+    },
+    {
+     "kind": "failed records only",
+     "identity_records": 14643,
+     "identity_texts": 1,
+     "timing": "unknown",
+     "range_records": 14643,
+     "range_texts": 1,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 1.57,
+     "slowest_seconds": 0.75,
+     "wall_seconds": 2.13
+    },
+    {
+     "kind": "extended protocol",
+     "identity_records": 903,
+     "identity_texts": 301,
+     "timing": "execute_first",
+     "range_records": 72,
+     "range_texts": 72,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 1.14,
+     "slowest_seconds": 0.73,
+     "wall_seconds": 2.29
+    },
+    {
+     "kind": "insufficient samples",
+     "identity_records": 7,
+     "identity_texts": 7,
+     "timing": "request",
+     "range_records": 7,
+     "range_texts": 7,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 0.89,
+     "slowest_seconds": 0.71,
+     "wall_seconds": 2.06
+    },
+    {
+     "kind": "random with requests",
+     "identity_records": 167,
+     "identity_texts": 1,
+     "timing": "request",
+     "range_records": 167,
+     "range_texts": 1,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 1.31,
+     "slowest_seconds": 0.74,
+     "wall_seconds": 2.08
+    },
+    {
+     "kind": "random with requests",
+     "identity_records": 44977,
+     "identity_texts": 2,
+     "timing": "request",
+     "range_records": 11088,
+     "range_texts": 2,
+     "equal": true,
+     "queries": 22,
+     "summed_seconds": 2.1,
+     "slowest_seconds": 0.82,
+     "wall_seconds": 2.35
+    }
+   ],
+   "list_pages": [
+    {
+     "page": "list, 24 hours, one cluster",
+     "range_rows": 6342,
+     "equal": true,
+     "queries": 8,
+     "summed_seconds": 1.65,
+     "slowest_seconds": 0.64,
+     "wall_seconds": 2.06
+    },
+    {
+     "page": "list, 24 hours, one cluster",
+     "range_rows": 251248,
+     "equal": true,
+     "queries": 8,
+     "summed_seconds": 3.9,
+     "slowest_seconds": 1.72,
+     "wall_seconds": 3.14
+    }
+   ]
+  },
+  "timing": {
+   "evidence": "measured",
+   "connection": "one long-lived read-only connection; first call and repeats",
+   "targets_seconds": {
+    "search_words_and_passage": 10,
+    "search_complete_sql": 3,
+    "detail_panel_7_days": 5,
+    "list_baseline_ranking": 3,
+    "list_time_range_24_hours": 10
+   },
+   "slowest_seconds": {
+    "search": 4.921,
+    "detail": 1.346,
+    "list": 3.833
+   },
+   "fuzzy_serial_against_parallel": [
+    {
+     "input": "zz_no_search_match_51",
+     "serial": {
+      "operation": "fuzzy serial: zz_no_search_match_51",
+      "first": 1.133,
+      "repeats": [
+       1.073,
+       1.102,
+       1.09,
+       1.089,
+       1.089
+      ],
+      "rows": 0
+     },
+     "parallel": {
+      "operation": "fuzzy parallel: zz_no_search_match_51",
+      "first": 0.553,
+      "repeats": [
+       0.56,
+       0.598,
+       0.705,
+       0.592,
+       0.563
+      ],
+      "rows": 0
+     }
+    },
+    {
+     "input": "select",
+     "serial": {
+      "operation": "fuzzy serial: select",
+      "first": 6.856,
+      "repeats": [
+       6.796,
+       6.716,
+       6.761,
+       6.669,
+       6.772
+      ],
+      "rows": 50
+     },
+     "parallel": {
+      "operation": "fuzzy parallel: select",
+      "first": 4.88,
+      "repeats": [
+       4.772,
+       4.759,
+       4.742,
+       4.728,
+       4.769
+      ],
+      "rows": 50
+     }
+    },
+    {
+     "input": "=",
+     "serial": {
+      "operation": "fuzzy serial: =",
+      "first": 5.568,
+      "repeats": [
+       5.514,
+       5.552,
+       5.499,
+       5.474,
+       5.555
+      ],
+      "rows": 50
+     },
+     "parallel": {
+      "operation": "fuzzy parallel: =",
+      "first": 3.674,
+      "repeats": [
+       3.61,
+       3.607,
+       3.649,
+       3.627,
+       3.596
+      ],
+      "rows": 50
+     }
+    }
+   ],
+   "results": [
+    {
+     "operation": "search words: zz_no_search_match_51",
+     "first": 0.636,
+     "repeats": [
+      0.581,
+      0.549,
+      0.634,
+      0.595,
+      0.555
+     ],
+     "rows": 0,
+     "group": "search"
+    },
+    {
+     "operation": "search words: select",
+     "first": 4.857,
+     "repeats": [
+      4.921,
+      4.795,
+      4.789,
+      4.84,
+      4.886
+     ],
+     "rows": 50,
+     "group": "search"
+    },
+    {
+     "operation": "search words: select from where",
+     "first": 3.625,
+     "repeats": [
+      3.628,
+      3.643,
+      3.616,
+      3.611,
+      3.654
+     ],
+     "rows": 50,
+     "group": "search"
+    },
+    {
+     "operation": "search words: =",
+     "first": 3.672,
+     "repeats": [
+      3.668,
+      3.608,
+      3.63,
+      3.633,
+      3.622
+     ],
+     "rows": 50,
+     "group": "search"
+    },
+    {
+     "operation": "search passage: select *",
+     "first": 1.527,
+     "repeats": [
+      1.532,
+      1.534,
+      1.529,
+      1.527,
+      1.532
+     ],
+     "rows": 50,
+     "group": "search"
+    },
+    {
+     "operation": "search passage: order by",
+     "first": 1.646,
+     "repeats": [
+      1.652,
+      1.659,
+      1.63,
+      1.634,
+      1.624
+     ],
+     "rows": 50,
+     "group": "search"
+    },
+    {
+     "operation": "search passage: zz_no_search_match_51",
+     "first": 0.598,
+     "repeats": [
+      0.553,
+      0.57,
+      0.587,
+      0.572,
+      0.551
+     ],
+     "rows": 0,
+     "group": "search"
+    },
+    {
+     "operation": "detail [most records] identities",
+     "first": 0.403,
+     "repeats": [
+      0.389,
+      0.388
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] timing categories",
+     "first": 0.991,
+     "repeats": [
+      0.951,
+      0.965
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] versions",
+     "first": 0.002,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 9,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] sql text",
+     "first": 0.015,
+     "repeats": [
+      0.013,
+      0.013
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] baseline overall",
+     "first": 0.01,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] baseline by hour",
+     "first": 0.003,
+     "repeats": [
+      0.003,
+      0.003
+     ],
+     "rows": 29,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] baseline by day",
+     "first": 0.004,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 86,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] comparison",
+     "first": 0.863,
+     "repeats": [
+      0.876,
+      0.878
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] summary tiles",
+     "first": 0.825,
+     "repeats": [
+      0.829,
+      0.817
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] points",
+     "first": 0.922,
+     "repeats": [
+      0.906,
+      0.931
+     ],
+     "rows": 102,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] counts",
+     "first": 0.85,
+     "repeats": [
+      0.829,
+      0.828
+     ],
+     "rows": 51,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] texts",
+     "first": 0.854,
+     "repeats": [
+      0.85,
+      0.857
+     ],
+     "rows": 10,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] executions newest",
+     "first": 1.287,
+     "repeats": [
+      1.139,
+      1.151
+     ],
+     "rows": 200,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] executions slowest",
+     "first": 1.346,
+     "repeats": [
+      1.165,
+      1.152
+     ],
+     "rows": 200,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most records] missing rules note",
+     "first": 0.583,
+     "repeats": [
+      0.586,
+      0.558
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most records",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] identities",
+     "first": 0.391,
+     "repeats": [
+      0.396,
+      0.39
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] timing categories",
+     "first": 0.963,
+     "repeats": [
+      0.997,
+      0.945
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] versions",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 9,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] sql text",
+     "first": 0.013,
+     "repeats": [
+      0.013,
+      0.012
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] baseline overall",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] baseline by hour",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 29,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] baseline by day",
+     "first": 0.004,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 86,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] comparison",
+     "first": 0.867,
+     "repeats": [
+      0.865,
+      0.884
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] summary tiles",
+     "first": 0.826,
+     "repeats": [
+      0.827,
+      0.831
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] points",
+     "first": 0.906,
+     "repeats": [
+      0.932,
+      0.917
+     ],
+     "rows": 102,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] counts",
+     "first": 0.836,
+     "repeats": [
+      0.824,
+      0.825
+     ],
+     "rows": 51,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] texts",
+     "first": 0.834,
+     "repeats": [
+      0.848,
+      0.835
+     ],
+     "rows": 10,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] executions newest",
+     "first": 1.153,
+     "repeats": [
+      1.155,
+      1.151
+     ],
+     "rows": 200,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] executions slowest",
+     "first": 1.165,
+     "repeats": [
+      1.149,
+      1.141
+     ],
+     "rows": 200,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [most texts] missing rules note",
+     "first": 0.571,
+     "repeats": [
+      0.577,
+      0.568
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "most texts",
+     "identity_records": 374838,
+     "identity_texts": 62473
+    },
+    {
+     "operation": "detail [random] identities",
+     "first": 0.006,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] timing categories",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] versions",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 4,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] sql text",
+     "first": 0.001,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline overall",
+     "first": 0.003,
+     "repeats": [
+      0.002,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by hour",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by day",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] comparison",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] summary tiles",
+     "first": 0.0,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] points",
+     "first": 0.001,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] counts",
+     "first": 0.0,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] texts",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions newest",
+     "first": 0.006,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions slowest",
+     "first": 0.004,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] missing rules note",
+     "first": 0.612,
+     "repeats": [
+      0.578,
+      0.591
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] identities",
+     "first": 0.008,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] timing categories",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] versions",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 4,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] sql text",
+     "first": 0.001,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline overall",
+     "first": 0.002,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by hour",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by day",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] comparison",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] summary tiles",
+     "first": 0.0,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] points",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] counts",
+     "first": 0.0,
+     "repeats": [
+      0.001,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] texts",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions newest",
+     "first": 0.006,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions slowest",
+     "first": 0.004,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] missing rules note",
+     "first": 0.576,
+     "repeats": [
+      0.566,
+      0.575
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] identities",
+     "first": 0.006,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] timing categories",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] versions",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 4,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] sql text",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline overall",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by hour",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] baseline by day",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 5,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] comparison",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 3,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] summary tiles",
+     "first": 0.0,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] points",
+     "first": 0.001,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] counts",
+     "first": 0.001,
+     "repeats": [
+      0.0,
+      0.0
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] texts",
+     "first": 0.002,
+     "repeats": [
+      0.002,
+      0.002
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions newest",
+     "first": 0.007,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] executions slowest",
+     "first": 0.004,
+     "repeats": [
+      0.004,
+      0.004
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "detail [random] missing rules note",
+     "first": 0.584,
+     "repeats": [
+      0.576,
+      0.592
+     ],
+     "rows": 1,
+     "group": "detail",
+     "identity": "random",
+     "identity_records": 1,
+     "identity_texts": 1
+    },
+    {
+     "operation": "list: time-range ranking, 24 hours, cluster 119",
+     "first": 0.317,
+     "repeats": [
+      0.314,
+      0.303
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: time-range ranking, 7 days, cluster 119",
+     "first": 0.521,
+     "repeats": [
+      0.522,
+      0.528
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: time-range ranking, 24 hours, cluster 120",
+     "first": 0.909,
+     "repeats": [
+      0.917,
+      0.908
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: time-range ranking, 7 days, cluster 120",
+     "first": 3.833,
+     "repeats": [
+      3.795,
+      3.801
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: time-range ranking, 24 hours, all clusters",
+     "first": 0.945,
+     "repeats": [
+      0.952,
+      0.953
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: current-baseline ranking by p95",
+     "first": 3.107,
+     "repeats": [
+      1.487,
+      1.303
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: current-baseline ranking by samples",
+     "first": 1.252,
+     "repeats": [
+      1.316,
+      1.271
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: current-baseline ranking by max",
+     "first": 1.309,
+     "repeats": [
+      1.268,
+      1.265
+     ],
+     "rows": 100,
+     "group": "list"
+    },
+    {
+     "operation": "list: versions",
+     "first": 0.003,
+     "repeats": [
+      0.001,
+      0.001
+     ],
+     "rows": 13,
+     "group": "list"
+    }
+   ]
+  }
+ },
+ "limitations": [
+  "performance figures are targets, not gates",
+  "development machine only; target machine results belong to Issue #52",
+  "the first call after start-up reads from the operating-system cache, not from cold disks",
+  "local data: cluster 119 has 31 days, cluster 120 has 7 days; production accumulates more records and versions",
+  "a statement whose kept constants hold more than one line-break form is not found as a complete SQL from the page (none in the full real data); the passage mode and the command line find it"
+ ],
+ "final_real_data_page_audit": {
+  "commit": "0dda73a68df09ea506505d1e82017d54fff02679",
+  "script": "scripts/grafana/verify_e2e.py --directory <real-data environment>",
+  "result": "passed",
+  "sampled_identities": 7,
+  "kinds": [
+   "most records",
+   "most original texts",
+   "failed records only",
+   "extended protocol",
+   "insufficient samples",
+   "random with requests (2)"
+  ],
+  "note": "rerun after the user finished the trial and after a restart of the development machine (cold cache); its page times are not the G21 figures",
+  "cold_cache_examples": {
+   "detail_slowest_panel_seconds": 1.97,
+   "widest_words_search_seconds": 7.3
+  }
+ },
+ "r1_remediation": {
+  "review": "https://github.com/shenxg13/sql-apm/pull/53#issuecomment-6080930223",
+  "commit": "05264d8db8bdb3c5b6a46dcdfd58a9a3cf5583a5",
+  "findings": [
+   "F-51-001",
+   "F-51-002",
+   "F-51-003",
+   "F-51-004",
+   "F-51-005",
+   "F-51-006",
+   "F-51-007",
+   "F-51-008",
+   "F-51-009"
+  ],
+  "confirmed_scope_changes": [
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6081170840",
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6081571383",
+   "https://github.com/shenxg13/sql-apm/issues/51#issuecomment-6082791528"
+  ],
+  "changed": [
+   "command-line search entry",
+   "fingerprint service",
+   "three dashboards and their generator",
+   "synthetic dataset and checks",
+   "documents"
+  ],
+  "unchanged": [
+   "structure",
+   "query functions",
+   "installer and configuration files",
+   "offline bundle and packaged documents"
+  ],
+  "rerun": [
+   "unit tests (90)",
+   "Grafana tooling tests (5)",
+   "packaging tests (30)",
+   "scripts/db/verify.py (278)",
+   "scripts/db/verify_search.py (8 groups)",
+   "scripts/db/verify_views.py (16 groups)",
+   "generated dashboards equal the committed ones",
+   "harness checks",
+   "end-to-end 17 groups",
+   "candidate package rebuilt and all six kit entries",
+   "real-data page audit"
+  ],
+  "not_rerun": [
+   "real database upgrade",
+   "real-data search audit of 15 inputs and 300 texts",
+   "timings of the performance section"
+  ],
+  "real_data": {
+   "evidence": "measured; counts and timings only",
+   "texts_with_cr": {
+    "total": 6906,
+    "cr_lf_only": 4477,
+    "lone_cr_only": 1785,
+    "mixed": 644,
+    "structure_depends_on_the_form": 119,
+    "of_these_lone_cr_in_a_kept_constant": 116,
+    "of_these_cr_lf_in_a_kept_constant": 3
+   },
+   "identical_text_lookup": {
+    "crlf_only": {
+     "texts": 4477,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 17.1,
+      "p95_ms": 32.7,
+      "max_ms": 96.5
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 16.9,
+      "p95_ms": 30.0,
+      "max_ms": 67.1
+     }
+    },
+    "cr_only": {
+     "texts": 1785,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 19.2,
+      "p95_ms": 24.5,
+      "max_ms": 26.3
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 17.9,
+      "p95_ms": 20.1,
+      "max_ms": 26.5
+     }
+    },
+    "mixed": {
+     "texts": 644,
+     "sampled": 644,
+     "found": 644,
+     "not_found": 0,
+     "found_in_another_form": {
+      "cr": 116,
+      "crlf": 3
+     },
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 644,
+      "median_ms": 23.7,
+      "p95_ms": 63.5,
+      "max_ms": 226.5
+     },
+     "service_ms_changed_input": {
+      "n": 644,
+      "median_ms": 22.3,
+      "p95_ms": 77.8,
+      "max_ms": 87.3
+     }
+    },
+    "lf_only": {
+     "texts": 537828,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 19.7,
+      "p95_ms": 327.7,
+      "max_ms": 1284.8
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 19.3,
+      "p95_ms": 365.2,
+      "max_ms": 390.6
+     }
+    },
+    "one_line": {
+     "texts": 841042,
+     "sampled": 200,
+     "found": 200,
+     "not_found": 0,
+     "found_in_another_form": {},
+     "changed_input_found": 0,
+     "changed_input_in_another_form": 0,
+     "service_ms": {
+      "n": 200,
+      "median_ms": 14.4,
+      "p95_ms": 313.5,
+      "max_ms": 420.3
+     },
+     "service_ms_changed_input": {
+      "n": 200,
+      "median_ms": 13.0,
+      "p95_ms": 317.1,
+      "max_ms": 418.4
+     }
+    }
+   },
+   "changed_input": "the same text with one blank added at its end",
+   "changed_input_median_ms_before_the_retry": {
+    "crlf_only": 15.7,
+    "cr_only": 15.7,
+    "mixed": 21.2,
+    "lf_only": 16.6,
+    "one_line": 12.8
+   },
+   "failure_only_identity_duration_chart": {
+    "identity_records": 14643,
+    "records_with_duration": 0,
+    "ranges": [
+     {
+      "hours": 168,
+      "query_failures": 0,
+      "records_in_range": 14643,
+      "mark_rows": 155,
+      "marks_drawn": 155,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     },
+     {
+      "hours": 24,
+      "query_failures": 0,
+      "records_in_range": 2104,
+      "mark_rows": 75,
+      "marks_drawn": 75,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     },
+     {
+      "hours": 1,
+      "query_failures": 0,
+      "records_in_range": 150,
+      "mark_rows": 35,
+      "marks_drawn": 35,
+      "canvases": 1,
+      "says_no_data": false,
+      "points_with_duration": 0
+     }
+    ]
+   },
+   "filter_options": {
+    "database": {
+     "options": 4,
+     "options_from_baselines_before": 4,
+     "runs_ms": [
+      298,
+      291,
+      290,
+      293,
+      295
+     ],
+     "median_ms": 293
+    },
+    "user": {
+     "options": 67,
+     "options_from_baselines_before": 67,
+     "runs_ms": [
+      310,
+      307,
+      302,
+      303,
+      304
+     ],
+     "median_ms": 304
+    },
+    "first_version_encoding_every_record_ms": "2200-2400 per dropdown"
+   },
+   "longest_text_characters": 80959,
+   "page_audit": {
+    "script": "scripts/grafana/verify_e2e.py --directory <real-data environment>",
+    "result": "passed",
+    "sampled_identities": 7
+   }
+  }
+ },
+ "r2_remediation": {
+  "review": "https://github.com/shenxg13/sql-apm/pull/53#issuecomment-6084652183",
+  "commit": "12a8a10d6ccded49a61aefc3f392e3283d2b12cb",
+  "findings": [
+   "F-51-010"
+  ],
+  "finding": "the direct lookup of a pasted fingerprint value in complete-SQL mode came before the 512 KB input limit; introduced by the R1 remediation",
+  "change": "sql_apm/cli/search.py exact(): the byte count is checked first; an input over the limit is answered as input_size_limit whatever it holds",
+  "contract_changed": false,
+  "unchanged": [
+   "structure",
+   "query functions",
+   "dashboards",
+   "installer and configuration files",
+   "offline bundle and packaged documents"
+  ],
+  "regression": {
+   "unit": "one new test (91); fails without the fix",
+   "command_line_file_entry": "scripts/db/verify_search.py: 512 KB - 1 and 512 KB found, 512 KB + 1, longer and the kept prefix of a longer input refused; fails without the fix",
+   "service": "scripts/db/verify_views.py: the same sizes answered like the command line; fails without the fix",
+   "search_page": "scripts/grafana/verify_e2e.py boundaries: pasted in the browser, found at 512 KB, refused with the reason over it"
+  },
+  "rerun": [
+   "unit tests (91)",
+   "Grafana tooling tests (5)",
+   "packaging tests (30)",
+   "scripts/db/verify.py (278)",
+   "scripts/db/verify_search.py (8 groups)",
+   "scripts/db/verify_views.py (16 groups)",
+   "generated dashboards equal the committed ones",
+   "harness checks",
+   "end-to-end 17 groups",
+   "candidate package rebuilt and all six kit entries"
+  ],
+  "not_rerun": [
+   "real-data page audit (dashboards and query functions unchanged)",
+   "real database upgrade",
+   "real-data search audit",
+   "timings of the performance section"
+  ],
+  "real_data": {
+   "evidence": "measured; states and counts only",
+   "service_answers": {
+    "fingerprints": 20,
+    "cases": [
+     {
+      "input": "bare value",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 15
+     },
+     {
+      "input": "blanks up to 512 KB - 1",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 21
+     },
+     {
+      "input": "blanks up to 512 KB",
+      "states": {
+       "has_baseline": 19,
+       "records_without_baseline": 1
+      },
+      "answers_with_hits": 20,
+      "median_ms": 21
+     },
+     {
+      "input": "blanks up to 512 KB + 1",
+      "states": {
+       "unreliable_fingerprint/input_size_limit": 20
+      },
+      "answers_with_hits": 0,
+      "median_ms": 8
+     },
+     {
+      "input": "first 512 KB + 1 bytes of a longer input",
+      "states": {
+       "unreliable_fingerprint/input_size_limit": 20
+      },
+      "answers_with_hits": 0,
+      "median_ms": 8
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,14 @@
+# Rendered by scripts/grafana/install.py. The three packaged dashboards are loaded
+# from files and cannot be saved over in the UI; copies go to MPP/用户自定义.
+apiVersion: 1
+providers:
+  - name: sql-apm-mpp
+    orgId: 1
+    folder: MPP
+    folderUid: mpp
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: @HOME@/dashboards/mpp

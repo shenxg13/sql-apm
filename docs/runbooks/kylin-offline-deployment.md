@@ -619,8 +619,22 @@ selected_batches 是本次整批入选数，excluded_batches 是两者之差；w
 有完成批次但一个都未选到而回退全部。四个字段与开发机同候选包生成的基准逐项比较。
 本九任务均应没有排除和回退。选择只看文件 last_log_at 与窗口起点，事件再按完整窗口过滤。
 
-先把交付记录中的开发机基准文件保存到 APM_ROOT/config/development-baseline.json，
-同时将随基准交付的八个统计数值 `.jsonl.gz` 文件放在同一 config 目录，并核对交付记录的摘要。
+交付目录的 `development-baseline/` 中包含开发机基准文件、八个统计数值 `.jsonl.gz` 文件和校验清单。
+先在开发机核对交付记录中的清单摘要，再检查文件并传输：
+
+```bash
+APM_BASELINE_DIR="$PWD/var/issue52/deliveries/$APM_EXPECTED_COMMIT/development-baseline"
+(cd "$APM_BASELINE_DIR" && sha256sum -c SHA256SUMS)
+scp -P "$APM_SSH_PORT" "$APM_BASELINE_DIR/development-baseline.json" \
+  "$APM_BASELINE_DIR/"*.jsonl.gz "$APM_BASELINE_DIR/SHA256SUMS" "$APM_SSH_TARGET:/data/sql-apm/config/"
+```
+
+目标机再核对文件：
+
+```bash
+(cd "$APM_ROOT/config" && sha256sum -c SHA256SUMS)
+```
+
 它不替换原 Alma 基准，只补充新字段和配置示例预期；指南工具在重新构建前核对数值文件摘要。
 下面两个循环只执行一次；set -e 保证任一步失败时停止。
 

@@ -1,0 +1,23 @@
+# Rendered by scripts/daily/install.py; copy to /etc/systemd/system as root, together with the timer.
+# One daily run and then exit. It is started by sql-apm-daily.timer, never by itself at boot.
+[Unit]
+Description=SQL APM daily run (import marked days, build when due, clean up)
+
+[Service]
+# The unit is active while the run is going. A timer time that comes meanwhile starts
+# no second run; the timer makes it up once, right after this run has ended.
+Type=simple
+@USER_LINE@
+WorkingDirectory=@APP_ROOT@
+Environment="SQL_APM_DSN=@DSN@"
+@PASSFILE_LINE@
+Environment="SQL_APM_CONNECTION_CHECK_SECONDS=@CHECK_SECONDS@"
+@FETCH_LINE@
+ExecStart=@PYTHON@ -m sql_apm daily run --config @CONFIG@ --schema @SCHEMA@ --trigger timer
+# Longest time a timer-started run may take. It is then stopped and the next run
+# carries on. A run started by hand from a shell has no such limit. The pull, when
+# one is configured, has the same limit of its own.
+RuntimeMaxSec=@MAX_SECONDS@
+TimeoutStartSec=@MAX_SECONDS@
+# 130: the run was stopped on purpose and recorded itself as aborted.
+SuccessExitStatus=130

@@ -11,6 +11,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+from sql_apm.daily.config import KEYS as DAILY_KEYS, load_config as daily_config
 from sql_apm.ingestion.config import load_config as import_config
 from sql_apm.training.config import validate, THRESHOLDS
 
@@ -60,7 +61,7 @@ def read_keys(root):
             imported[names[owner.id]].add(key.value)
     imported = {name: sorted(values) for name, values in imported.items()}
     imported['extra_keys'] = 'accepted'
-    return dict(training=training, **{'import': imported})
+    return dict(training=training, daily={name: sorted(values) for name, values in DAILY_KEYS.items()}, **{'import': imported})
 
 
 def json_block(source, marker):
@@ -72,7 +73,7 @@ def json_block(source, marker):
 
 def examples(source):
     return [(name, kind, json.loads(raw)) for name, kind, raw in re.findall(
-        r'<!-- example:([a-z]+) (training|import) -->\s*```json\n(.*?)\n```', source, re.S)]
+        r'<!-- example:([a-z]+) (training|import|daily) -->\s*```json\n(.*?)\n```', source, re.S)]
 
 
 def check_guide(root, source):
@@ -86,13 +87,39 @@ def check_guide(root, source):
     if documented != read_keys(root):
         raise ValueError('configuration key set differs from product validators')
     cases = examples(source)
-    if {case[0] for case in cases} != {'window', 'threshold', 'template', 'exclusion', 'retention', 'import'}:
+    if {case[0] for case in cases} != {'window', 'threshold', 'template', 'exclusion', 'retention', 'import', 'daily'}:
         raise ValueError('missing or unexpected configuration examples')
     for name, kind, document in cases:
         try:
             if kind == 'training':
                 for cluster in document['clusters']:
                     validate(document, cluster)
+            elif kind == 'daily':
+                # The example names its own files and directories; give it synthetic ones of the same names.
+                with tempfile.TemporaryDirectory() as temporary:
+                    base = Path(temporary)
+                    # A source named like "mpp-119" stands for cluster "119" here.
+                    owner = {source: source.rsplit('-', 1)[-1] for source in document['sources']}
+                    clusters = sorted(set(owner.values()))
+                    for index, (source, item) in enumerate(document['sources'].items()):
+                        (base / str(index)).mkdir()
+                        item['directory'] = str(base / str(index))
+                    (base / document['import_config']).write_text(json.dumps(dict(version=1, clusters=clusters, batches={},
+                        sources={source: dict(cluster=owner[source], build='HashData Warehouse 3.13.13', timezone='UTC+08:00',
+                                              declaration='example') for source in owner})))
+                    (base / document['training_config']).write_text(json.dumps(dict(version=1, clusters=clusters,
+                                                                                   window=dict(cutoff_date='2026-01-01'))))
+                    (base / 'daily.json').write_text(json.dumps(document))
+                    loaded = daily_config(base / 'daily.json')
+                    if loaded['clusters'] != clusters:
+                        raise ValueError('daily example does not load as written')
+                    (base / 'daily.json').write_text(json.dumps(dict(document, documented_extra_key=True)))
+                    try:
+                        daily_config(base / 'daily.json')
+                    except ValueError:
+                        pass
+                    else:
+                        raise ValueError('daily configuration accepted an unknown key')
             else:
                 with tempfile.TemporaryDirectory() as temporary:
                     path = Path(temporary) / 'import.json'
@@ -118,7 +145,7 @@ def schema_columns(root):
     result = {}
     for name, body in re.findall(r'CREATE TABLE IF NOT EXISTS (\w+) \(\n(.*?)\n\)(?: PARTITION BY[^;]+)?;', source, re.S):
         result[name] = set(re.findall(r'^    ([a-z][a-z_0-9]*)\s+[a-z]', body, re.M))
-    if len(result) != 57 or any(not columns for columns in result.values()):
+    if len(result) != 62 or any(not columns for columns in result.values()):
         raise ValueError('schema inventory changed or unsupported CREATE TABLE syntax')
     return result
 

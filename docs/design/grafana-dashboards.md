@@ -12,7 +12,7 @@
 | 固定的版本、下载地址和摘要（清单） | `grafana/components.json` | 是 |
 | Grafana 配置模板 | `grafana/grafana.ini.template` | 是 |
 | 数据源、看板装入的配置模板 | `grafana/provisioning/*.template` | 是 |
-| 三个随包看板 | `grafana/dashboards/mpp-*.json` | 是 |
+| 四个随包看板（第四个“运行状态”见[每日运行开发说明](daily-run.md#看板)） | `grafana/dashboards/mpp-*.json` | 是 |
 | systemd 单元文件模板 | `grafana/systemd/*.template` | 是 |
 | 安装：核对摘要、解压、生成配置；创建账号和文件夹 | `scripts/grafana/install.py` | 是 |
 | 设置只读账号密码 | `scripts/grafana/readonly_password.py` | 是 |
@@ -56,9 +56,9 @@ python scripts/grafana/install.py accounts --admin-password-file PRIVATE/admin-p
 ```
 
 `HOME` 下的布局：`grafana-13.2.3/`（解压的发行文件）、`plugins/`、`conf/`（`grafana.ini` 和
-`provisioning/`）、`dashboards/mpp/`（三个随包看板）、`data/`（Grafana 自己的文件数据库
+`provisioning/`）、`dashboards/mpp/`（四个随包看板）、`data/`（Grafana 自己的文件数据库
 `grafana.db`，账号、文件夹和使用者自己的看板都在里面）、`logs/`、`systemd/`（生成好的单元文件）。
-重复执行 `files` 只覆盖配置文件和三个随包看板，不动 `data/`。密码只从文件读取，
+重复执行 `files` 只覆盖配置文件和四个随包看板，不动 `data/`。密码只从文件读取，
 配置里以 `$__file{…}` 引用，不出现在参数、生成的文件和输出里。
 
 开发机用 `scripts/grafana/setup_dev.py synthetic|existing --directory DIR` 一条命令完成上述全部步骤，
@@ -153,8 +153,9 @@ python scripts/grafana/install.py accounts --admin-password-file PRIVATE/admin-p
 
 ## 看板的标识、变量与跳转
 
-三个看板都在文件夹 `MPP`（uid `mpp`）下，使用者的看板放在其子文件夹“用户自定义”（uid `mpp-custom`）。
-随包看板由文件装入，界面里不能保存修改；要改就另存一份到“用户自定义”。升级只替换这三个文件。
+随包看板都在文件夹 `MPP`（uid `mpp`）下，使用者的看板放在其子文件夹“用户自定义”（uid `mpp-custom`）。
+随包看板由文件装入，界面里不能保存修改；要改就另存一份到“用户自定义”。升级只替换随包的这几个文件。
+本节以下说的是检索、列表和详情三个看板；“运行状态”（uid `mpp-status`）没有变量跳转，只从另外三个看板顶部的链接进入。
 
 | 看板 | uid | 地址 |
 | --- | --- | --- |

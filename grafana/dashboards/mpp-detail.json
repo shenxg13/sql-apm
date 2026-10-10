@@ -83,6 +83,18 @@
       "tooltip": "",
       "type": "link",
       "url": "/d/mpp-list/sql-list"
+    },
+    {
+      "asDropdown": false,
+      "icon": "heart-rate",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "运行状态",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/mpp-status/run-status"
     }
   ],
   "panels": [

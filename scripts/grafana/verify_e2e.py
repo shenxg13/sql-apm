@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""End-to-end check of the three packaged dashboards in a headless browser.
+"""End-to-end check of the search, list and detail dashboards in a headless browser.
 
 Development machine only. It drives the environment made by
 ``setup_dev.py synthetic`` and compares what each panel received with values
@@ -416,14 +416,14 @@ def configuration(env):
     assert 'host %s %s 127.0.0.1/32 scram-sha-256' % (env.state['database'], env.state['readonly_role']) in hba
     _, found = env.api('GET', '/api/search?type=dash-db')
     assert {(item['uid'], item['title'], item.get('folderTitle')) for item in found} == \
-        {('mpp-search', 'SQL 检索', 'MPP'), ('mpp-list', 'SQL 列表', 'MPP'), ('mpp-detail', 'SQL 详情', 'MPP')}
+        {('mpp-search', 'SQL 检索', 'MPP'), ('mpp-list', 'SQL 列表', 'MPP'), ('mpp-detail', 'SQL 详情', 'MPP'), ('mpp-status', '运行状态', 'MPP')}
     for name, board in env.dashboards.items():
         assert board['timezone'] == 'Asia/Shanghai'
         _, live = env.api('GET', '/api/dashboards/uid/' + board['uid'])
         assert live['meta']['provisioned'] and live['dashboard']['description'] == board['description']
     _, preferences = env.api('GET', '/api/org/preferences')
     assert preferences['timezone'] == 'Asia/Shanghai' and preferences['language'] == 'zh-Hans'
-    env.ok('G4/G6: Grafana %s from the pinned manifest; own data in its file database; data sources and three dashboards usable without UI work; '
+    env.ok('G4/G6: Grafana %s from the pinned manifest; own data in its file database; data sources and the packaged dashboards usable without UI work; '
            'both data sources on 127.0.0.1, the database one as the read-only account with a password; Chinese and Beijing time' % health['version'])
     _, plugins = env.api('GET', '/api/plugins')
     external = {item['id']: item for item in plugins if item.get('signatureType') in ('community', 'commercial') or item['id'] in {p['id'] for p in manifest['plugins']}}
@@ -513,7 +513,7 @@ def folders(env):
         assert env.api('GET', '/api/dashboards/uid/mpp-e2e-copy')[1]['dashboard']['title'] == 'SQL 列表（我的副本）'
         assert env.api('GET', '/api/org/users')[1] == users and env.api('GET', '/api/org/preferences')[1] == preferences
         assert env.api('GET', '/api/folders/mpp-custom')[1]['parentUid'] == 'mpp'
-        assert {item['uid'] for item in env.api('GET', '/api/search?type=dash-db&folderUIDs=mpp')[1]} == {'mpp-search', 'mpp-list', 'mpp-detail'}
+        assert {item['uid'] for item in env.api('GET', '/api/search?type=dash-db&folderUIDs=mpp')[1]} == {'mpp-search', 'mpp-list', 'mpp-detail', 'mpp-status'}
     finally:
         target.write_text(original)
         env.api('POST', '/api/admin/provisioning/dashboards/reload')
@@ -522,7 +522,7 @@ def folders(env):
             break
         time.sleep(0.5)
     assert env.api('DELETE', '/api/dashboards/uid/mpp-e2e-copy')[0] == 200
-    env.ok('G9: MPP holds the three packaged dashboards and 用户自定义; saving over or deleting a packaged dashboard is refused; '
+    env.ok('G9: MPP holds the packaged dashboards and 用户自定义; saving over or deleting a packaged dashboard is refused; '
            'a copy saved into 用户自定义, the accounts and the settings are unchanged after a new packaged version is loaded')
 
 

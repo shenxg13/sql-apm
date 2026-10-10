@@ -55,7 +55,7 @@ Python 3.13.16 环境及准备步骤见[本地开发说明](../docs/runbooks/loc
 
 - `scripts/db/initialize.sh`：从明确指定的已有 PG17 实例引导项目账号／数据库，
   以项目账号安装或核对 schema、物理表、约束、索引和结构版本；
-  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0 → 1.10.0 → 1.11.0；1.7.0／1.8.0／1.9.0／1.10.0 可带数据升级且不回填，更早非空库须重建。
+  `upgrade` 显式执行 1.0.0 → 1.1.0 → 1.2.0 → 1.3.0 → 1.4.0 → 1.5.0 → 1.6.0 → 1.7.0 → 1.8.0 → 1.9.0 → 1.10.0 → 1.11.0 → 1.12.0；1.7.0／1.8.0／1.9.0／1.10.0／1.11.0 可带数据升级且不回填，更早非空库须重建。
   `bootstrap` 同时创建只读角色（`--readonly-role`、`--readonly-timeout`），升级旧库前须先执行一次。
 - `.venv/bin/python scripts/db/verify.py`：自动创建并清理私有 disposable PG17 实例，
   回放合成存储用例；默认不会接触已有服务或生产数据。
@@ -230,7 +230,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 `verify_mpp_naming.py` 在合成私有 PG17 实例核对新标识并检查等价比较器对统计变化的敏感性。
 `verify_mpp_naming_full.py` 显式重导固定 55 文件，以文件摘要／记录定位核对所有分组成员
 及五层全部指标；运行方法和资源边界见[验收报告](../docs/reports/mpp-naming-2026-10-05.md)。
-当前结构为 1.11.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
+当前结构为 1.12.0，旧版带数据迁移回归通过 `tests/database/legacy_160/` 的冻结入口
 验证至 1.6.0，不支持已有数据进入新标识上下文。历史 `verify_coverage_migration_full.py`
 须从 #29 对应提交运行，不能用当前初始化器对含数据旧库执行升级。
 
@@ -258,7 +258,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 
 ## v0.2.0 文档与完整演练验收
 
-`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、57 张表／列名和随包命令；
+`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、62 张表／列名和随包命令；
 随 `scripts/tests/test_deployment.py` 运行并覆盖反例。
 `verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例，
 并在九任务加四个示例的版本形态下验证自然日期清理的空操作与数据不变。
@@ -294,10 +294,28 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/grafana/fetch.py`：按 `grafana/components.json` 下载并核对安装文件（联网）。
 - `scripts/grafana/setup_dev.py synthetic|existing|stop|status`：开发机一条命令搭好 PostgreSQL、只读账号、
   指纹服务和 Grafana；全部内容在 `--directory` 指定的忽略目录里。
-- `scripts/grafana/build_dashboards.py [--check]`：三个随包看板的生成程序；改看板改这里再重新生成。
+- `scripts/grafana/build_dashboards.py [--check]`：四个随包看板的生成程序；改看板改这里再重新生成。
 - `scripts/grafana/prepare_browser.sh` 与 `verify_e2e.py`：在开发机准备无界面浏览器并做界面端到端检查。
   浏览器只用于验证，放在忽略目录，不进任何包。真实数据的环境下它核对抽样身份的页面数值并记录每页的查询数和耗时。
 - `scripts/db/verify_views.py`：合成验收，覆盖只读账号、指纹服务和看板函数对独立计算。
 - `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
   升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
 - `scripts/tests/test_grafana.py`：看板与生成结果一致、安装程序拒绝缺失或摘要不符的文件。
+
+## 每日运行
+
+[操作说明](../docs/runbooks/daily-run.md)给出配置、接收目录、定时器和传输脚本的用法；
+[开发说明](../docs/design/daily-run.md)说明组成、运行记录和各验证入口。
+
+- `python -m sql_apm daily run --config FILE`：执行一次每日运行；`python -m sql_apm daily status`：只读查询。
+- `scripts/daily/install.py`：按时刻、最长运行时间和可选的传输配置生成 systemd 的定时器和服务单元文件；不安装，随程序包交付。
+- `daily/fetch-logs.sh`：传输脚本，在基线服务器上用 scp 从源端拉取已结束日期的日志并放齐全标记；配置样例在 `daily/fetch-logs.conf.example`。
+- `scripts/db/verify_daily.py`：合成验收，覆盖标记、逐天导入、构建间隔、失败隔离、集群正忙、单实例、清理、
+  删除原始文件、连接存活、中止与恢复和运行记录。
+- `scripts/db/verify_daily_recovery.py`：合成验收，覆盖不能丢、不能藏的情形：导入之后文件被改（含大小不变和同名替换）、
+  删除被打断后的续做和计数、集群正忙而无事可做、问题跨过被跳过或被中止的运行、“成功”的口径、等语句时收到停止信号。
+- `scripts/daily/verify_fetch.py --sshd-root DIR`：传输脚本对回环地址上以普通用户运行的真实 sshd；`DIR` 是解包的 `openssh-server`。
+- `scripts/daily/verify_timer.py [--sshd-root DIR]`：在用户级 systemd 上安装临时单元，实测定时器各行为，约 13 分钟，结束后移除。
+- `scripts/grafana/verify_status_e2e.py --directory DIR`：无界面浏览器核对运行状态看板；用 `setup_dev.py synthetic` 新搭的环境。
+- `scripts/daily/verify_replay.py run|compare`：显式的真实样本回放，三种方式各用私有实例和样本的副本，再比对最终版本。
+  需要本地样本和数小时，不加入日常检查。

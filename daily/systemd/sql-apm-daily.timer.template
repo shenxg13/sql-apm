@@ -1,0 +1,17 @@
+# Rendered by scripts/daily/install.py; copy to /etc/systemd/system as root, then
+#   systemctl daemon-reload && systemctl enable --now @NAME@.timer
+# Times are the server's local time. A time that comes while a run is still going starts
+# nothing then; it is made up once, right after that run has ended.
+[Unit]
+Description=SQL APM daily run at the configured time
+
+[Timer]
+@CALENDAR_LINES@
+# A run missed while the machine was off is made up once after boot. It needs the
+# database to be running by then; start PostgreSQL first after a reboot.
+Persistent=true
+AccuracySec=1s
+Unit=@NAME@.service
+
+[Install]
+WantedBy=timers.target

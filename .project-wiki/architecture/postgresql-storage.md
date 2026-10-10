@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-09
+updated: 2026-10-10
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/54
+    status: current
   - path: docs/reports/python313-upgrade-2026-10-08.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
@@ -210,6 +212,21 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
 
 1.10.0 可带数据原地升级：只执行函数定义和授权，不重写任何表；升级前须由管理员再执行一次 bootstrap 创建只读账号。
 既有内容、行数与回执保持不变。随包的用户结构说明仍为旧版本，由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 更新。
+
+### 每日运行记录结构 1.12.0（2026-10-10）
+
+来源：[Issue #54](https://github.com/shenxg13/sql-apm/issues/54) 范围第八节；已实现，合成数据上的验证见
+[实测报告](../../docs/reports/daily-run-2026-10-10.md)。
+
+- 新增五张表：`mpp_daily_run`（每日运行的一次执行）、`mpp_daily_cluster`（其中一个集群的结果）、`mpp_daily_day`（某来源某一天的导入结果）、
+  `mpp_daily_problem`（留给人处理的事和接收目录里不合命名的文件）、`mpp_daily_file`（已导入日期的每个文件：对应的导入内容、
+  最近一次核对时的文件状态、删除的决定和进度）。表总数由 57 变为 62。记录里不含 SQL 原文、库名和用户名。
+- 新增 `mpp_daily_*` 查询函数和供看板使用的 `mpp_view_daily_*` 函数；只读账号对新表只有 SELECT，授权进入结构检查。
+  既有表、列、约束、索引和函数没有改动，任务的模式和阶段取值不变。
+- 同一时间只允许一个每日运行，用会话级咨询锁实现；仍标为运行中、却没有会话持有该锁的记录由查询函数显示为未正常结束。
+- 1.11.0 可带数据原地升级：只建新表、函数和授权，不重写、不回填任何既有表；既有内容、行数与回执保持不变。
+  随包的用户结构说明由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 更新，仓库里的表清单已补上这五张。
+  表和函数的口径由[开发说明](../../docs/design/daily-run.md)维护。
 
 ## Workflows
 

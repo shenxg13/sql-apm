@@ -1,7 +1,8 @@
-"""PostgreSQL 1.11.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
+"""PostgreSQL 1.12.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
 from collections import OrderedDict
 import hashlib
 import io
+import os
 import uuid
 
 import psycopg2
@@ -11,23 +12,42 @@ from sql_apm.ingestion.config import IngestionError, canonical, identity
 from sql_apm.sql.normalization import Normalizer
 
 
+def connection_check_seconds():
+    """How often the server looks whether this client is still there while a statement runs.
+
+    Without it a killed command keeps its cluster until the statement ends. 0 turns it off.
+    """
+    value = os.environ.get('SQL_APM_CONNECTION_CHECK_SECONDS', '10')
+    if not (value.isascii() and value.isdigit() and int(value) <= 3600):
+        raise IngestionError('invalid_connection_check_seconds')
+    return int(value)
+
+
+# Sets that want to know every connection the product opens (weak, see sql_apm.daily.interrupt).
+WATCHERS = []
+
+
 def connect(dsn, schema):
+    check = connection_check_seconds()
     connection = psycopg2.connect(dsn, connect_timeout=5)
     connection.autocommit = False
     try:
         with connection.cursor() as cur:
             if not 170000 <= connection.server_version < 180000:
                 raise IngestionError('postgresql_17_required')
+            cur.execute('SET client_connection_check_interval = %s', (str(check) + 's',))
             cur.execute(sql.SQL('SET search_path TO {}, pg_catalog').format(sql.Identifier(schema)))
             cur.execute("SET TIME ZONE 'Asia/Shanghai'")
             # Consecutive migrations share transaction_timestamp(). Receipts form
             # a version history, so applied_at cannot identify the current version.
             cur.execute('SELECT version FROM schema_version')
             versions = {row[0] for row in cur}
-            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0', '1.11.0']
+            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0', '1.11.0', '1.12.0']
             if versions not in [set(history[i:]) for i in range(len(history))]:
-                raise IngestionError('schema_1_11_0_required')
+                raise IngestionError('schema_1_12_0_required')
         connection.commit()
+        for watcher in WATCHERS:
+            watcher.add(connection)
         return connection
     except BaseException:
         connection.close()

@@ -13,7 +13,7 @@ RUNTIME_AVAILABLE = all(importlib.util.find_spec(name) is not None for name in (
 PLUGINS = {'grafana-postgresql-datasource', 'volkovlabs-form-panel', 'yesoreyeram-infinity-datasource'}
 PANELS = {'table', 'stat', 'text', 'timeseries', 'barchart', 'bargauge', 'row', 'volkovlabs-form-panel'}
 UIDS = {'mpp-search.json': ('mpp-search', 'SQL 检索'), 'mpp-list.json': ('mpp-list', 'SQL 列表'),
-        'mpp-detail.json': ('mpp-detail', 'SQL 详情')}
+        'mpp-detail.json': ('mpp-detail', 'SQL 详情'), 'mpp-status.json': ('mpp-status', '运行状态')}
 
 
 def panels(board):
@@ -36,7 +36,7 @@ class DeliveredGrafanaFiles(unittest.TestCase):
             self.assertRegex(item['url'], r'^https://(dl\.grafana\.com|grafana\.com)/')
             self.assertIn(item['version'], item['file'])
 
-    def test_three_packaged_dashboards_with_stable_identifiers(self):
+    def test_four_packaged_dashboards_with_stable_identifiers(self):
         self.assertEqual({name: (board['uid'], board['title']) for name, board in self.boards.items()}, UIDS)
         for name, board in self.boards.items():
             self.assertEqual(board['timezone'], 'Asia/Shanghai')
@@ -53,6 +53,32 @@ class DeliveredGrafanaFiles(unittest.TestCase):
                     self.assertTrue(variable['query'].startswith('/* ' + board['uid'] + ' variable ' + variable['name'] + ' */'))
         detail = {item['name'] for item in self.boards['mpp-detail.json']['templating']['list']}
         self.assertLessEqual({'fp', 'identity', 'timing', 'version', 'sqlid', 'mode', 'q', 'hit'}, detail)
+
+    def test_status_dashboard_only_displays_and_shows_run_values_once(self):
+        board = self.boards['mpp-status.json']
+        listed = list(panels(board))
+        self.assertEqual([(panel['type'], panel['title'].split('（')[0]) for panel in listed],
+                         [('stat', '上次运行开始于'), ('stat', '上次运行的结果'), ('stat', '上次成功的运行'), ('stat', '待处理问题数'),
+                          ('table', '各集群现状'), ('table', '待处理问题列表'), ('table', '最近的运行记录')])
+        text = json.dumps(board, ensure_ascii=False)
+        # Read through the read-only database source only; nothing on the page can act.
+        self.assertEqual(set(re.findall(r'"uid": "(sql-apm-[a-z]+)"', text)), {'sql-apm-pg'})
+        for panel in listed:
+            sql = panel['targets'][0]['rawSql']
+            self.assertRegex(sql, r'^/\* mpp-status panel \d+ A \*/ SELECT ')
+            self.assertIsNone(re.search(r'\b(INSERT|UPDATE|DELETE|CALL|DO|pg_advisory)\b', sql), sql)
+            self.assertNotIn('links', panel['fieldConfig']['defaults'])
+            self.assertTrue(panel['description'])
+        self.assertEqual({link['title'] for link in board['links']}, {'SQL 检索', 'SQL 列表'})
+        self.assertEqual((board['timepicker'], board['refresh']), ({'hidden': True}, '1m'))
+        # The time and result of the newest run are the same for every cluster: tiles above, not columns.
+        clusters = [item['matcher']['options'] for item in listed[4]['fieldConfig']['overrides']]
+        self.assertEqual(clusters, ['cluster', 'newest_imported', 'version_cutoff', 'version_published_at', 'last_result', 'open_problems'])
+        self.assertEqual([panel['gridPos'] for panel in listed[:4]], [dict(x=x, y=0, w=6, h=3) for x in (0, 6, 12, 18)])
+        self.assertEqual([(panel['gridPos']['y'], panel['gridPos']['h'], panel['gridPos']['w']) for panel in listed[4:]],
+                         [(3, 5, 24), (8, 5, 24), (13, 8, 24)])
+        for other in ('mpp-search.json', 'mpp-list.json', 'mpp-detail.json'):
+            self.assertIn('/d/mpp-status/run-status', [link['url'] for link in self.boards[other]['links']])
 
     def test_a_total_of_the_whole_list_is_shown_once_and_not_in_every_row(self):
         found = {}

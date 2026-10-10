@@ -1,0 +1,12 @@
+# Sources of fetch-logs.sh: one per line, fields separated by blanks.
+#
+#   NAME  LOGIN@HOST  REMOTE_LOG_DIRECTORY  LOCAL_RECEIVING_DIRECTORY  [SSH_PORT]
+#
+# NAME is only used in the script's messages; use the log source's name.
+# LOGIN must be able to log in from the baseline server with a key, without a
+# password, and only needs to list and read the files of the log directory.
+# LOCAL_RECEIVING_DIRECTORY is the directory the daily run's configuration
+# gives for the same source.
+#
+# mpp-119  gpadmin@mdw-119  /data/master/gpseg-1/pg_log  /data/sql-apm/inbox/119
+# mpp-120  gpadmin@mdw-120  /data/master/gpseg-1/pg_log  /data/sql-apm/inbox/120  22

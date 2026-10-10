@@ -13,6 +13,9 @@
 | 解析并发 | full／import 的 `--workers` | 本次尚未成功导入的文件 |
 | 集群、来源声明、批次完整清单 | `--config` 指定的导入 JSON | 本次导入 |
 | 数据库连接 | `SQL_APM_DSN`、`PGPASSFILE` | 下一条命令 |
+| 每天自动做什么：接收目录、构建间隔、自动清理、原始文件保留天数 | `daily run --config` 指定的 JSON | 下一次每日运行 |
+| 每天几点运行、定时启动的运行最长多久 | 定时器和服务单元文件，由 `scripts/daily/install.py` 生成 | 重新生成、覆盖并重新加载单元之后 |
+| 进程被强制终止后多久释放集群占用 | 环境变量 `SQL_APM_CONNECTION_CHECK_SECONDS` | 下一条命令 |
 
 下面的检查清单是配置键的机器可读目录。`{cluster}`、`{source}`、`{batch}` 是调用者的标识，
 `[]` 表示列表成员，`{layer}` 为五层之一。训练配置拒绝未知键；导入配置目前允许额外键，
@@ -38,6 +41,14 @@
     "batches.{batch}": ["source", "files_confirmed_complete", "dates", "files"],
     "batches.{batch}.files[]": ["path", "origin_key", "closed_and_copied"],
     "extra_keys": "accepted"
+  },
+  "daily": {
+    "root": ["version", "import_config", "training_config", "sources", "workers", "build", "cleanup", "raw_files", "stale_after_hours"],
+    "sources.{source}": ["directory"],
+    "build": ["interval_days", "clusters"],
+    "build.clusters": ["{cluster}"],
+    "cleanup": ["enabled"],
+    "raw_files": ["retention_days"]
   }
 }
 ```
@@ -213,6 +224,44 @@ path 非空，相对路径按配置文件目录解释；解析到同一路径的
 开发机示例复制现有 120 来源与完整清单，调用最后一批 import 并检查重复跳过及文件计数，
 不编造新的生产来源声明。合成 JSON 的真实 CSV 导入另由配置指南检查入口在私有实例执行。
 确认输出批次完成、文件清单和重复跳过数一致；目标机不单独执行此例。
+
+## 想让每天自动运行
+
+每日运行是一条命令 `python -m sql_apm daily run --config FILE`：按集群逐个导入有齐全标记的日期、按间隔构建发布、
+清理过期的版本结果、删除到期的原始文件。它有自己的一份 JSON，引用现有的导入配置和训练配置，不重复其中的内容。
+未知键和非法取值在连接数据库之前就被拒绝，不写入任何数据。操作步骤见[每日运行操作说明](daily-run.md)。
+
+| 键 | 默认 | 含义与取值 |
+| --- | --- | --- |
+| `version` | 必填 | 固定为 1 |
+| `import_config`、`training_config` | 必填 | 导入配置和训练配置的路径；相对路径按本文件所在目录解释 |
+| `sources.{来源}.directory` | 必填 | 该来源的接收目录，每个来源一个，互不相同，运行前必须已存在。来源须已在导入配置里登记；集群数量以这里列出的来源为准 |
+| `workers` | 4 | 解析并发，整数 1–8 |
+| `build.interval_days` | 1 | 构建间隔：已导入成功的最新日期比当前版本的截止日晚至少这么多天才构建。正整数，或 `"off"` 表示只导入、构建由人工执行 rebuild |
+| `build.clusters.{集群}` | 无 | 按集群覆盖构建间隔，取值同上 |
+| `cleanup.enabled` | true | 是否自动清理过期的版本结果；保留月数仍取训练配置的 `retention` |
+| `raw_files.retention_days` | 45 | 已整批导入成功的日期，早于“今天减这么多天”就删除它在接收目录里的文件和标记。正整数，或 `"off"` 表示完全由人工管理 |
+| `stale_after_hours` | 48 | 这么久没有一次成功的运行，就列为待处理问题。成功指运行跑完并且没有任何失败或被跳过的集群；跑完但有失败的运行不算。整数 1–8760；每天运行一次时 48 即两个周期 |
+
+集群按导入配置 `clusters` 列表的顺序逐个处理，不并行。没有当前版本的集群在首次导入后立即构建，不等间隔。
+
+<!-- example:daily daily -->
+```json
+{"version":1,"import_config":"import.json","training_config":"training.json","sources":{"mpp-119":{"directory":"/data/sql-apm/inbox/119"},"mpp-120":{"directory":"/data/sql-apm/inbox/120"}},"workers":4,"build":{"interval_days":1,"clusters":{"120":7}},"cleanup":{"enabled":true},"raw_files":{"retention_days":45},"stale_after_hours":48}
+```
+
+**自动删除不可恢复。** 调小 `retention.months` 会在下一次每日运行生效，没有人工预览这一步：先执行一次
+`python -m sql_apm cleanup --cluster 集群 --training-config FILE` 看预览，确认后再改。原始文件删除后本机不再有副本。
+两项都可以关闭：`"cleanup":{"enabled":false}`、`"raw_files":{"retention_days":"off"}`。
+
+另有三项不在这份 JSON 里：
+
+- **定时时刻和定时启动的最长运行时间**写在 systemd 单元里，由 `scripts/daily/install.py` 生成：`--at HH:MM` 可重复给出，
+  默认每天 17:00（服务器本地时间）；`--max-hours` 默认 12，只限制定时启动的运行，手工执行的不受限。
+  修改时用新的参数重新生成、覆盖单元文件并重新加载 systemd。
+- **连接存活检查间隔**由环境变量 `SQL_APM_CONNECTION_CHECK_SECONDS` 给出，默认 10 秒，取 0–3600 的整数，0 表示关闭。
+  它对所有命令的数据库连接生效：进程被强制终止后，集群占用在大约这么久之内释放。单元文件里由 `--check-seconds` 写入。
+- **传输脚本的来源**在它自己的文本文件里，一行一个来源，见操作说明。
 
 ## 连接、路径与其他操作参数
 

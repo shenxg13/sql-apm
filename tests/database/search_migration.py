@@ -1,6 +1,9 @@
-"""Populated 1.9 -> 1.11 preserves every old column; fold is database generated."""
+"""Populated 1.9 -> 1.12 preserves every old column; fold is database generated."""
 import hashlib
 from database.fixture import statements
+
+# 1.12.0 adds the daily-run records; every earlier table is kept as it was.
+DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_file', 'mpp_daily_problem', 'mpp_daily_run']
 
 
 def verify_search_migration(v, root):
@@ -21,8 +24,8 @@ def verify_search_migration(v, root):
     assert v.sql("SELECT bool_and(search_text=mpp_search_fold(text)) FROM mpp_sql_text") == 't'
     assert v.sql("SELECT count(*) FROM schema_version WHERE version='1.10.0'") == '1'
     assert v.sql("SELECT relname FROM pg_class WHERE relnamespace='sql_apm'::regnamespace "
-                 "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname").splitlines() == tables
+                 "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname").splitlines() == sorted(tables + DAILY)
     for mode in ('schema', 'all', 'upgrade', 'check'):
         v.init(mode)
     assert before == state()
-    v.require(True, 'populated 1.9 -> 1.11: old values, tables and receipts preserved; generated text complete; reruns safe')
+    v.require(True, 'populated 1.9 -> 1.12: old values, tables and receipts preserved; generated text complete; reruns safe')

@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-09
+updated: 2026-10-10
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/54
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/51
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
@@ -329,6 +331,22 @@ PostgreSQL 数据源插件。第一版不加展示类插件；随包看板只依
 - 详情页只应用属于当前结构的原文选择；原文区一次显示 200000 个字符，更长的分段显示。
 - 没有任何耗时的 SQL，耗时图里只有失败、取消、超时的标记。
 
+### 运行状态看板（2026-10-10）
+
+来源：[Issue #54](https://github.com/shenxg13/sql-apm/issues/54) 的已确认契约、[需求确认记录](https://github.com/shenxg13/sql-apm/issues/54#issuecomment-6092182097)和[2026-10-10 的范围变更确认](https://github.com/shenxg13/sql-apm/issues/54#issuecomment-6092385134)；来源状态 current。
+已实现并在开发机验证。
+
+- Grafana 的 MPP 文件夹里增加第四个随包看板“运行状态”，经只读账号读取，只展示，不能触发导入、构建、清理等任何操作。
+  它遵守随包看板的全部规则：由同一个生成程序产生、标识稳定并带 `mpp-` 前缀、只依赖随包插件、中文标签、北京时间、在界面里只读。
+- 内容三块：每个集群一行（最新已导入日期、当前版本的截止日和发布时间、上次运行在该集群的结果、待处理问题数）；待处理问题列表；
+  最近的运行记录（各集群导入了哪些天、是否构建发布、清理和删除文件的结果、耗时）。待处理问题的九类见
+  [每日运行命令](operator-cli.md#每日运行命令2026-10-10)，数据与 `daily status` 相同。
+- 按用户在 #51 试用时提出的要求：在 1920×920 的窗口里布局合理；表头完整显示在一行；描述整张表的数值只显示一次，
+  不做成每行相同的一列。据此，上次运行的开始时间、结果、上次成功的运行的时间和待处理问题数作为四个数值放在最上面，
+  不重复在集群表的每一行里（实施时的处理，已在 PR 和试用说明里列出）。
+- 其余三个看板的顶部各增加一个到运行状态的链接（实施时的处理）。这个看板展示的是每日运行这件事本身的状态，
+  不是 MPP 或系统的负载，不改变[产品定位](../decisions/project-scope.md)。
+
 ## Workflows
 
 按任务涉及的边界补读：
@@ -354,4 +372,4 @@ PostgreSQL 数据源插件。第一版不加展示类插件；随包看板只依
 
 ## Open Questions
 
-后续异常判定公式、activity 比对和告警方式尚待确定。Grafana 的离线安装、使用者文档和目标机实测由 #52 交付。各节已有待定说明继续有效。
+后续异常判定公式、activity 比对和告警方式尚待确定；每日运行第一版不做主动通知。Grafana 的离线安装、使用者文档和目标机实测由 #52 交付。各节已有待定说明继续有效。

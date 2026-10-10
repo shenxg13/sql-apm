@@ -140,13 +140,13 @@ def files(args):
         (home / target).write_text(render(SOURCE / template, values))
     # Only the packaged dashboards are replaced; nothing else below --home is removed.
     packaged = sorted((SOURCE / 'dashboards').glob('mpp-*.json'))
-    if len(packaged) != 3:
-        fail('expected exactly three packaged dashboards')
+    if len(packaged) != 4:
+        fail('expected exactly four packaged dashboards')
     for stale in (home / 'dashboards/mpp').glob('*.json'):
         stale.unlink()
     for dashboard in packaged:
         shutil.copyfile(dashboard, home / 'dashboards/mpp' / dashboard.name)
-    print('OK: Grafana ' + manifest['grafana']['version'] + ', plugins, configuration and three packaged dashboards in ' + str(home))
+    print('OK: Grafana ' + manifest['grafana']['version'] + ', plugins, configuration and four packaged dashboards in ' + str(home))
     print('START: ' + str(grafana / 'bin/grafana') + ' server --homepath ' + str(grafana) + ' --config ' + str(home / 'conf/grafana.ini'))
 
 

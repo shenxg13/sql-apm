@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-09
+updated: 2026-10-10
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/54
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/51
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/49
@@ -451,6 +453,30 @@ Grafana 的版本、配置方式和面板约定已于 2026-10-08 确认，见
 [检索主题](../features/sql-search-and-views.md#grafana-检索与看板2026-10-08)；生产部署位置仍待落实。
 
 关联条款：[已确认的首期统一入口展示范围](../features/sql-search-and-views.md#已确认的首期统一入口展示范围)。
+
+### 每日运行的运行方式（2026-10-10）
+
+来源：[Issue #54](https://github.com/shenxg13/sql-apm/issues/54) 的已确认契约、[需求确认记录](https://github.com/shenxg13/sql-apm/issues/54#issuecomment-6092182097)和[2026-10-10 的范围变更确认](https://github.com/shenxg13/sql-apm/issues/54#issuecomment-6092385134)；来源状态 current。
+已实现并在开发机验证；离线安装和目标机实测由 [#52](https://github.com/shenxg13/sql-apm/issues/52) 交付。
+
+- **不做常驻进程。** 每日运行是一条运行一次即退出的产品命令，由定时任务启动；状态全部在数据库里。
+  形态是“传输脚本 + 产品命令”，产品命令不依赖传输脚本，两者的接口是接收目录和齐全标记。
+- **用 systemd 定时器启动。** 随产品提供定时器和服务单元模板，以项目用户身份运行；安装定时器是单独的、可选的一步，
+  不装时手工执行同一条命令，效果相同。默认每天 17:00（服务器本地时间），可改，可写多个时刻；用户预计 16 点拉取前一天的日志，
+  那是 MPP 最空闲的时间。配置了传输脚本时，同一个定时任务先拉取、再执行每日运行，拉取失败不妨碍处理已有标记的日期。
+- **定时启动的运行最长 12 小时**，可配置，超过后被停止并记为被中止（systemd 发停止信号，命令正在等语句时也立即停下；
+  开发机上 20 秒上限的运行在第 20 秒多退出，measured）；手工启动的运行不受限。机器停机错过的那一次开机后补跑一次。
+  上一次没结束时不启动第二个：实测 systemd 在上一次结束后立即补跑一次，不并发（measured，开发机 systemd 252）。
+- **补跑以数据库已在运行为前提。** 现有安装方式里 PostgreSQL 由人工启动，没有开机自启；服务器重启后要先启动数据库，
+  否则补跑按连接失败退出，数据库里没有这次运行的记录，积压的日期由下一次运行处理。用户决定不为此增加等待（2026-10-10）。
+- **连接存活检查。** 所有产品连接打开 `client_connection_check_interval`，默认 10 秒，由环境变量调整；它是会话级参数，
+  不需要改服务端配置。开发机 PostgreSQL 17.10 上，七个写入命令在等待语句中被强制终止后约 2 秒（间隔设为 2 秒时）释放占用（measured）；
+  目标机上的验证在 #52。
+- **单元文件不含密码。** 单元文件对本机用户可读，生成程序拒绝带密码的连接串，关键字形式和 URI 形式（含百分号编码和查询参数）都检查；
+  密码只放在 `PGPASSFILE` 指向的文件里。
+- **传输的访问方式。** 只用 SSH 密钥从基线服务器单向登录源端，不存密码，保持主机密钥校验；源端账号只需能列出并读取日志目录。
+  源端主机的加固和网络隔离不在范围内。
+- 不做的事：实时 activity 对比、SQL 异常判定和告警、主动通知、集群并行、容器部署和生产部署、在 Grafana 页面上触发操作。
 
 ## Workflows
 

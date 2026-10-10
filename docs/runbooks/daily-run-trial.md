@@ -142,4 +142,4 @@ cat /tmp/sql-apm-units/sql-apm-daily.service /tmp/sql-apm-units/sql-apm-daily.ti
 
 | 日期 | 查看人 | 结论 | 备注 |
 | --- | --- | --- | --- |
-| | | | |
+| 2026-10-10 | 用户 | 确认，同意提交 R0 | 没有提出修改；“动手做一次”的五步没有在查看环境里执行，由实施会话在合成数据的副本上演练过。记录见 [Issue 评论](https://github.com/shenxg13/sql-apm/issues/54#issuecomment-6094912194) |

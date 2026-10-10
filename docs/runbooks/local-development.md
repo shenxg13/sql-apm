@@ -135,7 +135,7 @@ var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
   --app-root APP --verification-root KIT --logs raw/inbox/hashdata --output NEW_DIR
 ```
 
-第一项检查配置键集合、每个 JSON 示例、57 张表及所列列名、手册引用的随包命令；
+第一项检查配置键集合、每个 JSON 示例、62 张表及所列列名、手册引用的随包命令；
 第二项覆盖漏键、坏例、漏表、错列及缺少命令的反例，并检查三个 HTML。
 第三项在私有 PG17 用已安装候选包实际执行全部指南 JSON 示例、七个辅助命令及自然日期清理，
 最后一项用同一候选在私有 PG17 串行运行真实九任务及七个示例，生成目标机比较基准；

@@ -114,6 +114,8 @@ class Replay:
         self.mode, self.pg_bin = args.mode, args.pg_bin
         self.work, self.base = args.work.resolve(), args.work.resolve() / args.mode
         self.samples = {'119': args.samples_119.resolve(), '120': args.samples_120.resolve()}
+        if args.only:      # a smaller replay when disk is short; compare then covers that cluster alone
+            self.samples = {args.only: self.samples[args.only]}
         self.port, self.socket = PORTS[args.mode], self.base / 'socket'
         self.dsn = 'host=%s port=%d dbname=sql_apm user=sql_apm' % (self.socket, self.port)
         self.env = dict({k: v for k, v in os.environ.items() if not k.startswith('PG')}, SQL_APM_DSN=self.dsn)
@@ -272,8 +274,11 @@ class Replay:
 def compare(work):
     from statistic_comparison import compare_statistics
     reports = {mode: json.loads((work / mode / 'report.json').read_text()) for mode in PORTS}
-    outcome = dict(passed=True, clusters={})
-    for cluster in sorted(reports['manual']['clusters']):
+    # Only what all three replays hold: a replay may have been limited to one cluster.
+    replayed = sorted(set.intersection(*(set(report['clusters']) for report in reports.values())))
+    assert replayed, 'the three replays have no cluster in common'
+    outcome = dict(passed=True, clusters_compared=replayed, clusters={})
+    for cluster in replayed:
         reference = reports['manual']['clusters'][cluster]
         entry = dict(cutoff_date=reference['cutoff_date'], log_records=reference['log_records'], versions={}, comparisons={})
         for mode in PORTS:
@@ -304,6 +309,7 @@ def main():
     replay.add_argument('--mode', choices=sorted(PORTS), required=True)
     replay.add_argument('--samples-119', type=Path, required=True)
     replay.add_argument('--samples-120', type=Path, required=True)
+    replay.add_argument('--only', choices=['119', '120'], help='只回放这一个集群')
     replay.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
     check = actions.add_parser('compare', help='比对三种方式的最终版本')
     for action in (replay, check):

@@ -258,7 +258,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 
 ## v0.2.0 文档与完整演练验收
 
-`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、57 张表／列名和随包命令；
+`check_documents.py` 对照产品配置校验器与结构定义核对指南键／示例、62 张表／列名和随包命令；
 随 `scripts/tests/test_deployment.py` 运行并覆盖反例。
 `verify_release_examples.py --app-root APP --output NEW_DIR` 用候选包在私有 PG17 实际执行指南用例，
 并在九任务加四个示例的版本形态下验证自然日期清理的空操作与数据不变。
@@ -312,6 +312,8 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `daily/fetch-logs.sh`：传输脚本，在基线服务器上用 scp 从源端拉取已结束日期的日志并放齐全标记；配置样例在 `daily/fetch-logs.conf.example`。
 - `scripts/db/verify_daily.py`：合成验收，覆盖标记、逐天导入、构建间隔、失败隔离、集群正忙、单实例、清理、
   删除原始文件、连接存活、中止与恢复和运行记录。
+- `scripts/db/verify_daily_recovery.py`：合成验收，覆盖不能丢、不能藏的情形：导入之后文件被改（含大小不变和同名替换）、
+  删除被打断后的续做和计数、集群正忙而无事可做、问题跨过被跳过或被中止的运行、“成功”的口径、等语句时收到停止信号。
 - `scripts/daily/verify_fetch.py --sshd-root DIR`：传输脚本对回环地址上以普通用户运行的真实 sshd；`DIR` 是解包的 `openssh-server`。
 - `scripts/daily/verify_timer.py [--sshd-root DIR]`：在用户级 systemd 上安装临时单元，实测定时器各行为，约 13 分钟，结束后移除。
 - `scripts/grafana/verify_status_e2e.py --directory DIR`：无界面浏览器核对运行状态看板；用 `setup_dev.py synthetic` 新搭的环境。

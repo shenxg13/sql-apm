@@ -5,6 +5,7 @@ Every step calls the function its manual command calls, so the rules stay those
 commands' rules. The run adds only the choice of what to do and a record of it.
 """
 from datetime import date, timedelta
+import hashlib
 import os
 from pathlib import Path
 import stat
@@ -13,7 +14,7 @@ import time
 from sql_apm.baseline import workflow
 from sql_apm.daily import inbox
 from sql_apm.ingestion.config import IngestionError, manifest
-from sql_apm.ingestion.importer import Importer, checksum, file_stamp
+from sql_apm.ingestion.importer import Importer
 from sql_apm.storage.cleanup import CleanupStore, preview
 from sql_apm.storage.daily import DailyStore
 from sql_apm.storage.ingestion import connect
@@ -26,6 +27,32 @@ CHANGED = 'files_changed_after_import'
 
 class Busy(Exception):
     """Another task holds the cluster: leave it for the next run."""
+
+
+def _stamp(seen):
+    """What tells one file, in one state, from any other: where it is, how long, when its content
+    and when anything about it last changed. Writing to it, or putting another file under its name,
+    changes at least one of these."""
+    return (seen.st_dev, seen.st_ino, seen.st_size, seen.st_mtime_ns, seen.st_ctime_ns)
+
+
+def read_proof(path):
+    """SHA-256 of a file, and its stamp before and after the reading, all three taken through one
+    open descriptor: they describe the very file that was read, whatever its name leads to later."""
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        opened = os.fstat(descriptor)
+        if not stat.S_ISREG(opened.st_mode):
+            raise OSError('not_a_regular_file')
+        digest = hashlib.sha256()
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+        return digest.hexdigest(), _stamp(opened), _stamp(os.fstat(descriptor))
+    finally:
+        os.close(descriptor)
 
 
 def _blank():
@@ -104,9 +131,9 @@ class DailyRun:
                 record.update(reason='daily_cluster_failed', failed=True)
         except KeyboardInterrupt:
             record.update(state='aborted', reason='operator_interrupt')
-            self.store.cluster_finished(self.run_id, scope, record, problems)
+            self.store.cluster_finished(self.run_id, scope, record)
             raise
-        self.store.cluster_finished(self.run_id, scope, record, problems)
+        self.store.cluster_finished(self.run_id, scope, record)
         self.progress(phase='cluster_finished', run_id=self.run_id, cluster=scope, state=record['state'],
                       reason=record['reason'], failed=record['failed'],
                       newest_imported=record['newest_imported'] and record['newest_imported'].isoformat(),
@@ -118,59 +145,75 @@ class DailyRun:
                       open_problems=sum(p['kind'] != 'nonconforming_file' for p in problems))
         return record['failed']
 
-    def _unchanged(self, scope, source_id, item, day, files, prove=False):
-        """Is an imported day still what was imported? Returns (verdict, what the import stored).
+    def _settle(self, scope, problems, source_id, days, found=()):
+        """The run has looked at these days and reached a conclusion: that, and the problems found, are
+        written down at once and together, not when the cluster is finished with."""
+        problems.extend(found)
+        self.store.examined(self.run_id, scope, source_id, days, found)
 
-        A file whose device, inode, size and both times are as they were when it was last read
-        is taken as untouched; anything else is read again and compared with the checksum the
-        import stored. With `prove`, every file is read: that is asked before a deletion.
+    def _unchanged(self, scope, source_id, item, day, files, prove=False):
+        """Is an imported day still what was imported? Returns (verdict, what the batch holds).
+
+        A file whose stamp is the one it had when it was last read and found to be the imported
+        content is taken as untouched; anything else is read again and compared with the checksum
+        the import stored. With `prove`, every file is read: that is asked before a deletion.
+        A file is read through one descriptor, and the stamp kept for it is that of the file
+        that was read; the name must still lead to that file when the reading is over.
         Files that a deletion of ours has already taken are not missed.
         """
         known, present = self.store.day_files(source_id, day), dict(files)
         if set(present) - set(known):
-            return False, known                          # a file the import never had
+            return False, known                          # a file the batch never had
         missing = [name for name, fact in known.items() if name not in present and not fact['removed']]
         if missing and present and not any(fact['removing'] for fact in known.values()):
             return False, known                          # some taken away, some left, and not by us
         for name in sorted(present):
             fact, path = known[name], item['directory'] / name
             try:
-                before = file_stamp(path)
-                if not prove and not fact['removed'] and fact['stamp'] == before:
+                if not prove and not fact['removed'] and fact['stamp'] == _stamp(os.lstat(path)):
                     continue
-                sha256, _ = checksum(path)
-                if sha256 != fact['sha256'] or file_stamp(path) != before:
+                sha256, opened, read = read_proof(path)
+                if sha256 != fact['sha256'] or opened != read or _stamp(os.lstat(path)) != read:
+                    self.store.file_doubted(source_id, day, name)
                     return False, known
             except OSError:
                 return False, known
-            self.store.file_verified(self.run_id, scope, source_id, day, name, fact['file_id'], before)
-            fact.update(stamp=before, removed=False)
+            self.store.file_verified(self.run_id, scope, source_id, day, name, fact['file_id'], read)
+            fact.update(stamp=read, removed=False)
+            if prove:
+                self.fault('file_proven', scope, name)
         return True, known
 
     def _import(self, scope, record, problems):
+        """Every conclusion about a day is written down as it is reached: the problem if there is one,
+        and that the day has been looked at. A run that gets no further has still said that much."""
         started, plan = time.monotonic(), []
         record['import_state'] = 'incomplete'
+        self.store.cluster_step(self.run_id, scope, record, 'import_state')
         try:
             for order, (source_id, item) in enumerate(self._sources(scope)):
                 found = inbox.scan(item['directory'])
-                for name in found['other'][:inbox.OTHER_LIMIT]:
-                    problems.append(dict(kind='nonconforming_file', source_id=source_id, file_name=name, file_count=1))
+                other = [dict(kind='nonconforming_file', source_id=source_id, file_name=name, file_count=1)
+                         for name in found['other'][:inbox.OTHER_LIMIT]]
                 if len(found['other']) > inbox.OTHER_LIMIT:
-                    problems.append(dict(kind='nonconforming_file', source_id=source_id,
-                                         file_count=len(found['other']) - inbox.OTHER_LIMIT))
+                    other.append(dict(kind='nonconforming_file', source_id=source_id,
+                                      file_count=len(found['other']) - inbox.OTHER_LIMIT))
                 states = self.store.day_states(source_id, sorted(set(found['days']) | found['markers']))
                 pending, imported, seen = inbox.classify(found, self.today, states)
+                self._settle(scope, problems, source_id, [day for _, day, _, _ in seen], other + [
+                    dict(kind=kind, source_id=source_id, log_date=day, reason=reason, file_count=count)
+                    for kind, day, reason, count in seen])
                 for day in imported:
                     files = found['days'].get(day, [])
-                    if not self._unchanged(scope, source_id, item, day, files)[0]:
-                        seen.append(('day_failed', day, CHANGED, len(files)))
+                    changed = [] if self._unchanged(scope, source_id, item, day, files)[0] else [
+                        dict(kind='day_failed', source_id=source_id, log_date=day, reason=CHANGED, file_count=len(files))]
+                    self._settle(scope, problems, source_id, [day], changed)
+                    record['failed'] = record['failed'] or bool(changed)
                     self._stopping()
-                for kind, day, reason, count in sorted(seen, key=lambda entry: entry[1]):
-                    problems.append(dict(kind=kind, source_id=source_id, log_date=day, reason=reason, file_count=count))
-                    record['failed'] = record['failed'] or kind == 'day_failed'
                 plan += [(day, order, source_id, item, found['days'][day]) for day in pending]
             for day, _, source_id, item, files in sorted(plan, key=lambda entry: entry[:2]):
-                state, reason = self._day(scope, source_id, item, day, files)
+                self.fault('before_day', scope, day.isoformat())
+                state, reason = self._day(scope, source_id, item, day, files)    # writes its own conclusion
                 if state != 'complete':
                     record['failed'] = True
                     problems.append(dict(kind='day_failed', source_id=source_id, log_date=day, reason=reason,
@@ -179,6 +222,7 @@ class DailyRun:
         finally:
             record['newest_imported'] = self.store.newest_imported(scope)
             record['stage_seconds']['import'] = round(time.monotonic() - started, 3)
+            self.store.cluster_step(self.run_id, scope, record, 'import_state', 'newest_imported', 'failed')
 
     def _day(self, scope, source_id, item, day, files):
         entries = [dict(path=str(item['directory'] / name), origin_key=name, closed_and_copied=True)
@@ -227,7 +271,7 @@ class DailyRun:
         return state, reason
 
     def _build(self, scope, record, problems):
-        interval, newest = self.config['intervals'][scope], record['newest_imported']
+        interval, newest, left = self.config['intervals'][scope], record['newest_imported'], []
         current = self.store.current_cutoff(scope)
         if interval is None:
             record['build_state'] = 'disabled'
@@ -267,11 +311,15 @@ class DailyRun:
             record.update(build_state=state, build_reason=reason)
             if state == 'failed':
                 record['failed'] = True
-                problems.append(dict(kind='build_not_succeeded', reason=reason))
+                left = [dict(kind='build_not_succeeded', reason=reason)]
+        problems.extend(left)
+        self.store.cluster_step(self.run_id, scope, record, 'build_state', 'build_reason', 'cutoff_date', 'build_id',
+                                'publication_id', 'failed', problems=left)
 
     def _cleanup(self, scope, record, problems):
         if not self.config['cleanup']:
             record['cleanup_state'] = 'disabled'
+            self.store.cluster_step(self.run_id, scope, record, 'cleanup_state')
             return
         self.fault('before_cleanup', scope)
         started, db, state, reason, pending = time.monotonic(), None, 'nothing', None, []
@@ -316,14 +364,18 @@ class DailyRun:
         problems.extend(pending)
         record.update(cleanup_state=state, cleanup_reason=reason)
         record['failed'] = record['failed'] or state == 'failed'
+        self.store.cluster_step(self.run_id, scope, record, 'cleanup_state', 'cleanup_reason', 'months_cleaned',
+                                'months_pending', 'released_bytes', 'failed', problems=pending)
 
     def _raw_files(self, scope, record, problems):
         """Delete the files and marker of days imported whole, proven unchanged, and old enough.
 
-        The cluster is held meanwhile, as by any other step. Before the first file of a day
-        goes, the decision is written down; every file that goes is written down as it goes.
-        A deletion cut short is therefore finished by a later run instead of being taken for
-        a change of the input.
+        The cluster is held meanwhile, as by any other step. A day goes in this order, and every
+        step of it is written down when it is done: each file is read and found to be the imported
+        content; the decision is recorded; each file is deleted only if its name still leads to
+        the file that was read, as it was when it was read; the marker is deleted; the day is
+        recorded as complete. A deletion cut short anywhere is therefore finished by a later run,
+        counted once, and never taken for a change of the input.
         """
         if self.config['raw_days'] is None:
             record['raw_state'] = 'disabled'
@@ -336,47 +388,24 @@ class DailyRun:
                     raise Busy()
                 for source_id, item in self._sources(scope):
                     found = inbox.scan(item['directory'])
+                    # Only the last step was lost: marker and files are gone, the day was not yet recorded as complete.
+                    for day in self.store.pending_removals(source_id):
+                        if day not in found['markers'] and not found['days'].get(day):
+                            self._day_gone(scope, source_id, day, record)
                     states = self.store.day_states(source_id, sorted(found['markers']))
                     for day in sorted(day for day in found['markers'] if day < self.today and states.get(day) == 'complete'):
                         files = found['days'].get(day, [])
-                        facts = self.store.day_files(source_id, day).values()
                         # Begun and not finished: a file still waits, or only the marker is left.
-                        begun = any(fact['removing'] and not fact['removed'] for fact in facts) or (
-                            not files and any(fact['removing'] for fact in facts))
+                        begun = any(fact['removing'] for fact in self.store.day_files(source_id, day).values())
                         if not (day < limit or begun):
                             continue
                         self._stopping()
-                        proven, known = self._unchanged(scope, source_id, item, day, files, prove=True)
-                        if not proven:
+                        if not self._remove_day(scope, source_id, item, day, files, record):
                             if not any(p['kind'] == 'day_failed' and p.get('source_id') == source_id
                                        and p.get('log_date') == day for p in problems):
-                                problems.append(dict(kind='day_failed', source_id=source_id, log_date=day,
-                                                     reason=CHANGED, file_count=len(files)))
+                                self._settle(scope, problems, source_id, [day], [dict(
+                                    kind='day_failed', source_id=source_id, log_date=day, reason=CHANGED, file_count=len(files))])
                             record['failed'] = True
-                            continue
-                        self.store.removal_decided(self.run_id, source_id, day)
-                        present = dict(files)
-                        for name in sorted(known):
-                            if known[name]['removed']:
-                                continue
-                            if name in present:
-                                self.fault('before_unlink', scope, name)
-                                self._unlink(item['directory'], name)
-                                self.fault('after_unlink', scope, name)
-                            elif not known[name]['removing']:
-                                continue           # taken away by hand before any deletion of ours
-                            # Gone now: by this run, or by one that was cut short right after removing it.
-                            # Counted in the run's record at once, so the records of all runs add up
-                            # to what was removed even when a run is killed half-way.
-                            self.store.file_removed(self.run_id, scope, source_id, day, name)
-                            record['raw_files'] += 1
-                            record['raw_bytes'] += known[name]['byte_count']
-                            record['raw_state'] = 'deleted'
-                        self.fault('before_marker', scope, day.isoformat())
-                        self._unlink(item['directory'], inbox.marker_name(day))
-                        self.store.day_removed(self.run_id, scope)
-                        record['raw_days'] += 1
-                        record['raw_state'] = 'deleted'
             if record['raw_state'] == 'not_reached':
                 record['raw_state'] = 'nothing'
         except OSError:
@@ -384,10 +413,74 @@ class DailyRun:
         finally:
             record['stage_seconds']['raw_files'] = round(time.monotonic() - started, 3)
 
+    def _remove_day(self, scope, source_id, item, day, files, record):
+        """False when a file of the day is not, or is no longer, what the import stored; it and the rest stay."""
+        proven, known = self._unchanged(scope, source_id, item, day, files, prove=True)
+        present, directory = dict(files), item['directory']
+        if not proven:
+            return False
+        # Reading the files of a day takes time. Before the decision, each must still be the file that was read.
+        moved = [name for name in sorted(present) if not self._same(directory / name, known[name]['stamp'])]
+        for name in moved:
+            self.store.file_doubted(source_id, day, name)
+        if moved:
+            return False
+        self.store.removal_decided(self.run_id, source_id, day)
+        for name in sorted(known):
+            if known[name]['removed']:
+                continue
+            if name in present:
+                self.fault('before_unlink', scope, name)
+                if not self._unlink(directory, name, known[name]['stamp']):
+                    self.store.file_doubted(source_id, day, name)
+                    return False
+                self.fault('after_unlink', scope, name)
+            elif not known[name]['removing']:
+                continue           # taken away by hand before any deletion of ours
+            # Gone now: by this run, or by one that was cut short right after removing it.
+            # Counted in the run's record at once, so the records of all runs add up
+            # to what was removed even when a run is killed half-way.
+            self.store.file_removed(self.run_id, scope, source_id, day, name)
+            record['raw_files'] += 1
+            record['raw_bytes'] += known[name]['byte_count']
+            record['raw_state'] = 'deleted'
+        self.fault('before_marker', scope, day.isoformat())
+        # The marker says the day is whole. A file of the day that has appeared since the deletion began
+        # is not one of the batch: the marker stays with it and the day is reported.
+        if inbox.scan(directory)['days'].get(day):
+            return False
+        self._unlink(directory, inbox.marker_name(day))
+        self.fault('after_marker', scope, day.isoformat())
+        self._day_gone(scope, source_id, day, record)
+        return True
+
+    def _day_gone(self, scope, source_id, day, record):
+        if self.store.day_removed(self.run_id, scope, source_id, day):
+            record['raw_days'] += 1
+            record['raw_state'] = 'deleted'
+        self.fault('day_counted', scope, day.isoformat())
+
     @staticmethod
-    def _unlink(directory, name):
-        # Resolve first: only a regular file that really lies in the receiving directory goes.
+    def _same(path, stamp):
+        try:
+            return _stamp(os.lstat(path)) == stamp
+        except OSError:
+            return False
+
+    @staticmethod
+    def _unlink(directory, name, stamp=None):
+        """Delete a regular file that really lies in the receiving directory; a link is never followed.
+
+        With `stamp`, only the file that was proven goes: the name must lead to it, unmodified, in the
+        look taken immediately before the deletion. False when it does not. The look and the deletion
+        are two system calls and nothing can make them one; no other step lies between them.
+        """
         path = directory / name
-        if Path(os.path.realpath(path)).parent != directory or not stat.S_ISREG(os.lstat(path).st_mode):
+        inside = Path(os.path.realpath(path)).parent == directory
+        seen = os.lstat(path)
+        if not inside or not stat.S_ISREG(seen.st_mode):
             raise OSError('outside_receiving_directory')
+        if stamp is not None and _stamp(seen) != stamp:
+            return False
         os.unlink(path)
+        return True

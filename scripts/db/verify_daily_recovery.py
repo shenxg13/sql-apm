@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Synthetic acceptance of what the daily run must not lose or hide:
 
-imported files that change afterwards, a deletion cut short, a busy cluster with nothing
-else to do, problems that outlive a skipped or aborted run, the meaning of "no successful
-run for too long", and a stop signal that arrives while a statement waits.
+imported files that change afterwards (also between their proof and their deletion), a
+deletion cut short at any step, a busy cluster with nothing else to do, problems that
+outlive a skipped, stopped or killed run, a day batch that keeps its own frozen names,
+the meaning of "no successful run for too long", and a stop signal that arrives while a
+statement waits.
 
 Runs on private disposable PostgreSQL 17 instances with synthetic logs only.
 """
@@ -12,6 +14,7 @@ from datetime import date, timedelta
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import subprocess
 import sys
@@ -25,7 +28,7 @@ from verify_daily import TODAY, Site, clear, cutoff, many, one, problems
 from database.retention import clone_build
 import sql_apm.daily.run as daily_run
 from sql_apm.daily import inbox
-from sql_apm.storage.daily import status
+from sql_apm.storage.daily import DailyStore, status
 from sql_apm.storage.ingestion import connect
 from sql_apm.storage.tasks import Task
 
@@ -62,15 +65,15 @@ def verify_changed_files(v, site, db):
     paths = [site.inbox('S1') / name_of(day) for day in days]
     assert one(db, "SELECT count(*) FROM mpp_daily_file WHERE source_id='S1'") == 6
     # An untouched file is recognised by its stat values alone: nothing is read again.
-    reads, original = [], daily_run.checksum
-    daily_run.checksum = lambda path: (reads.append(path), original(path))[1]
+    reads, original = [], daily_run.read_proof
+    daily_run.read_proof = lambda path: (reads.append(path), original(path))[1]
     try:
         assert site.run(today=now)[0] == 0 and reads == []
         os.utime(paths[5])                       # only its times moved: read once, found the same, remembered
         assert site.run(today=now)[0] == 0 and clear(db) and reads == [paths[5]]
         assert site.run(today=now)[0] == 0 and reads == [paths[5]]
     finally:
-        daily_run.checksum = original
+        daily_run.read_proof = original
     v.require(True, 'F001 a run reads no imported file again while device, inode, size and both times are as recorded; a file whose times '
                     'alone moved is read once, found to be the same content and recorded anew')
     site.settings['raw_files'] = dict(retention_days=10)     # every one of these days is now due
@@ -576,6 +579,316 @@ def verify_stop_signal(v, site, db):
                     + json.dumps(measured) + '; the next run carries on and completes each step')
 
 
+def removed(db, cluster='C1'):
+    """Days, files and bytes the records of all runs say were removed."""
+    return tuple(int(value) for value in many(db, """SELECT coalesce(sum(raw_days),0),coalesce(sum(raw_files),0),
+        coalesce(sum(raw_bytes),0) FROM mpp_daily_cluster WHERE scope_id=%s""", (cluster,))[0])
+
+
+def left(site, source, day):
+    return sorted(path.name for path in site.inbox(source).iterdir() if day.isoformat() in path.name)
+
+
+def verify_proven_file_is_the_deleted_file(v, site, db):
+    """F001, second round: what is deleted is the file that was read, as it was when it was read."""
+    now = TODAY
+    days = [TODAY - timedelta(days=n) for n in (60, 59, 58, 57, 56)]
+    slices = ('_000000.csv', '_000000.csv.1', '_000000.csv.2')
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    one_file = [site.put('S1', days[0], base=10), site.put('S1', days[1], base=20), site.put('S1', days[4], base=90)]
+    during = [site.put('S1', days[2], base=30 + 10 * n, suffix=suffix) for n, suffix in enumerate(slices)]
+    before = [site.put('S1', days[3], base=60 + 10 * n, suffix=suffix) for n, suffix in enumerate(slices)]
+    every = one_file + during + before
+    sizes, contents = {path.name: path.stat().st_size for path in every}, {path.name: path.read_bytes() for path in every}
+    assert site.run(today=now)[0] == 0 and clear(db)
+    start = removed(db)
+    site.settings['raw_files'] = dict(retention_days=10)       # all five days are due
+    site.write()
+    def meddle(point, scope=None, name=None):
+        if point == 'before_unlink' and name == one_file[0].name:        # read, decided on; then another file takes its name
+            other = site.directory / 'other.csv'
+            other.write_bytes(contents[name].replace(b'daily_t', b'daily_u'))
+            os.replace(other, one_file[0])
+        if point == 'before_unlink' and name == one_file[1].name:        # read, decided on; then rewritten where it lies
+            same_size_rewrite(one_file[1])
+        if point == 'file_proven' and name == during[1].name:            # the first slice changes while the later ones are read
+            same_size_rewrite(during[0])
+        if point == 'before_unlink' and name == before[1].name:          # the first slice of this day has already gone
+            same_size_rewrite(before[1])
+    code, clusters, _ = site.run(today=now, fault=meddle)
+    changed = [('C1', day, CHANGED) for day in days[:4]]
+    assert code == 1 and day_problems(db) == changed, day_problems(db)
+    assert left(site, 'S1', days[0]) == [inbox.marker_name(days[0]), one_file[0].name]
+    assert left(site, 'S1', days[1]) == [inbox.marker_name(days[1]), one_file[1].name]
+    assert left(site, 'S1', days[2]) == [inbox.marker_name(days[2])] + [path.name for path in during]     # nothing of it went
+    assert left(site, 'S1', days[3]) == [inbox.marker_name(days[3]), before[1].name, before[2].name]      # stopped at the changed one
+    assert left(site, 'S1', days[4]) == []                                                                # the untouched day went whole
+    gone = [before[0].name, one_file[2].name]
+    assert (clusters['C1']['raw_days'], clusters['C1']['raw_files'], clusters['C1']['raw_bytes']) == (1, 2, sum(sizes[n] for n in gone))
+    assert one_file[0].read_bytes() != contents[one_file[0].name] and one_file[1].read_bytes() != contents[one_file[1].name]
+    # Still reported, and nothing more of these days deleted, until the files are the imported content again.
+    code, clusters, _ = site.run(today=now)
+    assert code == 1 and day_problems(db) == changed and clusters['C1']['raw_files'] == 0
+    assert len(left(site, 'S1', days[2])) == 4 and len(left(site, 'S1', days[3])) == 3
+    for path in (one_file[0], one_file[1], during[0], before[1]):
+        path.write_bytes(contents[path.name])
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and not [p for p in site.inbox('S1').iterdir()], (code, list(site.inbox('S1').iterdir()))
+    assert removed(db) == (start[0] + 5, start[1] + len(every), start[2] + sum(sizes.values())), (start, removed(db))
+    v.require(True, 'F001 after its proof and the decision, a file replaced under its name or rewritten in place at the same length is not '
+                    'deleted; a slice that changes while later slices are being read keeps the whole day; a slice that changes right before '
+                    'its own deletion is kept with the ones after it; each is reported, the untouched day beside them goes whole; once the '
+                    'files are the imported content again the days are finished and the records add up (5 days, %d files, %d bytes)'
+                    % (len(every), sum(sizes.values())))
+
+
+def verify_day_is_counted_once(v, site, db):
+    """F005, second round: the end of a day's deletion is itself written down and can be made up for."""
+    now = TODAY
+    days = [TODAY - timedelta(days=n) for n in (50, 49, 48, 47, 46)]
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    paths = [site.put('S1', day, base=100 + 10 * n) for n, day in enumerate(days)]
+    second = site.put('S1', days[4], base=190, suffix='_000000.csv.1')
+    sizes = [path.stat().st_size for path in paths]
+    original = paths[0].read_bytes()
+    assert site.run(today=now)[0] == 0 and clear(db)
+    start = removed(db)
+    def due(day):
+        site.settings['raw_files'] = dict(retention_days=(TODAY - day).days - 1)
+        site.write()
+    def open_days():
+        return one(db, "SELECT count(DISTINCT log_date) FROM mpp_daily_file WHERE source_id='S1' AND removing_at IS NOT NULL AND cleared_at IS NULL")
+    def since(base):
+        now_ = removed(db)
+        return tuple(a - b for a, b in zip(now_, base))
+    # Stopped after the marker has gone, before the day is written down as complete.
+    due(days[0])
+    def stop(point, scope=None, name=None):
+        if point == 'after_marker':
+            raise KeyboardInterrupt
+    try:
+        site.run(today=now, fault=stop)
+    except KeyboardInterrupt:
+        pass
+    else:
+        raise AssertionError('not stopped')
+    assert left(site, 'S1', days[0]) == [] and since(start) == (0, 1, sizes[0]) and open_days() == 1
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and (clusters['C1']['raw_state'], clusters['C1']['raw_days'], clusters['C1']['raw_files']) == ('deleted', 1, 0)
+    assert since(start) == (1, 1, sizes[0]) and open_days() == 0
+    assert site.run(today=now)[0] == 0 and since(start) == (1, 1, sizes[0])          # and not a second time
+    # Killed at the same place.
+    due(days[1])
+    killed_at(site, now, 'after_marker')
+    assert left(site, 'S1', days[1]) == [] and since(start) == (1, 2, sizes[0] + sizes[1]) and open_days() == 1
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and clusters['C1']['raw_days'] == 1 and since(start) == (2, 2, sizes[0] + sizes[1])
+    # Killed right after the day was written down: nothing is left to make up for.
+    due(days[2])
+    killed_at(site, now, 'day_counted')
+    assert since(start) == (3, 3, sum(sizes[:3])) and open_days() == 0
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and clusters['C1']['raw_days'] == 0 and since(start) == (3, 3, sum(sizes[:3]))
+    # Stopped before the marker goes: the next run removes it and counts the day, once.
+    due(days[3])
+    def earlier(point, scope=None, name=None):
+        if point == 'before_marker':
+            raise KeyboardInterrupt
+    try:
+        site.run(today=now, fault=earlier)
+    except KeyboardInterrupt:
+        pass
+    assert left(site, 'S1', days[3]) == [inbox.marker_name(days[3])] and since(start) == (3, 4, sum(sizes[:4]))
+    assert site.run(today=now)[0] == 0 and clear(db) and since(start) == (4, 4, sum(sizes[:4]))
+    assert site.run(today=now)[0] == 0 and since(start) == (4, 4, sum(sizes[:4]))
+    # The marker is taken away by hand while a file of a begun deletion is left: not ours to finish, not counted.
+    due(days[4])
+    def fail(point, scope=None, name=None):
+        if point == 'before_unlink' and name == second.name:
+            raise OSError('synthetic')
+    assert site.run(today=now, fault=fail)[0] == 1
+    (site.inbox('S1') / inbox.marker_name(days[4])).unlink()
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and second.exists() and [r[0] for r in problems(db)] == ['files_without_marker']
+    assert since(start) == (4, 5, sum(sizes)) and open_days() == 1
+    second.unlink()
+    code, clusters, _ = site.run(today=now)                                      # now nothing of the day is left
+    assert code == 0 and clear(db) and since(start) == (5, 5, sum(sizes)) and open_days() == 0
+    # A deleted day that is put back and marked again goes again and is a day again.
+    paths[0].write_bytes(original)
+    site.mark('S1', days[0])
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and (clusters['C1']['raw_days'], clusters['C1']['raw_files']) == (1, 1) and left(site, 'S1', days[0]) == []
+    assert since(start) == (6, 6, sum(sizes) + sizes[0])
+    # A file of the day that appears while its files are being deleted: the marker stays with it and the day is reported.
+    paths[0].write_bytes(original)
+    site.mark('S1', days[0])
+    late = site.inbox('S1') / name_of(days[0], '_230000.csv')
+    def appear(point, scope=None, name=None):
+        if point == 'before_marker' and name == days[0].isoformat():
+            late.write_bytes(b'late')
+    base = removed(db)
+    code, clusters, _ = site.run(today=now, fault=appear)
+    assert code == 1 and day_problems(db) == [('C1', days[0], CHANGED)], (code, problems(db))
+    assert left(site, 'S1', days[0]) == [inbox.marker_name(days[0]), late.name] and since(base) == (0, 1, sizes[0]) and open_days() == 1
+    late.unlink()
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and left(site, 'S1', days[0]) == [] and since(base) == (1, 1, sizes[0]) and open_days() == 0
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    v.require(True, 'F005 stopped or killed after the marker has gone and before the day is written down: the next run writes it down and '
+                    'counts exactly one day; killed right after it was written down, or stopped before the marker goes, the day is counted '
+                    'once as well; a marker taken away by hand while a file is left is not counted until nothing of the day is left; '
+                    'a day put back goes again and is a day again; a file that appears while the day is being deleted keeps the marker '
+                    'and is reported; at every step the records of all runs add up to the days, files and bytes removed')
+
+
+def verify_partial_runs_keep_what_they_found(v, site, db):
+    """F007, second round: what a run has looked at it has said, however far it got."""
+    now = TODAY
+    days = [TODAY - timedelta(days=n) for n in (30, 29, 28, 27)]
+    def shown():
+        return sorted((r[0], r[3], r[5]) for r in problems(db) if r[1] in ('C1', None))
+    def same_everywhere():
+        told = sorted((p['kind'], p['scope_id']) for p in json.loads(site.cli('daily', 'status', '--limit', 1).stdout)['problems'])
+        assert told == sorted((r[0], r[1]) for r in problems(db)), told
+        assert one(db, 'SELECT count(*) FROM mpp_view_daily_problems()') == len(told)
+    def stopped_at(point, day):
+        def stop(at, scope=None, name=None):
+            if at == point and name == day.isoformat():
+                raise KeyboardInterrupt
+        try:
+            site.run(today=now, fault=stop)
+        except KeyboardInterrupt:
+            return
+        raise AssertionError('not stopped')
+    unreadable = lambda day: ('day_failed', day, 'file_unreadable')
+    aborted, unfinished = ('run_not_finished', None, 'aborted'), ('run_not_finished', None, 'unfinished')
+    assert site.run(today=now)[0] == 0 and clear(db)
+    # A day fails; the run is stopped while a later day is under way.
+    first = site.put('S1', days[0], base=300)
+    first.chmod(0)
+    later = site.put('S1', days[1], base=310)
+    stopped_at('day_imported', days[1])
+    assert many(db, """SELECT c.import_state FROM mpp_daily_cluster c JOIN mpp_daily_run r USING(run_id)
+        WHERE c.scope_id='C1' ORDER BY r.started_at DESC LIMIT 1""") == [('incomplete',)]
+    assert shown() == [unreadable(days[0]), aborted], shown()
+    same_everywhere()
+    # The next run skips the cluster: the failed day is still listed.
+    holder = connect(site.dsn, 'sql_apm')
+    with Task(holder, 'C1', 'snapshot'):
+        assert site.run(today=now)[0] == 1
+        assert shown() == [('cluster_skipped', None, 'cluster_busy'), unreadable(days[0])], shown()
+        same_everywhere()
+    holder.close()
+    # Killed, not stopped: an old problem found again and a new one found by the same run are both listed.
+    third = site.put('S1', days[2], base=320)
+    third.chmod(0)
+    site.put('S1', days[3], base=330)
+    killed_at(site, now, 'day_imported', days[3].isoformat())
+    assert shown() == [unreadable(days[0]), unreadable(days[2]), unfinished], shown()
+    same_everywhere()
+    # One day is put right and imported; the run is stopped before it looks at the other: one gone, one kept.
+    first.chmod(0o644)
+    stopped_at('before_day', days[2])
+    assert one(db, 'SELECT state FROM import_batch WHERE batch_id=%s', (inbox.batch_id('S1', days[0]),)) == 'complete'
+    assert shown() == [unreadable(days[2]), aborted], shown()
+    # A conflict of an imported day, found and then put right, each time by a run that got no further than that.
+    kept = same_size_rewrite(later)
+    stopped_at('before_day', days[2])
+    assert shown() == [('day_failed', days[1], CHANGED), unreadable(days[2]), aborted], shown()
+    same_everywhere()
+    later.write_bytes(kept)
+    stopped_at('before_day', days[2])
+    assert shown() == [unreadable(days[2]), aborted], shown()
+    with Task(connect(site.dsn, 'sql_apm'), 'C1', 'snapshot'):
+        assert site.run(today=now)[0] == 1 and shown() == [('cluster_skipped', None, 'cluster_busy'), unreadable(days[2])]
+    # Really dealt with: gone.
+    third.chmod(0o644)
+    assert site.run(today=now)[0] == 0 and clear(db)
+    same_everywhere()
+    v.require(True, 'F007 a day that fails stays listed when the same run is stopped or killed at a later day and when the next run skips '
+                    'the cluster; an old and a new failure found by a killed run are both listed; of two open days, the one a stopped run '
+                    'imported goes and the one it did not reach stays; a conflict found and then put right by runs that got no further is '
+                    'listed and then gone; a run that really finishes clears the list; command line and dashboard functions agree throughout')
+
+
+def hand_batch(site, source, day, path, batch, key=None):
+    """Import one file as a hand-registered batch, the way the import command is used without the daily run."""
+    document = json.loads((site.directory / 'import.json').read_text())
+    document['batches'] = {batch: dict(source=source, files_confirmed_complete=True, dates=[day.isoformat()],
+                                       files=[dict(path=str(path), origin_key=key or path.name, closed_and_copied=True)])}
+    config = site.directory / (batch + '.json')
+    config.write_text(json.dumps(document))
+    out = site.cli('import', '--config', config, '--source', source, '--batch', batch, '--workers', '1')
+    assert out.returncode == 0, out.stdout[-800:]
+
+
+def verify_batch_keeps_its_own_names(v, site, db):
+    """F009: the files of a day are the names its batch froze, not every name its contents are known under."""
+    now = TODAY
+    day, other_day = TODAY - timedelta(days=20), TODAY - timedelta(days=19)
+    names = lambda source, of: sorted(DailyStore(db).day_files(source, of))
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    # A hand batch imports the same content under another name of the same day, after the day batch.
+    kept = site.put('S1', day, base=400)
+    assert site.run(today=now)[0] == 0 and clear(db)
+    alias = site.directory / name_of(day, '_010000.csv')
+    shutil.copyfile(kept, alias)
+    hand_batch(site, 'S1', day, alias, 'HAND-AFTER')
+    assert site.run(today=now)[0] == 0 and clear(db) and names('S1', day) == [kept.name]
+    # And before it.
+    early = site.put('S2', day, base=410, marker=False)
+    early_alias = site.directory / name_of(day, '_020000.csv')
+    shutil.copyfile(early, early_alias)
+    hand_batch(site, 'S2', day, early_alias, 'HAND-BEFORE')
+    records = one(db, 'SELECT count(*) FROM evidence_record')
+    site.mark('S2', day)
+    assert site.run(today=now)[0] == 0 and clear(db) and names('S2', day) == [early.name]
+    assert one(db, 'SELECT count(*) FROM evidence_record') == records
+    assert many(db, 'SELECT batch_id,state FROM import_batch WHERE batch_id=ANY(%s) ORDER BY 1',
+                ([inbox.batch_id('S1', day), inbox.batch_id('S2', day)],)) == [(inbox.batch_id('S1', day), 'complete'), (inbox.batch_id('S2', day), 'complete')]
+    # The alias is then put into the receiving directory of the frozen day: a new file, reported, and the day keeps its files.
+    shutil.copyfile(alias, site.inbox('S1') / alias.name)
+    site.settings['raw_files'] = dict(retention_days=10)
+    site.write()
+    code, clusters, _ = site.run(today=now)
+    assert code == 1 and day_problems(db) == [('C1', day, CHANGED)], (code, problems(db))
+    assert one(db, "SELECT count(*) FROM mpp_daily_file WHERE source_id='S1' AND log_date=%s AND removing_at IS NOT NULL", (day,)) == 0
+    assert left(site, 'S1', day) == sorted([inbox.marker_name(day), kept.name, alias.name])
+    assert left(site, 'S2', day) == [] and (clusters['C2']['raw_days'], clusters['C2']['raw_files']) == (1, 1)   # the unchanged day goes
+    (site.inbox('S1') / alias.name).unlink()
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and left(site, 'S1', day) == [] and clusters['C1']['raw_files'] == 1
+    # Inside one batch: two names with one content, a numbered slice, and a name of another date for one of its contents.
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    twin = site.put('S1', other_day, base=420)
+    copy = site.inbox('S1') / name_of(other_day, '_000000.csv.1')
+    shutil.copyfile(twin, copy)
+    third = site.put('S1', other_day, base=430, suffix='_000000.csv.2')
+    assert site.run(today=now)[0] == 0 and clear(db)
+    elsewhere = site.directory / 'elsewhere.csv'
+    shutil.copyfile(third, elsewhere)
+    hand_batch(site, 'S1', other_day, elsewhere, 'HAND-OTHER-DATE', key=name_of(TODAY - timedelta(days=18)))
+    assert site.run(today=now)[0] == 0 and clear(db) and names('S1', other_day) == sorted([twin.name, copy.name, third.name])
+    sizes = sum(path.stat().st_size for path in (twin, copy, third))
+    site.settings['raw_files'] = dict(retention_days=10)
+    site.write()
+    code, clusters, _ = site.run(today=now)
+    assert code == 0 and clear(db) and left(site, 'S1', other_day) == []
+    assert (clusters['C1']['raw_days'], clusters['C1']['raw_files'], clusters['C1']['raw_bytes']) == (1, 3, sizes)
+    site.settings['raw_files'] = dict(retention_days='off')
+    site.write()
+    v.require(True, 'F009 a hand batch that imports the same content under another name, after or before the day batch, adds no name to '
+                    'the day: no conflict is reported and the day is deleted when due; the other name placed into the receiving directory '
+                    'is reported as a new file and the day keeps all its files; two names with one content, a numbered slice and a name of '
+                    'another date for one of the contents leave the batch with exactly its own three names, all deleted when due')
+
+
 def verify(pg_bin):
     with instance(pg_bin) as (directory, env):
         v = Verification(pg_bin, directory, env)
@@ -591,13 +904,25 @@ def verify(pg_bin):
         v.init('check')
         db.close()
     with instance(pg_bin) as (directory, env):
+        v3 = Verification(pg_bin, directory, env)
+        v3.init()
+        dsn = 'host=' + str(directory / 'socket') + ' port=55473 dbname=sql_apm user=sql_apm'
+        db = connect(dsn, 'sql_apm')
+        site = Site(directory, dsn, dict(S1='C1', S2='C2'))
+        verify_proven_file_is_the_deleted_file(v3, site, db)
+        verify_day_is_counted_once(v3, site, db)
+        verify_partial_runs_keep_what_they_found(v3, site, db)
+        verify_batch_keeps_its_own_names(v3, site, db)
+        v3.init('check')
+        db.close()
+    with instance(pg_bin) as (directory, env):
         v2 = Verification(pg_bin, directory, env)
         v2.init()
         dsn = 'host=' + str(directory / 'socket') + ' port=55473 dbname=sql_apm user=sql_apm'
         db = connect(dsn, 'sql_apm')
         verify_stop_signal(v2, Site(directory, dsn, dict(S1='C1')), db)
         db.close()
-        print('DAILY RECOVERY CHECKS:', v.completed + v2.completed)
+        print('DAILY RECOVERY CHECKS:', v.completed + v2.completed + v3.completed)
 
 
 if __name__ == '__main__':

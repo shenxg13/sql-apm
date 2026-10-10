@@ -48,10 +48,11 @@ PROBLEM = dict(day_failed='导入失败或有冲突的日期', files_without_mar
                no_recent_success='太久没有成功的运行')
 REASON = dict(cluster_busy='集群正被其他任务占用', file_unreadable='文件读不了', cleanup_lock_timeout='拿不到锁',
               invalid_thresholds='invalid_thresholds', aborted='被中止', unfinished='未正常结束', raw_delete_failed='删除原始文件失败',
-              files_changed_after_import='导入之后文件有增减或内容变化')
-# Which step of a run a stored kind of problem belongs to, and how a cluster row says the step was gone through.
-STEPS = (({'day_failed', 'files_without_marker', 'marker_without_files', 'marker_not_before_today'}, lambda c: c[22] == 'done'),
-         ({'build_not_succeeded'}, lambda c: c[7] != 'not_reached'), ({'cleanup_pending'}, lambda c: c[10] != 'not_reached'))
+              files_changed_after_import='导入之后文件有增减或内容变化', operator_interrupt='被停止')
+# Problems of a day come from the newest run that looked at that day; these two kinds from the newest run that
+# went through the step they belong to, which a cluster row says in the given way.
+DAY_KINDS = ['day_failed', 'files_without_marker', 'marker_without_files', 'marker_not_before_today']
+STEPS = (({'build_not_succeeded'}, lambda c: c[7] != 'not_reached'), ({'cleanup_pending'}, lambda c: c[10] != 'not_reached'))
 STARTED = dict(timer='定时', manual='手工')
 
 
@@ -95,10 +96,10 @@ class Expectation:
                      for r in self.runs]
         self.clusters = many(db, '''SELECT run_id,scope_id,ordinal,state,failed,reason,newest_imported,build_state,build_reason,
             cutoff_date,cleanup_state,cleanup_reason,months_cleaned,months_pending,released_bytes,raw_state,raw_reason,raw_days,
-            raw_files,raw_bytes,started_at,finished_at,import_state FROM mpp_daily_cluster ORDER BY ordinal''')
+            raw_files,raw_bytes,started_at,finished_at,import_state,examined_days FROM mpp_daily_cluster ORDER BY ordinal''')
 
     def problems(self):
-        """Each stored kind from the newest run that went through its step; the rest worked out from the runs themselves."""
+        """Each stored problem from the newest run that looked at what it is about; the rest worked out from the runs themselves."""
         if not self.runs:
             return []
         latest, order = self.runs[0], {run[0]: index for index, run in enumerate(self.runs)}
@@ -106,6 +107,19 @@ class Expectation:
         rows = []
         for cluster in [c for c in self.clusters if c[0] == latest[0]]:
             turns = sorted((c for c in self.clusters if c[1] == cluster[1]), key=lambda c: order[c[0]])
+            # The newest run that finished its import step looked at every day; a later one only at the days it lists.
+            whole = next((index for index, c in enumerate(turns) if c[22] == 'done'), len(turns) - 1)
+            since = turns[:whole + 1]
+            found = {c[0]: many(self.db, '''SELECT kind,source_id,log_date,reason,file_count FROM mpp_daily_problem
+                WHERE run_id=%s AND scope_id=%s AND kind=ANY(%s)''', (c[0], cluster[1], DAY_KINDS)) for c in since}
+            for source, day in sorted({(row[1], row[2]) for rows_ in found.values() for row in rows_}):
+                looked = next(c for c in since if c[22] == 'done' or day.isoformat() in c[23].get(source, [])
+                              or any((row[1], row[2]) == (source, day) for row in found[c[0]]))
+                for kind, _, _, reason, count in [row for row in found[looked[0]] if (row[1], row[2]) == (source, day)]:
+                    detail = REASON.get(reason, reason or '')
+                    if count is not None:
+                        detail += ('，' if reason else '') + '%d 个文件' % count
+                    rows.append((PROBLEM[kind], cluster[1], source, day.isoformat(), detail, stamp(started[looked[0]])))
             for kinds, gone_through in STEPS:
                 examined = [c for c in turns if gone_through(c)]
                 if not examined:
@@ -406,6 +420,37 @@ def verify(env, play):
     browser.shot('status-cleared')
     env.ok('D19: after the causes are removed one run clears the list: the failed day is imported, the skipped cluster is made up, the build publishes '
            'and the waiting month is cleaned')
+
+    # A failure found by a run that is stopped at a later day is on the page, stays through a skipped run, and goes when dealt with.
+    unread = site.put('KS3', back(5), base=80)
+    unread.chmod(0)
+    site.put('KS3', back(1), base=90)
+    def later(point, scope=None, name=None):
+        if point == 'day_imported' and name == back(1).isoformat():
+            raise KeyboardInterrupt
+    try:
+        DailyRun(dsn, state['schema'], load_config(site.path), 'manual', None, None, later).execute()
+    except KeyboardInterrupt:
+        pass
+    else:
+        raise AssertionError('the run was not stopped')
+    assert one(db, """SELECT c.import_state FROM mpp_daily_cluster c JOIN mpp_daily_run r USING(run_id)
+        WHERE c.scope_id='K3' ORDER BY r.started_at DESC LIMIT 1""") == 'incomplete'
+    shown = compare(env, browser, db, 'found before the stop')
+    partial = {(PROBLEM['day_failed'], 'K3', 'KS3', back(5).isoformat(), '文件读不了，1 个文件'), (PROBLEM['run_not_finished'], '全部', '', '', '被中止')}
+    assert {row[:5] for row in shown} == partial, shown
+    holder = connect(dsn, state['schema'])
+    with Task(holder, 'K3', 'snapshot'):
+        assert run().returncode == 1
+        shown = compare(env, browser, db, 'found before the stop, then skipped')
+    holder.close()
+    assert {row[:5] for row in shown} == {(PROBLEM['day_failed'], 'K3', 'KS3', back(5).isoformat(), '文件读不了，1 个文件'),
+                                          (PROBLEM['cluster_skipped'], 'K3', '', '', '集群正被其他任务占用')}, shown
+    browser.shot('status-found-before-stop')
+    unread.chmod(0o644)
+    assert run().returncode == 0 and compare(env, browser, db, 'dealt with') == []
+    env.ok('D18/D19: a day that failed before the run was stopped at a later day is on the page, stays there when the next run skips the '
+           'cluster, and goes when a run imports it; the page equals the base tables each time')
 
     # Reached from the other dashboards by an actual click.
     browser.open('/d/mpp-list/sql-list', extra=2000)

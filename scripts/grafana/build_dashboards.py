@@ -1070,8 +1070,8 @@ ORDER BY p.placeholder,p.position""",
         [('problem', '问题', dict(custom__width=200)), ('cluster', '集群', dict(custom__width=80)), ('source', '日志来源', dict(custom__width=110)),
          ('subject', '日期或月份', dict(custom__width=110)), ('detail', '说明', dict(custom__width=260)),
          ('hint', '怎样处理', dict(custom__minWidth=480)), ('seen_at', '记录于', dict(unit=MOMENT, custom__width=170))],
-        description='需要人看一眼的事。每一类问题取最近一次真正做到那一步的运行所记录的：被跳过或中途停下的运行没有做到的步骤，不会让问题从这里消失；'
-                    '问题解决后，下一次做到那一步的运行不再记录它，这里随之消失。'
+        description='需要人看一眼的事。运行每得出一个结论就记下：某一天的问题取最近一次看过那一天的运行的结论，构建和清理的问题取最近一次做到那一步的运行所记录的；'
+                    '被跳过或中途停下的运行没有看到的日期、没有做到的步骤，不会让问题从这里消失。问题解决后，下一次看到它的运行不再记录它，这里随之消失。'
                     '“全部”表示这一条不属于某个集群。这个页面只展示，不能在这里触发导入、构建或清理。'), 24))
     layout.line(8, (table('最近的运行记录（最近 ${limit} 次运行，一行是一次运行里的一个集群）',
         """SELECT r.started_at,r.started_by,r.run_result,r.cluster,r.cluster_result,r.cluster_seconds,r.imported,r.failed,r.build,r.cleanup,

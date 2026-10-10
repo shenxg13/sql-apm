@@ -2358,6 +2358,10 @@ CREATE TABLE IF NOT EXISTS mpp_daily_cluster (
     reason text CHECK (reason <> ''),
     failed boolean NOT NULL DEFAULT false,
     import_state text NOT NULL DEFAULT 'not_reached' CHECK (import_state IN ('not_reached','incomplete','done')),
+    -- Days this run looked at and came to a conclusion about, by log source:
+    -- {"S1": ["2026-10-01", ...]}. Written as the run goes, like the problems it finds,
+    -- so a run that is stopped or killed has still said what it had seen.
+    examined_days jsonb NOT NULL DEFAULT '{}' CHECK (jsonb_typeof(examined_days) = 'object'),
     newest_imported date,
     build_state text NOT NULL DEFAULT 'not_reached' CHECK (build_state IN
         ('not_reached','disabled','no_data','not_due','published','no_samples','failed')),
@@ -2405,7 +2409,7 @@ CREATE TABLE IF NOT EXISTS mpp_daily_day (
     CHECK ((state = 'complete') = (reason IS NULL))
 );
 CREATE INDEX IF NOT EXISTS mpp_daily_day_source_idx ON mpp_daily_day (source_id, log_date);
--- What a run left for a person, written when it has finished with a cluster.
+-- What a run left for a person, written at the moment it is found.
 -- nonconforming_file is an observation of the receiving directory, not a problem.
 CREATE TABLE IF NOT EXISTS mpp_daily_problem (
     run_id text NOT NULL,
@@ -2424,12 +2428,17 @@ CREATE TABLE IF NOT EXISTS mpp_daily_problem (
 );
 
 -- One row per file name of an imported day. file_id is the content the import stored
--- under that name; the stat values are those of the moment the file was last read
--- and found to be that content, so a later run can tell an untouched file without
--- reading it. removing_* says a run decided to delete the day's files, removed_*
--- that this file is gone: a deletion cut short is told from a change of the input.
--- raw_days, raw_files and raw_bytes of mpp_daily_cluster move in the transaction
--- that sets removed_*, so the records of all runs add up to what was removed.
+-- under that name; the stat values are those of the very file that was last read and
+-- found to be that content (taken from the descriptor it was read through), so a later
+-- run can tell an untouched file without reading it and a deletion can tell that the
+-- name still leads to the file that was proven. They are empty when the last look
+-- found something else: the file is then read at every look until it is the content
+-- again. removing_* says a run decided to delete the day's files, removed_* that this
+-- file is gone, cleared_* that the day's marker is gone as well, which ends the
+-- deletion of the day: a deletion cut short at any point is told from a change of the
+-- input and finished later. raw_files and raw_bytes of mpp_daily_cluster move in the
+-- transaction that sets removed_*, raw_days in the one that sets cleared_*, so the
+-- records of all runs add up to what was removed.
 CREATE TABLE IF NOT EXISTS mpp_daily_file (
     source_id text NOT NULL CHECK (source_id <> ''),
     log_date date NOT NULL,
@@ -2438,20 +2447,26 @@ CREATE TABLE IF NOT EXISTS mpp_daily_file (
     batch_id text NOT NULL CHECK (batch_id <> ''),
     file_id text NOT NULL CHECK (file_id <> ''),
     byte_count bigint NOT NULL CHECK (byte_count >= 0),
-    device bigint NOT NULL,
-    inode bigint NOT NULL,
-    mtime_ns bigint NOT NULL,
-    ctime_ns bigint NOT NULL,
+    device bigint,
+    inode bigint,
+    mtime_ns bigint,
+    ctime_ns bigint,
     verified_at timestamptz NOT NULL DEFAULT clock_timestamp(),
     verified_run_id text NOT NULL CHECK (verified_run_id <> ''),
     removing_at timestamptz,
     removing_run_id text CHECK (removing_run_id <> ''),
     removed_at timestamptz,
     removed_run_id text CHECK (removed_run_id <> ''),
+    cleared_at timestamptz,
+    cleared_run_id text CHECK (cleared_run_id <> ''),
     PRIMARY KEY (source_id, log_date, file_name),
+    CHECK ((device IS NULL) = (inode IS NULL) AND (device IS NULL) = (mtime_ns IS NULL)
+        AND (device IS NULL) = (ctime_ns IS NULL)),
     CHECK ((removing_at IS NULL) = (removing_run_id IS NULL)),
     CHECK ((removed_at IS NULL) = (removed_run_id IS NULL)),
-    CHECK (removed_at IS NULL OR removing_at IS NOT NULL)
+    CHECK ((cleared_at IS NULL) = (cleared_run_id IS NULL)),
+    CHECK (removed_at IS NULL OR removing_at IS NOT NULL),
+    CHECK (cleared_at IS NULL OR removing_at IS NOT NULL)
 );
 
 -- Only one daily run at a time: the run holds this session lock for its whole life.
@@ -2479,13 +2494,16 @@ BEGIN ATOMIC
     FROM mpp_daily_run r CROSS JOIN held;
 END;
 
--- Open problems. A step that a run did not get to says nothing about that step, so
--- each kind comes from the newest run that actually went through the step it belongs
--- to: a skipped or aborted run hides nothing, and a problem goes when a later run has
--- really dealt with it. Derived here: the newest run that got to the cluster skipped
--- it, the newest run did not end normally, and no run has succeeded (finished without
--- any failure) for longer than the configured time, counted from the first run when
--- none has.
+-- Open problems. What a run did not look at, it says nothing about; what it did look
+-- at, it has said, whether or not it got any further. A problem of a day therefore
+-- comes from the newest run that looked at that day: the newest run that finished its
+-- import step looked at every day, and a later run that was skipped, stopped or killed
+-- speaks only for the days it lists in examined_days. A problem of the build or of
+-- the cleanup comes from the newest run that went through that step. A problem goes
+-- when a later run has really dealt with it, not when a run failed to get to it.
+-- Derived here: the newest run that got to the cluster skipped it, the newest run did
+-- not end normally, and no run has succeeded (finished without any failure) for longer
+-- than the configured time, counted from the first run when none has.
 CREATE OR REPLACE FUNCTION mpp_daily_problems()
 RETURNS TABLE(kind text,scope_id text,source_id text,log_date date,result_month date,
     reason text,file_count integer,run_id text,seen_at timestamptz)
@@ -2493,25 +2511,38 @@ LANGUAGE sql STABLE
 BEGIN ATOMIC
     WITH runs AS (SELECT * FROM mpp_daily_runs()),
     latest AS (SELECT * FROM runs r ORDER BY r.started_at DESC,r.run_id DESC LIMIT 1),
-    steps(step,kinds) AS (VALUES
-        ('import',ARRAY['day_failed','files_without_marker','marker_without_files','marker_not_before_today']),
-        ('build',ARRAY['build_not_succeeded']),
-        ('cleanup',ARRAY['cleanup_pending'])),
-    examined AS (SELECT DISTINCT ON (c.scope_id,s.step) c.scope_id,s.kinds,c.run_id,r.started_at
-        FROM mpp_daily_cluster c JOIN runs r USING(run_id) CROSS JOIN steps s
-        WHERE c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id))
-          AND CASE s.step WHEN 'import' THEN c.import_state='done'
-                          WHEN 'build' THEN c.build_state<>'not_reached'
-                          ELSE c.cleanup_state<>'not_reached' END
-        ORDER BY c.scope_id,s.step,r.started_at DESC,r.run_id DESC)
+    turns AS (SELECT c.scope_id,c.run_id,c.state,c.reason,c.import_state,c.examined_days,c.build_state,c.cleanup_state,
+            r.started_at
+        FROM mpp_daily_cluster c JOIN runs r USING(run_id)
+        WHERE c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id))),
+    whole AS (SELECT DISTINCT ON (t.scope_id) t.scope_id,t.run_id,t.started_at FROM turns t
+        WHERE t.import_state='done' ORDER BY t.scope_id,t.started_at DESC,t.run_id DESC),
+    since AS (SELECT t.scope_id,t.run_id,t.started_at,t.import_state,t.examined_days
+        FROM turns t LEFT JOIN whole w USING(scope_id)
+        WHERE w.run_id IS NULL OR (t.started_at,t.run_id)>=(w.started_at,w.run_id)),
+    day_found AS (SELECT p.kind,p.scope_id,p.source_id,p.log_date,p.result_month,p.reason,p.file_count,p.run_id,s.started_at
+        FROM mpp_daily_problem p JOIN since s USING(run_id,scope_id)
+        WHERE p.kind IN ('day_failed','files_without_marker','marker_without_files','marker_not_before_today')),
+    day_verdict AS (SELECT DISTINCT ON (d.scope_id,d.source_id,d.log_date) d.scope_id,d.source_id,d.log_date,s.run_id
+        FROM (SELECT DISTINCT f.scope_id,f.source_id,f.log_date FROM day_found f) d JOIN since s USING(scope_id)
+        WHERE s.import_state='done' OR (s.examined_days->d.source_id) ? to_char(d.log_date,'YYYY-MM-DD')
+           OR EXISTS (SELECT FROM day_found q WHERE q.run_id=s.run_id AND q.scope_id=d.scope_id
+                      AND q.source_id=d.source_id AND q.log_date=d.log_date)
+        ORDER BY d.scope_id,d.source_id,d.log_date,s.started_at DESC,s.run_id DESC),
+    steps(step,kinds) AS (VALUES ('build',ARRAY['build_not_succeeded']),('cleanup',ARRAY['cleanup_pending'])),
+    examined AS (SELECT DISTINCT ON (t.scope_id,s.step) t.scope_id,s.kinds,t.run_id,t.started_at
+        FROM turns t CROSS JOIN steps s
+        WHERE CASE s.step WHEN 'build' THEN t.build_state<>'not_reached' ELSE t.cleanup_state<>'not_reached' END
+        ORDER BY t.scope_id,s.step,t.started_at DESC,t.run_id DESC)
+    SELECT f.kind,f.scope_id,f.source_id,f.log_date,f.result_month,f.reason,f.file_count,f.run_id,f.started_at
+    FROM day_found f JOIN day_verdict v USING(run_id,scope_id,source_id,log_date)
+    UNION ALL
     SELECT p.kind,p.scope_id,p.source_id,p.log_date,p.result_month,p.reason,p.file_count,e.run_id,e.started_at
     FROM mpp_daily_problem p JOIN examined e ON e.run_id=p.run_id AND e.scope_id=p.scope_id AND p.kind=ANY(e.kinds)
     UNION ALL
     SELECT 'cluster_skipped',d.scope_id,NULL,NULL,NULL,d.reason,NULL,d.run_id,d.started_at
-    FROM (SELECT DISTINCT ON (c.scope_id) c.scope_id,c.state,c.reason,c.run_id,r.started_at
-          FROM mpp_daily_cluster c JOIN runs r USING(run_id)
-          WHERE c.scope_id IN (SELECT n.scope_id FROM mpp_daily_cluster n JOIN latest USING(run_id)) AND c.state<>'pending'
-          ORDER BY c.scope_id,r.started_at DESC,r.run_id DESC) d
+    FROM (SELECT DISTINCT ON (t.scope_id) t.scope_id,t.state,t.reason,t.run_id,t.started_at
+          FROM turns t WHERE t.state<>'pending' ORDER BY t.scope_id,t.started_at DESC,t.run_id DESC) d
     WHERE d.state='skipped'
     UNION ALL
     SELECT 'run_not_finished',NULL,NULL,NULL,NULL,l.state,NULL,l.run_id,l.started_at

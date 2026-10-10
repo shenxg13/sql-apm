@@ -3,14 +3,14 @@
 SQL APM 使用 Python 和 PostgreSQL 构建离线 SQL 基线；当前交付边界见[项目范围](.project-wiki/decisions/project-scope.md)。
 [SQL Baseline 原始资料](.project-wiki/raw/sql-baseline.md)是后续讨论的输入；
 运行环境为 Python 3.13.16 和项目 `.venv/`，
-Baseline 存储采用 PostgreSQL 17，后续 Grafana 按已确认范围直接查询该库展示基线和 SQL 执行历史。
+Baseline 存储采用 PostgreSQL 17，Grafana 直接查询该库展示基线和 SQL 执行历史。
 首期不引入 Prometheus，复用 MPP 已有监控，平台状态先通过任务记录和日志保留。
 日志首期手动拷贝至基线服务器，不引入流式读取组件；后续通过定时 SCP 每天传输一次。
 SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名单见[训练资格与黑名单](.project-wiki/contracts/training-eligibility.md#已确认的-sql-纳入与排除策略)。
 基线按计算集群、数据库、执行用户、SQL 结构指纹及计时类别分别统计，详见[分组规则](.project-wiki/contracts/timing-and-grouping.md)。
 后续按需准备 PostgreSQL 9.4.26 做实时采集兼容测试。
-当前开发以可联网的 AlmaLinux 环境为准；Kylin V10 SP2 x86_64 演练机已完成 Python 3.13.16 的
-[离线安装、随包验收及 119 首批验证](docs/reports/python313-upgrade-2026-10-08.md#目标机安装measured)。
+当前开发以可联网的 AlmaLinux 环境为准；Kylin V10 SP2 x86_64 演练机已完成 v0.3.0 候选的
+[离线安装、两集群九任务、每日回放和看板实测](docs/reports/v030-offline-release-2026-10-11.md)。
 操作步骤见[离线部署手册](docs/runbooks/kylin-offline-deployment.md)，正式生产部署尚未实施。
 精简程序及内网依赖包的交付边界见[发布说明](docs/runbooks/program-release.md)，
 开发环境准备见[开发说明](docs/runbooks/local-development.md)。
@@ -18,7 +18,7 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 交付顺序及验证安排见[项目知识](.project-wiki/decisions/project-scope.md#已确认的首期交付顺序)。
 已确认需求按主题保存在知识库；各主题标明尚待确认或实施验证的事项。
 
-当前正在准备 `v0.3.0` 离线预发布，包含检索、四个 Grafana 看板和每日运行；尚未完成本轮目标机及用户手动验收。
+当前正在准备 `v0.3.0` 离线预发布，包含检索、四个 Grafana 看板和每日运行；实施方目标机检查已通过，用户第二轮完整手动验收及独立评审仍待完成。
 从[安装手册](docs/runbooks/kylin-offline-deployment.md)、[检索指南](docs/runbooks/search-guide.md)与
 [发布说明](docs/releases/v0.3.0.md)进入；本版只支持全新安装，不用于生产。
 

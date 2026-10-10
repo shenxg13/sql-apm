@@ -1,5 +1,6 @@
 """Daily run rules that need no database: settings, receiving-directory reading and day sorting."""
 from datetime import date
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -10,8 +11,11 @@ from unittest import mock
 from sql_apm.daily import inbox
 from sql_apm.daily.config import DailyError, load_config
 from sql_apm.ingestion.config import IngestionError
-from sql_apm.storage.ingestion import connection_check_seconds
 from sql_apm.training.config import TrainingError
+
+RUNTIME_AVAILABLE = all(importlib.util.find_spec(name) is not None for name in ('psycopg2', 'pglast'))
+if RUNTIME_AVAILABLE:
+    from sql_apm.storage.ingestion import connection_check_seconds
 
 TODAY = date(2026, 10, 10)
 D1, D2, D3 = date(2026, 10, 7), date(2026, 10, 8), date(2026, 10, 9)
@@ -142,6 +146,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(str(raised.exception), 'unknown_cluster')
 
 
+@unittest.skipUnless(RUNTIME_AVAILABLE, 'requires the pinned PostgreSQL/parser product runtime')
 class ConnectionCheckTests(unittest.TestCase):
     def test_interval_setting(self):
         name = 'SQL_APM_CONNECTION_CHECK_SECONDS'

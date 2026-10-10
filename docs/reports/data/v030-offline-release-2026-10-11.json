@@ -1,0 +1,301 @@
+{
+  "format": 1,
+  "version": "v0.3.0",
+  "schema": "1.12.0",
+  "state": "partial",
+  "not_for_production": true,
+  "product_files": 111,
+  "source_rounds": {
+    "development": "c7b81b5f04e3ebebf6531df8ec995281f18a7efa",
+    "target": "ea65f75af8943d92b909d49b91fb977f8c4a3dd1",
+    "supplementary_verification": "9f27c821125cb99cac36ab43345dbc719efe9d06"
+  },
+  "target_initial_probe": {
+    "bytes": 1232,
+    "sha256": "f1671bf920f6aca3d5faaeb19dd2c3dc00a8521b2a6f5aaface8d97bf608bfb4"
+  },
+  "target_environment": {
+    "os": "Kylin V10 SP2",
+    "architecture": "x86_64",
+    "glibc": "2.28",
+    "systemd": "243",
+    "memory_bytes": 15443763200,
+    "swap_bytes": 4294963200,
+    "data_filesystem_bytes": 203911331840,
+    "data_filesystem_initial_available_bytes": 202455056384,
+    "python": "3.13.16",
+    "postgresql": "17.10",
+    "milestone": "10-SP2-Release-Build09-20210524",
+    "logical_cpus": 8,
+    "edition_probe_sha256": "5426fd2929b8f948fce3efee0a3e499326aa0992f71bcaeade64e4979d4fa83d"
+  },
+  "target_checks": {
+    "unittest.log": {
+      "bytes": 14290,
+      "sha256": "a024390b3e2b811a500b300bf91ffd365305f55ecc15768f7e31a00a3b51a4b5",
+      "passed": true,
+      "pass_labels": 0,
+      "unit_tests": 104
+    },
+    "verify-daily-recovery.log": {
+      "bytes": 5603,
+      "sha256": "7b09f0361d74aee4d263ef88a6d53bae5c5493342e9a0aa357bfa45abc50aea5",
+      "passed": true,
+      "pass_labels": 16
+    },
+    "verify-daily.log": {
+      "bytes": 4121,
+      "sha256": "7d39240b3556bba486569a915fa751a643622131eacd2648e6f29cc929a40aab",
+      "passed": true,
+      "pass_labels": 26
+    },
+    "verify-fetch-1.log": {
+      "bytes": 2046,
+      "sha256": "583e38ddee8763f6b29207302a0e5fd7a4fea02f7abba11bba0a5f3aabd9cc84",
+      "passed": true,
+      "pass_labels": 16
+    },
+    "verify-grafana.log": {
+      "bytes": 2615,
+      "sha256": "d1ba0ec92f1dea6bba2c71008108b024961be96235efde7a451efaa77b7e89f6",
+      "passed": true,
+      "pass_labels": 0,
+      "unit_tests": 14
+    },
+    "verify-publication.log": {
+      "bytes": 3466,
+      "sha256": "1b02de1a66b33705c45a38790309440726c293aa3b7649d2139f9d7405ae6839",
+      "passed": true,
+      "pass_labels": 33
+    },
+    "verify-search.log": {
+      "bytes": 1694,
+      "sha256": "42750898c9d2ba9aebe80845c497e8df168cd4e36c07066786f6e0f24094268c",
+      "passed": true,
+      "pass_labels": 8
+    },
+    "verify-smoke.log": {
+      "bytes": 352,
+      "sha256": "58d4cf4202d738d716929afe9ac61ac01f9cee33ee572b690330eafc84e112b8",
+      "passed": true,
+      "pass_labels": 0
+    },
+    "verify-timer-1.log": {
+      "bytes": 1540,
+      "sha256": "480d80fa97568b72e77608239182ecb69e40662c269a73e7c78f95b3a42ef10c",
+      "passed": true,
+      "pass_labels": 10
+    },
+    "verify-views.log": {
+      "bytes": 2980,
+      "sha256": "10e993270f788853e6f044391feef1b9cf6649bfb28171904c6e267e2fc0f872",
+      "passed": true,
+      "pass_labels": 16
+    },
+    "verify.log": {
+      "bytes": 20748,
+      "sha256": "f7b6641a7dad445d476dea83004c6683ffd3c0024246cf7097dfae42c80db39e",
+      "passed": true,
+      "pass_labels": 279
+    }
+  },
+  "service_boundaries": {
+    "passed": true,
+    "checks": {
+      "readonly_write_denied": true,
+      "grafana_components": {
+        "version": "13.2.3",
+        "sqlite": true,
+        "signature_validation": true,
+        "installed_plugin_downloads": 0
+      },
+      "accounts_and_provisioning": {
+        "anonymous_denied": true,
+        "default_password_denied": true,
+        "viewer_write_denied": true,
+        "dashboards": 4,
+        "datasources": 2,
+        "readonly_loopback": true
+      },
+      "systemd_kill_recovery": {
+        "sql-apm-grafana.service": {
+          "enabled": true,
+          "pid_changed": true,
+          "seconds": 7.029
+        },
+        "sql-apm-fingerprint.service": {
+          "enabled": true,
+          "pid_changed": true,
+          "seconds": 5.311
+        }
+      },
+      "fingerprint_loopback_only": true,
+      "project_account": {
+        "loopback_password": true,
+        "wrong_password_refused": true,
+        "other_source_rejected": true
+      },
+      "readonly_account": {
+        "loopback_password": true,
+        "wrong_password_refused": true,
+        "other_source_rejected": true
+      }
+    }
+  },
+  "lan_access": {
+    "passed": true,
+    "checks": {
+      "project_account": {
+        "lan_password_connection": true,
+        "wrong_password_refused": true
+      },
+      "readonly_account": {
+        "lan_password_connection": true,
+        "wrong_password_refused": true
+      }
+    }
+  },
+  "html_browser": {
+    "passed": true,
+    "external_requests": [],
+    "browser_errors": [],
+    "documents": {
+      "INSTALL": {
+        "code_blocks": 61,
+        "images": 0,
+        "internal_navigation": true,
+        "print_rendered": true
+      },
+      "DATABASE": {
+        "code_blocks": 0,
+        "images": 4,
+        "internal_navigation": true,
+        "print_rendered": true
+      },
+      "SEARCH": {
+        "code_blocks": 58,
+        "images": 0,
+        "internal_navigation": true,
+        "print_rendered": true
+      },
+      "RELEASE": {
+        "code_blocks": 0,
+        "images": 0,
+        "internal_navigation": true,
+        "print_rendered": true
+      }
+    }
+  },
+  "development_completed_tasks": {
+    "119-0": {
+      "passed": true,
+      "seconds": 956.757,
+      "resources": {
+        "seconds": 956.492,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 411086848,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4780580864,
+        "peak_swap_used_bytes": 348160,
+        "samples": 3818,
+        "oom_kills": 0
+      },
+      "database_bytes": 12530382515,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "record_sha256": "bfe19a3e7987f81e6388268976276076dc99d2b575496bc8fb3990a81da21dec"
+    },
+    "119-1": {
+      "passed": true,
+      "seconds": 209.224,
+      "resources": {
+        "seconds": 208.977,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 282550272,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4311654400,
+        "peak_swap_used_bytes": 417792,
+        "samples": 835,
+        "oom_kills": 0
+      },
+      "database_bytes": 13425194675,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "record_sha256": "d96677d5a359e9a6225ff3013c5134917da8c9b406fe2fa7984ecb3ee80ec602"
+    },
+    "119-2": {
+      "passed": true,
+      "seconds": 239.298,
+      "resources": {
+        "seconds": 239.028,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 301723648,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4264656896,
+        "peak_swap_used_bytes": 60284928,
+        "samples": 955,
+        "oom_kills": 0
+      },
+      "database_bytes": 14336308915,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "record_sha256": "17d245ba7c6799d9f3e73d713202ff2ce408a978cff8cc29f2f49bc949968d41"
+    },
+    "119-3": {
+      "passed": true,
+      "seconds": 135.231,
+      "resources": {
+        "seconds": 134.968,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 278515712,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4799561728,
+        "peak_swap_used_bytes": 60641280,
+        "samples": 539,
+        "oom_kills": 0
+      },
+      "database_bytes": 15266977459,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "record_sha256": "724ee21375819231a09505ee9720a9430f8f200e4baa4b9bda6268468140388c"
+    },
+    "119-4": {
+      "passed": true,
+      "seconds": 95.173,
+      "resources": {
+        "seconds": 94.945,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 190586880,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4804009984,
+        "peak_swap_used_bytes": 63463424,
+        "samples": 380,
+        "oom_kills": 0
+      },
+      "database_bytes": 15672211123,
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "record_sha256": "a9c00534d4debd19ad5dbde76ccff3f9f10a09698f57e7d7e0e59b57504faaff"
+    }
+  },
+  "pending": [
+    "development_remaining_real_tasks_and_examples",
+    "target_nine_tasks",
+    "target_real_daily_recovery_and_statistics",
+    "target_reboot",
+    "target_real_browser",
+    "user_manual_full_round",
+    "review",
+    "post_merge_release"
+  ]
+}

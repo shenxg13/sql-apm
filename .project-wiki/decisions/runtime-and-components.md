@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-10-11
 sources:
+  - path: docs/reports/v030-offline-release-2026-10-11.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6100590479
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
@@ -127,6 +129,13 @@ confidence: high
   关闭启动时的自动下载，保持签名校验。每个次版本官方只支持 9 个月，离线环境靠产品后续发版升级。
 - 事实（observed，2026-10-08，开发机）：Grafana 13.2.3 的安装包不含 PostgreSQL 数据源，
   联网时由 Grafana 在启动时自动下载，因此离线环境须把官方数据源插件作为固定组件。
+
+目标机阶段事实（measured，2026-10-11）：在用户恢复的 Kylin V10 SP2 x86_64 快照上，
+已按 v0.3.0 候选手册离线构建 Python 3.13.16、PG17.10 并装入上述组件；
+两个账号的回环／允许网段密码连接、错误密码及拒绝来源、只读权限、插件签名和被杀后的服务恢复已通过。
+systemd 243 的合成定时器 10 组与模拟 SSH 拉取 16 组通过；真实九任务、真实每日回放、机器重启和浏览器实测
+仍待完成，用户第二轮手动全流程尚未开始。该阶段结论不能作为完整交付、生产或其他系统兼容性承诺；
+候选身份、原始输出摘要和剩余项目见 [v0.3.0 验证报告](../../docs/reports/v030-offline-release-2026-10-11.md)。
 
 ### v0.3.0 的用户手动全流程验收（2026-10-11）
 

@@ -9,7 +9,8 @@
     "requirements.txt", "scripts/db/initialize.sh",
     "scripts/deployment/check_environment.py", "scripts/deployment/create_password.py",
     "scripts/deployment/verify_package.py",
-    "grafana/*", "scripts/grafana/install.py", "scripts/grafana/readonly_password.py"
+    "grafana/*", "scripts/grafana/install.py", "scripts/grafana/readonly_password.py",
+    "daily/*", "scripts/daily/install.py"
   ],
   "verification": [
     "tests/test_*.py", "tests/baseline/*.py", "tests/database/*.py", "tests/database/legacy_160/*", "tests/ingestion/*.py",

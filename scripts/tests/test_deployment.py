@@ -294,7 +294,7 @@ class HtmlTests(unittest.TestCase):
 
 class DocumentTests(unittest.TestCase):
     def test_current_documents(self):
-        self.assertEqual(check()['structure']['tables'], 57)
+        self.assertEqual(check()['structure']['tables'], 61)
 
     def test_missing_configuration_key(self):
         source = (ROOT / GUIDE).read_text().replace('"cutoff_date", "days"', '"cutoff_date"', 1)

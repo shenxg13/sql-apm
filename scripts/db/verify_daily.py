@@ -83,7 +83,7 @@ class Site:
 
     def cli(self, *words, env=None, timeout=120):
         return subprocess.run([sys.executable, '-m', 'sql_apm'] + [str(w) for w in words], cwd=ROOT,
-                              env=dict(os.environ, SQL_APM_DSN=self.dsn, **(env or {})),
+                              env={**os.environ, 'SQL_APM_DSN': self.dsn, **(env or {})},
                               capture_output=True, text=True, timeout=timeout)
 
     def start(self, *words, env=None):
@@ -272,6 +272,41 @@ def verify_days_and_builds(v, site, db):
     code, clusters, _ = site.run()
     assert clusters['C3']['build_state'] == 'published' and cutoff(db, 'C3') == TODAY - timedelta(days=2)
     v.require(True, 'D4 build interval 1, 7 and off decide building as specified, per cluster; a cluster without a version builds right after its first import')
+
+
+def verify_coexistence(v, site, db):
+    """A hand-registered batch and a day batch of the same file: the content is imported once."""
+    day = TODAY - timedelta(days=12)
+    path = site.put('S3', day, base=400, marker=False)
+    document = json.loads((site.directory / 'import.json').read_text())
+    document['batches'] = dict(HAND=dict(source='S3', files_confirmed_complete=True, dates=[day.isoformat()],
+                                         files=[dict(path=str(path), closed_and_copied=True)]))
+    manual = site.directory / 'hand.json'
+    manual.write_text(json.dumps(document))
+    out = site.cli('import', '--config', manual, '--source', 'S3', '--batch', 'HAND', '--workers', '1')
+    assert out.returncode == 0, out.stdout
+    records = one(db, 'SELECT count(*) FROM evidence_record')
+    site.mark('S3', day)
+    code, clusters, events = site.run()
+    assert code == 0 and [(e['date'], e['state'], e['added_records']) for e in events if e.get('phase') == 'day_finished'] == \
+        [(day.isoformat(), 'complete', 0)] and one(db, 'SELECT count(*) FROM evidence_record') == records
+    assert many(db, "SELECT batch_id,state FROM import_batch WHERE batch_id IN ('HAND',%s) ORDER BY 1", (inbox.batch_id('S3', day),)) == \
+        [('HAND', 'complete'), (inbox.batch_id('S3', day), 'complete')]
+    marked = TODAY - timedelta(days=11)
+    site.put('S3', marked, base=410)
+    assert site.run()[0] == 0
+    document['batches']['HAND2'] = dict(source='S3', files_confirmed_complete=True, dates=[marked.isoformat()],
+        files=[dict(path=str(site.inbox('S3') / ('gpdb-' + marked.isoformat() + '_000000.csv')), closed_and_copied=True)])
+    manual.write_text(json.dumps(document))
+    out = site.cli('import', '--config', manual, '--source', 'S3', '--batch', 'HAND2', '--workers', '1')
+    assert out.returncode == 0 and json.loads(out.stdout.splitlines()[-2])['state'] == 'duplicate_skipped', out.stdout
+    assert site.run()[0] == 0 and not problems(db, 'day_failed')
+    v.require(True, 'D3 a hand-registered batch and a day batch coexist in either order: the same content is imported once and both batches are complete')
+    out = site.cli('daily', 'run', '--config', site.path, env=dict(SQL_APM_DSN='host=' + str(site.directory / 'nowhere') + ' port=1 dbname=sql_apm user=sql_apm'))
+    assert out.returncode == 1 and json.loads(out.stdout) == dict(reason='database_unavailable', state='failed'), out.stdout
+    out = site.cli('daily', 'status', env=dict(SQL_APM_DSN='host=' + str(site.directory / 'nowhere') + ' port=1 dbname=sql_apm user=sql_apm'))
+    assert out.returncode == 1 and json.loads(out.stdout)['reason'] == 'database_unavailable'
+    v.require(True, 'D16 when the database cannot be reached the command says so and exits 1')
 
 
 def verify_failures(v, site, db):
@@ -678,6 +713,7 @@ def verify(pg_bin):
         verify_configuration(v, site, db)
         verify_markers(v, site, db)
         verify_days_and_builds(v, site, db)
+        verify_coexistence(v, site, db)
         verify_failures(v, site, db)
         verify_busy_and_single(v, site, db)
         verify_cleanup(v, site, db)

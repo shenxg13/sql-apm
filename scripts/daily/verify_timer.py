@@ -254,9 +254,10 @@ def verify(pg_bin, sshd_root):
                     wait_until(moment)
                     wait_for(lambda: runs() == before + 1 and newest()[1] == 'finished', 60, 'run after failed pull')
                     assert one(db, 'SELECT state FROM import_batch WHERE batch_id=%s', (inbox.batch_id('S1', marked),)) == 'complete'
-                    journal = subprocess.run(['journalctl', '--user', '-u', units.name + '.service', '--since', moment.strftime('%Y-%m-%d %H:%M:%S'),
-                                              '--no-pager', '-o', 'cat'], capture_output=True, text=True).stdout
-                    assert 'reason=source_unreachable' in journal and units.show('Result')['Result'] == 'success', journal[-800:]
+                    # The pull's own exit status is kept by systemd; its failure is ignored for the run that follows.
+                    pull = units.show('ExecStartPre')['ExecStartPre']
+                    assert 'ignore_errors=yes' in pull and 'status=1' in pull and units.show('Result')['Result'] == 'success', pull
+                    assert not (site.inbox('S1') / inbox.marker_name(today - timedelta(days=2))).exists()
                     ok('D15 when the pull fails the run still handles the day already marked')
         finally:
             units.remove()

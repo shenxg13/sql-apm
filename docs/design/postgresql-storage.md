@@ -3,10 +3,10 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前物理结构版本为 `1.11.0`，完整列、类型、空值、约束与索引定义以
+当前物理结构版本为 `1.12.0`，完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.11.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)已适配 1.12.0；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本
@@ -388,3 +388,13 @@ savepoint 回滚释放锁；实际连续升级保持单事务。清理中断、�
 新增一组供看板使用的 `mpp_view_*` 函数。只读角色获得 schema 的 USAGE 和每张非分区表的 SELECT，
 授权进入结构检查；分区经父表读取。没有新表、列、约束、索引和扩展。1.10.0 DDL 冻结，带数据升级只执行
 函数定义和授权。函数清单和口径见[Grafana 开发说明](grafana-dashboards.md)。
+
+## 1.12.0 每日运行记录
+
+新增四张表 `mpp_daily_run`、`mpp_daily_cluster`、`mpp_daily_day`、`mpp_daily_problem`，记录每日运行的每次执行、
+其中每个集群的结果、每个来源每一天的导入结果，以及留给人处理的事；两个索引（运行开始时间、来源加日期）。
+新增 `mpp_daily_*` 查询函数和供运行状态看板使用的 `mpp_view_daily_*` 函数。只读角色对新表同样只有 SELECT。
+既有表、列、约束、索引和函数没有改动，表总数为 61。1.11.0 DDL 冻结，带数据升级只建新表、函数和授权。
+同一时间只允许一个每日运行，用会话级咨询锁实现，键由 `mpp_daily_lock_key()` 给出（含 schema 名）；
+查询函数据此把“仍标为运行中、却没有会话持有该锁”的记录显示为未正常结束。表、函数和口径见
+[每日运行开发说明](daily-run.md)。

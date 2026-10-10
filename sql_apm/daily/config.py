@@ -6,6 +6,11 @@ from sql_apm.ingestion.config import IngestionError, load_sources, required_stri
 from sql_apm.training.config import TrainingError, load_retention
 
 OFF = 'off'
+# Every key the daily configuration accepts; anything else is refused.
+KEYS = {'root': ('version', 'import_config', 'training_config', 'sources', 'workers', 'build', 'cleanup', 'raw_files',
+                 'stale_after_hours'),
+        'sources.{source}': ('directory',), 'build': ('interval_days', 'clusters'), 'build.clusters': ('{cluster}',),
+        'cleanup': ('enabled',), 'raw_files': ('retention_days',)}
 DEFAULTS = dict(interval_days=1, retention_days=45, stale_after_hours=48, workers=4)
 
 
@@ -22,9 +27,9 @@ def unique(pairs):
     return result
 
 
-def section(document, name, allowed):
+def section(document, name):
     value = document.get(name, {})
-    if not isinstance(value, dict) or set(value) - allowed:
+    if not isinstance(value, dict) or set(value) - set(KEYS[name]):
         raise DailyError('invalid_' + name)
     return value
 
@@ -47,8 +52,7 @@ def load_config(path):
             raise DailyError('invalid_daily_config')
         if type(document['version']) is not int or document['version'] != 1:
             raise DailyError('daily_config_version')
-        if set(document) - {'version', 'import_config', 'training_config', 'sources', 'workers',
-                            'build', 'cleanup', 'raw_files', 'stale_after_hours'}:
+        if set(document) - set(KEYS['root']):
             raise DailyError('unknown_config_key')
         files = {}
         for name in ('import_config', 'training_config'):
@@ -61,15 +65,15 @@ def load_config(path):
         stale = document.get('stale_after_hours', DEFAULTS['stale_after_hours'])
         if type(stale) is not int or not 1 <= stale <= 8760:
             raise DailyError('invalid_stale_after_hours')
-        build = section(document, 'build', {'interval_days', 'clusters'})
+        build = section(document, 'build')
         interval = days(build.get('interval_days', DEFAULTS['interval_days']), 'invalid_build_interval')
         overrides = build.get('clusters', {})
         if not isinstance(overrides, dict):
             raise DailyError('invalid_build')
-        cleanup = section(document, 'cleanup', {'enabled'}).get('enabled', True)
+        cleanup = section(document, 'cleanup').get('enabled', True)
         if type(cleanup) is not bool:
             raise DailyError('invalid_cleanup')
-        raw_days = days(section(document, 'raw_files', {'retention_days'}).get('retention_days', DEFAULTS['retention_days']),
+        raw_days = days(section(document, 'raw_files').get('retention_days', DEFAULTS['retention_days']),
                         'invalid_raw_retention')
         declared = document['sources']
         if not isinstance(declared, dict) or not declared:
@@ -77,7 +81,7 @@ def load_config(path):
         clusters, registered = load_sources(files['import_config'])
         sources, seen = {}, set()
         for source_id, item in declared.items():
-            if not isinstance(item, dict) or set(item) != {'directory'} or not required_string(item['directory']):
+            if not isinstance(item, dict) or set(item) != set(KEYS['sources.{source}']) or not required_string(item['directory']):
                 raise DailyError('invalid_daily_source')
             if source_id not in registered:
                 raise DailyError('unregistered_source')

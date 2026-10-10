@@ -73,6 +73,8 @@ sudo -n ss -ltnp
 set -euo pipefail
 export APM_SSH_TARGET='执行账号@目标机地址'
 export APM_SSH_PORT=22
+export APM_EXPECTED_COMMIT='填写交付记录中的40位程序提交'
+export APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
 ```
 
 ## 2. 准备基础工具与离线依赖
@@ -584,11 +586,14 @@ sha256sum "$APM_BACKUP"
 
 ```bash
 APM_LOGS="$PWD/raw/inbox/hashdata"
+APM_SOURCE_CHECK="var/issue52/source-check-$(date +%Y%m%dT%H%M%S)"
 .venv/bin/python scripts/deployment/rehearsal.py prepare \
-  --logs "$APM_LOGS" --output var/issue52/source-check
+  --logs "$APM_LOGS" --output "$APM_SOURCE_CHECK"
 scp -r -P "$APM_SSH_PORT" "$APM_LOGS/119" "$APM_LOGS/120" \
   "$APM_SSH_TARGET:/data/sql-apm/logs/"
 ```
+
+每轮使用新的核验目录，保留先前输出；验证机恢复快照不会清除开发机上的首轮记录。
 
 ```bash
 cd "$APM_APP"

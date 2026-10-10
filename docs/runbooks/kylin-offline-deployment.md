@@ -804,6 +804,26 @@ PY
 并核对主机密钥加入 known_hosts。源端账号只需登录及目录、文件读取权限，见每日运行章节“传输脚本”。
 下例的目标目录不在每日运行配置中，合成 CSV 不会混入真实统计。
 
+初始快照上可以用以下步骤配置本机免密。已有默认密钥时沿用其公钥，不覆盖密钥；
+主机公钥直接读取本机 SSH 的公钥文件。若 known_hosts 已有不同的记录，连接会拒绝，先核对原因，不关闭校验。
+
+```bash
+install -d -m 0700 "$HOME/.ssh"
+if [ ! -e "$HOME/.ssh/id_ed25519" ]; then
+  ssh-keygen -q -t ed25519 -N '' -f "$HOME/.ssh/id_ed25519"
+fi
+test -f "$HOME/.ssh/id_ed25519.pub"
+touch "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
+chmod 600 "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
+if ! grep -qxF "$(cat "$HOME/.ssh/id_ed25519.pub")" "$HOME/.ssh/authorized_keys"; then
+  cat "$HOME/.ssh/id_ed25519.pub" >> "$HOME/.ssh/authorized_keys"
+fi
+if ! ssh-keygen -F 127.0.0.1 -f "$HOME/.ssh/known_hosts" >/dev/null; then
+  sudo awk '{print "127.0.0.1 " $1 " " $2}' /etc/ssh/ssh_host_ed25519_key.pub >> "$HOME/.ssh/known_hosts"
+fi
+ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "$APM_RUN_USER@127.0.0.1" true
+```
+
 ```bash
 mkdir -p "$APM_ROOT/mock-source" "$APM_ROOT/mock-inbox"
 APM_YESTERDAY="$(date -d yesterday +%F)"

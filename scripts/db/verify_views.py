@@ -108,8 +108,8 @@ def account(v, directory, owner, reader):
         reader.rows('SELECT count(*) FROM "' + table + '"')
         assert reader.one("SELECT has_table_privilege(current_user,%s,'SELECT') AND NOT has_table_privilege(current_user,%s,"
                           "'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')", ('sql_apm.' + table,) * 2), table
-    assert len(tables) == 57
-    v.require(True, 'G3: read-only account defaults; SELECT on all 57 tables and no other table privilege')
+    assert len(tables) == 61
+    v.require(True, 'G3: read-only account defaults; SELECT on all 61 tables and no other table privilege')
     refused = ["DELETE FROM mpp_occurrence", "UPDATE mpp_sql_text SET text='x'", "TRUNCATE mpp_occurrence",
                "INSERT INTO scope VALUES ('X','mpp','mpp-csv/1','1.0.0')", "CREATE TABLE sql_apm.probe (id integer)",
                "CREATE TABLE public.probe (id integer)", "CREATE TEMP TABLE probe (id integer)",

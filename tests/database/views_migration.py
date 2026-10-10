@@ -1,9 +1,10 @@
-"""Populated 1.10 -> 1.11 adds only functions and read-only grants; every row is preserved."""
+"""Populated 1.10 -> 1.12: 1.11 adds only functions and read-only grants, 1.12 the daily-run records; every row is preserved."""
 import hashlib
 from database.fixture import statements
 
 TABLES = ("SELECT relname FROM pg_class WHERE relnamespace='sql_apm'::regnamespace "
           "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname")
+DAILY = ['mpp_daily_cluster', 'mpp_daily_day', 'mpp_daily_problem', 'mpp_daily_run']
 
 
 def verify_views_migration(v, root):
@@ -15,7 +16,7 @@ def verify_views_migration(v, root):
     tables = v.sql(TABLES).splitlines()
     shape = lambda: v.sql("SELECT jsonb_agg(jsonb_build_array(c.relname,a.attname,format_type(a.atttypid,a.atttypmod)) ORDER BY c.relname,a.attnum) "
                           "FROM pg_class c JOIN pg_attribute a ON a.attrelid=c.oid WHERE c.relnamespace='sql_apm'::regnamespace "
-                          "AND c.relkind IN ('r','p','i') AND a.attnum>0 AND NOT a.attisdropped")
+                          "AND c.relkind IN ('r','p','i') AND a.attnum>0 AND NOT a.attisdropped AND c.relname NOT LIKE 'mpp\\_daily\\_%'")
     def state():
         return {t: v.sql('SELECT coalesce(jsonb_agg(to_jsonb(s) ORDER BY to_jsonb(s)::text),\'[]\') FROM "' + t + '" s' +
                          (" WHERE version='1.10.0'" if t == 'schema_version' else '')) for t in tables}
@@ -25,7 +26,7 @@ def verify_views_migration(v, root):
     # Before the upgrade the account exists but has been granted nothing.
     reader('SELECT count(*) FROM sql_apm.scope', ok=False)
     v.init('upgrade'); v.init('check')
-    assert before == state() and columns == shape() and v.sql(TABLES).splitlines() == tables
+    assert before == state() and columns == shape() and v.sql(TABLES).splitlines() == sorted(tables + DAILY)
     assert v.sql("SELECT count(*) FROM schema_version WHERE version='1.11.0'") == '1'
     assert v.sql("SELECT count(*) FROM pg_extension WHERE extname<>'plpgsql'") == '0'
     new_functions = set(v.sql("SELECT proname FROM pg_proc WHERE pronamespace='sql_apm'::regnamespace").splitlines())
@@ -42,5 +43,5 @@ def verify_views_migration(v, root):
     v.sql('REVOKE SELECT ON sql_apm.scope FROM sql_apm_ro')
     assert 'incompatible object: scope' in v.init('check', ok=False).stderr
     v.init('schema'); v.init('check')
-    v.require(True, 'populated 1.10 -> 1.11: rows, tables, columns and receipts preserved; only functions and read-only grants added; '
+    v.require(True, 'populated 1.10 -> 1.12: rows, tables, columns and receipts preserved; 1.11 adds only functions and read-only grants; '
                     'the read-only account works after the upgrade; a lost grant is detected and restored; reruns safe')

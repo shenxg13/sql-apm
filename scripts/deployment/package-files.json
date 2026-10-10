@@ -1,7 +1,7 @@
 {
   "program": [
     "sql_apm/__init__.py", "sql_apm/__main__.py",
-    "sql_apm/baseline/*.py", "sql_apm/cli/*.py", "sql_apm/ingestion/*.py",
+    "sql_apm/baseline/*.py", "sql_apm/cli/*.py", "sql_apm/daily/*.py", "sql_apm/ingestion/*.py",
     "sql_apm/sql/*.py", "sql_apm/storage/*.py", "sql_apm/storage/*.sql", "sql_apm/service/*.py",
     "sql_apm/training/*.py", "sql_apm/diagnostics/__init__.py",
     "sql_apm/diagnostics/normalize_sql.py", "sql_apm/diagnostics/approximate_sql.py",

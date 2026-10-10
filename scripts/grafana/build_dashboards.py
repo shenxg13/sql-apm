@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generate the three packaged dashboards into grafana/dashboards/.
+"""Generate the four packaged dashboards into grafana/dashboards/.
 
 The JSON files are committed; this program is their source. Identifiers that
 other dashboards may link to are stable: the dashboard uids (mpp-search,
-mpp-list, mpp-detail) and the variable names passed between them.
+mpp-list, mpp-detail, mpp-status) and the variable names passed between them.
 """
 import argparse
 import json
@@ -63,6 +63,7 @@ CROSS JOIN LATERAL (SELECT CASE WHEN NOT whole.cut OR t.listed<2 OR t.shared=0 T
 """ % dict(lead=HOVER_LEAD, short=HOVER_SHORT) + hover_cut('substr(t.sql_text,w.skip+1)', 'h'))
 REVISION = 1
 SEARCH, LIST, DETAIL = '/d/mpp-search/sql-search', '/d/mpp-list/sql-list', '/d/mpp-detail/sql-detail'
+STATUS = '/d/mpp-status/run-status'
 RANGE = '$__timeFrom()::timestamptz,$__timeTo()::timestamptz'
 MS = "(extract(epoch FROM {})*1000)::bigint"
 TIMINGS = [('请求整体', 'request'), ('Execute 首次', 'execute_first'), ('Execute 续取', 'execute_fetch'),
@@ -306,7 +307,7 @@ def dashboard(uid, title, description, panels, variables, time, annotations=None
 
 
 def navigation(*items):
-    names = dict(search=('SQL 检索', SEARCH, 'search'), list=('SQL 列表', LIST, 'list-ul'))
+    names = dict(search=('SQL 检索', SEARCH, 'search'), list=('SQL 列表', LIST, 'list-ul'), status=('运行状态', STATUS, 'heart-rate'))
     return [dict(type='link', title=names[item][0], url=names[item][1], icon=names[item][2], targetBlank=False,
                  keepTime=False, includeVars=False, asDropdown=False, tags=[], tooltip='') for item in items]
 
@@ -383,7 +384,7 @@ FROM mpp_query_versions('${norm}',mpp_view_decode(nullif('${cluster}','*'))) v O
         variable('textbox', 'min_samples', '基线样本数不少于', value=''),
         variable('custom', 'limit', '行数', pairs=[('50', '50'), ('100', '100'), ('200', '200'), ('500', '500')], default='100')]
     return dashboard('mpp-list', 'SQL 列表', '按时间范围现算的排行、按当前基线版本统计的排行和版本列表',
-                     layout.panels, variables, dict({'from': 'now-24h', 'to': 'now'}), links=navigation('search'))
+                     layout.panels, variables, dict({'from': 'now-24h', 'to': 'now'}), links=navigation('search', 'status'))
 
 
 # --------------------------------------------------------------------------- SQL 详情
@@ -726,7 +727,7 @@ ORDER BY 1""", ref='Anno'),
                                tags=dict(source='field', value='tags')))
     return dashboard('mpp-detail', 'SQL 详情', '一条 SQL 的原文、基线、与基线的对比、执行历史和按原文拆开',
                      layout.panels, variables, dict({'from': 'now-7d', 'to': 'now'}), annotations=[marks],
-                     links=navigation('search', 'list'))
+                     links=navigation('search', 'list', 'status'))
 
 
 # --------------------------------------------------------------------------- SQL 检索
@@ -1017,11 +1018,85 @@ WHERE '${xfor}'=""" + FILTER_TOKEN,
         variable('custom', 'timefilter', '时间', pairs=[('不限时间', 'off'), ('只看右上角所选的时间范围', 'on')]),
         variable('custom', 'order', '结果排序', pairs=[('记录数多的在前', 'count'), ('最近执行的在前', 'recent')])]
     return dashboard('mpp-search', 'SQL 检索', '粘贴一段 SQL 或输入关键词，找到 SQL 结构', layout.panels, variables,
-                     dict({'from': 'now-7d', 'to': 'now'}), links=navigation('list'))
+                     dict({'from': 'now-7d', 'to': 'now'}), links=navigation('list', 'status'))
+
+
+# --------------------------------------------------------------------------- 运行状态
+BEIJING = "to_char({} AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD HH24:MI:SS')"
+# Times in the lists are written to the second; the page is in Beijing time.
+MOMENT, SHORT_MOMENT = 'time:YYYY-MM-DD HH:mm:ss', 'time:MM-DD HH:mm:ss'
+
+
+def tile(title, sql, description='', steps=None):
+    """One value of the newest run. It describes every row of the lists below, so it is shown once, above them."""
+    return dict(type='stat', title=title, description=description, datasource=PG, targets=[target(sql)],
+                fieldConfig=dict(defaults=dict(color=dict(mode='thresholds') if steps else dict(mode='fixed', fixedColor='text'),
+                                               mappings=[], noValue='还没有运行记录',
+                                               thresholds=dict(mode='absolute', steps=steps or [dict(color='text', value=None)])),
+                                 overrides=[]),
+                options=dict(reduceOptions=dict(values=False, calcs=['lastNotNull'], fields='/.*/'), orientation='auto',
+                             textMode='value', colorMode='value' if steps else 'none', graphMode='none', justifyMode='center',
+                             wideLayout=True, showPercentChange=False))
+
+
+def status_dashboard():
+    """Display only: nothing on this page starts, stops or changes a run."""
+    layout = Layout()
+    layout.line(3,
+        (tile('上次运行开始于（北京时间）', 'SELECT ' + BEIJING.format('l.started_at') + ' AS started FROM mpp_view_daily_last() l',
+              '最近一次每日运行的开始时间。定时器每天启动一次；手工执行同一条命令也算一次运行。'), 6),
+        (tile('上次运行的结果', "SELECT l.result||'（'||l.started_by||'启动）' AS result FROM mpp_view_daily_last() l",
+              '完成：所有集群都处理完，没有失败。完成，有失败：有日期导入失败、构建或发布失败，或有集群被跳过。'
+              '被中止：收到停止信号。未正常结束：进程被强制终止或机器断电。'), 6),
+        (tile('上次正常结束的运行（北京时间）', 'SELECT ' + BEIJING.format('l.last_finished_at') + ' AS finished FROM mpp_view_daily_last() l',
+              '最近一次从头到尾跑完的运行的结束时间，不论其中有没有失败的日期。'), 6),
+        (tile('待处理问题数', 'SELECT l.open_problems FROM mpp_view_daily_last() l',
+              '下面“待处理问题列表”的行数。0 表示没有需要人处理的事。',
+              [dict(color='text', value=None), dict(color='orange', value=1)]), 6))
+    layout.line(5, (table('各集群现状', 'SELECT c.cluster,c.newest_imported,c.version_cutoff,c.version_published_at,c.last_result,c.open_problems '
+                                   'FROM mpp_view_daily_clusters() c',
+        [('cluster', '集群'), ('newest_imported', '最新已导入日期'), ('version_cutoff', '当前版本的截止日'),
+         ('version_published_at', '当前版本的发布时间', dict(unit=MOMENT)), ('last_result', '上次运行在该集群的结果'),
+         ('open_problems', '该集群的待处理问题数')],
+        description='一行是每日运行配置里的一个集群。“最新已导入日期”和当前版本取数据库里现在的情况，不限于每日运行导入的批次。'
+                    '构建按间隔进行，所以截止日可以早于最新已导入日期。'), 24))
+    layout.line(5, (table('待处理问题列表', """SELECT p.problem,p.cluster,p.source,p.subject,p.detail,p.hint,p.seen_at
+FROM (SELECT 0 AS placeholder,row_number() OVER () AS position,v.* FROM mpp_view_daily_problems() v
+      UNION ALL
+      SELECT 1,0,'（没有待处理的问题）','','','','','',NULL WHERE NOT EXISTS (SELECT FROM mpp_daily_problems())) p
+ORDER BY p.placeholder,p.position""",
+        # The advice takes what the fixed columns leave; the longest one fits beside them at 1920.
+        [('problem', '问题', dict(custom__width=200)), ('cluster', '集群', dict(custom__width=80)), ('source', '日志来源', dict(custom__width=110)),
+         ('subject', '日期或月份', dict(custom__width=110)), ('detail', '说明', dict(custom__width=260)),
+         ('hint', '怎样处理', dict(custom__minWidth=480)), ('seen_at', '记录于', dict(unit=MOMENT, custom__width=170))],
+        description='需要人看一眼的事。每个集群的问题取最近一次处理过该集群的运行所记录的；问题解决后，下一次运行不再记录它，这里随之消失。'
+                    '“全部”表示这一条不属于某个集群。这个页面只展示，不能在这里触发导入、构建或清理。'), 24))
+    layout.line(8, (table('最近的运行记录（最近 ${limit} 次运行，一行是一次运行里的一个集群）',
+        """SELECT r.started_at,r.started_by,r.run_result,r.cluster,r.cluster_result,r.cluster_seconds,r.imported,r.failed,r.build,r.cleanup,
+  r.raw_files,r.other_files
+FROM mpp_view_daily_recent(${limit}) r""",
+        # Fixed widths for the short columns; the five that carry text share the rest equally (about 212 px each at
+        # 1920), so none of them may ask for more than that or the table would scroll sideways.
+        [('started_at', '运行开始时间', dict(unit=SHORT_MOMENT, custom__width=130)), ('started_by', '启动方式', dict(custom__width=80)),
+         ('run_result', '运行结果', dict(custom__width=112)), ('cluster', '集群', dict(custom__width=70)),
+         ('cluster_result', '该集群的结果', dict(custom__width=132)),
+         ('cluster_seconds', '该集群耗时', dict(unit='s', custom__width=104)), ('imported', '导入成功的日期', dict(custom__minWidth=175)),
+         ('failed', '导入失败的日期', dict(custom__minWidth=165)), ('build', '构建发布', dict(custom__minWidth=200)),
+         ('cleanup', '版本结果清理', dict(custom__minWidth=205)), ('raw_files', '原始文件删除', dict(custom__minWidth=205)),
+         ('other_files', '其他文件数', dict(custom__width=100))],
+        description='集群按配置里的顺序逐个处理。开始时间写作“月-日 时:分:秒”，日期写作“月-日”；超过 4 天时写天数和起止日期。'
+                    '“其他文件数”是接收目录里既不是日志文件也不是齐全标记的文件，它们不会被处理。'), 24))
+    variables = [variable('custom', 'limit', '显示最近多少次运行', pairs=[('20', '20'), ('50', '50'), ('100', '100')])]
+    board = dashboard('mpp-status', '运行状态', '每日运行的现状、待处理问题和最近的运行记录；只展示，不能触发操作',
+                      layout.panels, variables, dict({'from': 'now-24h', 'to': 'now'}), links=navigation('search', 'list'))
+    # Nothing here depends on the time range; the page refreshes itself instead.
+    board.update(timepicker=dict(hidden=True), refresh='1m')
+    return board
 
 
 def build():
-    return {'mpp-search.json': search_dashboard(), 'mpp-list.json': list_dashboard(), 'mpp-detail.json': detail_dashboard()}
+    return {'mpp-search.json': search_dashboard(), 'mpp-list.json': list_dashboard(), 'mpp-detail.json': detail_dashboard(),
+            'mpp-status.json': status_dashboard()}
 
 
 def main():

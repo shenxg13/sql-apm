@@ -2587,12 +2587,28 @@ RETURN CASE WHEN p_bytes>=1073741824 THEN round(p_bytes/1073741824.0,1)||' GB'
     WHEN p_bytes>=1048576 THEN round(p_bytes/1048576.0,1)||' MB'
     WHEN p_bytes>=1024 THEN round(p_bytes/1024.0,1)||' KB' ELSE p_bytes||' B' END;
 
-CREATE OR REPLACE FUNCTION mpp_view_daily_clusters()
-RETURNS TABLE(cluster text,newest_imported date,version_cutoff date,version_published_at timestamptz,
-    last_run_at timestamptz,last_result text,open_problems bigint)
+-- The newest run, once: its time and result describe every row of the cluster list.
+CREATE OR REPLACE FUNCTION mpp_view_daily_last()
+RETURNS TABLE(started_at timestamptz,finished_at timestamptz,seconds double precision,started_by text,
+    result text,last_finished_at timestamptz,open_problems bigint)
 LANGUAGE sql STABLE
 BEGIN ATOMIC
-    SELECT c.scope_id,c.newest_imported,c.version_cutoff,c.version_published_at,c.run_started_at,
+    SELECT r.started_at,r.finished_at,extract(epoch FROM r.finished_at-r.started_at)::double precision,
+        mpp_view_daily_label('started_by',r.started_by),
+        mpp_view_daily_label('run',CASE WHEN r.state='finished' THEN CASE WHEN r.failed THEN 'failed' ELSE 'ok' END
+            ELSE r.state END),
+        (SELECT max(x.finished_at) FROM mpp_daily_runs() x WHERE x.state='finished'),
+        (SELECT count(*) FROM mpp_daily_problems())
+    FROM mpp_daily_runs() r ORDER BY r.started_at DESC,r.run_id DESC LIMIT 1;
+END;
+
+CREATE OR REPLACE FUNCTION mpp_view_daily_clusters()
+RETURNS TABLE(cluster text,newest_imported text,version_cutoff text,version_published_at timestamptz,
+    last_result text,open_problems bigint)
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+    SELECT c.scope_id,to_char(c.newest_imported,'YYYY-MM-DD'),to_char(c.version_cutoff,'YYYY-MM-DD'),
+        date_trunc('second',c.version_published_at),
         mpp_view_daily_label('cluster',CASE
             WHEN c.cluster_state='running' AND c.run_state<>'running' THEN c.run_state
             WHEN c.cluster_state='done' THEN CASE WHEN c.cluster_failed THEN 'failed' ELSE 'ok' END
@@ -2609,7 +2625,7 @@ BEGIN ATOMIC
         coalesce(to_char(p.log_date,'YYYY-MM-DD'),to_char(p.result_month,'YYYY-MM'),''),
         coalesce(mpp_view_daily_label('reason',p.reason),'')
             ||CASE WHEN p.file_count IS NOT NULL THEN CASE WHEN p.reason IS NULL THEN '' ELSE '，' END||p.file_count||' 个文件' ELSE '' END,
-        mpp_view_daily_label('hint',p.kind),p.seen_at
+        mpp_view_daily_label('hint',p.kind),date_trunc('second',p.seen_at)
     FROM mpp_daily_problems() p
     ORDER BY p.scope_id NULLS FIRST,p.kind,p.source_id,p.log_date,p.result_month;
 END;
@@ -2617,10 +2633,10 @@ END;
 CREATE OR REPLACE FUNCTION mpp_view_daily_recent(p_limit integer DEFAULT 20)
 RETURNS TABLE(started_at timestamptz,finished_at timestamptz,seconds double precision,started_by text,
     run_result text,cluster text,cluster_result text,imported text,failed text,build text,cleanup text,
-    raw_files text,cluster_seconds double precision)
+    raw_files text,other_files bigint,cluster_seconds double precision)
 LANGUAGE sql STABLE
 BEGIN ATOMIC
-    SELECT r.run_started_at,r.run_finished_at,
+    SELECT date_trunc('second',r.run_started_at),date_trunc('second',r.run_finished_at),
         extract(epoch FROM r.run_finished_at-r.run_started_at)::double precision,
         mpp_view_daily_label('started_by',r.started_by),
         mpp_view_daily_label('run',CASE WHEN r.run_state='finished' THEN CASE WHEN r.run_failed THEN 'failed' ELSE 'ok' END
@@ -2643,6 +2659,7 @@ BEGIN ATOMIC
         CASE WHEN r.scope_id IS NULL THEN '' ELSE mpp_view_daily_label('raw',r.raw_state)
             ||CASE WHEN r.raw_state='deleted' THEN ' '||r.raw_days||' 天 '||r.raw_files||' 个文件，'||mpp_view_daily_bytes(r.raw_bytes)
                    WHEN r.raw_state='failed' THEN '：'||mpp_view_daily_label('reason',r.raw_reason) ELSE '' END END,
+        r.nonconforming_files,
         extract(epoch FROM r.cluster_finished_at-r.cluster_started_at)::double precision
     FROM mpp_daily_recent(p_limit) r
     ORDER BY r.run_started_at DESC,r.run_id DESC,r.ordinal;

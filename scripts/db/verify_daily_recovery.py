@@ -204,7 +204,7 @@ def verify_interrupted_deletion(v, site, db):
     now = TODAY
     site.settings['raw_files'] = dict(retention_days='off')
     site.write()
-    days = [TODAY - timedelta(days=n) for n in (28, 27, 26, 25, 24)]
+    days = [TODAY - timedelta(days=n) for n in (28, 27, 26, 25, 24, 23, 22)]
     sizes = {}
     for n, day in enumerate(days):
         for part, suffix in enumerate(('_000000.csv', '_000000.csv.1', '_000000.csv.2')):
@@ -277,10 +277,32 @@ def verify_interrupted_deletion(v, site, db):
     for path in list(site.inbox('S1').iterdir()):
         if day.isoformat() in path.name:
             path.unlink()
+    assert site.run(today=now)[0] == 0 and clear(db)
+    v.require(True, 'F005 a file that appears, or a remaining file that changes, after a deletion began is kept and reported; nothing more of that day is deleted')
+    # Stopped, not killed, between two files and before the marker: the run records itself as aborted with what it removed.
+    for day, point, name, done in ((days[5], 'before_unlink', name_of(days[5], '_000000.csv.1'), 1), (days[6], 'before_marker', days[6].isoformat(), 3)):
+        site.settings['raw_files'] = dict(retention_days=(TODAY - day).days - 1)
+        site.write()
+        def stop(at, scope=None, which=None, point=point, name=name):
+            if at == point and which == name:
+                raise KeyboardInterrupt
+        try:
+            site.run(today=now, fault=stop)
+        except KeyboardInterrupt:
+            pass
+        else:
+            raise AssertionError('not stopped')
+        assert many(db, '''SELECT r.state,c.state,c.raw_state,c.raw_files FROM mpp_daily_cluster c JOIN mpp_daily_run r USING(run_id)
+            WHERE c.scope_id='C1' ORDER BY r.started_at DESC LIMIT 1''') == [('aborted', 'aborted', 'deleted', done)], point
+        code, clusters, _ = site.run(today=now)
+        total = sum(sizes[name_of(day, s)] for s in ('_000000.csv', '_000000.csv.1', '_000000.csv.2'))
+        assert code == 0 and clear(db) and (clusters['C1']['raw_days'], clusters['C1']['raw_files']) == (1, 3 - done), (point, clusters['C1'])
+        assert audit(day) == (3, 3, total) and not [p for p in site.inbox('S1').iterdir() if day.isoformat() in p.name], point
     site.settings['raw_files'] = dict(retention_days='off')
     site.write()
     assert site.run(today=now)[0] == 0 and clear(db)
-    v.require(True, 'F005 a file that appears, or a remaining file that changes, after a deletion began is kept and reported; nothing more of that day is deleted')
+    v.require(True, 'F005 stopped by a signal between two files, and between the last file and the marker: the run is recorded as aborted with the '
+                    'files it had removed; the next run finishes the day without a conflict and the counts add up')
 
 
 def verify_lasting_problems(v, site, db):
@@ -322,9 +344,11 @@ def verify_lasting_problems(v, site, db):
     v.require(True, 'F007 a failed build stays listed through two skipped runs and a run stopped before the cluster\'s turn, and so does the '
                     'skip itself; both go when a run really builds: kept, kept, kept, gone; the command line and the dashboard functions agree')
     # A conflict of a day and a month waiting for cleanup, through a skipped run and through a run stopped early.
-    bad_day = TODAY - timedelta(days=18)
+    bad_day, changed_day = TODAY - timedelta(days=18), TODAY - timedelta(days=19)
     bad = site.put('S3', bad_day, base=520)
     bad.chmod(0)
+    changed = site.inbox('S3') / name_of(changed_day)          # imported above; now other content at the same length
+    imported = same_size_rewrite(changed)
     pid = clone_build(db, one(db, "SELECT build_id FROM current_version WHERE scope_id='C3'"), 'recovery-old', '2025-01-01', True)
     reader = connect(site.dsn, 'sql_apm')
     def hold(point, scope=None, name=None):
@@ -333,11 +357,12 @@ def verify_lasting_problems(v, site, db):
                 cur.execute('SELECT 1 FROM mpp_statistic LIMIT 1')
     assert site.run(today=now, fault=hold)[0] == 1
     reader.rollback()
-    expected = [('cleanup_pending', 'C3'), ('day_failed', 'C3')]
-    assert kinds() == expected, kinds()
+    expected = [('cleanup_pending', 'C3'), ('day_failed', 'C3'), ('day_failed', 'C3')]
+    days_open = [('C3', changed_day, CHANGED), ('C3', bad_day, 'file_unreadable')]
+    assert kinds() == expected and day_problems(db) == days_open, (kinds(), day_problems(db))
     holder = connect(site.dsn, 'sql_apm')
     with Task(holder, 'C3', 'snapshot'):
-        assert site.run(today=now)[0] == 1 and kinds() == sorted(expected + [('cluster_skipped', 'C3')])
+        assert site.run(today=now)[0] == 1 and kinds() == sorted(expected + [('cluster_skipped', 'C3')]) and day_problems(db) == days_open
     holder.close()
     def early(point, scope=None, name=None):          # stopped after the import step, before building and cleaning
         if point == 'before_cleanup' and scope == 'C3':
@@ -355,13 +380,15 @@ def verify_lasting_problems(v, site, db):
         site.run(today=now, fault=before_import)
     except KeyboardInterrupt:
         pass
-    assert ('day_failed', 'C3') in kinds() and ('cleanup_pending', 'C3') in kinds()
+    assert day_problems(db) == days_open and ('cleanup_pending', 'C3') in kinds()
     bad.chmod(0o644)
+    changed.write_bytes(imported)
     assert site.run(today=now)[0] == 0 and clear(db)
     assert one(db, 'SELECT cleaned_at IS NOT NULL FROM mpp_result_partition WHERE partition_id=%s', (pid,))
     reader.close()
-    v.require(True, 'F007 a failed day and a month waiting for cleanup stay listed through a skipped run, a run stopped before those steps and a '
-                    'run stopped before the cluster was looked at; they go when a later run imports the day and cleans the month')
+    v.require(True, 'F007 a failed day, a conflict of an imported day and a month waiting for cleanup stay listed through a skipped run, a run '
+                    'stopped before those steps and a run stopped before the cluster was looked at; they go when a later run imports the day, '
+                    'finds the file to be the imported content again and cleans the month')
 
 
 def verify_success_age(v, site, db):
@@ -389,7 +416,9 @@ def verify_success_age(v, site, db):
     found = stale()
     assert len(found) == 1 and abs((found[0][1] - success).total_seconds() + 72 * 3600) < 1, found
     assert one(db, 'SELECT last_success_at FROM mpp_view_daily_last()') == found[0][1]
+    told = json.loads(site.cli('daily', 'status', '--limit', 1).stdout)['problems']
     shown = [p for p in status(db, 3)['problems'] if p['kind'] == 'no_recent_success']
+    assert told == status(db, 1)['problems'] and [p['kind'] for p in told].count('no_recent_success') == 1, told
     assert len(shown) == 1 and many(db, "SELECT problem FROM mpp_view_daily_problems() WHERE problem='太久没有成功的运行'") == [('太久没有成功的运行',)]
     # The limit itself: 48 hours by default, taken from the newest run.
     shift("state='finished' AND NOT failed", -72 + 47)
@@ -431,7 +460,7 @@ def verify_success_age(v, site, db):
                     'the command line and the dashboard functions show the same')
 
 
-def stopped(site, db, signal_number, lock, mode, group=False, cluster='C1'):
+def stopped(site, db, signal_number, lock, mode, group=False, cluster='C1', waiting="a.wait_event_type='Lock'"):
     """Send a stop signal to a command-line run whose statement waits behind the lock we take with `lock`.
 
     With `group` the signal goes to the whole process group, as from a terminal or from systemd.
@@ -441,7 +470,8 @@ def stopped(site, db, signal_number, lock, mode, group=False, cluster='C1'):
         AND a.pid<>pg_backend_pid() AND a.pid<>ALL(%s)"""
     try:
         with blocker.cursor() as cur:
-            cur.execute(*lock)
+            if lock:
+                cur.execute(*lock)
         probe = connect(site.dsn, 'sql_apm')
         probe.autocommit = True
         known = [blocker.get_backend_pid(), db.get_backend_pid()]
@@ -452,7 +482,7 @@ def stopped(site, db, signal_number, lock, mode, group=False, cluster='C1'):
             deadline = time.monotonic() + 60
             with probe.cursor() as cur:
                 while True:
-                    cur.execute(others + " AND a.wait_event_type='Lock'", (known,))
+                    cur.execute(others + ' AND ' + waiting, (known,))
                     if cur.fetchone()[0]:
                         break
                     assert time.monotonic() < deadline and child.poll() is None, (lock, child.poll(), child.stderr.read()[-500:])
@@ -494,8 +524,8 @@ def stopped(site, db, signal_number, lock, mode, group=False, cluster='C1'):
 def verify_stop_signal(v, site, db):
     """F008: a stop signal ends the run in bounded time although a statement is waiting."""
     measured = {}
-    def aborted(label, signal_number, lock, mode, group=False):
-        code, seconds, last = stopped(site, db, signal_number, lock, mode, group)
+    def aborted(label, signal_number, lock, mode, group=False, **more):
+        code, seconds, last = stopped(site, db, signal_number, lock, mode, group, **more)
         assert code == 130 and last == dict(reason='operator_interrupt', state='interrupted') and seconds < 5, (label, code, seconds, last)
         assert many(db, 'SELECT state,reason FROM mpp_daily_run ORDER BY started_at DESC LIMIT 1') == [('aborted', 'operator_interrupt')], label
         assert one(db, "SELECT state FROM mpp_daily_cluster c WHERE c.scope_id='C1' AND c.run_id=(SELECT run_id FROM mpp_daily_run ORDER BY started_at DESC LIMIT 1)") == 'aborted'
@@ -509,6 +539,17 @@ def verify_stop_signal(v, site, db):
     aborted('import, SIGTERM', signal.SIGTERM, ('LOCK TABLE evidence_record IN ACCESS EXCLUSIVE MODE',), 'import_only')
     aborted('import, SIGINT', signal.SIGINT, ('LOCK TABLE evidence_record IN ACCESS EXCLUSIVE MODE',), 'import_only')
     aborted('import, SIGINT to the process group', signal.SIGINT, ('LOCK TABLE evidence_record IN ACCESS EXCLUSIVE MODE',), 'import_only', group=True)
+    # Not a lock wait but a statement that is executing: every insert of a record sleeps.
+    with db, db.cursor() as cur:
+        cur.execute("CREATE FUNCTION slow_probe() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN PERFORM pg_sleep(300); RETURN NEW; END'")
+        cur.execute('CREATE TRIGGER slow_probe BEFORE INSERT ON evidence_record FOR EACH ROW EXECUTE FUNCTION slow_probe()')
+    try:
+        aborted('import, a statement that is executing, SIGTERM', signal.SIGTERM, None, 'import_only', waiting="a.wait_event='PgSleep'")
+        aborted('import, a statement that is executing, SIGINT', signal.SIGINT, None, 'import_only', waiting="a.wait_event='PgSleep'")
+    finally:
+        with db, db.cursor() as cur:
+            cur.execute('DROP TRIGGER slow_probe ON evidence_record')
+            cur.execute('DROP FUNCTION slow_probe()')
     out = site.cli('daily', 'run', '--config', site.path)
     assert out.returncode == 0 and one(db, 'SELECT state FROM import_batch WHERE batch_id=%s', (inbox.batch_id('S1', day),)) == 'complete'
     assert one(db, 'SELECT count(*) FROM evidence_record') == 40
@@ -529,8 +570,9 @@ def verify_stop_signal(v, site, db):
     out = site.cli('daily', 'run', '--config', site.path)
     assert out.returncode == 0 and one(db, 'SELECT cleaned_at IS NOT NULL FROM mpp_result_partition WHERE partition_id=%s', (pid,))
     assert not status(db, 1)['problems'] and one(db, "SELECT count(*) FROM task WHERE state='running'") == 0
-    v.require(True, 'F008 a stop signal that arrives while a statement of the import, the build or the cleanup waits behind a lock ends the run as '
-                    'aborted with exit 130, with the cluster released and no session left behind; seconds from the signal to the exit: '
+    v.require(True, 'F008 a stop signal that arrives while a statement of the import, the build or the cleanup waits behind a lock, or while a '
+                    'statement of the import is executing, ends the run as aborted with exit 130, with the cluster released and no session '
+                    'left behind; seconds from the signal to the exit: '
                     + json.dumps(measured) + '; the next run carries on and completes each step')
 
 

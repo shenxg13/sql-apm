@@ -2,7 +2,7 @@
  "format": "sql-apm-daily-run-report/1",
  "issue": 54,
  "date": "2026-10-10",
- "product_commit": "49b17b0277d291a3438b993cd1b0ead00624e6b7",
+ "product_commit": "5690b8c31a0b3a69bf970f011e11497de3a60cd5",
  "machine": {
   "cores": 12,
   "memory_gib": 23,
@@ -20,11 +20,21 @@
   "production_scale": "inferred"
  },
  "automated": {
-  "unit_tests": 101,
-  "scripts_tests": 36,
+  "unit_tests": 104,
+  "unit_tests_skipped_without_database_driver": 12,
+  "scripts_tests": {
+   "build_interpreter": {
+    "test_deployment": 30,
+    "test_grafana": 5
+   },
+   "project_interpreter": {
+    "test_python_runtime": 8
+   }
+  },
   "verify": {
    "verify": 279,
    "verify_daily": 26,
+   "verify_daily_recovery": 12,
    "verify_views": 16,
    "verify_ingestion": 125,
    "verify_publication": 33,
@@ -55,17 +65,31 @@
    "D9 an expired month is cleaned by the daily run with the same result as cleanup --execute; with nothing expired no task is opened",
    "D10 only days imported whole and past the keeping time lose their files and marker, and the record holds the counts; a failed day, an unmarked file, a day with an extra file and a file outside the directory stay; switched off deletes nothing",
    "D10 a deleted day put back and marked again adds no record and is deleted again",
-   "D11 killed inside a waiting statement, each writing command frees its cluster within the check interval (2 s here) plus margin; seconds={\"daily run\": 1.97, \"full\": 2.02, \"import\": 1.92, \"rebuild\": 2.02, \"training snapshot\": 2.02, \"statistics\": 2.02, \"cleanup --execute\": 2.02}",
+   "D11 killed inside a waiting statement, each writing command frees its cluster within the check interval (2 s here) plus margin; seconds={\"daily run\": 1.93, \"full\": 1.97, \"import\": 1.93, \"rebuild\": 1.98, \"training snapshot\": 1.98, \"statistics\": 1.98, \"cleanup --execute\": 1.98}",
    "D11 with the check switched off (0) the killed command still holds its cluster 12 s later, until its statement ends: the interval is what frees it",
    "D11 the interval defaults to 10 s on every product connection, is configurable, and an invalid value is rejected",
    "D12 a stop signal ends the run with exit 130; the run and its cluster are recorded as aborted and listed as open",
    "D12 a killed run shows as unfinished at once and is recorded so by the next run, which picks up where it stopped",
    "D12 after an abort and a kill the final version has the same statistics, row for row, as a run that was never interrupted; rows=8",
    "D16 a run record holds times, trigger, result, per-cluster days, build, cleanup, deleted files and stage seconds; status is read-only, needs no cluster and equals the database; the read-only account can read but not write; no SQL text, database or user name anywhere",
-   "D16 no normally finished run for longer than the configured hours is listed as open, and clears when one finishes"
+   "D16 no successful run for longer than the configured hours is listed as open, and is not listed while the last success is recent"
+  ],
+  "verify_daily_recovery_labels": [
+   "F001 a run reads no imported file again while device, inode, size and both times are as recorded; a file whose times alone moved is read once, found to be the same content and recorded anew",
+   "F001 an imported file rewritten at the same length, one replaced under its name, and one whose change no stat value shows are all kept and reported as a conflict of their day; the unchanged days beside them are deleted with the right count",
+   "F001 after a kill between the import and the run's own record, the names and contents come from the import's rows: a file that grew meanwhile is kept and reported; restored, it is proven and deleted",
+   "F004 a held cluster with nothing to import, build or clean is skipped and recorded, exit 1, its raw files kept, also with building and cleanup switched off; the other cluster goes on; a cluster taken just before the deletion is skipped as well",
+   "F005 a deletion that fails at the second file is finished by the next run without a false conflict; each run counts what it removed",
+   "F005 killed between two files, right after a file went, and before the marker: the next run finishes each deletion and reports no conflict; the killed runs' records hold what they had removed, and the records of all runs add up to exactly the days, files and bytes removed (3 days, 9 files, 8505 bytes)",
+   "F005 a file that appears, or a remaining file that changes, after a deletion began is kept and reported; nothing more of that day is deleted",
+   "F005 stopped by a signal between two files, and between the last file and the marker: the run is recorded as aborted with the files it had removed; the next run finishes the day without a conflict and the counts add up",
+   "F007 a failed build stays listed through two skipped runs and a run stopped before the cluster's turn, and so does the skip itself; both go when a run really builds: kept, kept, kept, gone; the command line and the dashboard functions agree",
+   "F007 a failed day, a conflict of an imported day and a month waiting for cleanup stay listed through a skipped run, a run stopped before those steps and a run stopped before the cluster was looked at; they go when a later run imports the day, finds the file to be the imported content again and cleans the month",
+   "F006 runs that failed or only skipped do not reset the time of the last success; the limit and its boundary hold; the problem stays while a run is going on; without any success it is counted from the first run; a successful run ends it; the command line and the dashboard functions show the same",
+   "F008 a stop signal that arrives while a statement of the import, the build or the cleanup waits behind a lock, or while a statement of the import is executing, ends the run as aborted with exit 130, with the cluster released and no session left behind; seconds from the signal to the exit: {\"import, SIGTERM\": 0.06, \"import, SIGINT\": 0.06, \"import, SIGINT to the process group\": 0.06, \"import, a statement that is executing, SIGTERM\": 0.06, \"import, a statement that is executing, SIGINT\": 0.06, \"build, SIGTERM\": 0.03, \"build, SIGINT\": 0.03, \"build, SIGTERM to the process group\": 0.03, \"cleanup, SIGTERM\": 0.03, \"cleanup, SIGINT\": 0.03}; the next run carries on and completes each step"
   ],
   "package": {
-   "commit": "decb021",
+   "commit": "ceed948",
    "kit_entries": {
     "unit": "passed",
     "database": "passed",
@@ -73,19 +97,21 @@
     "smoke": "passed",
     "cleanup": "passed",
     "search": "passed"
-   }
+   },
+   "note": "the cleanup entry passed on the third attempt: the first two failed one pre-existing timing assertion (month seconds 10.09 and 10.03, bound 9.5-10) while replays and other checks were running; the code it checks did not change"
   }
  },
  "timer": {
   "script": "scripts/daily/verify_timer.py",
   "systemd_scope": "user",
   "labels": [
-   "D13 the rendered system unit runs as the named user with the default 12-hour limit and daily times; wrong values are refused",
-   "D13/D15 the timer starts the run at the set time (0.5 s after the minute); without a pull configured only the command runs",
+   "D13 the rendered system unit runs as the named user with the default 12-hour limit and daily times; wrong values, and a connection string with a password in keyword or URI form, are refused and no unit file is written",
+   "D13/D15 the timer starts the run at the set time (0.6 s after the minute); without a pull configured only the command runs",
    "D13 the unit runs as the current user; a time that comes while a run is still going starts no second run beside it; systemd makes that time up once, 0.1 s after the first run has ended, and nothing more follows",
    "D13 two times missed while the timer was stopped are made up by exactly one run when the timer is started again",
-   "D13 a timer-started run over its limit (20 s here) is stopped by systemd 110 s after it began to wait; its cluster is free within the check interval and the run shows as unfinished",
-   "D13 a run started by hand outlasts that limit (30 s here) and finishes; it also records the stopped run as unfinished and picks up its day",
+   "F008/D13 a timer-started run over its limit (20 s here) is stopped by systemd while its statement waits behind a lock: the process ends 20.1 s after its start with exit 130, the run is recorded as aborted and its cluster is free at once",
+   "D13 a run started by hand outlasts that limit (30 s here) and finishes; it picks up the day the stopped run left",
+   "F008 systemctl stop while the statement of the run waits behind a lock returns after 0.0 s: exit 130, the run recorded as aborted, the cluster free, the unit not failed; the next run carries on",
    "D15 with a pull configured the service pulls first and the run then imports the day that was pulled",
    "D15 when the pull fails the run still handles the day already marked",
    "the temporary units are removed"
@@ -105,18 +131,20 @@
    "D14 a size that differs from the source leaves neither the file, a temporary file nor a marker",
    "D14 killed in the middle of a copy: no file under its final name and no marker; the next run copies it whole and removes the leftover",
    "D14 a local file of that day which the source does not have keeps the marker away",
+   "F002 a marked day is never fetched again, replaced or removed: asked for with --date or inside --from/--to, with the source as sealed, grown, with a new slice, unreadable, or with a local file already deleted, every local file keeps its content, inode and times, no copy is started, and a difference from the source is reported with exit 1; without a date it is not looked at",
+   "F002 when the list of the day changes on the source during the copy, no marker is placed; the next run fetches what is missing and places it; asking once more changes nothing",
    "D14 with a key the source does not accept the script fails in 0.1 s without asking for anything and fetches nothing",
    "D14 with an unknown host key the script fails in 0.0 s without asking for anything and fetches nothing",
    "D14 a second instance exits at once",
    "D14 the source directory is unchanged after all of the above: same names, contents, modes and modification times",
-   "D14 the server log shows 51 accepted logins and never more than one open at a time"
+   "D14 the server log shows 152 accepted logins and never more than one open at a time"
   ]
  },
  "dashboard": {
   "status": {
    "state": "ok",
    "checks": 7,
-   "seconds": 50.3,
+   "seconds": 49.9,
    "labels": [
     "D18: the run-status dashboard is loaded from files into the MPP folder as the fourth packaged dashboard, usable without UI work; it cannot be saved over or deleted; before any run it shows that there is none",
     "D18/D19: markers placed, one run, and the page shows it: the four values of the newest run, one row per cluster and the run record equal the base tables; no column header is cut",
@@ -131,24 +159,26 @@
   "window": "1920x920",
   "existing_three": {
    "groups": 17,
-   "seconds": 690
+   "seconds": 689
   }
  },
  "connection_check": {
   "interval_seconds": 2,
   "release_seconds": {
-   "daily run": 1.97,
-   "full": 2.02,
-   "import": 1.92,
-   "rebuild": 2.02,
-   "training snapshot": 2.02,
-   "statistics": 2.02,
-   "cleanup --execute": 2.02
+   "daily run": 1.93,
+   "full": 1.97,
+   "import": 1.93,
+   "rebuild": 1.98,
+   "training snapshot": 1.98,
+   "statistics": 1.98,
+   "cleanup --execute": 1.98
   },
   "disabled_still_held_after_seconds": 12,
   "default_interval_seconds": 10
  },
  "replay": {
+  "product_commit": "49b17b0",
+  "note": "full three-way replay at the head reviewed in R1; after the remediation only cluster 119 was replayed again, see replay_after_remediation",
   "samples": {
    "119": {
     "days": 29,
@@ -1557,5 +1587,244 @@
     }
    }
   }
+ },
+ "replay_after_remediation": {
+  "product_commit": "5690b8c",
+  "clusters": [
+   "119"
+  ],
+  "reference": "the manual replay above (import and rebuild commands, whose code the remediation did not change)",
+  "modes": {
+   "all": {
+    "steps": 1,
+    "samples_unchanged": {
+     "119": true
+    },
+    "cutoff_date": "2026-07-31",
+    "complete_batches": 29,
+    "log_records": 5728640,
+    "published_versions": 1,
+    "statistics": {
+     "mpp_statistic": {
+      "rows": 537198,
+      "sha256": "0cc350fd44b3866622ae888a33171bc5170d1da289e531156812fe3aaefc6946"
+     },
+     "mpp_observation_statistic": {
+      "rows": 180,
+      "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+     }
+    },
+    "wall_seconds": {
+     "minimum": 1068.5,
+     "maximum": 1068.5,
+     "total": 1068.5
+    },
+    "peak_host_used_gib": 8.49,
+    "peak_replay_pss_gib": 0.82,
+    "database_gib_after": 12.93,
+    "daily_runs": 1,
+    "daily_runs_without_failure": 1,
+    "open_problems": {},
+    "left_in_receiving_directories": {
+     "119": 0
+    },
+    "raw_files_deleted": 30,
+    "raw_bytes_deleted": 4302628352,
+    "raw_days_deleted": 29,
+    "import_seconds": [
+     898.77
+    ],
+    "raw_file_seconds": [
+     2.535
+    ]
+   },
+   "daily": {
+    "steps": 29,
+    "samples_unchanged": {
+     "119": true
+    },
+    "cutoff_date": "2026-07-31",
+    "complete_batches": 29,
+    "log_records": 5728640,
+    "published_versions": 29,
+    "statistics": {
+     "mpp_statistic": {
+      "rows": 537198,
+      "sha256": "0cc350fd44b3866622ae888a33171bc5170d1da289e531156812fe3aaefc6946"
+     },
+     "mpp_observation_statistic": {
+      "rows": 180,
+      "sha256": "5255c4a7d09129b1646c8f662db0b411eed94e304ce5d6338ae7dbeee83b6c1e"
+     }
+    },
+    "wall_seconds": {
+     "minimum": 33.4,
+     "maximum": 127.8,
+     "total": 2417.5
+    },
+    "peak_host_used_gib": 8.48,
+    "peak_replay_pss_gib": 0.79,
+    "database_gib_after": 19.58,
+    "daily_runs": 29,
+    "daily_runs_without_failure": 29,
+    "open_problems": {},
+    "left_in_receiving_directories": {
+     "119": 0
+    },
+    "raw_files_deleted": 30,
+    "raw_bytes_deleted": 4302628352,
+    "raw_days_deleted": 29,
+    "import_seconds": [
+     25.179,
+     25.559,
+     26.514,
+     37.329,
+     32.287,
+     33.813,
+     33.246,
+     29.733,
+     26.526,
+     26.278,
+     33.286,
+     29.489,
+     29.834,
+     32.726,
+     32.969,
+     24.601,
+     26.405,
+     31.77,
+     29.975,
+     31.161,
+     29.758,
+     31.586,
+     23.96,
+     23.577,
+     34.251,
+     31.89,
+     29.312,
+     30.948,
+     30.247
+    ],
+    "raw_file_seconds": [
+     0.057,
+     0.048,
+     0.054,
+     0.07,
+     0.057,
+     0.066,
+     0.06,
+     0.059,
+     0.049,
+     0.046,
+     0.062,
+     0.07,
+     0.064,
+     0.058,
+     0.07,
+     0.048,
+     0.054,
+     0.078,
+     0.067,
+     0.063,
+     0.064,
+     0.061,
+     0.041,
+     0.051,
+     0.078,
+     0.073,
+     0.072,
+     0.075,
+     0.058
+    ]
+   }
+  },
+  "comparison": {
+   "passed": true,
+   "clusters_compared": [
+    "119"
+   ],
+   "clusters": {
+    "119": {
+     "cutoff_date": "2026-07-31",
+     "log_records": 5728640,
+     "versions": {
+      "manual": {
+       "published_versions": 1,
+       "complete_batches": 1,
+       "rows": {
+        "mpp_statistic": 537198,
+        "mpp_observation_statistic": 180
+       }
+      },
+      "all": {
+       "published_versions": 1,
+       "complete_batches": 29,
+       "rows": {
+        "mpp_statistic": 537198,
+        "mpp_observation_statistic": 180
+       }
+      },
+      "daily": {
+       "published_versions": 29,
+       "complete_batches": 29,
+       "rows": {
+        "mpp_statistic": 537198,
+        "mpp_observation_statistic": 180
+       }
+      }
+     },
+     "comparisons": {
+      "all vs manual": {
+       "passed": true,
+       "bit_identical": true,
+       "tables": {
+        "mpp_statistic": {
+         "rows": 537198,
+         "exact_fields_equal": true,
+         "key_mismatches": 0,
+         "different_rows": 0
+        },
+        "mpp_observation_statistic": {
+         "rows": 180,
+         "exact_fields_equal": true,
+         "key_mismatches": 0,
+         "different_rows": 0
+        }
+       }
+      },
+      "daily vs manual": {
+       "passed": true,
+       "bit_identical": true,
+       "tables": {
+        "mpp_statistic": {
+         "rows": 537198,
+         "exact_fields_equal": true,
+         "key_mismatches": 0,
+         "different_rows": 0
+        },
+        "mpp_observation_statistic": {
+         "rows": 180,
+         "exact_fields_equal": true,
+         "key_mismatches": 0,
+         "different_rows": 0
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "content_check_cost": {
+  "files": 55,
+  "gib": 14.73,
+  "stat_all_seconds": 0.0001,
+  "read_and_sha256_all_seconds": 21.2,
+  "seconds_per_gib": 1.4,
+  "page_cache": "warm"
+ },
+ "review": {
+  "round_1": "changes_requested, 8 blockers (F001-F008)",
+  "remediation_commit": "5690b8c"
  }
 }

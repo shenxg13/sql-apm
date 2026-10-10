@@ -278,7 +278,7 @@ daily/fetch-logs.sh --config /data/sql-apm/config/fetch-logs.conf --from 2026-09
 | `file_changed_during_read` | 读取期间文件在变化，通常是文件还没拷完 |
 | `file_processing_failed` | 文件内容处理失败 |
 | `files_changed_after_import` | 这一天导入成功之后，目录里它的文件有增减或大小变化 |
-| `batch_manifest_changed` | 这一天第一次登记之后、导入成功之前，文件清单变了 |
+| `batch_manifest_changed` | 这一天第一次登记之后、导入成功之前，文件清单变了（多了、少了文件）。把清单恢复成第一次登记时的样子即可重试；做不到时，把这一天的文件和标记移出接收目录，用 `import` 以人工批次导入 |
 | `origin_content_changed` | 同名文件的内容与已导入的不同 |
 | `record_edge_overlap` | 文件内容与已导入的文件重叠 |
 | `cluster_busy` | 集群正被其他任务占用 |

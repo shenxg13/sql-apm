@@ -164,7 +164,10 @@ class DailyRun:
                 importer.close()
         if state == 'complete':
             # The sizes that were read, for noticing a later change without reading the files again.
-            files = [(name, os.stat(item['directory'] / name).st_size) for name, _ in files]
+            try:
+                files = [(name, os.stat(item['directory'] / name).st_size) for name, _ in files]
+            except OSError:
+                pass      # taken away right after the import: the sizes seen before it will do
         self.store.day(self.run_id, scope, source_id, day, state, reason, files, records,
                        round(time.monotonic() - started, 3))
         self.progress(phase='day_finished', run_id=self.run_id, cluster=scope, source=source_id,

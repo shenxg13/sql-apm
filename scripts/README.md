@@ -294,10 +294,26 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/grafana/fetch.py`：按 `grafana/components.json` 下载并核对安装文件（联网）。
 - `scripts/grafana/setup_dev.py synthetic|existing|stop|status`：开发机一条命令搭好 PostgreSQL、只读账号、
   指纹服务和 Grafana；全部内容在 `--directory` 指定的忽略目录里。
-- `scripts/grafana/build_dashboards.py [--check]`：三个随包看板的生成程序；改看板改这里再重新生成。
+- `scripts/grafana/build_dashboards.py [--check]`：四个随包看板的生成程序；改看板改这里再重新生成。
 - `scripts/grafana/prepare_browser.sh` 与 `verify_e2e.py`：在开发机准备无界面浏览器并做界面端到端检查。
   浏览器只用于验证，放在忽略目录，不进任何包。真实数据的环境下它核对抽样身份的页面数值并记录每页的查询数和耗时。
 - `scripts/db/verify_views.py`：合成验收，覆盖只读账号、指纹服务和看板函数对独立计算。
 - `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
   升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
 - `scripts/tests/test_grafana.py`：看板与生成结果一致、安装程序拒绝缺失或摘要不符的文件。
+
+## 每日运行
+
+[操作说明](../docs/runbooks/daily-run.md)给出配置、接收目录、定时器和传输脚本的用法；
+[开发说明](../docs/design/daily-run.md)说明组成、运行记录和各验证入口。
+
+- `python -m sql_apm daily run --config FILE`：执行一次每日运行；`python -m sql_apm daily status`：只读查询。
+- `scripts/daily/install.py`：按时刻、最长运行时间和可选的传输配置生成 systemd 的定时器和服务单元文件；不安装，随程序包交付。
+- `daily/fetch-logs.sh`：传输脚本，在基线服务器上用 scp 从源端拉取已结束日期的日志并放齐全标记；配置样例在 `daily/fetch-logs.conf.example`。
+- `scripts/db/verify_daily.py`：合成验收，覆盖标记、逐天导入、构建间隔、失败隔离、集群正忙、单实例、清理、
+  删除原始文件、连接存活、中止与恢复和运行记录。
+- `scripts/daily/verify_fetch.py --sshd-root DIR`：传输脚本对回环地址上以普通用户运行的真实 sshd；`DIR` 是解包的 `openssh-server`。
+- `scripts/daily/verify_timer.py [--sshd-root DIR]`：在用户级 systemd 上安装临时单元，实测定时器各行为，约 13 分钟，结束后移除。
+- `scripts/grafana/verify_status_e2e.py --directory DIR`：无界面浏览器核对运行状态看板；用 `setup_dev.py synthetic` 新搭的环境。
+- `scripts/daily/verify_replay.py run|compare`：显式的真实样本回放，三种方式各用私有实例和样本的副本，再比对最终版本。
+  需要本地样本和数小时，不加入日常检查。

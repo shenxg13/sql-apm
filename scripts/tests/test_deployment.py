@@ -15,12 +15,14 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from build_release import archive, select, compare_product, version_number
 from render_manual import DOCUMENTS, inspect, render
-from check_documents import check, check_guide, check_structure, check_paths, GUIDE, STRUCTURE
+from check_documents import check, check_guide, check_structure, check_paths, check_queries, GUIDE, STRUCTURE, QUERIES
+from build_bundle import grafana_inputs
 from verify_package import digest, verify
 import rehearsal
 from acceptance import verify_baseline
 from verify_release_full import collect_baseline
 from statistic_comparison import TABLES, compare_statistics, verify_values
+from daily_rehearsal import compare as compare_daily, prepare as prepare_daily
 
 
 class StatisticComparisonTests(unittest.TestCase):
@@ -76,6 +78,60 @@ class StatisticComparisonTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'checksum differs'):
             verify_values(directory,evidence)
 
+    def test_daily_comparison_checks_both_clusters_and_configuration(self):
+        for name in ('manual', 'daily'):
+            values, folder = self.fixture(name, [('1', '2')])
+            doc = dict(program_commit='tested', product_sha256={'sql_apm/a.py': 'abc'},
+                clusters={c: dict(cutoff_date='2026-07-31', window_start='start', window_end='end',
+                    configuration=dict(window_days=30), statistics=values) for c in ('119', '120')})
+            (folder / 'results.json').write_text(json.dumps(doc))
+        compare_daily(self.root / 'manual', self.root / 'daily', self.root / 'pass.json')
+        self.assertTrue(json.loads((self.root / 'pass.json').read_text())['passed'])
+        doc['clusters']['120']['configuration']['window_days'] = 7
+        (self.root / 'daily/results.json').write_text(json.dumps(doc))
+        with self.assertRaisesRegex(ValueError, 'final results differ'):
+            compare_daily(self.root / 'manual', self.root / 'daily', self.root / 'fail.json')
+        self.assertFalse(json.loads((self.root / 'fail.json').read_text())['passed'])
+
+    def test_daily_prepare_copies_and_does_not_mark_or_delete_originals(self):
+        source = self.root / 'source'; source.mkdir()
+        config = self.root / 'config'; config.mkdir()
+        for cluster in ('119', '120'):
+            original = source / (cluster + '.csv'); original.write_text('synthetic log')
+            (config / ('training-' + cluster + '.json')).write_text(json.dumps(
+                dict(version=1, clusters=[cluster], window=dict(days=30))))
+            (config / ('import-' + cluster + '.json')).write_text(json.dumps(dict(
+                sources={cluster: dict(cluster=cluster)}, batches={'first': dict(files=[dict(path=str(original))])})))
+        output = self.root / 'replay'
+        prepare_daily(config, output)
+        self.assertFalse(list(output.rglob('*.complete')))
+        self.assertEqual(json.loads((output / 'daily.json').read_text())['raw_files']['retention_days'], 'off')
+        for cluster in ('119', '120'):
+            copied = output / 'inbox' / cluster / (cluster + '.csv')
+            original = source / (cluster + '.csv')
+            self.assertNotEqual(original.stat().st_ino, copied.stat().st_ino)
+            copied.unlink()
+            self.assertEqual(original.read_text(), 'synthetic log')
+
+    def test_daily_comparison_is_exact_unless_cross_machine_is_explicit(self):
+        for name, median in [('manual', '1'), ('daily', '1.0000000000001')]:
+            values, folder = self.fixture(name, [(median, None)])
+            doc = dict(program_commit='tested', product_sha256={'sql_apm/a.py': 'abc'},
+                clusters={c: dict(cutoff_date='2026-07-31', window_start='start', window_end='end',
+                    configuration=dict(window_days=30), statistics=values) for c in ('119', '120')})
+            (folder / 'results.json').write_text(json.dumps(doc))
+        args = (self.root / 'manual', self.root / 'daily', self.root / 'comparison.json')
+        with self.assertRaisesRegex(ValueError, 'final results differ'):
+            compare_daily(*args)
+        report = json.loads(args[2].read_text())
+        self.assertFalse(report['passed'])
+        self.assertEqual(report['clusters']['120']['statistics']['absolute_limit'], '0')
+        cross_output = self.root / 'cross-machine.json'
+        compare_daily(args[0], args[1], cross_output, cross_machine=True)
+        report = json.loads(cross_output.read_text())
+        self.assertTrue(report['passed'])
+        self.assertTrue(report['cross_machine'])
+
     def test_collected_baseline_carries_verified_portable_value_files(self):
         metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
         (self.root/'tasks').mkdir();(self.root/'guide').mkdir()
@@ -125,6 +181,36 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'product hashes required'):
             verify_baseline(metadata,dict(program_commit='old'))
 
+    def test_deployment_assets_are_part_of_evidence_identity(self):
+        files = {name: 'original' for name in ('grafana/components.json',
+            'grafana/dashboards/daily.json', 'daily/fetch-logs.sh', 'scripts/grafana/install.py',
+            'scripts/daily/install.py', 'scripts/deployment/check_environment.py', 'requirements.txt')}
+        baseline = dict(program_commit='old', product_sha256=files)
+        verify_baseline(dict(commit='new', files=files), baseline)
+        for name in files:
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'product files differ'):
+                verify_baseline(dict(commit='new', files={**files, name: 'changed'}), baseline)
+
+    def test_grafana_cache_missing_corrupt_and_official_download(self):
+        (self.app / 'grafana').mkdir()
+        cache = self.root / 'downloads'
+        payload = b'fixed official artifact'
+        item = dict(file='grafana.tgz', url='https://example.invalid/official.tgz',
+                    version='pinned', sha256=hashlib.sha256(payload).hexdigest())
+        (self.app / 'grafana/components.json').write_text(json.dumps(dict(grafana=item, plugins=[])))
+        with self.assertRaisesRegex(ValueError, 'missing offline'):
+            grafana_inputs(self.app, cache, offline=True)
+        import io
+        with patch('build_bundle.urllib.request.urlopen', return_value=io.BytesIO(payload)) as download:
+            self.assertEqual(grafana_inputs(self.app, cache), [(cache / item['file'], item)])
+            download.assert_called_once_with(item['url'], timeout=60)
+        with patch('build_bundle.urllib.request.urlopen') as download:
+            grafana_inputs(self.app, cache, offline=True)
+            download.assert_not_called()
+        (cache / item['file']).write_bytes(b'corrupt')
+        with self.assertRaisesRegex(ValueError, 'input checksum mismatch'):
+            grafana_inputs(self.app, cache)
+
     def test_baseline_collection_ignores_sidecars_and_rejects_bad_evidence(self):
         metadata=dict(commit='tested',files={'sql_apm/a.py':'abc'})
         for folder in ('tasks','guide'):
@@ -139,12 +225,12 @@ class PackageTests(unittest.TestCase):
         result=collect_baseline(metadata,self.root)
         self.assertEqual(len(result['selection']),9)
         self.assertEqual(result['product_sha256'],metadata['files'])
-        (self.root/'v020-development-baseline.json').unlink()
+        (self.root/'development-baseline.json').unlink()
         for passed,commit in ((False,'tested'),(True,'different')):
             (self.root/'tasks/119-0.json').write_text(json.dumps(dict(passed=passed,program_verification=dict(commit=commit),selection={})))
             with self.subTest(passed=passed,commit=commit),self.assertRaisesRegex(ValueError,'task evidence'):
                 collect_baseline(metadata,self.root)
-            self.assertFalse((self.root/'v020-development-baseline.json').exists())
+            self.assertFalse((self.root/'development-baseline.json').exists())
 
     def test_valid_tree(self):
         self.assertTrue(verify(self.app)['passed'])
@@ -293,6 +379,17 @@ class HtmlTests(unittest.TestCase):
 
 
 class DocumentTests(unittest.TestCase):
+    def test_query_contract_rejects_wrong_parameter_and_column(self):
+        source = (ROOT / QUERIES).read_text()
+        for old, new in [('p_normalization text', 'p_wrong text'), ('occurrence_id text', 'missing_column text')]:
+            with self.subTest(old=old), self.assertRaisesRegex(ValueError, 'differ from schema'):
+                check_queries(ROOT, source.replace(old, new, 1))
+
+    def test_missing_daily_configuration_key(self):
+        source = (ROOT / GUIDE).read_text().replace('"interval_days", "clusters"', '"interval_days"', 1)
+        with self.assertRaisesRegex(ValueError, 'key set differs'):
+            check_guide(ROOT, source)
+
     def test_current_documents(self):
         self.assertEqual(check()['structure']['tables'], 62)
 
@@ -320,7 +417,7 @@ class DocumentTests(unittest.TestCase):
     def test_missing_packaged_command(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md',
+            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
                          'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)

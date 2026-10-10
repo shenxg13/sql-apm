@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the v0.2.0 developer baseline with an isolated installed candidate."""
+"""Generate the developer baseline with an isolated installed candidate."""
 import argparse
 from contextlib import closing
 from copy import deepcopy
@@ -45,7 +45,7 @@ def collect_baseline(metadata, out):
                 with (out/name).open('xb') as target, (out/'guide'/name).open('rb') as source:
                     shutil.copyfileobj(source,target)
         baseline.update(statistics_comparison=FORMAT,statistics_values=values)
-    with (out/'v020-development-baseline.json').open('x') as file:
+    with (out/'development-baseline.json').open('x') as file:
         file.write(json.dumps(baseline,sort_keys=True,indent=2)+'\n')
     return baseline
 
@@ -54,7 +54,7 @@ def supplement_statistics(app, out, destination):
     """Read the preserved database and prove it still matches recorded exact hashes."""
     verify(app,installed=True)
     metadata=json.loads((app/'RELEASE.json').read_text())
-    source=out/'v020-development-baseline.json'
+    source=out/'development-baseline.json'
     baseline=json.loads(source.read_text())
     if baseline['program_commit']!=metadata['commit'] or baseline['product_sha256']!=product_files(metadata):
         raise ValueError('supplement must use the originally executed candidate')
@@ -82,7 +82,7 @@ def supplement_statistics(app, out, destination):
             baseline['statistics_supplement'][case]=dict(record_sha256=digest(path),
                 cli_log_sha256=digest(log),statistics_exact=strict,readonly=True)
             print(json.dumps(dict(supplemented=case,rows=sum(v['rows'] for v in values.values()))),flush=True)
-    with (destination/'v020-development-baseline.json').open('x') as stream:
+    with (destination/'development-baseline.json').open('x') as stream:
         stream.write(json.dumps(baseline,sort_keys=True,indent=2)+'\n')
 
 
@@ -149,6 +149,8 @@ def main():
                 run('task-'+cluster+'-'+str(step),[python,kit/'scripts/deployment/rehearsal.py','run',
                     '--cluster',cluster,'--step',step,'--config',out/'config','--records',out/'tasks',
                     '--data-root',out,'--workers','4','--program-commit',metadata['commit']])
+        run('final-manual-results',[python,Path(__file__).with_name('daily_rehearsal.py'),
+            'snapshot','--app-root',app,'--output',out/'manual-results'])
         for case in ('window','threshold','template','exclusion','retention','workers','import'):
             run('guide-'+case,[python,kit/'scripts/deployment/guide_examples.py','--app-root',app,
                 '--config',out/'config','--records',out/'guide','run',case])

@@ -21,7 +21,7 @@ import sys
 import tempfile
 import time
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', Path(__file__).resolve().parents[2])).resolve()
 SCRIPT = ROOT / 'daily/fetch-logs.sh'
 
 
@@ -43,10 +43,12 @@ class Sandbox:
         with socket.socket() as probe:
             probe.bind(('127.0.0.1', 0))
             self.port = probe.getsockname()[1]
+        # OpenSSH 10 split the session helper; Kylin's older packaged sshd has no such option.
+        session_option = ['SshdSessionPath ' + str(self.session)] if self.session.is_file() else []
         (directory / 'sshd_config').write_text('\n'.join([
             'Port ' + str(self.port), 'ListenAddress 127.0.0.1', 'HostKey ' + str(directory / 'keys/host'),
             'PidFile ' + str(directory / 'sshd.pid'), 'AuthorizedKeysFile ' + str(directory / 'keys/authorized'),
-            'SshdSessionPath ' + str(self.session), 'Subsystem sftp internal-sftp', 'UsePAM no', 'StrictModes no',
+            *session_option, 'Subsystem sftp internal-sftp', 'UsePAM no', 'StrictModes no',
             'PasswordAuthentication no', 'KbdInteractiveAuthentication no', 'PubkeyAuthentication yes',
             'LogLevel VERBOSE', '']))
         self.user = os.environ.get('USER') or run(['id', '-un']).stdout.strip()
@@ -367,5 +369,5 @@ def verify(sshd_root):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--sshd-root', type=Path, required=True,
-                        help='directory holding usr/sbin/sshd and usr/libexec/openssh/sshd-session')
+                        help='root holding usr/sbin/sshd (and sshd-session for OpenSSH 10); use / for the installed system sshd')
     verify(parser.parse_args().sshd_root.resolve())

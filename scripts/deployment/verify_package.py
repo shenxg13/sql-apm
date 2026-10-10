@@ -7,6 +7,13 @@ import os
 from pathlib import Path
 
 
+def product_file(name):
+    """Files whose changes invalidate installed product evidence (including UI/installers)."""
+    return (name.startswith(('sql_apm/', 'rules/', 'grafana/', 'daily/'))
+            or name == 'requirements.txt'
+            or (name.startswith('scripts/') and name != 'scripts/deployment/verify_package.py'))
+
+
 def digest(path):
     value = hashlib.sha256()
     with path.open('rb') as stream:

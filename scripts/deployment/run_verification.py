@@ -102,16 +102,24 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root', type=Path, required=True)
     parser.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
-    parser.add_argument('check', choices=['unit', 'database', 'publication', 'smoke', 'cleanup', 'search'])
+    parser.add_argument('check', choices=['unit', 'database', 'publication', 'smoke', 'cleanup', 'search',
+                                         'views', 'grafana', 'daily', 'daily-recovery'])
     args = parser.parse_args()
     app = setup(args.app_root)
     if args.check == 'unit':
         return unit()
+    if args.check == 'grafana':
+        suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'), pattern='test_dashboards.py')
+        result = unittest.TextTestRunner(verbosity=2).run(suite)
+        if not suite.countTestCases() or result.skipped:
+            raise ValueError('Grafana static checks must execute without skips')
+        return 0 if result.wasSuccessful() else 1
     if args.check == 'smoke':
         smoke(app, args.pg_bin)
     else:
         name = {'database': 'verify.py', 'publication': 'verify_publication.py',
-                'cleanup': 'verify_cleanup.py', 'search': 'verify_search.py'}[args.check]
+                'cleanup': 'verify_cleanup.py', 'search': 'verify_search.py', 'views': 'verify_views.py',
+                'daily': 'verify_daily.py', 'daily-recovery': 'verify_daily_recovery.py'}[args.check]
         path = RESOURCES / 'scripts/db' / name
         sys.argv = [str(path), '--pg-bin', str(args.pg_bin)]
         runpy.run_path(str(path), run_name='__main__')

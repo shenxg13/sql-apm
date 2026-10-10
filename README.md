@@ -18,6 +18,10 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 交付顺序及验证安排见[项目知识](.project-wiki/decisions/project-scope.md#已确认的首期交付顺序)。
 已确认需求按主题保存在知识库；各主题标明尚待确认或实施验证的事项。
 
+当前正在准备 `v0.3.0` 离线预发布，包含检索、四个 Grafana 看板和每日运行；尚未完成本轮目标机及用户手动验收。
+从[安装手册](docs/runbooks/kylin-offline-deployment.md)、[检索指南](docs/runbooks/search-guide.md)与
+[发布说明](docs/releases/v0.3.0.md)进入；本版只支持全新安装，不用于生产。
+
 ## 从这里开始
 
 - 从[文档导航](docs/README.md)按阅读目的查找需求、设计、操作说明和分析报告。

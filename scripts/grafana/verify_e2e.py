@@ -1591,17 +1591,27 @@ def real(env, play):
     text = env.one("SELECT t.text FROM mpp_sql_text t JOIN mpp_fingerprint f USING(sql_id) WHERE f.state='reliable' AND length(t.text) BETWEEN 200 AND 4000 "
                    "AND EXISTS (SELECT FROM mpp_occurrence o WHERE o.sql_id=t.sql_id) ORDER BY md5(t.sql_id) LIMIT 1")
     browser.open('/d/mpp-search/sql-search', extra=2000)
-    for mode, value in (('words', 'select'), ('words', 'select from where'), ('passage', 'select *'), ('words', 'zz_no_search_match_51'), ('exact', text)):
+    cases = [('words', 'select', 'known word', True),
+             ('words', 'select from where', 'several known words', True),
+             ('passage', text[:120], 'stored fragment', True),
+             ('exact', text, 'stored statement', True),
+             ('words', 'zz_no_search_match_issue52_20261011', 'absent word', False),
+             ('passage', 'zz_no_search_match_issue52_20261011', 'absent passage', False),
+             ('exact', 'SELECT missing_issue52_column FROM missing_issue52_relation_20261011', 'absent structure', False)]
+    for mode, value, label, hit in cases:
         started = time.monotonic()
         del browser.timings[:]
         browser.search(value, mode)
         elapsed = time.monotonic() - started - 1.5
         rows = browser.rows('mpp-search', '结果')
         known = [item for _, item in browser.timings if item >= 0]
-        entry = dict(page='search, ' + mode + (' (stored statement)' if mode == 'exact' else ': ' + value), rows=len(rows), queries=len(browser.timings),
+        entry = dict(page='search, ' + mode + ', ' + label, expected_hit=hit, rows=len(rows), queries=len(browser.timings),
                      summed_seconds=round(sum(known) / 1000, 2), slowest_seconds=round(max(known) / 1000, 2) if known else 0, wall_seconds=round(elapsed, 2))
-        if mode == 'exact':
+        assert not browser.failures and bool(rows) == hit, (mode, label, len(rows), browser.failures[:2])
+        if mode == 'exact' and hit:
             assert len(rows) == 1 and browser.variables()['xsql'] != '' and browser.variables()['xstate'] in ('has_baseline', 'records_without_baseline')
+        elif mode == 'exact':
+            assert browser.variables()['xstate'] == 'not_seen'
         report['pages'].append(entry)
         print('real search', entry, flush=True)
     browser.close()

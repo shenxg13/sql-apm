@@ -193,7 +193,7 @@ systemctl list-timers sql-apm-daily.timer        # 下一次启动的时间
 
 **停用**：`sudo systemctl disable --now sql-apm-daily.timer`。**改时刻或上限**：用新的参数重新生成，覆盖两个文件，
 再执行 `sudo systemctl daemon-reload` 和 `sudo systemctl restart sql-apm-daily.timer`。**看某一次的输出**：
-`journalctl -u sql-apm-daily.service`。
+`sudo journalctl -u sql-apm-daily.service`（系统服务日志通常需要 root 或 systemd-journal 组权限）。
 
 定时器的行为：
 

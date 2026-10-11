@@ -543,7 +543,7 @@ fi
 admin 可管理自己的看板，viewer 只查看。MPP 下的检索、详情、列表、运行状态四个看板和两个数据源由配置装入。
 真实数据导入前空列表正常；真实检索操作及结果含义见[检索指南](search-guide.md)。
 
-指纹服务日志看 `journalctl -u sql-apm-fingerprint.service`，只有时间、字节数、状态和耗时，没有 SQL 原文。
+指纹服务日志看 `sudo journalctl -u sql-apm-fingerprint.service`，只有时间、字节数、状态和耗时，没有 SQL 原文。
 Grafana 日志位于 `$APM_GRAFANA/logs`，启动错误也可用 journalctl 查看。
 
 ```bash
@@ -811,7 +811,7 @@ sudo systemctl enable --now sql-apm-daily.timer
 systemctl list-timers sql-apm-daily.timer
 ```
 
-到点后查 `journalctl -u sql-apm-daily.service` 和 `daily status --schema sql_apm`，
+到点后查 `sudo journalctl -u sql-apm-daily.service` 和 `daily status --schema sql_apm`，
 预期启动方式为定时，已经导入的日期和当前版本保持不变。改时刻重新生成两文件并执行
 `sudo systemctl daemon-reload`、`sudo systemctl restart sql-apm-daily.timer`。
 停用用 `sudo systemctl disable --now sql-apm-daily.timer`；停止当前运行另用 `sudo systemctl stop sql-apm-daily.service`。

@@ -90,7 +90,7 @@
 | [v0.3.0 发布说明](releases/v0.3.0.md) | 随包入口 | 全新安装、固定组件、每日运行、四份文档入口和验收边界；[v0.2.0](releases/v0.2.0.md) 保留历史记录。 |
 | [检索与看板使用指南](runbooks/search-guide.md) | 随包使用说明 | 三种检索、结果解释、查询函数契约与示例、自定义看板。 |
 | [精简程序包与预发布交付](runbooks/program-release.md) | 操作说明 | 必要文件打包、离线 HTML、独立验收及用户确认后发布。 |
-| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 实施方与用户两轮完整安装、九任务、每日运行及四看板的独立记录。 |
+| [Kylin 人工验证记录](runbooks/kylin-validation-record.md) | 记录模板 | 实施方安装与九任务、用户安装与 daily 后续验收，以及定时器、传输和四看板的独立记录。 |
 | [质量工具安装与运行](runbooks/issue-pr-quality-tooling.md) | 操作说明 | 仓库检查工具的版本、安装步骤和运行方式。 |
 | [完整流程与版本操作](runbooks/build-publication.md) | 操作说明 | full、rebuild、status、history 及端到端验收。 |
 | [统计计算操作](runbooks/baseline-statistics.md) | 操作说明 | 快照计算、观察诊断、重试引用、分区维护和真实验收。 |

@@ -576,7 +576,7 @@ sha256sum "$APM_BACKUP"
 恢复时停止 Grafana，先保留现有目录，再用相同组件版本恢复 data/conf 和属主、权限，最后启动并核对账号及看板。
 备份不包含 PostgreSQL 数据库，也不包含程序目录外 private 中的密码文件；这些按部署方的独立备份安排保存。
 
-## 9. 传输日志并核验输入
+## 9. 配置由验证机拉取开发机日志
 
 本节起使用已安装的默认 `sql_apm` schema，后续操作只走 daily；首轮 full／rebuild 九任务的
 实施方证据保留，复现方法移至附录 A。日常构建的版本数不沿用九任务的 5／4。
@@ -598,70 +598,117 @@ systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
 这个快照的预期为 `files=0, versions=0`。若已有数据，先核对恢复点；不要删除业务表后继续。
 当前安装程序的提交仍以第 1–8 节交付记录为准；新的手册候选与它的产品文件一致性另行记录。
 
-开发机先按仓库固定 manifest 核对 55 个文件；令 APM_LOGS 指向实际输入目录，再通过 scp
-将其中的 119 和 120 复制到目标机 APM_ROOT/logs，只有指定演练机接收真实日志。
-本次开发机原文件仍在历史目录 raw/inbox/hashdata；目录名称不改变产品的 MPP 来源标识。
-不将日志、数据库、原始 SQL 或详细诊断加入 Git。
+### 9.1 核对反向免密与源端
 
-目标机先执行 `install -d -m 0700 "$APM_ROOT/logs"`，然后在开发机执行：
+本轮用开发机已有的 55 份日志作为源端，目标机通过随包的 `daily/fetch-logs.sh` 主动拉取。
+`daily run` 负责处理接收目录；定时器可将“拉取、daily”接成一次任务，见第 13.1 节。
+日志原件保留在开发机，目标机接收目录为 `daily-replay/inbox`。不用旧版“先 scp 全部日志、再复制并手放标记”的步骤。
+
+以下在**验证机**执行。按交付记录填写开发机账号、地址、端口及源端根目录，路径不含空格或引号：
 
 ```bash
-APM_LOGS="$PWD/raw/inbox/hashdata"
-APM_SOURCE_CHECK="var/issue52/source-check-$(date +%Y%m%dT%H%M%S)"
-.venv/bin/python scripts/deployment/rehearsal.py prepare \
-  --logs "$APM_LOGS" --output "$APM_SOURCE_CHECK"
-scp -r -P "$APM_SSH_PORT" "$APM_LOGS/119" "$APM_LOGS/120" \
-  "$APM_SSH_TARGET:/data/sql-apm/logs/"
+export APM_FETCH_LOGIN='读取账号@开发机地址'
+export APM_FETCH_PORT=22
+export APM_FETCH_SOURCE_ROOT='填写开发机日志根目录，其下包含119和120'
+ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$APM_FETCH_PORT" \
+  "$APM_FETCH_LOGIN" "test -r '$APM_FETCH_SOURCE_ROOT/119' && test -r '$APM_FETCH_SOURCE_ROOT/120'"
 ```
 
-每轮使用新的核验目录，保留先前输出；验证机恢复快照不会清除开发机上的首轮记录。
+预期退出 0；未知主机密钥或免密失败先处理，不关闭主机密钥校验。仅有“开发机到验证机”免密不足以拉取。
+源端账号需要列目录、读文件权限；本节摘要复核另使用源端 `sha256sum`，全部只读。
+
+### 9.2 创建空接收目录及固定配置
+
+这段从验收包的固定清单生成摘要文件，沿用已确认的来源声明、30 天窗口和默认门槛。
+只创建配置及空目录，不复制日志、不生成标记、不连接数据库；已有目录时拒绝覆盖。
+已安装的 v0.3.0 验收包即可执行，无需替换程序或验收目录。
 
 ```bash
 cd "$APM_APP"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
-  --logs "$APM_ROOT/logs" --output "$APM_ROOT/config"
-cd "$APM_ROOT/logs"
-sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
-```
-
-预期：55 个文件逐项匹配，119 为 30 个、120 为 25 个，输出 verified_files=55、batches=8。
-119 首批 26 文件，29 日两文件、30 和 31 日各一；120 首批 13 文件，后三日各四。
-配置沿用 #29 的来源、完整性声明、空模板／排除时段和默认门槛，窗口 30 天。
-失败：停止导入，核对源端清单和传输；不改摘要、删掉缺失成员或简化批次。
-
-## 10. 通过 daily 完成首批、追加与重复运行
-
-保持默认四解析进程、5 秒归一化期限和既定 30 天训练窗口。
-先创建演练副本；原始证据仍在 `logs`，副本放在 `daily-replay/inbox`。辅助工具只生成配置与复制文件，
-不调用 full／rebuild。自动清理保持开启，原始文件删除先关闭，至第 13.2 节单独验证。
-
-```bash
-cd "$APM_APP"
+.venv/bin/python - <<'PY'
+import hashlib
+import json
+import os
+from pathlib import Path
+root = Path(os.environ['APM_ROOT'])
+verification = Path(os.environ['APM_VERIFY'])
+manifest_path = verification / 'docs/reports/data/log-supplement-manifest-2026-09-28.json'
+baseline_path = verification / 'docs/reports/data/kylin-alma-baseline-2026-10-02.json'
+expected = json.loads(baseline_path.read_text())['provenance']['input_manifest_sha256']
+assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == expected
+manifest = json.loads(manifest_path.read_text())
+config, replay = root / 'config', root / 'daily-replay'
+if config.exists() or replay.exists():
+    raise SystemExit('config 或 daily-replay 已存在，请先核对已执行到哪一步，不覆盖。')
+config.mkdir(mode=0o700)
+replay.mkdir(mode=0o700)
+clusters = ['119', '120']
+sources = {}
+checks = {'logs': [], 'first': [], 'incremental': []}
+for cluster, cutoff in [('119', '2026-07-28'), ('120', '2026-09-16')]:
+    (replay / 'inbox' / cluster).mkdir(parents=True, mode=0o700)
+    sources['daily-' + cluster] = dict(cluster=cluster, build='HashData Warehouse 3.13.13',
+        timezone='UTC+08:00', declaration='Issue29-confirmed-local-master-files')
+    for member in manifest['clusters'][cluster]['files']:
+        line = member['sha256'] + '  ' + cluster + '/' + member['file']
+        checks['logs'].append(line)
+        phase = 'first' if member['file'][5:15] <= cutoff else 'incremental'
+        checks[phase].append(line)
+assert [len(checks[k]) for k in ['logs', 'first', 'incremental']] == [55, 39, 16]
+def save(name, value):
+    (replay / name).write_text(json.dumps(value, indent=2) + '\n')
+save('import.json', dict(version=1, clusters=clusters, sources=sources, batches={}))
+save('training.json', dict(version=1, clusters=clusters, window=dict(days=30)))
+save('daily.json', dict(version=1, import_config='import.json', training_config='training.json',
+    sources={name: dict(directory='inbox/' + item['cluster']) for name, item in sources.items()},
+    workers=4, cleanup=dict(enabled=True), raw_files=dict(retention_days='off')))
+for name, lines in checks.items():
+    (config / (name + '.SHA256SUMS')).write_text('\n'.join(lines) + '\n')
+print('配置完成：空接收目录；首批39文件、追加16文件；自动删除暂时关闭。')
+PY
 install -d -m 0700 "$APM_ROOT/records/daily"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" prepare \
-  --config "$APM_ROOT/config" --output "$APM_ROOT/daily-replay"
+for cluster in 119 120; do
+  printf 'daily-%s %s %s/%s %s/daily-replay/inbox/%s %s\n' \
+    "$cluster" "$APM_FETCH_LOGIN" "$APM_FETCH_SOURCE_ROOT" "$cluster" \
+    "$APM_ROOT" "$cluster" "$APM_FETCH_PORT" > "$APM_ROOT/config/fetch-$cluster.conf"
+done
+cat "$APM_ROOT/config/fetch-119.conf" "$APM_ROOT/config/fetch-120.conf" > "$APM_ROOT/config/fetch-all.conf"
 ```
 
-预期 `copied_files=55, markers_created=false`。同一接收目录准备一次即可；失败保留原输出，
-不要重复 prepare 覆盖目录，也不要改动日志内容或文件名。
+拉取前先从验证机只读核对源端 55 个文件的 SHA-256；清单通过标准输入传给源端，不在源端写文件：
+
+```bash
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$APM_FETCH_PORT" "$APM_FETCH_LOGIN" \
+  "cd '$APM_FETCH_SOURCE_ROOT' && sha256sum -c -" < "$APM_ROOT/config/logs.SHA256SUMS" \
+  > "$APM_ROOT/records/daily/source-before.log"
+```
+
+预期 55 项全部 OK。失败保留输出并停止；不改清单或略过缺失文件。
+
+## 10. 拉取首批、追加日期并运行 daily
+
+以下全部在验证机执行。保持默认四解析进程、5 秒归一化期限和 30 天窗口；自动清理开启，
+原始文件删除暂为 off，至第 13.2 节单独验证。日志拉取脚本逐日确认文件到齐后自行放标记，**不再手工 touch**。
+这批是历史样本，必须指定日期；默认拉取最近七天不会取到这些样本。
 
 ### 10.1 首批日期
 
-先只为 119 截至 7 月 28 日、120 截至 9 月 16 日的文件放齐全标记；虽然后续日期的副本已经传入，
-没有标记就不会导入。预期分别生成 26、4 个日期标记，覆盖 26、13 个文件。
+先拉 119 的 7 月 1–28 日与 120 的 9 月 13–16 日，后续日期暂不拉取。
+119 的空缺日期没有文件时不生成标记；预期 26、4 个日期标记，分别覆盖 26、13 个文件。
 
 ```bash
-.venv/bin/python - <<'PY'
-import os
-from pathlib import Path
-root = Path(os.environ['APM_ROOT']) / 'daily-replay/inbox'
-for cluster, cutoff in [('119', '2026-07-28'), ('120', '2026-09-16')]:
-    folder = root / cluster
-    days = sorted({p.name[5:15] for p in folder.glob('gpdb-*.csv*') if p.name[5:15] <= cutoff})
-    for day in days:
-        (folder / (day + '.complete')).touch(exist_ok=False)
-    print(cluster, cutoff, len(days))
-PY
+cd "$APM_APP"
+daily/fetch-logs.sh --config "$APM_ROOT/config/fetch-119.conf" --from 2026-07-01 --to 2026-07-28 \
+  > "$APM_ROOT/records/daily/first-fetch-119.log" 2>&1
+daily/fetch-logs.sh --config "$APM_ROOT/config/fetch-120.conf" --from 2026-09-13 --to 2026-09-16 \
+  > "$APM_ROOT/records/daily/first-fetch-120.log" 2>&1
+(cd "$APM_ROOT/daily-replay/inbox" && sha256sum -c "$APM_ROOT/config/first.SHA256SUMS")
+find "$APM_ROOT/daily-replay/inbox" -type f -name '*.complete' -size 0c | wc -l
+```
+
+预期 39 项摘要全部 OK、30 个空标记。通过后执行首批 daily：
+
+```bash
 .venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
   > "$APM_ROOT/records/daily/first.log" 2>&1
 .venv/bin/python -m sql_apm daily status --schema sql_apm \
@@ -675,27 +722,27 @@ done
 ```
 
 预期 daily 成功；两集群各发布一个版本，截止日分别为 2026-07-28、2026-09-16。
-`daily status` 此时应列出余下 6 个日期的 `files_without_marker`（有文件但没有齐全标记），
-分别是 119 的 7/29–7/31、120 的 9/17–9/19；这些文件未导入，下一节补齐标记后提示消失。
-除这 6 个预期提示外，不应有其他待处理问题。
+`daily status` 预期没有待处理问题：后续 6 天的文件尚未拉取，所以没有 `files_without_marker` 提示。
+旧复制路径中预先放入全部文件的六条提示不适用于这条拉取路径。
 每个 status 的 `current.fingerprint_normalization_timeout` 必须为 0；不能只看发布成功。
 
 ### 10.2 追加剩余日期
 
-核对副本已完整后，给余下 6 个日期放齐全标记，使用同一配置再执行 daily。
+拉取余下 6 个日期，脚本自动放标记，再用同一配置执行 daily。
 
 ```bash
-.venv/bin/python - <<'PY'
-import os
-from pathlib import Path
-root = Path(os.environ['APM_ROOT']) / 'daily-replay/inbox'
-for cluster, cutoff in [('119', '2026-07-28'), ('120', '2026-09-16')]:
-    folder = root / cluster
-    days = sorted({p.name[5:15] for p in folder.glob('gpdb-*.csv*') if p.name[5:15] > cutoff})
-    for day in days:
-        (folder / (day + '.complete')).touch(exist_ok=False)
-    print(cluster, len(days))
-PY
+daily/fetch-logs.sh --config "$APM_ROOT/config/fetch-119.conf" --from 2026-07-29 --to 2026-07-31 \
+  > "$APM_ROOT/records/daily/incremental-fetch-119.log" 2>&1
+daily/fetch-logs.sh --config "$APM_ROOT/config/fetch-120.conf" --from 2026-09-17 --to 2026-09-19 \
+  > "$APM_ROOT/records/daily/incremental-fetch-120.log" 2>&1
+(cd "$APM_ROOT/daily-replay/inbox" && sha256sum -c "$APM_ROOT/config/incremental.SHA256SUMS")
+(cd "$APM_ROOT/daily-replay/inbox" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+find "$APM_ROOT/daily-replay/inbox" -type f -name '*.complete' -size 0c | wc -l
+```
+
+预期追加 16 项摘要通过，全部 55 项摘要通过，累计 36 个空标记。通过后执行：
+
+```bash
 .venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
   > "$APM_ROOT/records/daily/incremental.log" 2>&1
 .venv/bin/python -m sql_apm daily status --schema sql_apm \
@@ -803,6 +850,7 @@ cd "$APM_APP"
 ```bash
 .venv/bin/python scripts/daily/install.py --app-root "$APM_APP" --python "$APM_APP/.venv/bin/python" \
   --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  --fetch-config "$APM_ROOT/config/fetch-all.conf" \
   --dsn "$SQL_APM_DSN" --passfile "$PGPASSFILE" --user "$APM_RUN_USER" \
   --at 17:00 --max-hours 12 --check-seconds 10 --output "$APM_ROOT/daily-units"
 sudo cp "$APM_ROOT/daily-units/sql-apm-daily.service" "$APM_ROOT/daily-units/sql-apm-daily.timer" /etc/systemd/system/
@@ -810,6 +858,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now sql-apm-daily.timer
 systemctl list-timers sql-apm-daily.timer
 ```
+
+定时任务先用 `fetch-all.conf` 拉取最近七天，再执行 daily。源端只有历史样本时输出 `no_files` 正常，
+不会重新拉取 7 月／9 月样本；手动 `daily run` 本身不会执行拉取。拉取失败时仍会处理已放标记的日期，
+所以同时检查拉取输出和 daily 状态。
 
 到点后查 `sudo journalctl -u sql-apm-daily.service` 和 `daily status --schema sql_apm`，
 预期启动方式为定时，已经导入的日期和当前版本保持不变。改时刻重新生成两文件并执行
@@ -821,7 +873,7 @@ systemctl list-timers sql-apm-daily.timer
 ### 13.2 自动删除只针对演练副本
 
 保留首轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
-历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；原始日志目录保持不变。
+历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；开发机的原始日志目录保持不变。
 
 ```bash
 .venv/bin/python - <<'PY'
@@ -838,10 +890,12 @@ PY
   > "$APM_ROOT/records/daily/delete-status.json"
 ```
 
-删除后再次核对原始日志摘要，并导出当前版本与删除前比较：
+删除后从验证机再次只读核对开发机原始日志摘要，并导出当前版本与删除前比较：
 
 ```bash
-(cd "$APM_ROOT/logs" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$APM_FETCH_PORT" "$APM_FETCH_LOGIN" \
+  "cd '$APM_FETCH_SOURCE_ROOT' && sha256sum -c -" < "$APM_ROOT/config/logs.SHA256SUMS" \
+  > "$APM_ROOT/records/daily/source-after-delete.log"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
   --schema sql_apm --output "$APM_ROOT/records/daily-after-delete-results"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
@@ -920,6 +974,16 @@ ls -l "$APM_ROOT/mock-inbox/"*.complete
 selected_batches 是本次整批入选数，excluded_batches 是两者之差；window_fallback 表示
 有完成批次但一个都未选到而回退全部。四个字段与开发机同候选包生成的基准逐项比较。
 本九任务均应没有排除和回退。选择只看文件 last_log_at 与窗口起点，事件再按完整窗口过滤。
+
+本附录使用独立演练目录及全新库。把原始 119／120 目录传入该目录的 `logs` 后，先生成本附录配置；
+不要使用第 9 节为分批拉取生成的配置目录，也不要覆盖已有用户记录：
+
+```bash
+cd "$APM_APP"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
+  --logs "$APM_ROOT/logs" --output "$APM_ROOT/config"
+(cd "$APM_ROOT/logs" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+```
 
 交付目录的 `development-baseline/` 中包含开发机基准文件、八个统计数值 `.jsonl.gz` 文件和校验清单。
 先在开发机核对交付记录中的清单摘要，再检查文件并传输：

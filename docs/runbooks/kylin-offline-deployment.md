@@ -10,7 +10,8 @@ SEARCH.html（检索与看板指南）、RELEASE.html（入口及发布说明）
 完整离线包和独立验收包内网交付。裸机安装需要完整离线包。
 
 按 [Issue #52](https://github.com/shenxg13/sql-apm/issues/52) 的要求，实施方先从初始快照完整实测并保存证据；
-随后用户再次恢复初始快照，亲自按本手册完整手动执行并确认。两轮均在传输前核对起点、使用离线 RPM、记录包身份与结果，
+随后用户从初始快照亲自完成第 1–8 节安装，再以 daily 完成第 9 节起的验收。
+两轮均在传输前核对起点、使用离线 RPM、记录包身份与结果，
 不调整系统时钟。初始状态可以包含操作者为解包预先安装的 tar，须在开始记录中写明。
 首次传输前先完成制包、随包文档和开发机检查；目标机不是约定起点时先核对，不自行清理。
 用户完整验收通过后才能合并，打标签与发布再取得用户对精确制品的确认。
@@ -575,7 +576,27 @@ sha256sum "$APM_BACKUP"
 恢复时停止 Grafana，先保留现有目录，再用相同组件版本恢复 data/conf 和属主、权限，最后启动并核对账号及看板。
 备份不包含 PostgreSQL 数据库，也不包含程序目录外 private 中的密码文件；这些按部署方的独立备份安排保存。
 
-## 9. 传输日志并生成批次配置
+## 9. 传输日志并核验输入
+
+本节起使用已安装的默认 `sql_apm` schema，后续操作只走 daily；首轮 full／rebuild 九任务的
+实施方证据保留，复现方法移至附录 A。日常构建的版本数不沿用九任务的 5／4。
+
+本次用户已经完成第 1–8 节并保存快照。实施方从该起点补验并备份结果后，用户恢复这个
+**第 8 步完成的快照**，重设第 1 节环境变量，再从本节继续；不重复初始化实例或创建密码。
+机器重启后 PostgreSQL 需要手动启动，Grafana 和指纹服务应已自动启动：
+
+```bash
+cd "$APM_APP"
+if ! sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" status; then
+  sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata/server.log" -w start
+fi
+systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
+"$APM_PG_BIN/psql" "$SQL_APM_DSN" -X -v ON_ERROR_STOP=1 -c \
+  'SELECT (SELECT count(*) FROM sql_apm.source_file) AS files, (SELECT count(*) FROM sql_apm.current_version) AS versions;'
+```
+
+这个快照的预期为 `files=0, versions=0`。若已有数据，先核对恢复点；不要删除业务表后继续。
+当前安装程序的提交仍以第 1–8 节交付记录为准；新的手册候选与它的产品文件一致性另行记录。
 
 开发机先按仓库固定 manifest 核对 55 个文件；令 APM_LOGS 指向实际输入目录，再通过 scp
 将其中的 119 和 120 复制到目标机 APM_ROOT/logs，只有指定演练机接收真实日志。
@@ -608,7 +629,283 @@ sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS"
 配置沿用 #29 的来源、完整性声明、空模板／排除时段和默认门槛，窗口 30 天。
 失败：停止导入，核对源端清单和传输；不改摘要、删掉缺失成员或简化批次。
 
-## 10. 默认四进程九任务与基准比对
+## 10. 通过 daily 完成首批、追加与重复运行
+
+保持默认四解析进程、5 秒归一化期限和既定 30 天训练窗口。
+先创建演练副本；原始证据仍在 `logs`，副本放在 `daily-replay/inbox`。辅助工具只生成配置与复制文件，
+不调用 full／rebuild。自动清理保持开启，原始文件删除先关闭，至第 13.2 节单独验证。
+
+```bash
+cd "$APM_APP"
+install -d -m 0700 "$APM_ROOT/records/daily"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" prepare \
+  --config "$APM_ROOT/config" --output "$APM_ROOT/daily-replay"
+```
+
+预期 `copied_files=55, markers_created=false`。同一接收目录准备一次即可；失败保留原输出，
+不要重复 prepare 覆盖目录，也不要改动日志内容或文件名。
+
+### 10.1 首批日期
+
+先只为 119 截至 7 月 28 日、120 截至 9 月 16 日的文件放齐全标记；虽然后续日期的副本已经传入，
+没有标记就不会导入。预期分别生成 26、4 个日期标记，覆盖 26、13 个文件。
+
+```bash
+.venv/bin/python - <<'PY'
+import os
+from pathlib import Path
+root = Path(os.environ['APM_ROOT']) / 'daily-replay/inbox'
+for cluster, cutoff in [('119', '2026-07-28'), ('120', '2026-09-16')]:
+    folder = root / cluster
+    days = sorted({p.name[5:15] for p in folder.glob('gpdb-*.csv*') if p.name[5:15] <= cutoff})
+    for day in days:
+        (folder / (day + '.complete')).touch(exist_ok=False)
+    print(cluster, cutoff, len(days))
+PY
+.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  > "$APM_ROOT/records/daily/first.log" 2>&1
+.venv/bin/python -m sql_apm daily status --schema sql_apm \
+  > "$APM_ROOT/records/daily/first-status.json"
+for cluster in 119 120; do
+  .venv/bin/python -m sql_apm status --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/first-$cluster-status.json"
+  .venv/bin/python -m sql_apm history --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/first-$cluster-history.json"
+done
+```
+
+预期 daily 成功；两集群各发布一个版本，截止日分别为 2026-07-28、2026-09-16。
+`daily status` 此时应列出余下 6 个日期的 `files_without_marker`（有文件但没有齐全标记），
+分别是 119 的 7/29–7/31、120 的 9/17–9/19；这些文件未导入，下一节补齐标记后提示消失。
+除这 6 个预期提示外，不应有其他待处理问题。
+每个 status 的 `current.fingerprint_normalization_timeout` 必须为 0；不能只看发布成功。
+
+### 10.2 追加剩余日期
+
+核对副本已完整后，给余下 6 个日期放齐全标记，使用同一配置再执行 daily。
+
+```bash
+.venv/bin/python - <<'PY'
+import os
+from pathlib import Path
+root = Path(os.environ['APM_ROOT']) / 'daily-replay/inbox'
+for cluster, cutoff in [('119', '2026-07-28'), ('120', '2026-09-16')]:
+    folder = root / cluster
+    days = sorted({p.name[5:15] for p in folder.glob('gpdb-*.csv*') if p.name[5:15] > cutoff})
+    for day in days:
+        (folder / (day + '.complete')).touch(exist_ok=False)
+    print(cluster, len(days))
+PY
+.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  > "$APM_ROOT/records/daily/incremental.log" 2>&1
+.venv/bin/python -m sql_apm daily status --schema sql_apm \
+  > "$APM_ROOT/records/daily/incremental-status.json"
+for cluster in 119 120; do
+  .venv/bin/python -m sql_apm status --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/incremental-$cluster-status.json"
+  .venv/bin/python -m sql_apm history --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/incremental-$cluster-history.json"
+done
+```
+
+预期只新增 16 个文件的导入，累计 55 个。两个集群各有两个成功版本，当前截止日分别为
+2026-07-31、2026-09-19，当前版本的发布前驱对应本节首批版本，归一化超时均为 0，待处理问题清零。
+一个 daily 按日期导入本次所有齐全的新日期，再按构建间隔决定是否构建，
+因此这条验收路径不要求每个日期发布一个版本。
+
+### 10.3 无新日志重复运行
+
+不添加文件或标记，再执行一次并保存输出：
+
+```bash
+.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  > "$APM_ROOT/records/daily/repeat.log" 2>&1
+.venv/bin/python -m sql_apm daily status --schema sql_apm \
+  > "$APM_ROOT/records/daily/repeat-status.json"
+for cluster in 119 120; do
+  .venv/bin/python -m sql_apm status --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/repeat-$cluster-status.json"
+  .venv/bin/python -m sql_apm history --cluster "$cluster" \
+    > "$APM_ROOT/records/daily/repeat-$cluster-history.json"
+done
+```
+
+预期新增一次 daily 运行记录，文件不重复导入，当前版本和两个发布历史不增加，待处理问题为零。
+若执行失败，保存日志，按[每日运行](daily-run.md)处理，再以同一配置接续；
+已成功的日期不重复导入。实际任务已成功、仅核对步骤失败时，先修复核对，不人为新增构建。
+
+## 11. 与首轮人工基准逐项比较
+
+实施方交付的 `manual-baseline/` 是首轮**同一验证机**已完成九任务的最终统计快照，含
+`results.json`、四个 `.jsonl.gz` 文件及 `SHA256SUMS`。这份基准与本轮程序产品文件逐项相同，
+通过交付记录核对清单摘要；它单独内网传输，不包含在公开程序包中。
+
+在开发机执行，`APM_MANUAL_BASELINE` 填交付记录给出的目录：
+
+```bash
+APM_MANUAL_BASELINE='填写交付记录中的 manual-baseline 目录'
+(cd "$APM_MANUAL_BASELINE" && sha256sum -c SHA256SUMS)
+scp -r -P "$APM_SSH_PORT" "$APM_MANUAL_BASELINE" "$APM_SSH_TARGET:/data/sql-apm/"
+```
+
+目标机执行：
+
+```bash
+cd "$APM_APP"
+(cd "$APM_ROOT/manual-baseline" && sha256sum -c SHA256SUMS)
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
+  --schema sql_apm --output "$APM_ROOT/records/daily-results"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
+  --manual "$APM_ROOT/manual-baseline" --daily "$APM_ROOT/records/daily-results" \
+  --output "$APM_ROOT/records/manual-daily-comparison.json"
+```
+
+预期 `passed=true`，配置、截止日、窗口一致；两张统计表逐行比较，所有统计值及 NULL 状态精确相同，
+绝对误差上限为 0。本节不使用 `--cross-machine`，也不把本轮版本数与九任务的 5／4 比较。
+
+| 集群 | 截止日 | 正式统计行 | 观察统计行 |
+| --- | --- | ---: | ---: |
+| 119 | 2026-07-31 | 537198 | 180 |
+| 120 | 2026-09-19 | 5850925 | 6748 |
+
+合计 6,395,051 行。任何无法解释的差异均未通过；保留两份快照、比较输出和产品摘要，先定位原因。
+配置学习示例移至附录 B，在本轮验收完成并保留最终快照后按需执行。
+
+## 12. 空闲时合成清理验证
+
+确认第 10、11 节结束，当前没有其他 CPU 密集任务。此命令创建自己的私有临时 PG，
+不连接演练库，包括预览、保护、锁等待、分批恢复和进程终止回放。
+
+```bash
+cd "$APM_APP"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
+  --pg-bin "$APM_PG_BIN" cleanup > "$APM_ROOT/records/verify-cleanup.log" 2>&1
+```
+
+预期退出 0，保存实际检查项数。锁等待的时间断言接近 10 秒；失败保留原始输出并分析。
+若只有该时间上界超出，也不能自行放宽测试，按 Issue 契约提请用户决定。
+
+## 13. 定时器、清理副本、传输与看板验收
+
+继续使用第 10 节的 `daily-replay/daily.json` 和默认 `sql_apm` schema。
+不再创建第二套 schema，也不重复导入真实日志。日常配置及问题处理见[每日运行](daily-run.md)。
+
+### 13.1 安装可选定时器
+
+先用下面命令生成文件，把 `--at` 改成服务器本地时间中接下来几分钟的时刻，观察实际启动。
+普通账号生成文件；复制、重新加载、启用和停用需要 root。
+
+```bash
+.venv/bin/python scripts/daily/install.py --app-root "$APM_APP" --python "$APM_APP/.venv/bin/python" \
+  --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  --dsn "$SQL_APM_DSN" --passfile "$PGPASSFILE" --user "$APM_RUN_USER" \
+  --at 17:00 --max-hours 12 --check-seconds 10 --output "$APM_ROOT/daily-units"
+sudo cp "$APM_ROOT/daily-units/sql-apm-daily.service" "$APM_ROOT/daily-units/sql-apm-daily.timer" /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now sql-apm-daily.timer
+systemctl list-timers sql-apm-daily.timer
+```
+
+到点后查 `journalctl -u sql-apm-daily.service` 和 `daily status --schema sql_apm`，
+预期启动方式为定时，已经导入的日期和当前版本保持不变。改时刻重新生成两文件并执行
+`sudo systemctl daemon-reload`、`sudo systemctl restart sql-apm-daily.timer`。
+停用用 `sudo systemctl disable --now sql-apm-daily.timer`；停止当前运行另用 `sudo systemctl stop sql-apm-daily.service`。
+重启后 PostgreSQL 仍需人工启动；先停用 timer，重启、启动数据库，再启用 timer，可核对错过的一次补跑。
+不通过修改服务器日期触发演练。最长运行、重叠和强制结束的自动故障记录由实施方另存。
+
+### 13.2 自动删除只针对演练副本
+
+保留首轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
+历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；原始日志目录保持不变。
+
+```bash
+.venv/bin/python - <<'PY'
+import json, os
+from pathlib import Path
+p = Path(os.environ['APM_ROOT']) / 'daily-replay/daily.json'
+x = json.loads(p.read_text())
+x['raw_files']['retention_days'] = 1
+p.write_text(json.dumps(x, indent=2) + '\n')
+PY
+.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm \
+  > "$APM_ROOT/records/daily/delete.log" 2>&1
+.venv/bin/python -m sql_apm daily status --schema sql_apm \
+  > "$APM_ROOT/records/daily/delete-status.json"
+```
+
+删除后再次核对原始日志摘要，并导出当前版本与删除前比较：
+
+```bash
+(cd "$APM_ROOT/logs" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
+  --schema sql_apm --output "$APM_ROOT/records/daily-after-delete-results"
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
+  --manual "$APM_ROOT/records/daily-results" --daily "$APM_ROOT/records/daily-after-delete-results" \
+  --output "$APM_ROOT/records/daily-delete-comparison.json"
+```
+
+预期比较 `passed=true`，当前版本及两表统计零差异。检查清理和删除两个步骤均有记录；当前月份受保护时结果清理为零是正常情况。
+不要求实际删除旧月统计结果，不调整服务器日期。重新复制已删除日期用于演练前先理解冻结清单规则，不能随意改名或增加文件。
+
+### 13.3 模拟源端的传输
+
+使用演练机本机 SSH 的独立目录作源端；不连接生产主机。先为执行账号配置到本机的密钥登录，
+并核对主机密钥加入 known_hosts。源端账号只需登录及目录、文件读取权限，见每日运行章节“传输脚本”。
+下例的目标目录不在每日运行配置中，合成 CSV 不会混入真实统计。
+
+初始快照上可以用以下步骤配置本机免密。已有默认密钥时沿用其公钥，不覆盖密钥；
+主机公钥直接读取本机 SSH 的公钥文件。若 known_hosts 已有不同的记录，连接会拒绝，先核对原因，不关闭校验。
+
+```bash
+install -d -m 0700 "$HOME/.ssh"
+if [ ! -e "$HOME/.ssh/id_ed25519" ]; then
+  ssh-keygen -q -t ed25519 -N '' -f "$HOME/.ssh/id_ed25519"
+fi
+test -f "$HOME/.ssh/id_ed25519.pub"
+touch "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
+chmod 600 "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
+if ! grep -qxF "$(cat "$HOME/.ssh/id_ed25519.pub")" "$HOME/.ssh/authorized_keys"; then
+  cat "$HOME/.ssh/id_ed25519.pub" >> "$HOME/.ssh/authorized_keys"
+fi
+if ! ssh-keygen -F 127.0.0.1 -f "$HOME/.ssh/known_hosts" >/dev/null; then
+  sudo awk '{print "127.0.0.1 " $1 " " $2}' /etc/ssh/ssh_host_ed25519_key.pub >> "$HOME/.ssh/known_hosts"
+fi
+ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "$APM_RUN_USER@127.0.0.1" true
+```
+
+```bash
+mkdir -p "$APM_ROOT/mock-source" "$APM_ROOT/mock-inbox"
+APM_YESTERDAY="$(date -d yesterday +%F)"
+printf 'synthetic transfer fixture\n' > "$APM_ROOT/mock-source/gpdb-${APM_YESTERDAY}_000000.csv"
+printf 'synthetic dated fixture\n' > "$APM_ROOT/mock-source/gpdb-2026-07-01_000000.csv"
+printf 'mock %s@127.0.0.1 %s %s 22\n' "$APM_RUN_USER" "$APM_ROOT/mock-source" "$APM_ROOT/mock-inbox" \
+  > "$APM_ROOT/config/mock-fetch.conf"
+daily/fetch-logs.sh --config "$APM_ROOT/config/mock-fetch.conf"
+daily/fetch-logs.sh --config "$APM_ROOT/config/mock-fetch.conf" --date 2026-07-01
+sha256sum "$APM_ROOT/mock-source/"*.csv "$APM_ROOT/mock-inbox/"*.csv
+ls -l "$APM_ROOT/mock-inbox/"*.complete
+```
+
+预期昨天与指定日期文件逐项摘要一致，文件到齐后才有对应的空标记。缺少免密登录的失败检查由实施方使用独立测试身份进行，
+不修改现有 SSH 登录凭据；失败不得产生齐全标记。常规部署若需要自动传输，给定时器生成命令增加
+`--fetch-config 配置文件`，重装并重启 timer；本次模拟源端不加入真实日志的每日运行配置。
+
+### 13.4 运行状态看板与用户记录
+
+本轮直接在第 8 节已配置的 `sql_apm` 中构建，Grafana 数据源和指纹服务沿用现有配置，
+不切换 schema、不重建密码。确认 PostgreSQL、Grafana 和指纹服务均正常后开始。
+
+按[检索指南](search-guide.md)亲自完成三种检索的命中和未命中、列表到详情、三个详情区与比较，
+并核对“运行状态”与 `daily status` 的日期、版本、步骤、问题一致。
+将包身份、步骤结果、耗时与问题填入[验证记录](kylin-validation-record.md)。
+本次实施方补验完成并在开发机核验备份后，才通知用户恢复“第 8 步完成”的快照，
+从第 9 节亲自操作。补验记录与用户记录分别保存；用户第 1–8 节的手动记录继续保留。
+用户完成后需明确确认结果，实施方代跑不计为用户验收通过。
+
+## 附录 A. 实施方九任务与基准比对
+
+本附录保留首轮实施方九任务的复现方法；不属于本次用户第 9 节起的操作路径。
+仅在独立的全新验收库运行，不能直接追加到第 10 节已完成的 daily 库。
 
 保持默认四解析进程和 5 秒归一化期限。辅助工具实际调用 full／rebuild、status／history，
 逐次比较原 Alma 业务基准，保存阶段耗时、任务期间内存最高占用、OOM 计数、数据库大小、
@@ -684,9 +981,10 @@ done
 若实际 CLI 已完成而后续核对失败，不再次 full/rebuild 产生额外版本；先修复记录／核对步骤。
 任何无法解释的差异均未通过；产品缺陷另开 Issue，不在本手册中修改产品计算。
 
-## 11. 可选的配置指南演练
+## 附录 B. 可选的配置指南演练
 
-本节会改变当前版本；本轮先跳到第 12、13 节，完成每日回放比较后再按需执行本节。
+本附录会改变当前版本，须在本轮最终验收及证据备份完成后另行安排。
+以下工具和版本预期基于附录 A 的独立九任务库，不直接用于本轮 daily 库。
 
 这些示例用于学习配置，按需要执行，不属于九任务本身。先保存九任务全部结果（119 第 5 版，120 第 4 版），再按[配置指南](configuration-guide.md)
 依次运行 window、threshold、template、exclusion 四个示例；每项从原配置生成独立配置，
@@ -708,170 +1006,3 @@ done
 门槛修改前后仍在各自机器上精确比较全部统计值，清理前后也不使用此跨机误差界限。
 模板原文不输出到公开记录。完成后 119 有 9 个版本，120 仍为 4 个。
 遇到差异停止，保留文件；不要再次运行已成功的 rebuild 增加版本。
-
-## 12. 空闲时合成清理验证
-
-确认九任务和已选择执行的示例结束，当前没有其他 CPU 密集任务。此命令创建自己的私有临时 PG，
-不连接演练库，包括预览、保护、锁等待、分批恢复和进程终止回放。
-
-```bash
-cd "$APM_APP"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  --pg-bin "$APM_PG_BIN" cleanup > "$APM_ROOT/records/verify-cleanup.log" 2>&1
-```
-
-预期退出 0，保存实际检查项数。锁等待的时间断言接近 10 秒；失败保留原始输出并分析。
-若只有该时间上界超出，也不能自行放宽测试，按 Issue 契约提请用户决定。
-
-## 13. 每日运行的手动演练
-
-完成九任务后直接执行本节，先保存最终统计快照；如需第 11 节可选示例，放在本节之后执行。
-日常操作的配置、问题处理和默认值见[每日运行](daily-run.md)；本节用同一批真实日志的**副本**演练，
-在独立 schema `sql_apm_daily` 中重新导入，保持九任务库及其记录不变。两个 schema 共用同一实例、数据库和账号。
-预留额外约一套日志与导入库、两个最终版本的磁盘空间；不要并行执行九任务和每日回放。
-
-```bash
-cd "$APM_APP"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot \
-  --app-root "$APM_APP" --output "$APM_ROOT/records/manual-results"
-sudo -u postgres "$APM_APP/scripts/db/initialize.sh" bootstrap --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN" \
-  --schema sql_apm_daily --admin-user postgres --admin-database postgres
-scripts/db/initialize.sh schema --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN" --schema sql_apm_daily
-.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" prepare \
-  --config "$APM_ROOT/config" --output "$APM_ROOT/daily-replay"
-```
-
-预期 55 个文件副本核验成功，初始没有齐全标记；配置继承九任务来源和 30 天训练窗口，默认四进程、
-自动清理开启，先关闭原始文件删除便于复查。逐天核对已复制的文件，再亲自放齐全标记：
-
-```bash
-.venv/bin/python - <<'PY'
-import os
-from pathlib import Path
-root = Path(os.environ['APM_ROOT']) / 'daily-replay/inbox'
-for cluster in ('119', '120'):
-    folder = root / cluster
-    for day in sorted({p.name[5:15] for p in folder.glob('gpdb-*.csv*')}):
-        (folder / (day + '.complete')).touch(exist_ok=False)
-        print(cluster, day)
-PY
-.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm_daily \
-  > "$APM_ROOT/records/daily-first.log" 2>&1
-.venv/bin/python -m sql_apm daily status --schema sql_apm_daily \
-  > "$APM_ROOT/records/daily-first-status.json"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
-  --schema sql_apm_daily --output "$APM_ROOT/records/daily-results"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
-  --manual "$APM_ROOT/records/manual-results" --daily "$APM_ROOT/records/daily-results" \
-  --output "$APM_ROOT/records/manual-daily-comparison.json"
-```
-
-预期首轮逐日导入两个集群、各发布一个版本；截止日分别为 2026-07-31 和 2026-09-19，
-比较 `passed=true`，同机两张统计表的全部统计值和 NULL 状态逐项一致。
-只有另行比对开发机与验证机时才使用 `--cross-machine`，允许两列对数统计绝对差不超过 1e-12。
-导入失败不重新创建批次，
-先保留日志、按原因处理，再运行同一命令，已经成功的文件不重复导入。
-要练习“只放第一天，运行，再放后面的日期”，也使用同一配置；最终全部日期齐全后比对结果应相同。
-
-### 13.1 安装可选定时器
-
-先用下面命令生成文件，把 `--at` 改成服务器本地时间中接下来几分钟的时刻，观察实际启动。
-普通账号生成文件；复制、重新加载、启用和停用需要 root。
-
-```bash
-.venv/bin/python scripts/daily/install.py --app-root "$APM_APP" --python "$APM_APP/.venv/bin/python" \
-  --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm_daily \
-  --dsn "$SQL_APM_DSN" --passfile "$PGPASSFILE" --user "$APM_RUN_USER" \
-  --at 17:00 --max-hours 12 --check-seconds 10 --output "$APM_ROOT/daily-units"
-sudo cp "$APM_ROOT/daily-units/sql-apm-daily.service" "$APM_ROOT/daily-units/sql-apm-daily.timer" /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now sql-apm-daily.timer
-systemctl list-timers sql-apm-daily.timer
-```
-
-到点后查 `journalctl -u sql-apm-daily.service` 和 `daily status --schema sql_apm_daily`，
-预期启动方式为定时，已经导入的日期和当前版本保持不变。改时刻重新生成两文件并执行
-`sudo systemctl daemon-reload`、`sudo systemctl restart sql-apm-daily.timer`。
-停用用 `sudo systemctl disable --now sql-apm-daily.timer`；停止当前运行另用 `sudo systemctl stop sql-apm-daily.service`。
-重启后 PostgreSQL 仍需人工启动；先停用 timer，重启、启动数据库，再启用 timer，可核对错过的一次补跑。
-不通过修改服务器日期触发演练。最长运行、重叠和强制结束的自动故障记录由实施方另存。
-
-### 13.2 自动删除只针对演练副本
-
-保留首轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
-历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；原始日志目录保持不变。
-
-```bash
-.venv/bin/python - <<'PY'
-import json, os
-from pathlib import Path
-p = Path(os.environ['APM_ROOT']) / 'daily-replay/daily.json'
-x = json.loads(p.read_text())
-x['raw_files']['retention_days'] = 1
-p.write_text(json.dumps(x, indent=2) + '\n')
-PY
-.venv/bin/python -m sql_apm daily run --config "$APM_ROOT/daily-replay/daily.json" --schema sql_apm_daily \
-  > "$APM_ROOT/records/daily-delete.log" 2>&1
-.venv/bin/python -m sql_apm daily status --schema sql_apm_daily \
-  > "$APM_ROOT/records/daily-delete-status.json"
-```
-
-检查清理和删除两个步骤均有记录；当前月份受保护时结果清理为零是正常情况。
-不要求实际删除旧月统计结果，不调整服务器日期。重新复制已删除日期用于演练前先理解冻结清单规则，不能随意改名或增加文件。
-
-### 13.3 模拟源端的传输
-
-使用演练机本机 SSH 的独立目录作源端；不连接生产主机。先为执行账号配置到本机的密钥登录，
-并核对主机密钥加入 known_hosts。源端账号只需登录及目录、文件读取权限，见每日运行章节“传输脚本”。
-下例的目标目录不在每日运行配置中，合成 CSV 不会混入真实统计。
-
-初始快照上可以用以下步骤配置本机免密。已有默认密钥时沿用其公钥，不覆盖密钥；
-主机公钥直接读取本机 SSH 的公钥文件。若 known_hosts 已有不同的记录，连接会拒绝，先核对原因，不关闭校验。
-
-```bash
-install -d -m 0700 "$HOME/.ssh"
-if [ ! -e "$HOME/.ssh/id_ed25519" ]; then
-  ssh-keygen -q -t ed25519 -N '' -f "$HOME/.ssh/id_ed25519"
-fi
-test -f "$HOME/.ssh/id_ed25519.pub"
-touch "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
-chmod 600 "$HOME/.ssh/authorized_keys" "$HOME/.ssh/known_hosts"
-if ! grep -qxF "$(cat "$HOME/.ssh/id_ed25519.pub")" "$HOME/.ssh/authorized_keys"; then
-  cat "$HOME/.ssh/id_ed25519.pub" >> "$HOME/.ssh/authorized_keys"
-fi
-if ! ssh-keygen -F 127.0.0.1 -f "$HOME/.ssh/known_hosts" >/dev/null; then
-  sudo awk '{print "127.0.0.1 " $1 " " $2}' /etc/ssh/ssh_host_ed25519_key.pub >> "$HOME/.ssh/known_hosts"
-fi
-ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes "$APM_RUN_USER@127.0.0.1" true
-```
-
-```bash
-mkdir -p "$APM_ROOT/mock-source" "$APM_ROOT/mock-inbox"
-APM_YESTERDAY="$(date -d yesterday +%F)"
-printf 'synthetic transfer fixture\n' > "$APM_ROOT/mock-source/gpdb-${APM_YESTERDAY}_000000.csv"
-printf 'synthetic dated fixture\n' > "$APM_ROOT/mock-source/gpdb-2026-07-01_000000.csv"
-printf 'mock %s@127.0.0.1 %s %s 22\n' "$APM_RUN_USER" "$APM_ROOT/mock-source" "$APM_ROOT/mock-inbox" \
-  > "$APM_ROOT/config/mock-fetch.conf"
-daily/fetch-logs.sh --config "$APM_ROOT/config/mock-fetch.conf"
-daily/fetch-logs.sh --config "$APM_ROOT/config/mock-fetch.conf" --date 2026-07-01
-sha256sum "$APM_ROOT/mock-source/"*.csv "$APM_ROOT/mock-inbox/"*.csv
-ls -l "$APM_ROOT/mock-inbox/"*.complete
-```
-
-预期昨天与指定日期文件逐项摘要一致，文件到齐后才有对应的空标记。缺少免密登录的失败检查由实施方使用独立测试身份进行，
-不修改现有 SSH 登录凭据；失败不得产生齐全标记。常规部署若需要自动传输，给定时器生成命令增加
-`--fetch-config 配置文件`，重装并重启 timer；本次模拟源端不加入真实日志的每日运行配置。
-
-### 13.4 运行状态看板与用户记录
-
-九任务与每日回放各使用一个 schema。要在四看板查看本次每日回放的真实数据与运行记录，
-重复第 8.2 节的 `install.py files` 命令时增加 `--schema sql_apm_daily`，随后
-复制新生成的两个 systemd 文件到 `/etc/systemd/system/`、执行 `sudo systemctl daemon-reload` 和
-`sudo systemctl restart sql-apm-fingerprint.service sql-apm-grafana.service`。账号和 SQLite 看板数据保留，
-不重复创建密码。数据源的默认 schema 来自只读账号在数据库中的 search_path，第 13 节 bootstrap 已将其设为 sql_apm_daily。
-切回九任务数据时，先按第 13 节的 sudo bootstrap 命令改用 `--schema sql_apm`，再以同样的 schema 重新生成、复制单元并重启。
-
-按[检索指南](search-guide.md)亲自完成三种检索的命中和未命中、列表到详情、三个详情区与比较，
-并核对“运行状态”与 `daily status` 的日期、版本、步骤、问题一致。
-将包身份、步骤结果、耗时与问题填入[验证记录](kylin-validation-record.md)。
-实施方完成后先保存全部证据，再通知用户恢复快照；用户的第二轮从本手册第 1 节重新开始。

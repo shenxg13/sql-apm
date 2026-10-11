@@ -2,7 +2,7 @@
   "format": 1,
   "version": "v0.3.0",
   "schema": "1.12.0",
-  "state": "agent_round_complete_user_round_pending",
+  "state": "agent_first_round_complete_daily_followup_running_user_round_pending",
   "not_for_production": true,
   "product_files": 111,
   "source_rounds": {
@@ -690,7 +690,7 @@
     }
   },
   "pending": [
-    "user_round_initial_probe",
+    "daily_followup_from_user_step8_snapshot",
     "user_manual_full_round",
     "two_round_candidate_product_identity",
     "review",
@@ -2344,5 +2344,35 @@
       "excluded_from_program_verification_and_html_sources": true,
       "note": "Candidate remains the fixed commit above; a following report-only commit records post-build evidence without changing any package input."
     }
+  },
+  "user_round_initial_probe": {
+    "completed": true,
+    "initial_snapshot_confirmed_by_user": true,
+    "tar_preinstalled": true,
+    "empty_deployment_directory": true,
+    "stdout_sha256": "8a9ec4c566da8d754b28233e973db00663b280c1cb4d61d3f56b344a5d3c8d22",
+    "local_evidence": "var/issue52/manual-round2/preflight-1"
+  },
+  "daily_followup": {
+    "state": "running",
+    "scope_confirmation": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6105789589",
+    "snapshot": "user completed steps 1-8, saved snapshot and rebooted",
+    "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+    "installed_files_verified": 120,
+    "business_schema": "sql_apm",
+    "schema_base_tables": 62,
+    "initial_business_tables_empty": true,
+    "postgres_started_manually": true,
+    "resident_services_active_after_reboot": true,
+    "user_install_records_backup": {
+      "files": 15,
+      "bytes": 1637713,
+      "all_file_hashes_match": true,
+      "manifest_sha256": "35b34a22c57967ff1935cd1485cfe3fb7effa7cff0638c09f4a4ef4239bbccf7"
+    },
+    "manual_baseline_manifest_sha256": "8a2daaceed0c9b75f3b84df09abf9c228efaf0d7758ba17bb89ebcd32dcb01ee",
+    "manual_baseline_origin": "first target rehearsal manual-results, matched verified final backup",
+    "local_evidence": "var/issue52/daily-followup-1",
+    "user_acceptance_completed": false
   }
 }

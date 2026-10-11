@@ -18,7 +18,9 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 交付顺序及验证安排见[项目知识](.project-wiki/decisions/project-scope.md#已确认的首期交付顺序)。
 已确认需求按主题保存在知识库；各主题标明尚待确认或实施验证的事项。
 
-当前正在准备 `v0.3.0` 离线预发布，包含检索、四个 Grafana 看板和每日运行；实施方首轮检查、daily 补验及用户手动拉取流程均已完成。用户已确认手动验收通过，并接受本轮自定义样本门槛与人工基准的差异；统计结果逐行一致，原严格配置比较失败记录保留。独立评审及合并后发布仍待完成，详情见[验证报告](docs/reports/v030-offline-release-2026-10-11.md)。
+已发布 [v0.3.0 预发布](https://github.com/shenxg13/sql-apm/releases/tag/v0.3.0)，包含检索、四个 Grafana 看板和每日运行。
+实施方实测、用户手动验收和 R2 独立评审已完成；合并后按用户确认的精确制品发布，附件已重新下载核对。
+用户接受本轮自定义样本门槛与人工基准的差异；统计结果逐行一致，原严格配置比较失败记录保留，详情见[验证报告](docs/reports/v030-offline-release-2026-10-11.md)。
 从[安装手册](docs/runbooks/kylin-offline-deployment.md)、[检索指南](docs/runbooks/search-guide.md)与
 [发布说明](docs/releases/v0.3.0.md)进入；本版只支持全新安装，不用于生产。
 

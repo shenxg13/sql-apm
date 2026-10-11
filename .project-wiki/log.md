@@ -436,3 +436,5 @@ GUI、自动清理、Kylin 重跑、重新制包及正式发布均不在本次�
 - 2026-10-11：[用户确认](https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6109049165)手动拉取、daily 和界面验收通过，接受本轮 15/25/25 与默认门槛差异；保留自动比较失败和零差异统计证据，记录由实施方整理。同步[运行环境与组件](decisions/runtime-and-components.md)及验证报告；独立评审和发布仍待完成。
 
 - 2026-10-11：#52 R1 整改同步发布说明中的用户验收及限定门槛差异，补齐检索指南的文本保留做法，修订安装／发布说明的旧表述；重新制包和文档回归通过，111 个产品文件不变，详见[整改证据](../docs/reports/v030-offline-release-2026-10-11.md#r1-文档整改与重新制包2026-10-11)。现行验收要求仍见[运行组件主题](decisions/runtime-and-components.md#v030-的用户手动全流程验收2026-10-11)，本次未变更需求或产品行为。
+
+- 2026-10-11：#52 R2 独立评审通过后合并，用户确认精确制品并发布 [v0.3.0 预发布](https://github.com/shenxg13/sql-apm/releases/tag/v0.3.0)；公开附件下载、清单、HTML 和标签核对通过，完整离线包含同一程序包，旧版未变。同步[运行组件事实](decisions/runtime-and-components.md#v030-的用户手动全流程验收2026-10-11)、README 与[发布核验记录](../docs/reports/v030-offline-release-2026-10-11.md#r2-通过与合并后发布2026-10-11)，保留各轮原始证据和已接受的门槛差异。

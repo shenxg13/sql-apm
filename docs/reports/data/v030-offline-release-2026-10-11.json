@@ -2,7 +2,7 @@
   "format": 1,
   "version": "v0.3.0",
   "schema": "1.12.0",
-  "state": "agent_and_user_rounds_complete_review_and_release_pending",
+  "state": "agent_and_user_rounds_review_and_release_complete",
   "not_for_production": true,
   "product_files": 111,
   "source_rounds": {
@@ -689,10 +689,7 @@
       "record_sha256": "ce876556692b3a4495dc00cd513eef0bf6e91a4682393fb17bd5f6a71f504f79"
     }
   },
-  "pending": [
-    "review",
-    "post_merge_release"
-  ],
+  "pending": [],
   "development_checks": {
     "unit": {
       "passed": true,
@@ -4109,5 +4106,247 @@
       "6": "Memory measurement remains an observation; no unverified causal explanation added."
     },
     "knowledge_sync": "No durable requirement or product behavior change; accepted rules remain in the existing topic pages. Corrected runbooks and evidence are linked from the knowledge log."
+  },
+  "independent_review": {
+    "verdict": "approve",
+    "review_round": "R2",
+    "formal_rounds_consumed": 2,
+    "reviewed_head": "f9228714d730762c61ea32fe82970dd1f94b458c",
+    "issue_handoff_url": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6109735930",
+    "pr_evidence_url": "https://github.com/shenxg13/sql-apm/pull/56#issuecomment-6109736106",
+    "record_sha256": "296351bf9e118a87fb18bfdeb55bd1d7f349e95b04592912ce76e935f9e86e82",
+    "findings": [
+      {
+        "finding_id": "F-52-001",
+        "disposition": "fixed",
+        "blocks_current_pr": false
+      },
+      {
+        "finding_id": "F-52-002",
+        "disposition": "fixed",
+        "blocks_current_pr": false
+      }
+    ]
+  },
+  "post_merge_release": {
+    "state": "published_and_download_verified",
+    "user_confirmation": {
+      "source": "user response in current conversation",
+      "answer": "确认发布这组制品",
+      "commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+      "tag": "v0.3.0",
+      "public_assets": {
+        "sql-apm-v0.3.0.tar.gz": {
+          "bytes": 487964,
+          "sha256": "2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd"
+        },
+        "sql-apm-v0.3.0.tar.gz.sha256": {
+          "bytes": 88,
+          "sha256": "3c4a59802114651258fd3520ce0669b518b57c79ff14b2a883aa14aa9c9c3531"
+        }
+      },
+      "release_notes_sha256": "8b71a6b3c5c77bbfba929984a71c7d82536711f9d17fc3451bf7b0fe13826ee5"
+    },
+    "prepublication_comment_url": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6110096585",
+    "comparison": {
+      "passed": true,
+      "release_commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+      "reviewed_head": "f9228714d730762c61ea32fe82970dd1f94b458c",
+      "candidate_commit": "4c403fe56192a1b3f27d7e32d390918c782ff5f4",
+      "release_tree_equals_reviewed_tree": true,
+      "product_files_equal": 111,
+      "product_comparison_sha256": "6ab0283ee053600d2c86ef72c8afc4ae59c701e5c4510df930efefa68405594e",
+      "installed_package": {
+        "passed": true,
+        "version": "v0.3.0",
+        "kind": "release",
+        "commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+        "files": 120
+      },
+      "program_changed_only": [
+        "app/DATABASE.html",
+        "app/INSTALL.html",
+        "app/PROGRAM_COMMIT",
+        "app/RELEASE.html",
+        "app/RELEASE.json",
+        "app/SEARCH.html",
+        "app/SHA256SUMS"
+      ],
+      "html_differences_only_commit": true,
+      "metadata_differences_only_kind_commit_and_derived": true,
+      "verification_files": 87,
+      "verification_changed_only": [
+        "verification/PROGRAM_COMMIT",
+        "verification/SHA256SUMS"
+      ],
+      "bundle_manifest_entries": 422,
+      "bundle_changed_entries": [
+        "program.tar.gz",
+        "verification.tar.gz",
+        "DATABASE.html",
+        "INSTALL.html",
+        "RELEASE.html",
+        "SEARCH.html"
+      ],
+      "offline_archive_members_verified": 425,
+      "artifacts": {
+        "release/sql-apm-v0.3.0.tar.gz": {
+          "bytes": 487964,
+          "sha256": "2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd"
+        },
+        "release/sql-apm-v0.3.0.tar.gz.sha256": {
+          "bytes": 88,
+          "sha256": "3c4a59802114651258fd3520ce0669b518b57c79ff14b2a883aa14aa9c9c3531"
+        },
+        "release/sql-apm-verification-v0.3.0.tar.gz": {
+          "bytes": 341904,
+          "sha256": "5b3f93abaa2e6cc5cab942b5bd38cda3916ba27de07ec70168b0a9431a308fd7"
+        },
+        "offline-bundle.tar.gz": {
+          "bytes": 972418647,
+          "sha256": "56386440888e2f593c8bdb37f3724e7a09d7917d0c8dfaeb17e4a3686eb7ce72"
+        }
+      },
+      "html_browser": {
+        "passed": true,
+        "external_requests": [],
+        "browser_errors": [],
+        "documents": {
+          "INSTALL": {
+            "code_blocks": 73,
+            "images": 0,
+            "internal_navigation": true,
+            "print_rendered": true
+          },
+          "DATABASE": {
+            "code_blocks": 0,
+            "images": 4,
+            "internal_navigation": true,
+            "print_rendered": true
+          },
+          "SEARCH": {
+            "code_blocks": 58,
+            "images": 0,
+            "internal_navigation": true,
+            "print_rendered": true
+          },
+          "RELEASE": {
+            "code_blocks": 0,
+            "images": 0,
+            "internal_navigation": true,
+            "print_rendered": true
+          }
+        }
+      },
+      "html_browser_sha256": "bc6dfb6d1edef30057d3365e1150fd9cd282c33ae3e8f81321cb1aeabebd7f74"
+    },
+    "download_verification": {
+      "passed": true,
+      "release_url": "https://github.com/shenxg13/sql-apm/releases/tag/v0.3.0",
+      "release_id": 409722576,
+      "published_at": "2026-10-11T14:38:08Z",
+      "commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+      "tag": "v0.3.0",
+      "tag_object": "2ea80fc05b41ce7d2ae872bd0f0d8097f596e521",
+      "prerelease": true,
+      "assets": {
+        "sql-apm-v0.3.0.tar.gz": {
+          "bytes": 487964,
+          "sha256": "2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd",
+          "id": 630974184,
+          "download_url": "https://github.com/shenxg13/sql-apm/releases/download/v0.3.0/sql-apm-v0.3.0.tar.gz",
+          "downloaded_bytes_equal": true
+        },
+        "sql-apm-v0.3.0.tar.gz.sha256": {
+          "bytes": 88,
+          "sha256": "3c4a59802114651258fd3520ce0669b518b57c79ff14b2a883aa14aa9c9c3531",
+          "id": 630974188,
+          "download_url": "https://github.com/shenxg13/sql-apm/releases/download/v0.3.0/sql-apm-v0.3.0.tar.gz.sha256",
+          "downloaded_bytes_equal": true
+        }
+      },
+      "release_notes_exact": true,
+      "release_notes_sha256": "8b71a6b3c5c77bbfba929984a71c7d82536711f9d17fc3451bf7b0fe13826ee5",
+      "downloaded_package_check": {
+        "passed": true,
+        "version": "v0.3.0",
+        "kind": "release",
+        "commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+        "files": 120
+      },
+      "downloaded_html": {
+        "INSTALL.html": {
+          "bytes": 140334,
+          "sha256": "2b33d9f5dc513e0e149608a50e0d72a68a85a7d2f16982683deee9cc73a40abc",
+          "equals_prepublication_verified_html": true
+        },
+        "SEARCH.html": {
+          "bytes": 61622,
+          "sha256": "c98500a46cb1431a3f15c5c18c0b287c699a2e7fea035e389300db85eb962edf",
+          "equals_prepublication_verified_html": true
+        },
+        "DATABASE.html": {
+          "bytes": 83078,
+          "sha256": "0b08b82f9d8da5c43d34aeef59d4f4e33d678d81cfcc79dfd42ff5e4a5cf6cc8",
+          "equals_prepublication_verified_html": true
+        },
+        "RELEASE.html": {
+          "bytes": 9206,
+          "sha256": "95f915f735ab5d521742710325e515dd61e07db61ad83b56522984329e706a25",
+          "equals_prepublication_verified_html": true
+        }
+      },
+      "v020_tag_and_assets_unchanged": true,
+      "offline_bundle_program_identical": true,
+      "offline_bundle_program_sha256": "2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd"
+    },
+    "release_notes": {
+      "tag": "v0.3.0",
+      "commit": "f983a311253a9d31029761fccb2e104fd6982bb0",
+      "prerelease": true,
+      "source": "docs/releases/v0.3.0.md",
+      "source_sha256": "c6f0d3dd50f546f7963d4eb385857d497571e8ffb3cca41a66af5efce97de00b",
+      "release_notes_sha256": "8b71a6b3c5c77bbfba929984a71c7d82536711f9d17fc3451bf7b0fe13826ee5",
+      "relative_link_replacements": {
+        "../runbooks/kylin-offline-deployment.md": "https://github.com/shenxg13/sql-apm/blob/f983a311253a9d31029761fccb2e104fd6982bb0/docs/runbooks/kylin-offline-deployment.md",
+        "../runbooks/daily-run.md": "https://github.com/shenxg13/sql-apm/blob/f983a311253a9d31029761fccb2e104fd6982bb0/docs/runbooks/daily-run.md",
+        "../runbooks/configuration-guide.md": "https://github.com/shenxg13/sql-apm/blob/f983a311253a9d31029761fccb2e104fd6982bb0/docs/runbooks/configuration-guide.md",
+        "../runbooks/search-guide.md": "https://github.com/shenxg13/sql-apm/blob/f983a311253a9d31029761fccb2e104fd6982bb0/docs/runbooks/search-guide.md",
+        "../design/database-structure.md": "https://github.com/shenxg13/sql-apm/blob/f983a311253a9d31029761fccb2e104fd6982bb0/docs/design/database-structure.md"
+      },
+      "public_assets": {
+        "sql-apm-v0.3.0.tar.gz": {
+          "bytes": 487964,
+          "sha256": "2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd"
+        },
+        "sql-apm-v0.3.0.tar.gz.sha256": {
+          "bytes": 88,
+          "sha256": "3c4a59802114651258fd3520ce0669b518b57c79ff14b2a883aa14aa9c9c3531"
+        }
+      }
+    },
+    "evidence_sha256": {
+      "user-confirmation.json": "9cbda326f7b8424786c48e4c1b2391a828c7b09b2dbb5241358cf50633740064",
+      "release-comparison.json": "70bf958e5dcc634b1e567b3baac0aa3716a9aeb9e773ad5aa127a376d3bf4254",
+      "published-verification.json": "c7d4b5dbf36f9077471b1673988827c055a614a4c55f020b15b948091962a07a",
+      "published-release.json": "c4af60854c980c46782b41f6764d3478b944051f222546abd641c633c4b79e43",
+      "published-tag.txt": "99d8e9e8bb3ee87f011a506b9b741d33740782bf8263e474f7ae4a95f5930938",
+      "release-notes-provenance.json": "f6111c322f3ccc715c61b390bc66e9be88677d38bd4695f1262a13bc38446226",
+      "v020-before.json": "d82e094b822452c0b686aa4abf0f84fbe9ff3bfc499168da9ebb84cd9fdcff07",
+      "v020-after.json": "d82e094b822452c0b686aa4abf0f84fbe9ff3bfc499168da9ebb84cd9fdcff07",
+      "v020-tag-before.json": "966b9871fd37f80c284feae47a8eae62a39fd4d3214285596d9537024913f5ad",
+      "v020-tag-after.json": "966b9871fd37f80c284feae47a8eae62a39fd4d3214285596d9537024913f5ad"
+    },
+    "main_ci": [
+      {
+        "conclusion": "success",
+        "html_url": "https://github.com/shenxg13/sql-apm/actions/runs/38147327270/job/114493323828",
+        "name": "quality",
+        "status": "completed"
+      }
+    ],
+    "validation_machine_accessed": false,
+    "evidence_directory": "var/issue52/release-1",
+    "post_publication_documentation": "Evidence-only followup; tag and published artifacts remain fixed to the confirmed merge commit."
   }
 }

@@ -2,7 +2,7 @@
   "format": 1,
   "version": "v0.3.0",
   "schema": "1.12.0",
-  "state": "agent_first_round_and_copy_followup_complete_user_source_pull_round_pending",
+  "state": "agent_and_user_rounds_complete_review_and_release_pending",
   "not_for_production": true,
   "product_files": 111,
   "source_rounds": {
@@ -690,9 +690,6 @@
     }
   },
   "pending": [
-    "user_source_pull_flow",
-    "user_manual_full_round",
-    "two_round_candidate_product_identity",
     "review",
     "post_merge_release"
   ],
@@ -3664,6 +3661,286 @@
       "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
     },
     "user_pull_flow_executed": false,
-    "user_acceptance_completed": false
+    "user_acceptance_completed": false,
+    "subsequent_completion": "user_manual_round"
+  },
+  "user_manual_round": {
+    "state": "user_accepted_with_documented_threshold_difference",
+    "confirmation": {
+      "date": "2026-10-11",
+      "source": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6109049165",
+      "user_statement": "这个我人工确认通过，还需要我手动填表吗？",
+      "browser_statement": "全部已验证且正常",
+      "record_prepared_by": "implementation_agent_from_user_statements_and_saved_evidence",
+      "user_reentry_required": false
+    },
+    "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+    "candidate_commit": "455b41303c7303842afd52d6d164ba8b9d12e886",
+    "product_identity": {
+      "paths": 111,
+      "matches_candidate": true,
+      "matches_manual_baseline": true,
+      "installed_manifest_passed": true
+    },
+    "source_pull": {
+      "first": {
+        "files": 39,
+        "days": 30
+      },
+      "incremental": {
+        "files": 16,
+        "days": 6
+      }
+    },
+    "source_file_count": 55,
+    "source_bytes": 15816193813,
+    "completed_daily_batches": 36,
+    "publication_counts": {
+      "119": 2,
+      "120": 2
+    },
+    "normalization_timeouts": 0,
+    "open_problems": 0,
+    "input_sha256_matches_fixed_manifest": true,
+    "source_originals_before_after_delete_verified": 55,
+    "runs": [
+      {
+        "started_by": "manual",
+        "started_at": "2026-10-11 17:31:55.463109+08:00",
+        "seconds": 2427.987723,
+        "failed": false,
+        "clusters": [
+          {
+            "scope_id": "119",
+            "build_state": "published",
+            "imported_days": [
+              "2026-07-01",
+              "2026-07-04",
+              "2026-07-05",
+              "2026-07-06",
+              "2026-07-07",
+              "2026-07-08",
+              "2026-07-09",
+              "2026-07-10",
+              "2026-07-11",
+              "2026-07-12",
+              "2026-07-13",
+              "2026-07-14",
+              "2026-07-15",
+              "2026-07-16",
+              "2026-07-17",
+              "2026-07-18",
+              "2026-07-19",
+              "2026-07-20",
+              "2026-07-21",
+              "2026-07-22",
+              "2026-07-23",
+              "2026-07-24",
+              "2026-07-25",
+              "2026-07-26",
+              "2026-07-27",
+              "2026-07-28"
+            ],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          },
+          {
+            "scope_id": "120",
+            "build_state": "published",
+            "imported_days": [
+              "2026-09-13",
+              "2026-09-14",
+              "2026-09-15",
+              "2026-09-16"
+            ],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          }
+        ]
+      },
+      {
+        "started_by": "manual",
+        "started_at": "2026-10-11 18:30:05.576328+08:00",
+        "seconds": 2160.942158,
+        "failed": false,
+        "clusters": [
+          {
+            "scope_id": "119",
+            "build_state": "published",
+            "imported_days": [
+              "2026-07-29",
+              "2026-07-30",
+              "2026-07-31"
+            ],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          },
+          {
+            "scope_id": "120",
+            "build_state": "published",
+            "imported_days": [
+              "2026-09-17",
+              "2026-09-18",
+              "2026-09-19"
+            ],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          }
+        ]
+      },
+      {
+        "started_by": "timer",
+        "started_at": "2026-10-11 19:25:03.369851+08:00",
+        "seconds": 0.061274,
+        "failed": false,
+        "clusters": [
+          {
+            "scope_id": "119",
+            "build_state": "not_due",
+            "imported_days": [],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          },
+          {
+            "scope_id": "120",
+            "build_state": "not_due",
+            "imported_days": [],
+            "raw_state": "disabled",
+            "raw_files": 0,
+            "raw_days": 0
+          }
+        ]
+      },
+      {
+        "started_by": "manual",
+        "started_at": "2026-10-11 19:43:30.424190+08:00",
+        "seconds": 13.977009,
+        "failed": false,
+        "clusters": [
+          {
+            "scope_id": "119",
+            "build_state": "not_due",
+            "imported_days": [],
+            "raw_state": "deleted",
+            "raw_files": 30,
+            "raw_days": 29
+          },
+          {
+            "scope_id": "120",
+            "build_state": "not_due",
+            "imported_days": [],
+            "raw_state": "deleted",
+            "raw_files": 25,
+            "raw_days": 7
+          }
+        ]
+      }
+    ],
+    "selection": {
+      "first": [
+        {
+          "completed_batches": 26,
+          "selected_batches": 26,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        {
+          "completed_batches": 4,
+          "selected_batches": 4,
+          "excluded_batches": 0,
+          "window_fallback": false
+        }
+      ],
+      "incremental": [
+        {
+          "completed_batches": 29,
+          "selected_batches": 28,
+          "excluded_batches": 1,
+          "window_fallback": false
+        },
+        {
+          "completed_batches": 7,
+          "selected_batches": 7,
+          "excluded_batches": 0,
+          "window_fallback": false
+        }
+      ]
+    },
+    "strict_comparison_passed": false,
+    "statistic_comparison_passed": true,
+    "statistic_rows": 6395051,
+    "statistic_absolute_limit": "0",
+    "independent_statistics_verification": {
+      "rows": 6395051,
+      "all_table_row_hashes_equal": true,
+      "all_log_value_file_sha256_equal": true,
+      "method": "已核对备份中的统计文件摘要；逐表核对其元数据与原始人工基准，行摘要及压缩统计值文件摘要完全相同。"
+    },
+    "accepted_difference": {
+      "fields": [
+        "basic_count",
+        "p95_count",
+        "p99_count"
+      ],
+      "layers": [
+        "overall",
+        "day",
+        "week",
+        "weekday",
+        "hour"
+      ],
+      "manual": [
+        30,
+        200,
+        1000
+      ],
+      "user": [
+        15,
+        25,
+        25
+      ],
+      "coverage_window_cutoff_other_config_equal": true,
+      "original_failure_preserved": true,
+      "default_rebuild_required": false,
+      "only_this_user_round": true,
+      "product_defaults_and_comparator_unchanged": true
+    },
+    "deleted_files": 55,
+    "deleted_date_markers": 36,
+    "deleted_bytes": 15816193813,
+    "delete_comparison_passed": true,
+    "timer": {
+      "triggered": true,
+      "fetch_before_daily": true,
+      "fetch_no_files": 14,
+      "service_succeeded": true
+    },
+    "mock_transfer": {
+      "files": 2,
+      "markers": 2,
+      "source_and_target_sha256_equal": true
+    },
+    "user_browser_confirmed": true,
+    "agent_browser_replay_this_round": false,
+    "installation_check_log_count": 10,
+    "backup": {
+      "files": 48,
+      "bytes": 622052055,
+      "sha256_verified": true,
+      "manifest_sha256": "54d6d4c9edc0b6599787cb4f8a3b44bc2ef2adc8e0d9b541e51cd82067b44f8e"
+    },
+    "audit_sha256": "82812fc31eec42abf8e64a2c663fe2f5b28961ee8e78d0409ad03739d83aeeab",
+    "manual_comparison_sha256": "17927c053f8ba8bf2da7fd7f317c3bf5e0c0bf99c997402e9ceef7c3579da58d",
+    "delete_comparison_sha256": "d216eb362a51d650116e1319d2ec340c2ac5efb403738092f8d995540246bb09",
+    "limitations": [
+      "未见单独的第10.3节repeat.log；19:25定时运行和19:43删除运行均证明无新增输入时不重复导入、不新增版本。",
+      "用户界面结论来自本次用户明确确认，未冒充本次实施方浏览器自动化结果。",
+      "本轮耗时来自数据库运行记录，未额外采集主机或进程内存。"
+    ]
   }
 }

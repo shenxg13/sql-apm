@@ -13,10 +13,10 @@ import tarfile
 import tempfile
 
 from render_manual import DOCUMENTS, render
-from verify_package import digest, verify
+from verify_package import digest, verify, product_file
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = '9bf4e4b6eb3871d6f996339b403c0c93f403e15c'
+BASE = 'a3fde9092b96497327133caf05cec173ba721dec'
 
 
 def version_number(value):
@@ -65,15 +65,12 @@ def select(source, destination, patterns):
 
 
 def compare_product(app, previous):
-    def product(name):
-        return (Path(name).parts[0] in ('sql_apm', 'rules') or
-                name in ('requirements.txt', 'scripts/db/initialize.sh'))
     current = {str(p.relative_to(app)): digest(p) for p in app.rglob('*')
-               if p.is_file() and product(str(p.relative_to(app)))}
+               if p.is_file() and product_file(str(p.relative_to(app)))}
     original = {}
     with tarfile.open(previous, 'r:gz') as tar:
         for member in tar.getmembers():
-            if member.isfile() and member.name.startswith('app/') and product(member.name[4:]):
+            if member.isfile() and member.name.startswith('app/') and product_file(member.name[4:]):
                 original[member.name[4:]] = hashlib.sha256(tar.extractfile(member).read()).hexdigest()
     rows = [dict(path=name, previous_sha256=original.get(name), candidate_sha256=current.get(name),
                  equal=original.get(name) == current.get(name)) for name in sorted(set(current) | set(original))]
@@ -156,7 +153,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', default='HEAD')
-    parser.add_argument('--version', type=version_number, default='v0.2.0')
+    parser.add_argument('--version', type=version_number, default='v0.3.0')
     parser.add_argument('--kind', choices=['candidate', 'release'], default='candidate')
     parser.add_argument('--previous-program', type=Path)
     build(parser.parse_args())

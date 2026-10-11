@@ -32,6 +32,28 @@ def run(*args):
     return subprocess.check_output(args, cwd=ROOT, text=True).strip()
 
 
+def grafana_inputs(app, cache, offline=False):
+    """Use the candidate's pins for both cached inputs and official downloads."""
+    manifest = json.loads((app / 'grafana/components.json').read_text())
+    cache.mkdir(parents=True, exist_ok=True)
+    result = []
+    for item in [manifest['grafana']] + manifest['plugins']:
+        target = cache / item['file']
+        if not target.is_file():
+            if offline:
+                raise ValueError('missing offline Grafana input: ' + item['file'])
+            partial = target.with_name(target.name + '.partial')
+            with urllib.request.urlopen(item['url'], timeout=60) as response, partial.open('wb') as stream:
+                shutil.copyfileobj(response, stream)
+            if digest(partial) != item['sha256']:
+                raise ValueError('Grafana download checksum mismatch: ' + item['file'])
+            partial.replace(target)
+        if digest(target) != item['sha256']:
+            raise ValueError('Grafana input checksum mismatch: ' + item['file'])
+        result.append((target, item))
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -39,6 +61,8 @@ def main():
     parser.add_argument('--python-source', type=Path, required=True)
     parser.add_argument('--wheel-dir', type=Path, action='append', required=True)
     parser.add_argument('--postgres-source', type=Path)
+    parser.add_argument('--grafana-files', type=Path, required=True,
+                        help='Cache for official pinned Grafana/plugin downloads; verified before inclusion')
     parser.add_argument('--release-dir', type=Path, required=True,
                         help='Output of build_release.py; includes the separate verification kit')
     parser.add_argument('--source-manifest', type=Path,
@@ -69,6 +93,9 @@ def main():
 
     add(args.python_source, 'sources/Python-3.13.16.tgz', '3.13.16',
         'https://www.python.org/ftp/python/3.13.16/Python-3.13.16.tgz', PY_SHA)
+    for path, item in grafana_inputs(args.release_dir / 'app', args.grafana_files,
+                                    offline=bool(args.source_manifest)):
+        add(path, 'grafana/' + item['file'], item['version'], item['url'], item['sha256'])
     pg = args.postgres_source
     if pg is None:
         pg = out / 'postgresql-download.tmp'

@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+from verify_package import product_file
 
 
 def save(path, value):
@@ -142,7 +143,7 @@ def build_counts(result):
 
 def product_files(metadata):
     return {name: digest for name, digest in metadata['files'].items()
-            if name.startswith(('sql_apm/', 'rules/')) or name in ('requirements.txt', 'scripts/db/initialize.sh')}
+            if product_file(name)}
 
 
 def verify_baseline(metadata, baseline):

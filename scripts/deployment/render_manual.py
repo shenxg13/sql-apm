@@ -14,6 +14,7 @@ from markdown.extensions.toc import slugify_unicode
 DOCUMENTS = {
     'INSTALL.html': dict(title='安装与操作手册', sources=(
         'docs/runbooks/kylin-offline-deployment.md',
+        'docs/runbooks/daily-run.md',
         'docs/runbooks/configuration-guide.md',
         'docs/runbooks/kylin-validation-record.md')),
     'DATABASE.html': dict(title='数据库结构说明', sources=(
@@ -22,8 +23,10 @@ DOCUMENTS = {
         'docs/design/database-structure/import.svg',
         'docs/design/database-structure/snapshot.svg',
         'docs/design/database-structure/build.svg')),
+    'SEARCH.html': dict(title='检索与看板使用指南', sources=(
+        'docs/runbooks/search-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v0.2.0.md',)),
+        'docs/releases/v0.3.0.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''

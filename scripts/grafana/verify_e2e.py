@@ -172,14 +172,16 @@ class Browser:
         started = time.monotonic()
         self.page.goto(self.env.base + path)
         self.settle(extra)
-        self.loaded_seconds = time.monotonic() - started - extra / 1000
+        self.loaded_seconds = time.monotonic() - started
+        self.observation_wait_seconds = extra / 1000
         return self
 
     def cost(self):
         """Queries of the last page load: how many, their summed and slowest time, and the wall time."""
         known = [value for _, value in self.timings if value >= 0]
         return dict(queries=len(self.timings), summed_seconds=round(sum(known) / 1000, 2),
-                    slowest_seconds=round(max(known) / 1000, 2) if known else 0, wall_seconds=round(self.loaded_seconds, 2))
+                    slowest_seconds=round(max(known) / 1000, 2) if known else 0, wall_seconds=round(self.loaded_seconds, 2),
+                    minimum_observation_wait_seconds=self.observation_wait_seconds)
 
     def rows(self, board, title, ref='A', frame=0):
         key = (board, 'panel ' + str(self.env.panel(board + '.json', title)['id']), ref)
@@ -245,7 +247,7 @@ class Browser:
     def mode(self):
         return self.page.evaluate("() => (document.querySelector('input[data-testid^=\"data-testid radio-button-option\"]:checked') || {}).getAttribute('data-testid')").rsplit(' ', 1)[1]
 
-    def search(self, text, mode, then=None):
+    def search(self, text, mode, then=None, *, fresh_results=False):
         self.type_sql(text, then)
         self.page.get_by_test_id('data-testid radio-button-option ' + mode).click(force=True)
         note, listed = [('mpp-search', 'panel ' + str(self.env.panel('mpp-search.json', title)['id']), 'A') for title in ('这次检索', '结果')]
@@ -261,12 +263,14 @@ class Browser:
             answered = lambda key: key in self.results or key in [failed for failed, _ in self.failures]
             waited = 0
             for _ in range(600):
-                if answered(note) and (answered(listed) or waited >= 15):
+                if answered(note) and (answered(listed) or (not fresh_results and waited >= 15)):
                     break
                 waited += 1 if answered(note) else 0
                 self.page.wait_for_timeout(200)
-            if not answered(listed) and shown is not None:
+            if not fresh_results and not answered(listed) and shown is not None:
                 self.results[listed] = shown
+            if fresh_results:
+                assert answered(note) and answered(listed), ('search response did not finish', self.failures[:2])
             self.page.wait_for_timeout(300)
 
     def close(self):
@@ -1591,17 +1595,30 @@ def real(env, play):
     text = env.one("SELECT t.text FROM mpp_sql_text t JOIN mpp_fingerprint f USING(sql_id) WHERE f.state='reliable' AND length(t.text) BETWEEN 200 AND 4000 "
                    "AND EXISTS (SELECT FROM mpp_occurrence o WHERE o.sql_id=t.sql_id) ORDER BY md5(t.sql_id) LIMIT 1")
     browser.open('/d/mpp-search/sql-search', extra=2000)
-    for mode, value in (('words', 'select'), ('words', 'select from where'), ('passage', 'select *'), ('words', 'zz_no_search_match_51'), ('exact', text)):
+    cases = [('words', 'select', 'known word', True),
+             ('words', 'select from where', 'several known words', True),
+             ('passage', text[:120], 'stored fragment', True),
+             ('exact', text, 'stored statement', True),
+             ('words', 'zz_no_search_match_issue52_20261011', 'absent word', False),
+             ('passage', 'zz_no_search_match_issue52_20261011', 'absent passage', False),
+             ('exact', 'SELECT missing_issue52_column FROM missing_issue52_relation_20261011', 'absent structure', False)]
+    for mode, value, label, hit in cases:
         started = time.monotonic()
         del browser.timings[:]
-        browser.search(value, mode)
-        elapsed = time.monotonic() - started - 1.5
+        # Each real case changes the query. A prior empty list is not this query's response.
+        browser.search(value, mode, fresh_results=True)
+        # The fixed observation wait can overlap a query; subtracting it understates elapsed time.
+        elapsed = time.monotonic() - started
         rows = browser.rows('mpp-search', '结果')
         known = [item for _, item in browser.timings if item >= 0]
-        entry = dict(page='search, ' + mode + (' (stored statement)' if mode == 'exact' else ': ' + value), rows=len(rows), queries=len(browser.timings),
-                     summed_seconds=round(sum(known) / 1000, 2), slowest_seconds=round(max(known) / 1000, 2) if known else 0, wall_seconds=round(elapsed, 2))
-        if mode == 'exact':
+        entry = dict(page='search, ' + mode + ', ' + label, expected_hit=hit, rows=len(rows), queries=len(browser.timings),
+                     summed_seconds=round(sum(known) / 1000, 2), slowest_seconds=round(max(known) / 1000, 2) if known else 0,
+                     wall_seconds=round(elapsed, 2), minimum_observation_wait_seconds=1.5)
+        assert not browser.failures and bool(rows) == hit, (mode, label, len(rows), browser.failures[:2])
+        if mode == 'exact' and hit:
             assert len(rows) == 1 and browser.variables()['xsql'] != '' and browser.variables()['xstate'] in ('has_baseline', 'records_without_baseline')
+        elif mode == 'exact':
+            assert browser.variables()['xstate'] == 'not_seen'
         report['pages'].append(entry)
         print('real search', entry, flush=True)
     browser.close()

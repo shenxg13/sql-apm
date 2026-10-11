@@ -77,10 +77,12 @@ def rows(path):
             yield key, values
 
 
-def compare_statistics(actual, actual_dir, expected, expected_dir):
+def compare_statistics(actual, actual_dir, expected, expected_dir, *, absolute_limit=LIMIT):
+    if absolute_limit not in (Decimal(0), LIMIT):
+        raise ValueError('statistics limit must be zero or the confirmed cross-machine limit')
     verify_values(actual_dir, actual)
     verify_values(expected_dir, expected)
-    report = dict(format=FORMAT, absolute_limit=str(LIMIT), passed=True, tables={})
+    report = dict(format=FORMAT, absolute_limit=str(absolute_limit), passed=True, tables={})
     for table in TABLES:
         a, b = actual[table], expected[table]
         result = dict(exact_fields_equal=exact_fields(actual)[table] == exact_fields(expected)[table],
@@ -110,7 +112,7 @@ def compare_statistics(actual, actual_dir, expected, expected_dir):
                     else:
                         delta = abs(value-original)
                         metric['different'] += delta != 0
-                        metric['exceeded'] += delta > LIMIT
+                        metric['exceeded'] += delta > absolute_limit
                         metric['max_absolute'] = max(delta, metric['max_absolute'])
                         different |= delta != 0
                 result['different_rows'] += different

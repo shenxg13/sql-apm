@@ -467,10 +467,34 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--directory', type=Path, required=True, help='setup_dev.py synthetic 使用的目录')
     parser.add_argument('--output', type=Path, help='截图和日志的私有目录，默认在 --directory 下')
+    parser.add_argument('--existing', action='store_true', help='only read existing real run records; connect with SQL_APM_DSN')
     args = parser.parse_args()
     output = (args.output or args.directory / 'e2e-status').resolve()
     output.mkdir(parents=True, exist_ok=True)
     env = e2e.Environment(args.directory.resolve(), output)
+    if args.existing:
+        db = connect(os.environ['SQL_APM_DSN'], env.state['schema'])
+        db.set_session(readonly=True)
+        started = time.monotonic()
+        try:
+            assert one(db, 'SELECT count(*) FROM mpp_daily_run') > 0, 'real daily evidence required'
+            with sync_playwright() as play:
+                browser = e2e.Browser(play, env, width=1920, height=920)
+                wanted = compare(env, browser, db, 'existing real target records')
+                cost = browser.cost()
+                browser.shot('status-existing-real')
+                browser.close()
+            _, live = env.api('GET', '/api/dashboards/uid/' + BOARD)
+            assert live['meta']['provisioned'] and live['meta']['folderUid'] == 'mpp'
+            assert {item['uid'] for item in env.api('GET', '/api/search?type=dash-db&folderUIDs=mpp')[1]} == {
+                'mpp-search', 'mpp-list', 'mpp-detail', BOARD}
+            summary = dict(passed=True, readonly=True, base_tables_equal=True, open_problems=len(wanted),
+                           seconds=round(time.monotonic() - started, 2), **cost)
+            (output / 'real-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+            print('RESULT: existing real run-status page equals the base tables; ' + json.dumps(summary), flush=True)
+        finally:
+            db.close()
+        return 0
     assert env.state['data'] == 'synthetic', 'synthetic environments only'
     started = time.time()
     with sync_playwright() as play:

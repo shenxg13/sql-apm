@@ -17,6 +17,26 @@ from sql_apm.training.config import validate, THRESHOLDS
 
 GUIDE = 'docs/runbooks/configuration-guide.md'
 STRUCTURE = 'docs/design/database-structure.md'
+QUERIES = 'docs/runbooks/search-guide.md'
+
+
+def query_signatures(root):
+    """Read complete declared signatures, including defaults and TABLE columns."""
+    source = (root / 'sql_apm/storage/schema.sql').read_text()
+    pattern = r'(CREATE OR REPLACE FUNCTION (mpp_(?:query|view|daily|search)_\w+)\([\s\S]*?\)\s*RETURNS [\s\S]*?)\s*LANGUAGE\b'
+    rows = re.findall(pattern, source)
+    result = {name: ' '.join(signature.split()) for signature, name in rows}
+    if not result or len(result) != len(rows):
+        raise ValueError('missing or duplicate query function signatures')
+    return result
+
+
+def check_queries(root, source):
+    blocks = re.findall(r'<!-- query-function:(\w+) -->\s*```sql\n(.*?)\n```', source, re.S)
+    documented = {name: ' '.join(signature.split()) for name, signature in blocks}
+    if len(documented) != len(blocks) or documented != query_signatures(root):
+        raise ValueError('documented query functions, parameters or return columns differ from schema')
+    return dict(functions=len(documented), signatures_equal=True)
 
 
 def read_keys(root):
@@ -175,7 +195,7 @@ def check_paths(root):
     rules = json.loads((root / 'scripts/deployment/package-files.json').read_text())
     patterns = rules['program'] + rules['verification']
     paths = set()
-    for name in ('docs/runbooks/kylin-offline-deployment.md', GUIDE):
+    for name in ('docs/runbooks/kylin-offline-deployment.md', GUIDE, 'docs/runbooks/daily-run.md'):
         source = (root / name).read_text()
         # These explicit spans are read only on the development machine.
         source = re.sub(r'<!-- developer-only:start -->.*?<!-- developer-only:end -->', '', source, flags=re.S)
@@ -188,6 +208,7 @@ def check_paths(root):
 
 def check(root=ROOT):
     return dict(configuration=check_guide(root, (root / GUIDE).read_text()),
+                queries=check_queries(root, (root / QUERIES).read_text()),
                 structure=check_structure(root, (root / STRUCTURE).read_text()), paths=check_paths(root))
 
 

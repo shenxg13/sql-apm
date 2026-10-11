@@ -2306,33 +2306,33 @@
   "html_browser_source_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
   "final_candidate_artifacts": {
     "passed": true,
-    "commit": "455b41303c7303842afd52d6d164ba8b9d12e886",
+    "commit": "4c403fe56192a1b3f27d7e32d390918c782ff5f4",
     "artifacts": {
       "release/sql-apm-v0.3.0.tar.gz": {
-        "bytes": 486968,
-        "sha256": "b7a394e5953f3caf6f1c98931d0a211ad2ef832b0bdf4ee54cdab07d60a578f0",
+        "bytes": 487976,
+        "sha256": "a8c2ddd6cc1f180184c56c2f80cee54ef1d57140899e61c12e6ca348c350edeb",
         "repeat_byte_identical": true
       },
       "release/sql-apm-verification-v0.3.0.tar.gz": {
-        "bytes": 341911,
-        "sha256": "8a7d4ac07cd4225fe48306eeee0ce8f548da3ad01521b2f361497ae5732a6070",
+        "bytes": 341908,
+        "sha256": "919dc66d39cd9da6cc78baa003f81f5152f1022865eda8e9d30b01c922fed37b",
         "repeat_byte_identical": true
       },
       "offline-bundle.tar.gz": {
-        "bytes": 972416384,
-        "sha256": "e0104abbd4de3ac7194c432fe73a9e342cfea7d3102e648d4782a7f74cb0a531",
+        "bytes": 972419367,
+        "sha256": "a3b9d814b16e351e2feb4d3c0a2501c67719af302e33c1f6c57a76fe54370472",
         "repeat_byte_identical": true
       }
     },
     "product_files_equal": 111,
     "comparison_method": "streaming byte-for-byte; both builds retained",
-    "comparison_record_sha256": "07d23477ae95cce563d11df3d95a773f2f8e59d34ecbf9376cb4490a4c3ef5fa",
+    "comparison_record_sha256": "c03265e3412ee52347fb596c2d52970ef3b896d91b2bd625c3ec8e62df855d6b",
     "html_browser_record_sha256": "bc6dfb6d1edef30057d3365e1150fd9cd282c33ae3e8f81321cb1aeabebd7f74",
     "offline_harness": {
       "passed": true,
       "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
     },
-    "evidence_only_followup": "Following report and navigation changes are outside package/HTML inputs."
+    "evidence_only_followup": "Subsequent report and knowledge-log changes are outside package/HTML inputs; continuity is recorded at handoff."
   },
   "user_round_initial_probe": {
     "completed": true,
@@ -3942,5 +3942,172 @@
       "用户界面结论来自本次用户明确确认，未冒充本次实施方浏览器自动化结果。",
       "本轮耗时来自数据库运行记录，未额外采集主机或进程内存。"
     ]
+  },
+  "r1_remediation": {
+    "review_id": "review-52-56-R1-20261011",
+    "review_evidence_url": "https://github.com/shenxg13/sql-apm/pull/56#issuecomment-6109436702",
+    "review_handoff_url": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6109436481",
+    "initial_head_sha": "652f6dbc8b7f5a9882b102d089713238d1db2f5a",
+    "candidate_commit": "4c403fe56192a1b3f27d7e32d390918c782ff5f4",
+    "state": "implementation_repairs_verified_independent_review_pending",
+    "findings": [
+      {
+        "finding_id": "F-52-001",
+        "implementation": "Release results now include the completed user round, bounded threshold acceptance and unchanged strict failure; publication remains readable after release.",
+        "files": [
+          "docs/releases/v0.3.0.md"
+        ]
+      },
+      {
+        "finding_id": "F-52-002",
+        "implementation": "Self-built dashboard guidance now lists each recorded text transformation and the corresponding preservation method.",
+        "files": [
+          "docs/runbooks/search-guide.md"
+        ]
+      }
+    ],
+    "related_document_corrections": [
+      "docs/runbooks/program-release.md",
+      "docs/README.md",
+      "docs/runbooks/kylin-offline-deployment.md"
+    ],
+    "validation_machine_accessed": false,
+    "product_comparisons": {
+      "installed_B1": {
+        "all_equal": true,
+        "files": 111,
+        "record_sha256": "92277226dbcce4188fc6711d75a999a7b2e7c67165fa9ae3ac8e44225265a841",
+        "previous_program_sha256": "285d98f6bd0d07535b292fe83227e6270f667dd73bc6b5eae830806716ed0b2e"
+      },
+      "previous_document_candidate": {
+        "all_equal": true,
+        "files": 111,
+        "record_sha256": "47a868b886da8b80db572712021e2c679f956d2b0063ba3a512683d3ed572356",
+        "previous_program_sha256": "b7a394e5953f3caf6f1c98931d0a211ad2ef832b0bdf4ee54cdab07d60a578f0"
+      }
+    },
+    "bundle_manifest_files": 422,
+    "bundle_files_verified": true,
+    "installed_package": {
+      "passed": true,
+      "version": "v0.3.0",
+      "kind": "candidate",
+      "commit": "4c403fe56192a1b3f27d7e32d390918c782ff5f4",
+      "files": 120
+    },
+    "html_checks": {
+      "DATABASE.html": {
+        "anchors": 27,
+        "code_blocks": 0,
+        "external_resource_requests": 0,
+        "links": 29
+      },
+      "INSTALL.html": {
+        "anchors": 65,
+        "code_blocks": 73,
+        "external_resource_requests": 0,
+        "links": 78
+      },
+      "RELEASE.html": {
+        "anchors": 7,
+        "code_blocks": 0,
+        "external_resource_requests": 0,
+        "links": 14
+      },
+      "SEARCH.html": {
+        "anchors": 68,
+        "code_blocks": 58,
+        "external_resource_requests": 0,
+        "links": 70
+      }
+    },
+    "html_browser": {
+      "passed": true,
+      "external_requests": [],
+      "browser_errors": [],
+      "documents": {
+        "INSTALL": {
+          "code_blocks": 73,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "DATABASE": {
+          "code_blocks": 0,
+          "images": 4,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "SEARCH": {
+          "code_blocks": 58,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "RELEASE": {
+          "code_blocks": 0,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        }
+      }
+    },
+    "document_commands": {
+      "docs/runbooks/kylin-offline-deployment.md": {
+        "code_blocks_unchanged": true,
+        "count": 48
+      },
+      "docs/runbooks/search-guide.md": {
+        "code_blocks_unchanged": true,
+        "count": 58
+      }
+    },
+    "affected_content_check": {
+      "passed": true,
+      "verification_files": 87,
+      "verification_changed_only": [
+        "verification/PROGRAM_COMMIT",
+        "verification/SHA256SUMS"
+      ],
+      "release_acceptance_text_present": true,
+      "search_preservation_advice_present": true
+    },
+    "checks": {
+      "documents": {
+        "passed": true,
+        "log_sha256": "625048a3c58ed723c7214b74e02b779197af5370f682eda84e3ef5bfe9fd905e"
+      },
+      "deployment_regressions": {
+        "passed": true,
+        "tests": 37,
+        "log_sha256": "8b204dae1d61ed838418c52248e915bae31e7436546941db0f0604f5041e4285"
+      },
+      "offline_harness": {
+        "passed": true,
+        "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
+      },
+      "html_browser": {
+        "passed": true,
+        "record_sha256": "bc6dfb6d1edef30057d3365e1150fd9cd282c33ae3e8f81321cb1aeabebd7f74"
+      },
+      "affected_content": {
+        "passed": true,
+        "record_sha256": "a22d9c79cb97870f3c89e5bceb0764099494c5d019285e03ac0ddb9fc6e40ae3"
+      },
+      "document_commands": {
+        "passed": true,
+        "record_sha256": "f4e5d14f9c96b845380d9f5f17015013abf07320ee83fa631c07594b960f9948"
+      }
+    },
+    "evidence_directory": "var/issue52/r1-remediation-1",
+    "non_blocking_review_notes": {
+      "1": "Corrected stale user nine-task wording in release runbook and document index.",
+      "2": "Changed snapshot narrative to reusable conditional instructions without changing command blocks.",
+      "3": "Preserved disclosure of no separate manual repeat run and no user-round memory sampling.",
+      "4": "Existing path-check scope remains scripts/; no checker change. R1 confirmed daily script and referenced data exist in the packages.",
+      "5": "README preparation wording remains accurate until R18 publication and will be updated then.",
+      "6": "Memory measurement remains an observation; no unverified causal explanation added."
+    },
+    "knowledge_sync": "No durable requirement or product behavior change; accepted rules remain in the existing topic pages. Corrected runbooks and evidence are linked from the knowledge log."
   }
 }

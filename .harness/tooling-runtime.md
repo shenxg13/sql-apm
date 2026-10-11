@@ -23,16 +23,91 @@ passwords or credential files, or install tools merely to diagnose availability.
 | --- | --- |
 | Offline tool availability and versions | `scripts/quality/check.sh --check-tools-only` |
 | Offline quality and workflow regressions | `scripts/quality/check.sh` |
+| Project-owned business checks | `scripts/quality/project_checks.sh` |
+| Pinned lint tools in a repository-local directory | `scripts/quality/install_local_tools.sh` |
 | Template files and references | `scripts/quality/check_template.sh` |
 | Issue lifecycle, after GitHub connection | `scripts/github/issue_status.sh` |
 | Live PR contract | `scripts/github/pr_contract.sh` |
 | Local review JSON structure | `scripts/github/review_convergence.sh RECORD.json` |
 
 The [tool runbook](../docs/runbooks/issue-pr-quality-tooling.md) owns installation.
+The Linux x86_64 local installer downloads from the network and stages tools
+beside its target, `var/harness-tools` by default. It accepts one relative or
+absolute directory, rejects an existing target, a final `.` or `..` component,
+unknown options and extra arguments before writing, and cleans staging files on failure. Run it when
+installation is authorized, not to diagnose availability. It does not change
+`PATH`, system directories or the user's npm cache or global prefix; scope the
+tool-path override to the command:
+
+```bash
+PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
+```
+
 Default checks use simulated GitHub clients and need neither a real `gh` binary
 nor GitHub authentication. Live modes require `gh` and authorized network access.
 A project's language runtime and service requirements belong in its wiki and
-runbooks. No business interpreter, database or search service is a harness default.
+runbooks. No business interpreter, database or search service is a harness
+default: `scripts/quality/check.sh` never runs the project-owned entry, and CI
+runs that entry as a separate step.
+
+## Worktrees And Local Resources
+
+Git worktrees share repository objects and refs, but ignored tools, dependencies,
+evidence and data are local to each directory; creating a worktree does not copy
+or share them. Never assume the main checkout's `var/` exists in a new worktree.
+
+Compatible check tools can be installed once in a shared directory outside all
+worktrees and reused through a command-scoped absolute `PATH`. When installation
+is authorized, the local installer accepts that external path as its argument.
+For example (choose a new shared target for installation):
+
+```bash
+shared_tools="$(dirname "$(git rev-parse --show-toplevel)")/harness-tools"
+scripts/quality/install_local_tools.sh "$shared_tools"
+PATH="$shared_tools/bin:$PATH" scripts/quality/check.sh
+```
+
+For an existing compatible installation, omit installation and use its absolute
+`bin` path from each worktree. Check the declared tool versions; do not replace
+or clean a shared installation while another session uses it. Filesystem and
+network authorization still apply to an external installation.
+
+An installation in the main checkout's default location, `var/harness-tools`,
+can be reused the same way from the main checkout, its subdirectories and its
+linked worktrees. Inside a worktree `git rev-parse --show-toplevel` returns the
+worktree's own root, so resolve the main checkout from the shared Git directory
+and scope the tool path to the command:
+
+```bash
+main_root=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+PATH="$main_root/var/harness-tools/bin:$PATH" scripts/quality/check.sh
+```
+
+Before reusing it, confirm that `$main_root/var/harness-tools/bin` exists, then
+check the versions with `scripts/quality/check.sh --check-tools-only` under the
+same command-scoped `PATH`. When the directory is absent, install only when
+installation is authorized, not to diagnose availability.
+
+Run without an argument inside a worktree, the installer targets that worktree's
+own `var/harness-tools`, which is lost when the worktree is cleaned up. To
+install once for every worktree, pass the path under the main checkout:
+
+```bash
+main_root=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+scripts/quality/install_local_tools.sh "$main_root/var/harness-tools"
+```
+
+This lookup applies only to linked worktrees of the same repository. A
+standalone clone has its own Git directory, so the command resolves to the clone
+itself and cannot find the original checkout.
+
+Both locations follow the same rules: check the declared tool versions, and do
+not replace or clean an installation while another session uses it.
+
+Projects declare in their own runbooks which local resources can be shared and
+which require exclusive use or separate allocation, including ports, databases
+and data directories. A worktree alone does not isolate those resources. Preserve
+ignored evidence/data before [worktree cleanup](workflows/github-planning.md#worktree-cleanup).
 
 ## Phase And Quality Boundaries
 

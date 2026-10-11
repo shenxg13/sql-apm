@@ -32,6 +32,7 @@
 - [Agent 开发流程](architecture/agent-development-harness.md)与[工程原则](decisions/engineering-principles.md)：协作及工程边界。
 - [开发说明](../docs/runbooks/local-development.md)：环境准备与实际检查命令。
 - [原始资料](raw/sql-baseline.md)：按字节保留的讨论输入；[来源和确认边界](decisions/project-scope.md#原始资料)。
-- [知识日志](log.md)：历史确认与修订的追溯记录，不作为当前要求的替代。
+- [知识日志目录](log/)：新变更按文件名排序阅读；[旧知识日志](log.md)冻结保留历史确认与修订，不作为当前要求的替代。
+- [流程更新目录](../.harness/update-log/)：模板采用与协作流程变更；[旧流程日志](../.harness/update-log.md)保留冻结历史。
 - [知识规范](schema.md)：新增或调整知识实体时使用。
 - [本次重组与完整性核对](../docs/reports/knowledge-reorganization-2026-09-25.md)：原章节的迁移位置和检查证据。

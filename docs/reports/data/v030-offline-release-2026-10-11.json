@@ -2,7 +2,7 @@
   "format": 1,
   "version": "v0.3.0",
   "schema": "1.12.0",
-  "state": "agent_first_round_and_daily_followup_complete_user_round_pending",
+  "state": "agent_first_round_and_copy_followup_complete_user_source_pull_round_pending",
   "not_for_production": true,
   "product_files": 111,
   "source_rounds": {
@@ -690,6 +690,7 @@
     }
   },
   "pending": [
+    "user_source_pull_flow",
     "user_manual_full_round",
     "two_round_candidate_product_identity",
     "review",
@@ -2308,33 +2309,33 @@
   "html_browser_source_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
   "final_candidate_artifacts": {
     "passed": true,
-    "commit": "43a19acc7e0fa827ad7fcb9770a4a2a3f9926fe5",
+    "commit": "455b41303c7303842afd52d6d164ba8b9d12e886",
     "artifacts": {
       "release/sql-apm-v0.3.0.tar.gz": {
-        "bytes": 485620,
-        "sha256": "537f3a3c566d77633f24d3117a9d0ff9d072834191fbe6ca1c17b93fc96d2bfa",
+        "bytes": 486968,
+        "sha256": "b7a394e5953f3caf6f1c98931d0a211ad2ef832b0bdf4ee54cdab07d60a578f0",
         "repeat_byte_identical": true
       },
       "release/sql-apm-verification-v0.3.0.tar.gz": {
         "bytes": 341911,
-        "sha256": "f000f60c5d7016b2a2c036a3f78ac981c8b20ae7ab588cacdb4ee5ae2e72d634",
+        "sha256": "8a7d4ac07cd4225fe48306eeee0ce8f548da3ad01521b2f361497ae5732a6070",
         "repeat_byte_identical": true
       },
       "offline-bundle.tar.gz": {
-        "bytes": 972416254,
-        "sha256": "a60241878de862ead582000ed211680ade438460f95c096cfa3cefab8ad83cc8",
+        "bytes": 972416384,
+        "sha256": "e0104abbd4de3ac7194c432fe73a9e342cfea7d3102e648d4782a7f74cb0a531",
         "repeat_byte_identical": true
       }
     },
     "product_files_equal": 111,
-    "comparison_method": "streaming byte-for-byte; both completed builds retained",
-    "comparison_record_sha256": "397808cbaf9e2fbeb85a46e70373c3bf9753101964c0aca9bfe32e5ddc27b8b9",
-    "html_browser_record_sha256": "5be220017a69562000657214bab92c6505b8cc590fdf380b461f7b354f912282",
+    "comparison_method": "streaming byte-for-byte; both builds retained",
+    "comparison_record_sha256": "07d23477ae95cce563d11df3d95a773f2f8e59d34ecbf9376cb4490a4c3ef5fa",
+    "html_browser_record_sha256": "bc6dfb6d1edef30057d3365e1150fd9cd282c33ae3e8f81321cb1aeabebd7f74",
     "offline_harness": {
       "passed": true,
       "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
     },
-    "evidence_only_followup": "Subsequent evidence and knowledge updates are outside all package and HTML inputs."
+    "evidence_only_followup": "Following report and navigation changes are outside package/HTML inputs."
   },
   "user_round_initial_probe": {
     "completed": true,
@@ -3535,5 +3536,134 @@
       "excluded_from_program_verification_and_html_sources": true,
       "note": "Candidate remains the fixed commit above; a following report-only commit records post-build evidence without changing any package input."
     }
+  },
+  "copy_flow_candidate_artifacts": {
+    "passed": true,
+    "commit": "43a19acc7e0fa827ad7fcb9770a4a2a3f9926fe5",
+    "artifacts": {
+      "release/sql-apm-v0.3.0.tar.gz": {
+        "bytes": 485620,
+        "sha256": "537f3a3c566d77633f24d3117a9d0ff9d072834191fbe6ca1c17b93fc96d2bfa",
+        "repeat_byte_identical": true
+      },
+      "release/sql-apm-verification-v0.3.0.tar.gz": {
+        "bytes": 341911,
+        "sha256": "f000f60c5d7016b2a2c036a3f78ac981c8b20ae7ab588cacdb4ee5ae2e72d634",
+        "repeat_byte_identical": true
+      },
+      "offline-bundle.tar.gz": {
+        "bytes": 972416254,
+        "sha256": "a60241878de862ead582000ed211680ade438460f95c096cfa3cefab8ad83cc8",
+        "repeat_byte_identical": true
+      }
+    },
+    "product_files_equal": 111,
+    "comparison_method": "streaming byte-for-byte; both completed builds retained",
+    "comparison_record_sha256": "397808cbaf9e2fbeb85a46e70373c3bf9753101964c0aca9bfe32e5ddc27b8b9",
+    "html_browser_record_sha256": "5be220017a69562000657214bab92c6505b8cc590fdf380b461f7b354f912282",
+    "offline_harness": {
+      "passed": true,
+      "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
+    },
+    "evidence_only_followup": "Subsequent evidence and knowledge updates are outside all package and HTML inputs."
+  },
+  "source_pull_handoff": {
+    "state": "documentation_and_readonly_preflight_passed_user_pull_flow_pending",
+    "scope_confirmation": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6106938039",
+    "candidate": {
+      "commit": "455b41303c7303842afd52d6d164ba8b9d12e886",
+      "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+      "product_files_equal": true,
+      "product_files": 111,
+      "product_comparisons_sha256": "45141df961982e444d003c5e8449fc59b7d684b9f71a22159e034f8f6207cdf7",
+      "artifacts": {
+        "release/sql-apm-v0.3.0.tar.gz": {
+          "bytes": 486968,
+          "sha256": "b7a394e5953f3caf6f1c98931d0a211ad2ef832b0bdf4ee54cdab07d60a578f0",
+          "repeat_byte_identical": true
+        },
+        "release/sql-apm-verification-v0.3.0.tar.gz": {
+          "bytes": 341911,
+          "sha256": "8a7d4ac07cd4225fe48306eeee0ce8f548da3ad01521b2f361497ae5732a6070",
+          "repeat_byte_identical": true
+        },
+        "offline-bundle.tar.gz": {
+          "bytes": 972416384,
+          "sha256": "e0104abbd4de3ac7194c432fe73a9e342cfea7d3102e648d4782a7f74cb0a531",
+          "repeat_byte_identical": true
+        }
+      }
+    },
+    "source": {
+      "passed": true,
+      "reverse_ssh_batch_mode": true,
+      "strict_host_key_checking": true,
+      "source_files_verified": 55,
+      "source_sha256_log_sha256": "5c4c7a2a006335e1769f86ccce79a8046bfcaa0870143e7c654f100d434d46b5",
+      "source_mutated": false,
+      "target_config_and_inbox_absent_at_probe": true,
+      "log_files_pulled": false,
+      "daily_run_executed": false
+    },
+    "configuration": {
+      "passed": true,
+      "shell_blocks_parsed": 48,
+      "installed_verification_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+      "configuration_matches_previous_rehearsal": true,
+      "empty_inbox": true,
+      "no_markers_created": true,
+      "source_partitions": {
+        "first_files": 39,
+        "first_days": 30,
+        "incremental_files": 16,
+        "incremental_days": 6
+      },
+      "existing_directories_refused": true,
+      "no_database_commands_run": true
+    },
+    "html_browser": {
+      "passed": true,
+      "external_requests": [],
+      "browser_errors": [],
+      "documents": {
+        "INSTALL": {
+          "code_blocks": 73,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "DATABASE": {
+          "code_blocks": 0,
+          "images": 4,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "SEARCH": {
+          "code_blocks": 58,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "RELEASE": {
+          "code_blocks": 0,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        }
+      }
+    },
+    "source_check_sha256": "3f5649def101a9a2212e33c58fac4479e3707fac990f4b5261b1a070d4fcb9d5",
+    "configuration_check_sha256": "f269434773c6096a5f3f872ad9756d987d4a24468846ad437a82f8895657bd35",
+    "html_browser_sha256": "bc6dfb6d1edef30057d3365e1150fd9cd282c33ae3e8f81321cb1aeabebd7f74",
+    "document_contract_check": {
+      "passed": true,
+      "log_sha256": "625048a3c58ed723c7214b74e02b779197af5370f682eda84e3ef5bfe9fd905e"
+    },
+    "offline_harness": {
+      "passed": true,
+      "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
+    },
+    "user_pull_flow_executed": false,
+    "user_acceptance_completed": false
   }
 }

@@ -85,7 +85,7 @@
 | --- | --- | --- |
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
-| [Kylin 离线部署与 daily 验收](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线安装、账号、日志传输、daily 首批／追加与人工基准比较；实施方九任务见附录。 |
+| [Kylin 离线部署与 daily 验收](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线安装、账号、开发机日志分批拉取、daily 首批／追加与人工基准比较；实施方九任务见附录。 |
 | [配置指南](runbooks/configuration-guide.md) | 随包操作说明 | 按“想改什么”查全部配置键、默认值、影响及可执行示例。 |
 | [v0.3.0 发布说明](releases/v0.3.0.md) | 随包入口 | 全新安装、固定组件、每日运行、四份文档入口和验收边界；[v0.2.0](releases/v0.2.0.md) 保留历史记录。 |
 | [检索与看板使用指南](runbooks/search-guide.md) | 随包使用说明 | 三种检索、结果解释、查询函数契约与示例、自定义看板。 |

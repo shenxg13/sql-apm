@@ -2,7 +2,7 @@
   "format": 1,
   "version": "v0.3.0",
   "schema": "1.12.0",
-  "state": "agent_first_round_complete_daily_followup_running_user_round_pending",
+  "state": "agent_first_round_and_daily_followup_complete_user_round_pending",
   "not_for_production": true,
   "product_files": 111,
   "source_rounds": {
@@ -690,7 +690,6 @@
     }
   },
   "pending": [
-    "daily_followup_from_user_step8_snapshot",
     "user_manual_full_round",
     "two_round_candidate_product_identity",
     "review",
@@ -2309,6 +2308,1198 @@
   "html_browser_source_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
   "final_candidate_artifacts": {
     "passed": true,
+    "commit": "43a19acc7e0fa827ad7fcb9770a4a2a3f9926fe5",
+    "artifacts": {
+      "release/sql-apm-v0.3.0.tar.gz": {
+        "bytes": 485620,
+        "sha256": "537f3a3c566d77633f24d3117a9d0ff9d072834191fbe6ca1c17b93fc96d2bfa",
+        "repeat_byte_identical": true
+      },
+      "release/sql-apm-verification-v0.3.0.tar.gz": {
+        "bytes": 341911,
+        "sha256": "f000f60c5d7016b2a2c036a3f78ac981c8b20ae7ab588cacdb4ee5ae2e72d634",
+        "repeat_byte_identical": true
+      },
+      "offline-bundle.tar.gz": {
+        "bytes": 972416254,
+        "sha256": "a60241878de862ead582000ed211680ade438460f95c096cfa3cefab8ad83cc8",
+        "repeat_byte_identical": true
+      }
+    },
+    "product_files_equal": 111,
+    "comparison_method": "streaming byte-for-byte; both completed builds retained",
+    "comparison_record_sha256": "397808cbaf9e2fbeb85a46e70373c3bf9753101964c0aca9bfe32e5ddc27b8b9",
+    "html_browser_record_sha256": "5be220017a69562000657214bab92c6505b8cc590fdf380b461f7b354f912282",
+    "offline_harness": {
+      "passed": true,
+      "log_sha256": "4f8f54f5b1df3043ca322127355ba86b6f07beabdf8d11516012c123f70ddcc3"
+    },
+    "evidence_only_followup": "Subsequent evidence and knowledge updates are outside all package and HTML inputs."
+  },
+  "user_round_initial_probe": {
+    "completed": true,
+    "initial_snapshot_confirmed_by_user": true,
+    "tar_preinstalled": true,
+    "empty_deployment_directory": true,
+    "stdout_sha256": "8a9ec4c566da8d754b28233e973db00663b280c1cb4d61d3f56b344a5d3c8d22",
+    "local_evidence": "var/issue52/manual-round2/preflight-1"
+  },
+  "daily_followup": {
+    "state": "passed",
+    "scope_confirmation": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6105789589",
+    "snapshot": "user completed steps 1-8, saved snapshot and rebooted",
+    "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+    "installed_files_verified": 120,
+    "business_schema": "sql_apm",
+    "schema_base_tables": 62,
+    "initial_business_tables_empty": true,
+    "postgres_started_manually": true,
+    "resident_services_active_after_reboot": true,
+    "user_install_records_backup": {
+      "files": 15,
+      "bytes": 1637713,
+      "all_file_hashes_match": true,
+      "manifest_sha256": "35b34a22c57967ff1935cd1485cfe3fb7effa7cff0638c09f4a4ef4239bbccf7"
+    },
+    "manual_baseline_manifest_sha256": "8a2daaceed0c9b75f3b84df09abf9c228efaf0d7758ba17bb89ebcd32dcb01ee",
+    "manual_baseline_origin": "first target rehearsal manual-results, matched verified final backup",
+    "local_evidence": "var/issue52/daily-followup-1",
+    "user_acceptance_completed": false,
+    "backup": {
+      "files": 93,
+      "bytes": 622159370,
+      "manifest_sha256": "4c46e4c96da7d346e318371ba25c41983b8f9e2e7d8bf2c51fd17d9184f46fed",
+      "all_file_hashes_match": true,
+      "database_dump_included": false
+    },
+    "stages": {
+      "first": {
+        "resources": {
+          "seconds": 2438.379,
+          "returncode": 0,
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "process_peak_rss_bytes": 403619840,
+          "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+          "peak_used_bytes": 2037280768,
+          "peak_swap_used_bytes": 110886912,
+          "samples": 9722,
+          "oom_kills": 0
+        },
+        "before": {
+          "counts": {
+            "source_file": 0,
+            "import_attempt": 0,
+            "publication": 0
+          },
+          "publications": {},
+          "current": {},
+          "open_problems": 0,
+          "normalization_timeouts": "0",
+          "database_bytes": 13997747,
+          "free_disk_bytes": 165683699712
+        },
+        "after": {
+          "counts": {
+            "source_file": 39,
+            "import_attempt": 39,
+            "publication": 2
+          },
+          "publications": {
+            "119": 1,
+            "120": 1
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T134810:14318718b28b4bf2b5486e6e24b5a480",
+              "cutoff_date": "2026-07-28"
+            },
+            "120": {
+              "build_id": "B:20261011T141056:1ab9066aa4f44e019193ef9a4177ccdc",
+              "cutoff_date": "2026-09-16"
+            }
+          },
+          "open_problems": 6,
+          "normalization_timeouts": "0",
+          "database_bytes": 28603422387,
+          "free_disk_bytes": 134684643328
+        },
+        "passed": true,
+        "record_sha256": "3b23c35c852808e65ff6ff7e53f7597748302802b99d02e7572437ed9df8c93a",
+        "normalization_timeouts": 0,
+        "initial_collector_passed": false,
+        "readonly_recheck": {
+          "passed": true,
+          "command_repeated": false,
+          "original_record": "first.result.json",
+          "correction": "The first stage deliberately leaves six file dates without markers; exactly these notices are expected.",
+          "expected_notices": [
+            [
+              "files_without_marker",
+              "119",
+              "daily-119",
+              "2026-07-29",
+              2
+            ],
+            [
+              "files_without_marker",
+              "119",
+              "daily-119",
+              "2026-07-30",
+              1
+            ],
+            [
+              "files_without_marker",
+              "119",
+              "daily-119",
+              "2026-07-31",
+              1
+            ],
+            [
+              "files_without_marker",
+              "120",
+              "daily-120",
+              "2026-09-17",
+              4
+            ],
+            [
+              "files_without_marker",
+              "120",
+              "daily-120",
+              "2026-09-18",
+              4
+            ],
+            [
+              "files_without_marker",
+              "120",
+              "daily-120",
+              "2026-09-19",
+              4
+            ]
+          ],
+          "record_sha256": "52e4c1beb0400c2328cbec65cc461b6ae4fc0a0671943bf3756343239b98269b"
+        }
+      },
+      "incremental": {
+        "resources": {
+          "seconds": 2174.418,
+          "returncode": 0,
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "process_peak_rss_bytes": 389750784,
+          "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+          "peak_used_bytes": 2008797184,
+          "peak_swap_used_bytes": 125566976,
+          "samples": 8670,
+          "oom_kills": 0
+        },
+        "before": {
+          "counts": {
+            "source_file": 39,
+            "import_attempt": 39,
+            "publication": 2
+          },
+          "publications": {
+            "119": 1,
+            "120": 1
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T134810:14318718b28b4bf2b5486e6e24b5a480",
+              "cutoff_date": "2026-07-28"
+            },
+            "120": {
+              "build_id": "B:20261011T141056:1ab9066aa4f44e019193ef9a4177ccdc",
+              "cutoff_date": "2026-09-16"
+            }
+          },
+          "open_problems": 6,
+          "normalization_timeouts": 0,
+          "database_bytes": 28603201203,
+          "free_disk_bytes": 134684565504
+        },
+        "after": {
+          "counts": {
+            "source_file": 55,
+            "import_attempt": 55,
+            "publication": 4
+          },
+          "publications": {
+            "119": 2,
+            "120": 2
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T141819:030dcf0e02154151a802007d16ba6b59",
+              "cutoff_date": "2026-07-31"
+            },
+            "120": {
+              "build_id": "B:20261011T144153:e2b25a5d09ec479787746677f920b738",
+              "cutoff_date": "2026-09-19"
+            }
+          },
+          "open_problems": 0,
+          "normalization_timeouts": 0,
+          "database_bytes": 48449025715,
+          "free_disk_bytes": 114470871040
+        },
+        "passed": true,
+        "record_sha256": "722ecdeb253fd314ca316949768968e4286a796d8718e1d41c34e023c7826ef4",
+        "normalization_timeouts": 0
+      },
+      "repeat": {
+        "resources": {
+          "seconds": 0.253,
+          "returncode": 0,
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "process_peak_rss_bytes": 524288,
+          "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+          "peak_used_bytes": 1618366464,
+          "peak_swap_used_bytes": 111149056,
+          "samples": 2,
+          "oom_kills": 0
+        },
+        "before": {
+          "counts": {
+            "source_file": 55,
+            "import_attempt": 55,
+            "publication": 4
+          },
+          "publications": {
+            "119": 2,
+            "120": 2
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T141819:030dcf0e02154151a802007d16ba6b59",
+              "cutoff_date": "2026-07-31"
+            },
+            "120": {
+              "build_id": "B:20261011T144153:e2b25a5d09ec479787746677f920b738",
+              "cutoff_date": "2026-09-19"
+            }
+          },
+          "open_problems": 0,
+          "normalization_timeouts": 0,
+          "database_bytes": 48449025715,
+          "free_disk_bytes": 114470711296
+        },
+        "after": {
+          "counts": {
+            "source_file": 55,
+            "import_attempt": 55,
+            "publication": 4
+          },
+          "publications": {
+            "119": 2,
+            "120": 2
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T141819:030dcf0e02154151a802007d16ba6b59",
+              "cutoff_date": "2026-07-31"
+            },
+            "120": {
+              "build_id": "B:20261011T144153:e2b25a5d09ec479787746677f920b738",
+              "cutoff_date": "2026-09-19"
+            }
+          },
+          "open_problems": 0,
+          "normalization_timeouts": 0,
+          "database_bytes": 48449025715,
+          "free_disk_bytes": 114470662144
+        },
+        "passed": true,
+        "record_sha256": "0817b5abe181dc9775b5abba35e077b500294b8e8cd950aa260266fdf9ae583b",
+        "normalization_timeouts": 0
+      },
+      "delete": {
+        "resources": {
+          "seconds": 14.29,
+          "returncode": 0,
+          "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+          "process_peak_rss_bytes": 35176448,
+          "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+          "peak_used_bytes": 1633918976,
+          "peak_swap_used_bytes": 109576192,
+          "samples": 58,
+          "oom_kills": 0
+        },
+        "before": {
+          "counts": {
+            "source_file": 55,
+            "import_attempt": 55,
+            "publication": 4
+          },
+          "publications": {
+            "119": 2,
+            "120": 2
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T141819:030dcf0e02154151a802007d16ba6b59",
+              "cutoff_date": "2026-07-31"
+            },
+            "120": {
+              "build_id": "B:20261011T144153:e2b25a5d09ec479787746677f920b738",
+              "cutoff_date": "2026-09-19"
+            }
+          },
+          "open_problems": 0,
+          "normalization_timeouts": 0,
+          "database_bytes": 48449230515,
+          "free_disk_bytes": 114696728576
+        },
+        "after": {
+          "counts": {
+            "source_file": 55,
+            "import_attempt": 55,
+            "publication": 4
+          },
+          "publications": {
+            "119": 2,
+            "120": 2
+          },
+          "current": {
+            "119": {
+              "build_id": "B:20261011T141819:030dcf0e02154151a802007d16ba6b59",
+              "cutoff_date": "2026-07-31"
+            },
+            "120": {
+              "build_id": "B:20261011T144153:e2b25a5d09ec479787746677f920b738",
+              "cutoff_date": "2026-09-19"
+            }
+          },
+          "open_problems": 0,
+          "normalization_timeouts": 0,
+          "database_bytes": 48449246899,
+          "free_disk_bytes": 130512961536
+        },
+        "passed": true,
+        "record_sha256": "92fd3bf4d09346480665cd17adfd87a87ca9bc7b72ae4ab6450975ce062444c2",
+        "normalization_timeouts": 0
+      }
+    },
+    "manual_comparison": {
+      "passed": true,
+      "cross_machine": false,
+      "clusters": {
+        "119": {
+          "same_configuration_and_window": true,
+          "statistics": {
+            "format": "sql-apm-guide-statistics/1",
+            "absolute_limit": "0",
+            "passed": true,
+            "tables": {
+              "mpp_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 537198,
+                "expected_rows": 537198,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0"
+                  }
+                },
+                "passed": true
+              },
+              "mpp_observation_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 180,
+                "expected_rows": 180,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16"
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        "120": {
+          "same_configuration_and_window": true,
+          "statistics": {
+            "format": "sql-apm-guide-statistics/1",
+            "absolute_limit": "0",
+            "passed": true,
+            "tables": {
+              "mpp_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 5850925,
+                "expected_rows": 5850925,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-17"
+                  }
+                },
+                "passed": true
+              },
+              "mpp_observation_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 6748,
+                "expected_rows": 6748,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0"
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        }
+      },
+      "record_sha256": "d216eb362a51d650116e1319d2ec340c2ac5efb403738092f8d995540246bb09"
+    },
+    "deletion_comparison": {
+      "passed": true,
+      "cross_machine": false,
+      "clusters": {
+        "119": {
+          "same_configuration_and_window": true,
+          "statistics": {
+            "format": "sql-apm-guide-statistics/1",
+            "absolute_limit": "0",
+            "passed": true,
+            "tables": {
+              "mpp_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 537198,
+                "expected_rows": 537198,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0"
+                  }
+                },
+                "passed": true
+              },
+              "mpp_observation_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 180,
+                "expected_rows": 180,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-16"
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        },
+        "120": {
+          "same_configuration_and_window": true,
+          "statistics": {
+            "format": "sql-apm-guide-statistics/1",
+            "absolute_limit": "0",
+            "passed": true,
+            "tables": {
+              "mpp_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 5850925,
+                "expected_rows": 5850925,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-17"
+                  }
+                },
+                "passed": true
+              },
+              "mpp_observation_statistic": {
+                "exact_fields_equal": true,
+                "actual_rows": 6748,
+                "expected_rows": 6748,
+                "key_mismatches": 0,
+                "different_rows": 0,
+                "metrics": {
+                  "log_median": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0E-15"
+                  },
+                  "log_mad": {
+                    "different": 0,
+                    "null_mismatches": 0,
+                    "exceeded": 0,
+                    "max_absolute": "0.0"
+                  }
+                },
+                "passed": true
+              }
+            }
+          }
+        }
+      },
+      "record_sha256": "d216eb362a51d650116e1319d2ec340c2ac5efb403738092f8d995540246bb09"
+    },
+    "deletion_audit": {
+      "passed": true,
+      "original_files_checked_separately": true,
+      "clusters": {
+        "119": {
+          "build_state": "not_due",
+          "cleanup_state": "nothing",
+          "raw_state": "deleted",
+          "deleted_days": 29,
+          "deleted_files": 30,
+          "deleted_bytes": 4302628352,
+          "stage_seconds": {
+            "import": 0.025,
+            "cleanup": 0.005,
+            "raw_files": 4.001
+          },
+          "receiving_directory_empty": true
+        },
+        "120": {
+          "build_state": "not_due",
+          "cleanup_state": "nothing",
+          "raw_state": "deleted",
+          "deleted_days": 7,
+          "deleted_files": 25,
+          "deleted_bytes": 11513565461,
+          "stage_seconds": {
+            "import": 0.007,
+            "cleanup": 0.006,
+            "raw_files": 9.927
+          },
+          "receiving_directory_empty": true
+        }
+      },
+      "daily_publications": {
+        "119": 2,
+        "120": 2
+      },
+      "completed_builds": [
+        {
+          "cluster": "119",
+          "build_state": "published",
+          "cleanup_state": "nothing",
+          "raw_state": "disabled",
+          "stage_seconds": {
+            "import": 759.931,
+            "cleanup": 0.007,
+            "rebuild": 148.143,
+            "rebuild_stages": {
+              "build": 94.418,
+              "check": 2.099,
+              "publish": 0.003,
+              "snapshot": 51.557
+            }
+          }
+        },
+        {
+          "cluster": "120",
+          "build_state": "published",
+          "cleanup_state": "nothing",
+          "raw_state": "disabled",
+          "stage_seconds": {
+            "import": 1114.722,
+            "cleanup": 0.012,
+            "rebuild": 415.255,
+            "rebuild_stages": {
+              "build": 245.722,
+              "check": 14.933,
+              "publish": 0.004,
+              "snapshot": 154.514
+            }
+          }
+        },
+        {
+          "cluster": "119",
+          "build_state": "published",
+          "cleanup_state": "nothing",
+          "raw_state": "disabled",
+          "stage_seconds": {
+            "import": 110.426,
+            "cleanup": 0.008,
+            "rebuild": 136.76,
+            "rebuild_stages": {
+              "build": 111.926,
+              "check": 2.669,
+              "publish": 0.003,
+              "snapshot": 22.097
+            }
+          }
+        },
+        {
+          "cluster": "120",
+          "build_state": "published",
+          "cleanup_state": "nothing",
+          "raw_state": "disabled",
+          "stage_seconds": {
+            "import": 1140.87,
+            "cleanup": 0.01,
+            "rebuild": 785.982,
+            "rebuild_stages": {
+              "build": 591.164,
+              "check": 36.599,
+              "publish": 0.004,
+              "snapshot": 158.14
+            }
+          }
+        }
+      ],
+      "record_sha256": "e479175d9134428edb080a5f7e5d4450f6c40ed48a39b3de9eb094285814b503"
+    },
+    "stage_audit": {
+      "passed": true,
+      "stages": {
+        "first": {
+          "119": {
+            "publications": 1,
+            "cutoff_date": "2026-07-28",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          },
+          "120": {
+            "publications": 1,
+            "cutoff_date": "2026-09-16",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          }
+        },
+        "incremental": {
+          "119": {
+            "publications": 2,
+            "cutoff_date": "2026-07-31",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          },
+          "120": {
+            "publications": 2,
+            "cutoff_date": "2026-09-19",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          }
+        },
+        "repeat": {
+          "119": {
+            "publications": 2,
+            "cutoff_date": "2026-07-31",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          },
+          "120": {
+            "publications": 2,
+            "cutoff_date": "2026-09-19",
+            "version_chain_verified": true,
+            "normalization_timeouts": 0,
+            "normalization_worker_failures": 0
+          }
+        }
+      },
+      "snapshot_selections": {
+        "first": [
+          {
+            "completed_batches": 26,
+            "selected_batches": 26,
+            "excluded_batches": 0,
+            "window_fallback": false
+          },
+          {
+            "completed_batches": 4,
+            "selected_batches": 4,
+            "excluded_batches": 0,
+            "window_fallback": false
+          }
+        ],
+        "incremental": [
+          {
+            "completed_batches": 29,
+            "selected_batches": 28,
+            "excluded_batches": 1,
+            "window_fallback": false
+          },
+          {
+            "completed_batches": 7,
+            "selected_batches": 7,
+            "excluded_batches": 0,
+            "window_fallback": false
+          }
+        ]
+      },
+      "excluded_119_day": {
+        "date": "2026-07-01",
+        "file_last_log_at_before_window_start": true,
+        "window_start": "2026-07-02 00:00:00+08:00"
+      },
+      "record_sha256": "6fc8010b6bd92235805aa940849f614f93169f3da6932249bac8c2d0b2fbc398"
+    },
+    "fingerprint_logs": {
+      "passed": true,
+      "request_succeeded": true,
+      "loopback_readonly_configuration": true,
+      "request_records": 3,
+      "only_metadata_in_request_logs": true,
+      "record_sha256": "acb8c139371ca0408414f3be7fdb4f9481682d6c15e4f02e56743b2654664b58"
+    },
+    "installed_package": {
+      "passed": true,
+      "version": "v0.3.0",
+      "kind": "candidate",
+      "commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+      "files": 120,
+      "record_sha256": "2c2f588e407ae170433ed43fb336e27af3a541128c78f83c0cc9be1509792627"
+    },
+    "final_state": {
+      "passed": true,
+      "timer_disabled_after_test": true,
+      "grafana_active": true,
+      "fingerprint_active": true,
+      "postgresql_running": true,
+      "firewalld_inactive": true,
+      "record_sha256": "33e82707b0229ced5bb84a475de0c003222d7a86cbc3ec12c0b48e52d653b76b"
+    },
+    "mock_fetch": {
+      "passed": true,
+      "files": 2,
+      "markers": 2,
+      "not_in_daily_sources": true,
+      "record_sha256": "ab2d294a81bb41859e9b5beda0079a26adefcbae9c2647892ca42ae1bcf0fc54"
+    },
+    "timer": {
+      "passed": true,
+      "actual_trigger": "timer",
+      "run_seconds": 0.054092,
+      "counts_unchanged": true,
+      "versions_unchanged": true,
+      "record_sha256": "4127720b05fe48163f34e84da100f30049cd77cd463c13c03344e6bb406587da"
+    },
+    "browser": {
+      "search_list_detail": {
+        "samples": [
+          {
+            "kind": "most records",
+            "identity_records": 374838,
+            "identity_texts": 62473,
+            "timing": "execute_first",
+            "range_records": 29232,
+            "range_texts": 14616,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 21.64,
+            "slowest_seconds": 3.75,
+            "wall_seconds": 11.81,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "most original texts",
+            "identity_records": 374838,
+            "identity_texts": 62473,
+            "timing": "execute_first",
+            "range_records": 29232,
+            "range_texts": 14616,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 18.75,
+            "slowest_seconds": 2.39,
+            "wall_seconds": 10.63,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "failed records only",
+            "identity_records": 14643,
+            "identity_texts": 1,
+            "timing": "unknown",
+            "range_records": 14643,
+            "range_texts": 1,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 2.78,
+            "slowest_seconds": 0.89,
+            "wall_seconds": 6.81,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "extended protocol",
+            "identity_records": 903,
+            "identity_texts": 301,
+            "timing": "execute_first",
+            "range_records": 72,
+            "range_texts": 72,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 1.66,
+            "slowest_seconds": 0.8,
+            "wall_seconds": 6.55,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "insufficient samples",
+            "identity_records": 7,
+            "identity_texts": 7,
+            "timing": "request",
+            "range_records": 7,
+            "range_texts": 7,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 1.22,
+            "slowest_seconds": 0.75,
+            "wall_seconds": 6.24,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "random with requests",
+            "identity_records": 167,
+            "identity_texts": 1,
+            "timing": "request",
+            "range_records": 167,
+            "range_texts": 1,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 1.65,
+            "slowest_seconds": 0.77,
+            "wall_seconds": 6.24,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "kind": "random with requests",
+            "identity_records": 44977,
+            "identity_texts": 2,
+            "timing": "request",
+            "range_records": 11088,
+            "range_texts": 2,
+            "equal": true,
+            "queries": 24,
+            "summed_seconds": 2.83,
+            "slowest_seconds": 0.92,
+            "wall_seconds": 6.76,
+            "minimum_observation_wait_seconds": 4.0
+          }
+        ],
+        "pages": [
+          {
+            "page": "detail, 7 days, most records",
+            "queries": 24,
+            "summed_seconds": 21.64,
+            "slowest_seconds": 3.75,
+            "wall_seconds": 11.81,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, most original texts",
+            "queries": 24,
+            "summed_seconds": 18.75,
+            "slowest_seconds": 2.39,
+            "wall_seconds": 10.63,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, failed records only",
+            "queries": 24,
+            "summed_seconds": 2.78,
+            "slowest_seconds": 0.89,
+            "wall_seconds": 6.81,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, extended protocol",
+            "queries": 24,
+            "summed_seconds": 1.66,
+            "slowest_seconds": 0.8,
+            "wall_seconds": 6.55,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, insufficient samples",
+            "queries": 24,
+            "summed_seconds": 1.22,
+            "slowest_seconds": 0.75,
+            "wall_seconds": 6.24,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, random with requests",
+            "queries": 24,
+            "summed_seconds": 1.65,
+            "slowest_seconds": 0.77,
+            "wall_seconds": 6.24,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "detail, 7 days, random with requests",
+            "queries": 24,
+            "summed_seconds": 2.83,
+            "slowest_seconds": 0.92,
+            "wall_seconds": 6.76,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "list, 24 hours, one cluster",
+            "range_rows": 6342,
+            "equal": true,
+            "queries": 8,
+            "summed_seconds": 2.38,
+            "slowest_seconds": 0.67,
+            "wall_seconds": 6.45,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "list, 24 hours, one cluster",
+            "range_rows": 251248,
+            "equal": true,
+            "queries": 8,
+            "summed_seconds": 4.87,
+            "slowest_seconds": 2.0,
+            "wall_seconds": 7.85,
+            "minimum_observation_wait_seconds": 4.0
+          },
+          {
+            "page": "search, words, known word",
+            "expected_hit": true,
+            "rows": 50,
+            "queries": 4,
+            "summed_seconds": 5.77,
+            "slowest_seconds": 5.69,
+            "wall_seconds": 6.52,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, words, several known words",
+            "expected_hit": true,
+            "rows": 50,
+            "queries": 4,
+            "summed_seconds": 4.46,
+            "slowest_seconds": 4.41,
+            "wall_seconds": 5.07,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, passage, stored fragment",
+            "expected_hit": true,
+            "rows": 1,
+            "queries": 6,
+            "summed_seconds": 3.28,
+            "slowest_seconds": 1.72,
+            "wall_seconds": 2.07,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, exact, stored statement",
+            "expected_hit": true,
+            "rows": 1,
+            "queries": 14,
+            "summed_seconds": 0.17,
+            "slowest_seconds": 0.02,
+            "wall_seconds": 2.03,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, words, absent word",
+            "expected_hit": false,
+            "rows": 0,
+            "queries": 13,
+            "summed_seconds": 3.69,
+            "slowest_seconds": 1.77,
+            "wall_seconds": 2.06,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, passage, absent passage",
+            "expected_hit": false,
+            "rows": 0,
+            "queries": 5,
+            "summed_seconds": 2.47,
+            "slowest_seconds": 1.78,
+            "wall_seconds": 2.06,
+            "minimum_observation_wait_seconds": 1.5
+          },
+          {
+            "page": "search, exact, absent structure",
+            "expected_hit": false,
+            "rows": 0,
+            "queries": 12,
+            "summed_seconds": 0.17,
+            "slowest_seconds": 0.02,
+            "wall_seconds": 2.04,
+            "minimum_observation_wait_seconds": 1.5
+          }
+        ],
+        "record_sha256": "c958fbd6ef16f66ebf37d38fbcd77c6d6bc39c55b4298f9947284a78e4748c9d"
+      },
+      "status": {
+        "passed": true,
+        "readonly": true,
+        "base_tables_equal": true,
+        "open_problems": 0,
+        "seconds": 6.16,
+        "queries": 7,
+        "summed_seconds": 0.25,
+        "slowest_seconds": 0.06,
+        "wall_seconds": 3.93,
+        "minimum_observation_wait_seconds": 2.5,
+        "record_sha256": "6ef4030bb9fed7b011fb3597c33d071613a23fbc580bb0f9091954298c241fca"
+      }
+    },
+    "html_browser": {
+      "passed": true,
+      "external_requests": [],
+      "browser_errors": [],
+      "documents": {
+        "INSTALL": {
+          "code_blocks": 70,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "DATABASE": {
+          "code_blocks": 0,
+          "images": 4,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "SEARCH": {
+          "code_blocks": 58,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        },
+        "RELEASE": {
+          "code_blocks": 0,
+          "images": 0,
+          "internal_navigation": true,
+          "print_rendered": true
+        }
+      }
+    },
+    "resident_services": {
+      "active_throughout": true,
+      "pid_start_and_restarts_unchanged": true,
+      "initial_record_sha256": "6226cfd78b3f9266ecf679e1864990ca599bbe28a2e61812f6a970ff9d2d9600",
+      "final_record_sha256": "6226cfd78b3f9266ecf679e1864990ca599bbe28a2e61812f6a970ff9d2d9600"
+    },
+    "browser_database_connection": {
+      "passed": true,
+      "readonly_role": "sql_apm_ro",
+      "default_readonly": "on",
+      "statement_timeout": "2min",
+      "schema": "sql_apm",
+      "development_loopback_to_authorized_lan": true
+    },
+    "candidate": {
+      "commit": "43a19acc7e0fa827ad7fcb9770a4a2a3f9926fe5",
+      "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
+      "product_files_equal": true,
+      "product_files": 111,
+      "product_comparison_sha256": "b568413c4d90e80dd71f6743fa8d9cc27ad3fab389f14bdf75610d512f27f867",
+      "artifacts": {
+        "release/sql-apm-v0.3.0.tar.gz": {
+          "bytes": 485620,
+          "sha256": "537f3a3c566d77633f24d3117a9d0ff9d072834191fbe6ca1c17b93fc96d2bfa",
+          "repeat_byte_identical": true
+        },
+        "release/sql-apm-verification-v0.3.0.tar.gz": {
+          "bytes": 341911,
+          "sha256": "f000f60c5d7016b2a2c036a3f78ac981c8b20ae7ab588cacdb4ee5ae2e72d634",
+          "repeat_byte_identical": true
+        },
+        "offline-bundle.tar.gz": {
+          "bytes": 972416254,
+          "sha256": "a60241878de862ead582000ed211680ade438460f95c096cfa3cefab8ad83cc8",
+          "repeat_byte_identical": true
+        }
+      }
+    },
+    "manual_baseline_product_identity": "111 product paths/hashes matched the first target manual result and current candidate",
+    "cleanup_entry": {
+      "passed": true,
+      "pass_lines": 23,
+      "log_sha256": "e555d35ffb1b17521f762ca29d533dc36e77328458c3d5e3d229714e611944a4"
+    },
+    "collector_corrections": {
+      "first_stage_console_serialization": "SUM(bigint) returned Decimal; original command completed and resource/result files were saved before console output failed",
+      "first_stage_notices": "exactly six deliberately unmarked dates, checked with actual date and file count",
+      "readonly_recheck_passed": true,
+      "business_command_repeated": false,
+      "subsequent_collector_uses_bigint": true,
+      "record_sha256": "6c049a88670f21649544cccec0c9dd777364dfd3711737d89c8508edb7c68e4e",
+      "daily_selection": "Final 119 daily batches select 28 of 29; July 1 ends before July 2 window start. Preserved initial assertion failure and verified time bounds, no business rerun.",
+      "journal_permissions": "Preserved failed unprivileged journal collection; documented sudo and collected a new privileged log after the successful timer without rerunning it."
+    }
+  },
+  "user_installed_candidate_artifacts": {
+    "passed": true,
     "commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
     "artifacts": {
       "release/sql-apm-v0.3.0.tar.gz": {
@@ -2344,35 +3535,5 @@
       "excluded_from_program_verification_and_html_sources": true,
       "note": "Candidate remains the fixed commit above; a following report-only commit records post-build evidence without changing any package input."
     }
-  },
-  "user_round_initial_probe": {
-    "completed": true,
-    "initial_snapshot_confirmed_by_user": true,
-    "tar_preinstalled": true,
-    "empty_deployment_directory": true,
-    "stdout_sha256": "8a9ec4c566da8d754b28233e973db00663b280c1cb4d61d3f56b344a5d3c8d22",
-    "local_evidence": "var/issue52/manual-round2/preflight-1"
-  },
-  "daily_followup": {
-    "state": "running",
-    "scope_confirmation": "https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6105789589",
-    "snapshot": "user completed steps 1-8, saved snapshot and rebooted",
-    "installed_commit": "b1f6daf03dd2aae1ffd1b580066ef4d6217ce822",
-    "installed_files_verified": 120,
-    "business_schema": "sql_apm",
-    "schema_base_tables": 62,
-    "initial_business_tables_empty": true,
-    "postgres_started_manually": true,
-    "resident_services_active_after_reboot": true,
-    "user_install_records_backup": {
-      "files": 15,
-      "bytes": 1637713,
-      "all_file_hashes_match": true,
-      "manifest_sha256": "35b34a22c57967ff1935cd1485cfe3fb7effa7cff0638c09f4a4ef4239bbccf7"
-    },
-    "manual_baseline_manifest_sha256": "8a2daaceed0c9b75f3b84df09abf9c228efaf0d7758ba17bb89ebcd32dcb01ee",
-    "manual_baseline_origin": "first target rehearsal manual-results, matched verified final backup",
-    "local_evidence": "var/issue52/daily-followup-1",
-    "user_acceptance_completed": false
   }
 }

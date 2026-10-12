@@ -8,10 +8,14 @@
 | `scripts/quality/check.sh --check-tools-only` | Required local tool versions | None |
 | `scripts/quality/check.sh --pr PR --repo OWNER/REPO` | Local checks plus live PR contract | GitHub |
 | `scripts/quality/check_template.sh` | Tracked files, local links, wiki ownership and CI entrypoint | None |
-| `scripts/github/issue_status.sh` | Live contract/state checks and audited transitions | GitHub |
+| `scripts/github/issue_status.sh` | Live contract/state checks and audited transitions; planned admission requires exactly one type label | GitHub |
 | `scripts/github/pr_contract.sh` | Live PR structure, branch and Issue association | GitHub |
 | `scripts/github/review_convergence.sh RECORD.json` | Local review evidence structure | None |
 | `scripts/quality/install_ci_tools.sh` | Explicit Linux x86_64 CI tool provisioning into runner temporary storage | Official downloads and npm |
+
+`scripts/github/issue_status.sh` 在 planned 准入处要求恰好一个 `type:*` 标签：
+设为 planned、检查处于 planned 的 Issue、认领 planned 的工作时都会检查；
+脚本不添加也不修改类型。完整规则见 [Issue 类型](../.harness/workflows/github-planning.md#issue-types)。
 
 The quality entrypoint invokes these tests once:
 

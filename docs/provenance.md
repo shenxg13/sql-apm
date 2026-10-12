@@ -37,8 +37,8 @@
 采用上游固定提交 `c8f26d983500e95a8c0fc4ce49f6c763f9d19cb2`，不自动跟踪上游 main。
 来源包括上游 #1、#2、#3、#7、#9、#10、#13，原始改动说明见
 [上游固定更新日志](https://github.com/shenxg13/agent-harness/tree/c8f26d983500e95a8c0fc4ce49f6c763f9d19cb2/.harness/update-log)。
-本项目确认定义采用目标，自动检查与 PR 保存实施证据；合并后还须核对该次 main CI、
-新 Claude Code 会话入口加载、完成状态转换及实施工作树清理。
+本项目确认定义采用目标，自动检查与 PR 保存实施证据。合并后验收覆盖该次 main CI、
+新 Claude Code 会话入口加载、完成状态转换及实施工作树清理；验收结果由在线 Issue 与 PR 记录。
 
 本次先建五个类型标签并给唯一未关闭的 #57 补 `type:process`，再换状态脚本。
 直接采用的 12 个文件以 Git blob 和文件模式逐一比较；范围 C 的剩余差异如下。
@@ -64,7 +64,7 @@ PR 同步列出此表，并保存逐文件比较证据。
 | `.harness/catalog.md` | 仅增加 SQL APM 需求讨论的流程及知识路由行，保留项目主题入口。 |
 | `.project-wiki/methods/knowledge-maintenance.md` | 日期为本次采纳日；owners 增加 `docs/README.md`；sources 增加本地重组报告；related 增加项目范围。Source Of Truth 保留 9 月两次用户确认、官方文章依据与重组报告，并改用本项目采用确认。导航表由可选示例改为本地链接；Workflows 第 3 条保留强制导航同步与新设计按实际交付加入；Update Rules 明确 SQL Baseline 原文字节；Open Questions 保留产品事项边界。这些差异保留项目既有知识与确认来源。 |
 | `.project-wiki/schema.md` | 无。 |
-| `.project-wiki/architecture/agent-development-harness.md` | 日期为本次采纳日；sources 以本地初始化计划为 current、上游提取计划为 historical。Source Of Truth 及 Contracts 的五处上游 Issue 依据改为本项目采用记录；入口条款注明启动加载尚待合并后实测；项目检查条款由模板空操作改为实际三条命令及脚本导航。差异避免把上游确认或验证冒充本项目事实。 |
+| `.project-wiki/architecture/agent-development-harness.md` | 日期为本次采纳日；sources 以本地初始化计划为 current、上游提取计划为 historical。Source Of Truth 及 Contracts 的五处上游 Issue 依据改为本项目采用记录；入口条款明确以合并后新会话实测启动加载，证据由在线 Issue 与 PR 保存；项目检查条款由模板空操作改为实际三条命令及脚本导航。差异避免把上游确认或验证冒充本项目事实。 |
 | `CLAUDE.md` | 无，全部内容为 `@AGENTS.md` 加换行。 |
 | `.github/workflows/quality.yml` | 无，单独调用项目检查入口。 |
 
@@ -72,7 +72,7 @@ PR 同步列出此表，并保存逐文件比较证据。
 
 | 文件或范围 | 定制与理由 |
 | --- | --- |
-| `README.md`、`AGENTS.md`、`.project-wiki/index.md`、`scripts/README.md` | 保留 SQL APM 产品、知识和操作导航，只补检查入口、工具复用、类型标签、工作树与新日志路由。 |
+| `README.md`、`AGENTS.md`、`.project-wiki/index.md`、`scripts/README.md`、`docs/README.md` | 保留 SQL APM 产品、知识和操作导航，只补检查入口、工具复用、类型标签、工作树、新日志路由及模板更新与回流说明。 |
 | `scripts/quality/project_checks.sh` | 替换上游空操作，保持原 CI 的 Python 版本输出、函数字典校验、单元测试与函数覆盖命令；从脚本位置定位仓库根目录。 |
 | Wiki 产品主题、原始资料、日志及工程原则 | 保存 SQL APM 需求、确认来源及本地初始化计划；原始 SQL Baseline 字节不变，旧日志冻结。 |
 | 本地初始化计划、开发说明、历史报告 | 保留本项目证据；上游提取历史仅供追溯，不表示本项目验收。 |

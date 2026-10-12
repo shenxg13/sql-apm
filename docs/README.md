@@ -84,6 +84,7 @@
 生产候选的安装入口为[生产安装手册](runbooks/production-installation.md)；
 [演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
 [v1.0.0 发布说明原稿](releases/v1.0.0.md)及[准备报告](reports/v100-preparation-2026-10-12.md)区分当前实现与未完成实测。
+[Kylin 成品编译验证](reports/v100-runtime-build-2026-10-12.md)记录首轮编译、成品身份和固定前缀位置。
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |

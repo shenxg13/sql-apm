@@ -67,8 +67,10 @@
 随后两个账号的四字符、含冒号、含反斜杠三组密码均经真实 `/login` 登录通过，
 结果在同目录 `roundtrip-results.json`；这不改变 1–3 字符创建 viewer 被拒绝的事实。
 [官方文档](https://grafana.com/docs/grafana/latest/setup-grafana/configure-access/configure-authentication/grafana/)
-也说明默认最低 4 字符。已在 [范围变更提议](https://github.com/shenxg13/sql-apm/issues/59#issuecomment-6117745213)
-记录，用户答复前不把“保留上游限制”当作已确认要求。
+也说明默认最低 4 字符。用户于 2026-10-12 明确选择“接受 Grafana 上游限制”，
+[确认记录](https://github.com/shenxg13/sql-apm/issues/59#issuecomment-6117961397)与 Issue 正文已同步：
+两个数据库账号接受任意非空单行密码；Grafana 的 admin、viewer 保留上游至少 4 字符的限制，
+本项目不叠加其他长度或字符规则，也不修改固定组件绕过上游限制。手册与验收用例据此更新。
 
 ## 资源、兼容与恢复（qualitative）
 

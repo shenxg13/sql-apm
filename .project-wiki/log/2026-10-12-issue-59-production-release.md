@@ -6,4 +6,5 @@
 - [命令行与配置](../features/operator-cli.md#生产安装账号与交互环境2026-10-12)维护操作者密码、pgpass 转义和登录 psql 默认环境。
 - [生产手册](../../docs/runbooks/production-installation.md)与演练手册分离；[准备报告](../../docs/reports/v100-preparation-2026-10-12.md)区分开发机验证、上游限制与未执行的目标机验收。
 
-没有修改业务规则、结构或 Harness 工作流。Grafana 上游密码限制的提议以在线确认推进，不把提议视为既成决定。
+没有修改业务规则、结构或 Harness 工作流。用户于本日明确接受 Grafana 上游至少 4 字符限制，
+已先同步在线 Issue 契约与确认记录，再更新账号主题、手册和发布说明；数据库账号仍接受任意非空单行密码。

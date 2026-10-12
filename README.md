@@ -56,18 +56,24 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 ```bash
 scripts/quality/check.sh --check-tools-only
 scripts/quality/check.sh
+scripts/quality/project_checks.sh
 ```
 
 如使用本次初始化安装的仓库本地工具，命令见[开发说明](docs/runbooks/local-development.md)。
-检查覆盖 Harness、文档和开发流程回归；业务检查按具体 Issue 契约执行，命令见[脚本导航](scripts/README.md)。
+通用入口检查 Harness、文档和流程回归；项目入口执行原 CI 的三条 Python 检查，
+其余业务验收按具体 Issue 契约执行，命令见[脚本导航](scripts/README.md)。
+需要新装固定工具时使用 `scripts/quality/install_local_tools.sh [DIR]`；已有兼容安装可从
+工作树复用主检出的绝对路径，详见[运行时指南](.harness/tooling-runtime.md#worktrees-and-local-resources)。
 
 ## 来源与维护
 
 模板固定版本、本地定制及原始资料来源见[来源记录](docs/provenance.md)。
 后续按[人工更新流程](docs/updating.md)审阅模板更新。
+新记录按变更写入[知识日志目录](.project-wiki/log/)和[流程日志目录](.harness/update-log/)，旧日志冻结保留。
 本地验证结果见[初始化验证记录](docs/reports/local-bootstrap-validation.md)。
 
 GitHub 仓库：[shenxg13/sql-apm](https://github.com/shenxg13/sql-apm)，公开，默认分支 main。
 首次同步范围与验证见[首次发布记录](docs/reports/initial-publication.md)。
-接入远程后的需求和交付遵循 [GitHub 工作流](.harness/workflows/github-planning.md)。
+接入远程后的需求和交付遵循 [GitHub 工作流](.harness/workflows/github-planning.md)，
+Issue 使用一个类型标签；并发实施、固定提交评审及工作树清理按该流程执行。
 许可证尚未选择，当前文件集不包含 LICENSE。

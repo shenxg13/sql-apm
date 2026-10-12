@@ -33,6 +33,7 @@ Rules:
   The target must be an Issue, never a pull request.
   Normal set operations enforce the documented transition graph.
   planned requires concrete acceptance criteria and the fixed checked confirmation.
+  planned also requires exactly one type:* label; types are never edited here.
   done requires an issue already closed with reason completed.
   not-planned uses one Issue PATCH for state, reason, and final labels.
   Every successful write is re-read and asserted against the requested target.
@@ -313,6 +314,8 @@ validate_planned_contract() {
     local item
     local item_text
     local item_count=0
+    local label
+    local type_labels=()
 
     [[ -n ${issue_body//[[:space:]]/} ]] ||
         die "$issue_url cannot be status:planned with an empty body"
@@ -348,6 +351,19 @@ validate_planned_contract() {
         <<<"$confirmation_clean"; then
         die "$issue_url cannot be status:planned with negative user-confirmation text"
     fi
+
+    for label in "${all_labels[@]}"; do
+        [[ $label != type:* ]] || type_labels+=("$label")
+    done
+    case ${#type_labels[@]} in
+        0)
+            die "$issue_url is missing a type:* label; found: none"
+            ;;
+        1) ;;
+        *)
+            die "$issue_url has more than one type:* label; found: ${type_labels[*]}"
+            ;;
+    esac
 }
 
 check_issue() {
@@ -366,9 +382,9 @@ check_issue() {
             case $issue_reason in
                 COMPLETED)
                     ((${#current_status_labels[@]} == 1)) ||
-                        die "$issue_url is completed and must have only status:done"
+                        die "$issue_url is completed and must have status:done as its only status:* label"
                     [[ ${current_status_labels[0]} == status:done ]] ||
-                        die "$issue_url is completed and must have only status:done"
+                        die "$issue_url is completed and must have status:done as its only status:* label"
                     ;;
                 NOT_PLANNED)
                     ((${#current_status_labels[@]} == 0)) ||

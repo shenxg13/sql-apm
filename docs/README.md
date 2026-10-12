@@ -174,7 +174,7 @@
 | [工具运行与排障约定](../.harness/tooling-runtime.md) | 操作说明 | 工具发现、网络与认证诊断、检查边界。 |
 | [知识维护方法](../.project-wiki/methods/knowledge-maintenance.md) | 协作说明 | 需求正文、导航、证据和日志如何分工维护。 |
 | [项目知识实体规范](../.project-wiki/schema.md)与[模板清单](../.project-wiki/templates/) | 协作说明 | 新建或调整知识页面时使用的字段、结构与模板。 |
-| [模板人工更新流程](updating.md) | 操作说明 | 如何审阅并采纳 agent-harness 的后续更新。 |
+| [模板人工更新流程](updating.md) | 操作说明 | 如何审阅并采纳 agent-harness 的后续更新，以及将下游通用改进回流模板。 |
 | [需求模板](../.github/ISSUE_TEMPLATE/requirement.md)与[PR 模板](../.github/pull_request_template.md) | 协作说明 | 新建需求和提交变更时需要描述的内容。 |
 
 ### 历史与参考
@@ -182,9 +182,11 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [SQL Baseline 原始资料](../.project-wiki/raw/sql-baseline.md) | 历史参考 | 最初讨论输入；其中建议是否采纳，以对应需求主题页为准。 |
-| [知识变更记录](../.project-wiki/log.md) | 历史参考 | 各次确认、修订和知识更新的时间及依据。 |
+| [知识变更日志目录](../.project-wiki/log/) | 变更记录 | 新确认、修订和知识更新的摘要及依据，一次变更一个文件，按文件名排序阅读。 |
+| [旧知识变更记录](../.project-wiki/log.md) | 历史参考 | 冻结保留日志分文件之前的确认与修订，不再追加。 |
 | [项目来源与模板采纳记录](provenance.md) | 历史参考 | 固定模板版本、原始资料来源和本地定制。 |
-| [Harness 更新记录](../.harness/update-log.md) | 历史参考 | 开发协作流程的历次调整。 |
+| [Harness 更新日志目录](../.harness/update-log/) | 变更记录 | 新的开发协作流程调整及上游采用说明，一次变更一个文件，按文件名排序阅读。 |
+| [旧 Harness 更新记录](../.harness/update-log.md) | 历史参考 | 冻结保留日志分文件之前的开发协作流程调整，不再追加。 |
 | [本地初始化计划](../.harness/plans/local-bootstrap.md) | 历史参考 | SQL APM 仓库建立时的范围、计划和验证安排。 |
 | [本地初始化验证](reports/local-bootstrap-validation.md) | 历史参考 | 仓库初始化阶段实际完成的检查。 |
 | [首次 GitHub 发布记录](reports/initial-publication.md) | 历史参考 | 首次公开同步的范围和验证结果。 |

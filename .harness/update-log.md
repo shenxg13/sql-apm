@@ -1,5 +1,7 @@
 # Harness Update Log
 
+新条目写入[日志目录](update-log/)，按文件名排序阅读；本文件已有条目冻结保留，不再追加。
+
 | Date | Commit | Summary |
 | --- | --- | --- |
 | 2026-09-21 | Upstream history | 通用模板历史，见[上游来源](../docs/provenance.md) |

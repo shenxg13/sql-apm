@@ -3,13 +3,19 @@
 | Command | Purpose | Network |
 | --- | --- | --- |
 | `scripts/quality/check.sh` | Tools, Shell, Markdown, template integrity and offline regressions | None |
+| `scripts/quality/project_checks.sh` | Project-owned function dictionary, unit tests and function coverage checks | None |
+| `scripts/quality/install_local_tools.sh [DIR]` | Explicit pinned tools in a new local or shared directory | Official downloads and npm |
 | `scripts/quality/check.sh --check-tools-only` | Required local tool versions | None |
 | `scripts/quality/check.sh --pr PR --repo OWNER/REPO` | Local checks plus live PR contract | GitHub |
 | `scripts/quality/check_template.sh` | Tracked files, local links, wiki ownership and CI entrypoint | None |
-| `scripts/github/issue_status.sh` | Live contract/state checks and audited transitions | GitHub |
+| `scripts/github/issue_status.sh` | Live contract/state checks and audited transitions; planned admission requires exactly one type label | GitHub |
 | `scripts/github/pr_contract.sh` | Live PR structure, branch and Issue association | GitHub |
 | `scripts/github/review_convergence.sh RECORD.json` | Local review evidence structure | None |
 | `scripts/quality/install_ci_tools.sh` | Explicit Linux x86_64 CI tool provisioning into runner temporary storage | Official downloads and npm |
+
+`scripts/github/issue_status.sh` 在 planned 准入处要求恰好一个 `type:*` 标签：
+设为 planned、检查处于 planned 的 Issue、认领 planned 的工作时都会检查；
+脚本不添加也不修改类型。完整规则见 [Issue 类型](../.harness/workflows/github-planning.md#issue-types)。
 
 The quality entrypoint invokes these tests once:
 
@@ -29,11 +35,17 @@ still owns semantic correctness and external-link validity.
 
 Installation is never part of the default read-only quality command. The CI
 provisioner requires a CI environment; local setup follows the tool runbook.
+The local installer never overwrites an existing target. Reuse compatible tools
+from the main checkout through a command-scoped absolute `PATH`; see
+[worktree resources](../.harness/tooling-runtime.md#worktrees-and-local-resources).
+The generic quality command never invokes project checks; CI calls them separately.
 
 ## 函数字典工具
 
 Python 3.13.16 环境及准备步骤见[本地开发说明](../docs/runbooks/local-development.md)。
-以下产品检查独立于 Harness，实施／评审时分别运行：
+以下三条产品检查由 `scripts/quality/project_checks.sh` 统一执行，独立于 Harness；
+CI 使用主机的 `python3`，本地可用 `PATH="$PWD/.venv/bin:$PATH" scripts/quality/project_checks.sh`
+选择已准备的解释器。单条运行方式保留如下：
 
 ```bash
 .venv/bin/python -m sql_apm.sql.function_dictionary validate rules/functions/v1.0.2.json

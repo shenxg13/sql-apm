@@ -482,7 +482,10 @@ for field in \
     stop_release_policy_applies \
     finding_origin evidence_timing late_reason exit_condition \
     regression_checks disposition adjudication_id repair_interactions_verified \
-    another_repair_allowed; do
+    another_repair_allowed \
+    '### Observations' observation_id summary \
+    '## PR Remediation Record' previous_head_sha new_head_sha changed_files \
+    maintainer_issue_comment_url; do
     grep -Fq "$field" "$template" ||
         fail "comment template is missing field: $field"
 done

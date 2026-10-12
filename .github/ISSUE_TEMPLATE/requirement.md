@@ -1,10 +1,12 @@
 ---
 name: 需求契约
 about: 记录并确认可交给独立实施会话的需求
-title: "[需求] "
+title: ""
 labels: "status:triage"
 assignees: ""
 ---
+
+<!-- 创建 Issue 后添加恰好一个 type:* 标签，按主要交付物归类，并在转为 status:planned 前完成。 -->
 
 ## 目标
 

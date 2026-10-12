@@ -11,10 +11,11 @@
 | Requirements, Issues or PR delivery after connection | [GitHub planning](workflows/github-planning.md) | Live contract and accepted project knowledge |
 | Review or handoff | [Review](workflows/review-sync.md), [knowledge sync](workflows/knowledge-sync.md) | Affected entities |
 | Wiki maintenance or knowledge reorganization | [Wiki update](workflows/wiki-update.md), [knowledge sync](workflows/knowledge-sync.md) | [Maintenance method](../.project-wiki/methods/knowledge-maintenance.md); [schema](../.project-wiki/schema.md) for entity structure |
-| Adopt a harness update | [Updating](../docs/updating.md) | [Provenance](../docs/provenance.md) |
+| Adopt a harness update or return a downstream improvement | [Updating](../docs/updating.md) | [Provenance](../docs/provenance.md) |
 
 Projects add their domain mappings here. Resolve uncertain scope through the
 optional capability discovery or repository search in the runtime guide.
 
-Select the applicable row, not all workflows. The wiki index routes business topics;
-bootstrap plans are historical context after publication, not routine prerequisites.
+Select the applicable row, not all workflows. The wiki index routes project
+topics; bootstrap plans are historical context after publication, not routine
+prerequisites.

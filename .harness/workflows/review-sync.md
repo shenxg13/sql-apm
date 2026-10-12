@@ -4,6 +4,30 @@ For a repository without its first GitHub remote, use the local review handoff
 in `.harness/workflows/local-bootstrap.md`. The formal R0–R3 protocol below
 applies to real GitHub Issue/PR handoffs after connection.
 
+Use a separate detached worktree pinned to the reviewed `head_sha`, or inspect
+with read-only commands such as `git show` and `git diff` that do not change any
+checkout. Never switch branches or reset another session's checkout. A review
+worktree is a sibling named `REPO-issue-N-review-ROUND`; use the frozen SHA, not a
+moving branch name. From the repository checkout:
+
+```bash
+issue_number=2
+review_round=R1
+review_head=${HEAD_SHA:?set the fixed reviewed head SHA}
+repo_root=$(git rev-parse --show-toplevel)
+repo_name=$(basename "$repo_root")
+worktree_path="$(dirname "$repo_root")/${repo_name}-issue-${issue_number}-review-${review_round}"
+git worktree add --detach "$worktree_path" "$review_head"
+cd "$worktree_path"
+```
+
+After posting the round's evidence, the session completing the review removes
+its worktree using [Worktree Cleanup](github-planning.md#worktree-cleanup),
+including inspection and preservation of ignored evidence/data. Cancellation
+also requires cleanup. Tool and local resource isolation follows
+[tooling and runtime](../tooling-runtime.md#worktrees-and-local-resources).
+These checkout rules do not change formal rounds or the fixed review surface.
+
 1. Review the diff for unintended changes.
 2. Verify relevant reported checks. If GitHub reports none, record
    “未配置/未报告检查” rather than saying checks are pending.
@@ -28,7 +52,8 @@ applies to real GitHub Issue/PR handoffs after connection.
    - merge does not by itself complete or close the Issue;
    - required post-merge verification remains open at `status:needs-review`;
    - after all current acceptance criteria pass, completed work is manually
-     closed as completed and then given only `status:done`;
+     closed as completed and then given `status:done` as its only status label,
+     preserving type and other ordinary labels;
    - canceled, rejected, and duplicate work is closed as not planned with no
      `status:*` label;
    - blocked work records `reason=...; unblock=...` before the label changes;
@@ -117,6 +142,45 @@ scripts/github/review_convergence.sh RECORD.json
 - Multiple domain Reviewers may work concurrently in one round, but the round
   has one fixed review surface, one evidence record, and one consolidated
   blocker ledger.
+
+### Remediation Scope And Observations
+
+After a `changes_requested` verdict, or a convergence adjudication authorizing
+batch repair, the delta up to the next handoff is limited to changes needed to
+satisfy open ledger exit conditions, plus necessary regressions and documentation
+sync caused by those changes. An observation may be included only through the
+Maintainer adoption below.
+
+The implementation owner posts a PR remediation record listing changed files
+under each `finding_id`. Every file in the repair delta must map to a ledger
+`finding_id` or an adopted `observation_id`, with the adopting Issue comment
+linked for each adopted observation.
+
+Before accepting the next handoff, the Reviewer compares the file list from
+the previous round's head to the new head with that mapping. An unmapped file
+means the handoff is not accepted and consumes no round. The implementation
+owner must remove the unrelated changes, or the Maintainer must adopt the
+observation under the rule below, before the handoff can be accepted. This
+file-level check does not replace review of the complete repair delta.
+
+Review evidence records non-blocking observations in a separate section, each
+with a stable `observation_id`, summary and evidence. Observations are not exit
+conditions and are outside the current PR by default. A finding that meets the
+existing blocker criteria must enter the ledger; it cannot be recorded as an
+observation.
+
+A Maintainer may adopt an observation into the current PR in a live Issue
+comment that states its `observation_id` and exit condition. The implementation
+owner may then address it during remediation. The next review records and
+verifies it as a ledger entry, filling all fields under the existing blocker
+criteria; an unmet adopted exit condition is a blocker. If addressing it would
+change the Issue scope or acceptance criteria, adoption is not available: use
+the existing [scope-change workflow](github-planning.md#scope-changes-and-blocking).
+
+After approval and before Issue completion, the Maintainer decides for each
+unadopted observation whether to open a follow-up Issue or take no action. The
+completion record lists each disposition as required by
+[Completion Rules](github-planning.md#completion-rules).
 
 ### Fixed Review Surface And Round Accounting
 
@@ -233,7 +297,8 @@ blocker-free R2 that cannot validly complete that verification returns
 verification responsibilities.
 
 The retired R2 verdict `pass_to_R3` (no current blocker, approval deferred to
-R3) appears only in records made before 2026-10-05 and is no longer issued.
+R3) appears only in records made before a project adopted this rule and is no
+longer issued.
 
 ### R3: Final Ordinary Verification
 
@@ -265,17 +330,38 @@ contract and non-waivable gates is routed to a mutually linked urgent Issue; it
 does not silently expand the current PR. A repository P0/P1 stop-release policy
 instead uses an explicit blocking Issue and exact unblock condition.
 
-Accepted risk requires an audit decision from a Maintainer/Risk Owner named in
-repository ownership configuration, or a person explicitly authorized by a
-Maintainer in the live Issue. With no such authorization, the finding remains a
-blocker. No Maintainer, Risk Owner, Reviewer, implementation Agent, or automated
-tool may waive a gate explicitly defined as non-waivable.
+Accepted risk requires an audit decision from a
+[Maintainer/Risk Owner](#maintainer-and-risk-owner), or a person explicitly
+authorized by a Maintainer in the live Issue. With no such authorization, the
+finding remains a blocker. No Maintainer, Risk Owner, Reviewer, implementation
+Agent, or automated tool may waive a gate explicitly defined as non-waivable.
+
+### Maintainer And Risk Owner
+
+Determine the Maintainer/Risk Owner for risk acceptance and convergence
+adjudication using these rules:
+
+1. Use the declaration in the project's confirmed operating-model decision.
+2. Without a confirmed declaration, if the repository belongs to an individual
+   account, that account's owner is both Maintainer and Risk Owner.
+3. Without a confirmed declaration, an organization-owned repository has no
+   default. Until the operating model declares the Maintainer/Risk Owner, no
+   one may accept risk or adjudicate; unresolved blocking findings remain
+   blockers.
+
+A Maintainer may explicitly authorize another person in the live Issue; that
+existing delegation remains valid. The risk-acceptance field
+`risk_authorization_evidence` and adjudication field `authorization_evidence`
+must identify the applicable rule above and its basis: the confirmed
+operating-model declaration or individual repository ownership. When authority
+is delegated, also link the explicit live Issue authorization. No separate
+ownership file or hard-coded username is required.
 
 ### Convergence Adjudication
 
 After three consumed rounds, freeze the current SHA tuple and complete ledger.
-A Maintainer/Risk Owner must record one decision with a stable
-`adjudication_id`:
+A [Maintainer/Risk Owner](#maintainer-and-risk-owner) must record one decision
+with a stable `adjudication_id`:
 
 1. `approve`: no blocker remains; normal merge gates still apply.
 2. `batch_repair_final_verification`: contract-bound blockers are fully bounded;

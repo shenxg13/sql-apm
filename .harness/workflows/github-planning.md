@@ -103,9 +103,11 @@ implementation and do not count as acceptance evidence.
 4. Resolve every open question that could materially change implementation and
    keep the issue body synchronized as the current contract.
 5. Obtain user confirmation and check the confirmation item in the issue body.
-6. After the executable-contract gate below passes, transition the issue to
+6. Select exactly one `type:*` label by the primary deliverable and add it as
+   described in [Issue Types](#issue-types).
+7. After the executable-contract gate below passes, transition the issue to
    `status:planned`.
-7. Return the issue URL for a separate implementation session. Do not implement
+8. Return the issue URL for a separate implementation session. Do not implement
    it in the requirements session.
 
 The requirements body records verification commands as a future plan and must
@@ -138,6 +140,27 @@ unconfirmed issue cannot enter the claimable `status:planned` state.
    edits do not provide a true compare-and-swap, so the command cannot by itself
    prevent two sessions that read the same old state from racing.
 6. Use an `issue-N-short-description` branch from the current `main` baseline.
+   When another session on the same machine uses the same checkout, implementation
+   must use its own Git worktree; never switch branches in that session's checkout.
+   With no concurrent user of the checkout, a separate worktree is optional.
+   Place implementation worktrees beside the repository, named `REPO-issue-N`.
+   After verifying the current `main` baseline and that the branch/path is unused,
+   run from the repository checkout (replace `2` and the description as needed):
+
+   ```bash
+   issue_number=2
+   repo_root=$(git rev-parse --show-toplevel)
+   repo_name=$(basename "$repo_root")
+   worktree_path="$(dirname "$repo_root")/${repo_name}-issue-${issue_number}"
+   git worktree add "$worktree_path" -b "issue-${issue_number}-short-description" main
+   cd "$worktree_path"
+   ```
+
+   Creating and committing in this worktree leaves the original checkout's branch
+   and worktree state unchanged. Ignored local resources are not shared; follow
+   [tooling and runtime](../tooling-runtime.md#worktrees-and-local-resources).
+   Cleanup is mandatory at the lifecycle boundaries in
+   [Worktree Cleanup](#worktree-cleanup), including cancellation.
 7. Implement only the accepted scope and run the planned verification.
 8. A Draft PR remains implementation work and keeps `status:in-progress`.
    When the PR is marked Ready for review and is ready for a separate reviewer,
@@ -162,7 +185,12 @@ scripts/github/issue_status.sh set ISSUE in-progress --force \
 2. Keep a Draft or change-request remediation at `status:in-progress`; mark it
    Ready for review and restore `status:needs-review` only at the next formal
    independent-review handoff.
-3. Merge only after required pre-merge verification passes.
+3. Merge only after required pre-merge verification passes. After merging, verify
+   that the checks triggered by that exact push to `main` pass, using the merge
+   commit SHA rather than an earlier PR result. If they fail, revert that merge
+   or repair immediately; do not merge other PRs until `main` checks pass again.
+   This verifies the combined result after merge; it does not require rerunning
+   against the latest target before merge or introduce a merge queue.
 4. Because PRs use `Refs #N`, merge does not close the issue. If the contract
    requires merge-time or production verification, keep the issue open with
    `status:needs-review` until those checks pass.
@@ -203,6 +231,14 @@ confirmation, and negative statements such as `用户未确认` or `用户尚未
 Large changes still require the plan, test cases, and user confirmation defined
 by `.harness/workflows/large-change.md`.
 
+The same gate also requires exactly one `type:*` label. Missing or multiple
+types fail before any remote write, including comments, with a diagnostic that
+lists the types found (or `none`). `repair` and `--force` cannot bypass it.
+Other transitions and checks do not require a type; work already beyond planned
+is not retroactively gated. The script validates types without adding or
+changing them, and preserves them on every transition, including completion
+and cancellation.
+
 ### Conditional Performance And Threat-Model Contract
 
 Apply this additional requirement only when a non-trivial Issue involves scale,
@@ -221,6 +257,36 @@ bounded probe or stronger evidence only when uncertainty could materially
 change the decision, rather than defaulting to an experiment whose cost
 approaches implementation.
 
+## Issue Types
+
+Every Issue has exactly one `type:*` label, selected by its primary deliverable.
+Titles describe the work directly, without a fixed prefix. The default types
+are:
+
+| Label | Primary deliverable |
+| --- | --- |
+| `type:feature` | A new capability or change to accepted behavior, including design and investigation for it |
+| `type:defect` | A fix for implemented behavior that violates its original contract or is clearly wrong |
+| `type:release` | Packaging, release, target-environment verification, and documentation delivered with the version |
+| `type:maintenance` | Work without externally visible behavior changes: dependency/runtime upgrades, renaming, refactoring, or cleanup |
+| `type:process` | Collaboration-only changes to Harness rules, templates, or quality tools |
+
+When the Harness itself is the product, as in this template repository, classify
+product changes as feature, defect, or maintenance according to their nature.
+Reserve `type:process` for collaboration conventions outside the product.
+
+The requirements session adds the selected label before setting `status:planned`:
+
+```bash
+gh issue edit ISSUE -R OWNER/REPO --add-label type:feature
+```
+
+A misclassification can be corrected directly with `gh issue edit --remove-label`
+and `--add-label`, keeping exactly one type; no audit comment or status transition
+is required. Projects may add or remove types. The script recognizes any label
+whose name starts with `type:`, without a fixed allowlist. Default names and
+colors are in the [initialization guide](../../docs/getting-started.md#接入-github).
+
 ## Status Model
 
 Every open implementation issue must have exactly one of these labels:
@@ -233,8 +299,9 @@ Every open implementation issue must have exactly one of these labels:
 | `status:blocked` | Work cannot continue until a documented condition changes |
 | `status:needs-review` | Implementation is Ready for review or awaiting required post-merge verification |
 
-A successfully completed issue is closed with reason `completed` and has only
-`status:done`. A duplicate, rejected, or canceled issue is closed as
+A successfully completed issue is closed with reason `completed` and has
+`status:done` as its only `status:*` label, preserving type and other ordinary
+labels. A duplicate, rejected, or canceled issue is closed as
 `not planned`, has no `status:*` label, and should use a reason label such as
 `duplicate`, `wontfix`, or `invalid` when applicable.
 
@@ -377,9 +444,52 @@ Before marking an issue done:
 5. Link relevant pull requests, commits, sub-issues, and confirmed follow-ups.
 6. Update `.project-wiki/` if durable facts changed.
 7. Update `.harness/` if workflow rules changed.
-8. Close the issue as completed, set only `status:done`, and run the status
-   check.
-9. Use `.harness/workflows/review-sync.md` for non-trivial handoff.
+8. After approval, record the Maintainer's disposition for every unadopted
+   observation: a follow-up Issue link or “不处理”. Omit this record when review
+   left no observations; follow the
+   [observation rules](review-sync.md#remediation-scope-and-observations).
+9. Close the issue as completed, set `status:done` as its only status label, and
+   run the status check.
+10. Use `.harness/workflows/review-sync.md` for non-trivial handoff.
+11. The session executing completion must perform [Worktree Cleanup](#worktree-cleanup).
+    Implementation worktrees are removed only after the PR is merged and all
+    post-merge acceptance is complete. Review worktrees are removed after that
+    round's evidence is posted. Cancellation also requires cleanup by the session
+    handling cancellation; do not depend on the worktree creator still being present.
+
+### Worktree Cleanup
+
+Run `git worktree list` from a remaining checkout to locate sibling directories:
+implementation uses `REPO-issue-N`; reviews use `REPO-issue-N-review-ROUND`.
+Before removing a worktree, confirm no session is still using it. Inspect its
+tracked changes, untracked files and ignored local directories/files:
+
+```bash
+git worktree list
+git -C "$worktree_path" status --short
+git -C "$worktree_path" status --short --ignored
+```
+
+Inspect the ignored directories reported with `!!`. Move evidence or data cited
+by reports/runbooks to a retained location and update its references, or confirm
+it is no longer needed. Git refuses normal removal with uncommitted changes or
+untracked files, but ignored files alone do not prevent removal: they are deleted
+with the directory without a warning.
+
+After those checks, leave the target worktree and remove it from a remaining
+checkout:
+
+```bash
+cd "$repo_root"
+git worktree remove "$worktree_path"
+git worktree list
+```
+
+Use `git worktree remove`, not manual directory deletion. Do not add `--force`
+unless the contents have explicitly been confirmed disposable. If a directory
+has already been deleted manually, inspect `git worktree prune --dry-run --verbose`
+and then use `git worktree prune` to clear stale registrations before deleting
+its branch. A stale registration can otherwise keep that branch in use.
 
 ## Discoveries After Completion
 
@@ -414,7 +524,8 @@ When reopening the original issue:
 4. Update the issue body as the current contract after confirmation and keep
    historical completion/reopening evidence in comments.
 5. Implement on an issue-linked branch and pull request. After merge and all
-   current checks, close as completed again and restore only `status:done`.
+   current checks, close as completed again and restore `status:done` as its only
+   status label, preserving type and other ordinary labels.
 
 Example repair after reopening:
 

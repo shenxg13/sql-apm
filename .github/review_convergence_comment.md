@@ -52,6 +52,15 @@ whether the effective diff was recomputed and whether the handoff was aborted.
 
 For every row, attach the JSON fields below. Do not omit false booleans.
 
+### Observations
+
+观察项不是退出条件；未经维护者在 Issue 纳入，不在本 PR 处理。
+符合阻断判定的发现必须进入台账，不能列为观察项。没有观察项时填写“无”。
+
+| observation_id | summary | evidence |
+| --- | --- | --- |
+| <stable observation ID> | <摘要> | <证据或链接> |
+
 ### Verdict
 
 - verdict: <admitted|approve|changes_requested|escalate|aborted>
@@ -148,13 +157,47 @@ Stage-specific evidence:
 - A late R2/R3 finding must fill `finding_origin`, `evidence_timing=late`,
   `late_reason`, `prior_miss_reason`, and `sibling_sweep_evidence` independently.
 
+## PR Remediation Record
+
+Use after `changes_requested` or an adjudication authorizing batch repair.
+Observations and remediation records are Markdown only, outside JSON validation.
+
+```markdown
+## 整改记录
+
+- previous_head_sha: <previous round head SHA>
+- new_head_sha: <new repair head SHA>
+
+### 台账项与改动文件
+
+| finding_id | changed_files |
+| --- | --- |
+| <open ledger ID> | <满足退出条件的改动及必要回归、文档同步涉及的全部文件> |
+
+### 已纳入的观察项
+
+没有已纳入观察项时填写“无”。维护者评论须写明编号和退出条件；下一轮作为台账条目核验。
+
+| observation_id | exit_condition | changed_files | maintainer_issue_comment_url |
+| --- | --- | --- | --- |
+| <stable observation ID> | <维护者明确的退出条件> | <全部改动文件> | <在线 Issue 纳入评论链接> |
+```
+
+Every file between the two heads must appear under a ledger finding or an
+adopted observation above. Before accepting the handoff, the Reviewer checks
+that file list against this mapping; unmapped files mean no acceptance and no
+round consumed. Remove unrelated changes or obtain Maintainer adoption before
+handoff. An observation that changes Issue scope or acceptance must use the
+scope-change workflow instead. After approval, the Maintainer disposes of each
+unadopted observation before Issue completion with a follow-up Issue or “不处理”.
+
 ## Convergence Adjudication
 
 ```markdown
 ## 收敛裁决：<adjudication_id>
 
 - adjudicator: <authorized Maintainer/Risk Owner>
-- authorization_evidence: <ownership config or live Issue authorization>
+- authorization_evidence: <confirmed operating-model declaration or individual ownership rule; link any live Issue delegation>
 - rounds_consumed: 3
 - frozen_target_tip_sha: <SHA>
 - frozen_merge_base_sha: <SHA>
@@ -182,7 +225,7 @@ decision, replace the decision-specific fields as described by the protocol.
   "issue_number": 18,
   "pr_number": 99,
   "adjudicator": "AUTHORIZED_OWNER",
-  "authorization_evidence": "ownership config or live Issue authorization",
+  "authorization_evidence": "confirmed operating-model declaration or individual ownership rule; link any live Issue delegation",
   "formal_rounds_consumed": 3,
   "target_tip_sha": "0000000000000000000000000000000000000000",
   "merge_base_sha": "1111111111111111111111111111111111111111",

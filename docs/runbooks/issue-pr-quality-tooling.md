@@ -25,7 +25,27 @@
 Bash、Git、jq 和 coreutils 从所用 Linux 发行版的受信任软件源安装。
 版本须满足上述下限，使用 `command -v` 和工具的版本命令核对。
 
-ShellCheck 从 [官方发行](https://github.com/koalaman/shellcheck/releases/tag/v0.10.0)
+Linux x86_64 上，五个固定版本的工具可以用安装脚本一次装好；安装前应取得相应授权：
+
+```bash
+scripts/quality/install_local_tools.sh
+PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh --check-tools-only
+```
+
+脚本从官方地址下载 ShellCheck、shfmt 和 Node.js，按工具合同记录的摘要核对，再用这份
+Node.js 安装固定版本的 npm 与 markdownlint-cli2，最后运行一次工具版本检查。默认目录是
+仓库内已被 Git 忽略的 `var/harness-tools`，也可以把相对或绝对目标目录作为唯一参数传入。
+目标已存在、末段为 `.` 或 `..`、未知选项或多于一个参数时，脚本在下载和写入前拒绝执行。下载和安装先在目标旁
+的临时目录完成，全部成功后才出现目标目录；失败时不留下目标目录，临时目录也会清理。脚本不修改
+`PATH`、系统目录、用户的 npm 缓存或全局前缀，运行检查时按上面的写法临时加上 `bin` 目录。
+安装命令通过命令行参数固定 npm 缓存和前缀，覆盖用户导出的同名配置；安装与版本检查期间
+禁用 Node 编译缓存。若发布时目标已出现，脚本失败并清理自身暂存，保留已有目标。
+辅助工具为 curl、tar、xz、sha256sum 和 install。
+
+装在主检出默认位置的工具可以从它的各个工作树复用；定位主检出和在工作树里安装的写法见
+[运行时指南](../../.harness/tooling-runtime.md#worktrees-and-local-resources)。
+
+不使用脚本或在其他架构上，按以下方式手工安装。ShellCheck 从 [官方发行](https://github.com/koalaman/shellcheck/releases/tag/v0.10.0)
 获取，shfmt 从 [官方发行](https://github.com/mvdan/sh/releases/tag/v3.13.1)
 获取。工具合同记录 Linux x86_64 资产摘要；其他架构应选官方对应资产，
 核对来源并记录摘要，不能复用 x86_64 摘要。
@@ -52,6 +72,11 @@ scripts/quality/check.sh --check-tools-only
 固定 npm 与 Markdown 工具，随后调用统一检查入口。
 CI 辅助工具为 curl、tar、xz、sha256sum 和 install，工作目录位于 runner 临时目录。
 安装脚本不修改业务依赖或凭据；本地入口不会自动调用它。
+
+统一检查入口之后，CI 另有一步调用 `scripts/quality/project_checks.sh`。该文件归项目
+所有：项目把自己的业务检查命令写在里面，不必改动工作流文件；模板自带的版本不做任何
+检查。统一检查入口不调用它，因此始终可以单独验证 harness。需要额外运行时或服务的
+项目检查，可以另建项目自己的工作流文件。
 
 ## 运行与排障
 

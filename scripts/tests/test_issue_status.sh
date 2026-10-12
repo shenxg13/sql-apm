@@ -395,15 +395,15 @@ force_claim_comment='reason=explicit owner handoff; evidence=no concurrent owner
 repair_not_planned_comment='reason=remove residual status label; evidence=issue is closed not planned; target=not-planned'
 
 # Ordinary Issue numbers, URLs, and --repo are accepted.
-set_state OPEN '' 'enhancement,status:planned'
+set_state OPEN '' 'enhancement,type:feature,status:planned'
 "$command_under_test" check 123 --repo example/project >/dev/null
 "$command_under_test" check \
     https://github.com/example/project/issues/123 >/dev/null
-set_state OPEN '' 'enhancement,status:planned'
+set_state OPEN '' 'enhancement,type:feature,status:planned'
 "$command_under_test" set \
     https://github.com/example/project/issues/123 in-progress \
     --comment "$claim_comment" >/dev/null
-assert_state 'OPEN||enhancement,status:in-progress|issue|valid'
+assert_state 'OPEN||enhancement,type:feature,status:in-progress|issue|valid'
 
 # PR numbers and /pull/N URLs are rejected before every possible write.
 for target in 123 https://github.com/example/project/pull/123; do
@@ -431,23 +431,23 @@ invalid_profiles=(
     negative_unconfirmed
 )
 for profile in "${invalid_profiles[@]}"; do
-    set_state OPEN '' 'status:triage' issue "$profile"
+    set_state OPEN '' 'type:feature,status:triage' issue "$profile"
     assert_fails "$command_under_test" set 123 planned
     assert_read_only_log
 
-    set_state OPEN '' 'status:planned' issue "$profile"
+    set_state OPEN '' 'type:feature,status:planned' issue "$profile"
     assert_fails "$command_under_test" check 123
     assert_read_only_log
 
-    set_state OPEN '' 'status:planned' issue "$profile"
+    set_state OPEN '' 'type:feature,status:planned' issue "$profile"
     assert_fails "$command_under_test" set 123 in-progress \
         --comment "$claim_comment"
     assert_read_only_log
 done
 
-set_state OPEN '' 'documentation,status:triage' issue english_valid
+set_state OPEN '' 'documentation,type:feature,status:triage' issue english_valid
 "$command_under_test" set 123 planned >/dev/null
-assert_state 'OPEN||documentation,status:planned|issue|english_valid'
+assert_state 'OPEN||documentation,type:feature,status:planned|issue|english_valid'
 "$command_under_test" check 123 >/dev/null
 
 # Structured audit comments reject free text, missing fields, blank fields, and
@@ -460,7 +460,7 @@ invalid_claim_comments=(
     'owner=codex; branch=issue-3-test; handoff= '
 )
 for invalid_comment in "${invalid_claim_comments[@]}"; do
-    set_state OPEN '' 'status:planned'
+    set_state OPEN '' 'type:feature,status:planned'
     assert_fails "$command_under_test" set 123 in-progress \
         --comment "$invalid_comment"
     assert_read_only_log
@@ -506,7 +506,7 @@ assert_fails "$command_under_test" repair 123 blocked \
     --comment 'reason=repair; evidence=inspection; target=blocked'
 assert_read_only_log
 
-set_state OPEN '' 'status:triage' issue placeholder
+set_state OPEN '' 'type:feature,status:triage' issue placeholder
 assert_fails "$command_under_test" repair 123 planned \
     --comment "$repair_planned_comment"
 assert_read_only_log
@@ -551,21 +551,21 @@ sources=(triage planned in-progress blocked needs-review)
 targets=(triage planned in-progress blocked needs-review 'done' not-planned)
 for source in "${sources[@]}"; do
     for target in "${targets[@]}"; do
-        set_state OPEN '' "enhancement,status:$source" issue valid
+        set_state OPEN '' "enhancement,type:feature,status:$source" issue valid
         transition_args "$target"
         if is_allowed_transition "$source" "$target"; then
             "$command_under_test" set 123 "$target" \
                 "${TRANSITION_ARGS[@]}" >/dev/null
             if [[ $target == not-planned ]]; then
-                assert_state 'CLOSED|NOT_PLANNED|enhancement|issue|valid'
+                assert_state 'CLOSED|NOT_PLANNED|enhancement,type:feature|issue|valid'
             else
-                assert_state "OPEN||enhancement,status:$target|issue|valid"
+                assert_state "OPEN||enhancement,type:feature,status:$target|issue|valid"
             fi
         else
             assert_fails "$command_under_test" set 123 "$target" \
                 "${TRANSITION_ARGS[@]}"
             assert_read_only_log
-            assert_state "OPEN||enhancement,status:$source|issue|valid"
+            assert_state "OPEN||enhancement,type:feature,status:$source|issue|valid"
         fi
     done
 done
@@ -597,11 +597,11 @@ assert_stderr_contains 'did not reach requested target needs-review'
 assert_stderr_contains 'may have been concurrently overwritten'
 assert_state 'OPEN||enhancement,status:in-progress|issue|valid'
 
-set_state OPEN '' 'enhancement,status:planned'
+set_state OPEN '' 'enhancement,type:feature,status:planned'
 set_api_mode success_override
 assert_fails "$command_under_test" set 123 in-progress --comment "$claim_comment"
-assert_stderr_contains 'final legal state is OPEN/none labels=enhancement,status:triage'
-assert_state 'OPEN||enhancement,status:triage|issue|valid'
+assert_stderr_contains 'final legal state is OPEN/none labels=enhancement,type:feature,status:triage'
+assert_state 'OPEN||enhancement,type:feature,status:triage|issue|valid'
 
 set_state OPEN '' 'enhancement,status:in-progress'
 set_api_mode apply_then_read_error
@@ -727,12 +727,12 @@ assert_read_only_log
 set_state OPEN '' 'documentation,status:unknown'
 assert_fails "$command_under_test" check 123
 assert_read_only_log
-set_state OPEN '' 'documentation,status:planned,status:blocked'
+set_state OPEN '' 'documentation,type:feature,status:planned,status:blocked'
 assert_fails "$command_under_test" set 123 triage --comment "$triage_comment"
 assert_read_only_log
 "$command_under_test" repair 123 planned \
     --comment "$repair_planned_comment" >/dev/null
-assert_state 'OPEN||documentation,status:planned|issue|valid'
+assert_state 'OPEN||documentation,type:feature,status:planned|issue|valid'
 
 set_state OPEN '' 'documentation,status:triage'
 "$command_under_test" set 123 needs-review --force \
@@ -750,5 +750,106 @@ assert_read_only_log
 "$command_under_test" set 123 in-progress --force \
     --comment "$force_claim_comment" >/dev/null
 assert_state 'OPEN||status:in-progress|issue|valid'
+
+# Type admission applies at every planned gate, including audited escape hatches.
+# Prefix lookalikes are ordinary labels; a custom type with spaces is accepted.
+for type_labels in '' 'type:feature,type:defect' 'type:feature' 'type:custom investigation'; do
+    for operation in set check claim repair force repair_claim force_claim; do
+        initial_labels=enhancement,prototype:feature,typewriter
+        [[ -z $type_labels ]] || initial_labels+=",$type_labels"
+        case $operation in
+            set)
+                initial_labels+=,status:triage
+                type_command=(set 123 planned --comment 'reason=confirmed requirement')
+                expected_status=planned
+                ;;
+            check)
+                initial_labels+=,status:planned
+                type_command=(check 123)
+                expected_status=planned
+                ;;
+            claim | repair_claim | force_claim)
+                initial_labels+=,status:planned
+                case $operation in
+                    claim) type_command=(set 123 in-progress --comment "$claim_comment") ;;
+                    repair_claim) type_command=(repair 123 in-progress --comment "$force_claim_comment") ;;
+                    force_claim) type_command=(set 123 in-progress --force --comment "$force_claim_comment") ;;
+                esac
+                expected_status=in-progress
+                ;;
+            repair | force)
+                initial_labels+=,status:triage,status:blocked
+                if [[ $operation == repair ]]; then
+                    type_command=(repair 123 planned --comment "$repair_planned_comment")
+                else
+                    type_command=(set 123 planned --force --comment "$repair_planned_comment")
+                fi
+                expected_status=planned
+                ;;
+        esac
+        set_state OPEN '' "$initial_labels"
+        case $type_labels in
+            '' | *,*)
+                assert_fails "$command_under_test" "${type_command[@]}"
+                assert_read_only_log
+                assert_state "OPEN||$initial_labels|issue|valid"
+                if [[ -z $type_labels ]]; then
+                    assert_stderr_contains 'missing a type:* label'
+                    assert_stderr_contains 'found: none'
+                else
+                    assert_stderr_contains 'more than one type:* label'
+                    assert_stderr_contains 'found: type:feature type:defect'
+                fi
+                ;;
+            *)
+                "$command_under_test" "${type_command[@]}" >/dev/null
+                assert_state "OPEN||enhancement,prototype:feature,typewriter,$type_labels,status:$expected_status|issue|valid"
+                if [[ $operation == check ]]; then
+                    assert_read_only_log
+                fi
+                ;;
+        esac
+    done
+done
+
+# Every normal transition preserves types. Away from planned admission, absent
+# or multiple types are also allowed: the command never assigns or repairs them.
+for type_labels in '' 'type:custom investigation' 'type:feature,type:defect'; do
+    ordinary=enhancement
+    [[ -z $type_labels ]] || ordinary+=",$type_labels"
+    for source in "${sources[@]}"; do
+        for target in "${targets[@]}"; do
+            is_allowed_transition "$source" "$target" || continue
+            if [[ $target == planned || ($source == planned && $target == in-progress) ]]; then
+                [[ $type_labels == 'type:custom investigation' ]] || continue
+            fi
+            set_state OPEN '' "$ordinary,status:$source"
+            transition_args "$target"
+            "$command_under_test" set 123 "$target" "${TRANSITION_ARGS[@]}" >/dev/null
+            if [[ $target == not-planned ]]; then
+                assert_state "CLOSED|NOT_PLANNED|$ordinary|issue|valid"
+            else
+                assert_state "OPEN||$ordinary,status:$target|issue|valid"
+            fi
+            "$command_under_test" check 123 >/dev/null
+        done
+    done
+
+    set_state CLOSED COMPLETED "$ordinary,status:needs-review"
+    "$command_under_test" set 123 'done' >/dev/null
+    assert_state "CLOSED|COMPLETED|$ordinary,status:done|issue|valid"
+    "$command_under_test" check 123 >/dev/null
+
+    # Explicit cancellation repair and owner transfer keep the same boundary.
+    set_state CLOSED NOT_PLANNED "$ordinary,status:blocked"
+    "$command_under_test" repair 123 not-planned --comment "$repair_not_planned_comment" >/dev/null
+    assert_state "CLOSED|NOT_PLANNED|$ordinary|issue|valid"
+    "$command_under_test" check 123 >/dev/null
+
+    set_state OPEN '' "$ordinary,status:in-progress"
+    "$command_under_test" set 123 in-progress --force --comment "$force_claim_comment" >/dev/null
+    assert_state "OPEN||$ordinary,status:in-progress|issue|valid"
+    "$command_under_test" check 123 >/dev/null
+done
 
 printf '%s\n' 'issue status tests passed'

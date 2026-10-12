@@ -6,7 +6,7 @@ owners:
   - path/to/workflow-or-source
 updated: 2026-01-01
 sources:
-  - path: raw/source.md
+  - path: .project-wiki/raw/source.md
     status: raw
 related: []
 confidence: medium

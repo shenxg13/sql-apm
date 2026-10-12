@@ -7,11 +7,15 @@ owners:
   - .harness/workflows/knowledge-sync.md
   - .project-wiki/index.md
   - docs/README.md
-updated: 2026-09-26
+updated: 2026-10-12
 sources:
   - path: .harness/rules.md
     status: current
   - path: docs/reports/knowledge-reorganization-2026-09-25.md
+    status: current
+  - path: docs/provenance.md
+    status: current
+  - path: .harness/workflows/wiki-update.md
     status: current
 related:
   - architecture.agent-development-harness
@@ -34,6 +38,8 @@ confidence: high
 - [官方文章](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)
   建议按任务读取相关资料、保持入口精简。以下目录分工是本项目的应用方案，非官方字数限制。
 - [迁移记录](../../docs/reports/knowledge-reorganization-2026-09-25.md)记录本次完整性核对。
+- 2026-10-11 用户确认采用上游日志分文件规则；固定来源与本项目确认见
+  [本次采用](../../docs/provenance.md#本次采用)，验证证据由对应 PR 保存。
 
 ## Contracts
 
@@ -41,7 +47,7 @@ confidence: high
 | --- | --- |
 | 根 Agent 入口 | 适用于全仓的协作规则、任务入口与必要限制 |
 | [人类文档导航](../../docs/README.md) | 跨目录按阅读目的分类，提供名称、类型、用途和链接；根 README 提供入口 |
-| Wiki 索引 | 知识主题、用途和链接；不展开需求正文 |
+| Wiki 索引 | 知识主题、何时阅读和链接；不展开需求正文 |
 | Wiki 主题页 | 当前有效的完整需求、确认依据、边界和待定事项 |
 | Harness | 开发、知识维护、Issue 交付和检查流程 |
 | Runbook | 实际操作步骤、命令及环境检查记录；业务规则链接到主题页 |
@@ -51,7 +57,7 @@ confidence: high
 
 已确认细节即使很长也须保存到适当主题页。缩短入口时不删除业务边界、例外、来源、
 试行数值或未确认标记。简介不取代正文；跨主题关系通过明确链接表达。
-不把所有主题文件列成每次必读清单，也不为每项需求新增 Skill。
+不把所有主题文件列成每次必读清单，也不为每项需求新增一份独立的 Agent 指令。
 
 ## Workflows
 
@@ -59,7 +65,12 @@ confidence: high
 2. 确认变化后更新负责该规则的主题正文。需要改变其他主题的契约时同步那些条款，并注明来源。
 3. 新增知识页面、调整路径或阅读条件时更新知识索引；新增、移动、删除面向人的文档或改变其用途时，同步人类文档导航。新设计按实际交付加入导航；文档类型不代替确认或实施状态，Issue 状态仍以在线任务为准。仅规则数值变化不向索引复制正文。
 4. 只有 Agent 工作方式变化才修改根入口或 Harness；只有实际操作变化才修改 runbook。
-5. 在知识日志添加简短摘要及正文链接；保留此前确认和修订的历史，不把旧建议恢复为现行要求。
+5. 知识日志写入 `.project-wiki/log/`，一次变更一个文件，内容为简短摘要及所属主题链接。
+   文件名为 `YYYY-MM-DD-标识.md`；标识只用小写字母、数字和连字符，有对应 Issue 时以
+   `issue-N-` 开头并接简述，例如 `2026-10-11-issue-2-concurrent-work.md`。按文件名排序阅读。
+   Harness 变更同时在 `.harness/update-log/` 按同一格式一次变更一个文件。
+   原 `.project-wiki/log.md` 和 `.harness/update-log.md` 的已有条目原样冻结，不再追加；
+   保留此前确认和修订的历史，不把旧建议恢复为现行要求。
 6. 涉及正在交付的 Issue 时，遵循既有范围变更流程更新在线契约，不用 wiki 更新代替。
 7. 重组已有知识时，先记录原章节到新位置的映射，检查正文、来源、相对链接与引用。
    业务语义变化须另有用户依据，不能夹带在文档搬迁中。

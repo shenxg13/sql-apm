@@ -107,10 +107,10 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
   --output "$APM_DELIVERY_DIR/offline-bundle" \
   --release-dir "$APM_DELIVERY_DIR/release" \
   --rpm-collection var/issue31/rpm-collection \
-  --python-source var/issue52/downloads/Python-3.13.16.tgz \
+  --python-source var/issue59/inputs/offline-bundle/sources/Python-3.13.16.tgz \
   --postgres-source var/issue33/delivery-final/offline-bundle/sources/postgresql-17.10.tar.gz \
-  --wheel-dir var/issue52/downloads/wheels --grafana-files var/issue51/downloads \
-  --compile-only
+  --wheel-dir var/issue59/inputs/offline-bundle/wheels --grafana-files var/issue51/downloads \
+  --compile-only --source-manifest var/issue59/inputs/offline-bundle/manifest.json
 ```
 
 首次组装从官方元数据核对两个 cp313 wheel 的来源和摘要。后续可增加

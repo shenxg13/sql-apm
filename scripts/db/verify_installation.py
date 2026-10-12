@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from credentials import passfile_text, write_private
 from create_password import set_password
+from install_postgres import render
 from verify import instance, Verification
 
 
@@ -40,13 +41,32 @@ def main():
                         env=check_env, capture_output=True)
                     assert denied.returncode != 0, 'read-only role unexpectedly wrote'
                 checked.append(dict(case=index, role=role, connected=True))
+        # Load exactly the generated login defaults in clean shells, without
+        # touching either real account's HOME or any global service environment.
+        (directory / 'postgresql-17.10').symlink_to(pg.parent)
+        private = directory / 'private'
+        private.mkdir(mode=0o700)
+        write_private(private / 'pgpass', passfile.read_text())
+        profiles = render(directory, 55473)
+        for name, expected in [('sfmon-psql.sh', 'sql_apm'), ('postgres-psql.sh', 'postgres')]:
+            profile = directory / name
+            profile.write_text(profiles[name])
+            command = '. "$1"; psql -X -w -At -c "SELECT current_user;"'
+            result = subprocess.run(['bash', '--noprofile', '--norc', '-c', command, 'profile-check', str(profile)],
+                                    env=env, capture_output=True, text=True)
+            assert result.returncode == 0 and result.stdout.strip() == expected, 'login profile connection failed'
+            if expected == 'sql_apm':
+                result = subprocess.run(['bash', '--noprofile', '--norc', '-c',
+                    '. "$1"; psql -X -w -U sql_apm_ro -At -c "SELECT current_user;"', 'profile-check', str(profile)],
+                    env=env, capture_output=True, text=True)
+                assert result.returncode == 0 and result.stdout.strip() == 'sql_apm_ro', 'readonly profile override failed'
         wrong = directory / 'wrong-passfile'
         write_private(wrong, passfile_text(wrong, [socket], 55473, 'sql_apm', 'sql_apm', 'wrong-fixture'))
         result = subprocess.run([pg / 'psql', '-X', '-w', '-h', socket, '-p', '55473', '-U', 'sql_apm',
                                  '-d', 'sql_apm', '-c', 'SELECT 1;'], env=dict(env, PGPASSFILE=str(wrong)), capture_output=True)
         assert result.returncode != 0, 'wrong password accepted'
         print(json.dumps(dict(passed=True, round_trips=checked, wrong_password_rejected=True,
-                              readonly_writes_rejected=5, fixture_only=True)))
+                              readonly_writes_rejected=5, login_profiles=3, fixture_only=True)))
 
 
 if __name__ == '__main__':

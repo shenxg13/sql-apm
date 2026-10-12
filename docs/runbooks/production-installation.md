@@ -23,6 +23,7 @@ export APM_ROOT=/data/sql-apm
 export APM_RUN_USER=sfmon
 export APM_RUN_GROUP="$(id -gn "$APM_RUN_USER")"
 test "$(id -un)" = "$APM_RUN_USER"
+test "$(getent passwd "$APM_RUN_USER" | cut -d: -f7)" = /bin/bash
 export APM_APP="$APM_ROOT/app"
 export APM_VERIFY="$APM_ROOT/verification"
 export APM_BUNDLE="$APM_ROOT/offline-bundle"

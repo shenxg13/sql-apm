@@ -24,13 +24,40 @@
 - 新增安装工具有界回归 12 项通过，含短密码输入、转义、账号轮换保留、符号链接拒绝、文件／权限篡改、
   越界与重复归档成员、错误目录和模拟缺库停止，以及完整导出／安装回放和重复归档字节一致。模拟缺库只证明停止逻辑，不是目标机缺库验收。
 - PostgreSQL 17.10 私有临时实例：两个角色各测试单字符、冒号、反斜杠、组合与保留空格，10 次 SCRAM 登录通过；
-  错误密码被拒绝、只读角色 5 次写入被拒绝；实例停止清除。测试没有访问已有库。
+  错误密码被拒绝、只读角色 5 次写入被拒绝；实例停止清除。另有三个生成 profile 的实际 psql 用法通过：项目默认、只读覆盖和管理员默认；未改动真实账号的 home。测试没有访问已有库。
 - 普通单元测试 104 项通过；Grafana 工具测试 5 项通过。
 - 文档自动检查核对配置、62 张表、55 个查询函数及随包路径，另校验生产手册 Bash／内嵌 Python 语法和三份真实配置示例。
-- 制包与 HTML 回归 37 项通过；重复制包和隔离安装结果在完成后追加于下节。
+- 制包与 HTML 回归 37 项通过；重复制包和隔离安装结果见下节。
 
 首次 Harness 检查在新增文件尚未加入索引时失败，原因是引用完整性只接收受版本管理的目标；
 没有删除引用或放宽检查；新文件加入索引并修正新增脚本的 shfmt 格式和 Markdown 排版后，完整离线 Harness 通过。
+
+## 固定候选与重复构建（measured）
+
+首个检查候选为 `cec28b3acf351ae0e842a8f74fb7c8fdd04a113e`。
+两次从干净固定提交构建，使用同一组源、391 个 RPM、wheel 和固定 Grafana／插件，三个归档分别字节一致：
+
+| 制品 | 大小（字节） | SHA-256 |
+| --- | --- | --- |
+| 程序包 | 506670 | `04694ccbe6382540260ef532d427758b29d569a51cd345bf55319981c7b9d7c7` |
+| 验收包 | 341906 | `a3e9a19d2141b13e58e51f94763fd6df915ec6b4e506cda5c4466af4a995e68b` |
+| 编译候选包 | 972454320 | `501b1cb9be62d39e183dfd8fa04e363fcbe56ddd624302226e097612127dcdad` |
+
+机器记录为 `var/issue59/checks/repeat-build.json`，制品位于
+`var/issue59/deliveries/cec28b3acf351ae0e842a8f74fb7c8fdd04a113e/`。
+它尚不含 Kylin 成品，manifest 中 `bundle_type=compilation-bootstrap`、`production_use=false`。
+归档包含六份离线 HTML，固定第三方组件摘要按原清单逐项核对。
+
+首次组装因旧 downloads 目录已清理而停止，原错误保存在 bundle-1／bundle-2 日志。
+随后核对保留的 v0.3.0 最终完整包摘要，从中只恢复源码、wheel 和来源清单到
+`var/issue59/inputs/offline-bundle/`，使用新输出目录构建成功；没有改动旧包或重新下载替代版本。
+制包操作说明已更新为可重复的恢复步骤。
+
+独立安装目录 `var/issue59/isolated-cec28b3/` 从两个归档解压，重新创建 venv、离线装入锁定 wheel，
+程序校验为 127 个文件；十个入口 unit、database、publication、smoke、cleanup、search、views、grafana、daily、daily-recovery 全部退出 0。
+发布检查 33 项、清理 23 项、daily 26 项、daily-recovery 16 项；每份输出摘要保存在
+`var/issue59/checks/isolated-verification.json`，临时数据库均停止清理。项目检查入口也通过。
+本候选之后的修改仅为文档与开发机验证脚本，最终包须通过 `--previous-program` 验证所有产品文件仍相同。
 
 ## Grafana 上游限制（measured + 官方资料）
 

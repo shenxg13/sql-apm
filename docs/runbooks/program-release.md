@@ -40,6 +40,18 @@ var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
 PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 ```
 
+旧的 downloads 和解压依赖已按用户要求清理，先从保留的最终完整包恢复到本轮新输入目录：
+
+```bash
+(cd var/issue52/deliveries/f983a311253a9d31029761fccb2e104fd6982bb0 && sha256sum -c offline-bundle.tar.gz.sha256)
+mkdir -p var/issue59/inputs
+tar -xzf var/issue52/deliveries/f983a311253a9d31029761fccb2e104fd6982bb0/offline-bundle.tar.gz \
+  -C var/issue59/inputs --wildcards \
+  'offline-bundle/sources/*' 'offline-bundle/wheels/*' 'offline-bundle/manifest.json'
+```
+
+输入目录恢复后执行下面的制包命令。
+
 固定提交后，用两个全新目录分别构建并比较程序、验收包和编译候选的摘要：
 
 ```bash
@@ -50,13 +62,14 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 .venv/bin/python scripts/deployment/build_bundle.py --compile-only \
   --release-dir "$APM_DELIVERY_DIR/release" --output "$APM_DELIVERY_DIR/compilation-bundle" \
   --rpm-collection var/issue31/rpm-collection \
-  --python-source var/issue52/downloads/Python-3.13.16.tgz \
+  --python-source var/issue59/inputs/offline-bundle/sources/Python-3.13.16.tgz \
   --postgres-source var/issue31/postgresql-17.10.tar.gz \
-  --wheel-dir var/issue52/downloads/wheels --grafana-files var/issue51/downloads \
-  --source-manifest var/issue52/bundle-1/manifest.json
+  --wheel-dir var/issue59/inputs/offline-bundle/wheels --grafana-files var/issue51/downloads \
+  --source-manifest var/issue59/inputs/offline-bundle/manifest.json
 ```
 
 已有源清单只用于核对固定 URL 和摘要，每个实际输入仍须校验；不下载安装工具来判断其是否存在。
+
 隔离解压 app 和 verification，在 app 创建精确 Python 3.13.16 的新 venv，从锁定 wheel 离线安装，
 再串行执行十个入口（每个数据库检查使用自己的临时实例）：
 

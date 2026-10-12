@@ -26,6 +26,9 @@ import urllib.request
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts/deployment'))
+from credentials import read_password
+
 SOURCE = ROOT / 'grafana'
 FOLDER_UID, CUSTOM_UID, HOME_UID = 'mpp', 'mpp-custom', 'mpp-search'
 
@@ -45,15 +48,11 @@ def digest(path):
 
 def secret(path, label):
     """A password file must be private to its owner and hold one non-empty line."""
-    path = Path(path).resolve()
-    if not path.is_file():
-        fail(label + ' password file is missing')
-    if stat.S_IMODE(path.stat().st_mode) & 0o077:
-        fail(label + ' password file must not be readable by group or others')
-    value = path.read_text().rstrip('\n')
-    if not value or '\n' in value:
-        fail(label + ' password file must hold exactly one non-empty line')
-    return path, value
+    path = Path(path)
+    try:
+        return path.resolve(), read_password(path)
+    except (OSError, ValueError):
+        fail(label + ' password file must be private and hold exactly one non-empty line')
 
 
 def render(template, values):
@@ -173,8 +172,6 @@ class Api:
 def accounts(args):
     _, admin = secret(args.admin_password_file, 'Grafana admin')
     _, viewer = secret(args.viewer_password_file, 'Grafana viewer')
-    if admin == 'admin':
-        fail('the default admin password must not be kept')
     api = Api(args.port, 'admin', admin)
     status, _ = api.call('GET', '/api/users/lookup?loginOrEmail=' + args.viewer_login, expected=(200, 404))
     if status == 404:

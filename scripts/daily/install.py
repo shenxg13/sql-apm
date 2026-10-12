@@ -110,6 +110,7 @@ def main():
         fetch = 'ExecStartPre=-' + word(app / 'daily/fetch-logs.sh', 'the program directory') + ' --config ' + \
             word(args.fetch_config.resolve(), '--fetch-config')
     values = dict(
+        DATABASE_ORDERING='' if args.user_unit else 'After=sql-apm-postgresql.service\nWants=sql-apm-postgresql.service',
         NAME=args.name, APP_ROOT=word(app, '--app-root'), PYTHON=word(args.python.absolute(), '--python'),
         CONFIG=word(args.config.resolve(), '--config'), SCHEMA=word(args.schema, '--schema'), DSN=plain(args.dsn, '--dsn'),
         USER_LINE='' if args.user_unit else 'User=' + word(args.user, '--user'),

@@ -2,6 +2,7 @@
 # One daily run and then exit. It is started by sql-apm-daily.timer, never by itself at boot.
 [Unit]
 Description=SQL APM daily run (import marked days, build when due, clean up)
+@DATABASE_ORDERING@
 
 [Service]
 # The unit is active while the run is going. A timer time that comes meanwhile starts

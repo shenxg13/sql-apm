@@ -2,8 +2,8 @@
 # The service loads the fingerprint rules when it starts: restart it after a product upgrade.
 [Unit]
 Description=SQL APM fingerprint service (loopback only)
-After=network-online.target
-Wants=network-online.target
+After=network-online.target sql-apm-postgresql.service
+Wants=network-online.target sql-apm-postgresql.service
 
 [Service]
 Type=simple

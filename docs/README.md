@@ -81,6 +81,10 @@
 
 ## 开发与操作
 
+生产候选的安装入口为[生产安装手册](runbooks/production-installation.md)；
+[演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
+[v1.0.0 发布说明原稿](releases/v1.0.0.md)及[准备报告](reports/v100-preparation-2026-10-12.md)区分当前实现与未完成实测。
+
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |

@@ -417,7 +417,7 @@ class DocumentTests(unittest.TestCase):
     def test_missing_packaged_command(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in (GUIDE, 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
+            for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
                          'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)

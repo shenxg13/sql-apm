@@ -64,6 +64,7 @@ make install
 新环境执行 `scripts/deployment/check_environment.py` 核对标准库及依赖；
 Alma 本机验证不能替代 Kylin 的独立源码构建、自检及真实流程。
 正式部署的解释器随项目安装到项目目录，不依赖主机已有的 Python；不得搬运 Alma 的解释器目录。
+v1.0.0 候选支持从 Kylin 一次编译的固定成品安装，详见[生产手册](production-installation.md)；目标机实测尚待完成。
 
 ## PostgreSQL 项目环境
 

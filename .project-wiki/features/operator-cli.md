@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-10
+updated: 2026-10-12
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/59
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
@@ -55,6 +57,24 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 生产安装账号与交互环境（2026-10-12）
+
+来源：[Issue #59](https://github.com/shenxg13/sql-apm/issues/59) 已确认要求；实现脚本与本机合成验证
+不能替代目标机账号、服务和真实重启验收。
+
+- 项目角色 `sql_apm` 与只读角色 `sql_apm_ro` 密码由操作者在终端不回显输入两次，不再随机生成。
+  脚本通过本地管理员写入 SCRAM 校验值，受保护文件保存在程序目录外，pgpass 中正确转义冒号和反斜杠。
+  输入不一致、空密码或换行会被拒绝；项目不叠加长度和字符限制。固定 Grafana 的上游短密码限制
+  已实测并提交在线契约讨论，不能把待确认处理记作已接受。
+- postgres 系统用户使用正常 shell，不设置系统登录密码；本地 peer 超级用户不设数据库密码，不开放远程超级用户登录。
+- sfmon 登录后裸 `psql` 使用项目属主账号，`psql -U sql_apm_ro` 使用只读账号，均自动引用 0600 的密码文件。
+  切换到 postgres 后裸 `psql` 使用本地超级用户。账号 home 的登录 profile 设置 PATH、连接默认值和密码文件，
+  不写入全局环境；产品命令、定时器和常驻服务继续显式指定连接。
+- 轮换密码按[生产手册](../../docs/runbooks/production-installation.md)重新交互输入，同步交互及服务文件。
+  数据库写入失败不替换已有文件；若数据库已更新而文件保存失败，先修正文件权限再以同一密码重试。
+
+部署、自启、生产资源与验收边界见[运行决定](../decisions/runtime-and-components.md#首个生产版本与二进制部署2026-10-12)。
 
 ### 已确认的首期操作入口
 

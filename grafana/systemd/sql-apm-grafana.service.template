@@ -1,8 +1,8 @@
 # Rendered by scripts/grafana/install.py; copy to /etc/systemd/system as root.
 [Unit]
 Description=SQL APM Grafana
-After=network-online.target
-Wants=network-online.target
+After=network-online.target sql-apm-postgresql.service
+Wants=network-online.target sql-apm-postgresql.service
 
 [Service]
 Type=simple

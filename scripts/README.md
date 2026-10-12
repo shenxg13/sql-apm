@@ -334,3 +334,14 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/grafana/verify_status_e2e.py --directory DIR`：无界面浏览器核对运行状态看板；用 `setup_dev.py synthetic` 新搭的环境。
 - `scripts/daily/verify_replay.py run|compare`：显式的真实样本回放，三种方式各用私有实例和样本的副本，再比对最终版本。
   需要本地样本和数小时，不加入日常检查。
+
+## v1.0.0 生产部署准备
+
+`runtime_archive.py export|inspect|install|verify-installed` 保存和核对一次性 Kylin 成品，
+`runtime_check.py` 依次自检解释器、临时数据库和十个随包入口；失败停止，不自动编译。
+`compile_runtime.sh` 是操作者显式选择的一次编译路径，记录系统包和编译证据。
+`install_postgres.py` 生成数据库 systemd 单元和两个登录 profile；
+`create_password.py` 交互设置两个数据库角色并正确转义密码文件，`credentials.py` 保存 Grafana 输入。
+[生产手册](../docs/runbooks/production-installation.md)与[制包说明](../docs/runbooks/program-release.md)给出步骤。
+`test_installation.py` 和 `verify_installation.py` 分别检查归档／停止逻辑与真实 PG17 合成认证。
+所有目标机成品、日志和详细证据留在忽略目录；本机检查不替代目标机或用户验收。

@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-11
+updated: 2026-10-12
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/59
+    status: current
   - path: docs/reports/v030-offline-release-2026-10-11.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6100590479
@@ -72,6 +74,33 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 首个生产版本与二进制部署（2026-10-12）
+
+来源：[Issue #59](https://github.com/shenxg13/sql-apm/issues/59) 的已确认契约。
+这是已确认要求，本阶段仅完成连接验证环境前的实现；目标机实测、用户验收和正式发布仍须独立完成。
+
+- 版本为 `v1.0.0` 正式版，结构保持 1.12.0；原生安装，不采用 Docker，不修改业务数据行为。
+  只支持全新安装，本版不提供升级手册／演练，声明后续版本提供带数据的原地升级。
+- 完整离线包保留源码、wheel、391 个签名 RPM 及索引、Grafana 和三个固定插件，增加 Kylin 上从初始快照
+  编译的 Python 3.13.16、虚拟环境和 PostgreSQL 17.10。成品仅编译一次，实施方、用户和生产复用同一摘要。
+  编译前后系统包、命令、源码／wheel 和逐成品文件摘要均保留；写死前缀的文件必须列明。
+- 二进制只在 `/data/sql-apm` 安装，不修改系统包；模块、临时 PG 实例、程序清单和随包验收入口全部通过才继续。
+  失败停下提示，由操作者选择编译路径，不自动切换。编译路径会升级系统包，必须说明与内网源基线不一致的影响。
+- PostgreSQL 用 postgres 系统账号、原数据目录与 pg_ctl 参数，由 systemd 管理和开机自启。
+  两个常驻服务和系统级每日运行排在它之后；业务命令连不上数据库仍直接失败、不重试。
+- 生产参考为 8 核或 16 核、32 GB、1 TB，取代旧 8 核 16 GB 500 GB 参考，不设性能门槛。
+  默认 PostgreSQL 参数保留已验证值，另列未经验证的保守 32 GB 建议；上线后记录库大小、磁盘剩余和日增长。
+- 生产手册独立于演练手册。首次真实 master 拉取由用户上线时手工拉一天核对，脚本不变；不符另开 Issue。
+  产品不提供数据库备份；原始文件默认只留 45 天。Grafana 账号体系、HTTPS 可选和许可证搁置保持原决定。
+- 发版看演练机：第一轮编译并过随包入口，第二轮初始系统上二进制完整流程和真实重启，第三轮用户亲自按生产手册操作。
+  第二轮安装前后系统包完全相同，用户明确验收通过是合并前要求；真实生产机自检不是发版门槛。
+  不验证 120 三十天首批或 32 GB 建议值；资源仅记录。
+
+实现入口与操作见[生产手册](../../docs/runbooks/production-installation.md)、
+[制包说明](../../docs/runbooks/program-release.md)。成品与目标机结论不得从开发机模拟推定；
+本阶段结果见[准备报告](../../docs/reports/v100-preparation-2026-10-12.md)。账号操作由
+[命令行主题](../features/operator-cli.md#生产安装账号与交互环境2026-10-12)维护。
 
 ### 项目自行维护 Python 版本（2026-10-08）
 

@@ -8,6 +8,10 @@ updated: 2026-10-12
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/59
     status: current
+  - path: docs/reports/v100-binary-validation-2026-10-12.md
+    status: current
+  - path: docs/reports/v100-runtime-build-2026-10-12.md
+    status: current
   - path: docs/reports/v030-offline-release-2026-10-11.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6100590479
@@ -78,7 +82,8 @@ confidence: high
 ### 首个生产版本与二进制部署（2026-10-12）
 
 来源：[Issue #59](https://github.com/shenxg13/sql-apm/issues/59) 的已确认契约。
-这是已确认要求；2026-10-12 已完成开发机准备及 Kylin 第一轮编译验证，初始系统二进制实测、用户验收和正式发布仍须独立完成。
+这是已确认要求；2026-10-12 已完成开发机准备及 Kylin 第一轮编译、第二轮初始系统二进制完整验证，
+第三轮用户验收和正式发布仍须独立完成。
 
 - 版本为 `v1.0.0` 正式版，结构保持 1.12.0；原生安装，不采用 Docker，不修改业务数据行为。
   只支持全新安装，本版不提供升级手册／演练，声明后续版本提供带数据的原地升级。
@@ -102,6 +107,13 @@ confidence: high
 开发机结果见[准备报告](../../docs/reports/v100-preparation-2026-10-12.md)。第一轮 Kylin 编译与十个随包入口通过，
 成品按摘要导出并保留；系统包新装 18、升级 28、替代移除 1 个，原始清单与成品固定路径见
 [编译验证报告](../../docs/reports/v100-runtime-build-2026-10-12.md)。这些实测只覆盖编译后的该机，不能推定初始系统或生产机兼容。
+第二轮在恢复的初始系统上已通过同一成品的 16 项自检、实际缺库与错误前缀拒绝、账号和九任务检查。
+全轮结束的 692 项系统包清单与初始值逐字节相同；九任务全部通过，归一化超时和 OOM 为 0，
+最终 6,395,051 行统计与开发机按已确认跨机规则一致。同机每日回放统计精确相同，55 份到期副本删除后统计不变，
+原件保持；传输、定时器、三种检索和四个看板通过。真实重启后三个服务自动启动，数据库先就绪，错过的任务只补一次。
+证据已复制回开发机逐文件核验，资源、工具问题及未完成项见
+[二进制验证报告](../../docs/reports/v100-binary-validation-2026-10-12.md)。
+宿主机休眠时长未测量，本轮耗时是观察值，不能当作连续性能基准或生产容量承诺。
 账号操作由
 [命令行主题](../features/operator-cli.md#生产安装账号与交互环境2026-10-12)维护。
 

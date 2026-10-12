@@ -8,6 +8,8 @@ updated: 2026-10-12
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/59
     status: current
+  - path: docs/reports/v100-binary-validation-2026-10-12.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
@@ -76,6 +78,11 @@ confidence: high
   数据库写入失败不替换已有文件；若数据库已更新而文件保存失败，先修正文件权限再以同一密码重试。
 
 部署、自启、生产资源与验收边界见[运行决定](../decisions/runtime-and-components.md#首个生产版本与二进制部署2026-10-12)。
+目标机实测（measured，2026-10-12）：初始 Kylin 二进制安装后的四个账号均通过短密码、冒号和反斜杠登录，
+空密码、不一致及 Grafana 上游 1–3 字符拒绝单独保留；裸 psql、远程超级用户拒绝、只读拒写均通过。
+登录 profile 存在／暂时移除两种状态各执行一次实际 systemd 每日服务，命令状态、数据源和指纹连接一致，
+常驻服务进程号不变，profile 最后按原字节恢复。详见
+[二进制验证报告](../../docs/reports/v100-binary-validation-2026-10-12.md)。上述账号结果不代表第三轮用户验收。
 
 ### 已确认的首期操作入口
 

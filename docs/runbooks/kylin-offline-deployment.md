@@ -56,6 +56,8 @@ sudo -n ss -ltnp
 预期：目标机为已约定的 Kylin SP2 x86_64、glibc 2.28；sudo 返回 root；`/data`
 独立挂载且可写、空间能容纳约 15 GiB 日志、约 55–60 GiB 数据库及 WAL／构建目录。
 这是依据 Alma 的估计，不是性能门槛。5432 未占用，且没有其他任务使用部署目录。
+第二轮会同时保留独立九任务库、每日运行库和两份日志副本，不能只按单库估计空间；
+还须容纳各自的 WAL、统计快照和验收备份。每阶段记录可用空间，实测大小见本轮验证报告。
 失败：连接／sudo／磁盘／端口不符先处理环境，不安装到其他主机或改变系统 Python。
 快照存在性由虚拟机操作者确认，SSH 探测不能证明快照可恢复。
 运行前必须填写目标地址、允许网段，以及交付记录中的完整提交和离线包摘要；
@@ -116,6 +118,8 @@ var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
 首次组装从官方元数据核对两个 cp313 wheel 的来源和摘要。后续可增加
 `--source-manifest 本次完整包目录/manifest.json` 离线复用已核对来源，仍逐项检查摘要和
 RPM 签名证据；旧 cp39 包的清单不能提供新 wheel 的来源。
+上述 `--compile-only` 只生成第一轮编译候选。第一轮导出成品后，按[制包说明](program-release.md)
+使用 `--runtime-artifact` 加入该唯一成品，重复构建并记录完整包摘要，第二、三轮均传输完整包。
 <!-- developer-only:end -->
 
 按本次交付记录填写外部摘要和精确提交，不用包内自行声明的值替代。在开发机传输：
@@ -288,12 +292,12 @@ sudo systemctl status sql-apm-postgresql.service --no-pager
 
 ## 9. 配置由验证机拉取开发机日志
 
-本节起使用已安装的默认 `sql_apm` schema，后续操作只走 daily；首轮 full／rebuild 九任务的
-实施方证据保留，复现方法移至附录 A。日常构建的版本数不沿用九任务的 5／4。
+本节用于第二轮实施方验证，使用已安装的默认 `sql_apm` schema，后续操作只走 daily。
+本轮独立实例的 full／rebuild 九任务证据保留，复现方法见附录 A；第一轮编译不跑九任务。
+日常构建的版本数不沿用九任务的 5／4。
 
-完成第 1–8 节后可直接从本节继续。若使用**第 8 步完成的快照**供实施方补验，须先确认补验证据
-已备份，再由用户恢复同一快照，重设第 1 节环境变量后继续；不重复初始化实例或创建密码。
-机器重启后三个服务均应自动启动：
+完成第 1–8 节后可直接从本节继续，不重复初始化实例或创建密码。
+先检查三个服务和空业务库；安装定时器后的真实重启还须验证三个服务自动启动：
 
 ```bash
 cd "$APM_APP"
@@ -494,29 +498,21 @@ done
 若执行失败，保存日志，按[每日运行](daily-run.md)处理，再以同一配置接续；
 已成功的日期不重复导入。实际任务已成功、仅核对步骤失败时，先修复核对，不人为新增构建。
 
-## 11. 与首轮人工基准逐项比较
+## 11. 与本轮人工基准逐项比较
 
-实施方交付的 `manual-baseline/` 是首轮**同一验证机**已完成九任务的最终统计快照，含
+附录 A 导出的 `nine-task-run/manual-baseline/` 是第二轮**同一验证机**已完成九任务的最终统计快照，含
 `results.json`、四个 `.jsonl.gz` 文件及 `SHA256SUMS`。这份基准与本轮程序产品文件逐项相同，
-通过交付记录核对清单摘要；它单独内网传输，不包含在公开程序包中。
-
-在开发机执行，`APM_MANUAL_BASELINE` 填交付记录给出的目录：
-
-```bash
-APM_MANUAL_BASELINE='填写交付记录中的 manual-baseline 目录'
-(cd "$APM_MANUAL_BASELINE" && sha256sum -c SHA256SUMS)
-scp -r -P "$APM_SSH_PORT" "$APM_MANUAL_BASELINE" "$APM_SSH_TARGET:/data/sql-apm/"
-```
-
-目标机执行：
+通过机器记录核对清单摘要，不包含在公开程序包中。九任务在独立实例运行并已停止；
+此处的连接串须已恢复为默认产品实例。目标机执行：
 
 ```bash
 cd "$APM_APP"
-(cd "$APM_ROOT/manual-baseline" && sha256sum -c SHA256SUMS)
+export APM_MANUAL_BASELINE="$APM_ROOT/nine-task-run/manual-baseline"
+(cd "$APM_MANUAL_BASELINE" && sha256sum -c SHA256SUMS)
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
   --schema sql_apm --output "$APM_ROOT/records/daily-results"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
-  --manual "$APM_ROOT/manual-baseline" --daily "$APM_ROOT/records/daily-results" \
+  --manual "$APM_MANUAL_BASELINE" --daily "$APM_ROOT/records/daily-results" \
   --output "$APM_ROOT/records/manual-daily-comparison.json"
 ```
 
@@ -580,7 +576,7 @@ systemctl list-timers sql-apm-daily.timer
 
 ### 13.2 自动删除只针对演练副本
 
-保留首轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
+保留本轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
 历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；开发机的原始日志目录保持不变。
 
 ```bash
@@ -666,12 +662,12 @@ ls -l "$APM_ROOT/mock-inbox/"*.complete
 并核对“运行状态”与 `daily status` 的日期、版本、步骤、问题一致。
 将包身份、步骤结果、耗时与问题保存到[验证记录](kylin-validation-record.md)；
 实施方可依据实际证据与用户确认整理记录，无需用户重复手填。
-补验记录与用户记录分别保存；若从第 8 步快照接续，用户第 1–8 节的手动记录继续保留。
-用户完成后需明确确认结果，实施方代跑不计为用户验收通过。
+本节属于第二轮实施方证据。第三轮由用户恢复初始快照后亲自按生产手册安装和上线，
+另存用户记录并明确确认结果，实施方代跑不计为用户验收通过。
 
 ## 附录 A. 实施方九任务与基准比对
 
-本附录保留首轮实施方九任务的复现方法；不属于本次用户第 9 节起的操作路径。
+本附录是第二轮实施方九任务的复现方法；不属于第三轮用户按生产手册操作的路径。
 仅在独立的全新验收库运行，不能直接追加到第 10 节已完成的 daily 库。
 
 保持默认四解析进程和 5 秒归一化期限。辅助工具实际调用 full／rebuild、status／history，
@@ -683,30 +679,54 @@ selected_batches 是本次整批入选数，excluded_batches 是两者之差；w
 有完成批次但一个都未选到而回退全部。四个字段与开发机同候选包生成的基准逐项比较。
 本九任务均应没有排除和回退。选择只看文件 last_log_at 与窗口起点，事件再按完整窗口过滤。
 
-本附录使用独立演练目录及全新库。把原始 119／120 目录传入该目录的 `logs` 后，先生成本附录配置；
-不要使用第 9 节为分批拉取生成的配置目录，也不要覆盖已有用户记录：
+本附录使用独立演练目录及私有实例，不连接产品实例。先把原始 119／120 目录传入
+`$APM_ROOT/logs`，然后创建新目录；不使用第 9 节的配置目录，不覆盖已有记录：
 
 ```bash
 cd "$APM_APP"
+export APM_NINE_ROOT="$APM_ROOT/nine-task-run"
+export APM_PRODUCT_DSN="$SQL_APM_DSN"
+test ! -e "$APM_NINE_ROOT"
+install -d -m 0700 "$APM_NINE_ROOT" "$APM_NINE_ROOT/socket" "$APM_NINE_ROOT/records"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
-  --logs "$APM_ROOT/logs" --output "$APM_ROOT/config"
-(cd "$APM_ROOT/logs" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+  --logs "$APM_ROOT/logs" --output "$APM_NINE_ROOT/config"
+(cd "$APM_ROOT/logs" && sha256sum -c "$APM_NINE_ROOT/config/logs.SHA256SUMS")
+"$APM_PG_BIN/initdb" -D "$APM_NINE_ROOT/pgdata" -U apm_test_admin \
+  --auth-local=trust --auth-host=reject --encoding=UTF8 --locale=C
+cat >> "$APM_NINE_ROOT/pgdata/postgresql.conf" <<PGCONF
+listen_addresses = ''
+port = 55473
+unix_socket_directories = '$APM_NINE_ROOT/socket'
+shared_buffers = '512MB'
+work_mem = '16MB'
+maintenance_work_mem = '128MB'
+max_connections = 30
+max_wal_size = '2GB'
+min_wal_size = '256MB'
+timezone = 'Asia/Shanghai'
+log_statement = 'none'
+log_min_error_statement = 'panic'
+PGCONF
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -l "$APM_NINE_ROOT/server.log" -w start
+export SQL_APM_DSN="host=$APM_NINE_ROOT/socket port=55473 dbname=sql_apm user=sql_apm"
+scripts/db/initialize.sh all --host "$APM_NINE_ROOT/socket" --port 55473 --pg-bin "$APM_PG_BIN" \
+  --admin-user apm_test_admin --admin-database postgres
 ```
 
 交付目录的 `development-baseline/` 中包含开发机基准文件、八个统计数值 `.jsonl.gz` 文件和校验清单。
 先在开发机核对交付记录中的清单摘要，再检查文件并传输：
 
 ```bash
-APM_BASELINE_DIR="$PWD/var/issue52/deliveries/$APM_EXPECTED_COMMIT/development-baseline"
+APM_BASELINE_DIR="$PWD/var/issue59/deliveries/$APM_EXPECTED_COMMIT/development-baseline"
 (cd "$APM_BASELINE_DIR" && sha256sum -c SHA256SUMS)
 scp -P "$APM_SSH_PORT" "$APM_BASELINE_DIR/development-baseline.json" \
-  "$APM_BASELINE_DIR/"*.jsonl.gz "$APM_BASELINE_DIR/SHA256SUMS" "$APM_SSH_TARGET:/data/sql-apm/config/"
+  "$APM_BASELINE_DIR/"*.jsonl.gz "$APM_BASELINE_DIR/SHA256SUMS" "$APM_SSH_TARGET:/data/sql-apm/nine-task-run/config/"
 ```
 
 目标机再核对文件：
 
 ```bash
-(cd "$APM_ROOT/config" && sha256sum -c SHA256SUMS)
+(cd "$APM_NINE_ROOT/config" && sha256sum -c SHA256SUMS)
 ```
 
 它不替换原 Alma 基准，只补充新字段和配置示例预期；指南工具在重新构建前核对数值文件摘要。
@@ -716,15 +736,15 @@ scp -P "$APM_SSH_PORT" "$APM_BASELINE_DIR/development-baseline.json" \
 cd "$APM_APP"
 for step in 0 1 2 3 4; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 119 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/tasks" --data-root "$APM_ROOT" \
     --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT" \
-    --selection-baseline "$APM_ROOT/config/development-baseline.json"
+    --selection-baseline "$APM_NINE_ROOT/config/development-baseline.json"
 done
 for step in 0 1 2 3; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 120 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/tasks" --data-root "$APM_ROOT" \
     --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT" \
-    --selection-baseline "$APM_ROOT/config/development-baseline.json"
+    --selection-baseline "$APM_NINE_ROOT/config/development-baseline.json"
 done
 ```
 
@@ -754,6 +774,17 @@ done
 .venv/bin/python -m sql_apm history --cluster 120
 ```
 
+完成九任务后，在该私有实例中导出第 11 节所用基准，停止实例并恢复产品连接串。
+数据库及记录保留，后续可选指南演练需要重新启动该私有实例并显式切换连接。
+
+```bash
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot \
+  --app-root "$APM_APP" --output "$APM_NINE_ROOT/manual-baseline"
+(cd "$APM_NINE_ROOT/manual-baseline" && sha256sum results.json *.jsonl.gz > SHA256SUMS)
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -m fast -w stop
+export SQL_APM_DSN="$APM_PRODUCT_DSN"
+```
+
 失败：保留对应 `.log` 与 `.json`，按[流程恢复说明](build-publication.md)检查任务和当前版本。
 若实际 CLI 已完成而后续核对失败，不再次 full/rebuild 产生额外版本；先修复记录／核对步骤。
 任何无法解释的差异均未通过；产品缺陷另开 Issue，不在本手册中修改产品计算。
@@ -762,17 +793,24 @@ done
 
 本附录会改变当前版本，须在本轮最终验收及证据备份完成后另行安排。
 以下工具和版本预期基于附录 A 的独立九任务库，不直接用于本轮 daily 库。
+先启动附录 A 保留的私有实例，使用其 socket、55473 端口和配置目录；结束后停止并恢复产品连接串。
 
 这些示例用于学习配置，按需要执行，不属于九任务本身。先保存九任务全部结果（119 第 5 版，120 第 4 版），再按[配置指南](configuration-guide.md)
 依次运行 window、threshold、template、exclusion 四个示例；每项从原配置生成独立配置，
 在 119 上重新构建一次，不累加改动。开发机还执行 retention、workers、import 示例。
 
 ```bash
+export APM_NINE_ROOT="$APM_ROOT/nine-task-run"
+export APM_PRODUCT_DSN="$SQL_APM_DSN"
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -l "$APM_NINE_ROOT/server.log" -w start
+export SQL_APM_DSN="host=$APM_NINE_ROOT/socket port=55473 dbname=sql_apm user=sql_apm"
 for example in window threshold template exclusion; do
   "$APM_APP/.venv/bin/python" "$APM_VERIFY/scripts/deployment/guide_examples.py" \
-    --app-root "$APM_APP" --config "$APM_ROOT/config" --records "$APM_ROOT/records/guide" \
-    --baseline "$APM_ROOT/config/development-baseline.json" run "$example"
+    --app-root "$APM_APP" --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/guide" \
+    --baseline "$APM_NINE_ROOT/config/development-baseline.json" run "$example"
 done
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -m fast -w stop
+export SQL_APM_DSN="$APM_PRODUCT_DSN"
 ```
 
 预期分别为排除批次、仅充足性标记数量变化、模板排除计数、时段排除计数；四项结果与开发机

@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-13
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62
+    status: current
   - path: scripts/grafana/install.py
     status: current
   - path: https://github.com/shenxg13/sql-apm/pull/60#issuecomment-6146826478
@@ -65,6 +67,34 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### sqlfind 运维入口（2026-10-13）
+
+来源：[Issue #62](https://github.com/shenxg13/sql-apm/issues/62) 于 2026-10-12 确认的契约。
+实现新增 `sqlfind` 和同名 Python 子命令；开发机自动验证和部分样本环境已具备，
+PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用户验收。
+
+- 运维人员在 SQL APM 主机登录后使用短命令，入口解析符号链接并定位项目 Python；已有 `search` JSON 命令保持兼容。
+- 给出输入时一次输出，无输入且标准输入输出都是终端时进入交互。参数、文件、标准输入只能选一个，
+  文件与标准输入原样保留 UTF-8 字节中的首尾空白和换行。时间无时区时按北京时间。
+- 交互按词读取一行；整段和完整 SQL 粘贴后回车、Ctrl-D，换行统一 LF，结束输入的那次回车不算 SQL。
+  多余粘贴不作为菜单指令；Ctrl-C 取消步骤或查询，输入／查询失败可以重试。无 readline 依赖、无历史文件。
+- 查询只读、不执行输入 SQL，不写表、不创建任务、不落盘 SQL／结果；短命令在启动解释器前禁用 Python 缓存。
+  成功查询含无命中、无法生成可靠指纹退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
+  错误使用中文且不带密码或堆栈，查询超时明确说明。
+- 账号配置与 #59 一样由 home 登录 profile 引入专属片段，但只增加 PATH，不改已有 `psql` 环境。
+  默认连接使用配置的只读账号；环境 `SQL_APM_DSN`、`PGPASSFILE` 和显式 `--schema` 优先。
+  既无 DSN 又无配置时提示先配置。配置不读写密码、数据库账号或系统文件。
+- `scripts/sqlfind/configure.py install` 只维护 home 的专属目录和一个登录片段，打印改动路径；相同输入幂等，
+  `uninstall` 恢复原文件字节并保留后来新增的其他设置。密码仍仅在已有的受保护 passfile 中。
+- 不分屏、不进入全屏，支持终端回滚。80 列起表格可用续行保持完整，200 列候选每个一行；
+  仅候选示例和过长身份可以标注截断。对齐只用 ASCII／中文全角字符，其他字符转义；原文区保留内容。
+  当前编码不能表示的字符以替代符号显示并提示。重定向默认 100 列，`--width` 可调整。
+
+检索及详情规则由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护，
+参数、数据来源与配置文件见[开发说明](../../docs/design/sql-search.md#面向运维的-sqlfind)，
+PuTTY 设置、试用环境和撤销见[试用步骤](../../docs/runbooks/sqlfind-trial.md)。
+本轮只在开发机实现和验证，离线包清单、随包手册和目标机验证由后续发版 Issue 负责。
 
 ### 生产安装账号与交互环境（2026-10-12）
 

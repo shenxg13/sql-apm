@@ -11,10 +11,13 @@ from sql_apm.cli.daily import main as daily
 
 def main():
     parser = argparse.ArgumentParser(prog='python -m sql_apm')
-    parser.add_argument('command', choices=['import','training','statistics','full','rebuild','status','history','cleanup','search','fingerprint-service','daily'])
+    parser.add_argument('command', choices=['import','training','statistics','full','rebuild','status','history','cleanup','search','sqlfind','fingerprint-service','daily'])
     parser.add_argument('arguments', nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
     args = parser.parse_args()
     remaining = args.arguments
+    if args.command == 'sqlfind':
+        from sql_apm.cli.sqlfind import main as sqlfind
+        return sqlfind(remaining)
     if args.command in ('full','rebuild','status','history'):
         return workflow(args.command,remaining)
     if args.command == 'fingerprint-service':

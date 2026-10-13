@@ -12,6 +12,7 @@ import urllib.request
 from urllib.parse import unquote
 
 from verify_package import verify
+from runtime_archive import inspect_artifact
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = '6451d140d44f4e06cc34862c3e5aff7593d7afeb'
@@ -65,6 +66,9 @@ def main():
                         help='Cache for official pinned Grafana/plugin downloads; verified before inclusion')
     parser.add_argument('--release-dir', type=Path, required=True,
                         help='Output of build_release.py; includes the separate verification kit')
+    runtime = parser.add_mutually_exclusive_group(required=True)
+    runtime.add_argument('--runtime-artifact', type=Path, help='Single artifact exported on the Kylin build host')
+    runtime.add_argument('--compile-only', action='store_true', help='Bootstrap candidate for the one-time compilation; not a complete release bundle')
     parser.add_argument('--source-manifest', type=Path,
                         help='Reuse verified source URLs from a prior bundle without network access')
     args = parser.parse_args()
@@ -76,6 +80,11 @@ def main():
     release = json.loads((args.release_dir / 'app/RELEASE.json').read_text())
     verify(args.release_dir / 'app')
     commit = release['commit']
+    if args.compile_only and release['kind'] == 'release':
+        raise ValueError('a formal release requires the Kylin runtime artifact')
+    runtime = inspect_artifact(args.runtime_artifact) if args.runtime_artifact else None
+    if runtime and runtime['requirements_sha256'] != digest(args.release_dir / 'app/requirements.txt'):
+        raise ValueError('runtime dependencies differ from the program lock')
     sources = ({entry['path']: entry for entry in json.loads(args.source_manifest.read_text())['files']}
                if args.source_manifest else {})
     out.mkdir(parents=True)
@@ -173,8 +182,15 @@ def main():
             'Markdown document generated from commit ' + commit, release['files'][filename])
     add(args.rpm_collection / 'compile-packages.txt', 'support/compile-packages.txt',
         'compile-package-roots/1', 'original RPM collection')
+    if runtime:
+        for path in sorted(args.runtime_artifact.rglob('*')):
+            if path.is_file():
+                add(path, 'runtime/' + path.relative_to(args.runtime_artifact).as_posix(),
+                    'python-3.13.16+postgresql-17.10', 'Kylin build commit ' + runtime['program_commit'])
     (out / 'manifest.json').write_text(json.dumps(dict(program_commit=commit, version=release['version'],
-        prerelease=True, kind=release['kind'], files=entries),
+        prerelease=release['prerelease'], production_use=release['production_use'], kind=release['kind'],
+        bundle_type='complete' if runtime else 'compilation-bootstrap',
+        runtime_manifest_sha256=digest(args.runtime_artifact / 'runtime-manifest.json') if runtime else None, files=entries),
                                                   ensure_ascii=False, indent=2) + '\n')
     files = sorted(p for p in out.rglob('*') if p.is_file())
     (out / 'SHA256SUMS').write_text(''.join(digest(p) + '  ' + str(p.relative_to(out)) + '\n'

@@ -64,6 +64,9 @@ make install
 新环境执行 `scripts/deployment/check_environment.py` 核对标准库及依赖；
 Alma 本机验证不能替代 Kylin 的独立源码构建、自检及真实流程。
 正式部署的解释器随项目安装到项目目录，不依赖主机已有的 Python；不得搬运 Alma 的解释器目录。
+v1.0.0 候选支持从 Kylin 一次编译的固定成品安装，详见[生产手册](production-installation.md)；
+各轮实测与未完成项见[编译报告](../reports/v100-runtime-build-2026-10-12.md)和
+[二进制报告](../reports/v100-binary-validation-2026-10-12.md)。
 
 ## PostgreSQL 项目环境
 
@@ -78,8 +81,9 @@ Baseline 存储采用 **PostgreSQL 17**，保存执行记录、SQL 指纹和基�
 数据库驱动使用已锁定的 psycopg2-binary 2.9.10，使用 CPython 3.13 Linux x86_64 wheel。
 本机 PG17.10 工具位于 /usr/pgsql-17/bin；已有[项目初始化、版本升级与临时实例验证入口](database-initialization.md)，
 初版业务物理结构随之交付。验证使用自动停止／清理的私有临时实例，未部署生产项目实例；
-Kylin 演练从源码离线构建同一 17.10 补丁版本，使用项目目录中的工具路径、专用 postgres
-系统用户和 pg_ctl；正式生产部署仍由后续工作落实。
+Kylin 的 17.10 成品使用项目目录中的工具路径和专用 postgres 系统用户。
+v1.0.0 产品实例由 systemd 管理，操作者使用 systemctl 启停；开发／验收的私有临时实例仍由
+各自工具用 pg_ctl 管理。真实生产机的安装尚未验证。
 
 ## 质量工具
 

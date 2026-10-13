@@ -8,6 +8,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,6 +34,39 @@ class Dashboards(unittest.TestCase):
 
 
 class Installer(unittest.TestCase):
+    def test_launcher_preserves_file_provider_edges_and_datasource_value(self):
+        install = load('install')
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            admin, database = directory / 'admin', directory / 'database'
+            samples = [' padded ', '\tpad\t', ' \t \t', '\xa0pad\u3000',
+                       ' %s:${HOME}:$__file{/not-read}:\\ ', '\x1cpad\x1f']
+            for value in samples:
+                for path in (admin, database):
+                    path.write_text(value)
+                    path.chmod(0o600)
+                with patch.object(install.os, 'execve') as execute:
+                    install.start(SimpleNamespace(home=directory, admin_password_file=admin, db_password_file=database))
+                binary, argv, env = execute.call_args.args
+                expression = env['GF_SECURITY_ADMIN_PASSWORD']
+                reconstructed = expression.replace('$__file{' + str(admin) + '}', value.strip(install.GRAFANA_WHITESPACE))
+                self.assertEqual(reconstructed, value)
+                self.assertEqual(env['SQL_APM_GRAFANA_DB_PASSWORD'], value)
+                self.assertNotIn(value, argv)
+                self.assertTrue(str(binary).endswith('/bin/grafana'))
+                self.assertEqual(admin.read_text(), value)
+
+    def test_launcher_rejects_unprotected_credentials_before_exec(self):
+        install = load('install')
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            secret = directory / 'secret'
+            secret.write_text(' synthetic ')
+            secret.chmod(0o644)
+            with patch.object(install.os, 'execve') as execute, self.assertRaises(SystemExit):
+                install.start(SimpleNamespace(home=directory, admin_password_file=secret, db_password_file=secret))
+            execute.assert_not_called()
+
     def run_files(self, directory, files, mode=0o600):
         secret = directory / 'secret'
         secret.write_text('a-long-enough-password\n')

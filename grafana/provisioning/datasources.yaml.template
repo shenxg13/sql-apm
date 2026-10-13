@@ -20,7 +20,8 @@ datasources:
       connMaxLifetime: 14400
       timeInterval: 1s
     secureJsonData:
-      password: $__file{@DB_PASSWORD_FILE@}
+      # Expanded once, after provider expansion; preserves whitespace and literal $.
+      password: $SQL_APM_GRAFANA_DB_PASSWORD
   - name: SQL APM 指纹服务
     uid: sql-apm-fingerprint
     type: yesoreyeram-infinity-datasource

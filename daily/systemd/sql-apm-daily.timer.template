@@ -8,7 +8,7 @@ Description=SQL APM daily run at the configured time
 [Timer]
 @CALENDAR_LINES@
 # A run missed while the machine was off is made up once after boot. It needs the
-# database to be running by then; start PostgreSQL first after a reboot.
+# database to be running by then; the system service orders itself after PostgreSQL.
 Persistent=true
 AccuracySec=1s
 Unit=@NAME@.service

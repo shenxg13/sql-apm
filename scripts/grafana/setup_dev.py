@@ -168,14 +168,13 @@ def setup(args):
                      '--admin-password-file', secrets_['admin'], '--pg-port', args.pg_port, '--database', args.database,
                      '--schema', args.schema, '--readonly-role', args.readonly_role, '--listen', args.listen,
                      '--port', args.grafana_port, '--service-port', args.service_port, '--service-passfile', passfile], quiet=False)
-    manifest = json.loads((ROOT / 'grafana/components.json').read_text())
-    grafana = home / manifest['grafana']['directory']
     environment = dict(os.environ, PGPASSFILE=str(passfile),
                        SQL_APM_DSN='host=127.0.0.1 port=%d dbname=%s user=%s' % (args.pg_port, args.database, args.readonly_role))
     start_process(directory / 'run/fingerprint.pid', directory / 'fingerprint.log',
                   [sys.executable, '-m', 'sql_apm', 'fingerprint-service', '--port', args.service_port, '--schema', args.schema], environment)
     start_process(directory / 'run/grafana.pid', directory / 'grafana.out',
-                  [grafana / 'bin/grafana', 'server', '--homepath', grafana, '--config', home / 'conf/grafana.ini'])
+                  installer + ['start', '--home', home, '--admin-password-file', secrets_['admin'],
+                               '--db-password-file', secrets_['db']])
     wait_http('http://127.0.0.1:%d/v1/health' % args.service_port)
     wait_http('http://127.0.0.1:%d/api/health' % args.grafana_port)
     run(installer + ['accounts', '--admin-password-file', secrets_['admin'], '--viewer-password-file', secrets_['viewer'],

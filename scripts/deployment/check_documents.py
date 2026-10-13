@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -195,7 +196,7 @@ def check_paths(root):
     rules = json.loads((root / 'scripts/deployment/package-files.json').read_text())
     patterns = rules['program'] + rules['verification']
     paths = set()
-    for name in ('docs/runbooks/kylin-offline-deployment.md', GUIDE, 'docs/runbooks/daily-run.md'):
+    for name in ('docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', GUIDE, 'docs/runbooks/daily-run.md'):
         source = (root / name).read_text()
         # These explicit spans are read only on the development machine.
         source = re.sub(r'<!-- developer-only:start -->.*?<!-- developer-only:end -->', '', source, flags=re.S)
@@ -206,10 +207,40 @@ def check_paths(root):
     return dict(checked_commands=sorted(paths), packaged=True)
 
 
+def check_installation(root):
+    path = root / 'docs/runbooks/production-installation.md'
+    source = path.read_text()
+    blocks = re.findall(r'```bash\n(.*?)\n```', source, re.S)
+    for block in blocks:
+        result = subprocess.run(['bash', '-n'], input=block, text=True, capture_output=True)
+        if result.returncode:
+            raise ValueError('production installation shell example has invalid syntax')
+        for python in re.findall(r"<<'PY'\n(.*?)\nPY", block, re.S):
+            ast.parse(python)
+    # Validate the exact operator-provided three-file example, replacing only the
+    # receiver directories with disposable ones; no real logs or database reads.
+    with tempfile.TemporaryDirectory() as folder:
+        directory = Path(folder)
+        documents = re.findall(r'cat > "\$APM_ROOT/config/(\w+\.json)" <<\'JSON\'\n(.*?)\nJSON', source, re.S)
+        if {name for name, _ in documents} != {'import.json', 'training.json', 'daily.json'}:
+            raise ValueError('production manual must contain the three configuration files')
+        for name, raw in documents:
+            document = json.loads(raw)
+            if name == 'daily.json':
+                for index, item in enumerate(document['sources'].values()):
+                    target = directory / str(index)
+                    target.mkdir()
+                    item['directory'] = str(target)
+            (directory / name).write_text(json.dumps(document))
+        daily_config(directory / 'daily.json')
+    return dict(shell_blocks=len(blocks), inline_python_syntax=True, production_configs_valid=True)
+
+
 def check(root=ROOT):
     return dict(configuration=check_guide(root, (root / GUIDE).read_text()),
                 queries=check_queries(root, (root / QUERIES).read_text()),
-                structure=check_structure(root, (root / STRUCTURE).read_text()), paths=check_paths(root))
+                structure=check_structure(root, (root / STRUCTURE).read_text()), paths=check_paths(root),
+                installation=check_installation(root))
 
 
 if __name__ == '__main__':

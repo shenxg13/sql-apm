@@ -81,6 +81,14 @@
 
 ## 开发与操作
 
+生产候选的安装入口为[生产安装手册](runbooks/production-installation.md)；
+[演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
+[v1.0.0 发布说明原稿](releases/v1.0.0.md)及[准备报告](reports/v100-preparation-2026-10-12.md)区分当前实现与未完成实测。
+[Kylin 成品编译验证](reports/v100-runtime-build-2026-10-12.md)记录首轮编译、成品身份和固定前缀位置。
+[Kylin 二进制验证](reports/v100-binary-validation-2026-10-12.md)保存初始系统上的安装、账号与后续业务实测及未完成项。
+[用户生产手册验收确认](reports/v100-user-acceptance-2026-10-13.md)收录第三轮用户授权公开的确认及适用边界。
+[密码首尾空白整改验证](reports/v100-password-r1-remediation-2026-10-13.md)记录真实认证、轮换及受影响的 Kylin 启动链补验。
+
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |

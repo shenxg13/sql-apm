@@ -7,6 +7,7 @@ from decimal import Decimal
 import gzip
 import hashlib
 import importlib
+from importlib import metadata
 import json
 import lzma
 import multiprocessing
@@ -30,6 +31,10 @@ def main():
     modules = ['ssl', '_ssl', 'hashlib', '_hashlib', 'bz2', 'lzma', 'zlib', 'sqlite3',
                'ctypes', 'readline', 'decimal', 'uuid', 'zoneinfo', 'multiprocessing',
                'pglast', 'psycopg2']
+    installed = sorted((dist.metadata['Name'], dist.version) for dist in metadata.distributions())
+    for name in sorted(metadata.packages_distributions()):
+        if name not in modules:
+            modules.append(name)
     for name in modules:
         importlib.import_module(name)
     data = 'SQL APM 离线验证'.encode()
@@ -60,7 +65,7 @@ def main():
         queue.close()
     print(json.dumps(dict(passed=True, python=platform.python_version(),
                          executable=sys.executable, base_prefix=sys.base_prefix,
-                         modules=modules, openssl=ssl.OPENSSL_VERSION,
+                         modules=modules, installed=installed, openssl=ssl.OPENSSL_VERSION,
                          sqlite=sqlite3.sqlite_version, network_checks=False)))
 
 

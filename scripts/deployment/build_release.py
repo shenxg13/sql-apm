@@ -16,7 +16,7 @@ from render_manual import DOCUMENTS, render
 from verify_package import digest, verify, product_file
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = 'a3fde9092b96497327133caf05cec173ba721dec'
+BASE = '5494075f13c7030c3f0d1d084a4589a439745b62'
 
 
 def version_number(value):
@@ -81,6 +81,8 @@ def compare_product(app, previous):
 
 
 def build(args):
+    if args.version != 'v1.0.0':
+        raise ValueError('this revision carries only v1.0.0 release documents; use the historical builder for older releases')
     if git('status', '--porcelain', '--untracked-files=all'):
         raise ValueError('commit repository changes before building')
     commit = git('rev-parse', args.commit + '^{commit}')
@@ -124,7 +126,7 @@ def build(args):
         (app / 'VERSION').write_text(args.version + '\n')
         (app / 'PROGRAM_COMMIT').write_text(commit + '\n')
         metadata = dict(format='sql-apm-release/1', version=args.version, kind=args.kind,
-                        prerelease=True, production_use=False, commit=commit, product_base=BASE,
+                        prerelease=False, production_use=args.kind == 'release', commit=commit, product_base=BASE,
                         build_requirements_sha256=digest(source / 'scripts/deployment/build-requirements.txt'),
                         documents=documents, entrypoint='RELEASE.html',
                         manual_sources=documents['INSTALL.html']['sources'], html_checks=html_checks,
@@ -153,7 +155,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', default='HEAD')
-    parser.add_argument('--version', type=version_number, default='v0.3.0')
+    parser.add_argument('--version', type=version_number, default='v1.0.0')
     parser.add_argument('--kind', choices=['candidate', 'release'], default='candidate')
     parser.add_argument('--previous-program', type=Path)
     build(parser.parse_args())

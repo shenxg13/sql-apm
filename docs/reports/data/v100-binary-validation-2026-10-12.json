@@ -1,0 +1,2547 @@
+{
+  "state": "agent_round_complete_user_round_pending",
+  "measured_on": "2026-10-12",
+  "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+  "version": "v1.0.0",
+  "schema_version": "1.12.0",
+  "pending": [
+    "user_manual_production_installation",
+    "independent_review",
+    "post_merge_release"
+  ],
+  "timing_limitations": {
+    "host_suspend_reported_by_user": true,
+    "durations_not_performance_benchmarks": true,
+    "completed_tasks_not_replayed": true
+  },
+  "runtime_artifact": {
+    "runtime.tar.gz": {
+      "bytes": 94220776,
+      "sha256": "d271d6a1471c41723724b48afad59f9675e1b324747fbb7dfae283f97340314c"
+    },
+    "runtime-manifest.json": {
+      "bytes": 1418409,
+      "sha256": "470e93f741a5d5f3cb82118baf632ac9468036fe6ffa5ccb698de430c4f92d0c"
+    },
+    "SHA256SUMS": {
+      "bytes": 2990,
+      "sha256": "cebc5746c8261721f24f35ee3b1de209f79e86cb604cfdd0160b9fa486a260aa"
+    }
+  },
+  "target_final_audit": {
+    "passed": true,
+    "installed_runtime_unchanged": true,
+    "rpm_count": 692,
+    "rpm_sha256": "c6aee16fa356e231324be8184f46996a4590890906edb4179167334ce6574bb3",
+    "rpm_bytes_equal": true,
+    "three_services_active_enabled": true,
+    "timer_disabled_after_acceptance": true,
+    "read_access_passed": true,
+    "record_sha256": "4aa0e727da796b9a94b0b09d65486d8a0f423a8da9a884ceeaf96d46e1f2f541"
+  },
+  "final_read_access": {
+    "passed": true,
+    "directories": 2351,
+    "regular_files": 23788,
+    "pgdata_not_writable": true,
+    "socket_not_writable": true,
+    "record_sha256": "caee81cc4d9cfa51ccb6b7b9bfe11698729234645e569e1d032a2d6fe835ea43"
+  },
+  "boot_id_independent_comparison": {
+    "passed": true,
+    "boot_identifiers_differ": true,
+    "comparison_method": "Python byte comparison",
+    "reason": "developer diff unavailable in wrapper; target verification independently checks boot identity and boot time",
+    "before_sha256": "b66c4abbadd2200489b70d5e56c98522f15581076abcc2a9797248f5bcb1048a",
+    "after_sha256": "dccbdff390b68e9d1563c408f067063c216a0d009cf87939336fdcb500461ab6",
+    "reboot_replayed": false,
+    "record_sha256": "d854428e7211ebcb4c1e18c16d581093b57ac2f8531bc9a9e609184cb24a6a98"
+  },
+  "nine_selection_comparison": {
+    "passed": true,
+    "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+    "product_files": 116,
+    "tasks": {
+      "119-0": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 1,
+          "selected_batches": 1,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "c465c96a73ddd60ddf567e8914e1e031b8aba0ab209b24f1e8ecad70155492fe",
+          "484d5c37bcad30780e58c7c9d4de2e9b7af97f7b6337cb16ffa1e4cac7a2a4a3"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "119-1": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 2,
+          "selected_batches": 2,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "82efbbf84d8c52fb013c07b976615d67ca666b6f94764e7759b71dfeded4e5cc",
+          "d1d3ede1cc29b9f850ea5b00a8e9b2ed2902dd8f0989adb27636f75593c6e1c0"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "119-2": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 3,
+          "selected_batches": 3,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "37d37018bc3d6b5d0d0dbd7d4ee1f077070f2122cc52d8c5d315f37bae79635c",
+          "755e647a83a755fe84cbe5ba9432338c124e7009d74d88801a5a4386dc34ab86"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "119-3": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 4,
+          "selected_batches": 4,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "201a1f65ed0755ff5fecc9ea8f0e49421eadf7d96a0787eb8f4bbd22176ae861",
+          "cd075715399e9003ea9aa315798d3dada822736d5722408072337a2331b53e9b"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "119-4": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 4,
+          "selected_batches": 4,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "01dd8f3d3ccf51c8a9ecadd8e43b2aa917e51a40bb354975e74320be9bd52c95",
+          "d50c1dcb1171fb1c88f9f0aafbe33e3928c16755fe86862616829e2f3b2f79c3"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "120-0": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 1,
+          "selected_batches": 1,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "afe6387c885c46cceb65914952642a91e0b7363bd586d187f20592f8a25a773f",
+          "907ffaaadc8a8d4218cb43659e3bf4b26380acd400a5e198d0261f81f7b78469"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "120-1": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 2,
+          "selected_batches": 2,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "247549dacb4d9ab81cb2870721606b73607d00ea33384ebb1d330b1b0a39b138",
+          "87e691d9f1f5c42b6b257ee0887f54a4815ccc19f3f332b982acddd2cb18cfd4"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "120-2": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 3,
+          "selected_batches": 3,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "e0d204368d8a3aea94d2547904f7c570e590768a008dbadd5f4efb7c551c708b",
+          "1644aeef33dcddd53c4e061db99cb60ebc66a5e6a0a0c5fe9dbcd33fe2f64795"
+        ],
+        "comparison_after_task_completed": true
+      },
+      "120-3": {
+        "selection_equal": true,
+        "selection": {
+          "completed_batches": 4,
+          "selected_batches": 4,
+          "excluded_batches": 0,
+          "window_fallback": false
+        },
+        "source_records": [
+          "28a2e1322ce0d30ac4eadeeaf091bfab7ee4e4330f65b1e12505655c547f99b0",
+          "845a161e1dcc6774d337fb6507322a6cd459527270eb4b844b0d0cdac09563cb"
+        ],
+        "comparison_after_task_completed": true
+      }
+    },
+    "record_sha256": "e27e57861131a3a22004e7ea50cd13765c2a5a0541bfcab92ddf996b51d4bef0"
+  },
+  "development_baseline_sha256": "e450800b5c1b1659c6b815de85678915bfe161d872c7faf51009e453421731a1",
+  "development_nine_tasks": {
+    "119-0": {
+      "passed": true,
+      "seconds": 962.308,
+      "resources": {
+        "seconds": 962.014,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 423112704,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4011667456,
+        "peak_swap_used_bytes": 376832,
+        "samples": 3840,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 192.659,
+        "check": 1.784,
+        "import": 718.955,
+        "publish": 0.005,
+        "snapshot": 48.182
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 1,
+        "selected_batches": 1,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 26
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 12530144947,
+      "record_sha256": "c465c96a73ddd60ddf567e8914e1e031b8aba0ab209b24f1e8ecad70155492fe"
+    },
+    "119-1": {
+      "passed": true,
+      "seconds": 203.715,
+      "resources": {
+        "seconds": 203.475,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 281972736,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 3850772480,
+        "peak_swap_used_bytes": 380928,
+        "samples": 813,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 167.601,
+        "check": 1.999,
+        "import": 29.623,
+        "publish": 0.003,
+        "snapshot": 4.009
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 2,
+        "selected_batches": 2,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 28
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 13425890995,
+      "record_sha256": "82efbbf84d8c52fb013c07b976615d67ca666b6f94764e7759b71dfeded4e5cc"
+    },
+    "119-2": {
+      "passed": true,
+      "seconds": 221.166,
+      "resources": {
+        "seconds": 220.864,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 279642112,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4118777856,
+        "peak_swap_used_bytes": 25747456,
+        "samples": 882,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 183.852,
+        "check": 2.344,
+        "import": 30.258,
+        "publish": 0.005,
+        "snapshot": 4.082
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 3,
+        "selected_batches": 3,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 29
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 14337488563,
+      "record_sha256": "37d37018bc3d6b5d0d0dbd7d4ee1f077070f2122cc52d8c5d315f37bae79635c"
+    },
+    "119-3": {
+      "passed": true,
+      "seconds": 140.06,
+      "resources": {
+        "seconds": 139.825,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 274219008,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4853026816,
+        "peak_swap_used_bytes": 25743360,
+        "samples": 559,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 97.666,
+        "check": 2.116,
+        "import": 33.34,
+        "publish": 0.002,
+        "snapshot": 6.519
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 15267837619,
+      "record_sha256": "201a1f65ed0755ff5fecc9ea8f0e49421eadf7d96a0787eb8f4bbd22176ae861"
+    },
+    "119-4": {
+      "passed": true,
+      "seconds": 99.193,
+      "resources": {
+        "seconds": 98.961,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 196698112,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4959039488,
+        "peak_swap_used_bytes": 21479424,
+        "samples": 396,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 94.583,
+        "check": 2.139,
+        "publish": 0.002,
+        "snapshot": 1.891
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 15673104051,
+      "record_sha256": "01dd8f3d3ccf51c8a9ecadd8e43b2aa917e51a40bb354975e74320be9bd52c95"
+    },
+    "120-0": {
+      "passed": true,
+      "seconds": 1461.815,
+      "resources": {
+        "seconds": 1461.501,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 407236608,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4729077760,
+        "peak_swap_used_bytes": 304476160,
+        "samples": 5833,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 225.087,
+        "check": 14.666,
+        "import": 1083.943,
+        "publish": 0.005,
+        "snapshot": 137.594
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 1,
+        "selected_batches": 1,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 13
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 31733094067,
+      "record_sha256": "afe6387c885c46cceb65914952642a91e0b7363bd586d187f20592f8a25a773f"
+    },
+    "120-1": {
+      "passed": true,
+      "seconds": 909.504,
+      "resources": {
+        "seconds": 909.144,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 364437504,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 7894274048,
+        "peak_swap_used_bytes": 632127488,
+        "samples": 3629,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 384.542,
+        "check": 23.123,
+        "import": 440.568,
+        "publish": 0.007,
+        "snapshot": 60.633
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 2,
+        "selected_batches": 2,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 17
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 40234841779,
+      "record_sha256": "247549dacb4d9ab81cb2870721606b73607d00ea33384ebb1d330b1b0a39b138"
+    },
+    "120-2": {
+      "passed": true,
+      "seconds": 843.951,
+      "resources": {
+        "seconds": 843.529,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 370032640,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 6654279680,
+        "peak_swap_used_bytes": 748482560,
+        "samples": 3367,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 430.85,
+        "check": 24.978,
+        "import": 333.14,
+        "publish": 0.006,
+        "snapshot": 54.108
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 3,
+        "selected_batches": 3,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 21
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 47540049587,
+      "record_sha256": "e0d204368d8a3aea94d2547904f7c570e590768a008dbadd5f4efb7c551c708b"
+    },
+    "120-3": {
+      "passed": true,
+      "seconds": 1222.095,
+      "resources": {
+        "seconds": 1221.457,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 385380352,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 16280055808,
+        "peak_swap_used_bytes": 982568960,
+        "samples": 4875,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 708.328,
+        "check": 39.043,
+        "import": 400.387,
+        "publish": 0.008,
+        "snapshot": 73.179
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 25,
+          "succeeded": 25,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 25
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 56860022451,
+      "record_sha256": "28a2e1322ce0d30ac4eadeeaf091bfab7ee4e4330f65b1e12505655c547f99b0"
+    }
+  },
+  "target_nine_tasks": {
+    "119-0": {
+      "passed": true,
+      "seconds": 1008.108,
+      "resources": {
+        "seconds": 1007.788,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 434454528,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2346614784,
+        "peak_swap_used_bytes": 78381056,
+        "samples": 4019,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 206.635,
+        "check": 2.073,
+        "import": 752.66,
+        "publish": 0.005,
+        "snapshot": 46.072
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 1,
+        "selected_batches": 1,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 26
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 12530300595,
+      "record_sha256": "484d5c37bcad30780e58c7c9d4de2e9b7af97f7b6337cb16ffa1e4cac7a2a4a3"
+    },
+    "119-1": {
+      "passed": true,
+      "seconds": 240.748,
+      "resources": {
+        "seconds": 240.463,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 267583488,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2081161216,
+        "peak_swap_used_bytes": 24809472,
+        "samples": 960,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 201.323,
+        "check": 2.172,
+        "import": 32.586,
+        "publish": 0.002,
+        "snapshot": 4.062
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 2,
+        "selected_batches": 2,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 26,
+          "succeeded": 26,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 28
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 13426087603,
+      "record_sha256": "d1d3ede1cc29b9f850ea5b00a8e9b2ed2902dd8f0989adb27636f75593c6e1c0"
+    },
+    "119-2": {
+      "passed": true,
+      "seconds": 140.454,
+      "resources": {
+        "seconds": 140.196,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 287834112,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2473652224,
+        "peak_swap_used_bytes": 27787264,
+        "samples": 560,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 101.059,
+        "check": 2.339,
+        "import": 32.779,
+        "publish": 0.012,
+        "snapshot": 3.755
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 3,
+        "selected_batches": 3,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 28,
+          "succeeded": 28,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 29
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 14336898739,
+      "record_sha256": "755e647a83a755fe84cbe5ba9432338c124e7009d74d88801a5a4386dc34ab86"
+    },
+    "119-3": {
+      "passed": true,
+      "seconds": 142.45,
+      "resources": {
+        "seconds": 142.195,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 299298816,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2484809728,
+        "peak_swap_used_bytes": 30408704,
+        "samples": 568,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 103.058,
+        "check": 2.332,
+        "import": 32.575,
+        "publish": 0.003,
+        "snapshot": 3.856
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 29,
+          "succeeded": 29,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 15267559091,
+      "record_sha256": "cd075715399e9003ea9aa315798d3dada822736d5722408072337a2331b53e9b"
+    },
+    "119-4": {
+      "passed": true,
+      "seconds": 107.327,
+      "resources": {
+        "seconds": 107.052,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 197722112,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2415931392,
+        "peak_swap_used_bytes": 30932992,
+        "samples": 428,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 102.448,
+        "check": 2.333,
+        "publish": 0.002,
+        "snapshot": 1.889
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 30,
+          "succeeded": 30,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 30
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 15672850099,
+      "record_sha256": "d50c1dcb1171fb1c88f9f0aafbe33e3928c16755fe86862616829e2f3b2f79c3"
+    },
+    "120-0": {
+      "passed": true,
+      "seconds": 1552.498,
+      "resources": {
+        "seconds": 1552.09,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 501051392,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2364157952,
+        "peak_swap_used_bytes": 99352576,
+        "samples": 6066,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 246.362,
+        "check": 15.138,
+        "import": 1131.184,
+        "publish": 0.014,
+        "snapshot": 158.972
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 1,
+        "selected_batches": 1,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 0,
+          "succeeded": 0,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 13
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 31735273139,
+      "record_sha256": "907ffaaadc8a8d4218cb43659e3bf4b26380acd400a5e198d0261f81f7b78469"
+    },
+    "120-1": {
+      "passed": true,
+      "seconds": 912.797,
+      "resources": {
+        "seconds": 912.364,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 459530240,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 2877304832,
+        "peak_swap_used_bytes": 149422080,
+        "samples": 3527,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 358.512,
+        "check": 24.793,
+        "import": 459.299,
+        "publish": 0.006,
+        "snapshot": 69.427
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 2,
+        "selected_batches": 2,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 13,
+          "succeeded": 13,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 17
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 40235095731,
+      "record_sha256": "87e691d9f1f5c42b6b257ee0887f54a4815ccc19f3f332b982acddd2cb18cfd4"
+    },
+    "120-2": {
+      "passed": true,
+      "seconds": 846.12,
+      "resources": {
+        "seconds": 845.686,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 446496768,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 3151929344,
+        "peak_swap_used_bytes": 176685056,
+        "samples": 3278,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 426.739,
+        "check": 28.865,
+        "import": 334.181,
+        "publish": 0.004,
+        "snapshot": 55.606
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 3,
+        "selected_batches": 3,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 17,
+          "succeeded": 17,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 21
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 47538132659,
+      "record_sha256": "1644aeef33dcddd53c4e061db99cb60ebc66a5e6a0a0c5fe9dbcd33fe2f64795"
+    },
+    "120-3": {
+      "passed": true,
+      "seconds": 1179.743,
+      "resources": {
+        "seconds": 1179.278,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 514953216,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 10859139072,
+        "peak_swap_used_bytes": 207355904,
+        "samples": 4577,
+        "oom_kills": 0
+      },
+      "stages": {
+        "build": 665.112,
+        "check": 40.867,
+        "import": 398.737,
+        "publish": 0.005,
+        "snapshot": 74.297
+      },
+      "baseline_equal": true,
+      "version_chain_verified": true,
+      "normalization_timeouts": 0,
+      "selection": {
+        "completed_batches": 4,
+        "selected_batches": 4,
+        "excluded_batches": 0,
+        "window_fallback": false
+      },
+      "import_attempt_audit": {
+        "before": {
+          "total": 21,
+          "succeeded": 21,
+          "interrupted": 0
+        },
+        "after": {
+          "total": 25,
+          "succeeded": 25,
+          "interrupted": 0
+        },
+        "allowed_interrupted": [],
+        "baseline_successful": 25
+      },
+      "program_verification": {
+        "passed": true,
+        "version": "v1.0.0",
+        "kind": "candidate",
+        "commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+        "files": 127
+      },
+      "selection_baseline_equal_after_completion": true,
+      "database_bytes": 56858629811,
+      "record_sha256": "845a161e1dcc6774d337fb6507322a6cd459527270eb4b844b0d0cdac09563cb"
+    }
+  },
+  "development_examples": {
+    "window": {
+      "passed": true,
+      "resources": {
+        "seconds": 34.32,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 88903680,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 4840927232,
+        "peak_swap_used_bytes": 823029760,
+        "samples": 138,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "944eae4b9ed909fce6fba68ef984e17049c6607b7200bcfd2edcb0a5c79e4631"
+    },
+    "threshold": {
+      "passed": true,
+      "resources": {
+        "seconds": 139.071,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 200552448,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 5503897600,
+        "peak_swap_used_bytes": 1023057920,
+        "samples": 556,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "14ee37ffd49ad5741a05a00d53772aa841fa0c9ae5b5f6550b2b9f599e97ecfd"
+    },
+    "template": {
+      "passed": true,
+      "resources": {
+        "seconds": 238.27,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 177180672,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 8563294208,
+        "peak_swap_used_bytes": 1554665472,
+        "samples": 952,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "5fa6deafa130b9ba36d40ffc3c2100ae054b2a1550048a7aa1b043859c6042bc"
+    },
+    "exclusion": {
+      "passed": true,
+      "resources": {
+        "seconds": 167.606,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 193941504,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 6044762112,
+        "peak_swap_used_bytes": 1937477632,
+        "samples": 670,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "c452950e020856cce5c4c05b787515588c3711f332b57f2a3720380c2bf322c2"
+    },
+    "retention": {
+      "passed": true,
+      "resources": {
+        "seconds": 0.251,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 1937408,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 3607052288,
+        "peak_swap_used_bytes": 2250756096,
+        "samples": 2,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "98679c774edc922fe8c5f0cfcde5588a5227013ff30e47d7caad63297097e945"
+    },
+    "workers": {
+      "passed": true,
+      "resources": {
+        "seconds": 0.501,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 41037824,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 3601920000,
+        "peak_swap_used_bytes": 2250256384,
+        "samples": 3,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "ac86a3c8833181275807219416bd64c14b2e29ed98055439e009f7a61cd7048f"
+    },
+    "import": {
+      "passed": true,
+      "resources": {
+        "seconds": 1.254,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 40919040,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 3594772480,
+        "peak_swap_used_bytes": 2250252288,
+        "samples": 6,
+        "oom_kills": 0
+      },
+      "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+      "record_sha256": "ff47430ef8edf10ce8a6a9d4dd251e24588cb057ce053b3ee7d252e3f34e4b4e"
+    }
+  },
+  "development_target_statistics": {
+    "passed": true,
+    "cross_machine": true,
+    "clusters": {
+      "119": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "1E-12",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 537198,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "different_rows": 17,
+              "metrics": {
+                "log_median": {
+                  "different": 12,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "1E-15"
+                },
+                "log_mad": {
+                  "different": 13,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "8.9E-16"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 180,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      },
+      "120": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "1E-12",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 5850925,
+              "expected_rows": 5850925,
+              "key_mismatches": 0,
+              "different_rows": 400,
+              "metrics": {
+                "log_median": {
+                  "different": 358,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "2E-15"
+                },
+                "log_mad": {
+                  "different": 84,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "9E-16"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 6748,
+              "expected_rows": 6748,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      }
+    },
+    "record_sha256": "5cabca37db50d6a9c4a1d61e54a5120d17cc891fc2bee5606b27be4c53744f1d"
+  },
+  "same_machine_manual_daily_statistics": {
+    "passed": true,
+    "cross_machine": false,
+    "clusters": {
+      "119": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "0",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 537198,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 180,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      },
+      "120": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "0",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 5850925,
+              "expected_rows": 5850925,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-17"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 6748,
+              "expected_rows": 6748,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      }
+    },
+    "record_sha256": "d216eb362a51d650116e1319d2ec340c2ac5efb403738092f8d995540246bb09"
+  },
+  "same_machine_after_deletion_statistics": {
+    "passed": true,
+    "cross_machine": false,
+    "clusters": {
+      "119": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "0",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 537198,
+              "expected_rows": 537198,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 180,
+              "expected_rows": 180,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-16"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      },
+      "120": {
+        "same_configuration_and_window": true,
+        "statistics": {
+          "format": "sql-apm-guide-statistics/1",
+          "absolute_limit": "0",
+          "passed": true,
+          "tables": {
+            "mpp_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 5850925,
+              "expected_rows": 5850925,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-17"
+                }
+              },
+              "passed": true
+            },
+            "mpp_observation_statistic": {
+              "exact_fields_equal": true,
+              "actual_rows": 6748,
+              "expected_rows": 6748,
+              "key_mismatches": 0,
+              "different_rows": 0,
+              "metrics": {
+                "log_median": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0E-15"
+                },
+                "log_mad": {
+                  "different": 0,
+                  "null_mismatches": 0,
+                  "exceeded": 0,
+                  "max_absolute": "0.0"
+                }
+              },
+              "passed": true
+            }
+          }
+        }
+      }
+    },
+    "record_sha256": "d216eb362a51d650116e1319d2ec340c2ac5efb403738092f8d995540246bb09"
+  },
+  "daily_first_recovery": {
+    "passed": true,
+    "product_first_command_returncode": 0,
+    "first_record_sha256": "d21ab6a5353db83f77d000838a97e057a64503f4afc927773ed5df4fc6eb72a2",
+    "original_failure_log_sha256": "92e95b5db07e08452555407be94c899aa8705a75c01a2dd1663fbc8e4179fec7",
+    "reason": "private verifier JSON stdout serialization after successful checks",
+    "first_stage_replayed": false,
+    "completed_commands_replayed": false,
+    "live_database_matches_completed_first_record": true,
+    "record_sha256": "425795d83c01e7c09ff18a046f1adff8e5f0cf17809ffdf50a8efe9d04624a0f"
+  },
+  "profile_effects": {
+    "passed": true,
+    "profile_restored_byte_equal": true,
+    "profile_sha256": "d19f5d687997909dbaabddd32c5e47955157a03b36c243146ce569fb50f3de2a",
+    "explicit_commands_equal": true,
+    "two_actual_service_runs_equal": true,
+    "resident_services_same_pids": true,
+    "grafana_connection_equal": true,
+    "fingerprint_connections_passed": true,
+    "profile_absence_presence_proved": true,
+    "record_sha256": "8b48e5caa9f234800909b6e3b0cea30b000672d58e03feda52894b6aa7f99503"
+  },
+  "reboot": {
+    "passed": true,
+    "boot_id_changed": true,
+    "scheduled_instant_preceded_boot": true,
+    "all_four_automatically_started": true,
+    "postgresql_preceded_dependants": true,
+    "manual_service_start": false,
+    "missed_run_count": 1,
+    "catchup_after_boot_seconds": 7.877,
+    "extra_observation_seconds": 15,
+    "clock_was_not_changed": true,
+    "services": {
+      "sql-apm-postgresql.service": {
+        "Wants": "",
+        "After": "basic.target system.slice data.mount sysinit.target -.mount systemd-journald.socket local-fs.target network.target",
+        "ActiveEnterTimestampMonotonic": "4074429"
+      },
+      "sql-apm-grafana.service": {
+        "Wants": "sql-apm-postgresql.service network-online.target",
+        "After": "network-online.target basic.target sysinit.target sql-apm-postgresql.service systemd-journald.socket data.mount system.slice -.mount",
+        "ActiveEnterTimestampMonotonic": "4076260"
+      },
+      "sql-apm-fingerprint.service": {
+        "Wants": "sql-apm-postgresql.service network-online.target",
+        "After": "-.mount basic.target system.slice network-online.target sql-apm-postgresql.service data.mount sysinit.target systemd-journald.socket",
+        "ActiveEnterTimestampMonotonic": "4075731"
+      },
+      "sql-apm-daily.timer": {
+        "Wants": "",
+        "After": "sysinit.target time-sync.target var.mount -.mount",
+        "ActiveEnterTimestampMonotonic": "3913568"
+      }
+    },
+    "record_sha256": "f10af0685574957928a5591176233ca7d30ae78a70fb65277ced86038405636e"
+  },
+  "fingerprint_logs": {
+    "passed": true,
+    "request_succeeded": true,
+    "loopback_readonly_configuration": true,
+    "request_records": 5,
+    "only_metadata_in_request_logs": true,
+    "record_sha256": "77800cbe3105389ce424d31e2255014b55713b432c426122c4230b431654f65e"
+  },
+  "custom_folder": {
+    "passed": true,
+    "custom_folder_present": true,
+    "viewer_write_refused": true,
+    "admin_custom_dashboard_saved": true,
+    "probe_dashboard_removed": true,
+    "record_sha256": "dbf7d8ee69f6c93076745a0b2726852fee19816f59f61519bdb5e9d0d31d8ad7"
+  },
+  "daily_stages": {
+    "first": {
+      "passed": true,
+      "resources": {
+        "seconds": 2513.254,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 545439744,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 1955078144,
+        "peak_swap_used_bytes": 164626432,
+        "samples": 9743,
+        "oom_kills": 0
+      },
+      "normalization_timeouts": 0,
+      "before": {
+        "counts": {
+          "source_file": 1,
+          "import_attempt": 1,
+          "publication": 0
+        },
+        "publications": {},
+        "open_problems": 1,
+        "normalization_timeouts": 0,
+        "database_bytes": 236672691,
+        "free_disk_bytes": 112277258240
+      },
+      "after": {
+        "counts": {
+          "source_file": 39,
+          "import_attempt": 40,
+          "publication": 2
+        },
+        "publications": {
+          "119": 1,
+          "120": 1
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 28606740147,
+        "free_disk_bytes": 81605054464
+      },
+      "cutoff_dates": {
+        "119": "2026-07-28",
+        "120": "2026-09-16"
+      },
+      "final_state": "succeeded",
+      "record_sha256": "d21ab6a5353db83f77d000838a97e057a64503f4afc927773ed5df4fc6eb72a2"
+    },
+    "incremental": {
+      "passed": true,
+      "resources": {
+        "seconds": 2194.135,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 391094272,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 1966211072,
+        "peak_swap_used_bytes": 179306496,
+        "samples": 8512,
+        "oom_kills": 0
+      },
+      "normalization_timeouts": 0,
+      "before": {
+        "counts": {
+          "source_file": 39,
+          "import_attempt": 40,
+          "publication": 2
+        },
+        "publications": {
+          "119": 1,
+          "120": 1
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 28606535347,
+        "free_disk_bytes": 76089303040
+      },
+      "after": {
+        "counts": {
+          "source_file": 55,
+          "import_attempt": 56,
+          "publication": 4
+        },
+        "publications": {
+          "119": 2,
+          "120": 2
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 48449705651,
+        "free_disk_bytes": 55488245760
+      },
+      "cutoff_dates": {
+        "119": "2026-07-31",
+        "120": "2026-09-19"
+      },
+      "final_state": "succeeded",
+      "record_sha256": "166a9de2dc6563baf180f467fa75a69824e9a2b558afaadb9218518a6b30b559"
+    },
+    "repeat": {
+      "passed": true,
+      "resources": {
+        "seconds": 0.261,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 516096,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 1579462656,
+        "peak_swap_used_bytes": 149946368,
+        "samples": 2,
+        "oom_kills": 0
+      },
+      "normalization_timeouts": 0,
+      "before": {
+        "counts": {
+          "source_file": 55,
+          "import_attempt": 56,
+          "publication": 4
+        },
+        "publications": {
+          "119": 2,
+          "120": 2
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 48449705651,
+        "free_disk_bytes": 55488065536
+      },
+      "after": {
+        "counts": {
+          "source_file": 55,
+          "import_attempt": 56,
+          "publication": 4
+        },
+        "publications": {
+          "119": 2,
+          "120": 2
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 48449705651,
+        "free_disk_bytes": 55488012288
+      },
+      "cutoff_dates": {
+        "119": "2026-07-31",
+        "120": "2026-09-19"
+      },
+      "final_state": "succeeded",
+      "record_sha256": "35fb52fdcab97c77c84948309352dab3bee62f478f0b235edb06b8905b6a4217"
+    },
+    "delete": {
+      "passed": true,
+      "resources": {
+        "seconds": 13.919,
+        "returncode": 0,
+        "memory_method": "host MemTotal-MemAvailable, 250ms sampling; includes OS and PostgreSQL",
+        "process_peak_rss_bytes": 35188736,
+        "process_memory_method": "sum VmRSS of CLI and recursive children, 250ms sampling; shared pages counted per process; excludes PostgreSQL",
+        "peak_used_bytes": 1607725056,
+        "peak_swap_used_bytes": 149684224,
+        "samples": 55,
+        "oom_kills": 0
+      },
+      "normalization_timeouts": 0,
+      "before": {
+        "counts": {
+          "source_file": 55,
+          "import_attempt": 56,
+          "publication": 4
+        },
+        "publications": {
+          "119": 2,
+          "120": 2
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 48449681075,
+        "free_disk_bytes": 55177953280
+      },
+      "after": {
+        "counts": {
+          "source_file": 55,
+          "import_attempt": 56,
+          "publication": 4
+        },
+        "publications": {
+          "119": 2,
+          "120": 2
+        },
+        "open_problems": 0,
+        "normalization_timeouts": 0,
+        "database_bytes": 48449738419,
+        "free_disk_bytes": 70994124800
+      },
+      "cutoff_dates": {
+        "119": "2026-07-31",
+        "120": "2026-09-19"
+      },
+      "final_state": "succeeded",
+      "record_sha256": "e884eecd42db94f8f8fae2c247077cbcb083c614689995ece0970fd52c34c240"
+    }
+  },
+  "daily_kill_recovery": {
+    "passed": true,
+    "signal": "SIGKILL",
+    "process_group": true,
+    "during": "real log import",
+    "connection_check_seconds": 10,
+    "lease_released_seconds": 0.059,
+    "seconds": 20.825,
+    "returncode": -9,
+    "peak_used_bytes": 1446240256,
+    "peak_swap_used_bytes": 187957248,
+    "process_peak_rss_bytes": 284618752,
+    "samples": 82,
+    "oom_kills": 0,
+    "record_sha256": "3665b2309defb6e5c165493307bd973619667dd82aa3d6627ca777c853eed1d4"
+  },
+  "daily_pipeline": {
+    "passed": true,
+    "steps": 34,
+    "clock_changed": false,
+    "first_recovery": "daily-first-recovery.json",
+    "completed_commands_replayed": false,
+    "record_sha256": "f866b541e47c580c031d7903128bdb305c966d5deacbfa13e6e5509bdf5f45dc"
+  },
+  "browser": {
+    "search_list_detail": {
+      "samples": [
+        {
+          "kind": "most records",
+          "identity_records": 374838,
+          "identity_texts": 62473,
+          "timing": "execute_first",
+          "range_records": 29232,
+          "range_texts": 14616,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 19.81,
+          "slowest_seconds": 2.68,
+          "wall_seconds": 11.22,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "most original texts",
+          "identity_records": 374838,
+          "identity_texts": 62473,
+          "timing": "execute_first",
+          "range_records": 29232,
+          "range_texts": 14616,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 19.11,
+          "slowest_seconds": 2.37,
+          "wall_seconds": 10.76,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "failed records only",
+          "identity_records": 14643,
+          "identity_texts": 1,
+          "timing": "unknown",
+          "range_records": 14643,
+          "range_texts": 1,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 2.03,
+          "slowest_seconds": 0.81,
+          "wall_seconds": 6.46,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "extended protocol",
+          "identity_records": 903,
+          "identity_texts": 301,
+          "timing": "execute_first",
+          "range_records": 72,
+          "range_texts": 72,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 1.67,
+          "slowest_seconds": 0.78,
+          "wall_seconds": 6.5,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "insufficient samples",
+          "identity_records": 7,
+          "identity_texts": 7,
+          "timing": "request",
+          "range_records": 7,
+          "range_texts": 7,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 1.23,
+          "slowest_seconds": 0.73,
+          "wall_seconds": 6.33,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "random with requests",
+          "identity_records": 167,
+          "identity_texts": 1,
+          "timing": "request",
+          "range_records": 167,
+          "range_texts": 1,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 1.63,
+          "slowest_seconds": 0.75,
+          "wall_seconds": 6.28,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "kind": "random with requests",
+          "identity_records": 44977,
+          "identity_texts": 2,
+          "timing": "request",
+          "range_records": 11088,
+          "range_texts": 2,
+          "equal": true,
+          "queries": 24,
+          "summed_seconds": 2.88,
+          "slowest_seconds": 0.9,
+          "wall_seconds": 6.85,
+          "minimum_observation_wait_seconds": 4.0
+        }
+      ],
+      "pages": [
+        {
+          "page": "detail, 7 days, most records",
+          "queries": 24,
+          "summed_seconds": 19.81,
+          "slowest_seconds": 2.68,
+          "wall_seconds": 11.22,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, most original texts",
+          "queries": 24,
+          "summed_seconds": 19.11,
+          "slowest_seconds": 2.37,
+          "wall_seconds": 10.76,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, failed records only",
+          "queries": 24,
+          "summed_seconds": 2.03,
+          "slowest_seconds": 0.81,
+          "wall_seconds": 6.46,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, extended protocol",
+          "queries": 24,
+          "summed_seconds": 1.67,
+          "slowest_seconds": 0.78,
+          "wall_seconds": 6.5,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, insufficient samples",
+          "queries": 24,
+          "summed_seconds": 1.23,
+          "slowest_seconds": 0.73,
+          "wall_seconds": 6.33,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, random with requests",
+          "queries": 24,
+          "summed_seconds": 1.63,
+          "slowest_seconds": 0.75,
+          "wall_seconds": 6.28,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "detail, 7 days, random with requests",
+          "queries": 24,
+          "summed_seconds": 2.88,
+          "slowest_seconds": 0.9,
+          "wall_seconds": 6.85,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "list, 24 hours, one cluster",
+          "range_rows": 6342,
+          "equal": true,
+          "queries": 8,
+          "summed_seconds": 2.65,
+          "slowest_seconds": 0.69,
+          "wall_seconds": 6.61,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "list, 24 hours, one cluster",
+          "range_rows": 251248,
+          "equal": true,
+          "queries": 8,
+          "summed_seconds": 4.88,
+          "slowest_seconds": 1.82,
+          "wall_seconds": 7.68,
+          "minimum_observation_wait_seconds": 4.0
+        },
+        {
+          "page": "search, words, known word",
+          "expected_hit": true,
+          "rows": 50,
+          "queries": 4,
+          "summed_seconds": 5.79,
+          "slowest_seconds": 5.73,
+          "wall_seconds": 6.52,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, words, several known words",
+          "expected_hit": true,
+          "rows": 50,
+          "queries": 4,
+          "summed_seconds": 4.63,
+          "slowest_seconds": 4.53,
+          "wall_seconds": 5.29,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, passage, stored fragment",
+          "expected_hit": true,
+          "rows": 2,
+          "queries": 6,
+          "summed_seconds": 3.8,
+          "slowest_seconds": 1.97,
+          "wall_seconds": 2.47,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, exact, stored statement",
+          "expected_hit": true,
+          "rows": 1,
+          "queries": 14,
+          "summed_seconds": 0.2,
+          "slowest_seconds": 0.03,
+          "wall_seconds": 2.05,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, words, absent word",
+          "expected_hit": false,
+          "rows": 0,
+          "queries": 12,
+          "summed_seconds": 1.99,
+          "slowest_seconds": 1.03,
+          "wall_seconds": 2.08,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, passage, absent passage",
+          "expected_hit": false,
+          "rows": 0,
+          "queries": 6,
+          "summed_seconds": 4.24,
+          "slowest_seconds": 1.79,
+          "wall_seconds": 2.08,
+          "minimum_observation_wait_seconds": 1.5
+        },
+        {
+          "page": "search, exact, absent structure",
+          "expected_hit": false,
+          "rows": 0,
+          "queries": 12,
+          "summed_seconds": 0.14,
+          "slowest_seconds": 0.02,
+          "wall_seconds": 2.04,
+          "minimum_observation_wait_seconds": 1.5
+        }
+      ],
+      "record_sha256": "c9c41aa7aaa3c8cf3e9293d26c841902fdd9294bd4f25c6ed588edc51b33faca"
+    },
+    "status": {
+      "passed": true,
+      "readonly": true,
+      "base_tables_equal": true,
+      "open_problems": 0,
+      "seconds": 6.45,
+      "queries": 7,
+      "summed_seconds": 0.45,
+      "slowest_seconds": 0.09,
+      "wall_seconds": 4.05,
+      "minimum_observation_wait_seconds": 2.5,
+      "record_sha256": "a1209c9cbe9576e64938ca884ff6303ac9e65e3b6e7255b0332f9dd6762bab05"
+    }
+  },
+  "backups": {
+    "before-reboot": {
+      "passed": true,
+      "files": 256,
+      "content_bytes": 933079116,
+      "archive_bytes": 931208961,
+      "archive_sha256": "8ccf018bd5a39badb041fa940dc65a80ba0cecbd66269b5a1b8e58f7288496bb",
+      "manifest_sha256": "8e94ffe224287794aa14dc022b7ce3677b1b981a7c4ac571722c3085eeb703f4"
+    },
+    "final": {
+      "passed": true,
+      "files": 261,
+      "content_bytes": 933106171,
+      "archive_bytes": 931212484,
+      "archive_sha256": "607b807c6070896ab4c3c47331df81122bf2ead2ffdd8049b2a1a83411fd5c9b",
+      "manifest_sha256": "813e23f28449c815d950781ec09192e3dd4739ba610760f3bbf53fa28d117225"
+    }
+  },
+  "source_preservation": {
+    "passed": true,
+    "original_files": 55,
+    "all_original_sha256_equal": true,
+    "temporary_fetch_key_removed": true,
+    "other_authorized_keys_byte_preserved": true,
+    "source_manifest_sha256": "0290cf007955b714455fe56ff7d42dfe5c19ca49720c08c951a005ab2ee23f2c"
+  },
+  "original_log_files": 55,
+  "batch_dates": 36,
+  "backup_scope": {
+    "database_dump_included": false,
+    "raw_logs_included": false,
+    "private_machine_evidence_kept_local": true,
+    "raw_logs_uploaded_to_github": false
+  },
+  "binary_selfcheck": {
+    "passed": true,
+    "checks": [
+      "python",
+      "postgres",
+      "initdb",
+      "psql",
+      "temporary-database",
+      "package",
+      "unit",
+      "database",
+      "publication",
+      "smoke",
+      "cleanup",
+      "search",
+      "views",
+      "grafana",
+      "daily",
+      "daily-recovery"
+    ],
+    "program_commit": "0e9e4ef421e1725f6f5aaf7e25d3192cdfaffb21",
+    "record_sha256": "4caca49c0a867d0d613e7f3b8548559f3e969e90fe161601010a1b7fa628935b"
+  },
+  "password_cases": {
+    "short": {
+      "case": "short",
+      "passed": true,
+      "connections": [
+        {
+          "role": "sql_apm",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "admin",
+          "actual_login": true,
+          "passed": true
+        },
+        {
+          "role": "viewer",
+          "actual_login": true,
+          "passed": true
+        }
+      ],
+      "readonly_write_denied": true,
+      "wrong_password_denied": true,
+      "grafana_upstream_short_rejected": [
+        1,
+        2,
+        3
+      ],
+      "record_sha256": "1e21388c011763423717af1ce6e4006d98f401a518a279aa111955e4c63d1035"
+    },
+    "colon": {
+      "case": "colon",
+      "passed": true,
+      "connections": [
+        {
+          "role": "sql_apm",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "admin",
+          "actual_login": true,
+          "passed": true
+        },
+        {
+          "role": "viewer",
+          "actual_login": true,
+          "passed": true
+        }
+      ],
+      "readonly_write_denied": true,
+      "wrong_password_denied": true,
+      "grafana_upstream_short_rejected": [
+        1,
+        2,
+        3
+      ],
+      "record_sha256": "fa71cb0f9c9eac25fa839d734446e8682ee18ef176f423133169031edddaf06d"
+    },
+    "backslash": {
+      "case": "backslash",
+      "passed": true,
+      "connections": [
+        {
+          "role": "sql_apm",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "socket",
+          "passed": true
+        },
+        {
+          "role": "sql_apm_ro",
+          "connection": "loopback",
+          "passed": true
+        },
+        {
+          "role": "admin",
+          "actual_login": true,
+          "passed": true
+        },
+        {
+          "role": "viewer",
+          "actual_login": true,
+          "passed": true
+        }
+      ],
+      "readonly_write_denied": true,
+      "wrong_password_denied": true,
+      "grafana_upstream_short_rejected": [
+        1,
+        2,
+        3
+      ],
+      "record_sha256": "efbcce8d64b5c045a1d39d894eb0cd2ab2b89dc715674a34fa6544081b56d73c"
+    }
+  },
+  "lan_access": {
+    "passed": true,
+    "checks": [
+      {
+        "role": "sql_apm",
+        "lan_login": true,
+        "wrong_password_denied": true
+      },
+      {
+        "role": "sql_apm_ro",
+        "lan_login": true,
+        "wrong_password_denied": true
+      }
+    ],
+    "remote_superuser_denied": true,
+    "fingerprint_lan_unreachable": true,
+    "record_sha256": "ed25288b0e06cb128d4bf612e70cc75320fad540e950692890ac8f41555d8658"
+  },
+  "account_files": {
+    "passed": true,
+    "readable_files": 23284,
+    "traversable_directories": 2343,
+    "private_directory_mode": "0700",
+    "password_files_mode": "0600",
+    "scan_during_active_database": true,
+    "record_sha256": "8b80e9b63a7bbde32f5a6f4e5f2381dbd123b3ccfa95fbbde186192dc274c4b0"
+  },
+  "service_boundaries": {
+    "passed": true,
+    "checks": [
+      "sql_apm",
+      "sql_apm_ro",
+      "readonly_write_denied",
+      "grafana_components",
+      "accounts_and_provisioning",
+      "systemd_kill_recovery",
+      "fingerprint_loopback_only"
+    ],
+    "record_sha256": "c1c6d0fd659f821cec0ec80ae7f80e2df32a03ab8b6d239a186f8a817e0a2e0f"
+  },
+  "fetch_and_timer": {
+    "fetch": {
+      "check": "fetch",
+      "returncode": 0,
+      "seconds": 27.867,
+      "checks": 16,
+      "passed": true,
+      "record_sha256": "6f6400324fadff96e5d25dd9683d6db4f5b77225b5c86aebb8714830e197d081",
+      "log_sha256": "583e38ddee8763f6b29207302a0e5fd7a4fea02f7abba11bba0a5f3aabd9cc84"
+    },
+    "timer": {
+      "check": "timer",
+      "returncode": 0,
+      "seconds": 608.677,
+      "checks": 10,
+      "passed": true,
+      "record_sha256": "f0650e59318dc588916dbc14ae4ec7258fbf4e9c1319c74ddc81c73fef874b62",
+      "log_sha256": "bbfb55b410563652740397d497e2f7c77597bed5eda2bde0bff0d8db7b228148"
+    }
+  },
+  "historical_releases": {
+    "passed": true,
+    "releases": {
+      "v0.1.0": {
+        "assets_unchanged": true,
+        "prerelease_unchanged": true,
+        "assets": [
+          {
+            "name": "sql-apm-v0.1.0.tar.gz",
+            "size": 209638,
+            "digest": "sha256:0c1095db4d89eaf587e66b7934565558c40d3b1792bdaf48d0f48edf803aab27"
+          },
+          {
+            "name": "sql-apm-v0.1.0.tar.gz.sha256",
+            "size": 88,
+            "digest": "sha256:76c1baa9610d8a76d48aaf67dcf730f5417213b3c4c38033265b32ba4758ab33"
+          }
+        ],
+        "tag_commit_unchanged": true
+      },
+      "v0.2.0": {
+        "assets_unchanged": true,
+        "prerelease_unchanged": true,
+        "assets": [
+          {
+            "name": "sql-apm-v0.2.0.tar.gz",
+            "size": 261968,
+            "digest": "sha256:28548dce31eeb1de91615896ff87d2031b721ee0bf5b63eed4912be91ea696c5"
+          },
+          {
+            "name": "sql-apm-v0.2.0.tar.gz.sha256",
+            "size": 88,
+            "digest": "sha256:e126919e4088dc4455f31d98f7368d35ace5ced6767a5b894c12a705acbce054"
+          }
+        ],
+        "tag_commit_unchanged": true
+      },
+      "v0.3.0": {
+        "assets_unchanged": true,
+        "prerelease_unchanged": true,
+        "assets": [
+          {
+            "name": "sql-apm-v0.3.0.tar.gz",
+            "size": 487964,
+            "digest": "sha256:2c2df336a5d890fd41612aeadbf5d184de8b864bbac01e7a997c4922fd0389fd"
+          },
+          {
+            "name": "sql-apm-v0.3.0.tar.gz.sha256",
+            "size": 88,
+            "digest": "sha256:3c4a59802114651258fd3520ce0669b518b57c79ff14b2a883aa14aa9c9c3531"
+          }
+        ],
+        "tag_commit_unchanged": true
+      }
+    },
+    "record_sha256": "3508e0e6ab83310bc557782d7d6b458b7db58ee8ddec116fabe2908b02bc62ec"
+  },
+  "host_suspend_diagnosis": {
+    "checked_target_utc": [
+      "2026-10-12T12:00:33Z",
+      "2026-10-12T12:07:10Z"
+    ],
+    "host_suspend_reported_by_user": true,
+    "target_reachable": true,
+    "same_boot_id": true,
+    "three_services_individually_active": true,
+    "completed_tasks": 5,
+    "completed_tasks_passed": true,
+    "completed_tasks_zero_timeouts_oom": true,
+    "active_task": "120-0",
+    "observed_progress": [
+      "file_read",
+      "13 files finished",
+      "build_created"
+    ],
+    "database_lock_wait_observed": false,
+    "kernel_oom_entries_observed": false,
+    "timer_fetch_exit": 0,
+    "daily_pipeline_waiting_for_nine": true,
+    "business_processes_restarted_by_diagnosis": false,
+    "completed_tasks_replayed": false,
+    "timing_limitation": "Host suspension duration was not measured; task durations are observations, not uninterrupted performance benchmarks."
+  }
+}

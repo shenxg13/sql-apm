@@ -12,10 +12,11 @@ import markdown
 from markdown.extensions.toc import slugify_unicode
 
 DOCUMENTS = {
-    'INSTALL.html': dict(title='安装与操作手册', sources=(
+    'INSTALL.html': dict(title='生产安装手册', sources=('docs/runbooks/production-installation.md',)),
+    'CONFIGURATION.html': dict(title='配置与每日运行', sources=(
+        'docs/runbooks/daily-run.md', 'docs/runbooks/configuration-guide.md')),
+    'REHEARSAL.html': dict(title='演练验证手册', sources=(
         'docs/runbooks/kylin-offline-deployment.md',
-        'docs/runbooks/daily-run.md',
-        'docs/runbooks/configuration-guide.md',
         'docs/runbooks/kylin-validation-record.md')),
     'DATABASE.html': dict(title='数据库结构说明', sources=(
         'docs/design/database-structure.md',
@@ -26,7 +27,7 @@ DOCUMENTS = {
     'SEARCH.html': dict(title='检索与看板使用指南', sources=(
         'docs/runbooks/search-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v0.3.0.md',)),
+        'docs/releases/v1.0.0.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''
@@ -204,7 +205,7 @@ def render(root, commit, version, filename='INSTALL.html'):
                 '<meta name="viewport" content="width=device-width,initial-scale=1">'
                 '<title>' + escape(title) + '</title><style>' + CSS + '</style></head><body>'
                 '<header><h1>' + escape(title) + '</h1><p>' + escape(version) +
-                ' · 预发布，不用于生产</p><p>离线文档；参考资料的 GitHub 链接需要联网。'
+                ' · 正式版本系列；候选与验收状态见 RELEASE.json 和发布说明</p><p>离线文档；参考资料的 GitHub 链接需要联网。'
                 '使用浏览器搜索、复制与打印。程序提交：<code>' + escape(commit) +
                 '</code></p></header><nav aria-label="文档目录"><ol>' + ''.join(contents) +
                 '</ol></nav>' + ''.join(sections) + '</body></html>\n')

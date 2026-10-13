@@ -1,53 +1,77 @@
 # SQL APM 程序发布说明
 
-当前交付目标为 `v0.3.0` 预发布，不用于生产；产品基准为包含 #51、#54 的 main
-`a3fde9092b96497327133caf05cec173ba721dec`。v0.2.0 的制品、标签和历史记录保持原样。
-范围、状态及验收以 [Issue #52](https://github.com/shenxg13/sql-apm/issues/52) 在线契约为准。
+交付目标为 `v1.0.0` 正式版，数据库结构保持 1.12.0，基线为 #57 合并后的 main
+`5494075f13c7030c3f0d1d084a4589a439745b62`。范围和状态以 [Issue #59](https://github.com/shenxg13/sql-apm/issues/59)
+在线契约为准；v0.3.0 及更早的标签、附件和历史发布说明保持原样。
 
-## 文件边界与文档
+## 文件与文档
 
-`scripts/deployment/package-files.json` 定义程序和独立验收资源集合。程序只包含运行代码、
-规则、SQL／迁移、Grafana／daily 配置、必要部署工具和四份 HTML；开发材料与测试放在 verification。
-`build_release.py` 接受 `vMAJOR.MINOR.PATCH`（不接受前导零），拒绝未提交变更，
-从固定提交导出，按固定顺序、模式和零时间戳生成可重复的 tar.gz。
+`scripts/deployment/package-files.json` 定义程序和独立验收包。
+程序含业务代码、规则、结构、Grafana／daily 配置及部署工具，测试和演练资源放在 verification。
 
-| 程序包根文件 | 原稿 |
+| 包根文档 | 原稿 |
 | --- | --- |
-| INSTALL.html | 部署手册、每日运行、配置指南、验证记录模板 |
+| INSTALL.html | [生产安装手册](production-installation.md) |
+| REHEARSAL.html | [演练验证手册](kylin-offline-deployment.md)、验证记录模板 |
+| CONFIGURATION.html | 每日运行、配置指南 |
 | DATABASE.html | 数据库结构说明和四张 SVG |
-| SEARCH.html | 检索与看板使用指南、查询函数契约 |
-| RELEASE.html | [v0.3.0 发布说明](../releases/v0.3.0.md)，兼作文档入口 |
+| SEARCH.html | 检索与看板使用指南 |
+| RELEASE.html | [v1.0.0 发布说明](../releases/v1.0.0.md)，与 GitHub 发布正文同源 |
 
-RELEASE.json 记录版本、提交、候选／发布类型、prerelease=true、production_use=false，
-`documents` 中记录每份文档标题、全部 Markdown／SVG 原稿摘要、HTML 检查结果；
-`entrypoint` 指向 RELEASE.html。files 记录程序逐文件摘要。
-HTML 用锁定 Python-Markdown 3.8.2 生成，无外部资源请求、图内嵌、锚点可达、代码块原样保留。
-GitHub 参考链接仅在用户点击时联网；四份 HTML 之间使用本地链接。
+构建使用锁定的 Python-Markdown 3.8.2，不进入产品依赖。
+RELEASE.json 保存提交、版本、原稿摘要、HTML 检查和逐文件摘要，`prerelease=false`；
+`kind=candidate` 时 `production_use=false`，合并后的 `kind=release` 才为 true。
+HTML 中明确候选与验收状态，离线链接、图与代码块均校验。
+`build_release.py` 只从干净固定提交导出，release 还要求提交已经包含在 origin/main 中。
 
-## 开发机构建与检查
+## 连接目标机前
 
-复用已安装的独立 `var/issue31/build-venv`；首次建立时按锁定的
-`scripts/deployment/build-requirements.txt` 下载并离线安装构建依赖，产品运行依赖不增加。
-程序与完整包命令见[手册第 3 节](kylin-offline-deployment.md#3-获取传输与核对本次离线包)。
-输出使用 `var/issue52/deliveries/完整提交/`，不可复用旧目录。
+先完成本地实现、文档、检查及可重复的编译候选包。没有 Kylin 成品时不能生成正式完整包，
+使用 `--compile-only` 产生 `bundle_type=compilation-bootstrap` 的明确候选。
+它用于唯一一次成品编译；不是生产交付包。无需临时替换为 Alma 二进制。
 
 ```bash
 .venv/bin/python scripts/deployment/check_documents.py
+.venv/bin/python scripts/tests/test_installation.py
+.venv/bin/python scripts/db/verify_installation.py
 var/issue31/build-venv/bin/python scripts/tests/test_deployment.py
+.venv/bin/python scripts/tests/test_grafana.py
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python scripts/db/verify.py
-.venv/bin/python scripts/db/verify_publication.py
-.venv/bin/python scripts/db/verify_cleanup.py
 PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 ```
 
-文档检查对照产品校验器中的键集合和 schema.sql 的表／列以及查询函数签名，逐个校验 JSON 示例，
-核对手册命令在程序或验收包中。制包测试包含漏键、坏例、漏表、错列、函数参数和返回列漂移、缺脚本的反例。
-另外必须执行全部指南示例，不把 JSON 校验等同于真实命令通过。
-重复制包使用同一固定提交、同一输入和不同输出目录；程序、验收和完整包应字节相同。
+旧的 downloads 和解压依赖已按用户要求清理，先从保留的最终完整包恢复到本轮新输入目录：
 
-在仓库外或隔离目录解压程序和验收包，用精确 Python 3.13.16 建立全新 venv，
-从离线 wheels 按 requirements.txt 安装。令 APM_APP、APM_VERIFY 指向这两个目录：
+```bash
+(cd var/issue52/deliveries/f983a311253a9d31029761fccb2e104fd6982bb0 && sha256sum -c offline-bundle.tar.gz.sha256)
+mkdir -p var/issue59/inputs
+tar -xzf var/issue52/deliveries/f983a311253a9d31029761fccb2e104fd6982bb0/offline-bundle.tar.gz \
+  -C var/issue59/inputs --wildcards \
+  'offline-bundle/sources/*' 'offline-bundle/wheels/*' 'offline-bundle/manifest.json'
+```
+
+输入目录恢复后执行下面的制包命令。
+
+固定提交后，用两个全新目录分别构建并比较程序、验收包和编译候选的摘要：
+
+```bash
+APM_BUILD_COMMIT="$(git rev-parse HEAD)"
+APM_DELIVERY_DIR="$PWD/var/issue59/deliveries/$APM_BUILD_COMMIT"
+var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
+  --commit "$APM_BUILD_COMMIT" --version v1.0.0 --kind candidate --output "$APM_DELIVERY_DIR/release"
+.venv/bin/python scripts/deployment/build_bundle.py --compile-only \
+  --release-dir "$APM_DELIVERY_DIR/release" --output "$APM_DELIVERY_DIR/compilation-bundle" \
+  --rpm-collection var/issue31/rpm-collection \
+  --python-source var/issue59/inputs/offline-bundle/sources/Python-3.13.16.tgz \
+  --postgres-source var/issue31/postgresql-17.10.tar.gz \
+  --wheel-dir var/issue59/inputs/offline-bundle/wheels --grafana-files var/issue51/downloads \
+  --source-manifest var/issue59/inputs/offline-bundle/manifest.json
+```
+
+已有源清单只用于核对固定 URL 和摘要，每个实际输入仍须校验；不下载安装工具来判断其是否存在。
+
+隔离解压 app 和 verification，在 app 创建精确 Python 3.13.16 的新 venv，从锁定 wheel 离线安装，
+再串行执行十个入口（每个数据库检查使用自己的临时实例）：
 
 ```bash
 cd "$APM_APP"
@@ -58,59 +82,59 @@ for check in unit database publication smoke cleanup search views grafana daily 
 done
 ```
 
-十个入口通过后，用同一候选程序在全新私有实例运行开发机九任务及全部指南示例，
-生成新增选批字段和四示例的机器基准。归一化超时非零或业务基准差异均拒绝通过。
-开发机与目标机均不修改系统日期；真实日志每日回放与九任务先后进行，保留独立记录。
-指南跨机比较采用已确认口径：两列 log_median、log_mad 逐行绝对差不超过 1e-12，
-其他字段精确相同，并核对 NULL 状态和记录最大差／差异行数。同机门槛前后及清理前后仍全部精确不变。
+本轮没有修改业务代码、规则和结构，开发机有界检查验证部署改变；目标机仍须重新执行完整九任务和界面流程。
+不能把本地合成检查、历史基准或缺库模拟当作 Kylin 二进制兼容性、自启和重启通过。
 
-完整开发机基准的 `development-baseline.json` 和八个统计数值 `.jsonl.gz` 文件另放在
-交付目录的 `development-baseline/`，生成 SHA256SUMS 并在交付记录中给出该清单的摘要。
-这些文件随内网验收材料交付，不加入 Git 或公开 Release 附件；九任务及指南复现见安装手册附录 A、B。
+## 成品编译与完整包
 
-## 目标机开始与证据绑定
+用户恢复初始快照后，按演练手册第一轮编译，十个随包入口全部通过后导出 runtime-artifact。
+成品包括固定目录下的 Python、PostgreSQL 和已安装 wheel 的 venv；记录系统版本、编译前后 RPM 清单、
+命令输出、源码／wheel／RPM 来源及摘要、成品逐文件摘要和嵌入前缀的文件清单。
+归档保留执行位和受限符号链接；不含 pgdata、日志、凭据或真实输入。
 
-四份文档、制包和开发机检查完成后，在 Issue／PR 留下精确提交、制品摘要、本地结果、
-目标机初始状态的最新只读探测和执行计划。用户已授权本轮实施方全流程演练，记录发出后即可开始。
-目标机不是初始状态或不可达时停止报告，不自行重置。
-
-按随包手册完成默认四进程九任务、每日真实日志回放、定时器与模拟传输、服务与访问检查、
-开发机浏览器访问目标机的检索和四看板检查。每次结果绑定实际候选提交与包摘要，无法解释的差异保留现场。
-
-最终候选制包用 `--previous-program 已实测程序包` 比较产品文件：sql_apm、rules、requirements.txt、
-grafana、daily 以及所有随包部署脚本（只排除包清单验证器自身）。新增、删除、改名也算不同。
-全部相同才能继承结果；文档和验收资源变更仍需补验受影响步骤。产品文件改变时重新确定重跑范围。
-
-实施方先保存全部证据；用户再次恢复初始快照后，实施方重新只读核对起点。
-用户亲自按随包手册完成第 1–8 节安装和账号配置，从第 9 节起用 daily 完成分批拉取、导入、构建、
-定时器、模拟传输、检索和四看板验收；用户轮不再重复 full／rebuild 九任务，实施方九任务证据保留。
-若从第 8 步快照接续，先保存实施方补验证据，再由用户恢复同一快照亲自继续；已完成的安装记录保留。
-两轮分别使用[记录模板](kylin-validation-record.md)，实施方可依据实际证据与用户确认整理，无需用户重复手填。
-本轮门槛差异按 [Issue #52 的确认](https://github.com/shenxg13/sql-apm/issues/52#issuecomment-6109049165)单列，
-保留原严格比较失败；用户明确确认完整通过后才能合并。
-
-## 合并后发布
-
-R1–R17、R19–R21 及独立评审完成后合并，R18 在合并后执行，Issue 保持打开。
-从确认的 main 提交以 `--kind release` 重制包，与最终验收候选比较；产品文件相同，
-其他差异只限提交标识与派生元数据。不同则补验。
-
-把精确提交、v0.3.0 标签、两个附件的文件名、大小、SHA-256 和发布说明交给用户。
-取得明确确认后才执行下面的形式，不覆盖已有标签或附件：
+复制回开发机，外部核对 SHA256SUMS 的摘要，再校验内容：
 
 ```bash
-git tag -a v0.3.0 "$APM_RELEASE_COMMIT" -m 'SQL APM v0.3.0 预发布'
-git push origin refs/tags/v0.3.0
-gh release create v0.3.0 \
-  "$APM_RELEASE_DIR/sql-apm-v0.3.0.tar.gz" \
-  "$APM_RELEASE_DIR/sql-apm-v0.3.0.tar.gz.sha256" \
-  -R shenxg13/sql-apm --verify-tag --prerelease \
-  --title 'SQL APM v0.3.0 预发布' --notes-file "$APM_RELEASE_NOTES"
+.venv/bin/python scripts/deployment/runtime_archive.py inspect --artifact "$APM_RUNTIME_ARTIFACT"
 ```
 
-发布说明由 docs/releases/v0.3.0.md 的同一原稿生成；Release 页面链接转换为对应精确提交
-或交付文件的可达链接，并仅在 Release 页面和内网交付记录追加程序包摘要及下载校验命令，
-避免自引用摘要进入包。实测完成前不填写通过结论。
+将上文 `--compile-only` 改为 `--runtime-artifact "$APM_RUNTIME_ARTIFACT"`，其余源和候选保持固定，
+用新输出目录生成完整包。两次相同输入的完整包也须字节相同。
+清单保存 `runtime_manifest_sha256` 和每个成品文件，Grafana 四个固定组件继续按清单校验。
+后续候选／发布可更改文档和程序身份，但必须复用同一成品；依赖锁不符则制包拒绝。
+成品输出目录不允许覆盖，不能在后续轮次悄悄重编。
 
-发布后实际下载两个附件，核对摘要、清单、四份 HTML、标签及提交；完整离线包包含同一
-程序包。将链接、大小和摘要写入 Issue／PR，R18 完成前不关闭 Issue。
+## 目标机与用户验收
+
+用户再次恢复初始快照后，实施方按生产手册完成二进制安装，用开发机样本代替真实首次拉取与首批导入。
+安装前后 rpm 清单必须完全相同，十个入口、九任务与基准、每日运行、定时器、传输、检索和四看板均检查。
+真实重启核对数据库、Grafana、指纹服务自启和一次错过任务的补跑。
+验证错误目录和缺失系统库的停止行为、四个账号的允许／拒绝情形，资源只记录，不设门槛。
+
+指南比较延用既定规则：log_median／log_mad 跨机绝对差最多 1e-12，其他列及 NULL 精确一致；
+同机比较仍精确，不能沿用 #52 用户轮接受的门槛配置差异作为本版例外。
+成品和各轮包身份、输出与机器记录均复制回开发机按摘要核对；公开报告只写脱敏结果。
+用户第三次恢复初始快照，亲自按生产手册完成一轮安装和上线并在 Issue 或 PR 明确确认。
+实施方实测不能替代用户验收。目标机不可达时保留剩余门槛，不降低验收、不合并。
+
+## 合并后正式发布
+
+M1–M14 和独立评审完成后才合并；核对精确合并提交触发的 main 检查通过。
+M15 在合并后执行，Issue 保持打开。从固定 main 提交重制 `--kind release` 程序和完整包，
+复用同一 Kylin 成品，与实测候选逐路径比较。部署脚本也属于产品文件，变化须补验，不能只比较业务目录。
+
+发布说明从 docs/releases/v1.0.0.md 转换仓库相对链接为精确提交链接；保持同一原稿，不另写独立版本。
+实际验收完成后更新“已验证、未验证、不提供”，不能把本阶段候选文字原样作为通过结论。
+正式发布命令不带 --prerelease：
+
+```bash
+git tag -a v1.0.0 "$APM_RELEASE_COMMIT" -m 'SQL APM v1.0.0'
+git push origin refs/tags/v1.0.0
+gh release create v1.0.0 \
+  "$APM_RELEASE_DIR/sql-apm-v1.0.0.tar.gz" \
+  "$APM_RELEASE_DIR/sql-apm-v1.0.0.tar.gz.sha256" \
+  -R shenxg13/sql-apm --verify-tag --title 'SQL APM v1.0.0' --notes-file "$APM_RELEASE_NOTES"
+```
+
+下载公开附件复核摘要、提交和文档；完整包通过内网交付。链接、大小、摘要和成品身份记入 Issue，
+M15 完成后才能关闭。不得覆盖既有标签或附件。

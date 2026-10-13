@@ -1,23 +1,17 @@
-# Kylin V10 SP2 离线部署与验证
+# Kylin V10 SP2 演练验证手册
 
-本手册交付 SQL APM `v0.3.0` 预发布，**不用于生产**。目标为已恢复初始快照的
-Kylin V10 SP2 x86_64 专用演练机，Python 3.13.16、PostgreSQL 17.10、结构 1.12.0。
-候选提交见 PROGRAM_COMMIT，全部原稿与文件摘要见 RELEASE.json；应用版本不等于结构版本。
-本版只支持全新安装，不提供从 v0.2.0 升级的步骤；后续 0.x 之间不承诺兼容。
+本手册用于 `v1.0.0` 的实施方和用户验收，结构保持 1.12.0；生产安装入口是
+[生产手册](production-installation.md)。本手册保留九任务、样本日志、快照和证据步骤，
+不把这些步骤混入生产手册。验收完成前候选包不得视为正式发布。
 
-程序包根目录有 INSTALL.html（本手册，含配置指南）、DATABASE.html（结构说明）、
-SEARCH.html（检索与看板指南）、RELEASE.html（入口及发布说明）。GitHub Release 附件只有程序包和校验文件；
-完整离线包和独立验收包内网交付。裸机安装需要完整离线包。
+按 [Issue #59](https://github.com/shenxg13/sql-apm/issues/59)：用户三次恢复初始快照，分别用于
+一次编译、实施方二进制完整验证、用户亲自按生产手册安装与上线。编译路径只跑安装和十个
+随包验收入口，不重跑九任务；二进制成品只编译一次，后续各轮按同一摘要核对。
+用户明确验收通过前不合并、不发布。真实 APM 生产机自检不是发版门槛。
 
-按 [Issue #52](https://github.com/shenxg13/sql-apm/issues/52) 的要求，实施方先从初始快照完整实测并保存证据；
-随后用户从初始快照亲自完成第 1–8 节安装，再以 daily 完成第 9 节起的验收。
-两轮均在传输前核对起点、使用离线 RPM、记录包身份与结果，
-不调整系统时钟。初始状态可以包含操作者为解包预先安装的 tar，须在开始记录中写明。
-首次传输前先完成制包、随包文档和开发机检查；目标机不是约定起点时先核对，不自行清理。
-用户完整验收通过后才能合并，打标签与发布再取得用户对精确制品的确认。
-
-**每日运行默认会清理过期版本结果并删除到期原始文件。** 正式使用前阅读[每日运行](daily-run.md)，
-关闭方式为 `cleanup.enabled=false`、`raw_files.retention_days="off"`；演练接收目录使用日志副本，原始证据另存。
+实施方二进制轮先按生产手册完成安装，第 8–9 节首次拉取和首批导入用开发机样本替代；
+以下第 9–13 节和附录保留既有数据核对方法。用户轮亲自按生产手册操作，样本来源仍由开发机提供。
+默认自动清理旧结果和删除过期原始文件，演练接收目录必须使用副本，原件另存。
 
 ## 1. 参数与前置检查
 
@@ -62,6 +56,8 @@ sudo -n ss -ltnp
 预期：目标机为已约定的 Kylin SP2 x86_64、glibc 2.28；sudo 返回 root；`/data`
 独立挂载且可写、空间能容纳约 15 GiB 日志、约 55–60 GiB 数据库及 WAL／构建目录。
 这是依据 Alma 的估计，不是性能门槛。5432 未占用，且没有其他任务使用部署目录。
+第二轮会同时保留独立九任务库、每日运行库和两份日志副本，不能只按单库估计空间；
+还须容纳各自的 WAL、统计快照和验收备份。每阶段记录可用空间，实测大小见本轮验证报告。
 失败：连接／sudo／磁盘／端口不符先处理环境，不安装到其他主机或改变系统 Python。
 快照存在性由虚拟机操作者确认，SSH 探测不能证明快照可恢复。
 运行前必须填写目标地址、允许网段，以及交付记录中的完整提交和离线包摘要；
@@ -82,7 +78,7 @@ export APM_EXPECTED_BUNDLE_SHA256='填写交付记录中的64位离线包摘要'
 
 复用已核验的 Python 3.13.16／PostgreSQL 17.10 源码、cp313 wheel 和离线 RPM 集合。
 Grafana 与三个插件采用随包固定清单，全部摘要和来源记在离线包 manifest.json 中。完整离线包含 RPM 仓库索引。
-以下在已获授权的目标机准备目录与 tar；tar 是解包工具，应在开始前由操作者准备；缺失则停止，不在本流程启用网络源。编译依赖在第 4 节离线安装。
+以下在已获授权的目标机准备目录与 tar；tar 是解包工具，应在开始前由操作者准备；缺失则停止，不在本流程启用网络源。二进制轮不安装 RPM；编译轮按第 4 节显式执行。
 
 ```bash
 sudo install -d -m 0755 -o "$(id -un)" -g "$(id -gn)" "$APM_ROOT" "$APM_ROOT/setup"
@@ -105,29 +101,32 @@ Python-Markdown 3.8.2 环境；开发机准备及重复构建、隔离安装的�
 
 ```bash
 APM_BUILD_COMMIT="$(git rev-parse HEAD)"
-APM_DELIVERY_DIR="$PWD/var/issue52/deliveries/$APM_BUILD_COMMIT"
+APM_DELIVERY_DIR="$PWD/var/issue59/deliveries/$APM_BUILD_COMMIT"
 var/issue31/build-venv/bin/python scripts/deployment/build_release.py \
-  --commit "$APM_BUILD_COMMIT" --version v0.3.0 --kind candidate \
+  --commit "$APM_BUILD_COMMIT" --version v1.0.0 --kind candidate \
   --output "$APM_DELIVERY_DIR/release"
 .venv/bin/python scripts/deployment/build_bundle.py \
   --output "$APM_DELIVERY_DIR/offline-bundle" \
   --release-dir "$APM_DELIVERY_DIR/release" \
   --rpm-collection var/issue31/rpm-collection \
-  --python-source var/issue52/downloads/Python-3.13.16.tgz \
-  --postgres-source var/issue33/delivery-final/offline-bundle/sources/postgresql-17.10.tar.gz \
-  --wheel-dir var/issue52/downloads/wheels --grafana-files var/issue51/downloads
+  --python-source var/issue59/inputs/offline-bundle/sources/Python-3.13.16.tgz \
+  --postgres-source var/issue31/postgresql-17.10.tar.gz \
+  --wheel-dir var/issue59/inputs/offline-bundle/wheels --grafana-files var/issue51/downloads \
+  --compile-only --source-manifest var/issue59/inputs/offline-bundle/manifest.json
 ```
 
 首次组装从官方元数据核对两个 cp313 wheel 的来源和摘要。后续可增加
 `--source-manifest 本次完整包目录/manifest.json` 离线复用已核对来源，仍逐项检查摘要和
 RPM 签名证据；旧 cp39 包的清单不能提供新 wheel 的来源。
+上述 `--compile-only` 只生成第一轮编译候选。第一轮导出成品后，按[制包说明](program-release.md)
+使用 `--runtime-artifact` 加入该唯一成品，重复构建并记录完整包摘要，第二、三轮均传输完整包。
 <!-- developer-only:end -->
 
 按本次交付记录填写外部摘要和精确提交，不用包内自行声明的值替代。在开发机传输：
 
 ```bash
 set -euo pipefail
-APM_DELIVERY_DIR="$PWD/var/issue52/deliveries/$APM_EXPECTED_COMMIT"
+APM_DELIVERY_DIR="$PWD/var/issue59/deliveries/$APM_EXPECTED_COMMIT"
 [[ "$APM_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
 [[ "$APM_EXPECTED_BUNDLE_SHA256" =~ ^[0-9a-f]{64}$ ]]
 printf '%s  %s\n' "$APM_EXPECTED_BUNDLE_SHA256" "$APM_DELIVERY_DIR/offline-bundle.tar.gz" | sha256sum -c -
@@ -153,190 +152,84 @@ sha256sum -c SHA256SUMS
 test "$(cat PROGRAM_COMMIT)" = "$APM_EXPECTED_COMMIT"
 ```
 
-预期全部 OK，`PROGRAM_COMMIT` 与交付记录一致；根目录四份 HTML 与程序包内对应文档相同。
+预期全部 OK，`PROGRAM_COMMIT` 与交付记录一致；根目录六份 HTML 与程序包内对应文档相同。
 失败停止安装，核对来源或重传，不修改摘要绕过。程序、业务日志及凭据不在目标机上联网获取。
 
-## 4. 安装系统编译依赖
+## 4. 编译路径与一次性成品
 
-本轮只执行禁用网络源的离线 RPM 路径，命令和完整输出保存到本次记录。
-
-```bash
-mapfile -t APM_COMPILE_PACKAGES < "$APM_BUNDLE/support/compile-packages.txt"
-```
-
-```bash
-# 先再验证 RPM 签名；不能接受 NOKEY 或只有 digest 没有 signature。
-for package in "$APM_BUNDLE"/rpms/*.rpm; do rpm --checksig "$package"; done
-sudo yum --disablerepo='*' \
-  --repofrompath="apm-offline,file://$APM_BUNDLE/rpms" --enablerepo=apm-offline \
-  --setopt=apm-offline.gpgcheck=1 --setopt=install_weak_deps=False \
-  install -y "${APM_COMPILE_PACKAGES[@]}"
-```
-
-离线路径禁用所有已配置网络源，仅启用这次命令的 file:// 本地源；不修改 yum 配置文件。
-完整 RPM 集合中的无关包不因存在于目录而全部安装；yum 按根包解析需要的依赖。
-预期：安装成功，`rpm -q "${APM_COMPILE_PACKAGES[@]}"` 全部存在。
-失败：保留事务错误，检查依赖或版本冲突；不加 `--skip-broken`、`--allowerasing` 或关闭签名。
-该集合覆盖本次初始主机和收集时源状态，不证明不同初始安装的生产主机一定可用。
-
-## 5. 程序与 Python 离线构建
+只在第一轮初始快照上执行。先解压程序与验收包，核对提交和 SHA256SUMS；
+`compile_runtime.sh` 会保存系统版本、编译前后 RPM 清单、全部命令和输出，编译后串行运行十个入口。
+它明确调用离线 yum，会升级系统包；影响见[生产手册编译附录](production-installation.md#附录-a-手工编译路径)。
 
 ```bash
 cd "$APM_ROOT"
 test ! -e "$APM_APP"
-tar -xzf "$APM_BUNDLE/program.tar.gz"
 test ! -e "$APM_VERIFY"
+tar -xzf "$APM_BUNDLE/program.tar.gz"
 tar -xzf "$APM_BUNDLE/verification.tar.gz"
 (cd "$APM_APP" && sha256sum -c SHA256SUMS)
 (cd "$APM_VERIFY" && sha256sum -c SHA256SUMS)
-test "$(cat "$APM_APP/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
-test "$(cat "$APM_VERIFY/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
-mkdir -p "$APM_ROOT/build" "$APM_ROOT/records"
-cd "$APM_ROOT/build"
-tar -xzf "$APM_BUNDLE/sources/Python-3.13.16.tgz"
-cd Python-3.13.16
-./configure --prefix="$(dirname "$(dirname "$APM_PYTHON")")" --with-ensurepip=install \
-  > "$APM_ROOT/records/python-configure.log" 2>&1
-make -j4 > "$APM_ROOT/records/python-make.log" 2>&1
-make install > "$APM_ROOT/records/python-install.log" 2>&1
-"$APM_PYTHON" --version
-"$APM_PYTHON" -m venv "$APM_APP/.venv"
-cd "$APM_APP"
-PIP_CONFIG_FILE=/dev/null .venv/bin/python -m pip --isolated --disable-pip-version-check \
-  install --no-index --find-links "$APM_BUNDLE/wheels" --require-hashes -r requirements.txt
-.venv/bin/python -m pip check
-.venv/bin/python scripts/deployment/check_environment.py
-.venv/bin/python scripts/deployment/verify_package.py --installed
+bash "$APM_APP/scripts/deployment/compile_runtime.sh" "$APM_ROOT"
 ```
 
-预期：精确 Python 3.13.16，pip 由源码内 ensurepip 提供，两个锁定 wheel 安装成功，
-`pip check` 无冲突，模块与离线功能自检输出 passed=true。不使用系统 Python 运行项目。
-失败：查构建日志中的 missing modules／编译错误；缺 bz2、lzma、sqlite3、ssl 等必须补齐依赖
-并重建，不能忽略。HTTP 可达性不属于离线解释器检查；可选 tkinter、nis、dbm 不作为门槛。
+## 5. 导出与保留成品
 
-## 6. PostgreSQL 编译与环境自检
+第一轮脚本退出成功后再导出，避免读取尚未关闭的编译日志：
 
 ```bash
-cd "$APM_ROOT/build"
-tar -xzf "$APM_BUNDLE/sources/postgresql-17.10.tar.gz"
-cd postgresql-17.10
-./configure --prefix="$(dirname "$APM_PG_BIN")" --with-openssl \
-  > "$APM_ROOT/records/pg-configure.log" 2>&1
-make -j4 > "$APM_ROOT/records/pg-make.log" 2>&1
-make install > "$APM_ROOT/records/pg-install.log" 2>&1
-"$APM_PG_BIN/psql" --version
-cd "$APM_APP"
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  unit > "$APM_ROOT/records/unittest.log" 2>&1
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  --pg-bin "$APM_PG_BIN" database > "$APM_ROOT/records/verify.log" 2>&1
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  --pg-bin "$APM_PG_BIN" publication > "$APM_ROOT/records/verify-publication.log" 2>&1
+PYTHONDONTWRITEBYTECODE=1 "$APM_APP/.venv/bin/python" "$APM_APP/scripts/deployment/runtime_archive.py" export \
+  --root "$APM_ROOT" --bundle "$APM_BUNDLE" --evidence "$APM_ROOT/runtime-build" \
+  --artifact "$APM_ROOT/runtime-artifact"
+(cd "$APM_ROOT/runtime-artifact" && sha256sum -c SHA256SUMS)
+sha256sum "$APM_ROOT/runtime-artifact/SHA256SUMS"
 ```
 
-再运行 smoke 和 search；合成清理入口在第 12 节空闲时运行。
+整个 runtime-artifact 与 runtime-build 的日志复制回开发机，核对 SHA256SUMS；源码构建中间目录无需交付。
+成品含固定前缀的 Python、PostgreSQL、虚拟环境，不含数据、日志、密码或源码程序。
+`runtime-manifest.json` 列出每个文件、符号链接、写死 `/data/sql-apm` 的路径，以及来源与编译证据摘要。
+把成品加入完整包后再开始第二轮，编译本身不代表二进制可在初始系统库上运行。
+
+## 6. 二进制轮与自检反例
+
+用户恢复初始快照后，重新核对系统、端口和空目录，使用已经加入成品的完整包，按生产手册安装。
+安装前后分别保存排序后的完整软件包清单，并用 `cmp` 逐字比较：
 
 ```bash
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  --pg-bin "$APM_PG_BIN" smoke > "$APM_ROOT/records/verify-smoke.log" 2>&1
-.venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-  --pg-bin "$APM_PG_BIN" search > "$APM_ROOT/records/verify-search.log" 2>&1
+rpm -qa --qf '%{NAME}\t%{EPOCHNUM}:%{VERSION}-%{RELEASE}\t%{ARCH}\n' | LC_ALL=C sort > "$APM_ROOT/setup/packages-before.tsv"
+# 此处执行生产手册第 2–6 节；不能执行本手册第 4 节。
+rpm -qa --qf '%{NAME}\t%{EPOCHNUM}:%{VERSION}-%{RELEASE}\t%{ARCH}\n' | LC_ALL=C sort > "$APM_ROOT/setup/packages-after.tsv"
+cmp "$APM_ROOT/setup/packages-before.tsv" "$APM_ROOT/setup/packages-after.tsv"
 ```
 
-还需执行新增的权限／指纹服务、看板静态检查和每日运行检查：
+自检要有两个失败记录：错误前缀，以及一个依赖系统库不可用。错误前缀可在安装前执行：
 
 ```bash
-for check in views grafana daily daily-recovery; do
-  .venv/bin/python "$APM_VERIFY/scripts/deployment/run_verification.py" --app-root "$APM_APP" \
-    --pg-bin "$APM_PG_BIN" "$check" > "$APM_ROOT/records/verify-$check.log" 2>&1
-done
+if python3 "$APM_APP/scripts/deployment/runtime_archive.py" install \
+  --root /data/sql-apm-wrong --artifact "$APM_BUNDLE/runtime"; then
+  echo '错误：其他目录居然被允许' >&2
+  exit 1
+fi
 ```
 
-预期：PG17.10，各入口退出 0；普通测试 104 项、数据库验证 279 个 PASS、发布检查 33 项、smoke 和 search 通过。
-合成清理检查 23 项；实际项数及输出摘要保存在机器记录。
-开头 APPLICATION 应指向 APM_APP，不能只检查输出文件存在。测试在 verification 中，
-核心代码从 app 加载；数据库检查各自创建禁用 TCP 的私有临时实例，退出后停止清理，
-不连接演练库。不在目标机运行 Harness 或未列出的开发全量探针。
-失败保留原输出，区分环境与业务差异，不改产品规则绕过。
+缺库反例由实施方使用进程级隔离隐藏一份被 ldd 确认需要的共享库，不能删除或改名主机系统库；
+完整命令、被隐藏库和停止项目保存在私有机器记录。结束后退出隔离并重新完整自检。
+开发机模拟失败只验证工具停止逻辑，不能充当此项目标机实测。
 
 ## 7. 建立实例与项目数据库
 
-```bash
-if ! getent passwd postgres >/dev/null; then
-  sudo useradd --system --user-group --home-dir "$APM_ROOT/postgres-home" --shell /sbin/nologin postgres
-fi
-command -v setfacl getfacl
-sudo install -d -m 0750 -o postgres -g postgres "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home"
-sudo install -d -m 2755 -o postgres -g "$APM_RUN_GROUP" "$APM_SOCKET"
-sudo -u postgres "$APM_PG_BIN/initdb" -D "$APM_ROOT/pgdata" -U postgres \
-  --allow-group-access --auth-local=peer --auth-host=scram-sha-256 --encoding=UTF8 --locale=C
-sudo find "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home" -type d \
-  -exec setfacl -m "u:$APM_RUN_USER:r-x,d:u:$APM_RUN_USER:r-x" {} +
-sudo find "$APM_ROOT/pgdata" "$APM_ROOT/postgres-home" -type f \
-  -exec setfacl -m "u:$APM_RUN_USER:r--" {} +
-```
+按[生产手册第 4 节](production-installation.md#4-建立实例数据库和账号)执行，
+包括 PostgreSQL 服务、可登录的 postgres、两次输入的数据库密码和两个登录 profile。
+结构应为 1.12.0，账号允许／拒绝的实测要分别记录。
 
-预期：专用 postgres 系统用户无需登录密码，空实例初始化成功。
-若用户或 PGDATA 已存在，先核对属主及来源，不接管未知用户／数据目录，不重复 initdb。
-`setfacl`／`getfacl` 在本次目标机已具备；缺失时由用户从已配置源安装 `acl`，
-不将其加入编译依赖清单。sfmon 须无需 sudo 即可遍历 APM_ROOT 全部目录并读取普通文件，
-包括 private 和 pgdata；其原有写权限保留，postgres 文件只增加 sfmon 的读权限。
-PGDATA 保持 postgres 属主；命名 ACL 及默认 ACL 配合
-[`--allow-group-access`](https://www.postgresql.org/docs/17/app-initdb.html)，
-使 PG 创建目录／文件时采用 0750／0640，并继承 sfmon 的读取权限。
-socket 目录用 sfmon 主组和 setgid 使锁文件继承可读组；不要给该目录设置只读默认 ACL，
-否则新 socket 节点的命名 ACL 会阻止连接。目录不给 sfmon 写权限，socket 节点沿用下方 0777，
-数据库连接仍受 SCRAM／peer 规则约束。
-参数明确写入本实例配置，不改系统服务；以下是 8 vCPU／14 GiB 演练机的起始配置：
-
-```bash
-sudo -u postgres tee -a "$APM_ROOT/pgdata/postgresql.conf" >/dev/null <<PGCONF
-listen_addresses = '127.0.0.1,$APM_SERVER'
-port = $APM_PORT
-unix_socket_directories = '$APM_SOCKET'
-unix_socket_permissions = 0777
-password_encryption = 'scram-sha-256'
-shared_buffers = '512MB'
-work_mem = '16MB'
-maintenance_work_mem = '128MB'
-max_connections = 30
-max_wal_size = '2GB'
-min_wal_size = '256MB'
-timezone = 'Asia/Shanghai'
-log_statement = 'none'
-log_min_error_statement = 'panic'
-PGCONF
-sudo -u postgres tee "$APM_ROOT/pgdata/pg_hba.conf" >/dev/null <<PGHBA
-local all postgres peer
-local sql_apm sql_apm,sql_apm_ro scram-sha-256
-local all all reject
-host sql_apm sql_apm,sql_apm_ro 127.0.0.1/32 scram-sha-256
-host sql_apm sql_apm,sql_apm_ro $APM_CLIENT_CIDR scram-sha-256
-host all all 0.0.0.0/0 reject
-host all all ::0/0 reject
-PGHBA
-sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" \
-  -l "$APM_ROOT/pgdata/server.log" -w start
-sudo -u postgres "$APM_APP/scripts/db/initialize.sh" bootstrap \
-  --host "$APM_SOCKET" --port "$APM_PORT" --admin-user postgres --admin-database postgres \
-  --pg-bin "$APM_PG_BIN"
-cd "$APM_APP"
-.venv/bin/python scripts/deployment/create_password.py --socket "$APM_SOCKET" \
-  --port "$APM_PORT" --tcp-host "$APM_SERVER" --passfile "$PGPASSFILE"
-scripts/db/initialize.sh schema --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN"
-scripts/db/initialize.sh check --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin "$APM_PG_BIN"
-"$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -U sql_apm -d sql_apm \
-  -c 'SELECT current_user, current_database(), version();'
-stat -c '%a %n' "$PGPASSFILE"
-```
-
-预期：bootstrap、schema、check 成功，结构版本 1.12.0；项目账号通过 socket 密码认证，
-密码文件权限 600。生成器不显示密码，仅通过匿名管道交给本机管理员并发送 SCRAM verifier。
-凭据只保存在程序目录外的 private/；不放进 Git、命令参数、报告或 shell 历史。
-private 由 sfmon 创建并拥有，目录 0700、pgpass 0600 已允许 sfmon 读取；
-不为满足此要求放宽 pgpass 的组权限，否则 [libpq 会忽略密码文件](https://www.postgresql.org/docs/17/libpq-pgpass.html)。
-失败：先核对 peer 身份、socket 权限、SCRAM 规则和密码文件，保留已创建对象；
-密码步骤失败时保留文件，诊断后重新设置，不随意轮换其他实例的账号。
+- `sfmon` 登录后裸 psql 为 sql_apm，`psql -U sql_apm_ro` 为只读账号，两者不提示密码。
+- `sudo su - postgres` 后裸 psql 为本机超级用户，不设登录密码或数据库密码；远程超级用户被拒绝。
+- 两个数据库账号测试单字符、冒号、反斜杠密码；空密码、换行和两次不一致由脚本拒绝。
+- Grafana 的 admin、viewer 测试至少 4 字符的短密码、冒号和反斜杠；另记录创建 viewer 时 1–3 字符被上游拒绝。
+  保留此上游限制，不计为本项目额外密码规则。
+- 四个账号另验证首尾空格／制表符的安装与轮换；Grafana 使用生成的服务启动入口，
+  原值须可登录，去空白值须被拒绝；同时核对数据源与指纹服务。隔离回归入口为
+  `verification/scripts/grafana/verify_credentials.py`，参数见脚本帮助；只使用新目录和合成凭据。
+- 登录环境设置前后对同一命令、timer 及两个服务核对显式连接和结果；不得因 profile 改写任务账号。
 
 ### 7.1 以执行账号核对读取权限
 
@@ -388,208 +281,30 @@ stat -c '%a %U:%G %n' "$APM_ROOT/private" "$PGPASSFILE" "$APM_ROOT/pgdata" "$APM
 
 ## 8. 远程连接与启停
 
-```bash
-systemctl is-active firewalld || true
-sudo ss -ltnp
-sudo -u postgres "$APM_PG_BIN/psql" -X -h "$APM_SOCKET" -p "$APM_PORT" -d postgres \
-  -c 'SELECT type,database,user_name,address,auth_method,error FROM pg_hba_file_rules;'
-# 仅当 firewalld 正在运行时，增加限定源网段的规则：
-if systemctl is-active --quiet firewalld; then
-  sudo firewall-cmd --add-rich-rule="rule family=ipv4 source address=$APM_CLIENT_CIDR port port=$APM_PORT protocol=tcp accept"
-  sudo firewall-cmd --permanent --add-rich-rule="rule family=ipv4 source address=$APM_CLIENT_CIDR port port=$APM_PORT protocol=tcp accept"
-fi
-```
-
-预期：实例同时监听 127.0.0.1 和指定内网地址；两个账号均可通过密码从允许的客户端网段连接，其余来源拒绝。
-允许网段可以填整个内网；仍保留密码认证，不使用 trust。
-防火墙未运行时不为本次演练启动它；运行时先检查是否已有过宽的端口规则，
-有冲突则由维护者处理，不因新增窄规则就声称访问已受限。
-
-从另一台允许网段内的开发机，用本机仓库外 0600 的 PGPASSFILE 连接明确目标：
+按[生产手册](production-installation.md)完成受限 HBA／防火墙、Grafana 与指纹服务以及 PostgreSQL 自启。
+允许网段内正确密码成功，错误密码和不允许来源失败；只读账号写入失败，匿名 Grafana 不能查看看板。
+所有账号均由操作者掌握密码，不在公开记录中保留凭据。启停统一使用 systemctl。
 
 ```bash
-psql -X -w -h TARGET_IP -p 5432 -U sql_apm -d sql_apm \
-  -c 'BEGIN READ ONLY; SELECT current_user,current_database(),version(); COMMIT;'
+systemctl is-enabled sql-apm-postgresql.service sql-apm-grafana.service sql-apm-fingerprint.service
+systemctl is-active sql-apm-postgresql.service sql-apm-grafana.service sql-apm-fingerprint.service
+sudo systemctl status sql-apm-postgresql.service --no-pager
 ```
 
-预期：正确密码成功，另用临时 0600 文件中的错误密码重试必须失败。不要把密码写入命令行。
-该账号拥有全部项目对象，查询验证保持只读；用户另用 DBA 工具查询为可选，本轮由实施方完成远程认证检查。
-本次不启用 TLS；接受 LAN 中查询与结果明文传输，生产部署另行决定。
-连接失败：区分路由、监听、防火墙、HBA 和密码，不关闭认证来排查。
-
-```bash
-# 按需启停；无 systemd 托管。
-sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" status
-sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -m fast -w stop
-sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata/server.log" -w start
-```
-
-预期：状态与启动／停止结果一致；失败先保留 server.log 和 pgdata，不删除仍运行的实例。
-
-### 8.1 设置只读数据库账号和 Grafana 密码
-
-bootstrap 已创建 `sql_apm_ro`。它只有查询权限，单条查询默认超时 2 分钟；可通过 bootstrap 的
-`--readonly-role`、`--readonly-timeout` 指定其他角色和时限。下面以默认角色为例。
-在执行账号自己的终端输入密码，输入不回显；不把密码写在命令行或录屏中。
-
-```bash
-export APM_GRAFANA="$APM_ROOT/grafana"
-export APM_GRAFANA_PORT=3000
-export APM_FINGERPRINT_PORT=3001
-"$APM_APP/.venv/bin/python" - <<'PY'
-from getpass import getpass
-from pathlib import Path
-import os
-root = Path(os.environ['APM_ROOT']) / 'private'
-root.mkdir(mode=0o700, exist_ok=True)
-for name in ('readonly-password', 'grafana-admin-password', 'grafana-viewer-password'):
-    path = root / name
-    if path.exists():
-        raise SystemExit('password file already exists: ' + name)
-    first = getpass(name + ': ')
-    second = getpass('再次输入: ')
-    if first != second or len(first) < 12 or any(c in first for c in ':\\\r\n'):
-        raise SystemExit('密码须相同，至少 12 个字符，不含冒号、反斜杠或换行')
-    with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as stream:
-        stream.write(first + '\n')
-PY
-```
-
-以下步骤需要 sudo：管理员经本地 peer 设置只读账号密码，再把生成的连接文件交给执行账号。
-临时目录只用于这次密码设置，操作完成后删除其中两个临时文件。
-
-```bash
-APM_PASSWORD_STAGE="$(sudo -u postgres mktemp -d /tmp/sql-apm-readonly.XXXXXX)"
-sudo install -m 0600 -o postgres -g postgres "$APM_ROOT/private/readonly-password" "$APM_PASSWORD_STAGE/password"
-sudo -u postgres "$APM_APP/.venv/bin/python" "$APM_APP/scripts/grafana/readonly_password.py" \
-  --admin-dsn "host=$APM_SOCKET port=$APM_PORT dbname=postgres user=postgres" \
-  --port "$APM_PORT" --password-file "$APM_PASSWORD_STAGE/password" --passfile "$APM_PASSWORD_STAGE/pgpass"
-sudo install -m 0600 -o "$APM_RUN_USER" -g "$APM_RUN_GROUP" "$APM_PASSWORD_STAGE/pgpass" "$APM_ROOT/private/readonly.pgpass"
-sudo rm -- "$APM_PASSWORD_STAGE/password" "$APM_PASSWORD_STAGE/pgpass"
-sudo rmdir -- "$APM_PASSWORD_STAGE"
-PGPASSFILE="$APM_ROOT/private/readonly.pgpass" "$APM_PG_BIN/psql" -X -w \
-  -h 127.0.0.1 -p "$APM_PORT" -U sql_apm_ro -d sql_apm \
-  -c 'SELECT current_user, current_setting('\''statement_timeout'\'');'
-```
-
-预期使用只读账号连接成功、超时为 2min。另用该账号尝试在项目 schema 创建临时演练表，应得到权限拒绝；
-允许网段内的外部机器分别以两个账号测试正确和错误密码，并从不允许来源测试 HBA 拒绝，结果单独记录。
-测试连接文件保持 0600，不能把凭据放进报告。只读账号可读全部 SQL 原文，分享查询结果前须检查敏感内容。
-
-**查看和更换项目账号随机密码。** 密码在 `$PGPASSFILE` 的每行最后一项，可在自己未录屏的本地编辑器里查看。
-更换时先暂停每日定时器和写入任务，用项目账号运行下面的交互命令，再在编辑器中同步更新 passfile 的各行密码：
-
-```bash
-"$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -U sql_apm -d sql_apm -c '\password sql_apm'
-chmod 600 "$PGPASSFILE"
-```
-
-密码更新后另开连接验证，失败先修正 passfile，不重复初始化。只读账号密码变更用上述管理员步骤，
-同时更新它的原始密码文件与 passfile，并重启 Grafana 和指纹服务。
-
-### 8.2 离线安装 Grafana、插件和指纹服务
-
-```bash
-cd "$APM_APP"
-.venv/bin/python scripts/grafana/install.py files --home "$APM_GRAFANA" \
-  --files "$APM_BUNDLE/grafana" --pg-port "$APM_PORT" --port "$APM_GRAFANA_PORT" \
-  --service-port "$APM_FINGERPRINT_PORT" --user "$APM_RUN_USER" \
-  --app-root "$APM_APP" --python "$APM_APP/.venv/bin/python" \
-  --admin-password-file "$APM_ROOT/private/grafana-admin-password" \
-  --db-password-file "$APM_ROOT/private/readonly-password" \
-  --service-passfile "$APM_ROOT/private/readonly.pgpass"
-sudo install -m 0644 "$APM_GRAFANA/systemd/sql-apm-grafana.service" \
-  "$APM_GRAFANA/systemd/sql-apm-fingerprint.service" /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now sql-apm-grafana.service sql-apm-fingerprint.service
-systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
-```
-
-等待 Grafana 启动后创建查看账号和“用户自定义”文件夹；此步骤可重复执行。
-
-```bash
-.venv/bin/python - <<'PY'
-import json
-import os
-import time
-import urllib.error
-import urllib.request
-
-url = 'http://127.0.0.1:' + os.environ['APM_GRAFANA_PORT'] + '/api/health'
-for attempt in range(60):
-    try:
-        with urllib.request.urlopen(url, timeout=2) as response:
-            if json.load(response).get('database') == 'ok':
-                break
-    except (OSError, urllib.error.URLError):
-        pass
-    time.sleep(2)
-else:
-    raise SystemExit('Grafana 未就绪，请先检查服务日志。')
-print('Grafana 已就绪')
-PY
-.venv/bin/python scripts/grafana/install.py accounts --port "$APM_GRAFANA_PORT" \
-  --admin-password-file "$APM_ROOT/private/grafana-admin-password" \
-  --viewer-password-file "$APM_ROOT/private/grafana-viewer-password" --viewer-login viewer
-if systemctl is-active --quiet firewalld; then
-  sudo firewall-cmd --permanent --add-rich-rule="rule family=ipv4 source address=$APM_CLIENT_CIDR port port=$APM_GRAFANA_PORT protocol=tcp accept"
-  sudo firewall-cmd --add-rich-rule="rule family=ipv4 source address=$APM_CLIENT_CIDR port port=$APM_GRAFANA_PORT protocol=tcp accept"
-fi
-```
-
-预期：Grafana 13.2.3、Business Forms 6.3.5、Infinity 4.1.1、PostgreSQL 数据源 13.0.4，签名校验有效，
-启动不下载插件。Grafana 默认 HTTP 3000；指纹服务只监听 127.0.0.1:3001；两者均经回环用只读数据库账号连接。
-浏览器打开 `http://目标机地址:3000`，匿名访问应要求登录；默认 admin/admin 不可用。
-admin 可管理自己的看板，viewer 只查看。MPP 下的检索、详情、列表、运行状态四个看板和两个数据源由配置装入。
-真实数据导入前空列表正常；真实检索操作及结果含义见[检索指南](search-guide.md)。
-
-指纹服务日志看 `sudo journalctl -u sql-apm-fingerprint.service`，只有时间、字节数、状态和耗时，没有 SQL 原文。
-Grafana 日志位于 `$APM_GRAFANA/logs`，启动错误也可用 journalctl 查看。
-
-```bash
-sudo ss -ltnp
-sudo systemctl restart sql-apm-fingerprint.service
-sudo systemctl restart sql-apm-grafana.service
-```
-
-产品更新后须重启指纹服务以加载新规则。需要停用时用 `systemctl stop`，长期停用用 `disable --now`。
-两者 enable 后随主机启动，被杀后由 systemd 拉起；验收时分别重启机器和强制停止主进程验证。
-PostgreSQL 仍由人工通过 pg_ctl 启动，重启机器后先启动数据库，再检查数据源与每日补跑；不额外引入数据库托管。
-
-**HTTPS（可选）。** 部署方准备证书与私钥，在 `$APM_GRAFANA/conf/grafana.ini` 的 `[server]` 下设置
-`protocol=https`、`cert_file=/证书绝对路径`、`cert_key=/私钥绝对路径` 后重启 Grafana；私钥仅服务用户可读。
-安装程序重新生成配置会覆盖手工设置，重新生成前保存并随后重新应用。默认 HTTP，不自动申请证书。
-
-**备份。** Grafana 用自己的 SQLite 文件保存账号、文件夹和用户自定义看板。
-暂停 Grafana 后备份整个 data 目录及配置、版本清单；备份目录包含账号信息和可能含原文的用户看板，应限制访问。
-
-```bash
-APM_BACKUP="$APM_ROOT/backups/grafana-$(date +%Y%m%d-%H%M%S).tar.gz"
-install -d -m 0700 "$APM_ROOT/backups"
-sudo systemctl stop sql-apm-grafana.service
-umask 077
-tar -czf "$APM_BACKUP" -C "$APM_GRAFANA" data conf
-sudo systemctl start sql-apm-grafana.service
-sha256sum "$APM_BACKUP"
-```
-
-恢复时停止 Grafana，先保留现有目录，再用相同组件版本恢复 data/conf 和属主、权限，最后启动并核对账号及看板。
-备份不包含 PostgreSQL 数据库，也不包含程序目录外 private 中的密码文件；这些按部署方的独立备份安排保存。
+真实重启验证放在安装定时器之后，保留错过的一次运行及重启后补跑记录。
 
 ## 9. 配置由验证机拉取开发机日志
 
-本节起使用已安装的默认 `sql_apm` schema，后续操作只走 daily；首轮 full／rebuild 九任务的
-实施方证据保留，复现方法移至附录 A。日常构建的版本数不沿用九任务的 5／4。
+本节用于第二轮实施方验证，使用已安装的默认 `sql_apm` schema，后续操作只走 daily。
+本轮独立实例的 full／rebuild 九任务证据保留，复现方法见附录 A；第一轮编译不跑九任务。
+日常构建的版本数不沿用九任务的 5／4。
 
-完成第 1–8 节后可直接从本节继续。若使用**第 8 步完成的快照**供实施方补验，须先确认补验证据
-已备份，再由用户恢复同一快照，重设第 1 节环境变量后继续；不重复初始化实例或创建密码。
-机器重启后 PostgreSQL 需要手动启动，Grafana 和指纹服务应已自动启动：
+完成第 1–8 节后可直接从本节继续，不重复初始化实例或创建密码。
+先检查三个服务和空业务库；安装定时器后的真实重启还须验证三个服务自动启动：
 
 ```bash
 cd "$APM_APP"
-if ! sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" status; then
-  sudo -u postgres "$APM_PG_BIN/pg_ctl" -D "$APM_ROOT/pgdata" -l "$APM_ROOT/pgdata/server.log" -w start
-fi
+systemctl is-active sql-apm-postgresql.service
 systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
 "$APM_PG_BIN/psql" "$SQL_APM_DSN" -X -v ON_ERROR_STOP=1 -c \
   'SELECT (SELECT count(*) FROM sql_apm.source_file) AS files, (SELECT count(*) FROM sql_apm.current_version) AS versions;'
@@ -621,7 +336,7 @@ ssh -n -o BatchMode=yes -o StrictHostKeyChecking=yes -p "$APM_FETCH_PORT" \
 
 这段从验收包的固定清单生成摘要文件，沿用已确认的来源声明、30 天窗口和默认门槛。
 只创建配置及空目录，不复制日志、不生成标记、不连接数据库；已有目录时拒绝覆盖。
-已安装的 v0.3.0 验收包即可执行，无需替换程序或验收目录。
+使用本次 v1.0.0 候选的验收包，不混用旧程序或验收目录。
 
 ```bash
 cd "$APM_APP"
@@ -786,29 +501,21 @@ done
 若执行失败，保存日志，按[每日运行](daily-run.md)处理，再以同一配置接续；
 已成功的日期不重复导入。实际任务已成功、仅核对步骤失败时，先修复核对，不人为新增构建。
 
-## 11. 与首轮人工基准逐项比较
+## 11. 与本轮人工基准逐项比较
 
-实施方交付的 `manual-baseline/` 是首轮**同一验证机**已完成九任务的最终统计快照，含
+附录 A 导出的 `nine-task-run/manual-baseline/` 是第二轮**同一验证机**已完成九任务的最终统计快照，含
 `results.json`、四个 `.jsonl.gz` 文件及 `SHA256SUMS`。这份基准与本轮程序产品文件逐项相同，
-通过交付记录核对清单摘要；它单独内网传输，不包含在公开程序包中。
-
-在开发机执行，`APM_MANUAL_BASELINE` 填交付记录给出的目录：
-
-```bash
-APM_MANUAL_BASELINE='填写交付记录中的 manual-baseline 目录'
-(cd "$APM_MANUAL_BASELINE" && sha256sum -c SHA256SUMS)
-scp -r -P "$APM_SSH_PORT" "$APM_MANUAL_BASELINE" "$APM_SSH_TARGET:/data/sql-apm/"
-```
-
-目标机执行：
+通过机器记录核对清单摘要，不包含在公开程序包中。九任务在独立实例运行并已停止；
+此处的连接串须已恢复为默认产品实例。目标机执行：
 
 ```bash
 cd "$APM_APP"
-(cd "$APM_ROOT/manual-baseline" && sha256sum -c SHA256SUMS)
+export APM_MANUAL_BASELINE="$APM_ROOT/nine-task-run/manual-baseline"
+(cd "$APM_MANUAL_BASELINE" && sha256sum -c SHA256SUMS)
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot --app-root "$APM_APP" \
   --schema sql_apm --output "$APM_ROOT/records/daily-results"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" compare \
-  --manual "$APM_ROOT/manual-baseline" --daily "$APM_ROOT/records/daily-results" \
+  --manual "$APM_MANUAL_BASELINE" --daily "$APM_ROOT/records/daily-results" \
   --output "$APM_ROOT/records/manual-daily-comparison.json"
 ```
 
@@ -867,12 +574,12 @@ systemctl list-timers sql-apm-daily.timer
 预期启动方式为定时，已经导入的日期和当前版本保持不变。改时刻重新生成两文件并执行
 `sudo systemctl daemon-reload`、`sudo systemctl restart sql-apm-daily.timer`。
 停用用 `sudo systemctl disable --now sql-apm-daily.timer`；停止当前运行另用 `sudo systemctl stop sql-apm-daily.service`。
-重启后 PostgreSQL 仍需人工启动；先停用 timer，重启、启动数据库，再启用 timer，可核对错过的一次补跑。
+保持 timer 启用，安排关机期间错过一次运行后真实重启；不人工启动数据库，核对三个服务自启和一次补跑成功。
 不通过修改服务器日期触发演练。最长运行、重叠和强制结束的自动故障记录由实施方另存。
 
 ### 13.2 自动删除只针对演练副本
 
-保留首轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
+保留本轮统计和状态记录后，将演练配置的原始文件保留天数改成 1，执行一次。
 历史样本已经早于此界限，预期已成功导入的 55 个副本及齐全标记被删除；开发机的原始日志目录保持不变。
 
 ```bash
@@ -958,12 +665,12 @@ ls -l "$APM_ROOT/mock-inbox/"*.complete
 并核对“运行状态”与 `daily status` 的日期、版本、步骤、问题一致。
 将包身份、步骤结果、耗时与问题保存到[验证记录](kylin-validation-record.md)；
 实施方可依据实际证据与用户确认整理记录，无需用户重复手填。
-补验记录与用户记录分别保存；若从第 8 步快照接续，用户第 1–8 节的手动记录继续保留。
-用户完成后需明确确认结果，实施方代跑不计为用户验收通过。
+本节属于第二轮实施方证据。第三轮由用户恢复初始快照后亲自按生产手册安装和上线，
+另存用户记录并明确确认结果，实施方代跑不计为用户验收通过。
 
 ## 附录 A. 实施方九任务与基准比对
 
-本附录保留首轮实施方九任务的复现方法；不属于本次用户第 9 节起的操作路径。
+本附录是第二轮实施方九任务的复现方法；不属于第三轮用户按生产手册操作的路径。
 仅在独立的全新验收库运行，不能直接追加到第 10 节已完成的 daily 库。
 
 保持默认四解析进程和 5 秒归一化期限。辅助工具实际调用 full／rebuild、status／history，
@@ -975,30 +682,54 @@ selected_batches 是本次整批入选数，excluded_batches 是两者之差；w
 有完成批次但一个都未选到而回退全部。四个字段与开发机同候选包生成的基准逐项比较。
 本九任务均应没有排除和回退。选择只看文件 last_log_at 与窗口起点，事件再按完整窗口过滤。
 
-本附录使用独立演练目录及全新库。把原始 119／120 目录传入该目录的 `logs` 后，先生成本附录配置；
-不要使用第 9 节为分批拉取生成的配置目录，也不要覆盖已有用户记录：
+本附录使用独立演练目录及私有实例，不连接产品实例。先把原始 119／120 目录传入
+`$APM_ROOT/logs`，然后创建新目录；不使用第 9 节的配置目录，不覆盖已有记录：
 
 ```bash
 cd "$APM_APP"
+export APM_NINE_ROOT="$APM_ROOT/nine-task-run"
+export APM_PRODUCT_DSN="$SQL_APM_DSN"
+test ! -e "$APM_NINE_ROOT"
+install -d -m 0700 "$APM_NINE_ROOT" "$APM_NINE_ROOT/socket" "$APM_NINE_ROOT/records"
 .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" prepare \
-  --logs "$APM_ROOT/logs" --output "$APM_ROOT/config"
-(cd "$APM_ROOT/logs" && sha256sum -c "$APM_ROOT/config/logs.SHA256SUMS")
+  --logs "$APM_ROOT/logs" --output "$APM_NINE_ROOT/config"
+(cd "$APM_ROOT/logs" && sha256sum -c "$APM_NINE_ROOT/config/logs.SHA256SUMS")
+"$APM_PG_BIN/initdb" -D "$APM_NINE_ROOT/pgdata" -U apm_test_admin \
+  --auth-local=trust --auth-host=reject --encoding=UTF8 --locale=C
+cat >> "$APM_NINE_ROOT/pgdata/postgresql.conf" <<PGCONF
+listen_addresses = ''
+port = 55473
+unix_socket_directories = '$APM_NINE_ROOT/socket'
+shared_buffers = '512MB'
+work_mem = '16MB'
+maintenance_work_mem = '128MB'
+max_connections = 30
+max_wal_size = '2GB'
+min_wal_size = '256MB'
+timezone = 'Asia/Shanghai'
+log_statement = 'none'
+log_min_error_statement = 'panic'
+PGCONF
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -l "$APM_NINE_ROOT/server.log" -w start
+export SQL_APM_DSN="host=$APM_NINE_ROOT/socket port=55473 dbname=sql_apm user=sql_apm"
+scripts/db/initialize.sh all --host "$APM_NINE_ROOT/socket" --port 55473 --pg-bin "$APM_PG_BIN" \
+  --admin-user apm_test_admin --admin-database postgres
 ```
 
 交付目录的 `development-baseline/` 中包含开发机基准文件、八个统计数值 `.jsonl.gz` 文件和校验清单。
 先在开发机核对交付记录中的清单摘要，再检查文件并传输：
 
 ```bash
-APM_BASELINE_DIR="$PWD/var/issue52/deliveries/$APM_EXPECTED_COMMIT/development-baseline"
+APM_BASELINE_DIR="$PWD/var/issue59/deliveries/$APM_EXPECTED_COMMIT/development-baseline"
 (cd "$APM_BASELINE_DIR" && sha256sum -c SHA256SUMS)
 scp -P "$APM_SSH_PORT" "$APM_BASELINE_DIR/development-baseline.json" \
-  "$APM_BASELINE_DIR/"*.jsonl.gz "$APM_BASELINE_DIR/SHA256SUMS" "$APM_SSH_TARGET:/data/sql-apm/config/"
+  "$APM_BASELINE_DIR/"*.jsonl.gz "$APM_BASELINE_DIR/SHA256SUMS" "$APM_SSH_TARGET:/data/sql-apm/nine-task-run/config/"
 ```
 
 目标机再核对文件：
 
 ```bash
-(cd "$APM_ROOT/config" && sha256sum -c SHA256SUMS)
+(cd "$APM_NINE_ROOT/config" && sha256sum -c SHA256SUMS)
 ```
 
 它不替换原 Alma 基准，只补充新字段和配置示例预期；指南工具在重新构建前核对数值文件摘要。
@@ -1008,15 +739,15 @@ scp -P "$APM_SSH_PORT" "$APM_BASELINE_DIR/development-baseline.json" \
 cd "$APM_APP"
 for step in 0 1 2 3 4; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 119 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/tasks" --data-root "$APM_ROOT" \
     --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT" \
-    --selection-baseline "$APM_ROOT/config/development-baseline.json"
+    --selection-baseline "$APM_NINE_ROOT/config/development-baseline.json"
 done
 for step in 0 1 2 3; do
   .venv/bin/python "$APM_VERIFY/scripts/deployment/rehearsal.py" run --cluster 120 --step "$step" \
-    --config "$APM_ROOT/config" --records "$APM_ROOT/records/tasks" --data-root "$APM_ROOT" \
+    --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/tasks" --data-root "$APM_ROOT" \
     --workers "$APM_WORKERS" --program-commit "$APM_EXPECTED_COMMIT" \
-    --selection-baseline "$APM_ROOT/config/development-baseline.json"
+    --selection-baseline "$APM_NINE_ROOT/config/development-baseline.json"
 done
 ```
 
@@ -1046,6 +777,17 @@ done
 .venv/bin/python -m sql_apm history --cluster 120
 ```
 
+完成九任务后，在该私有实例中导出第 11 节所用基准，停止实例并恢复产品连接串。
+数据库及记录保留，后续可选指南演练需要重新启动该私有实例并显式切换连接。
+
+```bash
+.venv/bin/python "$APM_VERIFY/scripts/deployment/daily_rehearsal.py" snapshot \
+  --app-root "$APM_APP" --output "$APM_NINE_ROOT/manual-baseline"
+(cd "$APM_NINE_ROOT/manual-baseline" && sha256sum results.json *.jsonl.gz > SHA256SUMS)
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -m fast -w stop
+export SQL_APM_DSN="$APM_PRODUCT_DSN"
+```
+
 失败：保留对应 `.log` 与 `.json`，按[流程恢复说明](build-publication.md)检查任务和当前版本。
 若实际 CLI 已完成而后续核对失败，不再次 full/rebuild 产生额外版本；先修复记录／核对步骤。
 任何无法解释的差异均未通过；产品缺陷另开 Issue，不在本手册中修改产品计算。
@@ -1054,17 +796,24 @@ done
 
 本附录会改变当前版本，须在本轮最终验收及证据备份完成后另行安排。
 以下工具和版本预期基于附录 A 的独立九任务库，不直接用于本轮 daily 库。
+先启动附录 A 保留的私有实例，使用其 socket、55473 端口和配置目录；结束后停止并恢复产品连接串。
 
 这些示例用于学习配置，按需要执行，不属于九任务本身。先保存九任务全部结果（119 第 5 版，120 第 4 版），再按[配置指南](configuration-guide.md)
 依次运行 window、threshold、template、exclusion 四个示例；每项从原配置生成独立配置，
 在 119 上重新构建一次，不累加改动。开发机还执行 retention、workers、import 示例。
 
 ```bash
+export APM_NINE_ROOT="$APM_ROOT/nine-task-run"
+export APM_PRODUCT_DSN="$SQL_APM_DSN"
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -l "$APM_NINE_ROOT/server.log" -w start
+export SQL_APM_DSN="host=$APM_NINE_ROOT/socket port=55473 dbname=sql_apm user=sql_apm"
 for example in window threshold template exclusion; do
   "$APM_APP/.venv/bin/python" "$APM_VERIFY/scripts/deployment/guide_examples.py" \
-    --app-root "$APM_APP" --config "$APM_ROOT/config" --records "$APM_ROOT/records/guide" \
-    --baseline "$APM_ROOT/config/development-baseline.json" run "$example"
+    --app-root "$APM_APP" --config "$APM_NINE_ROOT/config" --records "$APM_NINE_ROOT/records/guide" \
+    --baseline "$APM_NINE_ROOT/config/development-baseline.json" run "$example"
 done
+"$APM_PG_BIN/pg_ctl" -D "$APM_NINE_ROOT/pgdata" -m fast -w stop
+export SQL_APM_DSN="$APM_PRODUCT_DSN"
 ```
 
 预期分别为排除批次、仅充足性标记数量变化、模板排除计数、时段排除计数；四项结果与开发机

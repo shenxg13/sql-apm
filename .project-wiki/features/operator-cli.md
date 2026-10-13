@@ -4,8 +4,18 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-10
+updated: 2026-10-13
 sources:
+  - path: scripts/grafana/install.py
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/pull/60#issuecomment-6146826478
+    status: current
+  - path: docs/reports/v100-user-acceptance-2026-10-13.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/59
+    status: current
+  - path: docs/reports/v100-binary-validation-2026-10-12.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/47
@@ -55,6 +65,37 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 生产安装账号与交互环境（2026-10-12）
+
+来源：[Issue #59](https://github.com/shenxg13/sql-apm/issues/59) 已确认要求；实现脚本与本机合成验证
+不能替代目标机账号、服务和真实重启验收。
+
+- 项目角色 `sql_apm` 与只读角色 `sql_apm_ro` 密码由操作者在终端不回显输入两次，不再随机生成。
+  脚本通过本地管理员写入 SCRAM 校验值，受保护文件保存在程序目录外，pgpass 中正确转义冒号和反斜杠。
+  输入不一致、空密码或换行会被拒绝；项目不叠加长度和字符限制。两个数据库账号接受任意非空单行密码。
+  用户于 2026-10-12 [明确确认](https://github.com/shenxg13/sql-apm/issues/59#issuecomment-6117961397)
+  Grafana 的 admin、viewer 保留上游至少 4 字符的限制，不修改固定组件绕过限制。
+- postgres 系统用户使用正常 shell，不设置系统登录密码；本地 peer 超级用户不设数据库密码，不开放远程超级用户登录。
+- sfmon 登录后裸 `psql` 使用项目属主账号，`psql -U sql_apm_ro` 使用只读账号，均自动引用 0600 的密码文件。
+  切换到 postgres 后裸 `psql` 使用本地超级用户。账号 home 的登录 profile 设置 PATH、连接默认值和密码文件，
+  不写入全局环境；产品命令、定时器和常驻服务继续显式指定连接。
+- 轮换密码按[生产手册](../../docs/runbooks/production-installation.md)重新交互输入，同步交互及服务文件。
+  数据库写入失败不替换已有文件；若数据库已更新而文件保存失败，先修正文件权限再以同一密码重试。
+- 首尾空格／制表符属于密码原值，不静默去除。R1 发现 Grafana 文件 provider 会 trim 空白，
+  因此生成的服务与开发启动入口统一经 `scripts/grafana/install.py start` 每次重读受保护文件；
+  admin 保留首尾空白且原文不再作变量展开，数据源在最后一次环境替换中取得原值。
+  密码不进入参数、生成配置或登录 profile；数据源密码仅放在 Grafana 子进程环境。
+  账号数据库中已初始化的 admin 密码仍通过 Grafana 修改，替换原始文件不会自动轮换账号。
+
+部署、自启、生产资源与验收边界见[运行决定](../decisions/runtime-and-components.md#首个生产版本与二进制部署2026-10-12)。
+目标机实测（measured，2026-10-12）：初始 Kylin 二进制安装后的四个账号均通过短密码、冒号和反斜杠登录，
+空密码、不一致及 Grafana 上游 1–3 字符拒绝单独保留；裸 psql、远程超级用户拒绝、只读拒写均通过。
+登录 profile 存在／暂时移除两种状态各执行一次实际 systemd 每日服务，命令状态、数据源和指纹连接一致，
+常驻服务进程号不变，profile 最后按原字节恢复。详见
+[二进制验证报告](../../docs/reports/v100-binary-validation-2026-10-12.md)。上述账号结果不代表第三轮用户验收。
+第三轮由用户亲自按生产手册操作，并于 2026-10-13 明确确认安装上线及界面验收通过；
+其授权公开的原话和范围见[用户确认记录](../../docs/reports/v100-user-acceptance-2026-10-13.md)。
 
 ### 已确认的首期操作入口
 

@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-12
+updated: 2026-10-13
 sources:
+  - path: docs/reports/v100-user-acceptance-2026-10-13.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/59
     status: current
   - path: docs/reports/v100-binary-validation-2026-10-12.md
@@ -83,7 +85,8 @@ confidence: high
 
 来源：[Issue #59](https://github.com/shenxg13/sql-apm/issues/59) 的已确认契约。
 这是已确认要求；2026-10-12 已完成开发机准备及 Kylin 第一轮编译、第二轮初始系统二进制完整验证，
-第三轮用户验收和正式发布仍须独立完成。
+2026-10-13 用户已明确确认第三轮生产手册安装上线及界面验收通过，见
+[用户确认记录](../../docs/reports/v100-user-acceptance-2026-10-13.md)。独立评审和正式发布仍须完成。
 
 - 版本为 `v1.0.0` 正式版，结构保持 1.12.0；原生安装，不采用 Docker，不修改业务数据行为。
   只支持全新安装，本版不提供升级手册／演练，声明后续版本提供带数据的原地升级。

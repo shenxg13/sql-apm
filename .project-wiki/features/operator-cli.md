@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-12
+updated: 2026-10-13
 sources:
+  - path: docs/reports/v100-user-acceptance-2026-10-13.md
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/59
     status: current
   - path: docs/reports/v100-binary-validation-2026-10-12.md
@@ -83,6 +85,8 @@ confidence: high
 登录 profile 存在／暂时移除两种状态各执行一次实际 systemd 每日服务，命令状态、数据源和指纹连接一致，
 常驻服务进程号不变，profile 最后按原字节恢复。详见
 [二进制验证报告](../../docs/reports/v100-binary-validation-2026-10-12.md)。上述账号结果不代表第三轮用户验收。
+第三轮由用户亲自按生产手册操作，并于 2026-10-13 明确确认安装上线及界面验收通过；
+其授权公开的原话和范围见[用户确认记录](../../docs/reports/v100-user-acceptance-2026-10-13.md)。
 
 ### 已确认的首期操作入口
 

@@ -302,7 +302,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 [开发说明](../docs/design/grafana-dashboards.md)定义组件清单、安装步骤、指纹服务接口、看板函数和跳转变量；
 [试用步骤](../docs/runbooks/grafana-trial.md)供用户在浏览器里查看效果。
 
-- `scripts/grafana/install.py files|accounts`：核对清单里四个安装文件的摘要、解压、生成配置和单元文件；
+- `scripts/grafana/install.py files|accounts|start`：核对清单里四个安装文件的摘要、解压、生成配置和单元文件；
   启动后创建查看账号和“用户自定义”文件夹。不联网，随程序包交付。
 - `scripts/grafana/readonly_password.py`：把操作者设定的只读账号密码以 SCRAM 校验值写入数据库，并生成指纹服务用的 passfile。
 - `python -m sql_apm fingerprint-service`：只监听本机的指纹服务。
@@ -316,6 +316,11 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
   升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
 - `scripts/tests/test_grafana.py`：看板与生成结果一致、安装程序拒绝缺失或摘要不符的文件。
+- `scripts/grafana/install.py start`：供生成的 systemd 服务和开发环境调用，每次启动重读受保护密码文件，
+  保留首尾空白与字面量特殊字符；不把密码写入命令参数、配置或全局环境。
+- `scripts/grafana/verify_credentials.py --pg-bin DIR --files DIR --output NEW_DIR [--app-root DIR]`：
+  真实固定 Grafana 和私有 PG17 的合成安装／轮换回归，覆盖四账号、数据源、指纹服务、只读拒写与密码权限。
+  使用随机回环端口和新目录，结束后停止全部测试进程；随独立验收包提供，记录留在本地。
 
 ## 每日运行
 

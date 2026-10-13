@@ -45,6 +45,7 @@
     "scripts/db/verify_views.py",
     "scripts/db/verify_daily.py",
     "scripts/db/verify_daily_recovery.py",
+    "scripts/grafana/verify_credentials.py",
     "scripts/daily/verify_timer.py",
     "scripts/daily/verify_fetch.py",
     "scripts/deployment/run_verification.py",

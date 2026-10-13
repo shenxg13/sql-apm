@@ -187,7 +187,7 @@ stat -c '%a %n' "$PGPASSFILE"
 
 预期：bootstrap、schema、check 成功，结构版本 1.12.0；项目账号通过 socket 密码认证，
 密码文件权限 600。密码由操作者输入两次，不回显、不随机生成；只拒绝不一致、空密码或换行。
-短密码、冒号、反斜杠都可输入，脚本自动转义 pgpass；管理员只向 PostgreSQL 发送 SCRAM verifier。
+短密码、冒号、反斜杠以及首尾空格／制表符都按输入原值保存，脚本自动转义 pgpass；管理员只向 PostgreSQL 发送 SCRAM verifier。
 凭据只保存在程序目录外的 private/；不放进 Git、命令参数、报告或 shell 历史。
 private 由 sfmon 创建并拥有，目录 0700、pgpass 0600 已允许 sfmon 读取；
 不为满足此要求放宽 pgpass 的组权限，否则 [libpq 会忽略密码文件](https://www.postgresql.org/docs/17/libpq-pgpass.html)。
@@ -252,7 +252,7 @@ PROFILE
 ## 5. Grafana 与指纹服务
 
 Grafana 的 admin、viewer 密码须至少 4 字符，这是保留的上游限制；本项目不增加其他长度或字符规则。
-可包含冒号和反斜杠。为两个账号分别输入两次密码，不回显：
+可包含冒号、反斜杠及首尾空格／制表符，不会自动去掉空白。为两个账号分别输入两次密码，不回显：
 
 ```bash
 cd "$APM_APP"
@@ -275,6 +275,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now sql-apm-grafana.service sql-apm-fingerprint.service
 systemctl is-active sql-apm-grafana.service sql-apm-fingerprint.service
 ```
+
+Grafana 使用生成的 systemd 服务启动；该入口在每次启动时重新读取受保护密码文件，保持输入原值。
+人工前台诊断也使用 `scripts/grafana/install.py start`，传入与上面相同的 `--home`、
+`--admin-password-file`、`--db-password-file`；不要直接运行 Grafana 二进制，后者缺少此密码读取步骤。
+密码不写入命令参数、单元文件或生成的配置。数据库密码只传给当前 Grafana 进程的环境，不写入账号登录环境。
 
 等待 Grafana 启动后创建查看账号和“用户自定义”文件夹；此步骤可重复执行。
 
@@ -500,7 +505,8 @@ cd "$APM_APP"
 
 密码轮换：先暂停定时器并等待写入任务结束，重新执行第 4 节对应角色的 create_password.py 命令，
 输入新密码两次。脚本同时更新交互和服务的密码文件，不手工编辑转义后的字段。
-只读密码变化后重启 Grafana 和指纹服务，再测试两个账号后恢复定时器。
+只读密码变化后通过 `systemctl restart sql-apm-grafana sql-apm-fingerprint` 重启两个服务，
+使其重新读取文件原值，再测试两个数据库账号、Grafana 数据源和指纹服务后恢复定时器。
 Grafana 账号密码通过管理界面修改，并用 credentials.py 的 `--replace` 同步受保护文件；
 仅修改 admin 密码文件不会修改已初始化的 Grafana SQLite 账号。
 

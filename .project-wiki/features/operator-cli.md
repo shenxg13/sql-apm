@@ -6,6 +6,10 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-13
 sources:
+  - path: scripts/grafana/install.py
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/pull/60#issuecomment-6146826478
+    status: current
   - path: docs/reports/v100-user-acceptance-2026-10-13.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/59
@@ -78,6 +82,11 @@ confidence: high
   不写入全局环境；产品命令、定时器和常驻服务继续显式指定连接。
 - 轮换密码按[生产手册](../../docs/runbooks/production-installation.md)重新交互输入，同步交互及服务文件。
   数据库写入失败不替换已有文件；若数据库已更新而文件保存失败，先修正文件权限再以同一密码重试。
+- 首尾空格／制表符属于密码原值，不静默去除。R1 发现 Grafana 文件 provider 会 trim 空白，
+  因此生成的服务与开发启动入口统一经 `scripts/grafana/install.py start` 每次重读受保护文件；
+  admin 保留首尾空白且原文不再作变量展开，数据源在最后一次环境替换中取得原值。
+  密码不进入参数、生成配置或登录 profile；数据源密码仅放在 Grafana 子进程环境。
+  账号数据库中已初始化的 admin 密码仍通过 Grafana 修改，替换原始文件不会自动轮换账号。
 
 部署、自启、生产资源与验收边界见[运行决定](../decisions/runtime-and-components.md#首个生产版本与二进制部署2026-10-12)。
 目标机实测（measured，2026-10-12）：初始 Kylin 二进制安装后的四个账号均通过短密码、冒号和反斜杠登录，

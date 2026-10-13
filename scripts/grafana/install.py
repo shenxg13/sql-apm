@@ -5,7 +5,8 @@
 unpacks them and renders the configuration, data sources, packaged dashboards and
 systemd unit files below --home. ``accounts`` talks to the running Grafana on the
 loopback address: it creates the viewer login and the "用户自定义" folder once and
-sets the organisation defaults. Both steps can be repeated.
+sets the organisation defaults. ``start`` reads the protected files on every
+start and execs Grafana without putting passwords in its arguments or config.
 
 Passwords are read from files the operator owns (mode 0600); they never appear in
 arguments, rendered files or output.
@@ -31,6 +32,9 @@ from credentials import read_password
 
 SOURCE = ROOT / 'grafana'
 FOLDER_UID, CUSTOM_UID, HOME_UID = 'mpp', 'mpp-custom', 'mpp-search'
+# The pinned Grafana file provider uses Go strings.TrimSpace (Unicode White_Space).
+# Python str.strip() also removes U+001C..U+001F, which Go preserves.
+GRAFANA_WHITESPACE = '\t\n\v\f\r \x85\xa0\u1680' + ''.join(chr(c) for c in range(0x2000, 0x200b)) + '\u2028\u2029\u202f\u205f\u3000'
 
 
 def fail(message):
@@ -63,6 +67,24 @@ def render(template, values):
     if left:
         fail('unresolved placeholders in ' + template.name + ': ' + ', '.join(left))
     return text
+
+
+def start(args):
+    admin_path, admin = secret(args.admin_password_file, 'Grafana admin')
+    _, database = secret(args.db_password_file, 'read-only database')
+    # Config env expansion precedes file expansion. Restore only the whitespace
+    # stripped by the latter; the secret itself enters in the last pass, so a
+    # literal ${...} or $__file{...} in it is never evaluated as configuration.
+    leading = admin[:len(admin) - len(admin.lstrip(GRAFANA_WHITESPACE))]
+    trailing = admin[len(admin.rstrip(GRAFANA_WHITESPACE)):] if admin.strip(GRAFANA_WHITESPACE) else ''
+    env = dict(os.environ)
+    env['GF_SECURITY_ADMIN_PASSWORD'] = leading + '$__file{' + str(admin_path) + '}' + trailing
+    # The datasource uses $VAR, not ${VAR}: os.ExpandEnv is its final pass.
+    env['SQL_APM_GRAFANA_DB_PASSWORD'] = database
+    manifest = json.loads((SOURCE / 'components.json').read_text())
+    grafana = args.home.resolve() / manifest['grafana']['directory']
+    os.execve(grafana / 'bin/grafana', [str(grafana / 'bin/grafana'), 'server',
+              '--homepath', str(grafana), '--config', str(args.home.resolve() / 'conf/grafana.ini')], env)
 
 
 def safe_members(names, target):
@@ -146,7 +168,7 @@ def files(args):
     for dashboard in packaged:
         shutil.copyfile(dashboard, home / 'dashboards/mpp' / dashboard.name)
     print('OK: Grafana ' + manifest['grafana']['version'] + ', plugins, configuration and four packaged dashboards in ' + str(home))
-    print('START: ' + str(grafana / 'bin/grafana') + ' server --homepath ' + str(grafana) + ' --config ' + str(home / 'conf/grafana.ini'))
+    print('START: use the generated sql-apm-grafana.service (protected password-file launcher)')
 
 
 class Api:
@@ -216,11 +238,15 @@ def main():
     second = actions.add_parser('accounts', help='创建查看账号和“用户自定义”文件夹（Grafana 须已启动）')
     second.add_argument('--viewer-password-file', required=True)
     second.add_argument('--viewer-login', default='viewer')
-    for action in (first, second):
+    launch = actions.add_parser('start', help='读取受保护密码文件并启动 Grafana（由 systemd 调用）')
+    launch.add_argument('--home', type=Path, required=True)
+    launch.add_argument('--db-password-file', required=True)
+    for action in (first, second, launch):
         action.add_argument('--admin-password-file', required=True, help='Grafana admin 的密码文件')
+    for action in (first, second):
         action.add_argument('--port', type=int, default=3000, help='Grafana 端口')
     args = parser.parse_args()
-    return (files if args.action == 'files' else accounts)(args)
+    return {'files': files, 'accounts': accounts, 'start': start}[args.action](args)
 
 
 if __name__ == '__main__':

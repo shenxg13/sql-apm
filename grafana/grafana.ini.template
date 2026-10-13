@@ -18,6 +18,7 @@ type = sqlite3
 
 [security]
 admin_user = admin
+# The generated service's launcher preserves the input file's edge whitespace.
 admin_password = $__file{@ADMIN_PASSWORD_FILE@}
 disable_gravatar = true
 

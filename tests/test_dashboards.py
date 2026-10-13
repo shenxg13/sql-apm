@@ -277,7 +277,7 @@ class DeliveredGrafanaFiles(unittest.TestCase):
         sources = (ROOT / 'provisioning/datasources.yaml.template').read_text()
         self.assertIn('url: 127.0.0.1:@PG_PORT@', sources)
         self.assertIn('user: @READONLY_ROLE@', sources)
-        self.assertIn('password: $__file{@DB_PASSWORD_FILE@}', sources)
+        self.assertIn('password: $SQL_APM_GRAFANA_DB_PASSWORD', sources)
         self.assertIn('url: http://127.0.0.1:@SERVICE_PORT@', sources)
         provider = (ROOT / 'provisioning/dashboards.yaml.template').read_text()
         self.assertIn('allowUiUpdates: false', provider)

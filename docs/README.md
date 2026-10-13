@@ -87,6 +87,7 @@
 [Kylin 成品编译验证](reports/v100-runtime-build-2026-10-12.md)记录首轮编译、成品身份和固定前缀位置。
 [Kylin 二进制验证](reports/v100-binary-validation-2026-10-12.md)保存初始系统上的安装、账号与后续业务实测及未完成项。
 [用户生产手册验收确认](reports/v100-user-acceptance-2026-10-13.md)收录第三轮用户授权公开的确认及适用边界。
+[密码首尾空白整改验证](reports/v100-password-r1-remediation-2026-10-13.md)记录真实认证、轮换及受影响的 Kylin 启动链补验。
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |

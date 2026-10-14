@@ -39,6 +39,7 @@ def parser():
         epilog='''输入来源三选一：命令行参数、--file 文件、标准输入（管道或重定向）。
 文件和标准输入按 UTF-8 原始字节读取，保留首尾空白及换行。
 交互按词输入一行后回车；整段和完整 SQL 粘贴后回车、Ctrl-D 结束。
+方式选择、结果列表和详情菜单输入 ? 查看交互帮助，保留当前选择和设置。
 交互列表输入 o 选择记录数最多或最近执行；详情 v 列原文，v 编号 选原文，f 看全文。
 v matched 看本次命中原文的历史，v all 看整个结构；历史表原文编号可追到具体 SQL。
 详情 h 设置历史条数（1～1000）、时间与最新／最慢排序；设置仅在本次会话保留。
@@ -429,12 +430,18 @@ def interactive(finder, args, output):
     while True:
         try:
             if state == 'mode':
-                command = terminal_input(output,
-                    '方式: 1 按词(每词都出现，默认) / 2 整段(连续出现) / 3 完整SQL(结构相同)；q 退出').decode().strip()
+                for line in ('请选择检索方式：', '  1  按词（每个词都出现，默认）',
+                             '  2  整段（连续出现）', '  3  完整 SQL（结构相同）',
+                             '  ?  查看交互帮助'):
+                    output.line(line)
+                command = terminal_input(output, '  q 退出；回车选择 1。').decode().strip()
                 if command == 'q':
                     return 0
+                if command == '?':
+                    output.interactive_help()
+                    continue
                 if command not in ('', '1', '2', '3', 'words', 'passage', 'exact'):
-                    raise InputError('请选择 1、2 或 3。')
+                    raise InputError('请选择 1、2 或 3；? 查看交互帮助。')
                 args.mode = {'': 'words', '1': 'words', '2': 'passage', '3': 'exact'}.get(command, command)
                 state = 'input'
             elif state == 'input':
@@ -447,10 +454,13 @@ def interactive(finder, args, output):
                 output.candidates(found, args)
                 state = 'list'
             elif state == 'list':
+                output.line('? 查看交互帮助。')
                 command = terminal_input(output, '输入标记看详情；o 调整排序；l 重看列表；n 新检索；q 退出；Ctrl-C 返回输入。').decode().strip()
                 if command in ('', 'q'):
                     return 0
-                if command == 'n':
+                if command == '?':
+                    output.interactive_help()
+                elif command == 'n':
                     state = 'mode'
                 elif command == 'l':
                     output.candidates(found, args)
@@ -495,10 +505,12 @@ def interactive(finder, args, output):
                 if 'timings' in detail:
                     output.line('v 原文列表；v 编号 选原文；v matched 本次命中；v all 全部原文。')
                     output.line('h 历史设置（条数、时间范围、最新或最慢、恢复默认）。')
-                command = terminal_input(output, 'b 返回列表；n 新检索；q 退出；Ctrl-C 返回列表。').decode().strip()
+                command = terminal_input(output, 'b 返回列表；? 帮助；n 新检索；q 退出；Ctrl-C 返回列表。').decode().strip()
                 if command in ('', 'q'):
                     return 0
-                if command == 'b':
+                if command == '?':
+                    output.interactive_help()
+                elif command == 'b':
                     output.candidates(found, args)
                     state = 'list'
                 elif command == 'n':

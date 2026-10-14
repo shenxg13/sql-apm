@@ -134,6 +134,59 @@ def verify_input():
     print('PASS: input erase display and bytes, BS/DEL, UTF-8, tabs, wraps and split arrow sequences', flush=True)
 
 
+def check_help(term, prompt, width):
+    from sql_apm.cli.sqlfind_output import cells
+    term.send('?\n')
+    rendered = term.until('交互帮助结束。', timeout=5)
+    assert 'sqlfind 交互帮助' in rendered
+    for line in ('  o  调整检索结果排序', '  l  重新显示当前结果列表',
+                 '  i 序号  切换身份表', '  t 类别  切换计时类别',
+                 '  v 编号  选择一份原文', '  h  设置历史条数'):
+        assert '\n' + line in rendered
+    assert all(cells(line) <= width for line in rendered.splitlines())
+    assert '\x1b' not in rendered
+    term.until(prompt)
+
+
+def verify_help(dsn):
+    from verify_sqlfind import command
+    for width in (80, 200):
+        # The outer help requires no database connection, including repeat use.
+        term = Terminal('host=/nonexistent-sqlfind-help-socket connect_timeout=1', width=width)
+        try:
+            menu = term.until('回车选择 1。')
+            assert '\n  ?  查看交互帮助\n' in menu
+            for _ in range(2):
+                check_help(term, '回车选择 1。', width)
+            term.send('\n')
+            term.until('输入一行检索词')
+            term.until('之后 q 退出。')
+            term.send('\x03')
+            term.until('回车选择 1。')
+        finally:
+            term.close()
+        term = Terminal(dsn, width=width)
+        try:
+            for mode, raw in (('1', '?'), ('2', "SELECT '?'\nFROM orders"),
+                              ('3', "SELECT '?'\nFROM orders")):
+                term.until('回车选择 1。')
+                term.send(mode + '\n')
+                term.until('之后 q 退出。')
+                term.send(raw + ('\n' if mode == '1' else '\n\x04'))
+                result = term.until('Ctrl-C 返回输入。')
+                assert 'sqlfind 交互帮助' not in result
+                if mode == '3':
+                    # Exact mode reports a fingerprint, not the raw input digest.
+                    expected = command(dsn, ['--mode', 'exact', '--width', str(width), raw])
+                    assert expected.returncode == 0 and expected.stdout.decode().strip() in result
+                else:
+                    assert hashlib.sha256(raw.encode()).hexdigest() in result.replace('\n', '')
+                term.send('n\n')
+        finally:
+            term.close()
+    print('PASS: outer help without database, repeat help, 80/200 columns and literal question marks in all input modes', flush=True)
+
+
 def verify_history(dsn, owner):
     from sql_apm.cli.sqlfind import arguments, search, time_value
     from sql_apm.cli.sqlfind_output import Output
@@ -175,6 +228,9 @@ def verify_history(dsn, owner):
             rendered = term.until(prompt)
             compare(rendered, custom)
             assert '\n当前基线\n' not in rendered and '原文开始' not in rendered
+            check_help(term, prompt, width)
+            term.send('f\n')
+            compare(term.until(prompt), custom)
 
             # Cancelling after entering a different limit must retain all settings.
             for cancel in ('q\n', '\x03'):
@@ -211,6 +267,9 @@ def verify_history(dsn, owner):
             exact = search(finder, data.EXTENDED.encode(), exact_args)
             compare(term.until(prompt), finder.detail(exact, '1', exact_args, limit=100, window=window))
             term.send('t parse\n')
+            compare(term.until(prompt), finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
+            check_help(term, prompt, width)
+            term.send('f\n')
             compare(term.until(prompt), finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
 
             # Empty ranges are valid, and Enter retains all four settings.
@@ -296,6 +355,7 @@ def verify_drilldown(dsn, owner):
                 assert '保留原排序和列表' in term.until(listing)
             with owner.cursor() as cur:
                 cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            check_help(term, listing, width)
             term.send('o\n')
             term.until('取消。')
             term.send('1\n')
@@ -339,6 +399,11 @@ def verify_drilldown(dsn, owner):
             single = finder.detail(found, '1', args, original=original, limit=1000, order='slowest', window=frozen)
             single['window_kept'] = True
             compare(term.until(prompt), single)
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            check_help(term, prompt, width)
+            check_help(term, prompt, width)
+            owner.rollback()
             term.send('f\n')
             rendered = term.until(prompt)
             compare(rendered, single)
@@ -356,6 +421,9 @@ def verify_drilldown(dsn, owner):
             changed = finder.detail(found, '1', args, identity=identity, original=original, limit=1000, order='slowest')
             compare(term.until(prompt), changed)
             term.send('t request\n')
+            compare(term.until(prompt), changed)
+            check_help(term, prompt, width)
+            term.send('f\n')
             compare(term.until(prompt), changed)
             for scope in ('all', 'matched'):
                 term.send('v ' + scope + '\n')
@@ -408,13 +476,14 @@ def verify(dsn, directory, owner):
     from sql_apm.cli.sqlfind_output import cells
     from verify_sqlfind import command
     verify_input()
+    verify_help(dsn)
     verify_history(dsn, owner)
     verify_drilldown(dsn, owner)
     for width in (80, 200):
         term = Terminal(dsn, ['--mode', 'words'], width)
         try:
             first = term.until('之后 q 退出。')
-            assert '方式: 1' not in first
+            assert '请选择检索方式' not in first
             term.send('\n')
             term.until('输入为空')
             term.until('之后 q 退出。')

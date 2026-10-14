@@ -318,6 +318,8 @@ def verify_drilldown(dsn, owner):
 
             def compare(text, expected, method='history'):
                 stream = io.StringIO()
+                if method == 'originals':
+                    expected = finder.originals(expected)
                 getattr(Output(width, stream), method)(expected)
                 assert stream.getvalue().strip() in text, text[-2000:]
 
@@ -372,6 +374,16 @@ def verify_drilldown(dsn, owner):
             owner.rollback()
             term.send('v\n')
             compare(term.until(prompt), changed, 'originals')
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('v\n')
+            time.sleep(0.3)
+            term.send('\x03')
+            cancelled = term.until(prompt)
+            assert '取消' in cancelled and '保留原选择' in cancelled, repr(cancelled)
+            owner.rollback()
+            term.send('f\n')
+            compare(term.until(prompt), changed)
             term.send('n\n')
             term.until('q 退出')
             term.send('3\n')

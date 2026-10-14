@@ -253,9 +253,10 @@ class Output:
         self.line('原文列表：编号在本次检索的同一结构内保持不变。')
         self.original_scope(detail)
         self.line('记录数和最近执行时间按当前身份、计时及历史时间范围统计；0 表示此范围内没有记录。')
-        self.table(['原文编号', '本次命中', '记录数', '最近执行时间', '原文摘要'],
+        self.line('不同部分：去掉本列表原文共有的开头和结尾；较长差异保留首尾，... 表示中间省略。')
+        self.table(['原文编号', '本次命中', '记录数', '最近执行时间', '原文不同部分'],
             [(r['number'], '是' if r['matched'] else '否', r['records'], stamp(r['last_at']),
-              clip(' '.join(r['example'].split()) + ('...' if r['chars'] > len(r['example']) else ''), 80))
+              r['differing'].replace(' ', '\\x20') if r['differing'].isspace() else r['differing'])
              for r in detail['originals'] if r['in_scope']])
         self.line('v 编号 选择原文并看历史；f 查看所选原文全文；v matched 本次命中；v all 全部原文。')
         self.footer()

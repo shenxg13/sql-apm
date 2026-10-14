@@ -526,6 +526,16 @@ def interactive(finder, args, output):
                 elif command == 'v':
                     if 'timings' not in detail:
                         raise InputError('该提示没有可查看的原文列表。')
+                    try:
+                        updated = finder.originals(detail)
+                    except KeyboardInterrupt:
+                        output.line('已取消原文列表查询，保留原选择。')
+                        continue
+                    except ERRORS as error:
+                        output.line(failure(error))
+                        output.line('保留原选择。')
+                        continue
+                    detail = updated
                     output.originals(detail)
                 elif command == 'f' or command.startswith(('i ', 't ', 'v ')):
                     next_identity, next_timing = chosen_identity, chosen_timing

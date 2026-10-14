@@ -22,6 +22,10 @@ from sql_apm.cli.sqlfind_output import Output, cells
 from sql_apm.storage.sqlfind import Finder, rows
 from sql_apm.storage.ingestion import connect
 
+DIFFERENCE_VALUES = ('', 'alpha', 'beta', '中文\n值', '\t', ' ', 'a' * 200 + 'Z', 'b' * 200 + 'Y')
+DIFFERENCE_SQL = ('/* ' + 'shared-prefix ' * 30 + '*/ SELECT id FROM preview_differences '
+                  "WHERE code = 'shared-{value}-tail' /* " + 'shared-suffix ' * 30 + '*/')
+
 
 def command(dsn, options, raw=None, entry=None, overrides=None):
     master, slave = pty.openpty()
@@ -93,7 +97,7 @@ def verify_originals(finder):
             assert changed['text']['selected'] and changed['text']['sql_id'] == original
         for width in (80, 200):
             stream = io.StringIO()
-            Output(width, stream).originals(changed)
+            Output(width, stream).originals(finder.originals(changed))
             assert all(cells(line) <= width for line in stream.getvalue().splitlines())
     second = next(n for n, r in enumerate(default['identities'], 1) if r['scope_id'] == 'C2')
     alternate = finder.detail(found, '1', args, identity=second)
@@ -114,6 +118,39 @@ def verify_originals(finder):
     print('PASS: original subsets/all/single, full-range slowest, stable trace IDs, counts, zero records and baseline parity', flush=True)
 
 
+def verify_differences(finder):
+    args = arguments([])
+    found = search(finder, b'preview_differences', args)
+    detail = finder.detail(found, '1', args)
+    before = [dict(r) for r in detail['originals']]
+    listed = finder.originals(detail)
+    assert detail['originals'] == before
+    assert {r['example'] for r in listed['originals']} == {DIFFERENCE_SQL[:180]}
+    assert sum(r['records'] == 0 for r in listed['originals']) == 1
+    expected = {v if v and len(v) <= 160 else '（此处无字符）' if not v else
+                v[:100] + ' ... ' + v[-50:] for v in DIFFERENCE_VALUES}
+    assert {r['differing'] for r in listed['originals']} == expected
+    assert listed['statistics'] == detail['statistics'] and listed['executions'] == detail['executions']
+    for width in (80, 200):
+        stream = io.StringIO()
+        Output(width, stream).originals(listed)
+        rendered = stream.getvalue()
+        assert all(cells(line) <= width for line in rendered.splitlines())
+        assert 'alpha' in rendered and 'beta' in rendered and '\\t' in rendered and '\\x20' in rendered
+        assert '中文\\n值' in rendered and '原文不同部分' in rendered
+        assert 'shared-prefix' not in rendered and 'shared-suffix' not in rendered
+    selected = listed['originals'][0]
+    single = finder.detail(found, '1', args, original=selected['sql_id'])
+    single_list = finder.originals(single)
+    assert [r['differing'] for r in single_list['originals'] if r['in_scope']] == ['（只有这一份原文）']
+    # The comparison follows the displayed set, rather than the whole structure.
+    subset = search(finder, b'preview_differences shared-a', args)
+    subset_detail = finder.originals(finder.detail(subset, '1', args))
+    assert sorted(r['differing'] for r in subset_detail['originals'] if r['in_scope']) == [
+        'a' * 100 + ' ... ' + 'a' * 49 + 'Z', 'lpha']
+    print('PASS: full-text differences beyond 180 chars, common suffix, zero-count texts, whitespace, long/empty/single and scoped lists', flush=True)
+
+
 def verify(pg_bin):
     with instance(pg_bin) as (directory, env):
         v = Verification(pg_bin, directory, env)
@@ -127,12 +164,16 @@ def verify(pg_bin):
             event = session.request(time_value('2026-07-17 12:00:00') + timedelta(seconds=n),
                 data.BUSY.format(status=n, day='2026-06-26'), 99999)
             synthetic.extend(values for _, values in event)
+        for n, value in enumerate(DIFFERENCE_VALUES):
+            moment = time_value('2026-07-01' if n == 0 else '2026-07-21') + timedelta(seconds=n)
+            synthetic.extend(values for _, values in session.request(moment, DIFFERENCE_SQL.format(value=value), 25))
         with patch.object(data, 'events', return_value=sorted(synthetic, key=lambda r: r[0])):
             data.load(dsn, directory)
         owner = connect(dsn, 'sql_apm')
         before = contents(owner)
         finder = Finder(dsn + '_ro', 'sql_apm')
         verify_originals(finder)
+        verify_differences(finder)
         for mode, text in [('words', 'orders status'), ('passage', 'from orders'), ('exact', data.BUSY.format(status=1, day='2026-06-26')),
                            ('exact', data.LATER), ('exact', data.EXTENDED), ('exact', data.UNBASED_MIXED),
                            ('exact', 'SELECT v FROM absent_here'), ('exact', 'not a sql'),

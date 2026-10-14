@@ -107,6 +107,33 @@ class Finder:
             row['matching'] = row.pop('scope_matching')
         return result
 
+    def originals(self, detail):
+        """Compare full texts only when opening the catalog, including zero-count rows."""
+        ids = [r['sql_id'] for r in detail['originals'] if r['in_scope']]
+        if not ids:
+            return detail
+        with self.cursor() as cur:
+            # Reuse the dashboard's common-prefix primitive and overlap rule.
+            # Work on the entire text in PostgreSQL; return only bounded snippets.
+            cur.execute('''WITH texts AS MATERIALIZED (
+                    SELECT sql_id,text FROM mpp_sql_text WHERE sql_id=ANY(%s::text[])
+                ), shared AS (
+                    SELECT mpp_view_common_prefix(min(text COLLATE "C"),max(text COLLATE "C")) head,
+                        mpp_view_common_prefix(min(reverse(text) COLLATE "C"),max(reverse(text) COLLATE "C")) tail,
+                        min(length(text)) shortest,count(*) n FROM texts
+                ), parts AS (
+                    SELECT t.sql_id,s.n,substr(t.text,s.head+1,
+                        length(t.text)-s.head-least(s.tail,s.shortest-s.head)) part
+                    FROM texts t CROSS JOIN shared s
+                ) SELECT sql_id,CASE WHEN n=1 THEN '（只有这一份原文）'
+                    WHEN part='' THEN '（此处无字符）'
+                    WHEN length(part)>160 THEN left(part,100)||' ... '||right(part,50)
+                    ELSE part END AS differing FROM parts''', (ids,))
+            differences = {r['sql_id']: r['differing'] for r in cur.fetchall()}
+        if len(differences) != len(ids):
+            raise ValueError('records_changed')
+        return dict(detail, originals=[dict(r, differing=differences.get(r['sql_id'])) for r in detail['originals']])
+
     def detail(self, found, mark, args, identity=None, timing=None, limit=20, window=None,
                order='latest', original=None):
         if order not in ('latest', 'slowest') or not 1 <= limit <= 1000:

@@ -3,23 +3,27 @@ import hashlib
 import importlib.util
 import os
 from pathlib import Path
+import re
 import select
 import signal
 import struct
 import subprocess
+import sys
 import termios
 import time
 import fcntl
+import unicodedata
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class Terminal:
-    def __init__(self, dsn, args=(), width=80, env=None):
+    def __init__(self, dsn, args=(), width=80, env=None, entry=None):
         pid, self.fd = os.forkpty()
         if pid == 0:
             os.chdir('/tmp')
-            os.execve(str(ROOT / 'sqlfind'), ['sqlfind', *args],
+            command = entry or [str(ROOT / 'sqlfind'), *args]
+            os.execve(command[0], command,
                       dict(os.environ, SQL_APM_DSN=dsn, PYTHONPATH=str(ROOT), **(env or {})))
         self.pid, self.output, self.offset = pid, b'', 0
         fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack('HHHH', 24, width, 0, 0))
@@ -54,9 +58,85 @@ class Terminal:
         os.close(self.fd)
 
 
+def visible_screen(raw, width):
+    """Interpret the ordinary VT cursor/erase operations used by input echo."""
+    lines, row, column = {}, 0, 0
+    for token in re.findall(r'\x1b\[[0-9;]*[A-Za-z]|[^\x1b]', raw.decode()):
+        if token.startswith('\x1b['):
+            count = int(token[2:-1] or '1')
+            if token[-1] == 'A':
+                row = max(0, row - count)
+            elif token[-1] == 'C':
+                column = min(width - 1, column + count)
+            elif token == '\x1b[J':
+                for key in list(lines):
+                    if key[0] > row or key[0] == row and key[1] >= column:
+                        del lines[key]
+            else:
+                raise AssertionError('Unexpected terminal control: ' + repr(token))
+        elif token == '\r':
+            column = 0
+        elif token == '\n':
+            row += 1
+        else:
+            size = 2 if unicodedata.east_asian_width(token) in ('W', 'F') else 1
+            if column + size > width:
+                row, column = row + 1, 0
+            lines[row, column] = token
+            if size == 2:
+                lines[row, column + 1] = ''
+            column += size
+    return '\n'.join(''.join(lines.get((r, c), ' ') for c in range(width)).rstrip()
+                     for r in range(row + 1)).rstrip()
+
+
+def verify_input():
+    # Check both bytes delivered to the caller and what an operator sees, before
+    # involving a database. Split writes exercise escape/UTF-8 read boundaries.
+    cases = [
+        ([b't exwec', b'\x7f\x7f\x7fecute_first', b'\x1b', b'[A\x1b[', b'B\r'],
+         b't execute_first', 't execute_first', False),
+        ([b'\x08\x7ft requesx\x08t\x1bOA\x1bOB\x1b[1;5D\r'],
+         b't request', 't request', False),
+        (['中文错'.encode(), b'\x7f', '词'.encode(), b'\r'], '中文词'.encode(), '中文词', False),
+        ([b'a\xe4', b'\x7f', '中'.encode()[:1], '中'.encode()[1:], b'\r'], 'a中'.encode(), 'a中', False),
+        ([b'a\t', b'\x08', b'b\r'], b'ab', 'ab', False),
+        ([b'x' * 79 + '中'.encode(), b'\x7f\x08Z\r'], b'x' * 78 + b'Z', 'x' * 78 + 'Z', False),
+        ([b'x' * 80, b'\x7fZ\r'], b'x' * 79 + b'Z', 'x' * 79 + 'Z\n', False),
+        (['SELECT 中文\n\tFROM wrong'.encode(), b'\x08' * 5, b'orders\n\x04'],
+         'SELECT 中文\n\tFROM orders'.encode(), 'SELECT 中文\n        FROM orders\n', True),
+        ([b'first\n', b'\x7f', b' next\n\x04'], b'first next', 'first next\n', True),
+        ([b'SELECT 1\r\nFROM example\r\n\x04'], b'SELECT 1\nFROM example',
+         'SELECT 1\nFROM example\n', True),
+    ]
+    for width in (80, 200):
+        for parts, expected, display, multiline in cases:
+            probe = (
+                'import hashlib; from sql_apm.cli.sqlfind import terminal_input; '
+                'from sql_apm.cli.sqlfind_output import Output; '
+                f'raw = terminal_input(Output(), "READY", multiline={multiline}); '
+                'print("RESULT=" + hashlib.sha256(raw).hexdigest())'
+            )
+            term = Terminal('', width=width, entry=[sys.executable, '-B', '-c', probe])
+            try:
+                term.until('READY')
+                for part in parts:
+                    term.send(part)
+                    time.sleep(0.03)
+                result = 'RESULT=' + hashlib.sha256(expected).hexdigest()
+                term.until(result)
+                if width == 200 and display == 'x' * 79 + 'Z\n':
+                    display = display.rstrip('\n')
+                assert visible_screen(term.output, width) == 'READY\n' + display + '\n' + result, repr(term.output)
+            finally:
+                term.close()
+    print('PASS: input erase display and bytes, BS/DEL, UTF-8, tabs, wraps and split arrow sequences', flush=True)
+
+
 def verify(dsn, directory, owner):
     from sql_apm.cli.sqlfind_output import cells
     from verify_sqlfind import command
+    verify_input()
     for width in (80, 200):
         term = Terminal(dsn, ['--mode', 'words'], width)
         try:
@@ -84,8 +164,9 @@ def verify(dsn, directory, owner):
             assert expected.strip() in detail
             term.send('i 2\n')
             term.until('Ctrl-C 返回列表。')
-            term.send('t request\n')
-            term.until('Ctrl-C 返回列表。')
+            term.send('t requesx\x7ft\x1b[A\x1b[B\n')
+            changed = term.until('Ctrl-C 返回列表。')
+            assert '计时类别: 请求整体' in changed and '该身份没有所选计时类别' not in changed
             term.send('f\n')
             term.until('Ctrl-C 返回列表。')
             term.send('b\n')
@@ -150,3 +231,7 @@ def verify(dsn, directory, owner):
     configure.uninstall(home)
     assert profile.read_bytes() == original
     print('PASS: PTY workflows, paste bytes, cancellation, 80/200 columns and isolated login configuration', flush=True)
+
+
+if __name__ == '__main__':
+    verify_input()

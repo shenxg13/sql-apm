@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import sys
 import termios
+import unicodedata
 
 import psycopg2
 from psycopg2.extensions import get_wait_callback, make_dsn, set_wait_callback
@@ -198,6 +199,61 @@ def show(finder, found, mark, args, output, identity=None, timing=None, full=Fal
     return detail
 
 
+class InputEcho:
+    """Track input cells so erase also works for wide characters, tabs and wraps."""
+    def __init__(self, output):
+        self.output, self.width = output, output.width
+        self.row = self.column = 0
+        self.marks, self.pending = [], []
+
+    def add(self, text, end):
+        for char in text:
+            self.marks.append((end, self.row, self.column))
+            if char in '\r\n':
+                self.pending.append('\n')
+                self.row, self.column = self.row + 1, 0
+                continue
+            encoding = getattr(self.output.stream, 'encoding', None) or 'utf-8'
+            rendered = char.encode(encoding, 'replace').decode(encoding)
+            if rendered != char:
+                self.output.replaced = True
+            if char == '\t':
+                rendered = ' ' * (8 - self.column % 8)
+            elif unicodedata.category(char).startswith('C'):
+                rendered = ''
+            for glyph in rendered:
+                width = 0 if unicodedata.combining(glyph) else 2 if unicodedata.east_asian_width(glyph) in ('W', 'F') else 1
+                if self.column + width > self.width:
+                    self.pending.append('\n')
+                    self.row, self.column = self.row + 1, 0
+                self.pending.append(glyph)
+                self.column += width
+                if self.column == self.width:
+                    # Resolve the terminal's delayed wrap before a possible erase.
+                    self.pending.append('\n')
+                    self.row, self.column = self.row + 1, 0
+
+    def erase(self, end):
+        target = None
+        while self.marks and self.marks[-1][0] > end:
+            _, row, column = self.marks.pop()
+            target = row, column
+        if target is None:
+            return
+        row, column = target
+        if self.row > row:
+            self.pending.append(f'\x1b[{self.row - row}A')
+        self.pending.append('\r')
+        if column:
+            self.pending.append(f'\x1b[{column}C')
+        self.pending.append('\x1b[J')
+        self.row, self.column = row, column
+
+    def flush(self):
+        self.output.write(''.join(self.pending))
+        self.pending.clear()
+
+
 def terminal_input(output, prompt, multiline=False, maximum=MAX_BYTES):
     """Read noncanonical input: canonical PTYs silently truncate lines at 4096 bytes.
 
@@ -206,7 +262,6 @@ def terminal_input(output, prompt, multiline=False, maximum=MAX_BYTES):
     """
     fd = sys.stdin.fileno()
     termios.tcflush(fd, termios.TCIFLUSH)
-    output.line(prompt)
     old = termios.tcgetattr(fd)
     new = termios.tcgetattr(fd)
     new[0] &= ~(termios.ICRNL | termios.INLCR | termios.IGNCR)
@@ -214,35 +269,49 @@ def terminal_input(output, prompt, multiline=False, maximum=MAX_BYTES):
     new[6][termios.VMIN], new[6][termios.VTIME] = 1, 0
     data, overflow = bytearray(), False
     decoder = codecs.getincrementaldecoder('utf-8')('replace')
+    echo, escape = InputEcho(output), ''
     try:
         termios.tcsetattr(fd, termios.TCSANOW, new)
+        output.line(prompt)
         while True:
             chunk = os.read(fd, 4096)
             if not chunk:
                 break
             end = False
-            echo = []
             for byte in chunk:
                 if byte == 4 or (not multiline and byte in (10, 13)):
                     end = True
                     break
+                if byte == 27:
+                    escape = 'start'
+                    continue
+                if escape:
+                    if escape == 'start' and byte in (ord('['), ord('O')):
+                        escape = 'sequence'
+                        continue
+                    if escape == 'sequence' and 32 <= byte <= 126:
+                        if byte >= 64:
+                            escape = ''
+                        continue
+                    escape = ''
                 if byte in (8, 127):
                     if data:
                         while data and data[-1] & 0xc0 == 0x80:
                             data.pop()
                         if data:
                             data.pop()
+                    decoder.reset()
+                    echo.erase(len(data))
                     continue
                 if len(data) <= maximum:
                     data.append(byte)
                 else:
                     overflow = True
-                # Echo only input, not terminal control sequences from pasted text.
-                if byte in (10, 13):
-                    echo.append('\n')
-                elif byte == 9 or byte >= 32:
-                    echo.append(decoder.decode(bytes([byte])))
-            output.write(''.join(echo))
+                    continue
+                text = decoder.decode(bytes([byte]))
+                if byte != 10 or len(data) < 2 or data[-2] != 13:
+                    echo.add(text, len(data))
+            echo.flush()
             if end:
                 break
     finally:

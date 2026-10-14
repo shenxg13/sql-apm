@@ -4,7 +4,7 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-13
+updated: 2026-10-14
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/62
     status: current
@@ -79,6 +79,9 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
   文件与标准输入原样保留 UTF-8 字节中的首尾空白和换行。时间无时区时按北京时间。
 - 交互按词读取一行；整段和完整 SQL 粘贴后回车、Ctrl-D，换行统一 LF，结束输入的那次回车不算 SQL。
   多余粘贴不作为菜单指令；Ctrl-C 取消步骤或查询，输入／查询失败可以重试。无 readline 依赖、无历史文件。
+- 终端退格实现修正（2026-10-14 用户试用反馈）：BS／DEL 同时删除输入与屏幕字符，处理中文、制表符和折行。
+  方向键的 CSI／SS3 序列整体忽略，不进入 SQL 或操作命令；当前不提供方向键编辑／历史浏览。
+  这是交互输入的缺陷修复，未改变检索规则；自动验证与 PuTTY 用户确认仍分开记录。
 - 查询只读、不执行输入 SQL，不写表、不创建任务、不落盘 SQL／结果；短命令在启动解释器前禁用 Python 缓存。
   成功查询含无命中、无法生成可靠指纹退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
   错误使用中文且不带密码或堆栈，查询超时明确说明。

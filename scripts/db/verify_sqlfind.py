@@ -8,6 +8,8 @@ import pty
 import shutil
 import subprocess
 import sys
+from datetime import timedelta
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / 'tests')]
@@ -32,15 +34,105 @@ def command(dsn, options, raw=None, entry=None, overrides=None):
         os.close(slave)
 
 
+def verify_originals(finder):
+    args = arguments([])
+    found = search(finder, b'orders 2026-06-26', args)
+    default = finder.detail(found, '1', args)
+    assert default['original'] == 'matched'
+    catalog = default['originals']
+    selected = [r for r in catalog if r['in_scope']]
+    assert len(selected) == found['candidates'][0]['matched_texts'] == 5
+    assert len(catalog) == 80
+    assert all('2026-06-26' in r['example'] for r in selected)
+    numbers = {r['sql_id']: r['number'] for r in catalog}
+    common = [finder.norm, default['candidate']['fingerprint'],
+              default['identities'][default['identity'] - 1]['identity'], default['timing']]
+    build = default['version']['build_id']
+    for order in ('latest', 'slowest'):
+        actual = finder.detail(found, '1', args, order=order, limit=1000)
+        with finder.cursor() as cur:
+            cur.execute('''SELECT r.* FROM mpp_view_records(%s,%s,%s,%s,%s,%s) r
+                WHERE sql_id=ANY(%s) ORDER BY
+                CASE WHEN %s='slowest' THEN duration_ms END DESC NULLS LAST,
+                end_at DESC,analysis_id DESC,occurrence_id DESC''',
+                common + [actual['start'], actual['end'], [r['sql_id'] for r in selected], order])
+            expected = [dict(r) for r in cur.fetchall()]
+            assert 20 < len(expected) < 1000 and any(r['duration_ms'] is None for r in expected)
+            assert sum(c['records'] for c in actual['counts']) == len(expected)
+            assert len(actual['executions']) == len(expected)
+            for got, reference in zip(actual['executions'], expected):
+                assert all(got[k] == reference[k] for k in reference if k != 'anchor_ref')
+                assert got['original_number'] == numbers[got['sql_id']] and got['matching'] == len(expected)
+            # Every enriched row, including unknown durations and baseline comparison,
+            # agrees with the existing per-text execution function.
+            canonical = {}
+            for text in selected:
+                records = rows(cur, 'mpp_view_executions', common + [build, actual['start'], actual['end'],
+                    text['sql_id'], None, None, None, order, 1000])
+                canonical.update({(r['analysis_id'], r['occurrence_id']): r for r in records})
+            for got in actual['executions']:
+                reference = canonical[got['analysis_id'], got['occurrence_id']]
+                assert all(got[k] == v for k, v in reference.items() if k != 'matching')
+        first = finder.detail(found, '1', args, order=order, limit=1)
+        assert first['executions'] == actual['executions'][:1]
+        if order == 'slowest':
+            assert first['executions'][0]['occurrence_id'] not in {r['occurrence_id'] for r in default['executions']}
+            assert actual['executions'][-1]['duration_ms'] is None
+            tied = actual['executions'][:2]
+            assert tied[0]['duration_ms'] == tied[1]['duration_ms'] == 99999
+            assert tied[0]['end_at'] > tied[1]['end_at']
+        assert actual['statistics'] == default['statistics']
+    for original in ('all', selected[0]['sql_id'], 'matched'):
+        changed = finder.detail(found, '1', args, original=original)
+        assert {r['sql_id']: r['number'] for r in changed['originals']} == numbers
+        assert changed['statistics'] == default['statistics']
+        if original == 'all':
+            assert sum(c['records'] for c in changed['counts']) > sum(c['records'] for c in default['counts'])
+        elif original != 'matched':
+            assert all(r['sql_id'] == original for r in changed['executions'])
+            assert changed['text']['selected'] and changed['text']['sql_id'] == original
+        for width in (80, 200):
+            stream = io.StringIO()
+            Output(width, stream).originals(changed)
+            assert all(cells(line) <= width for line in stream.getvalue().splitlines())
+    second = next(n for n, r in enumerate(default['identities'], 1) if r['scope_id'] == 'C2')
+    alternate = finder.detail(found, '1', args, identity=second)
+    assert len([r for r in alternate['originals'] if r['in_scope']]) == 5
+    assert sum(r['in_scope'] and r['records'] > 0 for r in alternate['originals']) == 1
+    absent = next(r for r in alternate['originals'] if r['in_scope'] and r['records'] == 0)
+    empty = finder.detail(found, '1', args, identity=second, original=absent['sql_id'])
+    assert empty['executions'] == empty['counts'] == [] and empty['text']['sql_id'] == absent['sql_id']
+    assert empty['statistics'] == alternate['statistics']
+    # Candidate filters determine membership even when history uses another window.
+    scoped_args = arguments(['--cluster', 'C2', '--start', '2026-07-23', '--end', '2026-07-24'])
+    scoped = search(finder, b'orders', scoped_args)
+    scoped_detail = finder.detail(scoped, '1', scoped_args)
+    assert sum(r['matched'] for r in scoped_detail['originals']) == scoped['candidates'][0]['matched_texts'] == 1
+    fingerprint = default['candidate']['fingerprint']
+    direct = search(finder, fingerprint.encode(), args)
+    assert finder.detail(direct, '1', args)['original'] == 'all'
+    print('PASS: original subsets/all/single, full-range slowest, stable trace IDs, counts, zero records and baseline parity', flush=True)
+
+
 def verify(pg_bin):
     with instance(pg_bin) as (directory, env):
         v = Verification(pg_bin, directory, env)
         v.init()
         dsn = 'host=' + str(directory / 'socket') + ' port=55473 dbname=sql_apm user=sql_apm'
-        data.load(dsn, directory)
+        # Two old but very slow executions, with equal durations, exercise global
+        # ordering outside the latest page and the time tie-breaker.
+        synthetic = data.events()
+        session = data.Session(99, 'app_user', 'shop')
+        for n in (1, 2):
+            event = session.request(time_value('2026-07-17 12:00:00') + timedelta(seconds=n),
+                data.BUSY.format(status=n, day='2026-06-26'), 99999)
+            synthetic.extend(values for _, values in event)
+        with patch.object(data, 'events', return_value=sorted(synthetic, key=lambda r: r[0])):
+            data.load(dsn, directory)
         owner = connect(dsn, 'sql_apm')
         before = contents(owner)
         finder = Finder(dsn + '_ro', 'sql_apm')
+        verify_originals(finder)
         for mode, text in [('words', 'orders status'), ('passage', 'from orders'), ('exact', data.BUSY.format(status=1, day='2026-06-26')),
                            ('exact', data.LATER), ('exact', data.EXTENDED), ('exact', data.UNBASED_MIXED),
                            ('exact', 'SELECT v FROM absent_here'), ('exact', 'not a sql'),
@@ -71,12 +163,14 @@ def verify(pg_bin):
                     continue
                 candidate = detail['candidate']
                 with finder.cursor() as cur:
-                    assert detail['text'] == rows(cur, 'mpp_view_sql_text', [finder.norm, candidate['fingerprint'], candidate['only_sql_id']])[0]
+                    expected_text = rows(cur, 'mpp_view_sql_text', [finder.norm, candidate['fingerprint'], detail['text']['sql_id']])[0]
+                    expected_text['selected'] = detail['original'] not in ('all', 'matched')
+                    assert detail['text'] == expected_text
                     token = detail['identities'][detail['identity'] - 1]['identity']
                     version = detail['version']
                     build = version['build_id'] if version and version['selectable'] else None
                     assert detail['statistics'] == rows(cur, 'mpp_view_statistics', [finder.norm, candidate['fingerprint'], token, build, 'overall'])
-                    assert detail['executions'] == rows(cur, 'mpp_view_executions', [finder.norm, candidate['fingerprint'], token, detail['timing'],
+                    assert [{k: v for k, v in r.items() if k != 'original_number'} for r in detail['executions']] == rows(cur, 'mpp_view_executions', [finder.norm, candidate['fingerprint'], token, detail['timing'],
                         build, detail['start'], detail['end'], detail['text']['sql_id'] if detail['text']['selected'] else None,
                         None, None, None, 'latest', 20])
                 for width in (80, 200):

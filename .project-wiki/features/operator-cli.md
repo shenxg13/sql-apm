@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-14
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62
@@ -84,7 +86,8 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
 - 终端退格实现修正（2026-10-14 用户试用反馈）：BS／DEL 同时删除输入与屏幕字符，处理中文、制表符和折行。
   方向键的 CSI／SS3 序列整体忽略，不进入 SQL 或操作命令；当前不提供方向键编辑／历史浏览。
   这是交互输入的缺陷修复，未改变检索规则；自动验证与 PuTTY 用户确认仍分开记录。
-- 交互详情支持 `h 历史设置`（2026-10-14 用户确认扩展），条数与时间在会话内保留；逐项提示、取消、恢复默认及
+- 交互详情支持 `h 历史设置`（2026-10-14 用户确认扩展），条数、时间与最新／最慢排序在会话内保留；
+  候选 `o` 调整检索排序，详情 `v`／`v 编号`／`v matched`／`v all` 查看及切换原文范围。逐项提示、取消、恢复默认及
   查询口径由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护。设置不写入账号配置或历史文件。
 - 查询只读、不执行输入 SQL，不写表、不创建任务、不落盘 SQL／结果；短命令在启动解释器前禁用 Python 缓存。
   成功查询含无命中、无法生成可靠指纹退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
@@ -95,7 +98,7 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
 - `scripts/sqlfind/configure.py install` 只维护 home 的专属目录和一个登录片段，打印改动路径；相同输入幂等，
   `uninstall` 恢复原文件字节并保留后来新增的其他设置。密码仍仅在已有的受保护 passfile 中。
 - 不分屏、不进入全屏，支持终端回滚。80 列起表格可用续行保持完整，200 列候选每个一行；
-  仅候选示例和过长身份可以标注截断。对齐只用 ASCII／中文全角字符，其他字符转义；原文区保留内容。
+  候选示例、过长身份及原文目录摘要可以标注截断。对齐只用 ASCII／中文全角字符，其他字符转义；原文区保留内容。
   当前编码不能表示的字符以替代符号显示并提示。重定向默认 100 列，`--width` 可调整。
 
 检索及详情规则由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护，

@@ -1,6 +1,7 @@
 """Human SQL search entry; never evaluates SQL supplied by the operator."""
 import argparse
 import codecs
+from copy import copy
 from datetime import datetime
 import json
 import os
@@ -38,8 +39,10 @@ def parser():
         epilog='''输入来源三选一：命令行参数、--file 文件、标准输入（管道或重定向）。
 文件和标准输入按 UTF-8 原始字节读取，保留首尾空白及换行。
 交互按词输入一行后回车；整段和完整 SQL 粘贴后回车、Ctrl-D 结束。
-交互详情输入 h 设置历史条数（1～1000）与起止时间；设置仅在本次会话保留。
-历史设置中 r 恢复20条及默认7天，q 或 Ctrl-C 取消；不改变当前基线。
+交互列表输入 o 选择记录数最多或最近执行；详情 v 列原文，v 编号 选原文，f 看全文。
+v matched 看本次命中原文的历史，v all 看整个结构；历史表原文编号可追到具体 SQL。
+详情 h 设置历史条数（1～1000）、时间与最新／最慢排序；设置仅在本次会话保留。
+历史设置中 r 恢复20条、默认7天和最新排序，q 或 Ctrl-C 取消；不改变当前基线。
 Ctrl-C 取消当前步骤或查询；操作提示中 q 退出，不分屏，可用鼠标滚轮回看。
 时间均为北京时间；--start/--end 不带时区时按北京时间，结束时间不包含。
 
@@ -186,18 +189,23 @@ def failure(error):
         return '无法读取输入或配置文件，请检查路径和权限。'
     return {'invalid_identity': '身份序号不存在，请查看身份表中的可用序号。',
             'invalid_timing': '该身份没有所选计时类别，请查看可用计时类别。',
+            'invalid_original': '原文编号不存在，请输入 v 查看原文列表。',
             'records_changed': '检索结果已变化，请重新检索。'}.get(str(error), '输入或配置无效，请检查后重试。')
 
 
 ERRORS = (InputError, IngestionError, psycopg2.Error, OSError, ValueError, TypeError)
 
 
-def show(finder, found, mark, args, output, identity=None, timing=None, full=False, history=None, history_only=False):
+def show(finder, found, mark, args, output, identity=None, timing=None, full=False, history=None,
+         history_only=False, original=None, original_window=None):
     valid = [str(i) for i in range(1, len(found['candidates']) + 1)] + ['s' + str(h['statement']) for h in found['hints']]
     if mark not in valid:
         raise InputError('标记不存在，可用标记: ' + (', '.join(valid) if valid else '无') + '。')
-    settings = history or dict(limit=args.limit or 20, window=None)
-    detail = finder.detail(found, mark, args, identity, timing, **settings)
+    settings = dict(history or dict(limit=args.limit or 20, window=None))
+    if original_window is not None:
+        settings['window'] = original_window
+    detail = finder.detail(found, mark, args, identity, timing, original=original, **settings)
+    detail['window_kept'] = original_window is not None
     if history_only and 'hint' not in detail:
         output.history(detail)
     else:
@@ -335,6 +343,7 @@ def terminal_input(output, prompt, multiline=False, maximum=MAX_BYTES):
 def history_settings(output, current, detail):
     """Collect settings locally; the caller commits them after a successful query."""
     limit, window = current['limit'], current['window']
+    order = current.get('order', 'latest')
     start, end = window or (detail['start'], detail['end'])
     step = 'limit'
     output.line('历史设置：北京时间；回车保留；r 恢复默认；q 或 Ctrl-C 取消。')
@@ -345,6 +354,7 @@ def history_settings(output, current, detail):
                 'mode': f'时间范围：1 默认7天 / 2 指定起止时间 [{2 if window else 1}]：',
                 'start': f'开始时间（包含）[{stamp(start)}]：',
                 'end': f'结束时间（不包含）[{stamp(end)}]：',
+                'order': f'历史排序：1 最新在前 / 2 最慢在前 [{1 if order == "latest" else 2}]：',
             }
             raw = terminal_input(output, prompts[step], maximum=1024)
             try:
@@ -354,7 +364,7 @@ def history_settings(output, current, detail):
                 if value == 'q':
                     return None
                 if value == 'r':
-                    return dict(limit=20, window=None)
+                    return dict(limit=20, window=None, order='latest')
                 if step == 'limit':
                     try:
                         chosen = int(value) if value else limit
@@ -366,22 +376,45 @@ def history_settings(output, current, detail):
                 elif step == 'mode':
                     value = value or ('2' if window else '1')
                     if value == '1':
-                        return dict(limit=limit, window=None)
+                        window, step = None, 'order'
+                        continue
                     if value != '2':
                         raise InputError('请选择 1 或 2。')
                     step = 'start'
                 elif step == 'start':
                     start = time_value(value) if value else start
                     step = 'end'
-                else:
+                elif step == 'end':
                     chosen_end = time_value(value) if value else end
                     if start >= chosen_end:
                         raise InputError('结束时间必须晚于开始时间，请重新输入结束时间。')
-                    return dict(limit=limit, window=(start, chosen_end))
+                    window, step = (start, chosen_end), 'order'
+                else:
+                    value = value or ('1' if order == 'latest' else '2')
+                    if value not in ('1', '2'):
+                        raise InputError('请选择 1 或 2。')
+                    return dict(limit=limit, window=window, order='latest' if value == '1' else 'slowest')
             except UnicodeDecodeError:
                 output.line('输入不是有效的 UTF-8，请重新输入。')
             except InputError as error:
                 output.line(str(error))
+    except KeyboardInterrupt:
+        return None
+
+
+def search_order(output, current):
+    try:
+        while True:
+            value = terminal_input(output,
+                f'检索排序：1 记录数最多 / 2 最近执行 [{1 if current == "count" else 2}]；回车保留；q 或 Ctrl-C 取消。',
+                maximum=1024).decode('utf-8').strip()
+            if value == 'q':
+                return None
+            if not value:
+                return current
+            if value in ('1', '2'):
+                return 'count' if value == '1' else 'recent'
+            output.line('请选择 1 或 2。')
     except KeyboardInterrupt:
         return None
 
@@ -391,6 +424,7 @@ def interactive(finder, args, output):
     found = detail = None
     mark, chosen_identity, chosen_timing = None, None, None
     history = dict(limit=20, window=None)
+    original_window = None
     output.line('sqlfind 交互检索: Ctrl-C 取消当前步骤或查询；操作提示中 q 退出。')
     while True:
         try:
@@ -409,26 +443,58 @@ def interactive(finder, args, output):
                     if multi else '输入一行检索词，回车结束；Ctrl-C 返回方式选择，之后 q 退出。'), multi,
                     MAX_BYTES if args.mode == 'exact' else TEXT_MAX_BYTES)
                 found = search(finder, raw, args)
+                detail, original_window = None, None
                 output.candidates(found, args)
                 state = 'list'
             elif state == 'list':
-                command = terminal_input(output, '输入标记看详情；l 重看列表；n 新检索；q 退出；Ctrl-C 返回输入。').decode().strip()
+                command = terminal_input(output, '输入标记看详情；o 调整排序；l 重看列表；n 新检索；q 退出；Ctrl-C 返回输入。').decode().strip()
                 if command in ('', 'q'):
                     return 0
                 if command == 'n':
                     state = 'mode'
                 elif command == 'l':
                     output.candidates(found, args)
+                elif command == 'o':
+                    order = search_order(output, args.order)
+                    if order is None or order == args.order:
+                        output.line('保留原排序和列表。')
+                        continue
+                    pending = copy(args)
+                    pending.order = order
+                    try:
+                        updated = search(finder, raw, pending)
+                    except KeyboardInterrupt:
+                        output.line('已取消检索，保留原排序和列表。')
+                        continue
+                    except ERRORS as error:
+                        output.line(failure(error))
+                        output.line('保留原排序和列表。')
+                        continue
+                    updated['catalogs'] = found['catalogs']
+                    found, args.order = updated, order
+                    output.candidates(found, args)
                 else:
-                    detail = show(finder, found, command, args, output, history=history)
-                    mark, chosen_identity, chosen_timing = command, None, None
+                    fingerprints = {str(n): r['fingerprint'] for n, r in enumerate(found['candidates'], 1)}
+                    fingerprints.update({'s' + str(r['statement']): r['fingerprint'] for r in found['hints']})
+                    retained = (detail is not None and 'timings' in detail and
+                                fingerprints.get(command) == detail['candidate']['fingerprint'])
+                    next_identity = detail['identity'] if retained else None
+                    next_timing = detail['timing'] if retained else None
+                    updated = show(finder, found, command, args, output, next_identity, next_timing,
+                        history=history, original=detail['original'] if retained else None,
+                        original_window=original_window if retained else None)
+                    detail, mark = updated, command
+                    chosen_identity, chosen_timing = next_identity, next_timing
+                    if not retained:
+                        original_window = None
                     state = 'detail'
             else:
                 if 'timings' in detail:
                     output.line('可用计时类别: ' + '; '.join(t['timing'] + '=' + t['label'] for t in detail['timings']))
                 output.line('i 序号 换身份；t 类别 换计时；f 查看原文全文。')
                 if 'timings' in detail:
-                    output.line('h 历史设置（条数、时间范围、恢复默认）。')
+                    output.line('v 原文列表；v 编号 选原文；v matched 本次命中；v all 全部原文。')
+                    output.line('h 历史设置（条数、时间范围、最新或最慢、恢复默认）。')
                 command = terminal_input(output, 'b 返回列表；n 新检索；q 退出；Ctrl-C 返回列表。').decode().strip()
                 if command in ('', 'q'):
                     return 0
@@ -440,13 +506,14 @@ def interactive(finder, args, output):
                 elif command == 'h':
                     if 'timings' not in detail:
                         raise InputError('该提示没有可查看的执行历史。')
-                    next_history = history_settings(output, history, detail)
+                    current = dict(history, window=original_window) if original_window is not None else history
+                    next_history = history_settings(output, current, detail)
                     if next_history is None:
                         output.line('已取消历史设置，保留原设置。')
                         continue
                     try:
                         updated = show(finder, found, mark, args, output, chosen_identity, chosen_timing,
-                                       history=next_history, history_only=True)
+                                       history=next_history, history_only=True, original=detail['original'])
                     except KeyboardInterrupt:
                         output.line('已取消历史查询，保留原设置。')
                         continue
@@ -455,17 +522,47 @@ def interactive(finder, args, output):
                         output.line('历史设置未应用，保留原设置。')
                         continue
                     detail, history = updated, next_history
-                elif command == 'f' or command.startswith(('i ', 't ')):
+                    original_window = None
+                elif command == 'v':
+                    if 'timings' not in detail:
+                        raise InputError('该提示没有可查看的原文列表。')
+                    output.originals(detail)
+                elif command == 'f' or command.startswith(('i ', 't ', 'v ')):
                     next_identity, next_timing = chosen_identity, chosen_timing
+                    next_original, next_window = detail.get('original'), original_window
                     if command.startswith('i '):
                         try:
                             next_identity = int(command[2:])
                         except ValueError:
                             raise InputError('身份序号必须是整数。') from None
                         next_timing = None
+                        next_window = None
                     elif command.startswith('t '):
                         next_timing = command[2:].strip()
-                    detail = show(finder, found, mark, args, output, next_identity, next_timing, command == 'f', history)
+                    elif command.startswith('v '):
+                        if 'timings' not in detail:
+                            raise InputError('该提示没有可查看的原文列表。')
+                        value = command[2:].strip()
+                        if value in ('all', 'matched'):
+                            next_original = value
+                        else:
+                            selected = next((r for r in detail['originals'] if str(r['number']) == value), None)
+                            if selected is None:
+                                raise ValueError('invalid_original')
+                            next_original = selected['sql_id']
+                        if history['window'] is None:
+                            next_window = (detail['start'], detail['end'])
+                    try:
+                        updated = show(finder, found, mark, args, output, next_identity, next_timing,
+                            command == 'f', history, original=next_original, original_window=next_window)
+                    except KeyboardInterrupt:
+                        output.line('已取消查询，保留原选择。')
+                        continue
+                    except ERRORS as error:
+                        output.line(failure(error))
+                        output.line('保留原选择。')
+                        continue
+                    detail, original_window = updated, next_window
                     chosen_identity, chosen_timing = next_identity, next_timing
                 else:
                     raise InputError('操作无效，请使用提示中的操作。')

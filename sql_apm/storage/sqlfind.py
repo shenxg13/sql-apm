@@ -45,7 +45,7 @@ class Finder:
             if exact.get('statement_hints'):
                 token = base64.urlsafe_b64encode(json.dumps(exact['statement_hints']).encode()).decode().rstrip('=')
                 hints = rows(cur, 'mpp_view_hints', [self.norm, token] + filters)
-        return dict(notes=notes, candidates=candidates, hints=hints, exact=exact)
+        return dict(notes=notes, candidates=candidates, hints=hints, exact=exact, input=text, catalogs={})
 
     def candidates(self, cur, mode, text, args, sid=None):
         values = [self.norm, mode, text, args.cluster, args.database, args.user,
@@ -55,7 +55,62 @@ class Finder:
             LEFT JOIN LATERAL mpp_query_text(r.example_sql_id) t ON true''', values)
         return [dict(row) for row in cur.fetchall()]
 
-    def detail(self, found, mark, args, identity=None, timing=None, limit=20, window=None):
+    def catalog(self, cur, found, candidate, args):
+        """Freeze numbers and search membership for this structure in this search."""
+        fp = candidate['fingerprint']
+        if fp in found['catalogs']:
+            return found['catalogs'][fp]
+        terms = None
+        if candidate['matched_texts'] is not None:
+            function = 'mpp_search_terms' if args.mode == 'words' else 'mpp_search_passage'
+            cur.execute('SELECT ' + function + '(%s) AS terms', (found['input'],))
+            terms = cur.fetchone()['terms']
+        cur.execute('''SELECT f.sql_id,left(t.text,180) AS example,length(t.text) AS chars,
+            (%s::text[] IS NULL OR (NOT EXISTS
+                (SELECT FROM unnest(%s::text[]) term WHERE strpos(t.search_text,term)=0)
+                AND EXISTS (SELECT FROM mpp_occurrence o WHERE o.sql_id=f.sql_id
+                    AND (%s::text IS NULL OR o.scope_id=%s)
+                    AND (%s::text IS NULL OR o.database=%s)
+                    AND (%s::text IS NULL OR o.execution_user=%s)
+                    AND (%s::timestamptz IS NULL OR o.end_at>=%s)
+                    AND (%s::timestamptz IS NULL OR o.end_at<%s)))) AS matched
+            FROM mpp_fingerprint f JOIN mpp_sql_text t USING(sql_id)
+            WHERE f.normalization_id=%s AND f.profile='mpp-csv/1'
+                AND f.state='reliable' AND f.value=%s ORDER BY f.sql_id''',
+            (terms, terms, args.cluster, args.cluster, args.database, args.database, args.user, args.user,
+             args.start, args.start, args.end, args.end, self.norm, fp))
+        return [dict(row, number=n) for n, row in enumerate(cur.fetchall(), 1)]
+
+    def executions(self, cur, fp, token, timing, build, start, end, ids, order, limit):
+        common = [self.norm, fp, token, timing, build, start, end]
+        if ids is None or len(ids) == 1:
+            return rows(cur, 'mpp_view_executions', common +
+                        [ids[0] if ids else None, None, None, None, order, limit])
+        # The global page is selected before enrichment. Each text's rows in that
+        # page form a prefix of its own ordered executions, so ask the existing
+        # function only for that prefix, preserving its comparison/training rules.
+        cur.execute('''WITH page AS MATERIALIZED (
+                SELECT r.*,count(*) OVER () AS matching
+                FROM mpp_view_records(%s,%s,%s,%s,%s,%s) r WHERE r.sql_id=ANY(%s::text[])
+                ORDER BY CASE WHEN %s='slowest' THEN r.duration_ms END DESC NULLS LAST,
+                    r.end_at DESC,r.analysis_id DESC,r.occurrence_id DESC LIMIT %s
+            ), needed AS (SELECT sql_id,count(*)::integer n FROM page GROUP BY sql_id)
+            SELECT e.*,p.matching AS scope_matching FROM needed n
+            CROSS JOIN LATERAL mpp_view_executions(%s,%s,%s,%s,%s,%s,%s,
+                n.sql_id,NULL,NULL,NULL,%s,n.n) e
+            JOIN page p ON p.analysis_id=e.analysis_id AND p.occurrence_id=e.occurrence_id
+            ORDER BY CASE WHEN %s='slowest' THEN e.duration_ms END DESC NULLS LAST,
+                e.end_at DESC,e.analysis_id DESC,e.occurrence_id DESC''',
+            [self.norm, fp, token, timing, start, end, ids, order, limit] + common + [order, order])
+        result = [dict(row) for row in cur.fetchall()]
+        for row in result:
+            row['matching'] = row.pop('scope_matching')
+        return result
+
+    def detail(self, found, mark, args, identity=None, timing=None, limit=20, window=None,
+               order='latest', original=None):
+        if order not in ('latest', 'slowest') or not 1 <= limit <= 1000:
+            raise ValueError('invalid_history_settings')
         with self.cursor() as cur:
             if mark.startswith('s'):
                 hint = next((h for h in found['hints'] if 's' + str(h['statement']) == mark), None)
@@ -89,9 +144,17 @@ class Finder:
                 raise ValueError('invalid_identity')
             selected = identities[identity - 1]
             token = selected['identity']
-            texts = rows(cur, 'mpp_view_sql_text', [self.norm, fp, chosen['only_sql_id']])
+            catalog = self.catalog(cur, found, chosen, args)
+            original = original or ('matched' if chosen['matched_texts'] is not None else chosen['only_sql_id'] or 'all')
+            scope = [r for r in catalog if original == 'all' or original == 'matched' and r['matched']
+                     or original == r['sql_id']]
+            if original not in ('all', 'matched') and not scope:
+                raise ValueError('invalid_original')
+            sid = scope[0]['sql_id'] if scope else None
+            texts = rows(cur, 'mpp_view_sql_text', [self.norm, fp, sid]) if sid else []
             text = texts[0] if texts else None
-            sid = text['sql_id'] if text and text['selected'] else None
+            if text:
+                text['selected'] = original not in ('all', 'matched')
             timings = rows(cur, 'mpp_view_timings', [self.norm, fp, token])
             timing = timing or timings[0]['timing']
             if timing not in [t['timing'] for t in timings]:
@@ -104,12 +167,32 @@ class Finder:
             # last occurrence. Switching identity deliberately anchors its own window.
             last = chosen['top_last_at'] if selected['identity'] == chosen['top_identity'] else selected['last_at']
             start, end = window if window is not None else (last - timedelta(days=7), last + timedelta(milliseconds=1))
-            executions = rows(cur, 'mpp_view_executions', [self.norm, fp, token, timing, build,
-                start, end, sid, None, None, None, 'latest', limit])
-            cur.execute('''SELECT outcome,mpp_view_label('outcome',outcome) AS label,count(*) AS records
-                FROM mpp_view_records(%s,%s,%s,%s,%s,%s,%s) GROUP BY outcome ORDER BY outcome''',
-                (self.norm, fp, token, timing, start, end, sid))
-            counts = [dict(row) for row in cur.fetchall()]
+            scope_ids = {r['sql_id'] for r in scope}
+            executions = self.executions(cur, fp, token, timing, build, start, end,
+                None if len(scope) == len(catalog) else sorted(scope_ids), order, limit)
+            cur.execute('''SELECT sql_id,outcome,mpp_view_label('outcome',outcome) AS label,
+                count(*) AS records,max(end_at) AS last_at
+                FROM mpp_view_records(%s,%s,%s,%s,%s,%s) GROUP BY sql_id,outcome''',
+                (self.norm, fp, token, timing, start, end))
+            facts = [dict(row) for row in cur.fetchall()]
+            originals = {r['sql_id']: dict(r, records=0, last_at=None, in_scope=r['sql_id'] in scope_ids) for r in catalog}
+            totals = {}
+            for fact in facts:
+                item = originals.get(fact['sql_id'])
+                if item is None:
+                    if original == 'all':
+                        raise ValueError('records_changed')
+                    continue
+                item['records'] += fact['records']
+                item['last_at'] = max(item['last_at'], fact['last_at']) if item['last_at'] else fact['last_at']
+                if item['in_scope']:
+                    total = totals.setdefault(fact['outcome'], dict(outcome=fact['outcome'], label=fact['label'], records=0))
+                    total['records'] += fact['records']
+            counts = [totals[k] for k in sorted(totals)]
+            for record in executions:
+                if record['sql_id'] not in originals:
+                    raise ValueError('records_changed')
+                record['original_number'] = originals[record['sql_id']]['number']
             labels = {}
             for kind, codes in [('timing', ['request', 'execute_first', 'execute_fetch', 'parse', 'bind', 'unknown']),
                                 ('shape', ['single', 'batch', 'unknown']),
@@ -117,7 +200,9 @@ class Finder:
                 for code in codes:
                     cur.execute('SELECT mpp_view_label(%s,%s) AS label', (kind, code))
                     labels[kind, code] = cur.fetchone()['label']
+        found['catalogs'][fp] = catalog
         return dict(candidate=chosen, text=text, identities=identities, identity=identity, version=version,
                     statistics=statistics, timings=timings, timing=timing, start=start, end=end,
-                    limit=limit, custom_window=window is not None,
+                    limit=limit, custom_window=window is not None, order=order,
+                    original=original, originals=list(originals.values()),
                     executions=executions, counts=counts, labels=labels)

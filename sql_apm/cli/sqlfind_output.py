@@ -180,7 +180,8 @@ class Output:
             self.field('本次命中原文份数', candidate['matched_texts'])
         text = detail['text']
         if text:
-            note = ('本次只命中一份原文' if candidate['matched_texts'] == 1 else '库里与输入一字不差的原文') if text['selected'] else '该结构的一份示例'
+            number = next(r['number'] for r in detail['originals'] if r['sql_id'] == text['sql_id'])
+            note = f'编号 {number}，' + ('当前选中的原文' if text['selected'] else '当前原文范围的一份示例')
             self.field('原文', note)
             raw = text['sql_text']
             self.field('原文总字符数', len(raw))
@@ -196,6 +197,7 @@ class Output:
               r['record_count'], stamp(r['first_at']), stamp(r['last_at']), '有' if r['has_baseline'] else '无')
              for n, r in enumerate(detail['identities'], 1)])
         self.line('当前基线')
+        self.line('基线口径：当前身份整个 SQL 结构的整体基线，不随原文和历史时间筛选改变。')
         version = detail['version']
         if version:
             self.field('版本标识', version['build_id'])
@@ -221,18 +223,39 @@ class Output:
 
     def history(self, detail):
         labels = detail['labels']
-        self.line('最近执行')
+        self.line('执行历史')
         selected = detail['identities'][detail['identity'] - 1]
         self.field('身份', ' / '.join('未知' if selected[k] is None else str(selected[k])
                                    for k in ('scope_id', 'database', 'execution_user')))
         self.field('计时类别', labels['timing', detail['timing']])
-        self.field('时间设置', '自定义' if detail['custom_window'] else '最近一次执行往前 7 天')
+        self.original_scope(detail)
+        self.field('时间设置', '沿用切换原文前的范围' if detail.get('window_kept') else
+                   '自定义' if detail['custom_window'] else '最近一次执行往前 7 天')
         self.field('范围', stamp(detail['start']) + ' 至 ' + stamp(detail['end']) + ' (右端不含)')
         self.field('范围内记录数', sum(c['records'] for c in detail['counts']))
         for count in detail['counts']:
             self.field(count['label'], count['records'])
-        self.field('本次显示', f"{len(detail['executions'])} 条，上限 {detail['limit']} 条，最新在前")
-        self.table(['结束时间', '耗时', '状态', '与当前基线比较', '单条或整批'],
-            [(stamp(r['end_at']), duration(r['duration_ms']), labels['outcome', r['outcome']],
+        order = '最新在前' if detail['order'] == 'latest' else '最慢在前'
+        self.field('本次显示', f"{len(detail['executions'])} 条，上限 {detail['limit']} 条，{order}")
+        self.table(['原文编号', '结束时间', '耗时', '状态', '与当前基线比较', '单条或整批'],
+            [(r['original_number'], stamp(r['end_at']), duration(r['duration_ms']), labels['outcome', r['outcome']],
               r['comparison'], labels['shape', r['request_shape']]) for r in detail['executions']])
+        self.footer()
+
+    def original_scope(self, detail):
+        selected = [r for r in detail['originals'] if r['in_scope']]
+        name = {'matched': '本次检索命中的原文', 'all': '该结构的全部原文'}.get(detail['original'])
+        self.field('原文范围', (name + f'（共 {len(selected)} 份）') if name else
+                   f"指定原文（编号 {selected[0]['number']}）")
+        self.field('其中当前身份、计时和时间内出现的原文数', sum(r['records'] > 0 for r in selected))
+
+    def originals(self, detail):
+        self.line('原文列表：编号在本次检索的同一结构内保持不变。')
+        self.original_scope(detail)
+        self.line('记录数和最近执行时间按当前身份、计时及历史时间范围统计；0 表示此范围内没有记录。')
+        self.table(['原文编号', '本次命中', '记录数', '最近执行时间', '原文摘要'],
+            [(r['number'], '是' if r['matched'] else '否', r['records'], stamp(r['last_at']),
+              clip(' '.join(r['example'].split()) + ('...' if r['chars'] > len(r['example']) else ''), 80))
+             for r in detail['originals'] if r['in_scope']])
+        self.line('v 编号 选择原文并看历史；f 查看所选原文全文；v matched 本次命中；v all 全部原文。')
         self.footer()

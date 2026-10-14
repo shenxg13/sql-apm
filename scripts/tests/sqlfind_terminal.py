@@ -168,6 +168,8 @@ def verify_history(dsn, owner):
             term.send('2026-06-26\n')
             term.until(']：')
             term.send('2026-06-27\n')
+            term.until('最慢在前 [1]：')
+            term.send('1\n')
             window = (time_value('2026-06-26'), time_value('2026-06-27'))
             custom = finder.detail(found, '1', args, limit=100, window=window)
             rendered = term.until(prompt)
@@ -221,11 +223,13 @@ def verify_history(dsn, owner):
             term.send('2030-01-01\n')
             term.until(']：')
             term.send('2030-01-02\n')
+            term.until('最慢在前 [1]：')
+            term.send('1\n')
             empty_window = (time_value('2030-01-01'), time_value('2030-01-02'))
             empty = finder.detail(exact, '1', exact_args, timing='parse', limit=1, window=empty_window)
             compare(term.until(prompt), empty)
             term.send('h\n')
-            for end in ('可选 1-1000：', '指定起止时间 [2]：', ']：', ']：'):
+            for end in ('可选 1-1000：', '指定起止时间 [2]：', ']：', ']：', '最慢在前 [1]：'):
                 term.until(end)
                 term.send('\n')
             compare(term.until(prompt), empty)
@@ -243,6 +247,8 @@ def verify_history(dsn, owner):
             term.send('2\n')
             term.until('指定起止时间 [1]：')
             term.send('1\n')
+            term.until('最慢在前 [1]：')
+            term.send('1\n')
             time.sleep(0.3)
             term.send('\x03')
             cancelled = term.until(prompt, timeout=5)
@@ -256,11 +262,142 @@ def verify_history(dsn, owner):
     print('PASS: history settings, persistence, empty windows, reset and atomic input/query cancellation at 80/200 columns', flush=True)
 
 
+def verify_drilldown(dsn, owner):
+    from sql_apm.cli.sqlfind import arguments, search
+    from sql_apm.cli.sqlfind_output import Output
+    from sql_apm.storage.sqlfind import Finder
+    from database import dashboard_data as data
+    finder = Finder(dsn, 'sql_apm')
+    for width in (80, 200):
+        term = Terminal(dsn, ['--mode', 'words'], width)
+        listing, prompt = 'Ctrl-C 返回输入。', 'Ctrl-C 返回列表。'
+        try:
+            args = arguments([])
+            term.until('之后 q 退出。')
+            term.send('wide_\n')
+            term.until(listing)
+            term.send('o\n')
+            term.until('取消。')
+            term.send('9\n')
+            term.until('请选择 1 或 2。')
+            term.until('取消。')
+            term.send('2\n')
+            rendered = term.until(listing)
+            args.order = 'recent'
+            expected = search(finder, b'wide_', args)
+            stream = io.StringIO()
+            Output(width, stream).candidates(expected, args)
+            assert stream.getvalue().strip() in rendered
+            assert len(expected['candidates']) == 50 and 'wide_59' in expected['candidates'][0]['example']
+            for cancellation in ('q\n', '\x03', '\n'):
+                term.send('o\n')
+                term.until('取消。')
+                term.send(cancellation)
+                assert '保留原排序和列表' in term.until(listing)
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('o\n')
+            term.until('取消。')
+            term.send('1\n')
+            time.sleep(0.3)
+            term.send('\x03')
+            assert '保留原排序和列表' in term.until(listing)
+            owner.rollback()
+            term.send('l\n')
+            assert stream.getvalue().strip() in term.until(listing)
+            term.send('n\n')
+            term.until('q 退出')
+            term.send('1\n')
+            term.until('之后 q 退出。')
+            term.send('orders 2026-06-26\n')
+            assert '排序: 最近执行的在前' in term.until(listing)
+            found = search(finder, b'orders 2026-06-26', args)
+            term.send('1\n')
+            term.until(prompt)
+            detail = finder.detail(found, '1', args)
+
+            def compare(text, expected, method='history'):
+                stream = io.StringIO()
+                getattr(Output(width, stream), method)(expected)
+                assert stream.getvalue().strip() in text, text[-2000:]
+
+            term.send('v\n')
+            compare(term.until(prompt), detail, 'originals')
+            term.send('h\n')
+            for marker, value in [('可选 1-1000：', '1000'), ('指定起止时间 [1]：', '1'),
+                                  ('最慢在前 [1]：', '9'), ('最慢在前 [1]：', '2')]:
+                term.until(marker)
+                term.send(value + '\n')
+            slow = finder.detail(found, '1', args, limit=1000, order='slowest')
+            compare(term.until(prompt), slow)
+            number = slow['executions'][0]['original_number']
+            original = slow['executions'][0]['sql_id']
+            frozen = (slow['start'], slow['end'])
+            term.send(f'v {number}\n')
+            single = finder.detail(found, '1', args, original=original, limit=1000, order='slowest', window=frozen)
+            single['window_kept'] = True
+            compare(term.until(prompt), single)
+            term.send('f\n')
+            rendered = term.until(prompt)
+            compare(rendered, single)
+            assert single['text']['sql_text'] in rendered
+            term.send('v 999999\n')
+            assert '原文编号不存在' in term.until(prompt)
+            term.send('v\n')
+            compare(term.until(prompt), single, 'originals')
+            term.send('b\n')
+            term.until(listing)
+            term.send('1\n')
+            compare(term.until(prompt), single)
+            identity = next(n for n, r in enumerate(slow['identities'], 1) if r['scope_id'] == 'C2')
+            term.send(f'i {identity}\n')
+            changed = finder.detail(found, '1', args, identity=identity, original=original, limit=1000, order='slowest')
+            compare(term.until(prompt), changed)
+            term.send('t request\n')
+            compare(term.until(prompt), changed)
+            for scope in ('all', 'matched'):
+                term.send('v ' + scope + '\n')
+                changed = finder.detail(found, '1', args, identity=identity, original=scope,
+                    limit=1000, order='slowest', window=(changed['start'], changed['end']))
+                changed['window_kept'] = True
+                compare(term.until(prompt), changed)
+                term.send('v\n')
+                compare(term.until(prompt), changed, 'originals')
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('v all\n')
+            time.sleep(0.3)
+            term.send('\x03')
+            assert '保留原选择' in term.until(prompt)
+            owner.rollback()
+            term.send('v\n')
+            compare(term.until(prompt), changed, 'originals')
+            term.send('n\n')
+            term.until('q 退出')
+            term.send('3\n')
+            term.until('之后 q 退出。')
+            term.send(data.EXTENDED + '\n\x04')
+            term.until(listing)
+            term.send('1\n')
+            exact_args = arguments(['--mode', 'exact'])
+            exact = search(finder, data.EXTENDED.encode(), exact_args)
+            compare(term.until(prompt), finder.detail(exact, '1', exact_args, limit=1000, order='slowest'))
+            term.send('h\n')
+            term.until('可选 1-1000：')
+            term.send('r\n')
+            compare(term.until(prompt), finder.detail(exact, '1', exact_args))
+        finally:
+            owner.rollback()
+            term.close()
+    print('PASS: interactive search sort/requery/cancel, original list/selection/trace, history sort and persistence at 80/200 columns', flush=True)
+
+
 def verify(dsn, directory, owner):
     from sql_apm.cli.sqlfind_output import cells
     from verify_sqlfind import command
     verify_input()
     verify_history(dsn, owner)
+    verify_drilldown(dsn, owner)
     for width in (80, 200):
         term = Terminal(dsn, ['--mode', 'words'], width)
         try:

@@ -40,6 +40,7 @@ def parser():
 文件和标准输入按 UTF-8 原始字节读取，保留首尾空白及换行。
 交互按词输入一行后回车；整段和完整 SQL 粘贴后回车、Ctrl-D 结束。
 方式选择、结果列表和详情菜单输入 ? 查看交互帮助，保留当前选择和设置。
+交互每次操作有编号及输出起止标记；f 只显示当前原文全文，不刷新身份、基线和历史。
 交互列表输入 o 选择记录数最多或最近执行；详情 v 列原文，v 编号 选原文，f 看全文。
 v matched 看本次命中原文的历史，v all 看整个结构；历史表原文编号可追到具体 SQL。
 详情 h 设置历史条数（1～1000）、时间与最新／最慢排序；设置仅在本次会话保留。
@@ -420,6 +421,22 @@ def search_order(output, current):
         return None
 
 
+def operation_title(state, command):
+    if state == 'mode':
+        label = {'': '选择按词检索', '1': '选择按词检索', 'words': '选择按词检索',
+                 '2': '选择整段检索', 'passage': '选择整段检索',
+                 '3': '选择完整 SQL 检索', 'exact': '选择完整 SQL 检索'}.get(command)
+    else:
+        label = {'': '退出', 'l': '重看列表', 'o': '调整排序', 'b': '返回列表',
+                 'f': '查看原文全文', 'h': '历史设置', 'v': '查看原文列表',
+                 'v matched': '本次命中原文', 'v all': '全部原文'}.get(command)
+        if label is None:
+            label = ('查看 SQL 详情' if state == 'list' else
+                     {'i': '换身份', 't': '换计时', 'v': '选原文'}.get(command.split(' ', 1)[0]))
+    label = {'?': '查看交互帮助', 'n': '新检索', 'q': '退出'}.get(command, label or '操作')
+    return (command or '回车') + ' ' + label
+
+
 def interactive(finder, args, output):
     state = 'input' if args.mode_given else 'mode'
     found = detail = None
@@ -435,6 +452,7 @@ def interactive(finder, args, output):
                              '  ?  查看交互帮助'):
                     output.line(line)
                 command = terminal_input(output, '  q 退出；回车选择 1。').decode().strip()
+                output.begin_operation(operation_title(state, command))
                 if command == 'q':
                     return 0
                 if command == '?':
@@ -449,6 +467,7 @@ def interactive(finder, args, output):
                 raw = terminal_input(output, ('粘贴多行内容，完成后回车再按 Ctrl-D；Ctrl-C 返回方式选择，之后 q 退出。'
                     if multi else '输入一行检索词，回车结束；Ctrl-C 返回方式选择，之后 q 退出。'), multi,
                     MAX_BYTES if args.mode == 'exact' else TEXT_MAX_BYTES)
+                output.begin_operation({'words': '按词检索', 'passage': '整段检索', 'exact': '完整 SQL 检索'}[args.mode])
                 found = search(finder, raw, args)
                 detail, original_window = None, None
                 output.candidates(found, args)
@@ -459,6 +478,7 @@ def interactive(finder, args, output):
                              '  n  新检索', '  q  退出'):
                     output.line(line)
                 command = terminal_input(output, 'Ctrl-C 返回输入。').decode().strip()
+                output.begin_operation(operation_title(state, command))
                 if command in ('', 'q'):
                     return 0
                 if command == '?':
@@ -513,6 +533,7 @@ def interactive(finder, args, output):
                 for line in ('  b  返回列表', '  ?  查看交互帮助', '  n  新检索', '  q  退出'):
                     output.line(line)
                 command = terminal_input(output, 'Ctrl-C 返回列表。').decode().strip()
+                output.begin_operation(operation_title(state, command))
                 if command in ('', 'q'):
                     return 0
                 if command == '?':
@@ -556,7 +577,9 @@ def interactive(finder, args, output):
                         continue
                     detail = updated
                     output.originals(detail)
-                elif command == 'f' or command.startswith(('i ', 't ', 'v ')):
+                elif command == 'f':
+                    output.original_text(detail)
+                elif command.startswith(('i ', 't ', 'v ')):
                     next_identity, next_timing = chosen_identity, chosen_timing
                     next_original, next_window = detail.get('original'), original_window
                     if command.startswith('i '):
@@ -583,7 +606,7 @@ def interactive(finder, args, output):
                             next_window = (detail['start'], detail['end'])
                     try:
                         updated = show(finder, found, mark, args, output, next_identity, next_timing,
-                            command == 'f', history, original=next_original, original_window=next_window)
+                            history=history, original=next_original, original_window=next_window)
                     except KeyboardInterrupt:
                         output.line('已取消查询，保留原选择。')
                         continue
@@ -596,12 +619,18 @@ def interactive(finder, args, output):
                 else:
                     raise InputError('操作无效，请使用提示中的操作。')
         except KeyboardInterrupt:
+            if not output.operation_active:
+                output.begin_operation('Ctrl-C 取消当前步骤')
             output.line('已取消，q 可在操作提示中退出。')
             state = {'mode': 'mode', 'input': 'mode', 'list': 'input', 'detail': 'list'}[state]
         except ERRORS as error:
+            if not output.operation_active:
+                output.begin_operation('输入错误')
             output.line(failure(error))
             if isinstance(error, psycopg2.Error):
                 state = 'input'
+        finally:
+            output.end_operation()
 
 
 def main(argv=None):

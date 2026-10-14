@@ -71,6 +71,8 @@ class Output:
         self.stream = stream or sys.stdout
         self.requested_width = width
         self.replaced = False
+        self.operation = 0
+        self.operation_active = False
 
     @property
     def width(self):
@@ -116,6 +118,22 @@ class Output:
             self.write('提示: 当前输出编码无法表示部分字符，已使用替代符号。\n')
             self.replaced = False
 
+    def begin_operation(self, title):
+        self.operation += 1
+        self.operation_active = True
+        prefix, suffix = f'========== 操作 {self.operation}：', ' =========='
+        self.line()
+        self.line(prefix + clip(plain(title), max(1, self.width - cells(prefix + suffix))) + suffix)
+        self.line()
+
+    def end_operation(self):
+        if self.operation_active:
+            self.operation_active = False
+            self.footer()
+            self.line()
+            self.line(f'========== 操作 {self.operation} 输出结束 ==========')
+            self.line()
+
     def interactive_help(self):
         for line in (
             'sqlfind 交互帮助',
@@ -137,7 +155,7 @@ class Output:
             '  v 编号  选择一份原文并查看历史，例如 v 3。',
             '  v matched  查看本次检索命中原文的汇总历史。',
             '  v all  查看整个 SQL 结构所有原文的汇总历史。',
-            '  f  查看当前选中原文或当前范围示例的全文。',
+            '  f  只看当前选中原文或当前范围示例的全文，保留原文编号。',
             '  h  设置历史条数、时间范围和最新／最慢排序，可恢复默认。',
             '  i 序号  切换身份表中的一行，例如 i 2。',
             '    身份是集群、数据库、执行用户的一个组合。',
@@ -153,6 +171,7 @@ class Output:
             '  q  在方式选择、结果列表或详情菜单退出程序。',
             '',
             '输入与取消：',
+            '  每次操作有带编号及命令名的起止标记；结束后再显示菜单，可用滚轮定位。',
             '  按词输入一行后按回车；整段／完整 SQL 粘贴完后按回车，再按 Ctrl-D。',
             '  检索内容输入时，?、q、n 等都是原文，不是菜单命令。',
             '  Ctrl-C 取消当前步骤或查询；输入时回方式选择，列表回输入，详情回列表。',
@@ -228,19 +247,8 @@ class Output:
         self.field('该结构原文份数', candidate['structure_texts'])
         if candidate['matched_texts'] is not None:
             self.field('本次命中原文份数', candidate['matched_texts'])
-        text = detail['text']
-        if text:
-            number = next(r['number'] for r in detail['originals'] if r['sql_id'] == text['sql_id'])
-            note = f'编号 {number}，' + ('当前选中的原文' if text['selected'] else '当前原文范围的一份示例')
-            self.field('原文', note)
-            raw = text['sql_text']
-            self.field('原文总字符数', len(raw))
-            self.line('原文开始')
-            self.write(raw if full_text else raw[:TEXT_LIMIT])
-            self.write('\n')
-            self.line('原文结束')
-            if not full_text and len(raw) > TEXT_LIMIT:
-                self.line('原文已截断，使用 --show 标记 --full-text 或交互命令 f 查看全文。')
+        if detail['text']:
+            self.original_text(detail, full_text)
         self.line('身份 (* 表示当前所选)')
         self.table(['序号', '集群', '数据库', '执行用户', '记录数', '首次执行', '最近执行', '当前基线'],
             [(str(n) + ('*' if n == detail['identity'] else ''), r['scope_id'], r['database'], r['execution_user'],
@@ -270,6 +278,23 @@ class Output:
         if records:
             self.table(['计时类别', '有效样本', '活跃天数', '平均', 'P50', 'P95', 'P99', '最大', '基础条件', 'P95条件', 'P99条件'], records)
         self.history(detail)
+
+    def original_text(self, detail, full_text=True):
+        text = detail.get('text')
+        if not text:
+            self.line('当前没有可查看的原文。')
+            return
+        number = next(r['number'] for r in detail['originals'] if r['sql_id'] == text['sql_id'])
+        note = f'编号 {number}，' + ('当前选中的原文' if text['selected'] else '当前原文范围的一份示例')
+        self.field('原文', note)
+        raw = text['sql_text']
+        self.field('原文总字符数', len(raw))
+        self.line('原文开始')
+        self.write(raw if full_text else raw[:TEXT_LIMIT])
+        self.write('\n')
+        self.line('原文结束')
+        if not full_text and len(raw) > TEXT_LIMIT:
+            self.line('原文已截断，使用 --show 标记 --full-text 或交互命令 f 查看全文。')
 
     def history(self, detail):
         labels = detail['labels']

@@ -134,6 +134,36 @@ def verify_input():
     print('PASS: input erase display and bytes, BS/DEL, UTF-8, tabs, wraps and split arrow sequences', flush=True)
 
 
+def check_operations(term):
+    rendered = term.output[:term.offset].replace(b'\r\n', b'\n').decode('utf-8')
+    active, number = None, 0
+    for line in rendered.splitlines():
+        start = re.fullmatch(r'========== 操作 (\d+)：(.*) ==========', line)
+        end = re.fullmatch(r'========== 操作 (\d+) 输出结束 ==========', line)
+        if start:
+            assert active is None and int(start[1]) == number + 1, line
+            number = active = int(start[1])
+        elif end:
+            assert active == int(end[1]), line
+            active = None
+        elif line in ('请选择检索方式：', '检索结果列表操作：', 'SQL 详情操作：'):
+            assert active is None, 'Menu inside command output: ' + line
+    assert number > 0 and active is None, 'Missing operation boundary'
+
+
+def check_full_text(term, detail, width):
+    from sql_apm.cli.sqlfind_output import Output
+    term.send('f\n')
+    rendered = term.until('Ctrl-C 返回列表。', timeout=5)
+    stream = io.StringIO()
+    Output(width, stream).original_text(detail)
+    assert stream.getvalue().strip() in rendered
+    assert '\n当前基线\n' not in rendered and '\n执行历史\n' not in rendered
+    assert '身份 (* 表示当前所选)' not in rendered
+    check_operations(term)
+    return rendered
+
+
 def check_help(term, prompt, width):
     from sql_apm.cli.sqlfind_output import cells
     term.send('?\n')
@@ -146,6 +176,7 @@ def check_help(term, prompt, width):
     assert all(cells(line) <= width for line in rendered.splitlines())
     assert '\x1b' not in rendered
     term.until(prompt)
+    check_operations(term)
 
 
 def verify_help(dsn):
@@ -187,6 +218,57 @@ def verify_help(dsn):
     print('PASS: outer help without database, repeat help, 80/200 columns and literal question marks in all input modes', flush=True)
 
 
+def verify_operations(dsn, owner):
+    from sql_apm.cli.sqlfind import arguments, search
+    from sql_apm.storage.sqlfind import Finder
+    from database import dashboard_data as data
+    finder, args = Finder(dsn, 'sql_apm'), arguments([])
+    for width in (80, 200):
+        term = Terminal(dsn, width=width)
+        try:
+            term.until('回车选择 1。')
+            term.send('9\n')
+            assert '请选择 1、2 或 3' in term.until('回车选择 1。')
+            check_operations(term)
+            term.send('1\n')
+            term.until('之后 q 退出。')
+            term.send('big_list\n')
+            term.until('Ctrl-C 返回输入。')
+            term.send('1\n')
+            term.until('Ctrl-C 返回列表。')
+            found = search(finder, b'big_list', args)
+            detail = finder.detail(found, '1', args)
+            assert detail['text']['sql_text'] == data.LONG and len(data.LONG) > 4000
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            rendered = check_full_text(term, detail, width)
+            assert '原文开始\n' + data.LONG + '\n原文结束' in rendered
+            owner.rollback()
+            term.send('n\n')
+            term.until('回车选择 1。')
+            term.send('3\n')
+            term.until('之后 q 退出。')
+            term.send('SELECT absent_column_a; SELECT absent_column_b;\n\x04')
+            term.until('Ctrl-C 返回输入。')
+            term.send('s1\n')
+            assert '没有可查看的执行记录和身份' in term.until('Ctrl-C 返回列表。')
+            assert '当前没有可查看的原文' in check_full_text(term, {}, width)
+            term.send('invalid\n')
+            assert '操作无效' in term.until('Ctrl-C 返回列表。')
+            check_operations(term)
+            term.send('\x03')
+            term.until('Ctrl-C 返回输入。')
+            check_operations(term)
+            term.send('q\n')
+            term.until('：q 退出')
+            term.until('输出结束 ==========')
+            check_operations(term)
+        finally:
+            owner.rollback()
+            term.close()
+    print('PASS: paired sequential operation boundaries, errors/cancel/exit, text-only long/sample/empty output and no f query', flush=True)
+
+
 def verify_history(dsn, owner):
     from sql_apm.cli.sqlfind import arguments, search, time_value
     from sql_apm.cli.sqlfind_output import Output
@@ -209,6 +291,21 @@ def verify_history(dsn, owner):
                 Output(width, stream).history(expected)
                 assert stream.getvalue().strip() in rendered, rendered[-1500:]
 
+            def full_and_keep(expected):
+                check_full_text(term, expected, width)
+                # f no longer prints history; blank settings verify it was retained.
+                term.send('h\n')
+                custom = expected['custom_window']
+                markers = [f"显示条数 [{expected['limit']}]，可选 1-1000：",
+                           f'指定起止时间 [{2 if custom else 1}]：']
+                if custom:
+                    markers += [']：', ']：']
+                markers += ['最慢在前 [1]：']
+                for marker in markers:
+                    term.until(marker)
+                    term.send('\n')
+                compare(term.until(prompt), expected)
+
             term.send('h\n')
             term.until('可选 1-1000：')
             term.send('0\n')
@@ -229,8 +326,7 @@ def verify_history(dsn, owner):
             compare(rendered, custom)
             assert '\n当前基线\n' not in rendered and '原文开始' not in rendered
             check_help(term, prompt, width)
-            term.send('f\n')
-            compare(term.until(prompt), custom)
+            full_and_keep(custom)
 
             # Cancelling after entering a different limit must retain all settings.
             for cancel in ('q\n', '\x03'):
@@ -243,8 +339,7 @@ def verify_history(dsn, owner):
                 term.send(cancel)
                 cancelled = term.until(prompt)
                 assert '已取消历史设置，保留原设置。' in cancelled
-                term.send('f\n')
-                compare(term.until(prompt), custom)
+                full_and_keep(custom)
 
             term.send('i 2\n')
             compare(term.until(prompt), finder.detail(found, '1', args, identity=2, limit=100, window=window))
@@ -269,8 +364,7 @@ def verify_history(dsn, owner):
             term.send('t parse\n')
             compare(term.until(prompt), finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
             check_help(term, prompt, width)
-            term.send('f\n')
-            compare(term.until(prompt), finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
+            full_and_keep(finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
 
             # Empty ranges are valid, and Enter retains all four settings.
             term.send('h\n')
@@ -313,8 +407,7 @@ def verify_history(dsn, owner):
             cancelled = term.until(prompt, timeout=5)
             assert '保留原设置' in cancelled
             owner.rollback()
-            term.send('f\n')
-            compare(term.until(prompt), restored)
+            full_and_keep(restored)
         finally:
             owner.rollback()
             term.close()
@@ -403,10 +496,8 @@ def verify_drilldown(dsn, owner):
                 cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
             check_help(term, prompt, width)
             check_help(term, prompt, width)
+            rendered = check_full_text(term, single, width)
             owner.rollback()
-            term.send('f\n')
-            rendered = term.until(prompt)
-            compare(rendered, single)
             assert single['text']['sql_text'] in rendered
             term.send('v 999999\n')
             assert '原文编号不存在' in term.until(prompt)
@@ -423,8 +514,7 @@ def verify_drilldown(dsn, owner):
             term.send('t request\n')
             compare(term.until(prompt), changed)
             check_help(term, prompt, width)
-            term.send('f\n')
-            compare(term.until(prompt), changed)
+            check_full_text(term, changed, width)
             for scope in ('all', 'matched'):
                 term.send('v ' + scope + '\n')
                 changed = finder.detail(found, '1', args, identity=identity, original=scope,
@@ -450,8 +540,7 @@ def verify_drilldown(dsn, owner):
             cancelled = term.until(prompt)
             assert '取消' in cancelled and '保留原选择' in cancelled, repr(cancelled)
             owner.rollback()
-            term.send('f\n')
-            compare(term.until(prompt), changed)
+            check_full_text(term, changed, width)
             term.send('n\n')
             term.until('q 退出')
             term.send('3\n')
@@ -477,6 +566,7 @@ def verify(dsn, directory, owner):
     from verify_sqlfind import command
     verify_input()
     verify_help(dsn)
+    verify_operations(dsn, owner)
     verify_history(dsn, owner)
     verify_drilldown(dsn, owner)
     for width in (80, 200):
@@ -531,6 +621,7 @@ def verify(dsn, directory, owner):
             term.send('\x03')
             term.until('已取消')
             term.until('之后 q 退出。')
+            check_operations(term)
         finally:
             term.close()
     # Lock the synthetic text table only, to make cancellation deterministic.

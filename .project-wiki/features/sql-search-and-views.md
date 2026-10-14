@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-13
+updated: 2026-10-14
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
@@ -79,7 +81,14 @@ confidence: high
   默认最新 20 条，可设 1–1000；每条含结束时间、耗时、状态、相对当前基线和单条／整批。
   计时默认取 `mpp_view_timings` 第一类，可切换；失败／取消／超时随每类显示。
   所选原文范围与详情页相同，数值调用既有函数，不另算指标或样本门槛。
-- 交互可在候选、身份、计时和全文间切换，内容与一次输出相同；本轮不增加图、历史版本选择、
+- 交互历史设置（2026-10-14 用户[确认扩展](https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696)）：
+  详情 `h` 逐项设置 1–1000 条及默认 7 天／自定义起止时间，默认 20 条；按执行结束时间、北京时间、左闭右开筛选，
+  日期输入按当天 00:00:00，开始须早于结束。显示实际范围、总数、状态次数、实际显示数与上限，最新在前。
+  只影响执行历史及状态计数，基线及训练窗口不变，候选的 `--start`／`--end` 独立生效。
+  设置在本次会话换身份、计时、SQL 和新检索后保留，退出不落盘；默认窗口仍锚定当前身份最近执行。
+  回车保留，`r` 恢复 20 条和默认 7 天，`q`／Ctrl-C 取消；非法输入重试，查询成功后整体生效，取消或失败保留原设置。
+- 交互可在候选、身份、计时和全文间切换；默认历史范围、相同行数时内容与一次输出相同，
+  自定义范围的历史及计数与既有函数相同参数的结果一致。本轮不增加图、历史版本选择、
   非整体时间层、明细翻页、观察统计或列表排行。
 
 入口和账号配置规则见[命令行主题](operator-cli.md#sqlfind-运维入口2026-10-13)，

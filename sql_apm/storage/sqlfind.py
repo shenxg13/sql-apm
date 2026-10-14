@@ -55,7 +55,7 @@ class Finder:
             LEFT JOIN LATERAL mpp_query_text(r.example_sql_id) t ON true''', values)
         return [dict(row) for row in cur.fetchall()]
 
-    def detail(self, found, mark, args, identity=None, timing=None, limit=20):
+    def detail(self, found, mark, args, identity=None, timing=None, limit=20, window=None):
         with self.cursor() as cur:
             if mark.startswith('s'):
                 hint = next((h for h in found['hints'] if 's' + str(h['statement']) == mark), None)
@@ -103,7 +103,7 @@ class Finder:
             # On entry, the dashboard link anchors the window to the matched identity's
             # last occurrence. Switching identity deliberately anchors its own window.
             last = chosen['top_last_at'] if selected['identity'] == chosen['top_identity'] else selected['last_at']
-            start, end = last - timedelta(days=7), last + timedelta(milliseconds=1)
+            start, end = window if window is not None else (last - timedelta(days=7), last + timedelta(milliseconds=1))
             executions = rows(cur, 'mpp_view_executions', [self.norm, fp, token, timing, build,
                 start, end, sid, None, None, None, 'latest', limit])
             cur.execute('''SELECT outcome,mpp_view_label('outcome',outcome) AS label,count(*) AS records
@@ -119,4 +119,5 @@ class Finder:
                     labels[kind, code] = cur.fetchone()['label']
         return dict(candidate=chosen, text=text, identities=identities, identity=identity, version=version,
                     statistics=statistics, timings=timings, timing=timing, start=start, end=end,
+                    limit=limit, custom_window=window is not None,
                     executions=executions, counts=counts, labels=labels)

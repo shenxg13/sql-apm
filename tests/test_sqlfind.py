@@ -14,7 +14,7 @@ from sql_apm.cli.sqlfind_output import Output, cells, clip, plain, stamp
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = all(importlib.util.find_spec(name) for name in ('psycopg2', 'pglast'))
 if RUNTIME:
-    from sql_apm.cli.sqlfind import arguments, connection, input_source, InputError, main, validate
+    from sql_apm.cli.sqlfind import arguments, connection, history_settings, input_source, InputError, main, time_value, validate
 
 
 class FormattingTests(unittest.TestCase):
@@ -73,6 +73,36 @@ class InputTests(unittest.TestCase):
             for args in ([raw.decode()], ['--file', str(file)], [raw.decode(), '--file', str(file)]):
                 with self.assertRaises(InputError):
                     input_source(arguments(args), io.TextIOWrapper(io.BytesIO(raw)))
+
+    def test_history_settings_validation_and_defaults(self):
+        original = dict(limit=20, window=None)
+        detail = dict(start=time_value('2026-07-16'), end=time_value('2026-07-23'))
+        stream = io.StringIO()
+        entries = ['0', '1001', 'wrong', '100', '9', '2', 'bad-date', '2026-09-19',
+                   '2026-09-18', '2026-09-19', '2026-09-19T16:00:00Z']
+        with patch('sql_apm.cli.sqlfind.terminal_input', side_effect=[s.encode() for s in entries]):
+            chosen = history_settings(Output(80, stream), original, detail)
+        self.assertEqual(chosen, dict(limit=100, window=(time_value('2026-09-19'), time_value('2026-09-20'))))
+        self.assertEqual(original, dict(limit=20, window=None))
+        self.assertIn('结束时间必须晚于开始时间', stream.getvalue())
+        for size in (1, 1000):
+            with patch('sql_apm.cli.sqlfind.terminal_input', side_effect=[str(size).encode(), b'1']):
+                self.assertEqual(history_settings(Output(stream=io.StringIO()), chosen, detail), dict(limit=size, window=None))
+        with patch('sql_apm.cli.sqlfind.terminal_input', side_effect=[b'', b'', b'', b'']):
+            self.assertEqual(history_settings(Output(stream=io.StringIO()), chosen, detail), chosen)
+
+    def test_history_cancel_and_reset_do_not_partially_apply(self):
+        original = dict(limit=100, window=(time_value('2026-07-01'), time_value('2026-07-02')))
+        before = dict(original)
+        detail = dict(start=original['window'][0], end=original['window'][1])
+        for prefix in ([], [b'200'], [b'200', b'2'], [b'200', b'2', b'2026-07-03']):
+            for cancellation in (b'q', KeyboardInterrupt):
+                with patch('sql_apm.cli.sqlfind.terminal_input', side_effect=prefix + [cancellation]):
+                    self.assertIsNone(history_settings(Output(stream=io.StringIO()), original, detail))
+                self.assertEqual(original, before)
+            with patch('sql_apm.cli.sqlfind.terminal_input', side_effect=prefix + [b'r']):
+                self.assertEqual(history_settings(Output(stream=io.StringIO()), original, detail), dict(limit=20, window=None))
+            self.assertEqual(original, before)
 
     def test_connection_priority_and_no_secret_in_errors(self):
         with tempfile.TemporaryDirectory() as tmp, patch('pathlib.Path.home', return_value=Path(tmp)), patch.dict(os.environ, {}, clear=True):

@@ -1,6 +1,7 @@
 """PTY and login checks used by verify_sqlfind; no real account configuration."""
 import hashlib
 import importlib.util
+import io
 import os
 from pathlib import Path
 import re
@@ -133,10 +134,133 @@ def verify_input():
     print('PASS: input erase display and bytes, BS/DEL, UTF-8, tabs, wraps and split arrow sequences', flush=True)
 
 
+def verify_history(dsn, owner):
+    from sql_apm.cli.sqlfind import arguments, search, time_value
+    from sql_apm.cli.sqlfind_output import Output
+    from sql_apm.storage.sqlfind import Finder
+    from database import dashboard_data as data
+    finder, args = Finder(dsn, 'sql_apm'), arguments([])
+    for width in (80, 200):
+        term = Terminal(dsn, ['--mode', 'words'], width)
+        try:
+            prompt = 'Ctrl-C 返回列表。'
+            found = search(finder, b'orders', args)
+            term.until('之后 q 退出。')
+            term.send('orders\n')
+            term.until('Ctrl-C 返回输入。')
+            term.send('1\n')
+            term.until(prompt)
+
+            def compare(rendered, expected):
+                stream = io.StringIO()
+                Output(width, stream).history(expected)
+                assert stream.getvalue().strip() in rendered, rendered[-1500:]
+
+            term.send('h\n')
+            term.until('可选 1-1000：')
+            term.send('0\n')
+            term.until('显示条数必须是')
+            term.until('可选 1-1000：')
+            term.send('100\n')
+            term.until('指定起止时间 [1]：')
+            term.send('2\n')
+            term.until(']：')
+            term.send('2026-06-26\n')
+            term.until(']：')
+            term.send('2026-06-27\n')
+            window = (time_value('2026-06-26'), time_value('2026-06-27'))
+            custom = finder.detail(found, '1', args, limit=100, window=window)
+            rendered = term.until(prompt)
+            compare(rendered, custom)
+            assert '\n当前基线\n' not in rendered and '原文开始' not in rendered
+
+            # Cancelling after entering a different limit must retain all settings.
+            for cancel in ('q\n', '\x03'):
+                term.send('h\n')
+                term.until('可选 1-1000：')
+                term.send('3\n')
+                term.until('指定起止时间 [2]：')
+                term.send('2\n')
+                term.until(']：')
+                term.send(cancel)
+                cancelled = term.until(prompt)
+                assert '已取消历史设置，保留原设置。' in cancelled
+                term.send('f\n')
+                compare(term.until(prompt), custom)
+
+            term.send('i 2\n')
+            compare(term.until(prompt), finder.detail(found, '1', args, identity=2, limit=100, window=window))
+            term.send('t request\n')
+            compare(term.until(prompt), finder.detail(found, '1', args, identity=2, timing='request', limit=100, window=window))
+            term.send('b\n')
+            term.until('Ctrl-C 返回输入。')
+            term.send('2\n')
+            compare(term.until(prompt), finder.detail(found, '2', args, limit=100, window=window))
+
+            # A new SQL with real alternate timing categories inherits the session options.
+            term.send('n\n')
+            term.until('q 退出')
+            term.send('3\n')
+            term.until('之后 q 退出。')
+            term.send(data.EXTENDED + '\n\x04')
+            term.until('Ctrl-C 返回输入。')
+            term.send('1\n')
+            exact_args = arguments(['--mode', 'exact'])
+            exact = search(finder, data.EXTENDED.encode(), exact_args)
+            compare(term.until(prompt), finder.detail(exact, '1', exact_args, limit=100, window=window))
+            term.send('t parse\n')
+            compare(term.until(prompt), finder.detail(exact, '1', exact_args, timing='parse', limit=100, window=window))
+
+            # Empty ranges are valid, and Enter retains all four settings.
+            term.send('h\n')
+            term.until('可选 1-1000：')
+            term.send('1\n')
+            term.until('指定起止时间 [2]：')
+            term.send('2\n')
+            term.until(']：')
+            term.send('2030-01-01\n')
+            term.until(']：')
+            term.send('2030-01-02\n')
+            empty_window = (time_value('2030-01-01'), time_value('2030-01-02'))
+            empty = finder.detail(exact, '1', exact_args, timing='parse', limit=1, window=empty_window)
+            compare(term.until(prompt), empty)
+            term.send('h\n')
+            for end in ('可选 1-1000：', '指定起止时间 [2]：', ']：', ']：'):
+                term.until(end)
+                term.send('\n')
+            compare(term.until(prompt), empty)
+
+            term.send('h\n')
+            term.until('可选 1-1000：')
+            term.send('r\n')
+            restored = finder.detail(exact, '1', exact_args, timing='parse')
+            compare(term.until(prompt), restored)
+            # Cancel a real blocked history query, after completing the settings wizard.
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('h\n')
+            term.until('可选 1-1000：')
+            term.send('2\n')
+            term.until('指定起止时间 [1]：')
+            term.send('1\n')
+            time.sleep(0.3)
+            term.send('\x03')
+            cancelled = term.until(prompt, timeout=5)
+            assert '保留原设置' in cancelled
+            owner.rollback()
+            term.send('f\n')
+            compare(term.until(prompt), restored)
+        finally:
+            owner.rollback()
+            term.close()
+    print('PASS: history settings, persistence, empty windows, reset and atomic input/query cancellation at 80/200 columns', flush=True)
+
+
 def verify(dsn, directory, owner):
     from sql_apm.cli.sqlfind_output import cells
     from verify_sqlfind import command
     verify_input()
+    verify_history(dsn, owner)
     for width in (80, 200):
         term = Terminal(dsn, ['--mode', 'words'], width)
         try:

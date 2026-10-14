@@ -217,12 +217,21 @@ class Output:
                 ['满足' if conditions[k]['met'] else '不满足' for k in ('basic', 'p95', 'p99')])
         if records:
             self.table(['计时类别', '有效样本', '活跃天数', '平均', 'P50', 'P95', 'P99', '最大', '基础条件', 'P95条件', 'P99条件'], records)
+        self.history(detail)
+
+    def history(self, detail):
+        labels = detail['labels']
         self.line('最近执行')
+        selected = detail['identities'][detail['identity'] - 1]
+        self.field('身份', ' / '.join('未知' if selected[k] is None else str(selected[k])
+                                   for k in ('scope_id', 'database', 'execution_user')))
         self.field('计时类别', labels['timing', detail['timing']])
+        self.field('时间设置', '自定义' if detail['custom_window'] else '最近一次执行往前 7 天')
         self.field('范围', stamp(detail['start']) + ' 至 ' + stamp(detail['end']) + ' (右端不含)')
         self.field('范围内记录数', sum(c['records'] for c in detail['counts']))
         for count in detail['counts']:
             self.field(count['label'], count['records'])
+        self.field('本次显示', f"{len(detail['executions'])} 条，上限 {detail['limit']} 条，最新在前")
         self.table(['结束时间', '耗时', '状态', '与当前基线比较', '单条或整批'],
             [(stamp(r['end_at']), duration(r['duration_ms']), labels['outcome', r['outcome']],
               r['comparison'], labels['shape', r['request_shape']]) for r in detail['executions']])

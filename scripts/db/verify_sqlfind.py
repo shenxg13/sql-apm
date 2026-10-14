@@ -15,7 +15,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / 'tests')]
 from verify import instance, Verification
 from database import dashboard_data as data
 from database.retention import contents
-from sql_apm.cli.sqlfind import arguments, search, InputError
+from sql_apm.cli.sqlfind import arguments, search, time_value, InputError
 from sql_apm.cli.sqlfind_output import Output, cells
 from sql_apm.storage.sqlfind import Finder, rows
 from sql_apm.storage.ingestion import connect
@@ -99,6 +99,34 @@ def verify(pg_bin):
                         assert chosen['identity'] == number and chosen['timing'] == timing['timing']
                         assert len(chosen['executions']) <= 1
             print('PASS: ' + mode + ' synthetic case', flush=True)
+        # History limits and explicit boundaries reuse the same stored baseline.
+        history_args = arguments(['--cluster', 'C1', '--database', 'shop', '--user', 'app_user'])
+        history_found = search(finder, b'orders', history_args)
+        default = finder.detail(history_found, '1', history_args)
+        expanded = finder.detail(history_found, '1', history_args, limit=1000)
+        assert len(default['executions']) == 20 and len(expanded['executions']) == 1000
+        assert expanded['executions'][:20] == default['executions']
+        begin, finish = expanded['executions'][10]['end_at'], expanded['executions'][3]['end_at']
+        expected = [r for r in expanded['executions'] if begin <= r['end_at'] < finish]
+        expected = [dict(r, matching=len(expected)) for r in expected]
+        for size in (1, 1000):
+            bounded = finder.detail(history_found, '1', history_args, limit=size, window=(begin, finish))
+            assert bounded['executions'] == expected[:size]
+            assert sum(c['records'] for c in bounded['counts']) == len(expected)
+            assert bounded['version'] == default['version'] and bounded['statistics'] == default['statistics']
+            assert any(r['end_at'] == begin for r in expected) and all(r['end_at'] != finish for r in expected)
+            for width in (80, 200):
+                stream = io.StringIO()
+                Output(width, stream).history(bounded)
+                assert f'本次显示: {len(expected[:size])} 条，上限 {size} 条，最新在前' in stream.getvalue()
+                assert all(cells(line) <= width for line in stream.getvalue().splitlines())
+        old_window = (time_value('2026-06-26'), time_value('2026-06-27'))
+        older = finder.detail(history_found, '1', history_args, limit=100, window=old_window)
+        assert older['executions'] and all(old_window[0] <= r['end_at'] < old_window[1] < default['start'] for r in older['executions'])
+        assert older['statistics'] == default['statistics'] and older['version'] == default['version']
+        empty = finder.detail(history_found, '1', history_args, window=(time_value('2030-01-01'), time_value('2030-01-02')))
+        assert not empty['executions'] and not empty['counts'] and empty['statistics'] == default['statistics']
+        print('PASS: history limits, inclusive/exclusive bounds, old/empty windows and unchanged baseline', flush=True)
         for n in (20, 21):
             try:
                 search(finder, ('orders ' * n).encode(), arguments([]))

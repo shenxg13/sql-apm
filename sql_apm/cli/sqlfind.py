@@ -14,7 +14,7 @@ from psycopg2.extensions import get_wait_callback, make_dsn, set_wait_callback
 from psycopg2.extras import wait_select
 
 from sql_apm.cli.search import BLANKS, TEXT_MAX_BYTES
-from sql_apm.cli.sqlfind_output import BEIJING, Output, TEXT_LIMIT
+from sql_apm.cli.sqlfind_output import BEIJING, Output, TEXT_LIMIT, stamp
 from sql_apm.ingestion.config import IngestionError
 from sql_apm.sql.normalization import MAX_BYTES
 from sql_apm.storage.sqlfind import Finder
@@ -38,6 +38,8 @@ def parser():
         epilog='''输入来源三选一：命令行参数、--file 文件、标准输入（管道或重定向）。
 文件和标准输入按 UTF-8 原始字节读取，保留首尾空白及换行。
 交互按词输入一行后回车；整段和完整 SQL 粘贴后回车、Ctrl-D 结束。
+交互详情输入 h 设置历史条数（1～1000）与起止时间；设置仅在本次会话保留。
+历史设置中 r 恢复20条及默认7天，q 或 Ctrl-C 取消；不改变当前基线。
 Ctrl-C 取消当前步骤或查询；操作提示中 q 退出，不分屏，可用鼠标滚轮回看。
 时间均为北京时间；--start/--end 不带时区时按北京时间，结束时间不包含。
 
@@ -63,8 +65,8 @@ SQL
     result.add_argument('--cluster', help='集群筛选')
     result.add_argument('--database', help='数据库筛选')
     result.add_argument('--user', help='执行用户筛选')
-    result.add_argument('--start', help='开始时间，包含')
-    result.add_argument('--end', help='结束时间，不包含')
+    result.add_argument('--start', help='候选检索开始时间，包含；交互历史时间用 h 设置')
+    result.add_argument('--end', help='候选检索结束时间，不包含；交互历史时间用 h 设置')
     result.add_argument('--order', choices=['count', 'recent'], default='count', help='count 记录数最多；recent 最近执行')
     result.add_argument('--schema', help='数据库 schema，默认配置值或 sql_apm')
     result.add_argument('--show', help='只显示标记的详情，如 1 或 s1')
@@ -190,12 +192,16 @@ def failure(error):
 ERRORS = (InputError, IngestionError, psycopg2.Error, OSError, ValueError, TypeError)
 
 
-def show(finder, found, mark, args, output, identity=None, timing=None, full=False):
+def show(finder, found, mark, args, output, identity=None, timing=None, full=False, history=None, history_only=False):
     valid = [str(i) for i in range(1, len(found['candidates']) + 1)] + ['s' + str(h['statement']) for h in found['hints']]
     if mark not in valid:
         raise InputError('标记不存在，可用标记: ' + (', '.join(valid) if valid else '无') + '。')
-    detail = finder.detail(found, mark, args, identity, timing, args.limit or 20)
-    output.detail(detail, full)
+    settings = history or dict(limit=args.limit or 20, window=None)
+    detail = finder.detail(found, mark, args, identity, timing, **settings)
+    if history_only and 'hint' not in detail:
+        output.history(detail)
+    else:
+        output.detail(detail, full)
     return detail
 
 
@@ -326,10 +332,65 @@ def terminal_input(output, prompt, multiline=False, maximum=MAX_BYTES):
     return raw
 
 
+def history_settings(output, current, detail):
+    """Collect settings locally; the caller commits them after a successful query."""
+    limit, window = current['limit'], current['window']
+    start, end = window or (detail['start'], detail['end'])
+    step = 'limit'
+    output.line('历史设置：北京时间；回车保留；r 恢复默认；q 或 Ctrl-C 取消。')
+    try:
+        while True:
+            prompts = {
+                'limit': f'显示条数 [{limit}]，可选 1-1000：',
+                'mode': f'时间范围：1 默认7天 / 2 指定起止时间 [{2 if window else 1}]：',
+                'start': f'开始时间（包含）[{stamp(start)}]：',
+                'end': f'结束时间（不包含）[{stamp(end)}]：',
+            }
+            raw = terminal_input(output, prompts[step], maximum=1024)
+            try:
+                if len(raw) > 1024:
+                    raise InputError('设置内容过长，请重新输入。')
+                value = raw.decode('utf-8').strip()
+                if value == 'q':
+                    return None
+                if value == 'r':
+                    return dict(limit=20, window=None)
+                if step == 'limit':
+                    try:
+                        chosen = int(value) if value else limit
+                    except ValueError:
+                        raise InputError('显示条数必须是 1 到 1000 的整数。') from None
+                    if not 1 <= chosen <= 1000:
+                        raise InputError('显示条数必须是 1 到 1000 的整数。')
+                    limit, step = chosen, 'mode'
+                elif step == 'mode':
+                    value = value or ('2' if window else '1')
+                    if value == '1':
+                        return dict(limit=limit, window=None)
+                    if value != '2':
+                        raise InputError('请选择 1 或 2。')
+                    step = 'start'
+                elif step == 'start':
+                    start = time_value(value) if value else start
+                    step = 'end'
+                else:
+                    chosen_end = time_value(value) if value else end
+                    if start >= chosen_end:
+                        raise InputError('结束时间必须晚于开始时间，请重新输入结束时间。')
+                    return dict(limit=limit, window=(start, chosen_end))
+            except UnicodeDecodeError:
+                output.line('输入不是有效的 UTF-8，请重新输入。')
+            except InputError as error:
+                output.line(str(error))
+    except KeyboardInterrupt:
+        return None
+
+
 def interactive(finder, args, output):
     state = 'input' if args.mode_given else 'mode'
     found = detail = None
     mark, chosen_identity, chosen_timing = None, None, None
+    history = dict(limit=20, window=None)
     output.line('sqlfind 交互检索: Ctrl-C 取消当前步骤或查询；操作提示中 q 退出。')
     while True:
         try:
@@ -359,13 +420,15 @@ def interactive(finder, args, output):
                 elif command == 'l':
                     output.candidates(found, args)
                 else:
-                    detail = show(finder, found, command, args, output)
+                    detail = show(finder, found, command, args, output, history=history)
                     mark, chosen_identity, chosen_timing = command, None, None
                     state = 'detail'
             else:
                 if 'timings' in detail:
                     output.line('可用计时类别: ' + '; '.join(t['timing'] + '=' + t['label'] for t in detail['timings']))
                 output.line('i 序号 换身份；t 类别 换计时；f 查看原文全文。')
+                if 'timings' in detail:
+                    output.line('h 历史设置（条数、时间范围、恢复默认）。')
                 command = terminal_input(output, 'b 返回列表；n 新检索；q 退出；Ctrl-C 返回列表。').decode().strip()
                 if command in ('', 'q'):
                     return 0
@@ -374,6 +437,24 @@ def interactive(finder, args, output):
                     state = 'list'
                 elif command == 'n':
                     state = 'mode'
+                elif command == 'h':
+                    if 'timings' not in detail:
+                        raise InputError('该提示没有可查看的执行历史。')
+                    next_history = history_settings(output, history, detail)
+                    if next_history is None:
+                        output.line('已取消历史设置，保留原设置。')
+                        continue
+                    try:
+                        updated = show(finder, found, mark, args, output, chosen_identity, chosen_timing,
+                                       history=next_history, history_only=True)
+                    except KeyboardInterrupt:
+                        output.line('已取消历史查询，保留原设置。')
+                        continue
+                    except ERRORS as error:
+                        output.line(failure(error))
+                        output.line('历史设置未应用，保留原设置。')
+                        continue
+                    detail, history = updated, next_history
                 elif command == 'f' or command.startswith(('i ', 't ')):
                     next_identity, next_timing = chosen_identity, chosen_timing
                     if command.startswith('i '):
@@ -384,7 +465,7 @@ def interactive(finder, args, output):
                         next_timing = None
                     elif command.startswith('t '):
                         next_timing = command[2:].strip()
-                    detail = show(finder, found, mark, args, output, next_identity, next_timing, command == 'f')
+                    detail = show(finder, found, mark, args, output, next_identity, next_timing, command == 'f', history)
                     chosen_identity, chosen_timing = next_identity, next_timing
                 else:
                     raise InputError('操作无效，请使用提示中的操作。')

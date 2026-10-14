@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-14
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62
     status: current
   - path: scripts/grafana/install.py
@@ -82,6 +84,8 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
 - 终端退格实现修正（2026-10-14 用户试用反馈）：BS／DEL 同时删除输入与屏幕字符，处理中文、制表符和折行。
   方向键的 CSI／SS3 序列整体忽略，不进入 SQL 或操作命令；当前不提供方向键编辑／历史浏览。
   这是交互输入的缺陷修复，未改变检索规则；自动验证与 PuTTY 用户确认仍分开记录。
+- 交互详情支持 `h 历史设置`（2026-10-14 用户确认扩展），条数与时间在会话内保留；逐项提示、取消、恢复默认及
+  查询口径由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护。设置不写入账号配置或历史文件。
 - 查询只读、不执行输入 SQL，不写表、不创建任务、不落盘 SQL／结果；短命令在启动解释器前禁用 Python 缓存。
   成功查询含无命中、无法生成可靠指纹退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
   错误使用中文且不带密码或堆栈，查询超时明确说明。

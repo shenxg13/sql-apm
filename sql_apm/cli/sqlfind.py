@@ -454,8 +454,11 @@ def interactive(finder, args, output):
                 output.candidates(found, args)
                 state = 'list'
             elif state == 'list':
-                output.line('? 查看交互帮助。')
-                command = terminal_input(output, '输入标记看详情；o 调整排序；l 重看列表；n 新检索；q 退出；Ctrl-C 返回输入。').decode().strip()
+                for line in ('检索结果列表操作：', '  标记  输入标记看详情（例如 1 或 s1）',
+                             '  o  调整排序', '  l  重看列表', '  ?  查看交互帮助',
+                             '  n  新检索', '  q  退出'):
+                    output.line(line)
+                command = terminal_input(output, 'Ctrl-C 返回输入。').decode().strip()
                 if command in ('', 'q'):
                     return 0
                 if command == '?':
@@ -501,11 +504,15 @@ def interactive(finder, args, output):
             else:
                 if 'timings' in detail:
                     output.line('可用计时类别: ' + '; '.join(t['timing'] + '=' + t['label'] for t in detail['timings']))
-                output.line('i 序号 换身份；t 类别 换计时；f 查看原文全文。')
+                for line in ('SQL 详情操作：', '  i 序号  换身份', '  t 类别  换计时', '  f  查看原文全文'):
+                    output.line(line)
                 if 'timings' in detail:
-                    output.line('v 原文列表；v 编号 选原文；v matched 本次命中；v all 全部原文。')
-                    output.line('h 历史设置（条数、时间范围、最新或最慢、恢复默认）。')
-                command = terminal_input(output, 'b 返回列表；? 帮助；n 新检索；q 退出；Ctrl-C 返回列表。').decode().strip()
+                    for line in ('  v  原文列表', '  v 编号  选原文', '  v matched  本次命中',
+                                 '  v all  全部原文', '  h  历史设置（条数、时间范围、排序、恢复默认）'):
+                        output.line(line)
+                for line in ('  b  返回列表', '  ?  查看交互帮助', '  n  新检索', '  q  退出'):
+                    output.line(line)
+                command = terminal_input(output, 'Ctrl-C 返回列表。').decode().strip()
                 if command in ('', 'q'):
                     return 0
                 if command == '?':

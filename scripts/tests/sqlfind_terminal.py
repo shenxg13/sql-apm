@@ -1,4 +1,5 @@
 """PTY and login checks used by verify_sqlfind; no real account configuration."""
+import errno
 import hashlib
 import importlib.util
 import io
@@ -50,12 +51,35 @@ class Terminal:
         self.offset = self.output.index(wanted, start) + len(wanted)
         return self.output[start:self.offset].replace(b'\r\n', b'\n').decode('utf-8')
 
+    def finish(self, timeout=5):
+        end = time.monotonic() + timeout
+        while True:
+            if time.monotonic() >= end:
+                raise AssertionError('PTY did not exit')
+            if not select.select([self.fd], [], [], 0.1)[0]:
+                continue
+            try:
+                chunk = os.read(self.fd, 65536)
+            except OSError as error:
+                if error.errno != errno.EIO:
+                    raise
+                break
+            if not chunk:
+                break
+            self.output += chunk
+        _, status = os.waitpid(self.pid, 0)
+        self.pid = None
+        assert os.waitstatus_to_exitcode(status) == 0, status
+        start, self.offset = self.offset, len(self.output)
+        return self.output[start:].replace(b'\r\n', b'\n').decode('utf-8')
+
     def close(self):
-        try:
-            os.kill(self.pid, signal.SIGTERM)
-        except ProcessLookupError:
-            pass
-        os.waitpid(self.pid, 0)
+        if self.pid is not None:
+            try:
+                os.kill(self.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            os.waitpid(self.pid, 0)
         os.close(self.fd)
 
 
@@ -136,18 +160,22 @@ def verify_input():
 
 def check_operations(term):
     rendered = term.output[:term.offset].replace(b'\r\n', b'\n').decode('utf-8')
-    active, number = None, 0
+    active, number, content = None, 0, False
     for line in rendered.splitlines():
         start = re.fullmatch(r'========== 操作 (\d+)：(.*) ==========', line)
         end = re.fullmatch(r'========== 操作 (\d+) 输出结束 ==========', line)
         if start:
             assert active is None and int(start[1]) == number + 1, line
             number = active = int(start[1])
+            content = False
         elif end:
             assert active == int(end[1]), line
+            assert content, 'Empty operation: ' + line
             active = None
         elif line in ('请选择检索方式：', '检索结果列表操作：', 'SQL 详情操作：'):
             assert active is None, 'Menu inside command output: ' + line
+        elif active is not None and line.strip():
+            content = True
     assert number > 0 and active is None, 'Missing operation boundary'
 
 
@@ -189,11 +217,12 @@ def verify_help(dsn):
             assert '\n  ?  查看交互帮助\n' in menu
             for _ in range(2):
                 check_help(term, '回车选择 1。', width)
-            term.send('\n')
-            term.until('输入一行检索词')
-            term.until('之后 q 退出。')
-            term.send('\x03')
-            term.until('回车选择 1。')
+            for mode in ('', '1', '2', '3', 'words', 'passage', 'exact'):
+                term.send(mode + '\n')
+                assert '========== 操作' not in term.until('之后 q 退出。')
+                term.send('\x03')
+                term.until('回车选择 1。')
+                check_operations(term)
         finally:
             term.close()
         term = Terminal(dsn, width=width)
@@ -213,6 +242,7 @@ def verify_help(dsn):
                 else:
                     assert hashlib.sha256(raw.encode()).hexdigest() in result.replace('\n', '')
                 term.send('n\n')
+                assert '========== 操作' not in term.until('请选择检索方式：')
         finally:
             term.close()
     print('PASS: outer help without database, repeat help, 80/200 columns and literal question marks in all input modes', flush=True)
@@ -227,13 +257,11 @@ def verify_operations(dsn, owner):
         term = Terminal(dsn, width=width)
         try:
             term.until('回车选择 1。')
-            term.send('9\n')
-            assert '请选择 1、2 或 3' in term.until('回车选择 1。')
-            check_operations(term)
             term.send('1\n')
-            term.until('之后 q 退出。')
+            assert '========== 操作' not in term.until('之后 q 退出。')
             term.send('big_list\n')
-            term.until('Ctrl-C 返回输入。')
+            assert '操作 1：按词检索' in term.until('Ctrl-C 返回输入。')
+            check_operations(term)
             term.send('1\n')
             term.until('Ctrl-C 返回列表。')
             found = search(finder, b'big_list', args)
@@ -245,9 +273,12 @@ def verify_operations(dsn, owner):
             assert '原文开始\n' + data.LONG + '\n原文结束' in rendered
             owner.rollback()
             term.send('n\n')
-            term.until('回车选择 1。')
+            assert '========== 操作' not in term.until('回车选择 1。')
+            term.send('9\n')
+            assert '请选择 1、2 或 3' in term.until('回车选择 1。')
+            check_operations(term)
             term.send('3\n')
-            term.until('之后 q 退出。')
+            assert '========== 操作' not in term.until('之后 q 退出。')
             term.send('SELECT absent_column_a; SELECT absent_column_b;\n\x04')
             term.until('Ctrl-C 返回输入。')
             term.send('s1\n')
@@ -256,17 +287,42 @@ def verify_operations(dsn, owner):
             term.send('invalid\n')
             assert '操作无效' in term.until('Ctrl-C 返回列表。')
             check_operations(term)
+            term.send('b\n')
+            rendered = term.until('Ctrl-C 返回输入。')
+            assert '：b 返回列表' in rendered and '这次检索' in rendered
+            check_operations(term)
+            term.send('s1\n')
+            term.until('Ctrl-C 返回列表。')
             term.send('\x03')
             term.until('Ctrl-C 返回输入。')
             check_operations(term)
             term.send('q\n')
-            term.until('：q 退出')
-            term.until('输出结束 ==========')
+            assert term.finish().strip() == 'q'
             check_operations(term)
         finally:
             owner.rollback()
             term.close()
-    print('PASS: paired sequential operation boundaries, errors/cancel/exit, text-only long/sample/empty output and no f query', flush=True)
+        for screen, command in (('mode', 'q'), ('list', ''), ('detail', 'q'), ('detail', '')):
+            term = Terminal(dsn, width=width)
+            try:
+                term.until('回车选择 1。')
+                if screen != 'mode':
+                    term.send('\n')
+                    assert '========== 操作' not in term.until('之后 q 退出。')
+                    term.send('big_list\n')
+                    assert '操作 1：按词检索' in term.until('Ctrl-C 返回输入。')
+                    if screen == 'detail':
+                        term.send('1\n')
+                        term.until('Ctrl-C 返回列表。')
+                term.send(command + '\n')
+                assert term.finish().strip() == command
+                if screen != 'mode':
+                    check_operations(term)
+                else:
+                    assert b'==========' not in term.output
+            finally:
+                term.close()
+    print('PASS: nonempty sequential operation boundaries, silent transitions/exits, errors/cancel, text-only long/sample/empty output and no f query', flush=True)
 
 
 def verify_history(dsn, owner):

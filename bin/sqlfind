@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Resolve every symlink before locating the application and its interpreter.
+set -euo pipefail
+entry=${BASH_SOURCE[0]}
+while [[ -L $entry ]]; do
+    folder=$(cd -P -- "$(dirname -- "$entry")" && pwd)
+    entry=$(readlink -- "$entry")
+    [[ $entry == /* ]] || entry=$folder/$entry
+done
+root=$(cd -P -- "$(dirname -- "$entry")/.." && pwd)
+export PYTHONPATH="$root${PYTHONPATH:+:$PYTHONPATH}"
+exec "$root/.venv/bin/python" -B -m sql_apm sqlfind "$@"

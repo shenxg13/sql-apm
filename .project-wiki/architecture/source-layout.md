@@ -3,6 +3,7 @@ id: architecture.source-layout
 type: architecture
 status: active
 owners:
+  - bin/
   - sql_apm/
   - tests/
   - scripts/functions/
@@ -10,8 +11,10 @@ owners:
   - scripts/db/
   - tests/database/
   - scripts/deployment/
-updated: 2026-10-08
+updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183765468
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/43
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/33
@@ -64,6 +67,7 @@ confidence: high
 Python 产品源码放在仓库下的 `sql_apm/` 包内，按职责组织子包；仓库根目录不放
 业务源码，包根目录尽量只保留包声明和薄入口。目标结构按对应功能逐步落实，
 不为尚未实现的功能预建空目录。
+`sqlfind` 的仓库启动入口位于 `bin/sqlfind`，只负责定位程序目录和启动 Python，业务实现仍在 `sql_apm/`。
 
 ## Source Of Truth
 
@@ -81,6 +85,8 @@ SQL 引擎、统计构建器和完整流程 CLI 已经交付；只导入范围�
 
 ```text
 sql-apm/
+├── bin/
+│   └── sqlfind                 # 已有：面向运维的薄启动脚本
 ├── sql_apm/
 │   ├── __init__.py
 │   ├── __main__.py             # 已有：python -m sql_apm 的薄入口

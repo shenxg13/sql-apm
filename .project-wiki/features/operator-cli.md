@@ -4,8 +4,24 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-13
+updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6184745033
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6184734459
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183967369
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183765468
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/62
+    status: current
   - path: scripts/grafana/install.py
     status: current
   - path: https://github.com/shenxg13/sql-apm/pull/60#issuecomment-6146826478
@@ -65,6 +81,64 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### sqlfind 运维入口（2026-10-13）
+
+来源：[Issue #62](https://github.com/shenxg13/sql-apm/issues/62) 于 2026-10-12 确认的契约。
+实现新增 `sqlfind` 和同名 Python 子命令；开发机自动验证和部分样本环境已具备。
+C28 已由用户于 2026-10-15 [明确确认](https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183967369)：
+用 PuTTY 以 `sfmon` 新登录运行短命令，80×24 与最大化窗口均正常；该人工证据与自动检查分开记录。
+
+- 运维人员在 SQL APM 主机登录后使用短命令，仓库入口为 `bin/sqlfind`（2026-10-15 用户要求迁移），根目录不留旧入口。
+  入口解析符号链接，从 `bin` 上一级定位程序目录和项目 Python；已有 `search` JSON 命令保持兼容。
+- 给出输入时一次输出，无输入且标准输入输出都是终端时进入交互。参数、文件、标准输入只能选一个，
+  文件与标准输入原样保留 UTF-8 字节中的首尾空白和换行。时间无时区时按北京时间。
+- 交互按词读取一行；整段和完整 SQL 粘贴后回车、Ctrl-D，换行统一 LF，结束输入的那次回车不算 SQL。
+  多余粘贴不作为菜单指令；Ctrl-C 取消步骤或查询，输入／查询失败可以重试。无 readline 依赖、无历史文件。
+- 交互帮助（2026-10-14 用户确认）：最外层方式菜单逐行列出三种方式、`?` 帮助和 `q` 退出。
+  候选列表和 SQL 详情的常驻操作提示也每个命令一行；`v` 的各用法分别列出，Ctrl-C 返回提示独立一行。
+  方式、候选和详情菜单均支持 `?`，按流程和操作位置分组说明，每个命令独占一行；解释 `o` 排序、`l` 重看列表、
+  `i` 身份组合、`t` 计时类别、原文与历史操作，以及回车、Ctrl-D、Ctrl-C 和退出的作用域。
+  帮助不访问数据库，不改变当前菜单、筛选、排序、原文或身份／计时选择及历史设置，不分屏、不落盘。
+  检索内容输入阶段的 `?` 按字面保留，不触发帮助；启动参数仍通过 `sqlfind --help` 查看。
+- 启动帮助分组（2026-10-15 用户确认）：`--help` 分通用启动参数、非交互查询参数、进入交互模式；
+  保留两种模式的启动示例，详细菜单操作由 `?` 提供。参数明确适用条件，区分候选时间与历史时间、
+  整页详情中的全文与单独全文输出。两种模式的原文与历史查询能力已按[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)对齐。
+- 交互输出边界（2026-10-14 用户确认）：有实际输出的命令和检索提交有会话内递增操作编号、命令名及用途的开始标记，
+  以相同编号的结束标记和空行收尾，再显示下一轮菜单。设置向导属于发起命令的同一段；失败和取消也说明原因并收尾。
+  有效的方式选择（含默认回车和别名）、`n` 新检索、`q` 及列表／详情回车退出直接跳转或退出，不产生空段、不占编号。
+  `b` 会重显列表，因此保留输出边界；错误提示和菜单等待时的 Ctrl-C 反馈仍有边界。
+  操作编号用于回滚定位，与候选标记、原文编号分开；不复制 SQL 到标题，不落盘，不清屏、不分页。
+  一次输出不添加这些标记；`f` 只输出当前原文全文，具体原文范围由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护。
+- 终端退格实现修正（2026-10-14 用户试用反馈）：BS／DEL 同时删除输入与屏幕字符，处理中文、制表符和折行。
+  方向键的 CSI／SS3 序列整体忽略，不进入 SQL 或操作命令；当前不提供方向键编辑／历史浏览。
+  这是交互输入的缺陷修复，未改变检索规则；自动验证与 PuTTY 用户确认仍分开记录。
+- 交互详情支持 `h 历史设置`（2026-10-14 用户确认扩展），条数、时间与最新／最慢排序在会话内保留；
+  候选 `o` 调整检索排序，详情 `v`／`v 编号`／`v matched`／`v all` 查看及切换原文范围。逐项提示、取消、恢复默认及
+  查询口径由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护。设置不写入账号配置或历史文件。
+- 查询只读、不执行输入 SQL，不写表、不创建任务、不落盘 SQL／结果；短命令在启动解释器前禁用 Python 缓存。
+  成功查询含无命中、无法生成可靠指纹退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
+  错误使用中文且不带密码或堆栈，查询超时明确说明；下游提前关闭管道时退出 1，标准错误保持为空。
+- 账号配置与 #59 一样由 home 登录 profile 引入专属片段，但只增加 PATH，不改已有 `psql` 环境。
+  默认连接使用配置的只读账号；环境 `SQL_APM_DSN`、`PGPASSFILE` 和显式 `--schema` 优先。
+  既无 DSN 又无配置时提示先配置。配置不读写密码、数据库账号或系统文件。
+- `scripts/sqlfind/configure.py install` 只维护 home 的专属目录和一个登录片段，打印改动路径；相同输入幂等，
+  `uninstall` 恢复原文件字节并保留后来新增的其他设置。密码仍仅在已有的受保护 passfile 中。
+  账号的 `~/.sqlfind/bin/sqlfind` 指向仓库 `bin/sqlfind`；相同配置重跑时可迁移本工具管理且指向同一程序目录旧入口的符号链接。
+  迁移只原子替换该链接，保留连接、密码、profile 及撤销记录；非符号链接和其他目标不覆盖，迁移后仍可幂等执行和撤销。
+- 不分屏、不进入全屏，支持终端回滚。80 列起表格可用续行保持完整，200 列候选每个一行；
+  候选示例、过长身份及原文目录摘要可以标注截断。对齐只用 ASCII／中文全角字符，其他字符转义。
+  “这次检索”说明和拒绝提示不参与表格对齐，保留函数返回的文字和操作者词中的符号，只按窗口宽度换行及转义控制字符。
+  当前编码不能表示的字符以替代符号显示并提示。重定向默认 100 列，`--width` 可调整。
+- 原文显示（2026-10-15 用户确认）：详情原文、`f`、`--view text` 和 `--full-text` 保留制表符、LF 和 CR LF，
+  其他 C0（含单独 CR）、DEL、C1（U+0080–U+009F）使用 ASCII 可见转义，并在原文区外说明本次显示中转义的字符数。
+  不为原文插入宽度折行，截断仍按原文字符数，库内原文、原文总字符数和编号不变；
+  需要逐字节原文时使用既有 `python -m sql_apm search text`。该规则只改变显示，不改变检索、指纹及历史口径。
+
+检索及详情规则由[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)维护，
+参数、数据来源与配置文件见[开发说明](../../docs/design/sql-search.md#面向运维的-sqlfind)，
+PuTTY 设置、试用环境和撤销见[试用步骤](../../docs/runbooks/sqlfind-trial.md)。
+本轮只在开发机实现和验证，离线包清单、随包手册和目标机验证由后续发版 Issue 负责。
 
 ### 生产安装账号与交互环境（2026-10-12）
 

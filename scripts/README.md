@@ -284,7 +284,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 
 ## SQL检索与查询层
 
-`sqlfind` 为面向运维的中文终端入口，参数、候选与详情来源见[检索开发说明](../docs/design/sql-search.md#面向运维的-sqlfind)。
+[`bin/sqlfind`](../bin/sqlfind) 为面向运维的中文终端入口，参数、候选与详情来源见[检索开发说明](../docs/design/sql-search.md#面向运维的-sqlfind)。
 `scripts/sqlfind/configure.py install|uninstall` 维护执行账号 home 的短命令及只读连接，不修改密码或已有 psql 设置。
 `scripts/sqlfind/prepare_trial.py prepare|start|stop|status` 管理仅用部分完整样本的本地试用实例；步骤见
 [sqlfind 试用](../docs/runbooks/sqlfind-trial.md)。`scripts/db/verify_sqlfind.py` 执行真实 PG17 合成与伪终端验收，

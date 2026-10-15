@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183765468
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097
@@ -80,7 +82,8 @@ confidence: high
 实现新增 `sqlfind` 和同名 Python 子命令；开发机自动验证和部分样本环境已具备，
 PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用户验收。
 
-- 运维人员在 SQL APM 主机登录后使用短命令，入口解析符号链接并定位项目 Python；已有 `search` JSON 命令保持兼容。
+- 运维人员在 SQL APM 主机登录后使用短命令，仓库入口为 `bin/sqlfind`（2026-10-15 用户要求迁移），根目录不留旧入口。
+  入口解析符号链接，从 `bin` 上一级定位程序目录和项目 Python；已有 `search` JSON 命令保持兼容。
 - 给出输入时一次输出，无输入且标准输入输出都是终端时进入交互。参数、文件、标准输入只能选一个，
   文件与标准输入原样保留 UTF-8 字节中的首尾空白和换行。时间无时区时按北京时间。
 - 交互按词读取一行；整段和完整 SQL 粘贴后回车、Ctrl-D，换行统一 LF，结束输入的那次回车不算 SQL。
@@ -114,6 +117,8 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
   既无 DSN 又无配置时提示先配置。配置不读写密码、数据库账号或系统文件。
 - `scripts/sqlfind/configure.py install` 只维护 home 的专属目录和一个登录片段，打印改动路径；相同输入幂等，
   `uninstall` 恢复原文件字节并保留后来新增的其他设置。密码仍仅在已有的受保护 passfile 中。
+  账号的 `~/.sqlfind/bin/sqlfind` 指向仓库 `bin/sqlfind`；相同配置重跑时可迁移本工具管理且指向同一程序目录旧入口的符号链接。
+  迁移只原子替换该链接，保留连接、密码、profile 及撤销记录；非符号链接和其他目标不覆盖，迁移后仍可幂等执行和撤销。
 - 不分屏、不进入全屏，支持终端回滚。80 列起表格可用续行保持完整，200 列候选每个一行；
   候选示例、过长身份及原文目录摘要可以标注截断。对齐只用 ASCII／中文全角字符，其他字符转义；原文区保留内容。
   当前编码不能表示的字符以替代符号显示并提示。重定向默认 100 列，`--width` 可调整。

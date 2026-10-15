@@ -5,7 +5,7 @@
 
 ## 已准备的环境
 
-程序目录为 `/home/sfmon/code/sql-apm`，入口是根目录 `sqlfind`。
+程序目录为 `/home/sfmon/code/sql-apm`，仓库入口是 `bin/sqlfind`，在仓库中执行 `./bin/sqlfind`。
 试用库位于 `var/issue62/trial/pgdata`，只监听本机私有 socket，端口 55462。
 选取原样复制的两份较小完整日志，共 23,744 条记录、1,860 份原文；不是全量数据库或完整生产训练窗口。
 副本、来源文件路径、字节数、SHA-256 和构建记录保存在 `var/issue62/trial/provenance.json`，目录由 Git 忽略。
@@ -37,6 +37,8 @@ cd /home/sfmon/code/sql-apm
 ```
 
 不需要输入密码，不会更改已有的 `psql` 设置。相同配置可重复执行。
+如果此前已经配置过根目录入口，按上方相同连接参数重跑，工具只将已有短命令链接迁至 `bin/sqlfind`，
+连接设置、登录片段和撤销记录保持不变；遇到其他链接目标或普通文件会拒绝覆盖。
 关闭并重新登录一个 PuTTY 会话，以确认新的登录环境已生效；若当前会话手动设置过
 `SQL_APM_DSN` 或 `PGPASSFILE`，新会话应不带这些临时覆盖值。
 
@@ -100,10 +102,10 @@ sqlfind
 非交互可按相同选择核对原文及历史。先查看原文列表，再使用列表中的编号；每次调用重新检索，数据变化可能改变编号。
 
 ```bash
-./sqlfind --help
-./sqlfind 'select' --show 1 --view originals --original all
-./sqlfind 'select' --show 1 --original 1 --view text
-./sqlfind 'select' --show 1 --original 1 --view history --limit 100 \
+./bin/sqlfind --help
+./bin/sqlfind 'select' --show 1 --view originals --original all
+./bin/sqlfind 'select' --show 1 --original 1 --view text
+./bin/sqlfind 'select' --show 1 --original 1 --view history --limit 100 \
   --history-order slowest \
   --history-start '2026-09-19 00:00:00' --history-end '2026-09-20 00:00:00'
 ```

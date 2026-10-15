@@ -24,7 +24,7 @@ class Terminal:
         pid, self.fd = os.forkpty()
         if pid == 0:
             os.chdir('/tmp')
-            command = entry or [str(ROOT / 'sqlfind'), *args]
+            command = entry or [str(ROOT / 'bin/sqlfind'), *args]
             os.execve(command[0], command,
                       dict(os.environ, SQL_APM_DSN=dsn, PYTHONPATH=str(ROOT), **(env or {})))
         self.pid, self.output, self.offset = pid, b'', 0
@@ -720,6 +720,14 @@ def verify(dsn, directory, owner):
     values = dict(host=str(directory / 'socket'), port=55473, dbname='sql_apm', user='sql_apm_ro',
                   passfile=str(password), schema='sql_apm')
     configure.install(home, ROOT, values)
+    link = home / '.sqlfind/bin/sqlfind'
+    link.unlink()
+    link.symlink_to(ROOT / 'sqlfind')  # Existing account from the former layout.
+    saved = {p: p.read_bytes() for p in (home / '.sqlfind').iterdir() if p.is_file()}
+    profile_before = profile.read_bytes()
+    assert configure.install(home, ROOT, values) == [link]
+    assert link.resolve() == ROOT / 'bin/sqlfind'
+    assert profile.read_bytes() == profile_before and all(p.read_bytes() == content for p, content in saved.items())
     assert configure.install(home, ROOT, values) == []
     environment = {k: v for k, v in os.environ.items() if k != 'SQL_APM_DSN' and not k.startswith('PG')}
     environment['HOME'] = str(home)  # isolated login test, never a shell-wide override

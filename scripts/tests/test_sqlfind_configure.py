@@ -18,7 +18,8 @@ class ConfigurationTests(unittest.TestCase):
             app = home / 'app'
             (app / '.venv/bin').mkdir(parents=True)
             (app / '.venv/bin/python').symlink_to(sys.executable)
-            (app / 'sqlfind').write_text('# test entry\n')
+            (app / 'bin').mkdir()
+            (app / 'bin/sqlfind').write_text('# test entry\n')
             profile = home / '.bash_profile'
             before = b'# custom\r\nexport PGUSER=sql_apm\nexport PGPASSFILE=/private/existing'
             profile.write_bytes(before)
@@ -31,6 +32,32 @@ class ConfigurationTests(unittest.TestCase):
             self.assertTrue(all(p.is_relative_to(home) for p in changed))
             self.assertEqual(module.install(home, app, values), [])
             self.assertEqual(profile.stat().st_mode & 0o777, 0o640)
+            link = home / '.sqlfind/bin/sqlfind'
+            self.assertEqual(link.resolve(), app / 'bin/sqlfind')
+            saved = {p: p.read_bytes() for p in (home / '.sqlfind').iterdir() if p.is_file()}
+            profile_before = profile.read_bytes()
+            link.unlink()
+            link.symlink_to(app / 'sqlfind')
+            self.assertEqual(module.install(home, app, values), [link])
+            self.assertEqual(link.resolve(), app / 'bin/sqlfind')
+            self.assertEqual(module.install(home, app, values), [])
+            self.assertEqual(profile.read_bytes(), profile_before)
+            self.assertTrue(all(p.read_bytes() == content for p, content in saved.items()))
+            # Do not overwrite an unrelated symlink or a user-created file.
+            for target in (app / 'other-command', None):
+                link.unlink()
+                if target is None:
+                    link.write_text('# user file\n')
+                else:
+                    link.symlink_to(target)
+                with self.assertRaises(ValueError):
+                    module.install(home, app, values)
+                if target is None:
+                    self.assertEqual(link.read_text(), '# user file\n')
+                else:
+                    self.assertEqual(link.readlink(), target)
+            link.unlink()
+            link.symlink_to(app / 'bin/sqlfind')
             for path in (home / '.sqlfind').iterdir():
                 if path.is_file():
                     self.assertNotIn('SECRET', path.read_text())

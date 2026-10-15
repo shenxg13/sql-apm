@@ -30,7 +30,7 @@ DIFFERENCE_SQL = ('/* ' + 'shared-prefix ' * 30 + '*/ SELECT id FROM preview_dif
 def command(dsn, options, raw=None, entry=None, overrides=None):
     master, slave = pty.openpty()
     try:
-        return subprocess.run((entry or [str(ROOT / 'sqlfind')]) + options, input=raw,
+        return subprocess.run((entry or [str(ROOT / 'bin/sqlfind')]) + options, input=raw,
             stdin=slave if raw is None else None, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env={**os.environ, 'SQL_APM_DSN': dsn, 'PYTHONPATH': str(ROOT), **(overrides or {})}, cwd='/tmp', timeout=60)
     finally:
@@ -238,6 +238,7 @@ def verify_noninteractive(dsn, finder):
 
 
 def verify(pg_bin):
+    assert not (ROOT / 'sqlfind').exists() and not (ROOT / 'sqlfind').is_symlink()
     with instance(pg_bin) as (directory, env):
         v = Verification(pg_bin, directory, env)
         v.init()
@@ -414,24 +415,31 @@ def verify(pg_bin):
         assert all(r.returncode == 0 and not r.stderr for r in responses), [(r.returncode, r.stderr) for r in responses]
         assert len({r.stdout for r in responses}) == 1
         alias = directory / 'sqlfind-link'
-        alias.symlink_to(ROOT / 'sqlfind')
+        alias.symlink_to(ROOT / 'bin/sqlfind')
         linked = command(dsn + '_ro', ['--mode', 'passage'], sample, [str(alias)])
         module = command(dsn + '_ro', ['--mode', 'passage'], sample,
                          [str(ROOT / '.venv/bin/python'), '-B', '-m', 'sql_apm', 'sqlfind'])
         assert linked.stdout == responses[0].stdout
         assert module.returncode == 0 and module.stdout == responses[0].stdout
+        aliases = directory / 'links with spaces'
+        aliases.mkdir()
+        relative = aliases / 'sqlfind'
+        relative.symlink_to('../sqlfind-link')
+        chained = command(dsn + '_ro', ['--mode', 'passage'], sample, [str(relative)])
+        assert chained.returncode == 0 and chained.stdout == responses[0].stdout
         # A fresh source tree catches first-import bytecode writes, not just warmed caches.
-        fresh = directory / 'fresh-app'
+        fresh = directory / 'fresh app'
         shutil.copytree(ROOT / 'sql_apm', fresh / 'sql_apm', ignore=shutil.ignore_patterns('__pycache__'))
         shutil.copytree(ROOT / 'rules', fresh / 'rules')
-        shutil.copy2(ROOT / 'sqlfind', fresh / 'sqlfind')
+        (fresh / 'bin').mkdir()
+        shutil.copy2(ROOT / 'bin/sqlfind', fresh / 'bin/sqlfind')
         (fresh / '.venv').symlink_to(ROOT / '.venv', target_is_directory=True)
         empty_home = directory / 'empty-home'
         empty_home.mkdir()
         snapshot = lambda base: {str(p.relative_to(base)): (p.stat().st_size, p.stat().st_mtime_ns)
                                  for p in base.rglob('*') if p.is_file()}
         files_before = snapshot(fresh), snapshot(empty_home)
-        no_cache = command(dsn + '_ro', [], b'orders', [str(fresh / 'sqlfind')],
+        no_cache = command(dsn + '_ro', [], b'orders', [str(fresh / 'bin/sqlfind')],
                            overrides={'PYTHONPATH': str(fresh), 'HOME': str(empty_home)})
         assert no_cache.returncode == 0, no_cache.stderr
         assert (snapshot(fresh), snapshot(empty_home)) == files_before

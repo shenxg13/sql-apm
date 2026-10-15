@@ -6,8 +6,9 @@
 
 ## 面向运维的 sqlfind
 
-[Issue #62](https://github.com/shenxg13/sql-apm/issues/62) 新增根目录可执行脚本 `sqlfind`，
+[Issue #62](https://github.com/shenxg13/sql-apm/issues/62) 的仓库可执行入口为 `bin/sqlfind`，
 对应 `python -B -m sql_apm sqlfind`。脚本解析符号链接，使用程序目录的 `.venv/bin/python`，
+程序目录从解析后的入口所在 `bin` 目录向上一级定位，根目录不保留旧入口。
 保留调用者当前目录、参数、标准输入、终端和退出码。帮助中的名称始终是 `sqlfind`。
 开发机试用与撤销步骤见 [sqlfind 试用](../runbooks/sqlfind-trial.md)。
 本轮不调整离线包清单、随包手册、数据库结构或 Grafana；以后发版时另行纳入短入口和配置工具。
@@ -135,12 +136,14 @@
 `scripts/sqlfind/configure.py install` 接受主机或 socket、端口、数据库、已有只读角色、schema、
 已有密码文件路径。密码文件必须由当前账号拥有且无组／其他人权限，工具不读密码内容、不改密码或数据库账号。
 配置保存为 `~/.sqlfind/connection.json`，登录片段仅把 `~/.sqlfind/bin` 加入 PATH；
-其中短入口是程序脚本的符号链接。沿用 #59 的账号登录 profile 方式，选择 Bash 当前会读取的
+其中短入口是程序目录 `bin/sqlfind` 的符号链接。沿用 #59 的账号登录 profile 方式，选择 Bash 当前会读取的
 `.bash_profile`、`.bash_login`、`.profile` 中第一个已有文件，无文件则创建 `.bash_profile`。
 只追加有标记的 source 片段，不改已有 `psql` 和数据库环境变量。
 
 环境存在 `SQL_APM_DSN` 时优先用它，否则用上述连接配置；`PGPASSFILE` 同样优先于配置文件路径。
 连接与配置都没有时用一句中文提示先配置。重复相同配置不改文件；不同配置需先撤销，避免覆盖已有设置。
+入口迁移后，重复相同配置可将本工具管理且指向同一程序目录旧 `sqlfind` 的链接改指 `bin/sqlfind`；
+先验证新入口、连接内容和登录片段，再原子替换链接，保留其余配置及撤销记录；其他目标和普通文件不覆盖。
 `uninstall` 删除专属片段与专属文件，恢复原登录文件字节；配置后新增的其他登录设置保留。
 工具打印改动的文件，全部位于执行账号 home；不改系统 profile，不把密码放入参数、脚本或登录文件。
 

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import stat
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 BLOCK = b'\n# sqlfind login begin\n. "$HOME/.sqlfind/login.sh"\n# sqlfind login end\n'
@@ -23,18 +24,28 @@ def install(home, root, values):
     directory = home / '.sqlfind'
     if directory.is_symlink():
         raise ValueError('配置目录不能是符号链接')
+    entry = root / 'bin/sqlfind'
+    if not entry.is_file() or not os.access(root / '.venv/bin/python', os.X_OK):
+        raise ValueError('程序脚本或 Python 环境不存在')
     encoded = (json.dumps(values, ensure_ascii=False, indent=2) + '\n').encode()
     if directory.exists():
         expected = directory / 'connection.json'
+        link = directory / 'bin/sqlfind'
         if (directory / 'manifest.json').is_file() and expected.read_bytes() == encoded \
-                and (directory / 'bin/sqlfind').resolve() == root / 'sqlfind':
+                and link.is_symlink() and link.resolve() in (entry, root / 'sqlfind'):
             manifest = json.loads((directory / 'manifest.json').read_text())
             if BLOCK not in (home / manifest['profile']).read_bytes():
                 raise ValueError('登录配置已变化，请先核对或撤销')
-            return []
+            if link.resolve() == entry:
+                return []
+            # Replace only our known old entry; preserve connection/profile bytes
+            # and leave the old link intact if preparing the new one fails.
+            with tempfile.TemporaryDirectory(prefix='.sqlfind-', dir=link.parent) as tmp:
+                replacement = Path(tmp) / 'sqlfind'
+                replacement.symlink_to(entry)
+                os.replace(replacement, link)
+            return [link]
         raise ValueError('已有不同配置，请先撤销后重新配置')
-    if not (root / 'sqlfind').is_file() or not os.access(root / '.venv/bin/python', os.X_OK):
-        raise ValueError('程序脚本或 Python 环境不存在')
     passfile = Path(values['passfile'])
     info = passfile.stat()
     if not stat.S_ISREG(info.st_mode) or info.st_mode & 0o077 or info.st_uid != os.getuid():
@@ -51,7 +62,7 @@ def install(home, root, values):
     directory.mkdir(mode=0o700)
     try:
         (directory / 'bin').mkdir(mode=0o700)
-        (directory / 'bin/sqlfind').symlink_to(root / 'sqlfind')
+        (directory / 'bin/sqlfind').symlink_to(entry)
         private_write(directory / 'connection.json', encoded)
         login = '# Only the interactive login PATH changes; psql and database environment stay as configured.\n'
         login += 'case ":$PATH:" in *":$HOME/.sqlfind/bin:"*) ;; *) export PATH="$HOME/.sqlfind/bin:$PATH" ;; esac\n'

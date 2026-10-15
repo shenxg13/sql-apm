@@ -25,8 +25,8 @@ cd /home/sfmon/code/sql-apm
 
 ## 由 sfmon 执行一次配置
 
-本轮自动检查只使用临时 home，尚未替真实 `sfmon` 修改登录文件。
-请在开发机以 `sfmon` 执行以下命令，工具会列出改动的 home 文件：
+自动检查使用临时 home；真实 `sfmon` 已于 2026-10-14 完成配置，2026-10-15 将短命令链接迁至 `bin/sqlfind`。
+当前账号可直接使用 `sqlfind`。需要配置或核对时，在开发机以 `sfmon` 执行以下命令，工具会列出改动的 home 文件：
 
 ```bash
 /home/sfmon/code/sql-apm/.venv/bin/python -B \

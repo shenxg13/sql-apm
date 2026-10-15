@@ -40,6 +40,32 @@ class FormattingTests(unittest.TestCase):
         printer.footer()
         self.assertIn('中文?\n提示:', storage.getvalue().decode('gbk'))
 
+    def test_original_controls_keep_text_identity_and_normal_layout(self):
+        ordinary = "SELECT '中文\t原文\r\n下一行';\n"
+        unsafe = '\x00\x07\x1b[31m\r\x7f\x80\x85\x9b\x9f'
+        visible = r'\x00\x07\x1b[31m\r\x7f\x80\x85\x9b\x9f'
+        for raw, expected, count in ((ordinary, ordinary, 0),
+                                     (ordinary + unsafe, ordinary + visible, 9)):
+            stream = io.StringIO()
+            detail = dict(text=dict(sql_id='same-id', sql_text=raw, selected=True),
+                          originals=[dict(number=7, sql_id='same-id')])
+            Output(80, stream).original_text(detail)
+            rendered = stream.getvalue()
+            self.assertEqual(rendered.split('原文开始\n', 1)[1].split('\n原文结束', 1)[0], expected)
+            self.assertIn(f'原文总字符数: {len(raw)}\n', rendered)
+            self.assertIn('编号 7', rendered)
+            self.assertEqual(detail['text']['sql_text'], raw)
+            self.assertEqual('控制字符' in rendered, bool(count))
+            if count:
+                self.assertIn(f'{count} 个控制字符', rendered)
+        # A CR at the display limit must not escape as a terminal action when
+        # its following LF is outside the displayed portion.
+        detail['text']['sql_text'] = 'x' * 3999 + '\r\n末尾'
+        stream = io.StringIO()
+        Output(80, stream).original_text(detail, False)
+        self.assertIn('x\\r\n原文结束', stream.getvalue())
+        self.assertIn('1 个控制字符', stream.getvalue())
+
 
 @unittest.skipUnless(RUNTIME, 'requires pinned product runtime')
 class InputTests(unittest.TestCase):

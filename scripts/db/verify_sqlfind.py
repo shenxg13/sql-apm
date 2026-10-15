@@ -25,6 +25,13 @@ from sql_apm.storage.ingestion import connect
 DIFFERENCE_VALUES = ('', 'alpha', 'beta', '中文\n值', '\t', ' ', 'a' * 200 + 'Z', 'b' * 200 + 'Y')
 DIFFERENCE_SQL = ('/* ' + 'shared-prefix ' * 30 + '*/ SELECT id FROM preview_differences '
                   "WHERE code = 'shared-{value}-tail' /* " + 'shared-suffix ' * 30 + '*/')
+CONTROL_SQL = ("SELECT '中文\t原文\r\n尾' FROM control_display /* "
+               '\x1b]0;TITLE\x07\x1b[31mRED\x1b[0m\x1b[?1049hALT\x1b[?1049l'
+               '\rCR\x7f\x80\x85\x9b\x9f */')
+CONTROL_VISIBLE = ("SELECT '中文\t原文\r\n尾' FROM control_display /* "
+                   r'\x1b]0;TITLE\x07\x1b[31mRED\x1b[0m\x1b[?1049hALT\x1b[?1049l'
+                   r'\rCR\x7f\x80\x85\x9b\x9f */')
+ORDINARY_SQL = "SELECT '中文\t原文\r\n尾' FROM ordinary_display;\r\n"
 
 
 def command(dsn, options, raw=None, entry=None, overrides=None):
@@ -36,6 +43,102 @@ def command(dsn, options, raw=None, entry=None, overrides=None):
     finally:
         os.close(master)
         os.close(slave)
+
+
+def verify_rendered_notes(dsn, finder):
+    from sqlfind_terminal import Terminal
+    for width in (80, 200):
+        for query in ('orders status', 'orders ＝ ￥ ｜', 'orders ' * 21):
+            args = arguments([])
+            with finder.cursor() as cur:
+                notes = rows(cur, 'mpp_view_search_note', [finder.norm, args.mode, query] + [None] * 7)
+            refused = next((n['content'] for n in notes if n['item'] == '没有检索'), None)
+            expected = refused + '。' if refused else ''.join(n['item'] + ': ' + n['content'] for n in notes)
+            result = command(dsn, ['--width', str(width)], query.encode())
+            assert result.returncode == (1 if refused else 0) and not result.stderr
+            term = Terminal(dsn, ['--mode', 'words'], width)
+            try:
+                term.until('之后 q 退出。')
+                term.send(query + '\n')
+                interactive = term.until('之后 q 退出。' if refused else 'Ctrl-C 返回输入。')
+                for rendered in (result.stdout.decode(), interactive):
+                    if refused:
+                        assert expected in rendered.replace('\n', ''), rendered
+                    else:
+                        note_text = rendered.split('这次检索\n', 1)[1].split('集群: ', 1)[0]
+                        assert note_text.replace('\n', '') == expected, note_text
+                        assert all(cells(line) <= width for line in note_text.splitlines())
+                term.send('\x03' if refused else 'q\n')
+                if refused:
+                    term.until('q 退出')
+                    term.send('q\n')
+                term.finish()
+            finally:
+                term.close()
+    print('PASS: rendered search-note fidelity for multiple/full-width/21 terms, CLI and 80/200-column PTY', flush=True)
+
+
+def verify_control_display(dsn, finder):
+    from sqlfind_terminal import Terminal
+    for query, raw, expected, count in (('control_display', CONTROL_SQL, CONTROL_VISIBLE, 12),
+                                         ('ordinary_display', ORDINARY_SQL, ORDINARY_SQL, 0)):
+        detail = finder.detail(search(finder, query.encode(), arguments([])), '1', arguments([]))
+        number = next(r['number'] for r in detail['originals'] if r['sql_id'] == detail['text']['sql_id'])
+        assert detail['text']['sql_text'] == raw
+        for width in (80, 200):
+            results = []
+            for options in ([], ['--full-text'], ['--view', 'text']):
+                result = command(dsn, ['--show', '1', '--width', str(width), *options], query.encode())
+                assert result.returncode == 0 and not result.stderr
+                results.append(result.stdout.decode())
+            term = Terminal(dsn, ['--mode', 'words'], width)
+            try:
+                term.until('之后 q 退出。')
+                term.send(query + '\n')
+                term.until('Ctrl-C 返回输入。')
+                term.send('1\n')
+                results.append(term.until('Ctrl-C 返回列表。'))
+                term.send('f\n')
+                results.append(term.until('Ctrl-C 返回列表。'))
+                term.send('q\n')
+                term.finish()
+            finally:
+                term.close()
+            for rendered in results:
+                displayed = rendered.split('原文开始\n', 1)[1].split('\n原文结束', 1)[0]
+                assert displayed == expected, repr(displayed)
+                assert f'原文总字符数: {len(raw)}\n' in rendered and f'编号 {number}' in rendered
+                assert ('控制字符' in rendered) == bool(count)
+                if count:
+                    assert f'{count} 个控制字符' in rendered
+                remaining = rendered.replace('\r\n', '').replace('\n', '').replace('\t', '')
+                assert all(ord(c) >= 32 and not 0x7f <= ord(c) <= 0x9f for c in remaining)
+        assert finder.detail(search(finder, query.encode(), arguments([])), '1', arguments([]))['text'] == detail['text']
+    print('PASS: original control escapes and counts in detail/f/text/full-text; ordinary CRLF/tabs and text identity preserved', flush=True)
+
+
+def verify_broken_pipe(dsn):
+    # A large full text prevents the producer finishing before head closes.
+    producer = subprocess.Popen([str(ROOT / 'bin/sqlfind'), '--show', '1', '--view', 'text'],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        env={**os.environ, 'SQL_APM_DSN': dsn}, cwd='/tmp')
+    consumer = subprocess.Popen(['head', '-1'], stdin=producer.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    producer.stdout.close()
+    producer.stdout = None
+    try:
+        producer.stdin.write(b'long_text')
+        producer.stdin.close()
+        producer.stdin = None
+        first_line, consumer_errors = consumer.communicate(timeout=60)
+        _, producer_errors = producer.communicate(timeout=60)
+        assert first_line and consumer.returncode == 0 and not consumer_errors
+        assert producer.returncode == 1 and not producer_errors, (producer.returncode, producer_errors)
+    finally:
+        for process in (producer, consumer):
+            if process.poll() is None:
+                process.kill()
+            process.wait()
+    print('PASS: real sqlfind | head -1 exits 1 with empty stderr', flush=True)
 
 
 def verify_originals(finder):
@@ -254,11 +357,17 @@ def verify(pg_bin):
         for n, value in enumerate(DIFFERENCE_VALUES):
             moment = time_value('2026-07-01' if n == 0 else '2026-07-21') + timedelta(seconds=n)
             synthetic.extend(values for _, values in session.request(moment, DIFFERENCE_SQL.format(value=value), 25))
+        for raw in (CONTROL_SQL, ORDINARY_SQL):
+            synthetic.extend(values for _, values in session.request(time_value('2026-07-21'), raw, 25))
         with patch.object(data, 'events', return_value=sorted(synthetic, key=lambda r: r[0])):
             data.load(dsn, directory)
         owner = connect(dsn, 'sql_apm')
         before = contents(owner)
         finder = Finder(dsn + '_ro', 'sql_apm')
+        sys.path.insert(0, str(ROOT / 'scripts/tests'))
+        verify_rendered_notes(dsn + '_ro', finder)
+        verify_control_display(dsn + '_ro', finder)
+        verify_broken_pipe(dsn + '_ro')
         verify_originals(finder)
         verify_differences(finder)
         verify_noninteractive(dsn + '_ro', finder)

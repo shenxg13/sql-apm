@@ -547,7 +547,7 @@ def interactive(finder, args, output):
                         output.line('已取消检索，保留原排序和列表。')
                         continue
                     except ERRORS as error:
-                        output.line(failure(error))
+                        output.prose(failure(error))
                         output.line('保留原排序和列表。')
                         continue
                     updated['catalogs'] = found['catalogs']
@@ -606,7 +606,7 @@ def interactive(finder, args, output):
                         output.line('已取消历史查询，保留原设置。')
                         continue
                     except ERRORS as error:
-                        output.line(failure(error))
+                        output.prose(failure(error))
                         output.line('历史设置未应用，保留原设置。')
                         continue
                     detail, history = updated, next_history
@@ -620,7 +620,7 @@ def interactive(finder, args, output):
                         output.line('已取消原文列表查询，保留原选择。')
                         continue
                     except ERRORS as error:
-                        output.line(failure(error))
+                        output.prose(failure(error))
                         output.line('保留原选择。')
                         continue
                     detail = updated
@@ -659,7 +659,7 @@ def interactive(finder, args, output):
                         output.line('已取消查询，保留原选择。')
                         continue
                     except ERRORS as error:
-                        output.line(failure(error))
+                        output.prose(failure(error))
                         output.line('保留原选择。')
                         continue
                     detail, original_window = updated, next_window
@@ -674,14 +674,14 @@ def interactive(finder, args, output):
         except ERRORS as error:
             if not output.operation_active:
                 output.begin_operation('输入错误')
-            output.line(failure(error))
+            output.prose(failure(error))
             if isinstance(error, psycopg2.Error):
                 state = 'input'
         finally:
             output.end_operation()
 
 
-def main(argv=None):
+def _run(argv=None):
     output = Output()
     previous_wait = get_wait_callback()
     try:
@@ -710,12 +710,26 @@ def main(argv=None):
         output.line('查询已取消。')
         return 1
     except BrokenPipeError:
-        return 1
+        raise
     except ERRORS as error:
-        output.line(failure(error))
+        output.prose(failure(error))
         return 1
     finally:
         set_wait_callback(previous_wait)
+
+
+def main(argv=None):
+    try:
+        try:
+            return _run(argv)
+        finally:
+            sys.stdout.flush()
+    except BrokenPipeError:
+        # Discard pending buffered output so interpreter shutdown cannot retry
+        # the broken pipe and print an English traceback or change the exit code.
+        with open(os.devnull, 'w') as sink:
+            os.dup2(sink.fileno(), sys.stdout.fileno())
+        return 1
 
 
 if __name__ == '__main__':

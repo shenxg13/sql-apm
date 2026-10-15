@@ -35,6 +35,20 @@ def plain(value):
     return ''.join(result)
 
 
+def escape_controls(text, layout=False):
+    """Keep readable Unicode; optionally retain SQL tabs, LF and CR LF."""
+    rendered, escaped = [], 0
+    for index, char in enumerate(text):
+        keep = layout and (char in '\t\n' or
+                           (char == '\r' and text[index + 1:index + 2] == '\n'))
+        if not keep and (ord(char) < 32 or 0x7f <= ord(char) <= 0x9f):
+            rendered.append(ascii(char)[1:-1])
+            escaped += 1
+        else:
+            rendered.append(char)
+    return ''.join(rendered), escaped
+
+
 def pieces(text, width):
     line, size = '', 0
     for char in text:
@@ -97,6 +111,12 @@ class Output:
 
     def field(self, label, value):
         self.line(label + ': ' + plain(value))
+
+    def prose(self, text):
+        # Search explanations are prose, not aligned table cells.
+        rendered, _ = escape_controls(text)
+        for part in pieces(rendered, self.width):
+            self.write(part + '\n')
 
     def table(self, headers, records):
         records = [[plain(value) for value in row] for row in records]
@@ -190,7 +210,7 @@ class Output:
         self.line('时间均为北京时间 (UTC+08:00)')
         self.line('这次检索')
         for note in found['notes']:
-            self.field(note['item'], note['content'])
+            self.prose(note['item'] + ': ' + note['content'])
         if args.mode == 'exact':
             self.line('原文比较时 CR LF、单独的 CR、LF 视为相同，其余字符逐一比较。')
             form = found['exact'].get('line_breaks')
@@ -290,8 +310,11 @@ class Output:
         self.field('原文', note)
         raw = text['sql_text']
         self.field('原文总字符数', len(raw))
+        rendered, escaped = escape_controls(raw if full_text else raw[:TEXT_LIMIT], layout=True)
+        if escaped:
+            self.line(f'显示说明: 本段原文中的 {escaped} 个控制字符已用可见转义显示。')
         self.line('原文开始')
-        self.write(raw if full_text else raw[:TEXT_LIMIT])
+        self.write(rendered)
         self.write('\n')
         self.line('原文结束')
         if not full_text and len(raw) > TEXT_LIMIT:

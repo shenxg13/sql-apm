@@ -325,7 +325,13 @@ class Output:
                    f"指定原文（编号 {selected[0]['number']}）")
         self.field('其中当前身份、计时和时间内出现的原文数', sum(r['records'] > 0 for r in selected))
 
-    def originals(self, detail):
+    def originals(self, detail, interactive=True):
+        if not interactive:
+            selected = detail['identities'][detail['identity'] - 1]
+            self.field('身份', ' / '.join('未知' if selected[k] is None else str(selected[k])
+                                       for k in ('scope_id', 'database', 'execution_user')))
+            self.field('计时类别', detail['labels']['timing', detail['timing']])
+            self.field('范围', stamp(detail['start']) + ' 至 ' + stamp(detail['end']) + ' (右端不含)')
         self.line('原文列表：编号在本次检索的同一结构内保持不变。')
         self.original_scope(detail)
         self.line('记录数和最近执行时间按当前身份、计时及历史时间范围统计；0 表示此范围内没有记录。')
@@ -334,5 +340,9 @@ class Output:
             [(r['number'], '是' if r['matched'] else '否', r['records'], stamp(r['last_at']),
               r['differing'].replace(' ', '\\x20') if r['differing'].isspace() else r['differing'])
              for r in detail['originals'] if r['in_scope']])
-        self.line('v 编号 选择原文并看历史；f 查看所选原文全文；v matched 本次命中；v all 全部原文。')
+        if interactive:
+            self.line('v 编号 选择原文并看历史；f 查看所选原文全文；v matched 本次命中；v all 全部原文。')
+        else:
+            self.line('沿用检索输入及 --show 标记，用 --original 编号 选原文；matched 本次命中；all 全部原文。')
+            self.line('--view history 看历史；--view text 看全文。每次调用重新检索，编号须核对当前列表。')
         self.footer()

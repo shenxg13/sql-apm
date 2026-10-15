@@ -51,6 +51,27 @@ class InputTests(unittest.TestCase):
         args = arguments(['--start', '2026-07-01', '--end', '2026-07-02T00:00:00Z'])
         self.assertEqual(args.mode, 'words')
         self.assertEqual(args.start.utcoffset().total_seconds(), 28800)
+        for option, value in (('--history-start', '2026-07-01'), ('--history-end', '2026-07-02'),
+                              ('--history-order', 'slowest'), ('--original', 'all'), ('--view', 'text')):
+            with self.assertRaises(InputError):
+                arguments([option, value])
+        for options in (['--history-start', '2026-07-01'], ['--history-end', '2026-07-02'],
+                        ['--history-start', '2026-07-02', '--history-end', '2026-07-01'],
+                        ['--history-start', 'wrong', '--history-end', '2026-07-02'],
+                        ['--history-order', 'count'], ['--original', '0'], ['--original', '-1'],
+                        ['--original', 'x'], ['--original', '1.5'], ['--view', 'unknown'],
+                        ['--view', 'originals', '--full-text'], ['--view', 'history', '--full-text']):
+            with self.assertRaises(InputError):
+                arguments(['--show', '1', *options])
+        args = arguments(['--show', '1', '--start', '2026-07-20', '--end', '2026-07-21',
+                          '--history-start', '2026-07-01', '--history-end', '2026-07-02T00:00:00Z',
+                          '--original', '3', '--history-order', 'slowest', '--view', 'text', '--full-text'])
+        self.assertEqual(args.original, 3)
+        self.assertEqual(args.history_order, 'slowest')
+        self.assertEqual(args.view, 'text')
+        self.assertLess(args.history_end, args.start)
+        self.assertEqual(args.history_start.utcoffset().total_seconds(), 28800)
+        self.assertEqual(args.history_end.utcoffset().total_seconds(), 0)
         for mode, size in [('words', 256 * 1024), ('passage', 256 * 1024), ('exact', 512 * 1024)]:
             validate(b'x' * size, mode)
             with self.assertRaises(InputError):

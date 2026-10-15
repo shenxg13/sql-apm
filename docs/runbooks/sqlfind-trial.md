@@ -97,6 +97,22 @@ sqlfind
     `f` 只显示原文全文及编号／字符数等说明，不重复身份、基线和历史；单份选择显示该份，集合范围显示一份示例。
     较长原文仍完整显示，“原文开始／结束”间不插入输出边界或强制折行。
 
+非交互可按相同选择核对原文及历史。先查看原文列表，再使用列表中的编号；每次调用重新检索，数据变化可能改变编号。
+
+```bash
+./sqlfind --help
+./sqlfind 'select' --show 1 --view originals --original all
+./sqlfind 'select' --show 1 --original 1 --view text
+./sqlfind 'select' --show 1 --original 1 --view history --limit 100 \
+  --history-order slowest \
+  --history-start '2026-09-19 00:00:00' --history-end '2026-09-20 00:00:00'
+```
+
+`--help` 应分通用启动参数、非交互查询参数、进入交互模式，并说明在菜单中用 `?` 看详细操作。
+用交互的同一结构、身份、计时、原文、时间和排序对照结果；独立历史和原文列表须给出必要上下文，且没有操作编号或菜单。
+`--start`／`--end` 仍只筛选候选；历史时间用上述独立参数。省略 `--view` 仍打印整页详情，
+`--full-text` 只让详情原文不截断，`--view text` 才是单独全文。默认历史仍为最近一次执行往前 7 天、最新 20 条。
+
 一次输出也支持文件、管道和 here-document，例如：
 
 ```bash

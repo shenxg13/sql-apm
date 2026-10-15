@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6159484696
@@ -89,6 +91,9 @@ PuTTY 用户试用仍须按在线 Issue 留下确认，自动结果不代替用�
   `i` 身份组合、`t` 计时类别、原文与历史操作，以及回车、Ctrl-D、Ctrl-C 和退出的作用域。
   帮助不访问数据库，不改变当前菜单、筛选、排序、原文或身份／计时选择及历史设置，不分屏、不落盘。
   检索内容输入阶段的 `?` 按字面保留，不触发帮助；启动参数仍通过 `sqlfind --help` 查看。
+- 启动帮助分组（2026-10-15 用户确认）：`--help` 分通用启动参数、非交互查询参数、进入交互模式；
+  保留两种模式的启动示例，详细菜单操作由 `?` 提供。参数明确适用条件，区分候选时间与历史时间、
+  整页详情中的全文与单独全文输出。两种模式的原文与历史查询能力已按[检索主题](sql-search-and-views.md#sqlfind-候选与详情摘要2026-10-13)对齐。
 - 交互输出边界（2026-10-14 用户确认）：有实际输出的命令和检索提交有会话内递增操作编号、命令名及用途的开始标记，
   以相同编号的结束标记和空行收尾，再显示下一轮菜单。设置向导属于发起命令的同一段；失败和取消也说明原因并收尾。
   有效的方式选择（含默认回车和别名）、`n` 新检索、`q` 及列表／详情回车退出直接跳转或退出，不产生空段、不占编号。

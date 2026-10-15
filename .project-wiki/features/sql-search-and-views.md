@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162958350
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097
@@ -112,7 +114,20 @@ confidence: high
   数据库端复用已有共同前缀函数，仅返回差异片段，不把整批全文传给客户端；仅 v 时计算，取消／失败保留当前选择。
   差异超过 160 字符时显示前 100／后 50 字符并用 ASCII ` ... ` 标明省略；单份、空差异分别提示。
   换行／制表符可见转义，纯空白中的空格显示 `\x20`；不压缩成相同的空白摘要。原文编号、历史筛选和基线不变。
-- 交互可在候选、身份、计时和全文间切换；除交互输出起止标记及 `f` 专用输出外，默认历史范围、相同行数时内容与一次输出相同，
+- 非交互查询能力对齐（2026-10-15 用户[明确要求](https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357)）：
+  以下参数须提供检索输入并与 `--show` 一起使用；旧命令和默认行为保持兼容。
+  `--history-start`／`--history-end` 成对指定历史时间，格式、北京时间和左闭右开规则与 `h` 相同，开始须早于结束；
+  两项都省略时沿用默认 7 天，独立于候选的 `--start`／`--end`。
+  `--history-order latest|slowest` 与 `h` 的排序一致，默认 latest；`--limit` 仍为 1–1000。
+  `--original matched|all|编号` 与 `v` 的范围选择一致；省略时沿用默认规则，编号在当前结构目录中解析。
+  原文编号不存在或格式非法时拒绝；未出现过的逐条提示不能显式选择原文。每次调用重新查询，数据变化时不保证编号跨调用稳定。
+  `--view detail|originals|history|text` 默认 detail；分别输出整页详情、含差异的原文列表、历史及其上下文、原文全文及说明。
+  独立列表给结构、身份、计时和时间范围，末尾给参数指引；独立历史给结构、身份、计时、原文范围、时间、计数及排序。
+  text 与 `f` 使用相同全文显示，集合只取一份示例，无原文明确提示；其余无记录提示明确说明无执行记录。
+  `--full-text` 仍控制整页详情的原文截断，也可与 text 同用；与 originals／history 同用时拒绝。
+  原文选择、历史查询、差异与显示共用既有逻辑，基线仍是所选身份整个结构；不新增数据库函数或权限。
+  非交互不含交互菜单或操作编号，每次独立执行，不对应 `l/b/n/q`、会话保留或设置恢复。
+- 交互可在候选、身份、计时和全文间切换；除交互输出起止标记、`f` 及非交互选定内容的专用输出外，默认历史范围、相同行数时内容与一次输出相同，
   自定义范围的历史及计数与既有函数相同参数的结果一致。本轮不增加图、历史版本选择、
   非整体时间层、明细翻页、观察统计或列表排行。
 

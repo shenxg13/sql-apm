@@ -145,6 +145,8 @@ class Finder:
                     raise ValueError('invalid_mark')
                 candidates = self.candidates(cur, 'exact', hint['fingerprint'], args)
                 if not candidates:
+                    if original is not None:
+                        raise ValueError('no_originals')
                     return dict(hint=hint)
                 chosen = candidates[0]
             else:
@@ -172,6 +174,11 @@ class Finder:
             selected = identities[identity - 1]
             token = selected['identity']
             catalog = self.catalog(cur, found, chosen, args)
+            if isinstance(original, int):
+                selected_text = next((r for r in catalog if r['number'] == original), None)
+                if selected_text is None:
+                    raise ValueError('invalid_original')
+                original = selected_text['sql_id']
             original = original or ('matched' if chosen['matched_texts'] is not None else chosen['only_sql_id'] or 'all')
             scope = [r for r in catalog if original == 'all' or original == 'matched' and r['matched']
                      or original == r['sql_id']]

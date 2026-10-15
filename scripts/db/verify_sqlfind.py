@@ -151,6 +151,92 @@ def verify_differences(finder):
     print('PASS: full-text differences beyond 180 chars, common suffix, zero-count texts, whitespace, long/empty/single and scoped lists', flush=True)
 
 
+def verify_noninteractive(dsn, finder):
+    args = arguments([])
+    raw = b'orders 2026-06-26'
+    found = search(finder, raw, args)
+    default = finder.detail(found, '1', args)
+    single = next(r for r in default['originals'] if r['in_scope'])
+    alternate = next(n for n, r in enumerate(default['identities'], 1) if r['scope_id'] == 'C2')
+    other = finder.detail(found, '1', args, identity=alternate)
+    zero = next(r for r in other['originals'] if r['in_scope'] and not r['records'])
+    old = (time_value('2026-06-26'), time_value('2026-06-27'))
+    empty = (time_value('2030-01-01'), time_value('2030-01-02'))
+    # CLI parameters are compared with the same selections used by the existing
+    # interactive/function checks, including a different candidate time filter.
+    cases = [([], {}),
+             (['--original', 'matched', '--history-order', 'slowest', '--limit', '1'],
+              dict(original='matched', order='slowest', limit=1)),
+             (['--original', 'all', '--history-order', 'slowest', '--limit', '1000'],
+              dict(original='all', order='slowest', limit=1000)),
+             (['--original', str(single['number']), '--limit', '1000',
+               '--history-start', old[0].isoformat(), '--history-end', old[1].isoformat()],
+              dict(original=single['sql_id'], limit=1000, window=old)),
+             (['--original', str(zero['number']), '--identity', str(alternate), '--timing', 'request'],
+              dict(original=zero['sql_id'], identity=alternate, timing='request')),
+             (['--original', 'all', '--history-start', '2030-01-01', '--history-end', '2030-01-02'],
+              dict(original='all', window=empty))]
+    for width in (80, 200):
+        for options, settings in cases:
+            expected = finder.detail(found, '1', args, **settings)
+            assert expected['statistics'] == (other if settings.get('identity') == alternate else default)['statistics']
+            for view in ('detail', 'originals', 'history', 'text'):
+                done = command(dsn, ['--show', '1', '--width', str(width), '--view', view, *options], raw)
+                assert done.returncode == 0 and not done.stderr, (options, view, done.stdout[-500:])
+                actual = done.stdout.decode()
+                assert '========== 操作' not in actual and 'SQL 详情操作：' not in actual
+                stream = io.StringIO()
+                output = Output(width, stream)
+                if view == 'originals':
+                    output.originals(finder.originals(expected), interactive=False)
+                    assert '结构指纹:' in actual and '身份:' in actual and '范围:' in actual
+                    assert '\nv 编号 ' not in actual
+                elif view == 'history':
+                    output.history(expected)
+                    assert '结构指纹:' in actual
+                elif view == 'text':
+                    output.original_text(expected)
+                else:
+                    output.detail(expected)
+                assert stream.getvalue().strip() in actual, (options, view)
+                if view != 'detail':
+                    assert '\n当前基线\n' not in actual and '身份 (* 表示当前所选)' not in actual
+                if view in ('originals', 'history'):
+                    assert '原文开始\n' not in actual
+                    assert all(cells(line) <= width for line in actual.splitlines())
+                if view == 'text':
+                    assert actual.split('原文开始\n', 1)[1].split('\n原文结束', 1)[0] == expected['text']['sql_text']
+                    assert '\n执行历史\n' not in actual
+        # Candidate filtering and historical time filtering must stay independent.
+        filters = ['--cluster', 'C1', '--start', '2026-07-23', '--end', '2026-07-24']
+        scoped_args = arguments(filters)
+        scoped = search(finder, raw, scoped_args)
+        historic = finder.detail(scoped, '1', scoped_args, window=old, order='slowest', limit=1000)
+        assert historic['executions'] and historic['end'] < scoped_args.start
+        result = command(dsn, [*filters, '--show', '1', '--view', 'history', '--width', str(width),
+            '--history-start', '2026-06-26', '--history-end', '2026-06-26T16:00:00Z',
+            '--history-order', 'slowest', '--limit', '1000'], raw)
+        stream = io.StringIO()
+        Output(width, stream).history(historic)
+        assert result.returncode == 0 and stream.getvalue().strip() in result.stdout.decode()
+        # Long full text and the old --full-text detail behavior remain distinct.
+        text = command(dsn, ['--show', '1', '--view', 'text', '--width', str(width)], b'big_list')
+        assert text.returncode == 0 and data.LONG in text.stdout.decode()
+        full = command(dsn, ['--show', '1', '--full-text', '--width', str(width)], b'big_list')
+        assert full.returncode == 0 and data.LONG in full.stdout.decode() and '当前基线' in full.stdout.decode()
+        # The real difference list must include values beyond the shared prefix.
+        differences = command(dsn, ['--show', '1', '--view', 'originals', '--width', str(width)], b'preview_differences')
+        assert differences.returncode == 0
+        displayed = differences.stdout.decode()
+        assert 'alpha' in displayed and 'beta' in displayed and 'shared-prefix' not in displayed
+        for view in ('originals', 'history', 'text'):
+            missing = command(dsn, ['--mode', 'exact', '--show', 's1', '--view', view],
+                              b'SELECT absent_column_a; SELECT absent_column_b;')
+            assert missing.returncode == 0 and not missing.stderr
+            assert ('没有可查看的原文' if view == 'text' else '没有可查看的执行记录') in missing.stdout.decode()
+    print('PASS: noninteractive history/original/view options, shared results, independent windows, long text, differences, zero records and empty hints', flush=True)
+
+
 def verify(pg_bin):
     with instance(pg_bin) as (directory, env):
         v = Verification(pg_bin, directory, env)
@@ -174,6 +260,7 @@ def verify(pg_bin):
         finder = Finder(dsn + '_ro', 'sql_apm')
         verify_originals(finder)
         verify_differences(finder)
+        verify_noninteractive(dsn + '_ro', finder)
         for mode, text in [('words', 'orders status'), ('passage', 'from orders'), ('exact', data.BUSY.format(status=1, day='2026-06-26')),
                            ('exact', data.LATER), ('exact', data.EXTENDED), ('exact', data.UNBASED_MIXED),
                            ('exact', 'SELECT v FROM absent_here'), ('exact', 'not a sql'),
@@ -291,6 +378,10 @@ def verify(pg_bin):
                 expected = rows(cur, 'mpp_view_search', [finder.norm, 'words', 'orders', 'C1', 'shop', 'app_user', args.start, args.end, order])
                 assert [{k: row[k] for k in expected[0]} for row in found['candidates']] == expected
         for options, raw in [(['--show', '999'], b'orders'), (['--full-text'], b'orders'),
+                             (['--show', '1', '--original', '999999'], b'orders'),
+                             (['--show', '1', '--view', 'history', '--history-start', '2026-07-01'], b'orders'),
+                             (['--mode', 'exact', '--show', 's1', '--original', '1'],
+                              b'SELECT absent_column_a; SELECT absent_column_b;'),
                              (['--show', '1', '--identity', '999'], b'orders'),
                              (['--show', '1', '--timing', 'parse'], b'orders'), ([], b''), (['--limit', '0'], b'orders')]:
             done = command(dsn + '_ro', options, raw)

@@ -34,54 +34,76 @@ class Parser(argparse.ArgumentParser):
 
 
 def parser():
-    result = Parser(prog='sqlfind', add_help=False, formatter_class=argparse.RawDescriptionHelpFormatter,
-        description='SQL 检索：给出输入后打印一次；不带输入且输入输出都是终端时进入交互。',
-        epilog='''输入来源三选一：命令行参数、--file 文件、标准输入（管道或重定向）。
-文件和标准输入按 UTF-8 原始字节读取，保留首尾空白及换行。
-交互按词输入一行后回车；整段和完整 SQL 粘贴后回车、Ctrl-D 结束。
-方式选择、结果列表和详情菜单输入 ? 查看交互帮助，保留当前选择和设置。
-交互有实际输出的操作带编号及起止标记；选择方式、新检索及退出不产生空段。
-f 只显示当前原文全文，不刷新身份、基线和历史。
-交互列表输入 o 选择记录数最多或最近执行；详情 v 列原文，v 编号 选原文，f 看全文。
-v matched 看本次命中原文的历史，v all 看整个结构；历史表原文编号可追到具体 SQL。
-详情 h 设置历史条数（1～1000）、时间与最新／最慢排序；设置仅在本次会话保留。
-历史设置中 r 恢复20条、默认7天和最新排序，q 或 Ctrl-C 取消；不改变当前基线。
-Ctrl-C 取消当前步骤或查询；操作提示中 q 退出，不分屏，可用鼠标滚轮回看。
-时间均为北京时间；--start/--end 不带时区时按北京时间，结束时间不包含。
-
-例子：
+    result = Parser(prog='sqlfind', add_help=False, formatter_class=argparse.RawTextHelpFormatter,
+        description='SQL 检索：给出检索输入后打印一次；不带输入且输入输出都是终端时进入交互。',
+        epilog='''非交互示例：
   sqlfind 'orders status'
   sqlfind --mode passage --file query.sql
+  sqlfind orders --show 1 --view originals --original all
+  sqlfind orders --show 1 --original 3 --view text
+  sqlfind orders --show 1 --view history --limit 100 --history-order slowest
+  sqlfind orders --show 1 --view history \\
+    --history-start '2026-09-19 00:00:00' --history-end '2026-09-20 00:00:00'
   sqlfind --mode exact --show 1 --full-text <<'SQL'
 SELECT id, name
 FROM orders WHERE status = 'ready';
 SQL
-  sqlfind --mode exact
 
-先由登录账号执行 scripts/sqlfind/configure.py install 配置只读连接与登录入口。
---show 会重新检索；标记可能随新导入变化，可直接输入结构指纹来固定对象。
+进入交互模式：
+  sqlfind                 选择检索方式后输入内容
+  sqlfind --mode exact    直接输入完整 SQL
+  sqlfind --order recent  初始候选排序为最近执行
+  不带检索输入，且标准输入和输出都是终端时进入交互。
+  通用参数作为初始设置；身份、计时、原文和历史条件在交互菜单中选择。
+  方式选择、结果列表和详情菜单输入 ? 查看详细交互帮助。
+  Ctrl-C 取消当前步骤或查询；菜单中 q 退出，可用滚轮回看输出。
+
+说明：
+  时间不带时区时按北京时间，包含开始、不包含结束。
+  --start/--end 筛选候选；--history-start/--history-end 筛选执行历史。
+  历史条件和原文选择不改变当前结构的基线。
+  --full-text 仍输出整页详情；--view text 只输出完整原文及其说明。
+  --show 每次重新检索；数据变化可能改变候选和原文编号。
+  可输入完整结构指纹固定 SQL 结构；原文编号须核对本次原文列表。
+  先由登录账号执行 scripts/sqlfind/configure.py install 配置只读连接。
 ''')
-    result._positionals.title = '输入'
-    result._optionals.title = '选项'
-    result.add_argument('-h', '--help', action='help', help='显示中文帮助')
-    result.add_argument('input', nargs='?', help='要检索的内容，可含多行')
-    result.add_argument('--file', type=Path, help='从文件读取内容')
-    result.add_argument('--mode', choices=['words', 'passage', 'exact'],
-        help='words 按空白切词且全部出现（默认，最多20词）；passage 整段连续出现；exact 完整SQL结构相同')
-    result.add_argument('--cluster', help='集群筛选')
-    result.add_argument('--database', help='数据库筛选')
-    result.add_argument('--user', help='执行用户筛选')
-    result.add_argument('--start', help='候选检索开始时间，包含；交互历史时间用 h 设置')
-    result.add_argument('--end', help='候选检索结束时间，不包含；交互历史时间用 h 设置')
-    result.add_argument('--order', choices=['count', 'recent'], default='count', help='count 记录数最多；recent 最近执行')
-    result.add_argument('--schema', help='数据库 schema，默认配置值或 sql_apm')
-    result.add_argument('--show', help='只显示标记的详情，如 1 或 s1')
-    result.add_argument('--identity', type=int, help='详情身份序号，仅与 --show 一起使用')
-    result.add_argument('--timing', choices=['request', 'execute_first', 'execute_fetch', 'parse', 'bind', 'unknown'],
-        help='详情计时类别：请求整体、Execute首次、Execute续取、Parse、Bind、无计时；仅与 --show 一起使用')
-    result.add_argument('--limit', type=int, help='最近执行行数，默认20，范围1到1000；仅与 --show 一起使用')
-    result.add_argument('--full-text', action='store_true', help=f'打印原文全文，默认最多{TEXT_LIMIT}字符；仅与 --show 一起使用')
-    result.add_argument('--width', type=int, help='输出到管道或文件的宽度，默认100，最小20；终端随窗口')
+    common = result.add_argument_group('通用启动参数',
+        '检索方式、筛选、候选排序和连接设置适用于两种模式。\n'
+        '输入来源三选一：命令行内容、--file 文件、标准输入（管道或重定向）。\n'
+        '文件和标准输入按 UTF-8 原样读取，保留首尾空白及换行。')
+    common.add_argument('-h', '--help', action='help', help='显示启动参数帮助并退出')
+    common.add_argument('input', nargs='?', help='提供检索内容后打印一次，可含多行')
+    common.add_argument('--file', type=Path, metavar='FILE', help='从文件读取检索内容后打印一次')
+    common.add_argument('--mode', choices=['words', 'passage', 'exact'], metavar='MODE',
+        help='words 按词（默认，每词都出现，最多20词）\npassage 整段连续出现；exact 完整 SQL 结构相同')
+    common.add_argument('--cluster', metavar='NAME', help='集群筛选')
+    common.add_argument('--database', metavar='NAME', help='数据库筛选')
+    common.add_argument('--user', metavar='NAME', help='执行用户筛选')
+    common.add_argument('--start', metavar='TIME', help='候选检索开始时间，包含；不设置历史时间')
+    common.add_argument('--end', metavar='TIME', help='候选检索结束时间，不包含；不设置历史时间')
+    common.add_argument('--order', choices=['count', 'recent'], default='count', metavar='ORDER',
+        help='候选排序：count 记录数最多（默认）\nrecent 最近执行；交互中可用 o 调整')
+    common.add_argument('--schema', metavar='NAME', help='数据库 schema，默认配置值或 sql_apm')
+    common.add_argument('--width', type=int, metavar='N', help='管道或文件输出宽度，默认100，最小20\n终端输出随窗口宽度')
+    query = result.add_argument_group('非交互查询参数',
+        '须提供检索输入；默认输出候选列表，--show 选择一项查看。\n'
+        '以下其余参数均须与 --show 一起使用。')
+    query.add_argument('--show', metavar='MARK', help='选择候选或逐条提示，如 1 或 s1')
+    query.add_argument('--identity', type=int, metavar='N', help='选择详情身份表中的序号')
+    query.add_argument('--timing', metavar='CODE',
+        choices=['request', 'execute_first', 'execute_fetch', 'parse', 'bind', 'unknown'],
+        help='request 请求整体；execute_first Execute首次\nexecute_fetch Execute续取；parse 解析\nbind 绑定；unknown 无计时')
+    query.add_argument('--limit', type=int, metavar='N', help='历史显示条数，默认20，范围1到1000')
+    query.add_argument('--history-start', metavar='TIME', help='历史开始时间，包含；须与结束时间成对提供')
+    query.add_argument('--history-end', metavar='TIME', help='历史结束时间，不包含；省略两项则默认7天\n默认7天从所选身份最近一次执行向前计算')
+    query.add_argument('--history-order', choices=['latest', 'slowest'], metavar='ORDER',
+        help='历史排序：latest 最新（默认）；slowest 最慢')
+    query.add_argument('--original', metavar='SCOPE',
+        help='matched 本次命中；all 全部原文；或原文编号\n省略时按词/整段选命中集合\n完整 SQL 有一字不差原文时选该份，否则选全部\n按指纹查找时选全部原文')
+    query.add_argument('--view', choices=['detail', 'originals', 'history', 'text'], metavar='VIEW',
+        help='detail 整页详情（默认）；originals 原文列表\nhistory 仅历史；text 仅全文（集合取一份示例）')
+    query.add_argument('--full-text', action='store_true',
+        help=f'详情原文不截断，默认上限{TEXT_LIMIT}字符\n仍输出整页详情；不能与 originals/history 同用')
     return result
 
 
@@ -99,8 +121,10 @@ def arguments(argv):
     args = parser().parse_args(argv)
     args.mode_given = args.mode is not None
     args.mode = args.mode or 'words'
-    if not args.show and (args.identity is not None or args.timing is not None or args.limit is not None or args.full_text):
-        raise InputError('--identity、--timing、--limit、--full-text 只能与 --show 一起使用。')
+    detail_options = (args.identity, args.timing, args.limit, args.history_start, args.history_end,
+                      args.history_order, args.original, args.view)
+    if not args.show and (any(value is not None for value in detail_options) or args.full_text):
+        raise InputError('身份、计时、历史、原文、输出内容及全文参数只能与 --show 一起使用。')
     if args.identity is not None and args.identity < 1:
         raise InputError('身份序号必须从 1 起。')
     if args.limit is not None and not 1 <= args.limit <= 1000:
@@ -110,6 +134,17 @@ def arguments(argv):
     args.start, args.end = time_value(args.start), time_value(args.end)
     if args.start and args.end and args.start >= args.end:
         raise InputError('开始时间必须早于结束时间。')
+    if (args.history_start is None) != (args.history_end is None):
+        raise InputError('--history-start 和 --history-end 必须成对提供。')
+    args.history_start, args.history_end = time_value(args.history_start), time_value(args.history_end)
+    if args.history_start is not None and args.history_start >= args.history_end:
+        raise InputError('历史开始时间必须早于结束时间。')
+    if args.original is not None and args.original not in ('matched', 'all'):
+        if not args.original.isascii() or not args.original.isdecimal() or int(args.original) < 1:
+            raise InputError('--original 必须是 matched、all 或从 1 开始的原文编号。')
+        args.original = int(args.original)
+    if args.full_text and args.view in ('originals', 'history'):
+        raise InputError('--full-text 不能与 --view originals 或 history 一起使用。')
     return args
 
 
@@ -192,7 +227,8 @@ def failure(error):
         return '无法读取输入或配置文件，请检查路径和权限。'
     return {'invalid_identity': '身份序号不存在，请查看身份表中的可用序号。',
             'invalid_timing': '该身份没有所选计时类别，请查看可用计时类别。',
-            'invalid_original': '原文编号不存在，请输入 v 查看原文列表。',
+            'invalid_original': '原文编号不存在，请查看原文列表：交互用 v，非交互用 --show 标记 --view originals。',
+            'no_originals': '该提示没有可选择的原文。',
             'records_changed': '检索结果已变化，请重新检索。'}.get(str(error), '输入或配置无效，请检查后重试。')
 
 
@@ -200,7 +236,7 @@ ERRORS = (InputError, IngestionError, psycopg2.Error, OSError, ValueError, TypeE
 
 
 def show(finder, found, mark, args, output, identity=None, timing=None, full=False, history=None,
-         history_only=False, original=None, original_window=None):
+         history_only=False, original=None, original_window=None, view='detail'):
     valid = [str(i) for i in range(1, len(found['candidates']) + 1)] + ['s' + str(h['statement']) for h in found['hints']]
     if mark not in valid:
         raise InputError('标记不存在，可用标记: ' + (', '.join(valid) if valid else '无') + '。')
@@ -211,6 +247,16 @@ def show(finder, found, mark, args, output, identity=None, timing=None, full=Fal
     detail['window_kept'] = original_window is not None
     if history_only and 'hint' not in detail:
         output.history(detail)
+    elif view == 'text':
+        output.original_text(detail)
+        output.footer()
+    elif view in ('originals', 'history') and 'hint' not in detail:
+        output.line('时间均为北京时间 (UTC+08:00)')
+        output.field('结构指纹', detail['candidate']['fingerprint'])
+        if view == 'history':
+            output.history(detail)
+        else:
+            output.originals(finder.originals(detail), interactive=False)
     else:
         output.detail(detail, full)
     return detail
@@ -653,7 +699,10 @@ def main(argv=None):
             return interactive(finder, args, output)
         found = search(finder, raw, args)
         if args.show:
-            show(finder, found, args.show, args, output, args.identity, args.timing, args.full_text)
+            history = dict(limit=args.limit or 20, order=args.history_order or 'latest',
+                           window=(args.history_start, args.history_end) if args.history_start is not None else None)
+            show(finder, found, args.show, args, output, args.identity, args.timing, args.full_text,
+                 history=history, original=args.original, view=args.view or 'detail')
         else:
             output.candidates(found, args)
         return 0

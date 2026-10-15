@@ -471,6 +471,7 @@ def verify_history(dsn, owner):
 
 
 def verify_drilldown(dsn, owner):
+    from verify_sqlfind import command
     from sql_apm.cli.sqlfind import arguments, search
     from sql_apm.cli.sqlfind_output import Output
     from sql_apm.storage.sqlfind import Finder
@@ -540,7 +541,13 @@ def verify_drilldown(dsn, owner):
                 term.until(marker)
                 term.send(value + '\n')
             slow = finder.detail(found, '1', args, limit=1000, order='slowest')
-            compare(term.until(prompt), slow)
+            displayed = term.until(prompt)
+            compare(displayed, slow)
+            cli = command(dsn, ['--show', '1', '--view', 'history', '--order', 'recent',
+                               '--limit', '1000', '--history-order', 'slowest', '--width', str(width)],
+                          b'orders 2026-06-26')
+            assert cli.returncode == 0
+            assert cli.stdout.decode().split('执行历史\n', 1)[1].strip() in displayed
             number = slow['executions'][0]['original_number']
             original = slow['executions'][0]['sql_id']
             frozen = (slow['start'], slow['end'])
@@ -555,6 +562,9 @@ def verify_drilldown(dsn, owner):
             rendered = check_full_text(term, single, width)
             owner.rollback()
             assert single['text']['sql_text'] in rendered
+            cli = command(dsn, ['--show', '1', '--view', 'text', '--original', str(number),
+                               '--order', 'recent', '--width', str(width)], b'orders 2026-06-26')
+            assert cli.returncode == 0 and cli.stdout.decode().strip() in rendered
             term.send('v 999999\n')
             assert '原文编号不存在' in term.until(prompt)
             term.send('v\n')

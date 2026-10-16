@@ -94,7 +94,9 @@ confidence: high
 开发机制包见[准备报告](../../docs/reports/v110-preparation-2026-10-16.md)；
 [Kylin 部分样本验证](../../docs/reports/v110-target-validation-2026-10-16.md)已完成配置、使用说明示例、交互和看板数值比对。
 最多 10,416 份原文的结构，三次伪终端测量的详情／v 中位数为 1.093348／1.498511 秒；
-仅代表本轮部分样本，不含 PuTTY 网络／渲染或全量数据。PuTTY 用户验收和正式发布仍待完成。
+仅代表本轮部分样本，不含 PuTTY 网络／渲染或全量数据。
+2026-10-16 用户已确认完成本轮 PuTTY 80×24／最大化试用及手册检查，
+见[人工确认](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219052514)；正式发布仍待完成。
 
 ### sqlfind 运维入口（2026-10-13）
 

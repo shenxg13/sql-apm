@@ -331,7 +331,10 @@ source mpp-120 mdw-example-120 /data/sql-apm/inbox/120
 `expire_hours` 可省略，默认 24，允许 1–9999 的整数小时。配置只按文本读取，不执行。
 
 **首次补齐。** master 当前保留 25 天，首次把 `pushDays` 设为 **23 或 24**，比保留期少一两天，
-避免推送中 MPP 清掉最旧一天而使整次推送失败。手工执行一次平台计划，成功后以 `sfmon` 运行：
+避开最旧一天的清理窗口。这是保守的操作建议：若列出文件后、复制前恰好遇到 MPP 清理，推送可能失败。
+`pushDays` 只筛选昨天到前 N 天实际存在的日志，缺日期不算失败，今天始终排除；
+填 30 可以推送该范围内现存的历史日志，不要求 master 保留满 30 天。
+手工执行一次平台计划，成功后以 `sfmon` 运行：
 
 ```bash
 SQL_APM_PYTHON=/data/sql-apm/app/.venv/bin/python daily/intake-logs.sh --config /data/sql-apm/config/intake-logs.conf

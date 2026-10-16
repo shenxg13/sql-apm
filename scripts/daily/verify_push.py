@@ -130,8 +130,9 @@ def push_checks(box, ok):
     duplicate = box.directory / 'duplicate'
     duplicate.mkdir()
     shutil.copy2(rotated, duplicate / rotated.name)
-    done, _ = box.push(source=str(source) + ' ' + str(duplicate))
-    assert done.returncode != 0 and box.calls.read_text() == ''
+    for separator in (' ', '\n'):
+        done, _ = box.push(source=str(source) + separator + str(duplicate))
+        assert done.returncode != 0 and box.calls.read_text() == ''
     ok('U3-U4 duplicate names, empty destination fields and invalid days refuse before any SSH connection')
 
     rotated.chmod(0)

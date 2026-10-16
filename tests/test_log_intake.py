@@ -249,6 +249,7 @@ raise SystemExit(m.main())
         self.assertFalse((self.inbox / (DAY + '.complete')).exists())
 
 
+@unittest.skipUnless(importlib.util.find_spec('psycopg2'), 'requires the PostgreSQL driver used by the unit-file generator')
 class UnitOrderTests(unittest.TestCase):
     def test_optional_precommands_order_and_missing_config(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -30,7 +30,7 @@ master=$(hostname) || exit $?
 
 # Freeze names and sizes before connecting. Whitespace separates directories, as
 # in the original template. Globs are used only to list files, never to write.
-read -r -a backupArray <<<"$backupFilePath"
+read -r -a backupArray <<<"${backupFilePath//$'\n'/ }"
 files=() sizes=()
 declare -A seen=() dayCount=() dayBytes=()
 shopt -s nullglob

@@ -28,16 +28,19 @@ today=$(date +%F) || exit $?
 first=$(date -d "$today - $pushDays days" +%F) || exit $?
 master=$(hostname) || exit $?
 
-# Freeze names and sizes before connecting. Whitespace separates directories, as
-# in the original template. Globs are used only to list files, never to write.
-read -r -a backupArray <<<"${backupFilePath//$'\n'/ }"
+# Split whitespace entirely in memory, including on Bash 5.0 and older. Unlike
+# the original template, input paths are literal: do not expand their wildcards.
+IFS=$' \t\n'
+set -f
+# shellcheck disable=SC2206 # Intentional whitespace splitting, with globbing off.
+backupArray=($backupFilePath)
+set +f
 files=() sizes=()
 declare -A seen=() dayCount=() dayBytes=()
 shopt -s nullglob
 for pathStr in "${backupArray[@]}"; do
     if [[ ! -d $pathStr ]]; then
-        echo "path:$pathStr does not exist.Continue to backup the next path."
-        continue
+        fail "path:$pathStr does not exist or is not a directory"
     fi
     echo "------------backup path:$pathStr start------------------------------"
     for file in "$pathStr"/gpdb-*.csv*; do
@@ -90,8 +93,12 @@ done
 printf '%s' "$manifest" | remote "cat > $quoted/push.complete.tmp && mv -f $quoted/push.complete.tmp $quoted/push.complete"
 exitCode=$?
 [[ $exitCode == 0 ]] || fail 'completion marker write failed' "$exitCode"
-for day in "${!dayCount[@]}"; do
-    echo "date=$day state=pushed files=${dayCount[$day]} bytes=${dayBytes[$day]}"
+day=$first
+while [[ $day < $today ]]; do
+    if [[ ${dayCount[$day]+present} ]]; then
+        echo "date=$day state=pushed files=${dayCount[$day]} bytes=${dayBytes[$day]}"
+    fi
+    day=$(date -d "$day + 1 day" +%F) || exit $?
 done
 echo "state=complete today=$today pushDays=$pushDays files=${#files[@]} bytes=$total"
 exit 0

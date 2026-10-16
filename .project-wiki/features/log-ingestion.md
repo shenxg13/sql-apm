@@ -6,6 +6,10 @@ owners:
   - .project-wiki/features/log-ingestion.md
 updated: 2026-10-16
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207653317
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207662845
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207176211
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65
@@ -298,16 +302,21 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
 
 来源：[Issue #65](https://github.com/shenxg13/sql-apm/issues/65) 及其
 [确认记录](https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6206510522)，状态 current。
+2026-10-16 的[范围变更](https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207653317)及
+[观察项采用](https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207662845)确认无效源目录失败、日期汇总顺序和收取错误说明。
 用户确认 master 每天通过备份平台推送，SQL APM 服务器仅为落地机。以下是已确认要求；
 开发机验证与 U18 用户确认分别见[验证报告](../../docs/reports/log-push-2026-10-16.md)，
 不代表生产平台或离线包已经交付。
 
 - **平台模板。** 在公用“文件备份到中转机_Linux V1.0”的副本上作最小改动，保留内置和原入参名字及逐步失败退出；
   不改公用模板。master 上只列目录、读取日志和元数据，不创建、修改或删除任何文件，包括临时文件。
+  实现按空白在内存拆分目录参数，禁用参数中的通配符展开；旧版 Bash 也不能通过 here-string／here-document 创建临时文件。
   `appUser` 仍是 master 执行 ssh/scp 的账号，落地登录改成 `sfmon`。
 - **推送集合。** `pushDays` 为空默认 7，正整数上限由实现定为 366；只推 master 昨天到前 N 天、符合
   `gpdb-YYYY-MM-DD_HHMMSS.csv[.N]` 的普通文件，排除今天和子目录。缺一天不算失败；多目录同名文件在连接前拒绝。
-  文件平铺、`scp -p` 保留属性。平台输出日期、文件数、字节数及错误原因。
+  所列任一目录不存在或不是目录时，连接前非零退出并打印该路径；替代原模板跳过错误目录后继续的行为。
+  存在的空目录或未选出文件的目录仍成功并发布空清单。
+  文件平铺、`scp -p` 保留属性。平台按日期从旧到新输出文件数、字节数，另输出总数及错误原因。
 - **落地。** 两集群共用预建、属主为 `sfmon` 的根目录，示例 `/data/sql-apm/landing`；在接收目录之外且同一文件系统。
   推送目录为根目录／bucket／每次新生成的多级 dest_path。三项为空先退出；远端 `mkdir -p` 和 `rm -fr 推送目录/*` 保留。
   删除以 `sfmon` 权限执行，操作者不得把根目录填为接收目录、其上级或程序目录。
@@ -317,6 +326,7 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
 - **收取。** 独立脚本以 `sfmon` 运行，配置落地根及来源名称／master 主机名／接收目录；目录相同或互含时拒绝。
   同一落地根只运行一个收取进程。在任意深度找正式标志，不跟随链接、不出根目录，按 master 今天从旧到新处理。
   核对格式、已配置主机、普通文件与大小及没有额外日志；未知主机每次报告，不使用也不删除。
+  查找失败输出具体业务原因或系统错误名和说明，保留受影响目录，继续处理其他可访问的推送并返回 1。
 - **逐天移入。** 只处理 SQL APM 今天之前的日期。有齐全标记的不改，同名大小差异只报告。
   无文件时同文件系统改名移入所有文件，再放标记；有文件无标记时，每个已有文件须在清单且大小相同才补入剩余文件。
   为支持中断，已移入且大小相同的普通文件可替代推送目录里缺失的清单文件；其他缺失仍拒绝。

@@ -146,9 +146,13 @@
 [MPP 端推送](../runbooks/daily-run.md#mpp-端推送)。实现不进入 `sql_apm/`，不改产品命令或数据库。
 
 - master 端先在内存冻结名称和大小、检查重复，再执行原模板的远端建目录／清空、逐文件 `scp -p`、最后发布清单。
-  清单经 stdin 发送给远端，不在 master 创建临时文件；原模板逐段对照见[验证报告](../reports/log-push-2026-10-16.md)。
+  目录参数在关闭 glob 时按空白拆为数组，全程驻内存；不用 Bash 5.0 及以下会写临时文件的 here-string／here-document。
+  与原模板的数组赋值不同，目录参数不展开通配符；所列任一目录不存在或不是目录，在连接前失败并打印路径，不再跳过。
+  存在但没有选中文件的目录仍正常成功。清单经 stdin 发送给远端，不在 master 创建临时文件。
+  成功汇总按日期从旧到新输出，以有界日期循环避免外部排序可能使用的临时文件；原模板逐段对照及旧 Bash 验证见[报告](../reports/log-push-2026-10-16.md)。
 - 收取以落地根目录的文件描述符持有非阻塞 `flock`，因此同根目录的不同配置也不能并发收取。
   搜索和清理逐层使用 `O_DIRECTORY | O_NOFOLLOW` 的目录描述符，不跟随链接，不跨子挂载点。
+  查找错误保留业务原因（如 `nested_filesystem`）或系统错误名及说明（如 `EACCES`），继续处理其他可访问的推送并返回 1。
 - 先核对整份清单再移入。已经改名到接收目录的同名同大小普通文件，是缺失源文件唯一的恢复例外；
   未标记日期已有的每个文件须属于清单且大小相同，才允许续做。
   每次移动调用 Linux `renameat2(RENAME_NOREPLACE)`，不复制，不覆盖；不支持该操作时明确失败，不降级成复制或覆盖。
@@ -171,6 +175,7 @@
 | `scripts/db/verify.py` | 含 1.11.0 带数据升级到 1.12.0（`tests/database/daily_migration.py`） | PostgreSQL 17 |
 | `scripts/daily/verify_fetch.py --sshd-root DIR` | 传输脚本对回环地址上的真实 sshd | 解包的 `openssh-server` |
 | `python -m unittest discover -s tests -p test_log_intake.py` | 收取失败、原子移入、中断续做、清理与目录边界 | Linux |
+| `python -m unittest discover -s tests -p test_log_push.py` | 无隐式临时文件语法、多目录与完整清单、无效路径连接前失败、日期顺序；旧 Bash 隔离复验见报告 | Bash、Linux |
 | `scripts/daily/verify_push.py --sshd-root DIR --timer` | 推送模板、master 快照、24 天首批、故障补齐、人工输入对照及用户定时启动 | 私有 sshd、PG17、systemd 用户管理器 |
 | `scripts/daily/verify_timer.py [--sshd-root DIR]` | 用户级 systemd 上的定时器行为，约 13 分钟 | systemd 用户管理器 |
 | `scripts/grafana/verify_status_e2e.py --directory DIR` | 无界面浏览器核对运行状态看板，含九类待处理问题 | `setup_dev.py synthetic` 的环境和 #51 准备的浏览器 |

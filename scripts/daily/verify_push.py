@@ -109,6 +109,8 @@ def push_checks(box, ok):
         assert text.startswith('SQL_APM_PUSH\t1\nhost\tmaster-a\ntoday\t%s\ndays\t%s\n' % (today, days or 7))
         for name in expected:
             assert 'file\t%s\t%d\n' % (name, (source / name).stat().st_size) in text
+        summaries = [line.split()[0][5:] for line in done.stdout.splitlines() if line.startswith('date=')]
+        assert summaries == sorted({name[5:15] for name in expected}), summaries
         assert 'cat > ' in box.calls.read_text() and '/push.complete.tmp ' in box.calls.read_text()
         assert ' && mv -f ' in box.calls.read_text()
         assert snapshot(source) == before
@@ -134,6 +136,12 @@ def push_checks(box, ok):
         done, _ = box.push(source=str(source) + separator + str(duplicate))
         assert done.returncode != 0 and box.calls.read_text() == ''
     ok('U3-U4 duplicate names, empty destination fields and invalid days refuse before any SSH connection')
+
+    for bad in (box.directory / 'missing-source', source / 'notes.txt'):
+        for paths in ((bad, source), (source, bad)):
+            done, _ = box.push(source=' '.join(map(str, paths)))
+            assert done.returncode != 0 and str(bad) in done.stdout and box.calls.read_text() == ''
+    ok('O-65-001 missing and non-directory sources refuse before SSH, including one bad path among valid paths')
 
     rotated.chmod(0)
     done, destination = box.push()

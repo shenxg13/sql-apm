@@ -179,7 +179,8 @@ def find_pushes(root):
                         raise Invalid('nested_filesystem')
                     walk(child, parts + (name,))
             except (OSError, Invalid) as exc:
-                say(push='/'.join(parts + (name,)), state='failed', reason=type(exc).__name__)
+                reason = str(exc) if isinstance(exc, Invalid) else '%s:%s' % (errno.errorcode.get(exc.errno, 'OS_ERROR'), exc)
+                say(push='/'.join(parts + (name,)), state='failed', reason=reason)
                 failed = True
 
     walk(root, ())

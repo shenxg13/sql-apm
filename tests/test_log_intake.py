@@ -1,6 +1,7 @@
 """Destructive boundaries and interrupted receiving, using synthetic files only."""
 from contextlib import redirect_stdout
 from datetime import date, timedelta
+import errno
 import fcntl
 import importlib.util
 import io
@@ -13,6 +14,7 @@ import tempfile
 import time
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('intake', ROOT / 'daily/intake_logs.py')
@@ -121,6 +123,36 @@ class IntakeTests(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn('unknown_host', output)
             self.assertTrue(pushed.exists())
+
+    def test_discovery_errors_report_cause_and_continue_other_pushes(self):
+        blocked = self.push('blocked')
+        real_descend = intake.descend
+        def deny(root, parts):
+            if parts == ('blocked',):
+                raise PermissionError(errno.EACCES, os.strerror(errno.EACCES), 'blocked')
+            return real_descend(root, parts)
+        self.push('valid')
+        with patch.object(intake, 'descend', deny):
+            code, output = self.run_intake(90000)
+        self.assertEqual(code, 1, output)
+        self.assertIn('push=blocked state=failed reason=EACCES:', output)
+        self.assertIn('Permission\\x20denied', output)
+        self.assertTrue(blocked.exists())
+        self.assertTrue((self.inbox / (DAY + '.complete')).exists())
+
+    def test_discovery_nested_filesystem_reports_specific_reason(self):
+        pushed = self.push('mounted')
+        inode = pushed.stat().st_ino
+        real_fstat = os.fstat
+        def other_device(fd):
+            info = real_fstat(fd)
+            return SimpleNamespace(st_dev=info.st_dev + 1) if info.st_ino == inode else info
+        with patch.object(intake.os, 'fstat', other_device):
+            code, output = self.run_intake(90000)
+        self.assertEqual(code, 1, output)
+        self.assertIn('push=mounted state=failed reason=nested_filesystem', output)
+        self.assertTrue(pushed.exists())
+        self.assertEqual(list(self.inbox.iterdir()), [])
 
     def test_no_overwrite_resume_and_conflicting_unmarked_day(self):
         pushed = self.push(files={FILE: b'one', FILE + '.1': b'two'})

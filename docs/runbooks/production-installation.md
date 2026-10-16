@@ -541,7 +541,7 @@ systemctl list-timers sql-apm-daily.timer --all
   --passfile "$PGPASSFILE"
 ```
 
-工具列出改动的 home 文件，相同参数可重复执行。关闭并重新登录 PuTTY，确认没有临时设置的
+工具列出改动的 home 文件，相同参数可重复执行。保留安装终端，另开一个新的 PuTTY 登录会话，确认没有临时设置的
 `SQL_APM_DSN` 或 `PGPASSFILE` 覆盖；第 4 节登录环境设置的生产密码文件可以继续使用。
 在任意目录运行：
 
@@ -561,6 +561,7 @@ sqlfind 'select'
 
 ## 12. 上线后核对
 
+下面的安装命令返回原安装终端执行，沿用第 1 节的变量；`sqlfind` 在第 11 节新登录会话运行。
 浏览器登录，按[使用指南](search-guide.md)核对三种检索和四个看板。
 额外核对一次 `sqlfind 'select'` 检索；在运行状态看板查看每个来源的“最新导入日期”，应与实际到齐的日期一致；
 查看 `journalctl -u sql-apm-daily.service` 中收取脚本的逐推送、逐日期输出，不能只凭服务成功判定日志已到齐。

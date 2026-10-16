@@ -12,7 +12,7 @@ import subprocess
 import tarfile
 import tempfile
 
-from render_manual import DOCUMENTS, render
+from render_manual import DOCUMENTS, render, release_notes
 from verify_package import digest, verify, product_file
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -146,8 +146,11 @@ def build(args):
         program = output / ('sql-apm-' + args.version + '.tar.gz')
         archive(app, program)
         archive(validation, output / ('sql-apm-verification-' + args.version + '.tar.gz'))
+        notes = output / 'release-notes.md'
+        notes.write_text(release_notes(source, commit), encoding='utf-8')
         save(output / 'build-result.json', dict(program=str(program), sha256=digest(program),
-                                              bytes=program.stat().st_size, commit=commit, html_checks=html_checks))
+                                              bytes=program.stat().st_size, commit=commit, html_checks=html_checks,
+                                              release_notes_sha256=digest(notes)))
         print((output / 'build-result.json').read_text())
 
 

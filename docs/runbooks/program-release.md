@@ -58,6 +58,7 @@ PATH="$PWD/var/harness-tools/bin:$PATH" scripts/quality/check.sh
 
 ```bash
 (cd var/releases/v1.0.0 && sha256sum -c offline-bundle.tar.gz.sha256)
+test ! -e var/issue67/inputs
 mkdir -p var/issue67/inputs
 tar -xzf var/releases/v1.0.0/offline-bundle.tar.gz -C var/issue67/inputs
 APM_INPUTS="$PWD/var/issue67/inputs/offline-bundle"
@@ -142,16 +143,18 @@ done
   平台步骤再次对照真实界面；在 Issue 或 PR 明确确认。
 
 不重跑九任务、不重启、不重新编译；目标机及用户验收不可由开发机检查替代。
-当前会话只实施不需要验证机的部分，剩余验收仍是合并前门槛。
+开发机准备完成后保留目标机及用户验收作为合并前门槛。
 
 ## 合并后正式发布
 
 B1–B14 和独立评审完成后才合并，核对精确合并提交触发的 main 检查。B15 在合并后执行，Issue 保持打开。
 从固定 main 提交重制 `--kind release` 程序和完整包，复用同一成品；与实测候选逐路径比较，产品变化须补验。
-发布说明从 `docs/releases/v1.1.0.md` 转换相对链接为该提交链接，同一原稿生成包内 RELEASE.html 和 GitHub 正文。
+构建器从 `docs/releases/v1.1.0.md` 同时生成包内 RELEASE.html 和输出目录的 `release-notes.md`，
+后者仅将相对链接转为该提交链接，摘要写入 build-result.json。
 实际验收后更新“已验证、未验证、不提供”，发布命令不带 `--prerelease`：
 
 ```bash
+APM_RELEASE_NOTES="$APM_RELEASE_DIR/release-notes.md"
 git tag -a v1.1.0 "$APM_RELEASE_COMMIT" -m 'SQL APM v1.1.0'
 git push origin refs/tags/v1.1.0
 gh release create v1.1.0 \

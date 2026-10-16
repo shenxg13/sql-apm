@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/log-ingestion.md
 updated: 2026-10-16
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207176211
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
@@ -297,7 +299,7 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
 来源：[Issue #65](https://github.com/shenxg13/sql-apm/issues/65) 及其
 [确认记录](https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6206510522)，状态 current。
 用户确认 master 每天通过备份平台推送，SQL APM 服务器仅为落地机。以下是已确认要求；
-开发机验证与未完成的用户核对分别见[验证报告](../../docs/reports/log-push-2026-10-16.md)，
+开发机验证与 U18 用户确认分别见[验证报告](../../docs/reports/log-push-2026-10-16.md)，
 不代表生产平台或离线包已经交付。
 
 - **平台模板。** 在公用“文件备份到中转机_Linux V1.0”的副本上作最小改动，保留内置和原入参名字及逐步失败退出；
@@ -334,6 +336,8 @@ pglast 7.18 及哈希均保持不变。解析池在超时前重新检查回复�
   晚到或失败由下一次最近 N 天推送补齐，不通知、不自动取永久备份、不改 MPP 日志保留。
   平台操作、公钥和生产目录由用户操作；#65 不包含离线包、随包手册、目标机或生产验证，另起发版。
   请求独立评审前，用户须按 U18 核对手册的平台步骤与真实界面一致。
+  2026-10-16 用户回复“步骤与平台一致，确认”，[确认记录](https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207176211)
+  已满足该项；不替代独立代码评审或生产验证。
 
 ## Workflows
 

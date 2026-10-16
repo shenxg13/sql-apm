@@ -4,7 +4,7 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/log-ingestion.md
-updated: 2026-10-16
+updated: 2026-10-17
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/67
     status: current
@@ -81,6 +81,8 @@ confidence: high
 手册明确 systemctl start 返回不代表任务结束，须等待并检查成功状态后启用。
 2026-10-16 用户已明确确认本轮检查无问题，覆盖再次对照平台核对重写的步骤；
 该人工确认与 #65 的历史确认、实施方跨机器实测分别记录。
+[R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)已批准，PR #68 于 2026-10-17
+合并为 `fcf417f`；推送／收取的 v1.1.0 正式交付入口见[发布说明](../../docs/releases/v1.1.0.md)。
 
 ### 已确认的日志获取方式
 

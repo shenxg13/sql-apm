@@ -148,6 +148,10 @@ done
 ## 合并后正式发布
 
 B1–B14 和独立评审完成后才合并，核对精确合并提交触发的 main 检查。B15 在合并后执行，Issue 保持打开。
+正式构建前，先按[观察项处置](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219493703)
+用只改文档且写明 `Refs #67` 的收尾 PR 更新发布说明、README 和知识页：记录 R1 批准与实施合并提交，
+清除当前版本仍待验收或尚未发布的措辞，保留历史验证边界；核对产品文件与 R1 批准的 `ab6ad25` 逐项相同。
+收尾 PR 合并后，再核对该精确 main 提交的 CI，固定此提交用于下述正式构建。
 从固定 main 提交重制 `--kind release` 程序和完整包，复用同一成品；与实测候选逐路径比较，产品变化须补验。
 构建器从 `docs/releases/v1.1.0.md` 同时生成包内 RELEASE.html 和输出目录的 `release-notes.md`，
 后者仅将相对链接转为该提交链接，摘要写入 build-result.json。

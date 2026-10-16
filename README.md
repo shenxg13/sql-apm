@@ -5,14 +5,13 @@ SQL APM 使用 Python 和 PostgreSQL 构建离线 SQL 基线；当前交付边�
 运行环境为 Python 3.13.16 和项目 `.venv/`，
 Baseline 存储采用 PostgreSQL 17，Grafana 直接查询该库展示基线和 SQL 执行历史。
 首期不引入 Prometheus，复用 MPP 已有监控，平台状态先通过任务记录和日志保留。
-日志首期手动拷贝至基线服务器，不引入流式读取组件；后续通过定时 SCP 每天传输一次。
+日志由 MPP 端通过备份平台定时推送，SQL APM 收取后每日导入；不引入流式读取组件。
 SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名单见[训练资格与黑名单](.project-wiki/contracts/training-eligibility.md#已确认的-sql-纳入与排除策略)。
 基线按计算集群、数据库、执行用户、SQL 结构指纹及计时类别分别统计，详见[分组规则](.project-wiki/contracts/timing-and-grouping.md)。
 后续按需准备 PostgreSQL 9.4.26 做实时采集兼容测试。
-当前开发以可联网的 AlmaLinux 环境为准；Kylin V10 SP2 x86_64 演练机已完成 v1.0.0 的
-[一次编译](docs/reports/v100-runtime-build-2026-10-12.md)、
-[二进制安装与业务验证](docs/reports/v100-binary-validation-2026-10-12.md)和
-[用户生产手册验收](docs/reports/v100-user-acceptance-2026-10-13.md)。
+当前开发以可联网的 AlmaLinux 环境为准；Kylin V10 SP2 x86_64 演练机已完成 v1.1.0 的
+[二进制安装、跨机器推送、sqlfind 与用户验收](docs/reports/v110-target-validation-2026-10-16.md)，
+运行时沿用 v1.0.0 的[编译成品](docs/reports/v100-runtime-build-2026-10-12.md)。
 操作步骤见[生产安装手册](docs/runbooks/production-installation.md)，真实生产机部署尚未实施。
 精简程序及内网依赖包的交付边界见[发布说明](docs/runbooks/program-release.md)，
 开发环境准备见[开发说明](docs/runbooks/local-development.md)。
@@ -20,11 +19,13 @@ SQL 默认纳入基线计算，明确排除的语句进入黑名单，当前名�
 交付顺序及验证安排见[项目知识](.project-wiki/decisions/project-scope.md#已确认的首期交付顺序)。
 已确认需求按主题保存在知识库；各主题标明尚待确认或实施验证的事项。
 
-v1.0.0 是首个面向生产的正式版本，增加可复用二进制成品、PostgreSQL 自启及生产安装手册，保留检索、四个 Grafana 看板和每日运行。
-实施方实测、用户验收及 [R2 独立评审](https://github.com/shenxg13/sql-apm/pull/60#issuecomment-6148191309)已通过。
+当前版本为 v1.1.0，将 sqlfind、日志推送与收取纳入离线交付，沿用 v1.0.0 的二进制成品。
+实施方实测、用户验收及 [R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)已通过，
+[PR #68](https://github.com/shenxg13/sql-apm/pull/68) 已合并为 `fcf417f`。
 从[生产安装手册](docs/runbooks/production-installation.md)、[检索指南](docs/runbooks/search-guide.md)与
-[发布说明](docs/releases/v1.0.0.md)进入；仅支持全新安装，不提供从旧版原地升级的步骤。
-公开程序包见 [v1.0.0 发布页](https://github.com/shenxg13/sql-apm/releases/tag/v1.0.0)，完整离线包通过内网交付。
+[发布说明](docs/releases/v1.1.0.md)进入；仅支持全新安装，不提供从旧版原地升级的步骤。
+公开程序包见 [v1.1.0 发布页](https://github.com/shenxg13/sql-apm/releases/tag/v1.1.0)，完整离线包通过内网交付。
+[v1.0.0](https://github.com/shenxg13/sql-apm/releases/tag/v1.0.0) 是首个面向生产的正式版本，历史附件保持不变。
 历史 [v0.3.0 预发布](https://github.com/shenxg13/sql-apm/releases/tag/v0.3.0)及其[验证边界](docs/reports/v030-offline-release-2026-10-11.md)保留，不作为本版验收例外。
 
 ## 从这里开始

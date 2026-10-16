@@ -85,7 +85,8 @@
 
 ## 开发与操作
 
-v1.1.0 的候选、验证边界见[发布说明](releases/v1.1.0.md)及[开发机准备记录](reports/v110-preparation-2026-10-16.md)。
+v1.1.0 的候选、验证边界见[发布说明](releases/v1.1.0.md)、[开发机准备记录](reports/v110-preparation-2026-10-16.md)
+及[目标机验证记录](reports/v110-target-validation-2026-10-16.md)。
 当前安装入口为[生产安装手册](runbooks/production-installation.md)；
 [演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
 [v1.0.0 发布说明](releases/v1.0.0.md)保留该版本验证与交付边界；[准备报告](reports/v100-preparation-2026-10-12.md)保留开发机准备阶段的记录。

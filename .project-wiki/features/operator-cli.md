@@ -91,8 +91,10 @@ confidence: high
 [生产手册](../../docs/runbooks/production-installation.md#11-sqlfind-一次性配置)只写一次性配置与撤销：
 以 sfmon 使用生产 socket／端口、sql_apm_ro 和已有受保护密码文件，重新登录后使用短命令。
 [sqlfind 使用说明](../../docs/runbooks/sqlfind-guide.md)单独生成 SQLFIND.html，网页指南只增加指向它的链接。
-这是已确认交付目标；开发机制包与验证见[准备报告](../../docs/reports/v110-preparation-2026-10-16.md)，
-Kylin、PuTTY 用户验收及正式发布仍待完成。
+开发机制包见[准备报告](../../docs/reports/v110-preparation-2026-10-16.md)；
+[Kylin 部分样本验证](../../docs/reports/v110-target-validation-2026-10-16.md)已完成配置、使用说明示例、交互和看板数值比对。
+最多 10,416 份原文的结构，三次伪终端测量的详情／v 中位数为 1.093348／1.498511 秒；
+仅代表本轮部分样本，不含 PuTTY 网络／渲染或全量数据。PuTTY 用户验收和正式发布仍待完成。
 
 ### sqlfind 运维入口（2026-10-13）
 

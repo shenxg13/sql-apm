@@ -520,12 +520,16 @@ cd "$APM_APP"
 sudo install -m 0644 "$APM_ROOT/setup/daily/"*.service "$APM_ROOT/setup/daily/"*.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl start sql-apm-daily.service
+while systemctl is-active --quiet sql-apm-daily.service; do sleep 2; done
+test "$(systemctl show sql-apm-daily.service -p Result --value)" = success
+test "$(systemctl show sql-apm-daily.service -p ExecMainStatus --value)" = 0
 sudo journalctl -u sql-apm-daily.service --no-pager -n 100
 sudo systemctl enable --now sql-apm-daily.timer
 systemctl list-timers sql-apm-daily.timer --all
 ```
 
-先实际运行一次服务，核对日志中先收取、后 `daily run`，再启用定时器。
+先实际运行一次服务，等待任务结束、核对成功状态及日志中先收取、后 `daily run`，再启用定时器。
+`systemctl start` 返回只表示已经启动，不代表任务已成功完成；上面的等待和状态检查不能省略。
 每次运行先收取落地目录，再执行每日运行；收取失败不阻止处理已齐全的日期，须同时查看收取输出。
 定时任务排在 PostgreSQL 后启动，最长 12 小时，停止后下一次继续；不同时运行第二份。
 停用使用 `sudo systemctl disable --now sql-apm-daily.timer`；它不会停止已经开始的运行。
@@ -568,7 +572,8 @@ sqlfind 'select'
 确认只读账号写入被拒绝、非允许来源连接被拒绝；不得通过关闭认证解决连接问题。
 
 ```bash
-psql -X -w -c 'SELECT pg_size_pretty(pg_database_size(current_database()));'
+"$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -U sql_apm -d sql_apm \
+  -c 'SELECT pg_size_pretty(pg_database_size(current_database()));'
 df -h /data
 systemctl is-active sql-apm-postgresql.service sql-apm-grafana.service sql-apm-fingerprint.service
 systemctl is-enabled sql-apm-daily.timer

@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/log-ingestion.md
 updated: 2026-10-16
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/67
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207653317
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207662845
@@ -61,6 +63,17 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 生产推送接入与随包手册（2026-10-16）
+
+[Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 确认生产以推送接入为主，
+[生产手册](../../docs/runbooks/production-installation.md#8-推送接入)按落地目录、公钥与主机密钥、收取配置、
+平台计划、首次手工推送／收取／每日运行、启用定时器编排；原拉取步骤原样保留在附录。
+平台的 pushDays 首次比 master 保留期少一到两天，缺少的首批日期从永久备份人工补齐并放标记；
+完成后清空 pushDays，服务用 --intake-config 先收取再 daily run。
+这不改变 #65 产品行为。推送／收取脚本及示例纳入 v1.1.0 包，
+[开发机准备](../../docs/reports/v110-preparation-2026-10-16.md)与目标机跨机器实测分开记录，后者尚待完成。
+用户验收须再次对照平台核对重写的步骤；#65 的历史确认不能替代本轮确认。
 
 ### 已确认的日志获取方式
 

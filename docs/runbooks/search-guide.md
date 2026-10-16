@@ -4,6 +4,8 @@
 执行时换成自己的筛选值。先按[安装手册](kylin-offline-deployment.md)安装，再从浏览器登录 Grafana。
 日常查看使用只读数据库账号；它能读取全部 SQL 原文，原文中可能包含业务数据。
 
+命令行检索见 [sqlfind 使用说明](sqlfind-guide.md)。
+
 ## 一、怎样检索
 
 Grafana 的“MPP / SQL 检索”有三种方式，输入后点击检索。筛选集群、数据库和执行用户可以缩小范围。

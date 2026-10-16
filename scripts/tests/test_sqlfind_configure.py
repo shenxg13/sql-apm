@@ -1,11 +1,12 @@
-"""Developer-only login configuration checks; the setup tool is not packaged yet."""
+"""Reversible login configuration checks, also usable against the delivered app."""
 import importlib.util
+import os
 from pathlib import Path
 import tempfile
 import unittest
 import sys
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', Path(__file__).resolve().parents[2])).resolve()
 
 
 class ConfigurationTests(unittest.TestCase):

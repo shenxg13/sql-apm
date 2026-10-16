@@ -64,6 +64,7 @@
 | --- | --- | --- |
 | [检索查询层开发说明](design/sql-search.md) | 设计说明 | 数据库函数、JSON命令、升级、只读和清理并发契约；按词与整段两种文本方式。 |
 | [开发机检索试用](runbooks/sql-search-trial.md) | 测试步骤 | 准备专用副本、自选SQL和关键词、必做／选做用例及结果记录。 |
+| [sqlfind 使用说明](runbooks/sqlfind-guide.md) | 操作说明 | 随包命令行检索、结果解读、参数、PuTTY 与常见错误。 |
 | [sqlfind 开发机试用](runbooks/sqlfind-trial.md) | 测试步骤 | 短命令的账号配置、PuTTY 80 列与宽窗口试用、交互、撤销及用户确认。 |
 | [sqlfind 开发机验证](reports/sqlfind-2026-10-13.md) | 验证报告 | 查询函数对照、伪终端、只读与文件快照、原命令回归，以及用户试用边界。 |
 | [检索验收报告](reports/sql-search-2026-10-07.md) | 验证报告 | 真实升级、独立匹配核对、最坏／随机性能及证据边界。 |
@@ -84,9 +85,10 @@
 
 ## 开发与操作
 
-v1.0.0 的安装入口为[生产安装手册](runbooks/production-installation.md)；
+v1.1.0 的候选、验证边界见[发布说明](releases/v1.1.0.md)及[开发机准备记录](reports/v110-preparation-2026-10-16.md)。
+当前安装入口为[生产安装手册](runbooks/production-installation.md)；
 [演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
-[v1.0.0 发布说明](releases/v1.0.0.md)汇总当前验证与交付边界；[准备报告](reports/v100-preparation-2026-10-12.md)保留开发机准备阶段的记录。
+[v1.0.0 发布说明](releases/v1.0.0.md)保留该版本验证与交付边界；[准备报告](reports/v100-preparation-2026-10-12.md)保留开发机准备阶段的记录。
 [Kylin 成品编译验证](reports/v100-runtime-build-2026-10-12.md)记录首轮编译、成品身份和固定前缀位置。
 [Kylin 二进制验证](reports/v100-binary-validation-2026-10-12.md)保存初始系统上的安装、账号与后续业务实测及未完成项。
 [用户生产手册验收确认](reports/v100-user-acceptance-2026-10-13.md)收录第三轮用户授权公开的确认及适用边界。

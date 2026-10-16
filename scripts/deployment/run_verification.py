@@ -50,8 +50,8 @@ def unit():
             sys.modules[qualified] = module
             spec.loader.exec_module(module)
     suite = unittest.defaultTestLoader.discover(str(RESOURCES / 'tests'))
-    if suite.countTestCases() != 113:
-        raise ValueError('MPP verification kit must retain all 113 ordinary tests')
+    if suite.countTestCases() != 131:
+        raise ValueError('MPP verification kit must retain all 131 ordinary tests')
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if result.skipped:
         raise ValueError('product verification must execute every ordinary test without skips')
@@ -102,9 +102,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app-root', type=Path, required=True)
     parser.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
+    parser.add_argument('--sshd-root', type=Path, help='private SSH fixture for the optional push check')
+    parser.add_argument('--timer', action='store_true', help='also exercise temporary user systemd units with push')
     parser.add_argument('check', choices=['unit', 'database', 'publication', 'smoke', 'cleanup', 'search',
-                                         'views', 'grafana', 'daily', 'daily-recovery'])
+                                         'views', 'grafana', 'daily', 'daily-recovery', 'sqlfind', 'push'])
     args = parser.parse_args()
+    if args.check == 'push' and args.sshd_root is None:
+        parser.error('push requires --sshd-root')
+    if args.check != 'push' and (args.sshd_root is not None or args.timer):
+        parser.error('--sshd-root and --timer only apply to push')
     app = setup(args.app_root)
     if args.check == 'unit':
         return unit()
@@ -116,10 +122,17 @@ def main():
         return 0 if result.wasSuccessful() else 1
     if args.check == 'smoke':
         smoke(app, args.pg_bin)
+    elif args.check == 'push':
+        path = RESOURCES / 'scripts/daily/verify_push.py'
+        sys.argv = [str(path), '--pg-bin', str(args.pg_bin), '--sshd-root', str(args.sshd_root)]
+        if args.timer:
+            sys.argv.append('--timer')
+        runpy.run_path(str(path), run_name='__main__')
     else:
         name = {'database': 'verify.py', 'publication': 'verify_publication.py',
                 'cleanup': 'verify_cleanup.py', 'search': 'verify_search.py', 'views': 'verify_views.py',
-                'daily': 'verify_daily.py', 'daily-recovery': 'verify_daily_recovery.py'}[args.check]
+                'daily': 'verify_daily.py', 'daily-recovery': 'verify_daily_recovery.py',
+                'sqlfind': 'verify_sqlfind.py'}[args.check]
         path = RESOURCES / 'scripts/db' / name
         sys.argv = [str(path), '--pg-bin', str(args.pg_bin)]
         runpy.run_path(str(path), run_name='__main__')

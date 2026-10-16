@@ -263,7 +263,8 @@ daily/fetch-logs.sh --config /data/sql-apm/config/fetch-logs.conf --from 2026-09
 每次推送进入独立目录，最后放 `push.complete`；SQL APM 服务器上的收取脚本核对后移入接收目录并放齐全标记。
 脚本只列目录、取大小和读 master 文件，不在 master 上写任何文件（包括临时文件）。
 目录参数在内存拆分，不使用旧版 Bash 会写临时文件的 here-string／here-document。
-本节适用于 #65 的源码实现；离线包、随包手册和生产部署验证另行发版。
+推送模板与收取工具随 v1.1.0 程序包交付；生产安装顺序见[生产手册](production-installation.md#8-推送接入)，
+验证边界见[发布说明](../releases/v1.1.0.md)。
 
 **SQL APM 服务器上准备。** 下列主机名和地址均为示例，按实际值替换。两个集群共用一个落地根目录：
 

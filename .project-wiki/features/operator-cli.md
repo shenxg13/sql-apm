@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/operator-cli.md
 updated: 2026-10-15
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/67
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6184745033
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6184734459
@@ -81,6 +83,16 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### sqlfind 的离线交付（2026-10-16）
+
+[Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 确认将 `bin/sqlfind`（保留执行权限）和
+`scripts/sqlfind/configure.py` 加入 v1.1.0 程序包，数据库与终端检查加入独立验收包。
+[生产手册](../../docs/runbooks/production-installation.md#11-sqlfind-一次性配置)只写一次性配置与撤销：
+以 sfmon 使用生产 socket／端口、sql_apm_ro 和已有受保护密码文件，重新登录后使用短命令。
+[sqlfind 使用说明](../../docs/runbooks/sqlfind-guide.md)单独生成 SQLFIND.html，网页指南只增加指向它的链接。
+这是已确认交付目标；开发机制包与验证见[准备报告](../../docs/reports/v110-preparation-2026-10-16.md)，
+Kylin、PuTTY 用户验收及正式发布仍待完成。
 
 ### sqlfind 运维入口（2026-10-13）
 

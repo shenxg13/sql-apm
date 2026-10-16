@@ -26,8 +26,10 @@ DOCUMENTS = {
         'docs/design/database-structure/build.svg')),
     'SEARCH.html': dict(title='检索与看板使用指南', sources=(
         'docs/runbooks/search-guide.md',)),
+    'SQLFIND.html': dict(title='sqlfind 使用说明', sources=(
+        'docs/runbooks/sqlfind-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v1.0.0.md',)),
+        'docs/releases/v1.1.0.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''

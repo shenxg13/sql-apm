@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import unittest
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', Path(__file__).resolve().parents[1])).resolve()
 SCRIPT = ROOT / 'daily/push-logs.sh'
 
 

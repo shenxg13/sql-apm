@@ -288,7 +288,7 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 `scripts/sqlfind/configure.py install|uninstall` 维护执行账号 home 的短命令及只读连接，不修改密码或已有 psql 设置。
 `scripts/sqlfind/prepare_trial.py prepare|start|stop|status` 管理仅用部分完整样本的本地试用实例；步骤见
 [sqlfind 试用](../docs/runbooks/sqlfind-trial.md)。`scripts/db/verify_sqlfind.py` 执行真实 PG17 合成与伪终端验收，
-`scripts/tests/test_sqlfind_configure.py` 验证配置重复执行和撤销。这些开发工具本轮不新增到离线包清单。
+`scripts/tests/test_sqlfind_configure.py` 验证配置重复执行和撤销。v1.1.0 将启动入口和 configure.py 放入程序包，数据库／终端检查放入验收包；试用环境管理工具仍仅供开发机使用。
 
 `verify_search_plans.py --directory PRIVATE_COPY` 对已升级、已停止的专用全量副本核对嵌套执行计划，
 补测稀疏／密集结构、20条语句完整命令和长输入切分；原始SQL与计划仅留在该私有目录。
@@ -350,13 +350,17 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/daily/verify_replay.py run|compare`：显式的真实样本回放，三种方式各用私有实例和样本的副本，再比对最终版本。
   需要本地样本和数小时，不加入日常检查。
 
-## v1.0.0 生产部署准备
+## 生产部署与 v1.1.0 制包
 
 `runtime_archive.py export|inspect|install|verify-installed` 保存和核对一次性 Kylin 成品，
-`runtime_check.py` 依次自检解释器、临时数据库和十个随包入口；失败停止，不自动编译。
+`runtime_check.py` 依次自检解释器、临时数据库和十一个随包入口（含 sqlfind）；失败停止，不自动编译。
 `compile_runtime.sh` 是操作者显式选择的一次编译路径，记录系统包和编译证据。
 `install_postgres.py` 生成数据库 systemd 单元和两个登录 profile；
 `create_password.py` 交互设置两个数据库角色并正确转义密码文件，`credentials.py` 保存 Grafana 输入。
 [生产手册](../docs/runbooks/production-installation.md)与[制包说明](../docs/runbooks/program-release.md)给出步骤。
 `test_installation.py` 和 `verify_installation.py` 分别检查归档／停止逻辑与真实 PG17 合成认证。
 所有目标机成品、日志和详细证据留在忽略目录；本机检查不替代目标机或用户验收。
+
+v1.1.0 的 `build_bundle.py` 要求复用固定摘要的 v1.0.0 成品，拒绝缺失或不同成品。
+`run_verification.py sqlfind` 检查已解包程序，`push --sshd-root DIR [--timer]` 使用合成 master 与私有 SSH；
+真实跨机器验证仍由发布契约定义。制包与验证范围见[发布说明](../docs/runbooks/program-release.md)。

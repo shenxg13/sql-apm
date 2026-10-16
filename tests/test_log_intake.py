@@ -16,7 +16,7 @@ import unittest
 from unittest.mock import patch
 from types import SimpleNamespace
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', Path(__file__).resolve().parents[1])).resolve()
 spec = importlib.util.spec_from_file_location('intake', ROOT / 'daily/intake_logs.py')
 intake = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(intake)

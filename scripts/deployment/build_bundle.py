@@ -19,6 +19,7 @@ BASE = '6451d140d44f4e06cc34862c3e5aff7593d7afeb'
 PY_SHA = 'cfac63bddf956deafb1172ca131ae5dcaafd6f95056086e233fca205593ed427'
 PG_SHA = 'e4b43025f32ea3d271be64365d284c8462cffd41d80db0c3df6fc62417a2d9dc'
 PG_URL = 'https://ftp.postgresql.org/pub/source/v17.10/postgresql-17.10.tar.gz'
+V100_RUNTIME_SHA = 'd271d6a1471c41723724b48afad59f9675e1b324747fbb7dfae283f97340314c'
 
 
 def digest(path):
@@ -83,6 +84,9 @@ def main():
     if args.compile_only and release['kind'] == 'release':
         raise ValueError('a formal release requires the Kylin runtime artifact')
     runtime = inspect_artifact(args.runtime_artifact) if args.runtime_artifact else None
+    runtime_sha = digest(args.runtime_artifact / 'runtime.tar.gz') if runtime else None
+    if release['version'] == 'v1.1.0' and runtime_sha != V100_RUNTIME_SHA:
+        raise ValueError('v1.1.0 requires the unchanged v1.0.0 Kylin runtime artifact')
     if runtime and runtime['requirements_sha256'] != digest(args.release_dir / 'app/requirements.txt'):
         raise ValueError('runtime dependencies differ from the program lock')
     sources = ({entry['path']: entry for entry in json.loads(args.source_manifest.read_text())['files']}
@@ -186,7 +190,9 @@ def main():
         for path in sorted(args.runtime_artifact.rglob('*')):
             if path.is_file():
                 add(path, 'runtime/' + path.relative_to(args.runtime_artifact).as_posix(),
-                    'python-3.13.16+postgresql-17.10', 'Kylin build commit ' + runtime['program_commit'])
+                    'python-3.13.16+postgresql-17.10',
+                    ('v1.0.0 ' if runtime_sha == V100_RUNTIME_SHA else '') +
+                    'Kylin build commit ' + runtime['program_commit'])
     (out / 'manifest.json').write_text(json.dumps(dict(program_commit=commit, version=release['version'],
         prerelease=release['prerelease'], production_use=release['production_use'], kind=release['kind'],
         bundle_type='complete' if runtime else 'compilation-bootstrap',

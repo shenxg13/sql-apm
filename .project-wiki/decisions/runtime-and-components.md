@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-13
+updated: 2026-10-16
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/67
+    status: current
   - path: docs/reports/v100-user-acceptance-2026-10-13.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/59
@@ -80,6 +82,20 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### v1.1.0 交付约定（2026-10-16）
+
+来源：[Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 的已确认契约。目标为 v1.1.0 正式版，
+生产机尚未安装 v1.0.0，仍只支持全新安装。结构保持 1.12.0，Python 依赖、RPM、Grafana 与插件不变。
+复用 v1.0.0 的 Python 3.13.16／venv、PostgreSQL 17.10 成品，runtime.tar.gz 摘要为
+`d271d6a1471c41723724b48afad59f9675e1b324747fbb7dfae283f97340314c`，不重新编译。
+完整包只变更程序、验收资源、文档及相应清单，逐文件核对第三方组成与旧包相同。
+
+验收采用初始快照上的精简验证：两个集群各连续至少三天完整样本经真实 SSH 推送，随后收取、每日运行及 sqlfind；
+O-62-005 只在这批部分样本上测详情和原文目录耗时，无门槛，全量耗时列为未验证。
+不重跑九任务、不重启；用户在实施方已安装环境用 PuTTY 试用并核对手册及平台步骤，明确确认前不合并或发布。
+当前仅推进开发机准备，实测与未完成边界见[准备报告](../../docs/reports/v110-preparation-2026-10-16.md)，
+不把已确认目标写成已发布结果。
 
 ### 首个生产版本与二进制部署（2026-10-12）
 

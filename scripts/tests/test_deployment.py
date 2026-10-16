@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import patch
 
@@ -296,6 +297,29 @@ class PackageTests(unittest.TestCase):
         archive(self.app, second)
         self.assertEqual(first.read_bytes(), second.read_bytes())
 
+    def test_archive_preserves_executable_entries_and_package_selection(self):
+        rules = json.loads((ROOT / 'scripts/deployment/package-files.json').read_text())
+        packaged = self.root / 'program'
+        select(ROOT, packaged, rules['program'])
+        target = self.root / 'program.tar.gz'
+        archive(packaged, target)
+        with tarfile.open(target) as tar:
+            for name in ('bin/sqlfind', 'daily/push-logs.sh', 'daily/intake-logs.sh'):
+                self.assertEqual(tar.getmember('program/' + name).mode, 0o755)
+            self.assertEqual(tar.getmember('program/requirements.txt').mode, 0o644)
+            self.assertTrue(tar.getmember('program/scripts/sqlfind/configure.py').isfile())
+        kit = self.root / 'verification'
+        select(ROOT, kit, rules['verification'])
+        for name in ('scripts/db/verify_sqlfind.py', 'scripts/tests/sqlfind_terminal.py',
+                     'scripts/daily/verify_push.py', 'scripts/daily/verify_fetch.py',
+                     'scripts/daily/verify_timer.py', 'tests/test_log_intake.py'):
+            self.assertTrue((kit / name).is_file(), name)
+
+    def test_sqlfind_launcher_changes_invalidate_product_evidence(self):
+        metadata = dict(commit='new', files={'bin/sqlfind': 'changed'})
+        with self.assertRaisesRegex(ValueError, 'product files differ'):
+            verify_baseline(metadata, dict(product_sha256={'bin/sqlfind': 'original'}))
+
     def test_product_comparison_records_renamed_and_removed_paths(self):
         (self.app / 'sql_apm').mkdir()
         old = self.app / 'sql_apm/old.py'
@@ -418,7 +442,7 @@ class DocumentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
-                         'scripts/deployment/package-files.json'):
+                         'docs/runbooks/sqlfind-guide.md', 'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(ROOT / name, target)

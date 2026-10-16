@@ -16,7 +16,7 @@ import time
 import fcntl
 import unicodedata
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', Path(__file__).resolve().parents[2])).resolve()
 
 
 class Terminal:

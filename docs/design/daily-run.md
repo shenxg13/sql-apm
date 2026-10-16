@@ -15,6 +15,8 @@
 | 停止信号 | `sql_apm/daily/interrupt.py` | 运行正在等一条语句时，停止信号也能及时生效 |
 | 定时启动 | `daily/systemd/*.template`、`scripts/daily/install.py` | 只生成单元文件，不安装 |
 | 传输脚本 | `daily/fetch-logs.sh`、`daily/fetch-logs.conf.example` | Bash，独立于产品命令 |
+| 平台推送模板 | `daily/push-logs.sh` | master 上只读选取过去 N 天文件；登录 `sfmon` 推送，最后原子发布清单 |
+| 收取脚本 | `daily/intake-logs.sh`、`daily/intake_logs.py`、`daily/intake-logs.conf.example` | Shell 入口＋Python 标准库；核对、同文件系统移入、标记和清理，不连接数据库 |
 | 看板 | `scripts/grafana/build_dashboards.py` 的 `status_dashboard` → `grafana/dashboards/mpp-status.json` | 第四个随包看板 |
 
 ## 编排的做法
@@ -130,10 +132,34 @@
 
 ## 定时器与服务单元
 
-服务是 `Type=simple`，用 `RuntimeMaxSec` 限制定时启动的运行；拉取作为 `ExecStartPre=-…`，失败被忽略，
-它的时间由 `TimeoutStartSec` 另行限制（同一个数值）。定时器 `Persistent=true`。实测到的 systemd 行为：
+服务是 `Type=simple`，用 `RuntimeMaxSec` 限制定时启动的运行；可选的收取、拉取按这个顺序作为 `ExecStartPre=-…`，失败被忽略，
+二者共享 `TimeoutStartSec` 的启动阶段限制（与运行上限同一个数值）。`--intake-config`、`--fetch-config` 独立可选；
+配置收取时将生成器所用的项目解释器写入 `SQL_APM_PYTHON`，Shell 入口用它执行独立辅助程序。
+定时器 `Persistent=true`。实测到的 systemd 行为：
 运行期间到达的时刻不会并发启动第二个，但定时器在该次运行结束后按上次触发时间重新计算，于是立即补跑一次；
 多个错过的时刻也只补一次。这与停机后的补跑是同一个机制。
+
+## 推送与收取
+
+契约来自 [Issue #65](https://github.com/shenxg13/sql-apm/issues/65)，业务规则归属
+[日志获取主题](../../.project-wiki/features/log-ingestion.md#mpp-平台推送与收取2026-10-16)，操作及清单格式见
+[MPP 端推送](../runbooks/daily-run.md#mpp-端推送)。实现不进入 `sql_apm/`，不改产品命令或数据库。
+
+- master 端先在内存冻结名称和大小、检查重复，再执行原模板的远端建目录／清空、逐文件 `scp -p`、最后发布清单。
+  清单经 stdin 发送给远端，不在 master 创建临时文件；原模板逐段对照见[验证报告](../reports/log-push-2026-10-16.md)。
+- 收取以落地根目录的文件描述符持有非阻塞 `flock`，因此同根目录的不同配置也不能并发收取。
+  搜索和清理逐层使用 `O_DIRECTORY | O_NOFOLLOW` 的目录描述符，不跟随链接，不跨子挂载点。
+- 先核对整份清单再移入。已经改名到接收目录的同名同大小普通文件，是缺失源文件唯一的恢复例外；
+  未标记日期已有的每个文件须属于清单且大小相同，才允许续做。
+  每次移动调用 Linux `renameat2(RENAME_NOREPLACE)`，不复制，不覆盖；不支持该操作时明确失败，不降级成复制或覆盖。
+  仅处理今天之前的日期，每天文件齐全后以独占创建放空标记。
+- 清理只逐个删除核验过的普通日志／标志文件，再 `rmdir` 空目录；未知主机和非预期内容保留。
+  超时按最新落地文件 ctime（空叶子用目录 ctime），不按 mtime；本地文件改动会保守地延后超时。
+  正式清单最后删除，中途被杀后可以依据剩余清单及接收目录继续；没有清单的残留空叶子按时限清理。
+- 性能证据等级为 qualitative：目录遍历、清单和元数据处理的成本随文件数增长；不会扫描日志内容或额外复制日志。
+  同文件系统改名不随日志字节数增长；验证使用有界合成样本，不将其耗时外推为生产网络吞吐。
+  信任边界仍为已确认的 MPP 运维共用账号；原模板远端 `rm -fr` 保留，非空错误路径仍由操作者核对，
+  不声称对同账号恶意并发替换目录、改写清单或推送日志内容提供认证。
 
 ## 验证入口
 
@@ -144,6 +170,8 @@
 | `scripts/db/verify_daily_recovery.py` | 不能丢、不能藏的情形：导入之后文件被改（含核验之后、删除之前）、删除在任何一步被打断、集群正忙而无事可做、问题跨过被跳过、被中止或被杀的运行、日批只认自己冻结的文件名、“成功”的口径、等语句时收到停止信号 | PostgreSQL 17 |
 | `scripts/db/verify.py` | 含 1.11.0 带数据升级到 1.12.0（`tests/database/daily_migration.py`） | PostgreSQL 17 |
 | `scripts/daily/verify_fetch.py --sshd-root DIR` | 传输脚本对回环地址上的真实 sshd | 解包的 `openssh-server` |
+| `python -m unittest discover -s tests -p test_log_intake.py` | 收取失败、原子移入、中断续做、清理与目录边界 | Linux |
+| `scripts/daily/verify_push.py --sshd-root DIR --timer` | 推送模板、master 快照、24 天首批、故障补齐、人工输入对照及用户定时启动 | 私有 sshd、PG17、systemd 用户管理器 |
 | `scripts/daily/verify_timer.py [--sshd-root DIR]` | 用户级 systemd 上的定时器行为，约 13 分钟 | systemd 用户管理器 |
 | `scripts/grafana/verify_status_e2e.py --directory DIR` | 无界面浏览器核对运行状态看板，含九类待处理问题 | `setup_dev.py synthetic` 的环境和 #51 准备的浏览器 |
 | `scripts/daily/verify_replay.py run`／`compare` | 本地真实样本的三种方式回放和最终版本比对 | 本地样本，数小时 |

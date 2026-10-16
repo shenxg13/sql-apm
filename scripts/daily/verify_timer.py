@@ -65,7 +65,7 @@ class Units:
         self.files = [UNITS / (name + '.service'), UNITS / (name + '.timer')]
         self.drop_in = UNITS / (name + '.service.d')
 
-    def install(self, times, max_hours=12.0, fetch=None, environment=None):
+    def install(self, times, max_hours=12.0, fetch=None, environment=None, intake=None):
         self.remove()
         identity = ['--user', pwd.getpwuid(os.getuid()).pw_name] if SYSTEM else ['--user-unit']
         words = [sys.executable, ROOT / 'scripts/daily/install.py', *identity, '--output', UNITS, '--name', self.name,
@@ -74,6 +74,8 @@ class Units:
             words += ['--at', moment.strftime('%H:%M')]
         if fetch:
             words += ['--fetch-config', fetch]
+        if intake:
+            words += ['--intake-config', intake]
         done = subprocess.run([str(w) for w in words], capture_output=True, text=True)
         assert done.returncode == 0, done.stderr
         if environment:

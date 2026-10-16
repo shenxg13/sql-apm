@@ -4,7 +4,7 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/operator-cli.md
-updated: 2026-10-15
+updated: 2026-10-17
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/67
     status: current
@@ -96,7 +96,9 @@ confidence: high
 最多 10,416 份原文的结构，三次伪终端测量的详情／v 中位数为 1.093348／1.498511 秒；
 仅代表本轮部分样本，不含 PuTTY 网络／渲染或全量数据。
 2026-10-16 用户已确认完成本轮 PuTTY 80×24／最大化试用及手册检查，
-见[人工确认](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219052514)；正式发布仍待完成。
+见[人工确认](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219052514)。
+[R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)已批准，PR #68 于 2026-10-17
+合并为 `fcf417f`；sqlfind 的 v1.1.0 正式交付入口与验证边界见[发布说明](../../docs/releases/v1.1.0.md)。
 
 ### sqlfind 运维入口（2026-10-13）
 

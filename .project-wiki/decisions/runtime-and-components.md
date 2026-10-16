@@ -4,7 +4,7 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-16
+updated: 2026-10-17
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/67
     status: current
@@ -99,7 +99,9 @@ O-62-005 只在这批部分样本上测详情和原文目录耗时，无门槛�
 692 项 RPM 安装前后相同，部分样本跨机推送及后续自动核对通过。
 2026-10-16 用户明确回复“我这边都检查完了，没有问题”，
 [本轮人工确认](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219052514)覆盖 PuTTY／手册／平台界面核对。
-独立评审仍待完成，当前是候选，尚未正式发布。
+2026-10-17，[R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)批准通过，
+PR #68 合并为 `fcf417f`，该提交 main CI 成功。v1.1.0 的正式交付入口与验证边界见
+[发布说明](../../docs/releases/v1.1.0.md)，固定发布提交和制品摘要由 Issue #67 的完成记录保存。
 
 ### 首个生产版本与二进制部署（2026-10-12）
 

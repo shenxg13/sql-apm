@@ -254,7 +254,7 @@ def verify_installed(root):
 
 
 CHECKS = ['python', 'postgres', 'initdb', 'psql', 'temporary-database', 'package',
-          'unit', 'database', 'publication', 'smoke', 'cleanup', 'search', 'views', 'grafana', 'daily', 'daily-recovery']
+          'unit', 'database', 'publication', 'smoke', 'cleanup', 'search', 'views', 'grafana', 'daily', 'daily-recovery', 'sqlfind']
 
 
 def main():

@@ -26,8 +26,10 @@ DOCUMENTS = {
         'docs/design/database-structure/build.svg')),
     'SEARCH.html': dict(title='检索与看板使用指南', sources=(
         'docs/runbooks/search-guide.md',)),
+    'SQLFIND.html': dict(title='sqlfind 使用说明', sources=(
+        'docs/runbooks/sqlfind-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v1.0.0.md',)),
+        'docs/releases/v1.1.0.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''
@@ -148,6 +150,26 @@ def embedded_svg(path):
             if key.split('}')[-1] == 'href' and not value.startswith('#'):
                 raise ValueError('external SVG reference')
     return 'data:image/svg+xml;base64,' + base64.b64encode(raw).decode('ascii')
+
+
+def release_notes(root, commit):
+    """Keep the release Markdown unchanged except for commit-pinned relative links."""
+    path, = DOCUMENTS['RELEASE.html']['sources']
+    source = (root / path).read_text(encoding='utf-8')
+
+    def rewrite(match):
+        parts = urlsplit(match[2])
+        if parts.scheme or parts.netloc or not parts.path:
+            return match[0]
+        target = posixpath.normpath(posixpath.join(posixpath.dirname(path), parts.path))
+        if target.startswith('../') or not (root / target).is_file():
+            raise ValueError('missing release reference: ' + target)
+        url = 'https://github.com/shenxg13/sql-apm/blob/' + commit + '/' + target
+        if parts.fragment:
+            url += '#' + parts.fragment
+        return '[' + match[1] + '](' + url + ')'
+
+    return re.sub(r'\[([^\]]+)\]\(([^)]+)\)', rewrite, source)
 
 
 def render(root, commit, version, filename='INSTALL.html'):

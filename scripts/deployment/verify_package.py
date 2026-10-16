@@ -9,7 +9,7 @@ from pathlib import Path
 
 def product_file(name):
     """Files whose changes invalidate installed product evidence (including UI/installers)."""
-    return (name.startswith(('sql_apm/', 'rules/', 'grafana/', 'daily/'))
+    return (name.startswith(('sql_apm/', 'rules/', 'grafana/', 'daily/', 'bin/'))
             or name == 'requirements.txt'
             or (name.startswith('scripts/') and name != 'scripts/deployment/verify_package.py'))
 

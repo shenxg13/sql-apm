@@ -17,8 +17,9 @@ import sys
 import tempfile
 import time
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT / 'scripts/daily'), str(ROOT / 'scripts/db'), str(ROOT / 'tests'), str(ROOT)]
+RESOURCES = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', RESOURCES)).resolve()
+sys.path[:0] = [str(ROOT), str(RESOURCES / 'scripts/daily'), str(RESOURCES / 'scripts/db'), str(RESOURCES / 'tests')]
 from verify_fetch import Sandbox
 from verify import instance, Verification
 from verify_daily import Site, lines, many, one, write_csv
@@ -291,7 +292,7 @@ def main():
     def ok(label):
         print('PASS: ' + label, flush=True)
     # Separate fixtures keep intentional invalid pushes out of the end-to-end run.
-    parent = ROOT / 'var/issue65'
+    parent = RESOURCES / 'var/push-verification'
     parent.mkdir(parents=True, exist_ok=True)
     for function in ('push', 'chain'):
         with tempfile.TemporaryDirectory(prefix='sql-apm-push-', dir=parent) as temporary, PushBox(args.sshd_root.resolve(), Path(temporary)) as box:

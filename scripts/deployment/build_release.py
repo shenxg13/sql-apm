@@ -12,11 +12,11 @@ import subprocess
 import tarfile
 import tempfile
 
-from render_manual import DOCUMENTS, render
+from render_manual import DOCUMENTS, render, release_notes
 from verify_package import digest, verify, product_file
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = '5494075f13c7030c3f0d1d084a4589a439745b62'
+BASE = '35f5826ce8b6276c6a61a77f818157e164142b3c'
 
 
 def version_number(value):
@@ -43,7 +43,7 @@ def archive(directory, output):
                 info = tar.gettarinfo(str(path), arcname=directory.name + '/' + str(path.relative_to(directory)))
                 info.uid = info.gid = info.mtime = 0
                 info.uname = info.gname = ''
-                info.mode = 0o755 if path.suffix == '.sh' else 0o644
+                info.mode = 0o755 if path.stat().st_mode & 0o111 else 0o644
                 with path.open('rb') as file:
                     tar.addfile(info, file)
     Path(str(output) + '.sha256').write_text(digest(output) + '  ' + output.name + '\n')
@@ -81,8 +81,8 @@ def compare_product(app, previous):
 
 
 def build(args):
-    if args.version != 'v1.0.0':
-        raise ValueError('this revision carries only v1.0.0 release documents; use the historical builder for older releases')
+    if args.version != 'v1.1.0':
+        raise ValueError('this revision carries only v1.1.0 release documents; use the historical builder for older releases')
     if git('status', '--porcelain', '--untracked-files=all'):
         raise ValueError('commit repository changes before building')
     commit = git('rev-parse', args.commit + '^{commit}')
@@ -146,8 +146,11 @@ def build(args):
         program = output / ('sql-apm-' + args.version + '.tar.gz')
         archive(app, program)
         archive(validation, output / ('sql-apm-verification-' + args.version + '.tar.gz'))
+        notes = output / 'release-notes.md'
+        notes.write_text(release_notes(source, commit), encoding='utf-8')
         save(output / 'build-result.json', dict(program=str(program), sha256=digest(program),
-                                              bytes=program.stat().st_size, commit=commit, html_checks=html_checks))
+                                              bytes=program.stat().st_size, commit=commit, html_checks=html_checks,
+                                              release_notes_sha256=digest(notes)))
         print((output / 'build-result.json').read_text())
 
 
@@ -155,7 +158,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', default='HEAD')
-    parser.add_argument('--version', type=version_number, default='v1.0.0')
+    parser.add_argument('--version', type=version_number, default='v1.1.0')
     parser.add_argument('--kind', choices=['candidate', 'release'], default='candidate')
     parser.add_argument('--previous-program', type=Path)
     build(parser.parse_args())

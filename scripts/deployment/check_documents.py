@@ -196,11 +196,14 @@ def check_paths(root):
     rules = json.loads((root / 'scripts/deployment/package-files.json').read_text())
     patterns = rules['program'] + rules['verification']
     paths = set()
-    for name in ('docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', GUIDE, 'docs/runbooks/daily-run.md'):
+    for name in ('docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md',
+                 GUIDE, 'docs/runbooks/daily-run.md', 'docs/runbooks/sqlfind-guide.md'):
         source = (root / name).read_text()
         # These explicit spans are read only on the development machine.
         source = re.sub(r'<!-- developer-only:start -->.*?<!-- developer-only:end -->', '', source, flags=re.S)
         paths.update(re.findall(r'\bscripts/[A-Za-z0-9_./-]+\.(?:py|sh)', source))
+        paths.update(re.findall(r'(?<![\w/])daily/[A-Za-z0-9_.-]+\.(?:py|sh|conf\.example)', source))
+        paths.update(re.findall(r'\bbin/sqlfind\b', source))
     for path in paths:
         if not (root / path).is_file() or not any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns):
             raise ValueError('manual command missing from program/verification kit: ' + path)

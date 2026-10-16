@@ -11,8 +11,9 @@ import sys
 from datetime import timedelta
 from unittest.mock import patch
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / 'tests')]
+RESOURCES = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('SQL_APM_APP_ROOT', RESOURCES)).resolve()
+sys.path[:0] = [str(ROOT), str(RESOURCES / 'tests')]
 
 from verify import instance, Verification
 from database import dashboard_data as data
@@ -364,7 +365,7 @@ def verify(pg_bin):
         owner = connect(dsn, 'sql_apm')
         before = contents(owner)
         finder = Finder(dsn + '_ro', 'sql_apm')
-        sys.path.insert(0, str(ROOT / 'scripts/tests'))
+        sys.path.insert(0, str(RESOURCES / 'scripts/tests'))
         verify_rendered_notes(dsn + '_ro', finder)
         verify_control_display(dsn + '_ro', finder)
         verify_broken_pipe(dsn + '_ro')
@@ -552,7 +553,7 @@ def verify(pg_bin):
                            overrides={'PYTHONPATH': str(fresh), 'HOME': str(empty_home)})
         assert no_cache.returncode == 0, no_cache.stderr
         assert (snapshot(fresh), snapshot(empty_home)) == files_before
-        sys.path.insert(0, str(ROOT / 'scripts/tests'))
+        sys.path.insert(0, str(RESOURCES / 'scripts/tests'))
         from sqlfind_terminal import verify as verify_terminal
         verify_terminal(dsn + '_ro', directory, owner)
         assert contents(owner) == before

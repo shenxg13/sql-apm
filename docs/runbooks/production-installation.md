@@ -1,6 +1,6 @@
 # SQL APM 生产安装手册
 
-适用版本 `v1.0.0`，Kylin V10 SP2 x86_64 全新安装，数据库结构 1.12.0。
+适用版本 `v1.1.0`，Kylin V10 SP2 x86_64 全新安装，数据库结构 1.12.0。
 只支持新实例；后续版本将提供带数据的原地升级，本版没有升级步骤。
 候选包仍须完成发布验收，不能把候选标识当作正式发布。
 
@@ -11,7 +11,7 @@
 55 个文件、36 个“集群×日期”、15.8 GB 日志，每日运行后数据库 48.4 GB，
 两个常驻服务运行期间主机内存采样峰值 6.24 GB，无 OOM。
 这是 v0.3.0 的有限输入实测，磁盘需求按样本放大只是估计，没有生产实测依据。
-本版候选二进制在同类 8 vCPU、约 14 GiB 内存机器上的同规模输入实测：三个产品服务运行，
+v1.0.0 二进制在同类 8 vCPU、约 14 GiB 内存机器上的同规模输入实测：三个产品服务运行，
 主机内存采样最高约 10.86 GB，每日运行后数据库约 48.45 GB，零 OOM。
 两轮均为有限样本和 250ms 采样，不能将这些数字作为生产容量或瞬时内存上限。
 
@@ -87,7 +87,7 @@ test "$(cat "$APM_VERIFY/PROGRAM_COMMIT")" = "$APM_EXPECTED_COMMIT"
 ```
 
 所有校验须成功。包根 `INSTALL.html` 是本手册，`REHEARSAL.html` 单独供演练验证使用；
-`CONFIGURATION.html`、`SEARCH.html`、`DATABASE.html` 和 `RELEASE.html` 均可离线打开。
+`CONFIGURATION.html`、`SEARCH.html`、`SQLFIND.html`、`DATABASE.html` 和 `RELEASE.html` 均可离线打开。
 
 ## 3. 二进制安装与自检
 
@@ -413,38 +413,82 @@ JSON
 如要关闭，daily.json 增加 `"cleanup":{"enabled":false}` 与 `"raw_files":{"retention_days":"off"}`。
 配置改变影响后续构建，不改已有版本。密码只在受保护文件中，不能放进 JSON 或连接串。
 
-## 8. 生产首次拉取
+## 8. 推送接入
 
-先核对每个 master 的 SSH 主机指纹，由 sfmon 配好公钥互信；源账号只需列目录和读日志的权限。
-在本机手工测试连通与免密，保持主机密钥检查，不使用 StrictHostKeyChecking=no。
-实际 master 的地址、账号与目录仅写本地配置，不放进公开报告。
+生产以 MPP master 推送、SQL APM 收取为主。完整参数和失败处理见[MPP 端推送](daily-run.md#mpp-端推送)。
+先完成本节和首批手工运行，再启用定时器；两个集群各配置一个平台计划。
 
-```bash
-export APM_SOURCE='源账号@master地址'
-export APM_SOURCE_LOGS='/master日志目录'
-export APM_FIRST_DATE='填写已经结束的YYYY-MM-DD'
-ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$APM_SOURCE" 'true'
-cp "$APM_APP/daily/fetch-logs.conf.example" "$APM_ROOT/config/fetch-logs.conf"
-chmod 600 "$APM_ROOT/config/fetch-logs.conf"
-```
-
-编辑 fetch-logs.conf，每个来源一行：`来源名 源账号@主机 源日志目录 本机接收目录 [SSH端口]`，
-与 daily.json 的接收目录一致。先只拉一个已经结束的日期：
+**落地与公钥。** 在 SQL APM 服务器以 `sfmon` 创建落地根；它与接收目录须在同一文件系统，
+彼此不能相同或包含，不得设为程序目录或接收目录的上级。
 
 ```bash
-"$APM_APP/daily/fetch-logs.sh" --config "$APM_ROOT/config/fetch-logs.conf" --date "$APM_FIRST_DATE"
-find "$APM_ROOT/inbox" -maxdepth 2 -type f -name "*$APM_FIRST_DATE*" -printf '%P\t%s\n'
+install -d -m 0700 "$APM_ROOT/landing"
+install -d -m 0700 "$HOME/.ssh"
+touch "$HOME/.ssh/authorized_keys"
+chmod 600 "$HOME/.ssh/authorized_keys"
 ```
 
-逐个来源与 master 上当日文件清单对照文件数和每个文件的大小，并确认只在全部复制成功后出现
-`YYYY-MM-DD.complete`。核对无误才允许下节导入、随后启用自动拉取。
-真实 master 上的首次拉取由部署方执行；脚本与真实目录／文件命名不符时停止并反馈，另开 Issue，
-不临时改脚本或手工放标记掩盖问题。传输脚本的行为与 v0.3.0 相同。
+把每台 master 上 `appUser` 的公钥逐行追加到 `sfmon` 的 `authorized_keys`，保留已有内容；
+每条用 `from=` 限定对应 master 的地址，以下仅示意，须替换占位内容：
+
+```text
+from="MASTER_ADDRESS" ssh-ed25519 MASTER_PUBLIC_KEY
+```
+
+`.ssh` 和 `authorized_keys` 属主为 `sfmon`，只交换公钥、不复制私钥。
+在每台 master 上以 `appUser` 第一次手工执行 `ssh sfmon@SQL_APM_ADDRESS`，
+通过可信渠道核对主机密钥指纹后接受。自动计划运行前确认免密可用；不关闭主机密钥校验。
+
+**收取配置。** 以 `sfmon` 复制示例后编辑：
+
+```bash
+cp "$APM_APP/daily/intake-logs.conf.example" "$APM_ROOT/config/intake-logs.conf"
+chmod 600 "$APM_ROOT/config/intake-logs.conf"
+```
+
+改成下面的形式；将 `MASTER_C1`、`MASTER_C2` 替换为各 master 上 `hostname` 的完整输出，
+来源名和接收目录与第 7 节一致。配置只按文本读取，不执行。
+
+```text
+landing /data/sql-apm/landing
+expire_hours 24
+source mpp-C1 MASTER_C1 /data/sql-apm/inbox/C1
+source mpp-C2 MASTER_C2 /data/sql-apm/inbox/C2
+```
+
+**平台计划。** 复制公用模板“文件备份到中转机_Linux V1.0”，只编辑副本：
+将包内 `daily/push-logs.sh` 的完整内容粘贴为 Shell 内容，保留原有内置参数和入参名字，
+新增可为空的 `pushDays`。两个集群各创建或调整一个计划，填写：
+
+| 参数 | 内容 |
+| --- | --- |
+| `backupFilePath` | 对应 master 的日志目录；多目录用空白分隔，目录名不能含空白，不展开通配符 |
+| `backHomePath` | 两计划均为 `/data/sql-apm/landing` |
+| `uploadServerIp` | SQL APM 服务器地址 |
+| `appUser` | master 上能读取日志并执行 SSH/SCP 的账号；远端固定登录 `sfmon` |
+| `pushDays` | 首次按下一节填写；日常留空取 7 天，允许 1–366 |
+| `RCLONE_DEST_PATH`、`RCLONE_BUCKET_NAME`、`PLAN_ID` | 保留平台提供的值，每次推送使用新的多级路径 |
+
+核对落地根、bucket 和路径：脚本会以 `sfmon` 权限清空本次推送目录后写入，不能指向已有数据。
+建议平台每天 16:00 推送，SQL APM 17:00 运行；双方时区用北京时间。
+主机名未在收取配置中登记时，收取报告错误并保留推送，不自动猜测来源。
 
 ## 9. 首批日志导入与首次构建
 
-按上一节的 `--date` 命令逐天拉取计划中的首批日期，每次核对齐全标记。
-不要拉当天；不要在已经导入的日期里追加、更名或替换文件。
+先不要启用定时器。首次将平台 `pushDays` 设为比 master 保留天数少一到两天，
+例如保留 25 天时填 23 或 24，避开最旧一天的清理窗口。
+这是保守的操作建议：若列出文件后、复制前恰好遇到 master 清理，推送可能失败。
+`pushDays` 本身只筛选昨天到前 N 天实际存在的日志，缺某一天不算失败，也不会推今天；
+填 30 可以推送该范围内现存的历史日志，并不要求 master 一定保留满 30 天。
+手工执行两个计划，核对平台输出的日期、文件数和字节数。
+以 `sfmon` 手工收取，检查每个日期的结果；只有核对齐全才会生成 `YYYY-MM-DD.complete`：
+
+```bash
+SQL_APM_PYTHON="$APM_APP/.venv/bin/python" "$APM_APP/daily/intake-logs.sh" \
+  --config "$APM_ROOT/config/intake-logs.conf"
+```
+
+不要推今天；不要在已经导入的日期里追加、更名或替换文件。
 首批可以是三十天，但 120 三十天首批的时间与空间成本尚未实测，执行时观察资源。
 
 ```bash
@@ -462,34 +506,78 @@ export SQL_APM_DSN="host=$APM_SOCKET port=$APM_PORT dbname=sql_apm user=sql_apm"
 手工运行没有定时器的 12 小时时限，重复运行不会重复导入成功日期。
 旧于保留期限的原始文件可能在首次成功导入后立即删除，执行前确认保留配置符合备份安排。
 
+想补满 30 天时，从永久备份把剩余日期的全部原始文件复制到对应接收目录，保持原名；
+逐个核对文件数、大小和日期，确认齐全后才放对应的 `YYYY-MM-DD.complete`，再执行一次上方 `daily run`。
+复制与放标记的方法见[接收目录](daily-run.md#二接收目录和齐全标记)。不得向已经导入的日期补文件。
+首批完成后清空平台 `pushDays`，回到日常 7 天；`raw_files.retention_days` 不要小于推送天数。
+
 ## 10. 启用定时器
 
-先确认手工拉取与每日运行均成功，再安装定时器，示例为每日 17:00：
+先确认平台推送、手工收取与每日运行均成功，再安装定时器，示例为每日 17:00：
 
 ```bash
 cd "$APM_APP"
 .venv/bin/python scripts/daily/install.py --output "$APM_ROOT/setup/daily" \
   --app-root "$APM_APP" --python "$APM_APP/.venv/bin/python" --user "$APM_RUN_USER" \
   --config "$APM_ROOT/config/daily.json" --dsn "$SQL_APM_DSN" --passfile "$PGPASSFILE" \
-  --fetch-config "$APM_ROOT/config/fetch-logs.conf" --at 17:00
+  --intake-config "$APM_ROOT/config/intake-logs.conf" --at 17:00
 sudo install -m 0644 "$APM_ROOT/setup/daily/"*.service "$APM_ROOT/setup/daily/"*.timer /etc/systemd/system/
 sudo systemctl daemon-reload
+sudo systemctl start sql-apm-daily.service
+while systemctl is-active --quiet sql-apm-daily.service; do sleep 2; done
+test "$(systemctl show sql-apm-daily.service -p Result --value)" = success
+test "$(systemctl show sql-apm-daily.service -p ExecMainStatus --value)" = 0
+sudo journalctl -u sql-apm-daily.service --no-pager -n 100
 sudo systemctl enable --now sql-apm-daily.timer
 systemctl list-timers sql-apm-daily.timer --all
 ```
 
-默认先尝试拉取最近七天，再执行每日运行；拉取失败不阻止处理已齐全的日期。
+先实际运行一次服务，等待任务结束、核对成功状态及日志中先收取、后 `daily run`，再启用定时器。
+`systemctl start` 返回只表示已经启动，不代表任务已成功完成；上面的等待和状态检查不能省略。
+每次运行先收取落地目录，再执行每日运行；收取失败不阻止处理已齐全的日期，须同时查看收取输出。
 定时任务排在 PostgreSQL 后启动，最长 12 小时，停止后下一次继续；不同时运行第二份。
 停用使用 `sudo systemctl disable --now sql-apm-daily.timer`；它不会停止已经开始的运行。
 查看行为、日志和失败恢复见[每日运行](daily-run.md)。
 
-## 11. 上线后核对
+## 11. sqlfind 一次性配置
 
+以 `sfmon` 执行，使用第 4 节已设置的只读账号和已有密码文件；不重新生成密码，不改变 `psql` 设置：
+
+```bash
+"$APM_APP/.venv/bin/python" -B "$APM_APP/scripts/sqlfind/configure.py" install \
+  --host "$APM_SOCKET" --port "$APM_PORT" --database sql_apm --user sql_apm_ro \
+  --passfile "$PGPASSFILE"
+```
+
+工具列出改动的 home 文件，相同参数可重复执行。保留安装终端，另开一个新的 PuTTY 登录会话，确认没有临时设置的
+`SQL_APM_DSN` 或 `PGPASSFILE` 覆盖；第 4 节登录环境设置的生产密码文件可以继续使用。
+在任意目录运行：
+
+```bash
+sqlfind --help
+sqlfind 'select'
+```
+
+帮助应正常显示，检索应列出候选或明确提示无命中。两种用法、三种检索和结果说明见[sqlfind 使用说明](sqlfind-guide.md)。
+撤销时以同一账号执行下列命令，再重新登录；只撤销本工具的配置，保留密码文件及其他登录设置：
+
+```bash
+/data/sql-apm/app/.venv/bin/python -B /data/sql-apm/app/scripts/sqlfind/configure.py uninstall
+```
+
+若登录片段已被手工改动，工具会拒绝猜测覆盖，先核对再撤销。
+
+## 12. 上线后核对
+
+下面的安装命令返回原安装终端执行，沿用第 1 节的变量；`sqlfind` 在第 11 节新登录会话运行。
 浏览器登录，按[使用指南](search-guide.md)核对三种检索和四个看板。
+额外核对一次 `sqlfind 'select'` 检索；在运行状态看板查看每个来源的“最新导入日期”，应与实际到齐的日期一致；
+查看 `journalctl -u sql-apm-daily.service` 中收取脚本的逐推送、逐日期输出，不能只凭服务成功判定日志已到齐。
 确认只读账号写入被拒绝、非允许来源连接被拒绝；不得通过关闭认证解决连接问题。
 
 ```bash
-psql -X -w -c 'SELECT pg_size_pretty(pg_database_size(current_database()));'
+"$APM_PG_BIN/psql" -X -w -h "$APM_SOCKET" -p "$APM_PORT" -U sql_apm -d sql_apm \
+  -c 'SELECT pg_size_pretty(pg_database_size(current_database()));'
 df -h /data
 systemctl is-active sql-apm-postgresql.service sql-apm-grafana.service sql-apm-fingerprint.service
 systemctl is-enabled sql-apm-daily.timer
@@ -512,9 +600,9 @@ Grafana 账号密码通过管理界面修改，并用 credentials.py 的 `--repl
 
 ## 附录 A. 手工编译路径
 
-**只有操作者在二进制自检失败后明确选择才执行。** 本路径会安装编译工具并升级系统软件包。
+**本版没有重新验证编译路径。只有操作者在二进制自检失败后明确选择才执行。** 本路径会安装编译工具并升级系统软件包。
 Issue #52 在演练机实际新装 18、升级 28 个包；同类生产机估计升级约 31 个包，其内网源只有旧版本。
-本轮编译前后清单也测得新装 18、升级 28 个包，另移除被 util-linux 替代的 hardlink 包。
+v1.0.0 编译前后清单也测得新装 18、升级 28 个包，另移除被 util-linux 替代的 hardlink 包。
 升级后会偏离同类主机的补丁基线，随后安装要求旧版本精确匹配的软件包可能失败。
 版本比较没有冲突不等同于这项长期影响不存在。请先由部署方评估，并安排系统级恢复途径。
 
@@ -588,3 +676,35 @@ python3 "$APM_APP/scripts/deployment/runtime_check.py" \
 
 全部检查退出 0 后回到第 4 节。编译路径允许自定前缀，但所有变量、配置、登录环境与服务路径
 必须一致；固定二进制不能搬到自定前缀。原有失败输出保留，不把编译成功当作二进制自检通过。
+
+## 附录 B. 备选：从 master 拉取
+
+以下原第 8 节的拉取步骤原样保留；拉取脚本与 `v1.0.0` 相同，本版没有重新做目标机验证。
+采用拉取时用本附录代替第 8 节的推送接入，首批按 `--date` 逐天拉取后执行第 9 节 `daily run`；
+第 10 节生成器将 `--intake-config` 换成 `--fetch-config "$APM_ROOT/config/fetch-logs.conf"`。
+
+先核对每个 master 的 SSH 主机指纹，由 sfmon 配好公钥互信；源账号只需列目录和读日志的权限。
+在本机手工测试连通与免密，保持主机密钥检查，不使用 StrictHostKeyChecking=no。
+实际 master 的地址、账号与目录仅写本地配置，不放进公开报告。
+
+```bash
+export APM_SOURCE='源账号@master地址'
+export APM_SOURCE_LOGS='/master日志目录'
+export APM_FIRST_DATE='填写已经结束的YYYY-MM-DD'
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$APM_SOURCE" 'true'
+cp "$APM_APP/daily/fetch-logs.conf.example" "$APM_ROOT/config/fetch-logs.conf"
+chmod 600 "$APM_ROOT/config/fetch-logs.conf"
+```
+
+编辑 fetch-logs.conf，每个来源一行：`来源名 源账号@主机 源日志目录 本机接收目录 [SSH端口]`，
+与 daily.json 的接收目录一致。先只拉一个已经结束的日期：
+
+```bash
+"$APM_APP/daily/fetch-logs.sh" --config "$APM_ROOT/config/fetch-logs.conf" --date "$APM_FIRST_DATE"
+find "$APM_ROOT/inbox" -maxdepth 2 -type f -name "*$APM_FIRST_DATE*" -printf '%P\t%s\n'
+```
+
+逐个来源与 master 上当日文件清单对照文件数和每个文件的大小，并确认只在全部复制成功后出现
+`YYYY-MM-DD.complete`。核对无误才允许下节导入、随后启用自动拉取。
+真实 master 上的首次拉取由部署方执行；脚本与真实目录／文件命名不符时停止并反馈，另开 Issue，
+不临时改脚本或手工放标记掩盖问题。传输脚本的行为与 v0.3.0 相同。

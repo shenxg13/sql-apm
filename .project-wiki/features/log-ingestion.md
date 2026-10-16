@@ -6,6 +6,8 @@ owners:
   - .project-wiki/features/log-ingestion.md
 updated: 2026-10-16
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/67
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207653317
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/65#issuecomment-6207662845
@@ -61,6 +63,24 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### 生产推送接入与随包手册（2026-10-16）
+
+[Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 确认生产以推送接入为主，
+[生产手册](../../docs/runbooks/production-installation.md#8-推送接入)按落地目录、公钥与主机密钥、收取配置、
+平台计划、首次手工推送／收取／每日运行、启用定时器编排；原拉取步骤原样保留在附录。
+平台的 pushDays 首次比 master 保留期少一到两天，缺少的首批日期从永久备份人工补齐并放标记；
+完成后清空 pushDays，服务用 --intake-config 先收取再 daily run。
+首次少一两天旨在避开源端清理窗口，不是参数校验限制；原脚本按昨天到前 N 天筛选实际存在的文件，
+缺日期跳过且今天排除，N=30 不要求 master 保留满 30 天。用户验收时的疑问与说明见
+[本轮确认记录](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219052514)。
+这不改变 #65 产品行为。推送／收取脚本及示例纳入 v1.1.0 包，
+[开发机准备](../../docs/reports/v110-preparation-2026-10-16.md)与
+[目标机跨机器实测](../../docs/reports/v110-target-validation-2026-10-16.md)分开记录。后者已覆盖 pushDays=24 的首次推送和默认 7 天的日常推送，
+两集群各三天共 12 文件，每日期仅导入一次；实际服务先收取再每日运行，成功退出后启用定时器。
+手册明确 systemctl start 返回不代表任务结束，须等待并检查成功状态后启用。
+2026-10-16 用户已明确确认本轮检查无问题，覆盖再次对照平台核对重写的步骤；
+该人工确认与 #65 的历史确认、实施方跨机器实测分别记录。
 
 ### 已确认的日志获取方式
 

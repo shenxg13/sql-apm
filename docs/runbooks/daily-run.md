@@ -263,7 +263,8 @@ daily/fetch-logs.sh --config /data/sql-apm/config/fetch-logs.conf --from 2026-09
 每次推送进入独立目录，最后放 `push.complete`；SQL APM 服务器上的收取脚本核对后移入接收目录并放齐全标记。
 脚本只列目录、取大小和读 master 文件，不在 master 上写任何文件（包括临时文件）。
 目录参数在内存拆分，不使用旧版 Bash 会写临时文件的 here-string／here-document。
-本节适用于 #65 的源码实现；离线包、随包手册和生产部署验证另行发版。
+推送模板与收取工具随 v1.1.0 程序包交付；生产安装顺序见[生产手册](production-installation.md#8-推送接入)，
+验证边界见[发布说明](../releases/v1.1.0.md)。
 
 **SQL APM 服务器上准备。** 下列主机名和地址均为示例，按实际值替换。两个集群共用一个落地根目录：
 
@@ -330,7 +331,10 @@ source mpp-120 mdw-example-120 /data/sql-apm/inbox/120
 `expire_hours` 可省略，默认 24，允许 1–9999 的整数小时。配置只按文本读取，不执行。
 
 **首次补齐。** master 当前保留 25 天，首次把 `pushDays` 设为 **23 或 24**，比保留期少一两天，
-避免推送中 MPP 清掉最旧一天而使整次推送失败。手工执行一次平台计划，成功后以 `sfmon` 运行：
+避开最旧一天的清理窗口。这是保守的操作建议：若列出文件后、复制前恰好遇到 MPP 清理，推送可能失败。
+`pushDays` 只筛选昨天到前 N 天实际存在的日志，缺日期不算失败，今天始终排除；
+填 30 可以推送该范围内现存的历史日志，不要求 master 保留满 30 天。
+手工执行一次平台计划，成功后以 `sfmon` 运行：
 
 ```bash
 SQL_APM_PYTHON=/data/sql-apm/app/.venv/bin/python daily/intake-logs.sh --config /data/sql-apm/config/intake-logs.conf

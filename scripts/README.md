@@ -341,6 +341,10 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/db/verify_daily_recovery.py`：合成验收，覆盖不能丢、不能藏的情形：导入之后文件被改（含大小不变和同名替换）、
   删除被打断后的续做和计数、集群正忙而无事可做、问题跨过被跳过或被中止的运行、“成功”的口径、等语句时收到停止信号。
 - `scripts/daily/verify_fetch.py --sshd-root DIR`：传输脚本对回环地址上以普通用户运行的真实 sshd；`DIR` 是解包的 `openssh-server`。
+- `daily/push-logs.sh` 是 master 端平台模板；`daily/intake-logs.sh --config FILE` 在 SQL APM 端核对清单后移入。
+  `scripts/daily/verify_push.py --sshd-root DIR --timer` 使用合成 master、私有 SSH/PG 和临时用户定时器验收；
+  `tests/test_log_intake.py` 覆盖中断恢复、清理和目录边界。操作步骤及清单格式见上述每日运行说明，开发机证据见
+  [推送验证报告](../docs/reports/log-push-2026-10-16.md)。
 - `scripts/daily/verify_timer.py [--sshd-root DIR]`：在用户级 systemd 上安装临时单元，实测定时器各行为，约 13 分钟，结束后移除。
 - `scripts/grafana/verify_status_e2e.py --directory DIR`：无界面浏览器核对运行状态看板；用 `setup_dev.py synthetic` 新搭的环境。
 - `scripts/daily/verify_replay.py run|compare`：显式的真实样本回放，三种方式各用私有实例和样本的副本，再比对最终版本。

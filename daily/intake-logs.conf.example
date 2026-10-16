@@ -1,0 +1,8 @@
+# Plain text, never executed. Fields are separated by whitespace; no spaces in paths.
+# Create all directories first, on the same filesystem. No overlapping directories.
+landing /data/sql-apm/landing
+expire_hours 24
+# source NAME MASTER_HOSTNAME RECEIVING_DIRECTORY
+# MASTER_HOSTNAME must equal `hostname` on that master, including any domain suffix.
+source mpp-119 mdw-example-119 /data/sql-apm/inbox/119
+source mpp-120 mdw-example-120 /data/sql-apm/inbox/120

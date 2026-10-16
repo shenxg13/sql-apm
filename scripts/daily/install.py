@@ -76,6 +76,7 @@ def main():
     parser.add_argument('--max-hours', type=float, default=12, help='定时启动的运行最长多少小时，默认 12')
     parser.add_argument('--check-seconds', type=int, default=10, help='连接存活检查间隔（秒），默认 10')
     parser.add_argument('--fetch-config', type=Path, help='传输脚本的配置文件；给出后先拉取再运行')
+    parser.add_argument('--intake-config', type=Path, help='收取脚本的配置文件；给出后先收取，再拉取（如有），再运行')
     parser.add_argument('--schema', default='sql_apm')
     parser.add_argument('--app-root', type=Path, default=ROOT, help='程序目录')
     parser.add_argument('--python', type=Path, default=Path(sys.executable), help='项目解释器')
@@ -98,13 +99,19 @@ def main():
     refuse_password(args.dsn)
     if not args.user_unit and not args.user:
         fail('--user is required for a system unit')
-    for path, label in [(args.config, '--config'), (args.passfile, '--passfile'), (args.fetch_config, '--fetch-config')]:
+    for path, label in [(args.config, '--config'), (args.passfile, '--passfile'), (args.fetch_config, '--fetch-config'),
+                        (args.intake_config, '--intake-config')]:
         if path is not None and not path.is_file():
             fail(label + ' is not a file')
     app = args.app_root.resolve()
     if not (app / 'sql_apm/__main__.py').is_file():
         fail('--app-root does not hold the program')
     fetch = ''
+    intake = ''
+    if args.intake_config:
+        intake = 'Environment="SQL_APM_PYTHON=' + plain(args.python.absolute(), '--python') + '"\n' + \
+            'ExecStartPre=-' + word(app / 'daily/intake-logs.sh', 'the program directory') + ' --config ' + \
+            word(args.intake_config.resolve(), '--intake-config')
     if args.fetch_config:
         # The leading "-": a failed pull does not keep the run from handling days already marked.
         fetch = 'ExecStartPre=-' + word(app / 'daily/fetch-logs.sh', 'the program directory') + ' --config ' + \
@@ -115,7 +122,7 @@ def main():
         CONFIG=word(args.config.resolve(), '--config'), SCHEMA=word(args.schema, '--schema'), DSN=plain(args.dsn, '--dsn'),
         USER_LINE='' if args.user_unit else 'User=' + word(args.user, '--user'),
         PASSFILE_LINE='Environment="PGPASSFILE=' + plain(args.passfile.resolve(), '--passfile') + '"' if args.passfile else '',
-        CHECK_SECONDS=args.check_seconds, FETCH_LINE=fetch, MAX_SECONDS=str(round(args.max_hours * 3600)) + 's',
+        CHECK_SECONDS=args.check_seconds, INTAKE_LINE=intake, FETCH_LINE=fetch, MAX_SECONDS=str(round(args.max_hours * 3600)) + 's',
         CALENDAR_LINES='\n'.join('OnCalendar=*-*-* ' + value + ':00' for value in times))
     args.output.mkdir(parents=True, exist_ok=True)
     for suffix in ('service', 'timer'):

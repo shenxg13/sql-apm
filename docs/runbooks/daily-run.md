@@ -177,7 +177,7 @@ python scripts/daily/install.py --output /tmp/sql-apm-units \
 
 它生成 `sql-apm-daily.service` 和 `sql-apm-daily.timer` 两个文件。常用参数：`--at HH:MM` 是每天启动的时刻（服务器本地时间），
 可以重复给出多个，默认 17:00；`--max-hours` 是定时启动的运行最长多少小时，默认 12；`--user` 是运行它的系统用户，
-用项目用户；`--fetch-config` 见下一节。用项目的解释器执行它。
+用项目用户；`--fetch-config` 和 `--intake-config` 见下一节。用项目的解释器执行它。
 
 单元文件对本机所有用户可读，所以**连接串里不能有密码**：关键字形式的 `password=`、URI 形式的“用户:密码@主机”和 `?password=`
 （包括百分号编码的写法）都会被拒绝，不生成任何文件，报错里也不重复连接串。密码放在 `--passfile` 指向的文件里。
@@ -209,6 +209,11 @@ systemctl list-timers sql-apm-daily.timer        # 下一次启动的时间
   不影响下一次定时启动。
 
 ## 八、传输脚本
+
+可以由基线服务器拉取，也可以由 MPP master 推送后收取。两种配置可以都不启用、只启用一种或同时启用；
+同时启用时先收取、再拉取、再执行 `daily run`。取日志失败不会阻止每日运行处理已有标记的日期。
+
+### 基线服务器拉取
 
 `daily/fetch-logs.sh` 在基线服务器上运行，用 scp 从 MPP 的 master 把已经结束的日期的日志拉到接收目录，
 整天到齐后放齐全标记。它是可选的：不用它时，手工拷贝并放标记，其余功能完全一样。
@@ -251,6 +256,130 @@ daily/fetch-logs.sh --config /data/sql-apm/config/fetch-logs.conf --from 2026-09
 
 **与定时器衔接。** 生成单元文件时加上 `--fetch-config /data/sql-apm/config/fetch-logs.conf`，同一个定时任务就先拉取、再执行每日运行，
 只需要设一个时刻。拉取失败不妨碍每日运行处理已经有标记的日期。
+
+### MPP 端推送
+
+平台每天在 master 上以 root 执行推送模板，模板通过 `appUser` 用 SSH/SCP 登录 SQL APM 服务器的 `sfmon` 账号。
+每次推送进入独立目录，最后放 `push.complete`；SQL APM 服务器上的收取脚本核对后移入接收目录并放齐全标记。
+脚本只列目录、取大小和读 master 文件，不在 master 上写任何文件（包括临时文件）。
+目录参数在内存拆分，不使用旧版 Bash 会写临时文件的 here-string／here-document。
+本节适用于 #65 的源码实现；离线包、随包手册和生产部署验证另行发版。
+
+**SQL APM 服务器上准备。** 下列主机名和地址均为示例，按实际值替换。两个集群共用一个落地根目录：
+
+```bash
+sudo install -d -o sfmon -g sfmon -m 0700 /data/sql-apm/landing
+```
+
+接收目录仍按第二节预先建立，例如 `/data/sql-apm/inbox/119` 和 `/data/sql-apm/inbox/120`，都由 `sfmon` 读写。
+落地根目录必须在接收目录之外，二者不能相同或互相包含，且须在同一个文件系统（收取只改名、不复制）。
+不要把落地根目录设成接收目录、接收目录的上级、程序目录或其他已有数据的目录。
+
+把每台 master 上 **appUser 的公钥**逐行加入 SQL APM 服务器 `/home/sfmon/.ssh/authorized_keys`，保留已有条目；
+每条用 `from=` 限定该 master 的地址。例如（不是可直接使用的公钥）：
+
+```text
+from="192.0.2.10" ssh-ed25519 REPLACE_WITH_MASTER_PUBLIC_KEY
+```
+
+`.ssh` 和 `authorized_keys` 属主为 `sfmon`，权限分别为 700、600。只交换公钥，不复制私钥。
+首次在 master 上以 `appUser` 手工执行 `ssh sfmon@SQL_APM服务器地址`，核对并接受主机密钥；
+自动计划运行前必须完成免密登录和主机密钥准备；模板不自动接受新密钥，不改应用用户的 SSH 配置。
+这意味着 master 上的应用用户能以 `sfmon` 登录 SQL APM 服务器；`from=` 限定来源地址。
+
+**平台上。**
+
+1. 在平台复制公用模板“文件备份到中转机_Linux V1.0”。只编辑副本，不改公用模板。
+2. 打开副本的 Shell 内容，将仓库 `daily/push-logs.sh` 的完整内容粘贴进去，保存。
+   保留原有内置参数 `RCLONE_DEST_PATH`、`RCLONE_BUCKET_NAME`、`PLAN_ID` 和原入参名字。
+3. 新增自定义入参 `pushDays`，设为“可为空”。空值取 7；只接受 1–366 的整数。
+4. 两个集群各用模板副本创建或调整一个计划。参数如下：
+
+| 平台参数 | 填写内容 |
+| --- | --- |
+| 备份文件目录 `backupFilePath` | 对应 master 的 `pg_log` 完整目录；多个目录用空白分隔，目录名不能含空白；按字面路径读取，不展开 `*`、`?` 等通配符 |
+| 备份挂载目录 `backHomePath` | 两计划都填 `/data/sql-apm/landing` |
+| 中转机 IP `uploadServerIp` | SQL APM 服务器地址 |
+| 应用用户 `appUser` | master 上执行 ssh/scp、能读取日志的账号；不是 SQL APM 服务器的登录账号 |
+| 推送天数 `pushDays` | 日常留空；首次按下一段填 23 或 24 |
+| 内置路径、bucket、计划标识 | 沿用平台提供的值；每次推送的 `dest_path` 应是新的多级路径 |
+
+计划建议每天 **16:00** 执行，早于 SQL APM 每日运行的 **17:00**；master 与 SQL APM 服务器的时区都用北京时间。
+首次补齐之前，先不要启用 SQL APM 定时器。
+
+推送目标为 `backHomePath/bucketName/dest_path`，登录账号固定为 `sfmon`。
+模板先拒绝三个路径变量为空的情况，再以 `sfmon` 执行原来的 `mkdir -p 推送目录` 和 `rm -fr 推送目录/*`。
+删除只发生在 SQL APM 服务器；填写错误的非空目录仍可能删除 `sfmon` 有权限删除的数据，务必核对上述目录关系。
+文件平铺在推送目录，只有最近 N 天、不含今天的 `gpdb-YYYY-MM-DD_HHMMSS.csv[.N]` 普通文件会被推送；
+不同源目录选出同名文件时，在连接服务器前退出。
+所列任一目录不存在或不是目录时，也在连接前以非零退出，并打印具体路径；这与原公用模板跳过错误目录后继续的行为不同。
+目录存在但没有选中文件时正常成功，发布空清单；缺某一天不算失败。
+平台按日期从旧到新列出已推送日期的文件数、字节数，并输出总数或失败原因。
+
+**收取配置。** 将 `daily/intake-logs.conf.example` 复制成 `/data/sql-apm/config/intake-logs.conf` 并修改：
+
+```text
+landing /data/sql-apm/landing
+expire_hours 24
+source mpp-119 mdw-example-119 /data/sql-apm/inbox/119
+source mpp-120 mdw-example-120 /data/sql-apm/inbox/120
+```
+
+`source` 后为来源名称、master 上 `hostname` 的完整输出（可能含域名）、接收目录；接收目录必须与 `daily.json` 一致。
+字段用空白分隔，空行及以 `#` 开头的行忽略。名称、主机名不能重复，目录不能重叠。
+`expire_hours` 可省略，默认 24，允许 1–9999 的整数小时。配置只按文本读取，不执行。
+
+**首次补齐。** master 当前保留 25 天，首次把 `pushDays` 设为 **23 或 24**，比保留期少一两天，
+避免推送中 MPP 清掉最旧一天而使整次推送失败。手工执行一次平台计划，成功后以 `sfmon` 运行：
+
+```bash
+SQL_APM_PYTHON=/data/sql-apm/app/.venv/bin/python daily/intake-logs.sh --config /data/sql-apm/config/intake-logs.conf
+python -m sql_apm daily run --config /data/sql-apm/config/daily.json
+```
+
+按实际项目解释器路径替换 `SQL_APM_PYTHON`；未设置时使用 PATH 中的 `python3`。
+先按第三节设置连接环境。想补足 30 天时，从永久备份手工把其余日期的完整文件复制到接收目录，核对后放对应的齐全标记，
+再执行一次 `daily run`。完成后清空平台 `pushDays`，回到日常 7 天；每日运行的 `raw_files.retention_days` 不要小于推送天数，
+否则已删除的日期会再次被收取和核对。
+
+**定时衔接。** 在第七节生成单元文件的命令后加上：
+
+```text
+--intake-config /data/sql-apm/config/intake-logs.conf
+```
+
+然后按第七节安装并启用定时器。生成的单元使用同一个项目解释器执行收取；收取和可选的拉取共享 `TimeoutStartSec`
+的启动阶段限制，数值与 `--max-hours` 相同。二者用 `ExecStartPre=-`，退出失败仍执行后续步骤。
+回退时停用平台计划，去掉 `--intake-config` 重新生成并安装单元文件。
+
+**标志与收取结果。** `push.complete` 是 ASCII 文本，字段用制表符分隔，格式版本为 1：
+
+```text
+SQL_APM_PUSH<TAB>1
+host<TAB>mdw-example-119
+today<TAB>2026-10-16
+days<TAB>7
+file<TAB>gpdb-2026-10-15_000000.csv<TAB>12345
+```
+
+这里 `<TAB>` 表示一个制表符；`file` 行逐文件列出名字与拷贝前字节数。没有选出文件时只有前四行。
+全部 scp 成功后，模板才通过 SSH 从内存把清单写成 `push.complete.tmp`，再改名为 `push.complete`；任一步失败都以该步的退出码退出。
+临时名不能用于收取。收取按清单里的 master 日期从旧到新，核对主机、格式、文件大小和是否有额外日志，
+不读取日志内容、不连接数据库。已移入且大小相同的文件可作为中断续做的依据；有标记的日期保持不动，大小差异只报告。
+接收目录里未标记的日期如果有额外文件或大小冲突，保持原样，等待人工核对。
+
+输出为 `key=value`，含每次推送和每个日期的结果。退出码：0 无失败（包括没有新推送），
+1 有不能使用的推送、未收取日期或主机名未配置的推送，2 参数／配置错误。
+查找目录失败时报告具体原因，例如 `nested_filesystem` 表示子目录跨文件系统，
+`EACCES` 加系统错误说明表示权限不足；输出中的空白转义为 `\x20` 等字符。
+同一落地根目录只允许一个收取进程，第二个立即以 1 退出。
+处理完的推送删除；未完成、核对失败或暂时移不进的推送超过 `expire_hours` 后清理。时限取落地文件最新的 ctime
+（空目录用目录 ctime），不会用 scp 保留下来的源端 mtime；本地再次改动会延后清理。
+未知主机的推送每次报告、始终保留。含其他文件、子目录或符号链接的推送不清理；符号链接不跟随。
+仅删除推送中的日志和标志文件，再逐级删空目录，落地根目录保留。
+
+**发现没收到。** 看看板“最新导入日期”、`journalctl -u sql-apm-daily.service` 的收取输出，以及平台计划执行结果。
+日志没到不新增产品待处理问题。推送晚于收取，或某天推送失败时，下一次推送会再带上最近 N 天，补齐后继续导入。
 
 ## 九、调整
 

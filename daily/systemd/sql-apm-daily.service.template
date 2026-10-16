@@ -13,11 +13,12 @@ WorkingDirectory=@APP_ROOT@
 Environment="SQL_APM_DSN=@DSN@"
 @PASSFILE_LINE@
 Environment="SQL_APM_CONNECTION_CHECK_SECONDS=@CHECK_SECONDS@"
+@INTAKE_LINE@
 @FETCH_LINE@
 ExecStart=@PYTHON@ -m sql_apm daily run --config @CONFIG@ --schema @SCHEMA@ --trigger timer
 # Longest time a timer-started run may take. It is then stopped and the next run
-# carries on. A run started by hand from a shell has no such limit. The pull, when
-# one is configured, has the same limit of its own.
+# carries on. A run started by hand from a shell has no such limit. The configured
+# intake and pull share the start-phase limit, with the same value.
 RuntimeMaxSec=@MAX_SECONDS@
 TimeoutStartSec=@MAX_SECONDS@
 # 130: the run was stopped on purpose and recorded itself as aborted.

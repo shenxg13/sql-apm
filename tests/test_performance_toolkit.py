@@ -170,6 +170,10 @@ class ToolkitTests(unittest.TestCase):
         documents={'timing.json':timing,'timing-state.json':dict(state='complete',seconds=3)}
         self.assertEqual(overview.counts([good])['failed'],0)
         self.assertEqual(overview.counts([page])['timeout'],1)
+        self.assertEqual(overview.counts([page])['failed'],0)
+        self.assertEqual(overview.counts([page])['over_reference'],0)
+        slow=dict(statement,state='ok',ms=1001,target_ms=1000)
+        self.assertEqual(overview.counts([dict(page,statements=[slow,slow])])['over_reference'],1)
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
             for name,value in documents.items():

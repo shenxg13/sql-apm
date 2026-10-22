@@ -44,16 +44,21 @@ def counts(rows):
     def states(row):
         # A page is one operation even if several of its SQL statements fail.
         return [s.get('state') for s in row.get('statements',[])] + [row.get('state')]
+    def exceeds(row):
+        if 'page_estimate_ms' in row:
+            return any(exceeds(statement) for statement in row.get('statements',[]))
+        return row.get('ms',0)>row.get('target_ms',1000)
     return dict(total=len(rows), timeout=sum(any(s in ('timeout','over_limit') for s in states(r)) for r in rows),
+        over_reference=sum(exceeds(r) for r in rows),
         attention=sum(bool(r.get('attention')) or any(s.get('attention') for s in r.get('statements',[])) for r in rows),
-        failed=sum(bool(r.get('incomplete')) or any(s not in (None,'ok','timeout','over_limit',
+        failed=sum(any(s not in (None,'ok','timeout','over_limit',
             'has_baseline','records_without_baseline','not_seen','unreliable_fingerprint') for s in states(r)) for r in rows))
 
 
 def count_line(label, rows):
     values = counts(rows)
     return (f"{label}: {values['total']} 项；超时 {values['timeout']}；"
-            f"关注 {values['attention']}；失败 {values['failed']}")
+            f"超参照 {values['over_reference']}；失败 {values['failed']}")
 
 
 def elapsed(row):
@@ -110,7 +115,7 @@ def terminal(directory, part):
 
 
 def bundle(documents):
-    lines = ['快速概要（操作计数与 SQL 计数分开；关注含超参照及异常）']
+    lines = ['快速概要（操作与 SQL 分列；页面超参照按其 SQL 判断）']
     lines.extend(state_line(documents,part) for part in PARTS)
     lines.append(selection_line(documents))
     timing = documents.get('timing.json',{})

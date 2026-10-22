@@ -1,5 +1,6 @@
 """Independent inspection boundaries, Grafana substitution and disclosure guards."""
 from datetime import datetime,timezone
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -70,6 +71,7 @@ class ToolkitTests(unittest.TestCase):
         self.assertIn('--with-openssl',data['build'][0]['setting'])
         scan({'settings.json':json.dumps(data).encode()},['postgres'])
 
+    @unittest.skipUnless(importlib.util.find_spec('psycopg2'), 'requires the pinned PostgreSQL driver')
     def test_connection_options_preserve_the_existing_timeout(self):
         from psycopg2.extensions import parse_dsn
         with patch('psycopg2.connect',return_value=Mock()) as connect,patch('psycopg2.extensions.set_wait_callback'):

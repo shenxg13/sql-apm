@@ -24,6 +24,12 @@ from perfkit.vocabulary import fixed, Vocabulary
 
 
 class ToolkitTests(unittest.TestCase):
+    def test_build_and_kernel_field_names_are_checked_before_timing(self):
+        with patch('perfkit.collect.read',return_value='SyntheticHostMetric70: 1\n'):
+            vocabulary=fixed()
+        for value in ('CC','CFLAGS','SyntheticHostMetric70','"SyntheticHostMetric70"'):
+            self.assertIsNotNone(vocabulary.collision(value))
+
     def test_automatic_inputs_skip_colliding_names_without_changing_scan(self):
         vocabulary = fixed(Mock(query=Mock(side_effect=[
             [{'name':'mpp_drop_result_month'},{'name':'xact_commit'}], []])))

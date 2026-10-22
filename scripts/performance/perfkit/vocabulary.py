@@ -49,6 +49,10 @@ def fixed(session=None):
     if manifest.exists():
         from .pack import strings
         groups['tool:manifest'] = list(strings(json.loads(manifest.read_text())))
+    # These public field names come from the running kernel, not Python literals.
+    groups['host:columns'] = [line.split()[0].rstrip(':')
+        for name in ('stat','meminfo','vmstat')
+        for line in (collect.read('/proc/'+name) or '').splitlines() if line.split()]
     if session is not None:
         groups['catalog:names'] = [row['name'] for row in session.query("""
             SELECT relname::text name FROM pg_class

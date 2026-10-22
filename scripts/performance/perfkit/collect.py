@@ -110,6 +110,7 @@ SETTINGS_SQL = """SELECT name,setting,unit,boot_val,source,vartype,enumvals,pend
         FROM pg_settings WHERE setting IS DISTINCT FROM boot_val OR name ~
         'work_mem|buffers|parallel|checkpoint|autovacuum|page_cost|io_concurrency|jit|max_connections|wal_size|effective_cache'
         ORDER BY name"""
+BUILD_NAMES = ('VERSION','CONFIGURE','CC','CFLAGS')
 
 
 def settings(session):
@@ -122,7 +123,8 @@ def settings(session):
                 'log_directory', 'timezone', 'TimeZone', 'search_path'):
             row['setting'] = row['boot_val'] = '<redacted>'
         row.pop('enumvals', None)
-    build = session.query("SELECT name,setting FROM pg_config WHERE name IN ('VERSION','CONFIGURE','CC','CFLAGS')")
+    build = session.query('SELECT name,setting FROM pg_config WHERE name IN ('+
+                          ','.join("'"+name+"'" for name in BUILD_NAMES)+')')
     return {'values': rows, 'build': build}
 
 

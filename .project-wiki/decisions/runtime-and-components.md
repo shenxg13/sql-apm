@@ -4,7 +4,7 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-22
+updated: 2026-10-23
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/70
     status: current
@@ -130,6 +130,13 @@ PostgreSQL 和指纹服务 RSS。前后统计增量与累计值分开，累计�
 白名单限定名称和位置，不能从敏感值集合整体删除某个词；同词在业务值、动态文本或未确认元数据中仍拒绝。
 普通计时默认全部用例、每项三次；时段不足时可按编号选择部分用例，输出须显式标记覆盖减少，
 本轮双机验收仍保留全部用例和三轮计时。
+
+2026-10-23 R1 整改遵循[完整台账](https://github.com/shenxg13/sql-apm/pull/71#issuecomment-6345466034)
+及[维护者采纳](https://github.com/shenxg13/sql-apm/issues/70#issuecomment-6345776755)：
+自动输入与固定导出名称重名时确定性回退并记录原因；库名、执行用户或手工输入重名时在计时前拒绝，
+仅报告类别和位置，不扩展 Q11 白名单。选择阶段使用独立可配置的会话预算，单个集群超时可跳过，
+普通计时仍遵守账号原有超时。终端和包首共享概要，普通计划列出重放预算，手册明确父目录准备。
+O-70-003 不处理，继续整体替换表达式。具体候选次序和预算边界由手册、设计和测试维护。
 
 ### v1.1.0 交付约定（2026-10-16）
 

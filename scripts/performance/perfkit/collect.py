@@ -106,11 +106,14 @@ def inventory(session, work, pgdata):
                 residual_reason='catalogs_other_schemas_and_relation_metadata; WAL_is_cluster_wide')
 
 
-def settings(session):
-    rows = session.query("""SELECT name,setting,unit,boot_val,source,vartype,enumvals,pending_restart
+SETTINGS_SQL = """SELECT name,setting,unit,boot_val,source,vartype,enumvals,pending_restart
         FROM pg_settings WHERE setting IS DISTINCT FROM boot_val OR name ~
         'work_mem|buffers|parallel|checkpoint|autovacuum|page_cost|io_concurrency|jit|max_connections|wal_size|effective_cache'
-        ORDER BY name""")
+        ORDER BY name"""
+
+
+def settings(session):
+    rows = session.query(SETTINGS_SQL)
     for row in rows:
         # String GUCs include connection secrets, addresses and arbitrary options.
         # Keep numeric/bool/enum values; retain only the approved path settings.

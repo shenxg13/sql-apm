@@ -129,7 +129,8 @@ class Work:
             record['ended_at'] = datetime.now().astimezone()
             self.flush()
             save(self.public / (name + '-state.json'), record)
-            print(f"{name}: {record['state']}，{record['seconds']:.1f} 秒", flush=True)
+            from .overview import terminal
+            print(terminal(self.public,name), flush=True)
 
 
 class Session:

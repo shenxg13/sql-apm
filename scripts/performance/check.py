@@ -28,6 +28,8 @@ def parser():
     result.add_argument('--module-dir',type=Path,default=Path(__file__).resolve().parent/'module')
     result.add_argument('--fingerprint-url',default='http://127.0.0.1:3001')
     result.add_argument('--limit-seconds',type=int,default=600)
+    result.add_argument('--cases-limit-seconds',type=int,default=600,
+                        help='每集群选用例预算，1..3600 秒；不改变普通计时超时')
     result.add_argument('--at',help='固定 ISO 时间，用于两次测试／浏览器对照；默认当前时间')
     return result
 
@@ -131,6 +133,8 @@ def run(args):
     args.dashboards=args.dashboards or args.root/'grafana/dashboards/mpp'
     if not 1<=args.limit_seconds<=3600:
         raise Refused('limit_must_be_1_to_3600_seconds')
+    if not 1<=args.cases_limit_seconds<=3600:
+        raise Refused('cases_limit_must_be_1_to_3600_seconds')
     work=Work(args.work,args.root)
     try:
         if args.part=='pack':
@@ -160,7 +164,7 @@ def run(args):
         if args.part in ('main','cases'):
             with work.section('cases'),Session(dsn) as session:
                 idle(session)
-                cases.choose(session,work,args.extra_cases)
+                cases.choose(session,work,args.extra_cases,args.cases_limit_seconds)
         if args.part in ('main','timing'):
             with work.section('timing'):
                 timed(args,work,dsn)
@@ -187,6 +191,8 @@ def run(args):
                     unique={}
                     for item in json.loads(source.read_text()) if source.exists() else []:
                         unique.setdefault(item['sql'],[]).append(item['item'])
+                    print(f'普通计划：{len(unique)} 条；每条上限 {args.limit_seconds} 秒；'
+                          f'最坏查询预算 {len(unique)*args.limit_seconds} 秒', flush=True)
                     journal=work.private/'plans.jsonl'
                     journal.write_bytes(b'')
                     save(work.public/'plans.json',result)

@@ -7,7 +7,7 @@ import shlex
 import tarfile
 
 from .core import digest, encoded, Refused, save
-from . import metadata
+from . import metadata, overview
 
 
 ALLOWED = {'identity.json','cases.json','host.json','inventory.json','health.json','settings.json',
@@ -81,7 +81,8 @@ def export_document(name,value,secrets):
 def summary(files):
     def document(name):
         return json.loads(files[name])
-    lines=['SQL APM 使用性能检查结果','',
+    documents={name:json.loads(raw) for name,raw in files.items() if name.endswith('.json')}
+    lines=['SQL APM 使用性能检查结果','']+overview.bundle(documents)+['',
         '库级累计统计包含导入和构建；计时增量见 deltas.json。',
         '首次与后两次分别记录；参照值用于关注提示，不是通过门槛。',
         '页面估计 = 变量链 + 最慢面板；不包含浏览器和并行争用。','']

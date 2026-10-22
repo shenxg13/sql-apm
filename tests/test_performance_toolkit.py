@@ -20,16 +20,23 @@ from perfkit.commands import statement_target
 from perfkit.metadata import scan_views, declaration
 from perfkit.core import encoded
 from perfkit import cases, overview, pack
-from perfkit.vocabulary import fixed, Vocabulary
+from perfkit.vocabulary import fixed, sql_fields, Vocabulary
 
 
 class ToolkitTests(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
     def test_build_and_kernel_field_names_are_checked_before_timing(self):
         with patch('perfkit.collect.read',return_value='SyntheticHostMetric70: 1\n'):
             vocabulary=fixed()
-        for value in ('CC','CFLAGS','SyntheticHostMetric70','"SyntheticHostMetric70"'):
+        for value in ('CC','CFLAGS','SyntheticHostMetric70','"SyntheticHostMetric70"',
+                      'heap_bytes','table_bytes','index_bytes','"heap_bytes"'):
             self.assertIsNotNone(vocabulary.collision(value))
+        self.assertIsNone(vocabulary.collision('SELECT'))
+        self.assertEqual(sql_fields(['SELECT %s AS explicit_label, t.natural_label, count(*) FROM t',
+                                     'SELECT name FROM (']),
+                         {'explicit_label','natural_label','count'})
 
+    @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
     def test_automatic_inputs_skip_colliding_names_without_changing_scan(self):
         vocabulary = fixed(Mock(query=Mock(side_effect=[
             [{'name':'mpp_drop_result_month'},{'name':'xact_commit'}], []])))

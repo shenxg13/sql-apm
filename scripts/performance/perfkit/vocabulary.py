@@ -20,6 +20,36 @@ class Vocabulary:
                      if isinstance(value, str) and value and value in text), None)
 
 
+def sql_fields(statements):
+    # SQL text itself is not exported, but its result column labels are.
+    from pglast import ast as pgast, parse_sql
+    from pglast.parser import ParseError
+    from pglast.visitors import Visitor
+
+    names = set()
+
+    class Fields(Visitor):
+        def visit_ResTarget(self, ancestors, node):
+            if node.name:
+                names.add(node.name)
+            elif isinstance(node.val, pgast.ColumnRef):
+                last = node.val.fields[-1]
+                if isinstance(last, pgast.String):
+                    names.add(last.sval)
+            elif isinstance(node.val, pgast.FuncCall):
+                names.add(node.val.funcname[-1].sval)
+
+    for statement in statements:
+        try:
+            tree = parse_sql(statement.replace('%s', 'NULL'))
+        except ParseError:
+            # Concatenation fragments have their literal field names included
+            # separately; complete queries provide generated output labels.
+            continue
+        Fields()(tree)
+    return names
+
+
 def fixed(session=None):
     # JSON plan labels/enums are plain words, not C include paths, error format
     # strings or XML/HTML renderer fragments in the same upstream source.
@@ -39,11 +69,14 @@ def fixed(session=None):
         # These two internal strings are normalized by pack.export_document:
         # the process classifier/connection OS account and its old RSS key.
         # They are not exported fixed names. pack.scan still scans both values.
-        groups['tool:'+path.name] = [node.value for node in ast.walk(tree)
+        literals = [node.value for node in ast.walk(tree)
             if isinstance(node, ast.Constant) and isinstance(node.value, str)
-            and id(node) not in docstrings
-            and not re.match(r'^\s*\(?\s*(SELECT|WITH|SET|SHOW|LOAD|EXPLAIN|UNION)(?:\s|$)',node.value,re.I)
-            and node.value not in ('postgres','postgres_rss_kib')] + [
+            and id(node) not in docstrings]
+        statements = {value for value in literals if re.match(
+            r'^\s*\(?\s*(SELECT|WITH|SET|SHOW|LOAD|EXPLAIN|UNION)(?:\s|$)',value,re.I)}
+        groups['sql:fields:'+path.name] = sql_fields(statements)
+        groups['tool:'+path.name] = [value for value in literals
+            if value not in statements and value not in ('postgres','postgres_rss_kib')] + [
             node.arg for node in ast.walk(tree) if isinstance(node, ast.keyword) and node.arg]
     manifest = directory.parent/'MANIFEST.json'
     if manifest.exists():

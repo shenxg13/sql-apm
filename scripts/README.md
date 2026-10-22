@@ -364,3 +364,13 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 v1.1.0 的 `build_bundle.py` 要求复用固定摘要的 v1.0.0 成品，拒绝缺失或不同成品。
 `run_verification.py sqlfind` 检查已解包程序，`push --sshd-root DIR [--timer]` 使用合成 master 与私有 SSH；
 真实跨机器验证仍由发布契约定义。制包与验证范围见[发布说明](../docs/runbooks/program-release.md)。
+
+## 独立生产性能检查工具包
+
+`scripts/performance/build.py --module DIR --output NEW_DIR` 从已提交源码生成独立压缩包和中文 HTML；
+开发时可用 `--allow-dirty` 生成明确标记的预览包，不作为最终交付。
+`compile_module.py` 在 Kylin 上用已装运行时的 PGXS 编译单独模块，不安装到产品目录。
+`perfcheck main|system|pack --work DIR` 的账号、目录和恢复步骤见
+[性能检查手册](../docs/runbooks/performance-check.md)。
+`verify_browser.py`、`verify_commands.py`、`verify_boundaries.py` 和 `audit.py` 仅供开发机私有环境验收，
+不进入生产工具包；原始浏览器、驱动语句及服务器日志必须保留在本地忽略目录。

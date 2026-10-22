@@ -99,6 +99,9 @@
 
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
+| [生产使用性能检查](runbooks/performance-check.md) | 操作说明 | 独立只读工具包的准备、三步执行、中断、结果审阅及阅读参照。 |
+| [性能检查工具包设计](design/performance-toolkit.md) | 设计说明 | 版本绑定、实际查询记录、计划及脱敏边界。 |
+| [性能检查工具包验证](reports/performance-toolkit-2026-10-22.md) | 验证报告 | 重建、双机实测、浏览器／命令 SQL 对照、交付摘要及用户查看边界。 |
 | [Duration 覆盖与合并耗时诊断](runbooks/duration-dispersion.md) | 操作说明 | 只读提取、真实维度覆盖、合并子组中位数倍数及脱敏边界。 |
 | [本地开发说明](runbooks/local-development.md) | 操作说明 | 当前环境准备情况、Python 用法、本地样本位置及检查入口。 |
 | [Kylin 离线部署与 daily 验收](runbooks/kylin-offline-deployment.md) | 操作说明 | 离线安装、账号、开发机日志分批拉取、daily 首批／追加与人工基准比较；实施方九任务见附录。 |

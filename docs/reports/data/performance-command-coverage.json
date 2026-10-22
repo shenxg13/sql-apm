@@ -1,0 +1,230 @@
+{
+  "product_commit": "c18af96755cc0f8f623393d51d208ff35b649c2d",
+  "commands": 435,
+  "recorded_statements": 14646,
+  "all_matched_server_log": true,
+  "sites": [
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "rows",
+      "line": 15,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "search",
+      "line": 41,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "search",
+      "line": 47,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "candidates",
+      "line": 53,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "catalog",
+      "line": 68,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "catalog",
+      "line": 66,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "executions",
+      "line": 92,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "executions",
+      "line": 87,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "originals",
+      "line": 118,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 161,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 162,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 192,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 196,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 199,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 207,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 188,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/sqlfind.py",
+      "function": "detail",
+      "line": 235,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "query",
+      "line": 68,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "exact",
+      "line": 84,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "exact",
+      "line": 81,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "exact",
+      "line": 95,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "main",
+      "line": 149,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "main",
+      "line": 158,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "main",
+      "line": 165,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "main",
+      "line": 168,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/cli/search.py",
+      "function": "main",
+      "line": 171,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/service/fingerprint.py",
+      "function": "same_but_breaks",
+      "line": 40,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/service/fingerprint.py",
+      "function": "same_text_id",
+      "line": 58,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/service/fingerprint.py",
+      "function": "same_text_id",
+      "line": 67,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/daily.py",
+      "function": "status",
+      "line": 252,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/daily.py",
+      "function": "status",
+      "line": 254,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/daily.py",
+      "function": "status",
+      "line": 256,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/daily.py",
+      "function": "status",
+      "line": 264,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/ingestion.py",
+      "function": "connect",
+      "line": 38,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/ingestion.py",
+      "function": "connect",
+      "line": 39,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/ingestion.py",
+      "function": "connect",
+      "line": 40,
+      "covered": true
+    },
+    {
+      "file": "sql_apm/storage/ingestion.py",
+      "function": "connect",
+      "line": 43,
+      "covered": true
+    }
+  ]
+}

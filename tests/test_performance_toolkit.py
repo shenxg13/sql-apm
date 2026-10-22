@@ -78,10 +78,35 @@ class ToolkitTests(unittest.TestCase):
                     with self.assertRaisesRegex(Refused,'fixed_name_collision:database:cluster-0001/identity-1'):
                         cases.choose(Mock(query=Mock(side_effect=query)),work)
                 self.assertFalse((work.private/'cases.json').exists())
+                self.assertIn('temp',work.secrets)
+                self.assertIn('BusinessSentinel70',work.secrets)
                 public=(work.public/'cases.json').read_text()
                 self.assertNotIn('temp',public)
                 self.assertNotIn('BusinessSentinel70',public)
                 self.assertIn('fixed_name_collision',public)
+            finally:
+                work.close()
+
+    @unittest.skipUnless(importlib.util.find_spec('psycopg2'), 'requires the pinned PostgreSQL driver')
+    def test_refused_operator_input_is_still_scanned_when_packing_partial_results(self):
+        def query(sql,params=None):
+            if sql == 'SHOW statement_timeout':
+                return [{'statement_timeout':'2min'}]
+            if 'set_config' in sql:
+                return []
+            self.fail('operator refusal must precede data selection')
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);work=Work(root,root/'product')
+            try:
+                save(root/'extra.json',[{'cluster':'119','input':'commit'}])
+                with patch('perfkit.cases.fixed',return_value=Vocabulary({'fixed':['xact_commit','119']})):
+                    with self.assertRaisesRegex(Refused,'fixed_name_collision:operator_input:extra-1'):
+                        cases.choose(Mock(query=Mock(side_effect=query)),work,root/'extra.json')
+                self.assertIn('commit',work.secrets)
+                self.assertNotIn('119',work.secrets)
+                save(root/'MANIFEST.json',{'commit':'fixture'})
+                with self.assertRaisesRegex(Refused,'sensitive_value_in:TOOLKIT.json'):
+                    pack.package(work,root)
             finally:
                 work.close()
 

@@ -94,6 +94,11 @@ def select_cases(session, work, extra, limit_seconds, coverage):
     vocabulary = fixed(session)
 
     def required(value, category, location):
+        # Preserve Work.alias's existing numeric-cluster rule. External inputs
+        # and account names remain sensitive even when this phase refuses them.
+        if category == 'operator_cluster' and isinstance(value,str) and value.isdecimal():
+            return
+        work.secret(value)
         hit = vocabulary.collision(value)
         if hit:
             coverage.append(dict(state='refused', category=category,
@@ -160,6 +165,9 @@ def select_cases(session, work, extra, limit_seconds, coverage):
         pending, offset = set(range(len(KINDS))), 0
         try:
             identities = query.query('SELECT DISTINCT database,execution_user FROM mpp_occurrence WHERE scope_id=%s ORDER BY 1,2', (cluster,))
+            for row in identities:
+                work.secret(row['database'])
+                work.secret(row['execution_user'])
             for ordinal, row in enumerate(identities, 1):
                 for field, category in (('database','database'),('execution_user','user')):
                     required(row[field], category, alias+'/identity-'+str(ordinal))

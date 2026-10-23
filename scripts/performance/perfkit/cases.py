@@ -73,7 +73,7 @@ class ClusterBudget:
         return self.session.query(sql, params)
 
 
-def choose(session, work, extra=None, limit_seconds=600):
+def choose(session, work, extra=None, limit_seconds=600, *, app=None, dashboards=None):
     if not 1 <= limit_seconds <= 3600:
         raise Refused('cases_limit_must_be_1_to_3600_seconds')
     coverage = []
@@ -81,7 +81,7 @@ def choose(session, work, extra=None, limit_seconds=600):
     (work.private/'cases.json').unlink(missing_ok=True)
     try:
         with selection_limit(session, limit_seconds):
-            selected = select_cases(session, work, extra, limit_seconds, coverage)
+            selected = select_cases(session, work, extra, limit_seconds, coverage, app, dashboards)
         save(work.private/'cases.json', selected)
         return selected
     finally:
@@ -89,9 +89,9 @@ def choose(session, work, extra=None, limit_seconds=600):
         save(work.public/'cases.json', coverage)
 
 
-def select_cases(session, work, extra, limit_seconds, coverage):
+def select_cases(session, work, extra, limit_seconds, coverage, app=None, dashboards=None):
     from psycopg2.errors import QueryCanceled
-    vocabulary = fixed(session)
+    vocabulary = fixed(session, app=app, dashboards=dashboards)
 
     def required(value, category, location):
         # Preserve Work.alias's existing numeric-cluster rule. External inputs

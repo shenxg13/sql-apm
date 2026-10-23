@@ -164,7 +164,8 @@ def run(args):
         if args.part in ('main','cases'):
             with work.section('cases'),Session(dsn) as session:
                 idle(session)
-                cases.choose(session,work,args.extra_cases,args.cases_limit_seconds)
+                cases.choose(session,work,args.extra_cases,args.cases_limit_seconds,
+                             app=args.app,dashboards=args.dashboards)
         if args.part in ('main','timing'):
             with work.section('timing'):
                 timed(args,work,dsn)

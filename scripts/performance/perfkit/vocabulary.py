@@ -2,7 +2,9 @@
 import ast
 import json
 from pathlib import Path
+import platform
 import re
+import sys
 
 from . import plan_vocabulary
 from . import collect
@@ -50,11 +52,54 @@ def sql_fields(statements):
     return names
 
 
-def fixed(session=None):
+def public_runtime(app=None, dashboards=None):
+    """Predict public text without running product code or reading SQL values."""
+    app = Path(app) if app is not None else Path(sys.prefix).parent
+    dashboards = Path(dashboards) if dashboards is not None else app/'grafana/dashboards'
+    groups = {
+        # Cover every hour, including a run that crosses midnight. Identifier
+        # tokens can contain T0/T1/T2/T20, regardless of the date or UTC offset.
+        'runtime:timestamps': ['T'+str(hour).zfill(2)+':' for hour in range(24)] + ['Z'],
+        'runtime:host': [platform.release(), platform.machine(),
+            collect.read('/sys/kernel/mm/transparent_hugepage/enabled') or ''] + [
+            line.split(':',1)[1].strip()
+            for line in (collect.read('/proc/cpuinfo') or '').splitlines()
+            if line.startswith('model name') and ':' in line] + [
+            line.split(' - ',1)[1].split()[0]
+            for line in (collect.read('/proc/self/mountinfo') or '').splitlines()
+            if ' - ' in line and line.split(' - ',1)[1].split()],
+        'runtime:sites': ['<module>','<lambda>','<listcomp>','<dictcomp>','<setcomp>','<genexpr>'],
+        'runtime:dashboards': [],
+    }
+    for path in sorted((app/'sql_apm').rglob('*.py')):
+        groups['runtime:sites'].append(path.relative_to(app).as_posix())
+        tree = ast.parse(path.read_text())
+        groups['runtime:sites'].extend(node.name for node in ast.walk(tree)
+            if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)))
+    from .dashboards import load
+    if dashboards.is_dir():
+        for uid, document in load(dashboards).items():
+            groups['runtime:dashboards'].append(uid)
+            groups['runtime:dashboards'].extend(v['name'] for v in document['templating']['list'])
+            def refs(value):
+                if isinstance(value,dict):
+                    if isinstance(value.get('refId'),str):
+                        groups['runtime:dashboards'].append(value['refId'])
+                    for item in value.values():
+                        refs(item)
+                elif isinstance(value,list):
+                    for item in value:
+                        refs(item)
+            refs(document)
+    return groups
+
+
+def fixed(session=None, app=None, dashboards=None):
     # JSON plan labels/enums are plain words, not C include paths, error format
     # strings or XML/HTML renderer fragments in the same upstream source.
     groups = {'catalog:plan': [s for s in plan_vocabulary.STRINGS
                               if re.fullmatch(r'[A-Za-z][A-Za-z0-9 _/-]*',s)]}
+    groups.update(public_runtime(app, dashboards))
     directory = Path(__file__).resolve().parent
     for path in sorted(directory.glob('*.py')) + [directory.parent/'check.py']:
         if path.name in ('plan_vocabulary.py','vocabulary.py'):
@@ -102,4 +147,7 @@ def fixed(session=None):
         # enumvals itself is not exported: only retained setting/boot values are.
         groups['catalog:settings'] = [str(row[field]) for row in session.query(collect.SETTINGS_SQL)
             if row['vartype'] in ('enum','bool') for field in ('setting','boot_val') if row[field] is not None]
+        groups['runtime:io'] = [row[field] for row in session.query(
+            'SELECT DISTINCT backend_type,object,context FROM pg_stat_io')
+            for field in ('backend_type','object','context') if row[field] is not None]
     return Vocabulary(groups)

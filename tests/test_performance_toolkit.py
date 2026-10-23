@@ -39,7 +39,7 @@ class ToolkitTests(unittest.TestCase):
     @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
     def test_automatic_inputs_skip_colliding_names_without_changing_scan(self):
         vocabulary = fixed(Mock(query=Mock(side_effect=[
-            [{'name':'mpp_drop_result_month'},{'name':'xact_commit'}], []])))
+            [{'name':'mpp_drop_result_month'},{'name':'xact_commit'}], [], []])))
         for source in ('drop table BusinessSentinel70', 'set BusinessSentinel70 = 7',
                        'vacuum BusinessSentinel70', 'select "state" from BusinessSentinel70'):
             skipped = []
@@ -68,6 +68,51 @@ class ToolkitTests(unittest.TestCase):
             cases.inputs('state',Vocabulary({'fixed':['state']}))
         with self.assertRaisesRegex(Refused,'sensitive_value_in:deltas.json'):
             scan({'deltas.json':encoded({'xact_commit':1})},['commit'])
+
+    @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
+    def test_predictable_public_values_are_skipped_before_pack(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);app=root/'product';source=app/'sql_apm'
+            source.mkdir(parents=True)
+            (source/'ingestion.py').write_text('def public_callable():\n    pass\n')
+            dashboards=root/'boards';dashboards.mkdir()
+            for uid in ('mpp-search','mpp-detail','mpp-list','mpp-status'):
+                save(dashboards/(uid+'.json'),dict(uid=uid,templating=dict(list=[dict(name='public_variable')]),
+                    panels=[dict(targets=[dict(refId='Anno')])]))
+            host={'/proc/cpuinfo':'model name : Intel FixtureProcessor\n',
+                  '/proc/self/mountinfo':'1 0 1:1 / / rw - xfs root rw\n',
+                  '/sys/kernel/mm/transparent_hugepage/enabled':'always [madvise] never\n'}
+            io=dict(backend_type='autovacuum launcher',object='relation',context='bulkread')
+            with patch('perfkit.collect.read',side_effect=lambda path:host.get(str(path))), \
+                    patch('perfkit.vocabulary.platform.release',return_value='FixtureKernel'), \
+                    patch('perfkit.vocabulary.platform.machine',return_value='x86_64'):
+                vocabulary=fixed(Mock(query=Mock(side_effect=[[],[],[io]])),app,dashboards)
+            for value in ('T0','T1','T2','T20','Intel','never','x86_64','xfs','FixtureKernel',
+                          'launcher','bulkread','ingestion','public_callable','Anno','public_variable'):
+                self.assertIsNotNone(vocabulary.collision(value),value)
+            fixtures=[('T2','host-state.json',dict(part='host',state='complete',started_at='2026-10-23T20:15:00+08:00')),
+                      ('Intel','host.json',dict(cpu_model='Intel FixtureProcessor')),
+                      ('bulkread','health.json',dict(io=[io])),
+                      ('ingestion','timing.json',dict(pages=[],http=[],commands=[dict(item='case-0001/test',ms=1,
+                           state='ok',exit_code=0,output_bytes=0,statements=[dict(item='case-0001/sql',ms=1,
+                           state='ok',sites=[dict(file='sql_apm/ingestion.py',function='public_callable',line=1)])])])),
+                      ('Anno','timing.json',dict(pages=[],http=[],commands=[],refs=['Anno','public_variable']))]
+            save(root/'MANIFEST.json',{'version':'fixture'})
+            for ordinal,(word,name,document) in enumerate(fixtures):
+                with self.subTest(word=word):
+                    raw=encoded(document)
+                    with self.assertRaises(Refused):
+                        scan(scan_views({name:raw}),[word])
+                    skipped=[];values=cases.inputs('select '+word+' UniqueBusinessSentinel70',vocabulary,skipped)
+                    self.assertNotIn(word,[v['text'] for v in values])
+                    self.assertTrue(any(s['location'].startswith('runtime:') for s in skipped))
+                    target=root/str(ordinal);target.mkdir();work=Work(target,app)
+                    try:
+                        (work.public/name).write_bytes(raw)
+                        save(work.public/'cases.json',skipped)
+                        for value in values:work.secret(value['text'])
+                        self.assertTrue(pack.package(work,root).is_file())
+                    finally:work.close()
 
     @unittest.skipUnless(importlib.util.find_spec('psycopg2'), 'requires the pinned PostgreSQL driver')
     def test_identity_collision_refuses_before_selecting_or_reusing_stale_cases(self):

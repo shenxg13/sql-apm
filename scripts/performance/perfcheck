@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+perfcheck_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+exec "${PERFCHECK_PYTHON:-/data/sql-apm/app/.venv/bin/python}" -B "$perfcheck_dir/check.py" "$@"

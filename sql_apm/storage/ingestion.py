@@ -1,4 +1,4 @@
-"""PostgreSQL 1.12.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
+"""PostgreSQL 1.13.0 writer. Identifiers are quoted; values are bound or COPY encoded."""
 from collections import OrderedDict
 import hashlib
 import io
@@ -7,6 +7,7 @@ import uuid
 
 import psycopg2
 from psycopg2 import sql
+from psycopg2.extras import execute_values
 
 from sql_apm.ingestion.config import IngestionError, canonical, identity
 from sql_apm.sql.normalization import Normalizer
@@ -42,9 +43,9 @@ def connect(dsn, schema):
             # a version history, so applied_at cannot identify the current version.
             cur.execute('SELECT version FROM schema_version')
             versions = {row[0] for row in cur}
-            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0', '1.11.0', '1.12.0']
+            history = ['1.0.0', '1.1.0', '1.2.0', '1.3.0', '1.4.0', '1.5.0', '1.6.0', '1.7.0', '1.8.0', '1.9.0', '1.10.0', '1.11.0', '1.12.0', '1.13.0']
             if versions not in [set(history[i:]) for i in range(len(history))]:
-                raise IngestionError('schema_1_12_0_required')
+                raise IngestionError('schema_1_13_0_required')
         connection.commit()
         for watcher in WATCHERS:
             watcher.add(connection)
@@ -115,20 +116,37 @@ class SqlWriter:
             # Startup/transport failures raise instead and roll back the whole file.
             with self.connection, self.connection.cursor() as cur:
                 cur.execute('SELECT pg_advisory_xact_lock(1835101, 1)')
+                # Recheck exact text under the same metadata lock as before.
+                # Batch statements let the summary triggers count each page once;
+                # updating singleton counters for every text creates many tuple
+                # versions and bloats the counter tables during large imports.
+                complete = [(raw.decode('utf-8'), hashlib.sha256(raw).digest())
+                            for raw, result in zip(fresh, parsed) if result['sql_state'] == 'complete']
+                existing = {}
+                if complete:
+                    cur.execute('SELECT text,content_sha256,sql_id FROM mpp_sql_text WHERE content_sha256=ANY(%s)',
+                                ([digest for _, digest in complete],))
+                    existing = {(text, bytes(digest)): sid for text, digest, sid in cur}
+                texts, fingerprints = [], []
                 for raw, result in zip(fresh, parsed):
                     sid = None
                     fp = result['fingerprint']
                     if result['sql_state'] == 'complete':
                         text, digest = raw.decode('utf-8'), hashlib.sha256(raw).digest()
-                        cur.execute('SELECT sql_id FROM mpp_sql_text WHERE content_sha256=%s AND text=%s', (digest, text))
-                        row = cur.fetchone()
-                        sid = row[0] if row else 'S:' + uuid.uuid4().hex
-                        if not row:
-                            cur.execute('INSERT INTO mpp_sql_text VALUES (%s,%s,%s)', (sid, text, digest))
-                        cur.execute('''INSERT INTO mpp_fingerprint VALUES (%s,%s,%s,'mpp-csv/1',%s,%s,%s)
-                            ON CONFLICT (sql_id,normalization_id,profile) DO NOTHING''',
-                            ('F:' + identity(sid, self.normalization_id), sid, self.normalization_id, fp['state'], fp['value'], fp['reason']))
+                        sid = existing.get((text, digest))
+                        if sid is None:
+                            sid = 'S:' + uuid.uuid4().hex
+                            existing[text, digest] = sid
+                            texts.append((sid, text, digest))
+                        fingerprints.append(('F:' + identity(sid, self.normalization_id), sid,
+                                             self.normalization_id, 'mpp-csv/1', fp['state'], fp['value'], fp['reason']))
                     result.update(sql_id=sid, approximate_id=None, rule_id=None)
+                if texts:
+                    execute_values(cur, 'INSERT INTO mpp_sql_text VALUES %s', texts, page_size=100)
+                if fingerprints:
+                    execute_values(cur, '''INSERT INTO mpp_fingerprint VALUES %s
+                        ON CONFLICT (sql_id,normalization_id,profile) DO NOTHING''', fingerprints, page_size=100)
+                for raw, result in zip(fresh, parsed):
                     approx = result.pop('approximate')
                     if approx is not None:
                         result['approximate_id'], result['rule_id'] = self.approximate(cur, raw, approx)

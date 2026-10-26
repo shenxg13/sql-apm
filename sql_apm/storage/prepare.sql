@@ -17,6 +17,7 @@ SELECT set_config('apm.schema', :'project_schema', true),
        set_config('apm.v190_sha256', :'v190_sha256', true),
        set_config('apm.v1100_sha256', :'v1100_sha256', true),
        set_config('apm.v1110_sha256', :'v1110_sha256', true),
+       set_config('apm.v1120_sha256', :'v1120_sha256', true),
        set_config('apm.readonly_role', :'readonly_role', true);
 DO $block$
 DECLARE r record; d record; n record;

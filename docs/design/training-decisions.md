@@ -54,6 +54,8 @@
 - `mpp_training_decisions(input_id, config_id, analysis_id DEFAULT NULL, occurrence_id DEFAULT NULL)`
   是唯一的资格实现。函数以解析后的 SQL 体绑定表，支持自定义 schema。只读函数不创建
   Build、Statistic 或永久 Decision 行。单条查询传入后两个参数，批量统计省略它们。
+  1.13.0 的双键读取先物化请求键，避免新批次尚未进入列统计时误扫整个 Analysis；
+  不带双键的构建路径及后续资格规则不变，见[查询读取说明](sql-search.md#1130-的训练明细读取)。
 - 返回四种状态、全部原因码和规则引用／锚点证据、八项评估、计时类别、推算开始／耗时、
   类别及命中的模板／时段 ID。`outside_window` 优先，但保留全部已知原因；明确失败或
   黑名单／时段命中为 excluded，其他可靠性不足为 unresolved。

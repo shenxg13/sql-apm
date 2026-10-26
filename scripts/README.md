@@ -321,6 +321,13 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/db/verify_views.py`：合成验收，覆盖只读账号、指纹服务和看板函数对独立计算。
 - `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
   升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
+- `scripts/db/verify_query_performance.py`：结构 1.13.0 的合成升级、精确计数、4,032 组排行、训练／构建等价性及新批次完整键计划回归。
+- `scripts/db/verify_query_performance_full.py`：#72 的显式私有全量验收；`prepare` 从冻结 1.12.0 程序重导固定日志，
+  `rebuild` 增加同月真实构建，`rows`／`cli`／`timing`／`snapshot` 保存输出、嵌套计划、耗时和全表摘要，
+  `upgrade` 测量就地升级及锁，`compare` 逐行核对前后输出，`import_check` 在两个新库重放同一指定导入批次，
+  `continue_import` 向已升级库的独立测试集群导入新一天，`cleanup` 验证完整旧月结果及其索引一并删除、当前结果保留。
+  必须显式给出 `--directory`，已存在的阶段证据不覆盖；运行实例的启动／停止由调用方负责。
+  样本和完整输出留在忽略目录，说明及模型见[验证报告](../docs/reports/query-performance-2026-10-26.md)。不加入日常检查。
 - `scripts/tests/test_grafana.py`：看板与生成结果一致、安装程序拒绝缺失或摘要不符的文件。
 - `scripts/grafana/install.py start`：供生成的 systemd 服务和开发环境调用，每次启动重读受保护密码文件，
   保留首尾空白与字面量特殊字符；不把密码写入命令参数、配置或全局环境。

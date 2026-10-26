@@ -1,4 +1,4 @@
--- Structure version 1.12.0. Called only after catalog compatibility checks.
+-- Structure version 1.13.0. Called only after catalog compatibility checks.
 -- The caller sets the verified project schema as search_path.
 CREATE TABLE IF NOT EXISTS schema_version (
     version text PRIMARY KEY,
@@ -569,6 +569,11 @@ CREATE TABLE IF NOT EXISTS mpp_statistic (
     CHECK (mean_ms BETWEEN min_ms AND max_ms)
 ) PARTITION BY LIST (partition_id);
 CREATE INDEX IF NOT EXISTS mpp_statistic_group_build_idx ON mpp_statistic (group_id, build_id, layer);
+-- Only the overall rows that can enter the current-baseline ranking. Dates
+-- are fetched after LIMIT, so large training windows do not enlarge this index.
+CREATE INDEX IF NOT EXISTS mpp_statistic_ranking_idx ON mpp_statistic (partition_id,build_id,group_id)
+    INCLUDE (included_count,p50_ms,p95_ms,p99_ms,max_ms,mean_ms)
+    WHERE layer='overall' AND included_count>0;
 -- Pure projection: callers join the statistic's Build to its sealed ConfigSnapshot.
 -- Keep the version branch when a future statistics contract is added.
 CREATE OR REPLACE FUNCTION mpp_statistic_sufficiency(
@@ -937,7 +942,20 @@ RETURNS TABLE (analysis_id text, occurrence_id text, scope_id text, timing_type 
     estimated_start_at timestamptz, duration_ms numeric)
 LANGUAGE sql STABLE
 BEGIN ATOMIC
-WITH context AS MATERIALIZED (
+WITH requested AS MATERIALIZED (
+    -- Keep an unseen, newly imported analysis out of constant selectivity
+    -- estimates. Both existing key columns remain index conditions.
+    SELECT selected_analysis AS analysis_id,selected_occurrence AS occurrence_id
+), selected_occurrences AS NOT MATERIALIZED (
+    -- The unfiltered build path folds to the original relation when inlined.
+    SELECT o.* FROM mpp_occurrence o
+    WHERE (selected_analysis IS NULL OR selected_occurrence IS NULL)
+        AND (selected_analysis IS NULL OR o.analysis_id=selected_analysis)
+        AND (selected_occurrence IS NULL OR o.occurrence_id=selected_occurrence)
+    UNION ALL
+    SELECT o.* FROM requested k JOIN mpp_occurrence o USING(analysis_id,occurrence_id)
+    WHERE selected_analysis IS NOT NULL AND selected_occurrence IS NOT NULL
+), context AS MATERIALIZED (
     SELECT c.*,tc.rule_id,tc.decision_version,r.template_rules
     FROM config_snapshot c JOIN training_config tc USING(config_id)
     JOIN mpp_training_rule r USING(rule_id)
@@ -969,12 +987,10 @@ WITH context AS MATERIALIZED (
               ORDER BY e->>'rule_id') AS intervals
     FROM context c JOIN input_file_analysis m ON m.input_id=selected_input
     JOIN evidence_record e ON e.file_id=m.file_id
-    JOIN mpp_occurrence o ON o.analysis_id=m.analysis_id AND o.anchor_ref=e.record_id
+    JOIN selected_occurrences o ON o.analysis_id=m.analysis_id AND o.anchor_ref=e.record_id
     LEFT JOIN mpp_training_sql s ON s.sql_id=o.sql_id AND s.rule_id=c.rule_id
     LEFT JOIN mpp_fingerprint f ON f.fingerprint_id=s.fingerprint_id
-    WHERE (selected_analysis IS NULL OR o.analysis_id=selected_analysis)
-      AND (selected_occurrence IS NULL OR o.occurrence_id=selected_occurrence)
-      AND CASE WHEN o.sql_id IS NULL OR s.sql_id IS NOT NULL THEN true
+    WHERE CASE WHEN o.sql_id IS NULL OR s.sql_id IS NOT NULL THEN true
                ELSE training_cache_required() END
 ), flags AS (
     SELECT facts.*,
@@ -1460,12 +1476,184 @@ BEGIN
         CASE WHEN p_order='recent' THEN r.last_at END DESC NULLS LAST,r.value;
 END $function$;
 
+-- Exact read summaries. Statement transition tables count only rows actually
+-- changed (including COPY / ON CONFLICT); rollback rolls the summaries back too.
+-- Name counts are per analysis so different cluster imports do not share a hot row.
+CREATE TABLE IF NOT EXISTS mpp_sql_text_count (
+    singleton boolean PRIMARY KEY DEFAULT true CHECK (singleton),
+    item_count bigint NOT NULL CHECK (item_count >= 0)
+);
+INSERT INTO mpp_sql_text_count VALUES (true,0) ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS mpp_fingerprint_count (
+    normalization_id text PRIMARY KEY REFERENCES mpp_normalization ON DELETE CASCADE,
+    item_count bigint NOT NULL CHECK (item_count >= 0)
+);
+CREATE TABLE IF NOT EXISTS mpp_occurrence_name (
+    analysis_id text NOT NULL REFERENCES analysis,
+    kind text NOT NULL CHECK (kind IN ('database','user')),
+    name text NOT NULL CHECK (name <> ''),
+    item_count bigint NOT NULL CHECK (item_count >= 0),
+    PRIMARY KEY (analysis_id,kind,name)
+);
+
+CREATE OR REPLACE FUNCTION mpp_maintain_text_count() RETURNS trigger LANGUAGE plpgsql AS $function$
+DECLARE delta bigint := 0;
+BEGIN
+    IF TG_OP='TRUNCATE' THEN
+        UPDATE mpp_sql_text_count SET item_count=0;
+    ELSE
+        IF TG_OP IN ('DELETE','UPDATE') THEN SELECT -count(*) INTO delta FROM old_rows; END IF;
+        IF TG_OP IN ('INSERT','UPDATE') THEN delta := delta + (SELECT count(*) FROM new_rows); END IF;
+        IF delta<>0 THEN UPDATE mpp_sql_text_count SET item_count=item_count+delta; END IF;
+    END IF;
+    RETURN NULL;
+END $function$;
+
+CREATE OR REPLACE FUNCTION mpp_maintain_fingerprint_count() RETURNS trigger LANGUAGE plpgsql AS $function$
+BEGIN
+    IF TG_OP='TRUNCATE' THEN
+        DELETE FROM mpp_fingerprint_count;
+    ELSE
+        IF TG_OP IN ('DELETE','UPDATE') THEN
+            UPDATE mpp_fingerprint_count c SET item_count=c.item_count-r.n
+                FROM (SELECT normalization_id,count(*) n FROM old_rows GROUP BY normalization_id) r
+                WHERE c.normalization_id=r.normalization_id;
+        END IF;
+        IF TG_OP IN ('INSERT','UPDATE') THEN
+            INSERT INTO mpp_fingerprint_count SELECT normalization_id,count(*) FROM new_rows
+                GROUP BY normalization_id ORDER BY normalization_id
+                ON CONFLICT (normalization_id) DO UPDATE
+                    SET item_count=mpp_fingerprint_count.item_count+excluded.item_count;
+        END IF;
+    END IF;
+    DELETE FROM mpp_fingerprint_count WHERE item_count=0;
+    RETURN NULL;
+END $function$;
+
+CREATE OR REPLACE FUNCTION mpp_maintain_occurrence_names() RETURNS trigger LANGUAGE plpgsql AS $function$
+BEGIN
+    IF TG_OP='TRUNCATE' THEN
+        DELETE FROM mpp_occurrence_name;
+    ELSE
+        IF TG_OP IN ('DELETE','UPDATE') THEN
+            UPDATE mpp_occurrence_name c SET item_count=c.item_count-r.n
+                FROM (SELECT analysis_id,v.kind,v.name,count(*) n FROM old_rows
+                    CROSS JOIN LATERAL (VALUES ('database',database),('user',execution_user)) v(kind,name)
+                    WHERE v.name IS NOT NULL GROUP BY analysis_id,v.kind,v.name) r
+                WHERE (c.analysis_id,c.kind,c.name)=(r.analysis_id,r.kind,r.name);
+        END IF;
+        IF TG_OP IN ('INSERT','UPDATE') THEN
+            INSERT INTO mpp_occurrence_name
+                SELECT analysis_id,v.kind,v.name,count(*) FROM new_rows
+                CROSS JOIN LATERAL (VALUES ('database',database),('user',execution_user)) v(kind,name)
+                WHERE v.name IS NOT NULL GROUP BY analysis_id,v.kind,v.name ORDER BY analysis_id,v.kind,v.name
+                ON CONFLICT (analysis_id,kind,name) DO UPDATE
+                    SET item_count=mpp_occurrence_name.item_count+excluded.item_count;
+        END IF;
+    END IF;
+    DELETE FROM mpp_occurrence_name WHERE item_count=0;
+    RETURN NULL;
+END $function$;
+
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_sql_text'::regclass AND tgname='mpp_sql_text_summary_insert') THEN
+        CREATE TRIGGER mpp_sql_text_summary_insert AFTER INSERT ON mpp_sql_text
+            REFERENCING NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_text_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_sql_text'::regclass AND tgname='mpp_sql_text_summary_delete') THEN
+        CREATE TRIGGER mpp_sql_text_summary_delete AFTER DELETE ON mpp_sql_text
+            REFERENCING OLD TABLE AS old_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_text_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_sql_text'::regclass AND tgname='mpp_sql_text_summary_update') THEN
+        CREATE TRIGGER mpp_sql_text_summary_update AFTER UPDATE ON mpp_sql_text
+            REFERENCING OLD TABLE AS old_rows NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_text_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_sql_text'::regclass AND tgname='mpp_sql_text_summary_truncate') THEN
+        CREATE TRIGGER mpp_sql_text_summary_truncate AFTER TRUNCATE ON mpp_sql_text
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_text_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_fingerprint'::regclass AND tgname='mpp_fingerprint_summary_insert') THEN
+        CREATE TRIGGER mpp_fingerprint_summary_insert AFTER INSERT ON mpp_fingerprint
+            REFERENCING NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_fingerprint_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_fingerprint'::regclass AND tgname='mpp_fingerprint_summary_delete') THEN
+        CREATE TRIGGER mpp_fingerprint_summary_delete AFTER DELETE ON mpp_fingerprint
+            REFERENCING OLD TABLE AS old_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_fingerprint_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_fingerprint'::regclass AND tgname='mpp_fingerprint_summary_update') THEN
+        CREATE TRIGGER mpp_fingerprint_summary_update AFTER UPDATE ON mpp_fingerprint
+            REFERENCING OLD TABLE AS old_rows NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_fingerprint_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_fingerprint'::regclass AND tgname='mpp_fingerprint_summary_truncate') THEN
+        CREATE TRIGGER mpp_fingerprint_summary_truncate AFTER TRUNCATE ON mpp_fingerprint
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_fingerprint_count();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_occurrence'::regclass AND tgname='mpp_occurrence_summary_insert') THEN
+        CREATE TRIGGER mpp_occurrence_summary_insert AFTER INSERT ON mpp_occurrence
+            REFERENCING NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_occurrence_names();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_occurrence'::regclass AND tgname='mpp_occurrence_summary_delete') THEN
+        CREATE TRIGGER mpp_occurrence_summary_delete AFTER DELETE ON mpp_occurrence
+            REFERENCING OLD TABLE AS old_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_occurrence_names();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_occurrence'::regclass AND tgname='mpp_occurrence_summary_update') THEN
+        CREATE TRIGGER mpp_occurrence_summary_update AFTER UPDATE ON mpp_occurrence
+            REFERENCING OLD TABLE AS old_rows NEW TABLE AS new_rows
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_occurrence_names();
+    END IF;
+END $block$;
+DO $block$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_trigger WHERE tgrelid='mpp_occurrence'::regclass AND tgname='mpp_occurrence_summary_truncate') THEN
+        CREATE TRIGGER mpp_occurrence_summary_truncate AFTER TRUNCATE ON mpp_occurrence
+            FOR EACH STATEMENT EXECUTE FUNCTION mpp_maintain_occurrence_names();
+    END IF;
+END $block$;
+
 CREATE OR REPLACE FUNCTION mpp_query_missing_rules(p_normalization text) RETURNS bigint
 LANGUAGE sql STABLE
 BEGIN ATOMIC
-    SELECT count(*) FROM mpp_sql_text t WHERE NOT EXISTS (
-        SELECT FROM mpp_fingerprint f WHERE f.sql_id=t.sql_id AND f.normalization_id=p_normalization
-            AND f.profile='mpp-csv/1');
+    SELECT t.item_count-coalesce(f.item_count,0) FROM mpp_sql_text_count t
+        LEFT JOIN mpp_fingerprint_count f ON f.normalization_id=p_normalization;
 END;
 
 CREATE OR REPLACE FUNCTION mpp_query_text(p_sql_id text) RETURNS TABLE(sql_id text,sql_text text)
@@ -1492,7 +1680,7 @@ END $function$;
 CREATE OR REPLACE FUNCTION mpp_query_training(p_build text,p_records jsonb)
 RETURNS TABLE(analysis_id text,occurrence_id text,decision text,reason_codes text[],detail jsonb)
 LANGUAGE plpgsql STABLE AS $function$
-DECLARE b record; r record;
+DECLARE b record; r record; anchor text;
 BEGIN
     SELECT x.input_id,x.config_id,t.decision_version INTO b FROM build x
         LEFT JOIN training_config t USING(config_id) WHERE x.build_id=p_build;
@@ -1501,12 +1689,11 @@ BEGIN
         RAISE EXCEPTION 'invalid_training_records'; END IF;
     FOR r IN SELECT * FROM jsonb_to_recordset(p_records) AS x(analysis_id text,occurrence_id text) LOOP
         IF r.analysis_id IS NULL OR r.occurrence_id IS NULL THEN RAISE EXCEPTION 'invalid_training_records'; END IF;
-        IF NOT EXISTS(SELECT FROM mpp_occurrence o WHERE o.analysis_id=r.analysis_id AND o.occurrence_id=r.occurrence_id) THEN
-            RAISE EXCEPTION 'occurrence_not_found';
-        END IF;
-        IF NOT EXISTS(SELECT FROM mpp_occurrence o JOIN evidence_record e ON e.record_id=o.anchor_ref
-            JOIN input_file_analysis i ON i.file_id=e.file_id AND i.analysis_id=o.analysis_id
-            WHERE i.input_id=b.input_id AND o.analysis_id=r.analysis_id AND o.occurrence_id=r.occurrence_id) THEN
+        WITH requested AS MATERIALIZED (SELECT r.analysis_id AS analysis_id,r.occurrence_id AS occurrence_id)
+        SELECT o.anchor_ref INTO anchor FROM requested k JOIN mpp_occurrence o USING(analysis_id,occurrence_id);
+        IF NOT FOUND THEN RAISE EXCEPTION 'occurrence_not_found'; END IF;
+        IF NOT EXISTS(SELECT FROM evidence_record e JOIN input_file_analysis i ON i.file_id=e.file_id
+            WHERE e.record_id=anchor AND i.input_id=b.input_id AND i.analysis_id=r.analysis_id) THEN
             RETURN QUERY SELECT r.analysis_id,r.occurrence_id,'not_in_version_input'::text,ARRAY[]::text[],'{}'::jsonb;
         ELSIF b.decision_version IS DISTINCT FROM 'training-decision/1' THEN
             RETURN QUERY SELECT r.analysis_id,r.occurrence_id,'decision_unavailable'::text,
@@ -2309,11 +2496,11 @@ BEGIN
     END LOOP;
     RETURN QUERY
     SELECT r.scope_id,r.database,r.execution_user,r.fingerprint_value,r.timing_type,r.build_id,r.included_count,
-        cardinality(r.active_dates),r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,
+        cardinality(coverage.active_dates),r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,
         (x.sufficiency->'basic'->>'met')::boolean,(x.sufficiency->'p95'->>'met')::boolean,
         (x.sufficiency->'p99'->>'met')::boolean,mpp_view_identity_token(r.scope_id,r.database,r.execution_user),r.rows
     FROM (SELECT g.scope_id,g.database,g.execution_user,g.fingerprint_value,g.timing_type,s.build_id,s.included_count,
-            s.active_dates,s.active_week_starts,s.p50_ms,s.p95_ms,s.p99_ms,s.max_ms,s.mean_ms,count(*) OVER () rows
+            s.partition_id,s.group_id,s.p50_ms,s.p95_ms,s.p99_ms,s.max_ms,s.mean_ms,count(*) OVER () rows
         FROM mpp_statistic s JOIN mpp_baseline_group g USING(group_id)
         WHERE s.partition_id=ANY(partitions) AND s.build_id=ANY(builds) AND s.layer='overall'
             AND s.included_count>0 AND s.included_count>=coalesce(p_min_samples,0)
@@ -2323,9 +2510,14 @@ BEGIN
         ORDER BY CASE p_order WHEN 'samples' THEN s.included_count WHEN 'p50' THEN s.p50_ms WHEN 'p95' THEN s.p95_ms
                 WHEN 'p99' THEN s.p99_ms WHEN 'max' THEN s.max_ms ELSE s.mean_ms END DESC NULLS LAST,s.group_id
         LIMIT p_limit) r
+    -- Fetch coverage arrays only for the bounded output page. Keeping them out
+    -- of the ranking scan also keeps the covering index independent of window size.
+    JOIN mpp_statistic coverage ON coverage.partition_id=r.partition_id AND coverage.build_id=r.build_id
+        AND coverage.group_id=r.group_id AND coverage.layer='overall'
+        AND coverage.partition_id=ANY(partitions) AND coverage.build_id=ANY(builds)
     JOIN build b ON b.build_id=r.build_id JOIN config_snapshot c USING(config_id)
     CROSS JOIN LATERAL (SELECT mpp_statistic_sufficiency(c.statistics_version,c.thresholds,'overall',
-        r.included_count,r.active_dates,r.active_week_starts) sufficiency) x
+        r.included_count,coverage.active_dates,coverage.active_week_starts) sufficiency) x
     ORDER BY CASE p_order WHEN 'samples' THEN r.included_count WHEN 'p50' THEN r.p50_ms WHEN 'p95' THEN r.p95_ms
             WHEN 'p99' THEN r.p99_ms WHEN 'max' THEN r.max_ms ELSE r.mean_ms END DESC NULLS LAST,
         r.scope_id,r.database,r.execution_user,r.fingerprint_value,r.timing_type;

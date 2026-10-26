@@ -253,9 +253,8 @@ def filters():
     Grafana quotes the values of a variable that offers "All", so the choice is
     an ordinary first option instead. Databases and users come from the execution
     records, so that an identity without a baseline (new, or with failures only)
-    can be chosen as well; this scans the records once per dropdown when a page opens.
-    The distinct values are found first and encoded afterwards: encoding every record
-    made the scan several times slower.
+    can be chosen as well. Transactional name counts avoid scanning execution records.
+    The distinct names are encoded only after reading the small summary.
     """
     def one(name, label, column, source):
         return variable('query', name, label, current=dict(text='全部', value='*'),
@@ -263,8 +262,8 @@ def filters():
                             "SELECT x.name, mpp_view_encode(x.name), 1 FROM (SELECT DISTINCT {0} AS name FROM {1} WHERE {0} IS NOT NULL) x "
                             "ORDER BY 3, 1".format(column, source))
     return [one('cluster', '集群', 'scope_id', 'scope'),
-            one('database', '数据库', 'database', 'mpp_occurrence'),
-            one('user', '执行用户', 'execution_user', 'mpp_occurrence')]
+            one('database', '数据库', 'name', "(SELECT name FROM mpp_occurrence_name WHERE kind='database' AND item_count>0) names"),
+            one('user', '执行用户', 'name', "(SELECT name FROM mpp_occurrence_name WHERE kind='user' AND item_count>0) names")]
 
 
 FILTER_ARGS = ("mpp_view_decode(nullif('${cluster}','*')),mpp_view_decode(nullif('${database}','*')),"

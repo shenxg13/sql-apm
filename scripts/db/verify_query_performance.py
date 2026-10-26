@@ -12,6 +12,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / 'tests')]
 from verify import Verification, instance
 from database.fixture import statements
 from database import dashboard_data
+from database import fingerprint_concurrency
 from database.retention import digest
 from sql_apm.baseline.workflow import run
 from sql_apm.training.config import validate
@@ -265,8 +266,16 @@ def verify(pg):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--pg-bin', type=Path, default=Path('/usr/pgsql-17/bin'))
-    parser.add_argument('--training-only', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--training-only', action='store_true')
+    mode.add_argument('--concurrency-only', action='store_true')
     args = parser.parse_args()
+    if not args.concurrency_only:
+        if not args.training_only:
+            verify(args.pg_bin)
+        training_equivalence(args.pg_bin)
     if not args.training_only:
-        verify(args.pg_bin)
-    training_equivalence(args.pg_bin)
+        with instance(args.pg_bin) as (directory, env):
+            v = Verification(args.pg_bin, directory, env); v.init()
+            dsn = f'host={directory}/socket port=55473 dbname=sql_apm user=sql_apm'
+            fingerprint_concurrency.verify(v, dsn, directory)

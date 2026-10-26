@@ -321,7 +321,8 @@ Python 3.13.16 升级使用 `scripts/deployment/verify_python_unicode.py` 做全
 - `scripts/db/verify_views.py`：合成验收，覆盖只读账号、指纹服务和看板函数对独立计算。
 - `scripts/db/verify_views_full.py upgrade|audit|timing`：显式的全量核对，使用已停止的 1.10.0 真实库副本：
   升级前后逐表摘要、三种检索对独立实现、长连接下的耗时。不加入日常检查。
-- `scripts/db/verify_query_performance.py`：结构 1.13.0 的合成升级、精确计数、4,032 组排行、训练／构建等价性及新批次完整键计划回归。
+- `scripts/db/verify_query_performance.py`：结构 1.13.0 的合成升级、精确计数、4,032 组排行、训练／构建等价性及新批次完整键计划回归；
+  默认还验证导入／训练和跨集群训练的指纹写入交错，`--concurrency-only` 可单独运行这两项锁回归。
 - `scripts/db/verify_query_performance_full.py`：#72 的显式私有全量验收；`prepare` 从冻结 1.12.0 程序重导固定日志，
   `rebuild` 增加同月真实构建，`rows`／`cli`／`timing`／`snapshot` 保存输出、嵌套计划、耗时和全表摘要，
   `upgrade` 测量就地升级及锁，`compare` 逐行核对前后输出，`import_check` 在两个新库重放同一指定导入批次，

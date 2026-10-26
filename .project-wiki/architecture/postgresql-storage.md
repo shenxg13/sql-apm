@@ -7,7 +7,7 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-26
+updated: 2026-10-27
 sources:
   - path: https://github.com/shenxg13/sql-apm/issues/72
     status: current
@@ -238,6 +238,9 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
 来源：[Issue #72](https://github.com/shenxg13/sql-apm/issues/72) 的已确认契约；开发实现与验证见
 [结构说明](../../docs/design/database-structure.md#页面查询的精确汇总)和[验证报告](../../docs/reports/query-performance-2026-10-26.md)。
 已发布 v1.1.0 仍为 1.12.0，生产升级和复测属于 #74。
+Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定运行时，再停写、调用同一迁移入口；
+不改变本节迁移 SQL。事务失败时旧程序保持，提交后只允许继续完成 1.13.0，不能降级；
+操作和恢复见[生产升级手册](../../docs/runbooks/production-upgrade.md)。
 
 - 增加三张可由原表重算的精确汇总表，非叶表总数 65。语句级触发器与原写入事务一起维护名称选项、原文总数、每个规则已有指纹结果数；
   冲突不写入、回滚、更新、删除和清空都不改变计数含义。没有定时刷新或人工维护步骤。

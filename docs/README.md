@@ -86,10 +86,12 @@
 ## 开发与操作
 
 当前 v1.1.0 的交付与验证边界见[发布说明](releases/v1.1.0.md)、[开发机准备记录](reports/v110-preparation-2026-10-16.md)
+| [v1.2.0 发布说明](releases/v1.2.0.md) | 交付说明 | 第一批性能修复、原地升级与验证边界。 |
 及[目标机验证记录](reports/v110-target-validation-2026-10-16.md)；
 [R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)已批准，实施由 PR #68 合并为 `fcf417f`。
 公开制品见 [v1.1.0 发布页](https://github.com/shenxg13/sql-apm/releases/tag/v1.1.0)。
 当前安装入口为[生产安装手册](runbooks/production-installation.md)；
+| [生产升级手册](runbooks/production-upgrade.md) | 操作说明 | v1.1.0 带数据升级到 v1.2.0、失败恢复与核对。 |
 [演练验证手册](runbooks/kylin-offline-deployment.md)保留目标机验证与用户验收流程。
 [v1.0.0 发布说明](releases/v1.0.0.md)保留该版本验证与交付边界；[准备报告](reports/v100-preparation-2026-10-12.md)保留开发机准备阶段的记录。
 [Kylin 成品编译验证](reports/v100-runtime-build-2026-10-12.md)记录首轮编译、成品身份和固定前缀位置。

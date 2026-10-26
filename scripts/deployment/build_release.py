@@ -81,8 +81,8 @@ def compare_product(app, previous):
 
 
 def build(args):
-    if args.version != 'v1.1.0':
-        raise ValueError('this revision carries only v1.1.0 release documents; use the historical builder for older releases')
+    if args.version != 'v1.2.0':
+        raise ValueError('this revision carries only v1.2.0 release documents; use the historical builder for older releases')
     if git('status', '--porcelain', '--untracked-files=all'):
         raise ValueError('commit repository changes before building')
     commit = git('rev-parse', args.commit + '^{commit}')
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', default='HEAD')
-    parser.add_argument('--version', type=version_number, default='v1.1.0')
+    parser.add_argument('--version', type=version_number, default='v1.2.0')
     parser.add_argument('--kind', choices=['candidate', 'release'], default='candidate')
     parser.add_argument('--previous-program', type=Path)
     build(parser.parse_args())

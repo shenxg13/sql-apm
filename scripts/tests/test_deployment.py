@@ -364,11 +364,11 @@ class PackageTests(unittest.TestCase):
 
 class HtmlTests(unittest.TestCase):
     def test_release_notes_use_the_same_source_and_pin_repository_links(self):
-        source = (ROOT / 'docs/releases/v1.1.0.md').read_text()
+        source = (ROOT / 'docs/releases/v1.2.0.md').read_text()
         notes = release_notes(ROOT, 'a' * 40)
         prefix = 'https://github.com/shenxg13/sql-apm/blob/' + 'a' * 40 + '/docs/'
         self.assertEqual(notes.replace(prefix, '../'), source)
-        self.assertIn('https://grafana.com/docs/', notes)
+        self.assertIn('production-upgrade.md', notes)
 
     def test_current_manual(self):
         for filename in DOCUMENTS:
@@ -448,7 +448,7 @@ class DocumentTests(unittest.TestCase):
     def test_missing_packaged_command(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
+            for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/production-upgrade.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
                          'docs/runbooks/sqlfind-guide.md', 'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)

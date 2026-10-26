@@ -13,6 +13,7 @@ from markdown.extensions.toc import slugify_unicode
 
 DOCUMENTS = {
     'INSTALL.html': dict(title='生产安装手册', sources=('docs/runbooks/production-installation.md',)),
+    'UPGRADE.html': dict(title='生产升级手册', sources=('docs/runbooks/production-upgrade.md',)),
     'CONFIGURATION.html': dict(title='配置与每日运行', sources=(
         'docs/runbooks/daily-run.md', 'docs/runbooks/configuration-guide.md')),
     'REHEARSAL.html': dict(title='演练验证手册', sources=(
@@ -29,7 +30,7 @@ DOCUMENTS = {
     'SQLFIND.html': dict(title='sqlfind 使用说明', sources=(
         'docs/runbooks/sqlfind-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v1.1.0.md',)),
+        'docs/releases/v1.2.0.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''

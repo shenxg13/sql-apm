@@ -10,7 +10,7 @@ from unittest.mock import patch,Mock
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts/performance'))
-from perfkit.core import Refused,Work,save,Session
+from perfkit.core import Refused,Work,save,Session,check_versions
 from perfkit.dashboards import interpolate,defaults
 from perfkit.pack import scan,paths,export_document
 from perfkit.plans import redact_plan,Notices
@@ -24,6 +24,19 @@ from perfkit.vocabulary import fixed, sql_fields, Vocabulary
 
 
 class ToolkitTests(unittest.TestCase):
+    def test_toolkit_110_accepts_only_the_new_product_schema_pair(self):
+        with tempfile.TemporaryDirectory() as folder:
+            app=Path(folder)
+            for product,schema,accepted in [('v1.2.0','1.13.0',True),('v1.1.0','1.12.0',False),
+                                             ('v1.2.0','1.12.0',False),('v1.2.0','1.14.0',False)]:
+                with self.subTest(product=product,schema=schema):
+                    (app/'RELEASE.json').write_text(json.dumps(dict(version=product)))
+                    session=Mock(query=Mock(return_value=[dict(version=schema)]))
+                    if accepted:
+                        self.assertEqual(check_versions(app,session)['schema'],'1.13.0')
+                    else:
+                        with self.assertRaises(Refused):check_versions(app,session)
+
     @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
     def test_build_and_kernel_field_names_are_checked_before_timing(self):
         with patch('perfkit.collect.read',return_value='SyntheticHostMetric70: 1\n'):

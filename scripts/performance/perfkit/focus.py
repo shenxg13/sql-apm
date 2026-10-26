@@ -55,7 +55,7 @@ def run(args,work,session):
     documents=dashboards.load(args.dashboards)
     source=(Path(__file__).resolve().parents[1]/'internal.json')
     templates=json.loads(source.read_text())
-    # Bind the templates to exactly the installed v1.1.0 source.
+    # Bind the templates to exactly the installed v1.2.0 source.
     if templates!=extract((args.app/'sql_apm/storage/schema.sql').read_text()):
         raise Refused('internal_statement_source_mismatch')
     allowed=plans.names(session)
@@ -92,12 +92,12 @@ def run(args,work,session):
         result['shape'].append(record)
         trace.append(dict(item=label,function=name,sql=sql))
         checkpoint()
-    def actual(sql,label,split=False,keep=False):
+    def actual(sql,label,split=False,keep=False,target_ms=1000):
         if module['state']=='loaded':
             session.query('SET auto_explain.log_min_duration=0')
             notice=plans.Notices(allowed)
             session.db.notices=notice
-        record,rows=measure(session,sql,label=label,keep=keep,upper_limit=True)
+        record,rows=measure(session,sql,label=label,keep=keep,upper_limit=True,target_ms=target_ms)
         record['plans']=notice.plans if module['state']=='loaded' else []
         record['scan']=plans.summary(record['plans'])
         result['split' if split else 'measurements'].append(record)
@@ -109,8 +109,8 @@ def run(args,work,session):
             return cur.mogrify(sql,params).decode(session.db.encoding)
     try:
         clusters=sorted({c['scope_id'] for c in selected})
-        result['worst_seconds']=(80*(len(clusters)+1)+32)*args.limit_seconds
-        result['budget_basis']='at_most_80_statements_per_scope_plus_32_setup_distribution; includes_EXPLAIN_and_lookups'
+        result['worst_seconds']=(180*(len(clusters)+1)+32)*args.limit_seconds
+        result['budget_basis']='at_most_180_statements_per_scope_plus_32_setup_distribution; includes_EXPLAIN_and_lookups'
         for cluster in clusters+[None]:
             case=max((c for c in selected if cluster is None or c['scope_id']==cluster),key=lambda c:(c['events'],c['id']))
             label=work.alias('cluster',cluster) if cluster is not None else 'all'
@@ -134,7 +134,16 @@ def run(args,work,session):
                 planned('mpp_view_baseline_ranking',parameters,stem+'/internal')
                 core=sql_params('SELECT * FROM mpp_view_baseline_ranking(%s,%s,NULL,NULL,%s,%s,0,%s)',
                                 (case['norm'],cluster,'request,execute_first','p95',limit))
-                rows=actual(core,stem+'/core',split=True,keep=True)
+                rows=actual(core,stem+'/core',split=True,keep=True,target_ms=10000)
+                # Retain the original p95/core key for comparison with toolkit 1.0.0.
+                # Every order/limit gets three independent function measurements.
+                for order in ('samples','p50','p95','p99','max','mean'):
+                    for repeat in range(1,4):
+                        if order=='p95' and repeat==1:
+                            continue
+                        statement=sql_params('SELECT * FROM mpp_view_baseline_ranking(%s,%s,NULL,NULL,%s,%s,0,%s)',
+                                             (case['norm'],cluster,'request,execute_first',order,limit))
+                        actual(statement,stem+'/order-'+order+'/run-'+str(repeat)+'/core',split=True,target_ms=10000)
                 for i,row in enumerate(rows[:5],1):
                     hit_values=dict(common,p_fingerprint=(row['fingerprint'],'text'),p_scope=(None,'text'))
                     planned('mpp_query_hits',hit_values,stem+'/hit-'+str(i)+'/internal')

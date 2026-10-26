@@ -32,6 +32,7 @@
     "scripts/deployment/install_postgres.py",
     "scripts/deployment/runtime_archive.py",
     "scripts/deployment/runtime_check.py",
+    "scripts/deployment/upgrade.py",
     "scripts/deployment/compile_runtime.sh"
   ],
   "verification": [

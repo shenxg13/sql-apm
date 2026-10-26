@@ -40,12 +40,12 @@ def build(root,module,out,allow_dirty=False):
     manual=(root/'docs/runbooks/performance-check.md').read_text()
     renderer=converter('manual')
     body=renderer.convert(manual)
-    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.1.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
+    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.2.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
     inspection=inspect(document,code_blocks(manual))
     files['PERFORMANCE.html']=document.encode()
     manifest=dict(format='sql-apm-performance-toolkit/1',version=VERSION,commit=commit,
-                  source_state='working_tree' if dirty else 'committed',product_version='v1.1.0',
-                  schema_version='1.12.0',html_checks=inspection,
+                  source_state='working_tree' if dirty else 'committed',product_version='v1.2.0',
+                  schema_version='1.13.0',html_checks=inspection,
                   files={name:hashlib.sha256(raw).hexdigest() for name,raw in sorted(files.items())})
     files['MANIFEST.json']=encoded(manifest)
     files['SHA256SUMS']=''.join(hashlib.sha256(raw).hexdigest()+'  '+name+'\n' for name,raw in sorted(files.items())).encode()

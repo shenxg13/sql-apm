@@ -7,9 +7,11 @@ from html import escape
 import io
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tarfile
+from urllib.parse import unquote, urlsplit
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'scripts/deployment'))
@@ -41,6 +43,18 @@ def build(root,module,out,allow_dirty=False):
     manual=(root/'docs/runbooks/performance-check.md').read_text()
     renderer=converter('manual')
     body=renderer.convert(manual)
+    def repository_link(match):
+        parts=urlsplit(unquote(match[1].replace('&amp;','&')))
+        if parts.scheme or parts.netloc or not parts.path:
+            return match[0]
+        target=(root/'docs/runbooks'/parts.path).resolve()
+        if not target.is_relative_to(root) or not target.is_file():
+            raise ValueError('missing manual reference')
+        url='https://github.com/shenxg13/sql-apm/blob/'+commit+'/'+target.relative_to(root).as_posix()
+        if parts.fragment:
+            url+='#'+parts.fragment
+        return 'href="'+escape(url,quote=True)+'"'
+    body=re.sub(r'href="([^"]+)"',repository_link,body)
     document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.2.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
     inspection=inspect(document,code_blocks(manual))
     files['PERFORMANCE.html']=document.encode()

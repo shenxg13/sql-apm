@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-10-11
+updated: 2026-10-26
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/72
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/52
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/54
@@ -58,9 +60,9 @@ confidence: high
 
 ## Summary
 
-当前物理结构版本 1.11.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径。
+当前开发结构版本 1.13.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.1.0 的结构仍为 1.12.0。
 交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
-新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 尚未实现。
+新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 与每日运行记录见下文各结构版本。
 
 ## Source Of Truth
 
@@ -230,6 +232,27 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
   随包[结构说明](../../docs/design/database-structure.md)已包含 62 张表、更新后的总览与版本沿革，
   [检索指南](../../docs/runbooks/search-guide.md)列出查询函数；自动检查核对表／列、55 个查询函数签名和反例。
   表和函数的口径由[开发说明](../../docs/design/daily-run.md)维护。
+
+### 查询读取结构 1.13.0（2026-10-26）
+
+来源：[Issue #72](https://github.com/shenxg13/sql-apm/issues/72) 的已确认契约；开发实现与验证见
+[结构说明](../../docs/design/database-structure.md#页面查询的精确汇总)和[验证报告](../../docs/reports/query-performance-2026-10-26.md)。
+已发布 v1.1.0 仍为 1.12.0，生产升级和复测属于 #74。
+
+- 增加三张可由原表重算的精确汇总表，非叶表总数 65。语句级触发器与原写入事务一起维护名称选项、原文总数、每个规则已有指纹结果数；
+  冲突不写入、回滚、更新、删除和清空都不改变计数含义。没有定时刷新或人工维护步骤。
+- 导入原文／指纹在既有元数据锁和事务内成批复查完整文本，再以每页至多 100 条插入。
+  精确去重、冲突和文件回滚语义不变；避免逐条插入导致单行汇总反复更新、表膨胀和写入退化。
+- 训练缓存准备需要补指纹时，在至多 1000 条的短写事务中先取同一元数据锁，再写指纹／训练缓存，
+  避免跨集群写入在指纹唯一键与规则计数行之间形成锁环。解析在锁外，已有指纹时不取该锁；
+  事务提交或回滚自动释放，不把锁持有到完整构建。依据 [R1 整改要求](https://github.com/shenxg13/sql-apm/pull/75#issuecomment-6419461856)，
+  锁范围与成本见[编排设计](../../docs/design/build-publication.md#连接事务与恢复)。
+- 当前基线排行使用统计父表的 overall 部分覆盖索引，只为输出页补查活跃日期数组并计算原样本条件。
+  不增加统计结果副本，新增索引随原月分区创建和清理；当前指针、发布和保留规则不变。
+- 训练明细按完整事件键读取。共享函数保留无筛选构建入口和所有判定规则，构建结果等价性另行验证。
+- 冻结 1.12.0 DDL，带数据迁移建立索引、回填汇总、安装触发器；先锁来源表以封闭回填与维护之间的空档。
+  沿用 5 秒锁等待上限及单事务回滚，升级须在停止写入的维护窗口执行。既有表数据、构建结果与旧回执保留，结构检查覆盖新增对象及授权。
+- 全量开发数据和三构建形态用于验证；生产时延、额外空间和升级成本是 modeled，不能替代生产验收。
 
 ## Workflows
 

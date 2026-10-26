@@ -4,8 +4,10 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-15
+updated: 2026-10-26
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/72
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162958350
@@ -428,6 +430,18 @@ PostgreSQL 数据源插件。第一版不加展示类插件；随包看板只依
   不重复在集群表的每一行里（实施时的处理，已在 PR 和试用说明里列出）。
 - 其余三个看板的顶部各增加一个到运行状态的链接（实施时的处理）。这个看板展示的是每日运行这件事本身的状态，
   不是 MPP 或系统的负载，不改变[产品定位](../decisions/project-scope.md)。
+
+### 查询性能修复的兼容边界（2026-10-26）
+
+来源：[Issue #72](https://github.com/shenxg13/sql-apm/issues/72) 的已确认契约。本轮只改变四处读取方式：当前基线排行、
+执行明细中的训练标记、数据库／用户选项、尚未按规则生成指纹的原文计数。列、行、顺序、样本条件、错误码和提示条件保持不变。
+
+- 训练查询按 `(analysis_id, occurrence_id)` 完整键定位。共享训练函数的无筛选构建入口保持原判定，
+  未进入版本输入与选入文件内的窗口外记录仍按前文区分。
+- 名称选项仍来自所有保留事件，包括没有基线和只有失败记录的身份；导入事务自动更新名称计数，查询小表去重并保留“全部”在前。
+- 未生成指纹计数等于保留原文总数减去该规则已有指纹结果数。指纹失败也属于已有结果；规则切换、新原文和后续生成均由事务内维护，
+  不是近似统计或定时刷新的缓存。实现由[存储主题](../architecture/postgresql-storage.md)及[结构说明](../../docs/design/database-structure.md)维护。
+- 本轮只在开发机测量；生产效果须标为 modeled，生产复测和发版由 #74 负责。事件表按指纹／时间访问、检索聚合和其他面板仍属于 #73。
 
 ## Workflows
 

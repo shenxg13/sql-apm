@@ -127,6 +127,10 @@ class TrainingStore:
                     values.append((sid,rule_id,self.normalization_id,fid,category['kind'],category['categories'],matches))
                 with self.db, self.db.cursor() as cur:
                     if fingerprints:
+                        # Match SqlWriter's lock order before any fingerprint
+                        # unique key or shared summary row is locked. Parsing
+                        # stays outside this bounded (at most 1000 rows) write.
+                        cur.execute('SELECT pg_advisory_xact_lock(1835101, 1)')
                         execute_values(cur,'INSERT INTO mpp_fingerprint VALUES %s ON CONFLICT DO NOTHING',fingerprints)
                     execute_values(cur,'INSERT INTO mpp_training_sql VALUES %s ON CONFLICT DO NOTHING',values)
                 added += len(values)

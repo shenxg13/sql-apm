@@ -23,6 +23,15 @@ def extract(source):
     return result
 
 
+def extract_settings(source):
+    """The detached EXPLAIN must use the function's own planner settings."""
+    result={}
+    for name in FUNCTIONS:
+        header=source.split('CREATE OR REPLACE FUNCTION '+name+'(',1)[1].split('AS $function$',1)[0]
+        result[name]=dict(re.findall(r'\bSET\s+([a-z_]+)\s*=\s*([a-z_0-9.]+)',header,re.I))
+    return result
+
+
 def bound(template,values,session):
     # PostgreSQL scanner distinguishes names from literals and comments.
     from pglast import scan
@@ -55,9 +64,12 @@ def run(args,work,session):
     documents=dashboards.load(args.dashboards)
     source=(Path(__file__).resolve().parents[1]/'internal.json')
     templates=json.loads(source.read_text())
+    settings=json.loads(source.with_name('internal-settings.json').read_text())
     # Bind the templates to exactly the installed v1.2.0 source.
     if templates!=extract((args.app/'sql_apm/storage/schema.sql').read_text()):
         raise Refused('internal_statement_source_mismatch')
+    if settings!=extract_settings((args.app/'sql_apm/storage/schema.sql').read_text()):
+        raise Refused('internal_statement_settings_mismatch')
     allowed=plans.names(session)
     module=plans.enable(session,args.module_dir)
     result=dict(module=module,shape=[],measurements=[],split=[],limit_seconds=args.limit_seconds)
@@ -88,7 +100,13 @@ def run(args,work,session):
     def planned(name,values,label):
         sql=bound(templates[name],values,session)
         session.query('SET auto_explain.log_min_duration=-1') if module['state']=='loaded' else None
-        record=plans.shape(session,sql,None,label,allowed)
+        session.query('BEGIN READ ONLY')
+        try:
+            for parameter,value in settings[name].items():
+                session.query('SELECT set_config(%s,%s,true)',(parameter,value))
+            record=plans.shape(session,sql,None,label,allowed)
+        finally:
+            session.query('ROLLBACK')
         result['shape'].append(record)
         trace.append(dict(item=label,function=name,sql=sql))
         checkpoint()

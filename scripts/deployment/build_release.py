@@ -49,7 +49,7 @@ def archive(directory, output):
     Path(str(output) + '.sha256').write_text(digest(output) + '  ' + output.name + '\n')
 
 
-def select(source, destination, patterns):
+def select(source, destination, patterns, exclude=()):
     files = [str(p.relative_to(source)) for p in source.rglob('*') if p.is_file()]
     selected = set()
     for pattern in patterns:
@@ -57,6 +57,10 @@ def select(source, destination, patterns):
         if not matches:
             raise ValueError('package rule matched no files: ' + pattern)
         selected.update(matches)
+    for name in exclude:
+        if name not in selected:
+            raise ValueError('excluded package path was not selected: ' + name)
+        selected.remove(name)
     for name in sorted(selected):
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -111,7 +115,7 @@ def build(args):
         rules = json.loads((source / 'scripts/deployment/package-files.json').read_text())
         app, validation = output / 'app', output / 'verification'
         select(source, app, rules['program'])
-        select(source, validation, rules['verification'])
+        select(source, validation, rules['verification'], rules.get('verification_exclude', ()))
         for name in rules['verification_probes']:
             target = validation / 'probes' / (name + '.py')
             target.parent.mkdir(exist_ok=True)

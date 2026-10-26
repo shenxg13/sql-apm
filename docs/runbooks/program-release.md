@@ -63,9 +63,9 @@ for round in first repeat; do
     --wheel-dir "$APM_INPUTS/wheels" --grafana-files "$APM_INPUTS/grafana" \
     --source-manifest "$APM_INPUTS/manifest.json"
 done
-cmp "$APM_DELIVERY_DIR/first/release/sql-apm-v1.2.0.tar.gz" "$APM_DELIVERY_DIR/repeat/release/sql-apm-v1.2.0.tar.gz"
-cmp "$APM_DELIVERY_DIR/first/release/sql-apm-verification-v1.2.0.tar.gz" "$APM_DELIVERY_DIR/repeat/release/sql-apm-verification-v1.2.0.tar.gz"
-cmp "$APM_DELIVERY_DIR/first/offline-bundle.tar.gz" "$APM_DELIVERY_DIR/repeat/offline-bundle.tar.gz"
+.venv/bin/python -c 'import filecmp,sys; assert filecmp.cmp(sys.argv[1],sys.argv[2],shallow=False)' "$APM_DELIVERY_DIR/first/release/sql-apm-v1.2.0.tar.gz" "$APM_DELIVERY_DIR/repeat/release/sql-apm-v1.2.0.tar.gz"
+.venv/bin/python -c 'import filecmp,sys; assert filecmp.cmp(sys.argv[1],sys.argv[2],shallow=False)' "$APM_DELIVERY_DIR/first/release/sql-apm-verification-v1.2.0.tar.gz" "$APM_DELIVERY_DIR/repeat/release/sql-apm-verification-v1.2.0.tar.gz"
+.venv/bin/python -c 'import filecmp,sys; assert filecmp.cmp(sys.argv[1],sys.argv[2],shallow=False)' "$APM_DELIVERY_DIR/first/offline-bundle.tar.gz" "$APM_DELIVERY_DIR/repeat/offline-bundle.tar.gz"
 ```
 
 与 v1.1.0 离线包逐路径比较摘要，差异仅允许程序包、验收包、文档及对应身份／摘要清单。
@@ -80,7 +80,7 @@ for round in first repeat; do
   var/issue31/build-venv/bin/python scripts/performance/build.py \
     --module var/issue70/module --output "$APM_DELIVERY_DIR/performance-$round"
 done
-cmp "$APM_DELIVERY_DIR/performance-first/performance-toolkit.tar.gz" \
+.venv/bin/python -c 'import filecmp,sys; assert filecmp.cmp(sys.argv[1],sys.argv[2],shallow=False)' "$APM_DELIVERY_DIR/performance-first/performance-toolkit.tar.gz" \
     "$APM_DELIVERY_DIR/performance-repeat/performance-toolkit.tar.gz"
 ```
 

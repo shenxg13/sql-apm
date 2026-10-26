@@ -16,7 +16,7 @@ sys.path.insert(0,str(ROOT/'scripts/deployment'))
 from render_manual import CSS,converter,code_blocks,inspect
 from perfkit import VERSION
 from perfkit.core import digest,encoded
-from perfkit.focus import extract
+from perfkit.focus import extract, extract_settings
 
 
 def build(root,module,out,allow_dirty=False):
@@ -32,6 +32,7 @@ def build(root,module,out,allow_dirty=False):
     for path in sorted((source/'perfkit').glob('*.py'))+[source/'check.py',source/'perfcheck']:
         files[str(path.relative_to(source))]=path.read_bytes()
     files['internal.json']=encoded(extract((root/'sql_apm/storage/schema.sql').read_text()))
+    files['internal-settings.json']=encoded(extract_settings((root/'sql_apm/storage/schema.sql').read_text()))
     for name in ('auto_explain.so','module.json','COPYRIGHT'):
         files['module/'+name]=(module/name).read_bytes()
     module_info=json.loads(files['module/module.json'])

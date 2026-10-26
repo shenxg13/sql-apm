@@ -309,7 +309,8 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(tar.getmember('program/requirements.txt').mode, 0o644)
             self.assertTrue(tar.getmember('program/scripts/sqlfind/configure.py').isfile())
         kit = self.root / 'verification'
-        select(ROOT, kit, rules['verification'])
+        select(ROOT, kit, rules['verification'], rules['verification_exclude'])
+        self.assertFalse((kit / 'tests/test_performance_toolkit.py').exists())
         for name in ('scripts/db/verify_sqlfind.py', 'scripts/tests/sqlfind_terminal.py',
                      'scripts/daily/verify_push.py', 'scripts/daily/verify_fetch.py',
                      'scripts/daily/verify_timer.py', 'tests/test_log_intake.py'):

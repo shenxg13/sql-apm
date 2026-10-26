@@ -70,6 +70,9 @@
     "docs/reports/data/kylin-alma-baseline-2026-10-02.json",
     "docs/reports/data/log-supplement-manifest-2026-09-28.json"
   ],
+  "verification_exclude": [
+    "tests/test_performance_toolkit.py"
+  ],
   "verification_probes": [
     "function_probe",
     "statement_census",

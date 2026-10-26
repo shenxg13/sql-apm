@@ -15,7 +15,7 @@ from perfkit.dashboards import interpolate,defaults
 from perfkit.pack import scan,paths,export_document
 from perfkit.plans import redact_plan,Notices
 from perfkit.collect import delta
-from perfkit.focus import extract
+from perfkit.focus import extract,extract_settings
 from perfkit.commands import statement_target
 from perfkit.metadata import scan_views, declaration
 from perfkit.core import encoded
@@ -403,6 +403,8 @@ class ToolkitTests(unittest.TestCase):
     def test_internal_queries_are_exact_source_slices(self):
         source=(ROOT/'sql_apm/storage/schema.sql').read_text()
         bodies=extract(source)
+        self.assertEqual(extract_settings(source)['mpp_view_baseline_ranking'],
+                         dict(plan_cache_mode='force_custom_plan',parallel_setup_cost='0',parallel_tuple_cost='0'))
         self.assertEqual(len(bodies),4)
         for body in bodies.values():
             self.assertIn(body,source)

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from build_release import archive, select, compare_product, version_number
 from render_manual import DOCUMENTS, inspect, render, release_notes
-from check_documents import check, check_guide, check_structure, check_paths, check_queries, GUIDE, STRUCTURE, QUERIES
+from check_documents import check, check_guide, check_structure, check_paths, check_queries, check_upgrade, GUIDE, STRUCTURE, QUERIES
 from build_bundle import grafana_inputs
 from verify_package import digest, verify
 import rehearsal
@@ -364,6 +364,18 @@ class PackageTests(unittest.TestCase):
 
 
 class HtmlTests(unittest.TestCase):
+    def test_upgrade_examples_require_explicit_irreversible_confirmation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            target=root/'docs/runbooks/production-upgrade.md'
+            target.parent.mkdir(parents=True)
+            source=(ROOT/'docs/runbooks/production-upgrade.md').read_text()
+            target.write_text(source)
+            self.assertTrue(check_upgrade(root)['explicit_confirmation'])
+            target.write_text(source.replace('--confirm-no-rollback',''))
+            with self.assertRaisesRegex(ValueError,'acknowledge no rollback'):
+                check_upgrade(root)
+
     def test_release_notes_use_the_same_source_and_pin_repository_links(self):
         source = (ROOT / 'docs/releases/v1.2.0.md').read_text()
         notes = release_notes(ROOT, 'a' * 40)

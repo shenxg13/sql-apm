@@ -203,8 +203,15 @@ class Upgrade:
                      '--pg-bin', self.root / 'postgresql-17.10/bin'])
 
     def stop(self):
+        timer = self.state['preflight']['services']['sql-apm-daily.timer']
+        if timer['LoadState'] == 'loaded':
+            self.command('stop-sql-apm-daily.timer', ['sudo', '-n', 'systemctl', 'stop', 'sql-apm-daily.timer'])
+        # A scheduled run can start after admission. Stop future triggers first,
+        # then refuse that race without terminating the running daily service.
+        self.services()
+        self.idle()
         for unit, state in self.state['preflight']['services'].items():
-            if state['LoadState'] == 'loaded':
+            if unit not in ('sql-apm-daily.timer', 'sql-apm-daily.service') and state['LoadState'] == 'loaded':
                 self.command('stop-' + unit, ['sudo', '-n', 'systemctl', 'stop', unit])
         self.idle()
 

@@ -159,6 +159,24 @@ class UpgradeTests(unittest.TestCase):
         for path in (self.root/'app/grafana/dashboards').glob('*.json'):
             self.assertEqual(path.read_bytes(),(self.root/'grafana/dashboards/mpp'/path.name).read_bytes())
 
+    def test_daily_starting_after_preflight_is_not_killed(self):
+        obj=self.subject
+        obj.service_states['sql-apm-daily.timer']['ActiveState']='active'
+        result=obj.preflight();command=obj.command
+        def race(name,args):
+            value=command(name,args)
+            if name=='stop-sql-apm-daily.timer':obj.busy=True
+            return value
+        with patch.object(obj,'command',side_effect=race), self.assertRaisesRegex(ValueError,'task is running'):
+            obj.apply(result)
+        self.assertNotIn('stop-sql-apm-daily.service',obj.operations)
+        self.assertNotIn('initialize-upgrade',obj.operations)
+        self.assertEqual(obj.version,'1.12.0')
+        obj.busy=False
+        obj.recover()
+        self.assertEqual(obj.service_states['sql-apm-daily.timer']['ActiveState'],'active')
+        self.assertEqual(obj.state['phase'],'rolled-back')
+
     def test_resume_each_interrupted_directory_rename(self):
         for position in range(1,6):
             with self.subTest(rename=position):

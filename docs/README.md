@@ -87,6 +87,7 @@
 
 当前 v1.1.0 的交付与验证边界见[发布说明](releases/v1.1.0.md)、[开发机准备记录](reports/v110-preparation-2026-10-16.md)
 | [v1.2.0 发布说明](releases/v1.2.0.md) | 交付说明 | 第一批性能修复、原地升级与验证边界。 |
+| [v1.2.0 带数据升级验证](reports/v120-upgrade-2026-10-27.md) | 验证报告 | 双机迁移、失败回滚、数据保留、升级后核对及生产验证边界。 |
 及[目标机验证记录](reports/v110-target-validation-2026-10-16.md)；
 [R1 独立评审](https://github.com/shenxg13/sql-apm/issues/67#issuecomment-6219402233)已批准，实施由 PR #68 合并为 `fcf417f`。
 公开制品见 [v1.1.0 发布页](https://github.com/shenxg13/sql-apm/releases/tag/v1.1.0)。

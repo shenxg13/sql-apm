@@ -2,6 +2,7 @@
 """Upgrade admission and recovery regression without touching a real installation."""
 import copy
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -85,6 +86,19 @@ class Fixture(upgrade.Upgrade):
 
 
 class UpgradeTests(unittest.TestCase):
+    def test_libpq_environment_cannot_redirect_receipt_connection(self):
+        inherited=dict(PGHOSTADDR='192.0.2.1',PGSERVICE='unrelated',
+                       PGOPTIONS='-c search_path=unrelated',PGPASSWORD='test-only')
+        def connect(**kwargs):
+            self.assertFalse(any(k.startswith('PG') for k in os.environ))
+            self.assertEqual(kwargs['host'],str(self.root/'socket'))
+            self.assertEqual(kwargs['passfile'],str(self.root/'private/pgpass'))
+            raise RuntimeError('connection refused')
+        with patch.dict(os.environ,inherited),patch('psycopg2.connect',side_effect=connect):
+            with self.assertRaisesRegex(RuntimeError,'connection refused'):
+                upgrade.Upgrade.query(self.subject,'SELECT 1')
+            self.assertEqual({k:os.environ[k] for k in inherited},inherited)
+
     def setUp(self):
         self.temporary=tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

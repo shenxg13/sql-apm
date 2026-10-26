@@ -111,15 +111,25 @@ class Upgrade:
 
     def query(self, sql):
         import psycopg2
-        # Explicit connection identity; no environment-provided remote host or credentials.
-        with psycopg2.connect(host=str(self.root / 'socket'), port=self.port, dbname='sql_apm',
-                              user='sql_apm', passfile=str(self.root / 'private/pgpass'),
-                              connect_timeout=10, application_name='sql-apm-upgrade') as db:
-            db.set_session(readonly=True)
-            with db.cursor() as cur:
-                cur.execute("SET LOCAL statement_timeout='30s'")
-                cur.execute(sql)
-                return cur.fetchall()
+        # libpq can still take PGHOSTADDR/PGSERVICE/PGOPTIONS from the process
+        # environment even with an explicit host. This single-threaded entry
+        # clears them during connection setup, just as it does for subprocesses.
+        inherited = {k: os.environ.pop(k) for k in tuple(os.environ) if k.startswith('PG')}
+        try:
+            connection = psycopg2.connect(host=str(self.root / 'socket'), port=self.port, dbname='sql_apm',
+                                           user='sql_apm', passfile=str(self.root / 'private/pgpass'),
+                                           connect_timeout=10, application_name='sql-apm-upgrade')
+        finally:
+            os.environ.update(inherited)
+        try:
+            with connection as db:
+                db.set_session(readonly=True)
+                with db.cursor() as cur:
+                    cur.execute("SET LOCAL statement_timeout='30s'")
+                    cur.execute(sql)
+                    return cur.fetchall()
+        finally:
+            connection.close()
 
     def schema(self):
         return self.query("SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1")[0][0]

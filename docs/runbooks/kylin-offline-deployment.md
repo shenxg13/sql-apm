@@ -2,7 +2,7 @@
 
 本手册随 v1.2.0 交付，当前产品结构为 1.13.0。本版验证范围以 [Issue #74](https://github.com/shenxg13/sql-apm/issues/74) 为准：
 带数据升级按[升级手册](production-upgrade.md)，全新安装按[生产手册](production-installation.md)，
-制包与接续顺序见[程序发布说明](program-release.md#目标机与用户验收)。
+制包与接续顺序见[程序发布说明](program-release.md#验证机与用户验收)。
 本版不重新演练 Kylin 全新安装、不重跑九任务、不重启验证机。
 
 **历史版本说明（v1.1.0／v1.0.0，结构 1.12.0）。**

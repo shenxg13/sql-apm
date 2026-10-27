@@ -427,7 +427,7 @@ postgres 数据保持原属主，以命名读取 ACL、默认 ACL 和 PG 组读�
 目标机已验证全部目录和普通文件可读、PG 新文件继承、重启后 socket／TCP 正常，
 原九个发布版本保持不变。实际计数、socket ACL 失败及修正见
 [权限修正报告](../../docs/reports/kylin-read-access-2026-10-04.md)，操作方法见
-[部署手册](../../docs/runbooks/kylin-offline-deployment.md#71-已有部署补齐读取权限)。
+[部署手册](../../docs/runbooks/kylin-offline-deployment.md#71-以执行账号核对读取权限)。
 外部工具显式收紧权限或移入文件后需复查，不以默认 ACL 保证任意外部操作后的可读性。
 
 ### 已确认的精简预发布与离线手册（2026-10-03）

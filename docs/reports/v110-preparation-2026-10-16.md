@@ -94,7 +94,7 @@ statistics、training、views、window、cleanup、daily、daily_recovery（后 
 
 演练机初始系统安装、跨机器推送和每日运行、部分样本 O-62-005 测量、看板比对及用户 PuTTY 验收仍待完成。
 须由用户恢复初始快照，随后按[生产手册](../runbooks/production-installation.md)及
-[发布验证顺序](../runbooks/program-release.md#目标机与用户验收)执行；用户在实施方装好的环境验收，不再恢复第二次。
+[发布验证顺序](https://github.com/shenxg13/sql-apm/blob/v1.1.0/docs/runbooks/program-release.md#目标机与用户验收)执行；用户在实施方装好的环境验收，不再恢复第二次。
 样本过期副本可能按默认 45 天配置删除，这是目标机副本的预期行为；开发机硬链接源只读，原件保留。
 原文、真实身份与访问细节只保留在受保护本地记录；本报告不含真实业务身份或连接参数。
 本轮未连接验证机，不重跑九任务，不重启，不发布或合并。开发机验证不能替代合并前的目标机与用户验收。

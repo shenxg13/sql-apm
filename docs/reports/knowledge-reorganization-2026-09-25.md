@@ -63,7 +63,7 @@
 | 524 | 已确认的指纹生成失败处理 | [日志导入、来源与异常处理](../../.project-wiki/features/log-ingestion.md#已确认的指纹生成失败处理) |
 | 550 | 已确认的 SQL 纳入与排除策略 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#已确认的-sql-纳入与排除策略) |
 | 576 | 已确认的黑名单能力与维护分工 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#已确认的黑名单能力与维护分工) |
-| 593 | 首版黑名单规则的后续梳理 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#首版黑名单规则的后续梳理) |
+| 593 | 首版黑名单规则的后续梳理 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#首版黑名单规则的维护入口) |
 | 608 | 已确认的单条语句与多语句批次 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#已确认的单条语句与多语句批次) |
 | 634 | 已确认的训练样本基本资格 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#已确认的训练样本基本资格) |
 | 658 | 故障与维护时段的人工排除 | [训练资格、黑名单与排除时段](../../.project-wiki/contracts/training-eligibility.md#故障与维护时段的人工排除) |

@@ -1,6 +1,6 @@
 # Kylin 历史完整验证记录模板
 
-v1.1.0 使用 [Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 的精简验收项及[制包说明](program-release.md#目标机与用户验收)。
+v1.1.0 使用 [Issue #67](https://github.com/shenxg13/sql-apm/issues/67) 的精简验收项及[制包说明](https://github.com/shenxg13/sql-apm/blob/v1.1.0/docs/runbooks/program-release.md#目标机与用户验收)。
 下列三轮表格只保留 v1.0.0 历史记录格式，不要求本版重新执行。
 
 分别记录三轮：第一轮编译、随包检查及成品导出；第二轮实施方二进制完整验证；

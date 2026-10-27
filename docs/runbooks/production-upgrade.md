@@ -84,30 +84,91 @@ test "$(cat verification/PROGRAM_COMMIT)" = "$APM_EXPECTED_COMMIT"
 失败时停下，按错误处理版本、损坏文件、忙碌任务、空间或权限。此步骤不停止服务、不写升级目录、
 不修改程序和数据库。不要修改程序清单、版本回执或放宽检查来绕过拒绝。
 
-## 4. 确认并升级
+## 4. 确认并在后台升级
 
 再次确认：**不备份；迁移提交后不可回退，只能重装旧版并从原始日志重建。**
 下列 `--confirm-no-rollback` 表示操作者已阅读并接受这一点；不提供该参数会立即拒绝。
+以第 2 步的执行账号运行，继续使用已导出的环境变量。先确认 sudo 可免交互执行：
 
 ```bash
-"$APM_ROOT/app/.venv/bin/python" "$APM_UPGRADE/app/scripts/deployment/upgrade.py" apply \
-  --root "$APM_ROOT" --candidate "$APM_UPGRADE/app" --verification "$APM_UPGRADE/verification" \
-  --confirm-no-rollback
+sudo -n true
 ```
+
+没有报错后，用 `nohup … &` 启动。每次新建一个控制日志目录，保留历次运行的输出和退出码：
+
+```bash
+umask 077
+export APM_UPGRADE_RUN
+APM_UPGRADE_RUN=$(mktemp -d "$APM_UPGRADE/run-apply-XXXXXXXX")
+nohup bash -c '
+  set +e
+  "$APM_ROOT/app/.venv/bin/python" -u "$APM_UPGRADE/app/scripts/deployment/upgrade.py" apply \
+    --root "$APM_ROOT" --candidate "$APM_UPGRADE/app" --verification "$APM_UPGRADE/verification" \
+    --confirm-no-rollback
+  result=$?
+  printf "%s\n" "$result" > "$APM_UPGRADE_RUN/exit-code.tmp"
+  mv "$APM_UPGRADE_RUN/exit-code.tmp" "$APM_UPGRADE_RUN/exit-code"
+  exit "$result"
+' </dev/null >"$APM_UPGRADE_RUN/console.log" 2>&1 &
+printf '%s\n' "$!" > "$APM_UPGRADE_RUN/pid"
+printf '后台已启动；请保存控制日志目录：%s\n' "$APM_UPGRADE_RUN"
+```
+
+**这里返回终端只表示后台已启动，不表示升级成功。** `pid` 是后台包装进程的 PID；
+`console.log` 收集前置检查、进度和错误，`exit-code` 在升级入口退出后写入。
+`-u` 让 Python 输出及时写入日志；标准输入关闭，后台不会等待密码或终端输入。
+`nohup` 用于在普通 SSH 断开后继续运行；它不能防止重启、掉电或管理员终止进程。
+
+查看进度：
+
+```bash
+tail -n 50 -f "$APM_UPGRADE_RUN/console.log"
+```
+
+按 `Ctrl-C` 只退出日志查看，后台升级继续执行。重新登录后只恢复变量，
+将刚才保存的完整目录填入最后一行；不要重复解包或再次启动升级：
+
+```bash
+export APM_ROOT=/data/sql-apm
+export APM_UPGRADE=/data/sql-apm-upgrade-v1.2.0
+export APM_UPGRADE_RUN='填写后台启动时打印的控制日志目录'
+```
+
+检查是否结束：
+
+```bash
+tail -n 50 "$APM_UPGRADE_RUN/console.log"
+if test -f "$APM_UPGRADE_RUN/exit-code"; then
+  printf '升级入口退出码：'
+  cat "$APM_UPGRADE_RUN/exit-code"
+else
+  printf '尚无退出码；检查下列进程和控制日志。\n'
+  ps -p "$(cat "$APM_UPGRADE_RUN/pid")" -o pid,etime,args || true
+fi
+```
+
+退出码为 `0` 且日志末尾出现 `OK: upgraded to v1.2.0`，才进入第 5 步。
+非零退出码按第 6 步处理；没有退出码且进程已经消失时，按异常中断检查，不能当作成功。
 
 入口重新检查前置条件，暂存交付文件，停止写入方，然后在一个事务内迁移。
 锁等待上限 5 秒，超时即回滚。迁移提交后替换程序，沿用原虚拟环境，更新四个随包看板，
 核对结构、解释器和 `daily status`，恢复服务原有状态。不会启用原本未启用的服务或定时器。
-预期最后为 `OK: upgraded to v1.2.0`，并打印升级记录目录。
+成功时在 `console.log` 打印升级记录目录（`record=...`）。
 每条命令的退出码、耗时及输出保存在 `$APM_ROOT/upgrades/时间戳/`，`state.json` 记录阶段。
 该目录也保留被替换的程序文件供诊断；它不是数据库备份，不能用来降级。
 
 ## 5. 升级后核对
 
-先将上一步打印的完整记录目录填入 `APM_RECORD`。执行随包自检；它使用独立临时库，不重建产品库。
+确认上一步退出码为 `0` 且日志报告升级成功，再将 `record=...` 后的完整目录填入 `APM_RECORD`。
+这是 `$APM_ROOT/upgrades/` 下的升级记录目录，与 `APM_UPGRADE_RUN` 控制日志目录不同。
+执行随包自检；它使用独立临时库，不重建产品库。重新登录后补回数据库连接环境：
 
 ```bash
 export APM_RECORD='填写上一步打印的升级记录目录'
+export PYTHONDONTWRITEBYTECODE=1
+export PGPASSFILE="$APM_ROOT/private/pgpass"
+export SQL_APM_DSN="host=$APM_ROOT/socket port=5432 dbname=sql_apm user=sql_apm"
+unset PGPASSWORD PGSERVICE PGSERVICEFILE PGOPTIONS PGHOSTADDR
 cd "$APM_ROOT/app"
 .venv/bin/python scripts/deployment/verify_package.py --installed
 scripts/db/initialize.sh check --host "$APM_ROOT/socket" --port 5432 \
@@ -136,6 +197,7 @@ sqlfind --help
 
 ## 6. 失败与中断
 
+- SSH 断开或退出 `tail`：先按第 4 步查看原控制日志和退出码，不能据此判断升级中断。
 - 前置检查失败：安装保持原样，处理原因后重新执行 `check`。
 - 迁移失败且输出 `migration rolled back`：旧版结构检查通过，原服务已恢复；
   保存该次记录，排除锁等待等原因后重新执行 `apply`，会生成新的记录目录。
@@ -145,11 +207,31 @@ sqlfind --help
 - 停止定时器后发现每日任务刚启动：不终止该任务，不开始迁移。
   等待任务结束，再对该次记录执行恢复入口，恢复原服务和定时器状态。
 
+从失败日志的 `Upgrade record: ...` 或此次升级的 `state.json` 确认完整记录目录，
+设置 `APM_RECORD`，并确认原升级包装进程及其迁移子进程都已结束，再后台恢复。
+若前置检查失败且没有产生升级记录，应修正原因后重新检查，不使用 `resume`。
+
 ```bash
-"$APM_ROOT/python-3.13.16/bin/python3.13" "$APM_UPGRADE/app/scripts/deployment/upgrade.py" resume \
-  --root "$APM_ROOT" --record "$APM_RECORD" --confirm-no-rollback
+export APM_RECORD='填写本次失败的升级记录目录'
+sudo -n true
+umask 077
+export APM_UPGRADE_RUN
+APM_UPGRADE_RUN=$(mktemp -d "$APM_UPGRADE/run-resume-XXXXXXXX")
+nohup bash -c '
+  set +e
+  "$APM_ROOT/python-3.13.16/bin/python3.13" -u "$APM_UPGRADE/app/scripts/deployment/upgrade.py" resume \
+    --root "$APM_ROOT" --record "$APM_RECORD" --confirm-no-rollback
+  result=$?
+  printf "%s\n" "$result" > "$APM_UPGRADE_RUN/exit-code.tmp"
+  mv "$APM_UPGRADE_RUN/exit-code.tmp" "$APM_UPGRADE_RUN/exit-code"
+  exit "$result"
+' </dev/null >"$APM_UPGRADE_RUN/console.log" 2>&1 &
+printf '%s\n' "$!" > "$APM_UPGRADE_RUN/pid"
+printf '后台恢复已启动；请保存控制日志目录：%s\n' "$APM_UPGRADE_RUN"
 ```
 
+用第 4 步相同命令查看本次恢复的日志和退出码；恢复仍需退出码为 `0` 才算成功。
 恢复入口从记录中的虚拟环境位置加载原有依赖。结构仍为 1.12.0 时只恢复旧服务；
-已为 1.13.0 时完成新程序替换和核对。
+对应日志为 `OK: migration rolled back`，此时仍是旧版，不执行新版核对。
+已为 1.13.0 时完成新程序替换和核对，日志为 `OK: upgraded to v1.2.0`，随后执行第 5 步。
 连接失败或回执不明确时保持服务停止，保留日志交给实施方处理，不猜测事务是否已经提交。

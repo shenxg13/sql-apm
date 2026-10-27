@@ -10,12 +10,12 @@ from unittest.mock import patch,Mock
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts/performance'))
-from perfkit.core import Refused,Work,save,Session
+from perfkit.core import Refused,Work,save,Session,check_versions
 from perfkit.dashboards import interpolate,defaults
 from perfkit.pack import scan,paths,export_document
 from perfkit.plans import redact_plan,Notices
 from perfkit.collect import delta
-from perfkit.focus import extract
+from perfkit.focus import extract,extract_settings
 from perfkit.commands import statement_target
 from perfkit.metadata import scan_views, declaration
 from perfkit.core import encoded
@@ -24,6 +24,19 @@ from perfkit.vocabulary import fixed, sql_fields, Vocabulary
 
 
 class ToolkitTests(unittest.TestCase):
+    def test_toolkit_110_accepts_only_the_new_product_schema_pair(self):
+        with tempfile.TemporaryDirectory() as folder:
+            app=Path(folder)
+            for product,schema,accepted in [('v1.2.0','1.13.0',True),('v1.1.0','1.12.0',False),
+                                             ('v1.2.0','1.12.0',False),('v1.2.0','1.14.0',False)]:
+                with self.subTest(product=product,schema=schema):
+                    (app/'RELEASE.json').write_text(json.dumps(dict(version=product)))
+                    session=Mock(query=Mock(return_value=[dict(version=schema)]))
+                    if accepted:
+                        self.assertEqual(check_versions(app,session)['schema'],'1.13.0')
+                    else:
+                        with self.assertRaises(Refused):check_versions(app,session)
+
     @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
     def test_build_and_kernel_field_names_are_checked_before_timing(self):
         with patch('perfkit.collect.read',return_value='SyntheticHostMetric70: 1\n'):
@@ -390,6 +403,8 @@ class ToolkitTests(unittest.TestCase):
     def test_internal_queries_are_exact_source_slices(self):
         source=(ROOT/'sql_apm/storage/schema.sql').read_text()
         bodies=extract(source)
+        self.assertEqual(extract_settings(source)['mpp_view_baseline_ranking'],
+                         dict(plan_cache_mode='force_custom_plan',parallel_setup_cost='0',parallel_tuple_cost='0'))
         self.assertEqual(len(bodies),4)
         for body in bodies.values():
             self.assertIn(body,source)

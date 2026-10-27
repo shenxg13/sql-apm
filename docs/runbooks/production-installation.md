@@ -1,7 +1,7 @@
 # SQL APM 生产安装手册
 
-适用版本 `v1.1.0`，Kylin V10 SP2 x86_64 全新安装，数据库结构 1.12.0。
-只支持新实例；后续版本将提供带数据的原地升级，本版没有升级步骤。
+适用版本 `v1.2.0`，Kylin V10 SP2 x86_64 全新安装，数据库结构 1.13.0。
+已有带数据的 v1.1.0 实例请使用[生产升级手册](production-upgrade.md)，不要执行本篇的新建步骤。
 候选包仍须完成发布验收，不能把候选标识当作正式发布。
 
 ## 1. 前置检查与参考配置
@@ -185,7 +185,7 @@ scripts/db/initialize.sh check --host "$APM_SOCKET" --port "$APM_PORT" --pg-bin 
 stat -c '%a %n' "$PGPASSFILE"
 ```
 
-预期：bootstrap、schema、check 成功，结构版本 1.12.0；项目账号通过 socket 密码认证，
+预期：bootstrap、schema、check 成功，结构版本 1.13.0；项目账号通过 socket 密码认证，
 密码文件权限 600。密码由操作者输入两次，不回显、不随机生成；只拒绝不一致、空密码或换行。
 短密码、冒号、反斜杠以及首尾空格／制表符都按输入原值保存，脚本自动转义 pgpass；管理员只向 PostgreSQL 发送 SCRAM verifier。
 凭据只保存在程序目录外的 private/；不放进 Git、命令参数、报告或 shell 历史。

@@ -196,7 +196,7 @@ def check_paths(root):
     rules = json.loads((root / 'scripts/deployment/package-files.json').read_text())
     patterns = rules['program'] + rules['verification']
     paths = set()
-    for name in ('docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md',
+    for name in ('docs/runbooks/production-installation.md', 'docs/runbooks/production-upgrade.md', 'docs/runbooks/kylin-offline-deployment.md',
                  GUIDE, 'docs/runbooks/daily-run.md', 'docs/runbooks/sqlfind-guide.md'):
         source = (root / name).read_text()
         # These explicit spans are read only on the development machine.
@@ -239,11 +239,28 @@ def check_installation(root):
     return dict(shell_blocks=len(blocks), inline_python_syntax=True, production_configs_valid=True)
 
 
+def check_upgrade(root):
+    source = (root / 'docs/runbooks/production-upgrade.md').read_text()
+    blocks = re.findall(r'```bash\n(.*?)\n```', source, re.S)
+    for block in blocks:
+        result = subprocess.run(['bash', '-n'], input=block, text=True, capture_output=True)
+        if result.returncode:
+            raise ValueError('production upgrade shell example has invalid syntax')
+        if re.search(r'upgrade\.py" (?:apply|resume)\b', block) and '--confirm-no-rollback' not in block:
+            raise ValueError('upgrade mutation example must acknowledge no rollback')
+    if re.search(r'(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])', source):
+        raise ValueError('upgrade manual must not contain a machine address')
+    if not all(text in source for text in ('v1.1.0', '1.12.0', 'v1.2.0', '1.13.0',
+                                           '不备份', '不能回退', '原始日志', 'daily status')):
+        raise ValueError('upgrade manual is missing its version or recovery contract')
+    return dict(shell_blocks=len(blocks), no_machine_address=True, explicit_confirmation=True)
+
+
 def check(root=ROOT):
     return dict(configuration=check_guide(root, (root / GUIDE).read_text()),
                 queries=check_queries(root, (root / QUERIES).read_text()),
                 structure=check_structure(root, (root / STRUCTURE).read_text()), paths=check_paths(root),
-                installation=check_installation(root))
+                installation=check_installation(root), upgrade=check_upgrade(root))
 
 
 if __name__ == '__main__':

@@ -209,12 +209,12 @@ def measure(session, statement, params=None, *, label, target_ms=1000, replay=No
 
 def check_versions(app, session):
     release = json.loads((Path(app) / 'RELEASE.json').read_text())
-    if release.get('version') not in ('1.1.0', 'v1.1.0'):
-        raise Refused('program_v1_1_0_required')
+    if release.get('version') not in ('1.2.0', 'v1.2.0'):
+        raise Refused('program_v1_2_0_required')
     versions = {r['version'] for r in session.query('SELECT version FROM schema_version')}
-    if '1.12.0' not in versions or any(tuple(map(int, v.split('.'))) > (1, 12, 0) for v in versions):
-        raise Refused('schema_1_12_0_required')
-    return {'version': 'v1.1.0', 'schema': '1.12.0', 'program_manifest_sha256': digest(Path(app)/'RELEASE.json')}
+    if '1.13.0' not in versions or any(tuple(map(int, v.split('.'))) > (1, 13, 0) for v in versions):
+        raise Refused('schema_1_13_0_required')
+    return {'version': 'v1.2.0', 'schema': '1.13.0', 'program_manifest_sha256': digest(Path(app)/'RELEASE.json')}
 
 
 def idle(session):

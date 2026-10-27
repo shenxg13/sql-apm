@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts/deployment'))
 from build_release import archive, select, compare_product, version_number
 from render_manual import DOCUMENTS, inspect, render, release_notes
-from check_documents import check, check_guide, check_structure, check_paths, check_queries, GUIDE, STRUCTURE, QUERIES
+from check_documents import check, check_guide, check_structure, check_paths, check_queries, check_upgrade, GUIDE, STRUCTURE, QUERIES
 from build_bundle import grafana_inputs
 from verify_package import digest, verify
 import rehearsal
@@ -309,7 +309,8 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(tar.getmember('program/requirements.txt').mode, 0o644)
             self.assertTrue(tar.getmember('program/scripts/sqlfind/configure.py').isfile())
         kit = self.root / 'verification'
-        select(ROOT, kit, rules['verification'])
+        select(ROOT, kit, rules['verification'], rules['verification_exclude'])
+        self.assertFalse((kit / 'tests/test_performance_toolkit.py').exists())
         for name in ('scripts/db/verify_sqlfind.py', 'scripts/tests/sqlfind_terminal.py',
                      'scripts/daily/verify_push.py', 'scripts/daily/verify_fetch.py',
                      'scripts/daily/verify_timer.py', 'tests/test_log_intake.py'):
@@ -363,12 +364,24 @@ class PackageTests(unittest.TestCase):
 
 
 class HtmlTests(unittest.TestCase):
+    def test_upgrade_examples_require_explicit_irreversible_confirmation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            target=root/'docs/runbooks/production-upgrade.md'
+            target.parent.mkdir(parents=True)
+            source=(ROOT/'docs/runbooks/production-upgrade.md').read_text()
+            target.write_text(source)
+            self.assertTrue(check_upgrade(root)['explicit_confirmation'])
+            target.write_text(source.replace('--confirm-no-rollback',''))
+            with self.assertRaisesRegex(ValueError,'acknowledge no rollback'):
+                check_upgrade(root)
+
     def test_release_notes_use_the_same_source_and_pin_repository_links(self):
-        source = (ROOT / 'docs/releases/v1.1.0.md').read_text()
+        source = (ROOT / 'docs/releases/v1.2.0.md').read_text()
         notes = release_notes(ROOT, 'a' * 40)
         prefix = 'https://github.com/shenxg13/sql-apm/blob/' + 'a' * 40 + '/docs/'
         self.assertEqual(notes.replace(prefix, '../'), source)
-        self.assertIn('https://grafana.com/docs/', notes)
+        self.assertIn('production-upgrade.md', notes)
 
     def test_current_manual(self):
         for filename in DOCUMENTS:
@@ -448,7 +461,7 @@ class DocumentTests(unittest.TestCase):
     def test_missing_packaged_command(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
+            for name in (GUIDE, 'docs/runbooks/production-installation.md', 'docs/runbooks/production-upgrade.md', 'docs/runbooks/kylin-offline-deployment.md', 'docs/runbooks/daily-run.md',
                          'docs/runbooks/sqlfind-guide.md', 'scripts/deployment/package-files.json'):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)

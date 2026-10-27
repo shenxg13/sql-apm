@@ -4,8 +4,10 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-23
+updated: 2026-10-27
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/74
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/70
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/67
@@ -84,6 +86,34 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### v1.2.0 带数据升级（2026-10-27）
+
+来源：[Issue #74](https://github.com/shenxg13/sql-apm/issues/74) 的已确认契约。
+本版交付 #72 的第一批性能修复（结构 1.13.0），不纳入 #73。
+从正式 v1.1.0／结构 1.12.0 原地升级，保留全部数据、安装路径、配置、密码、sqlfind 和每日运行单元。
+沿用固定运行时归档 `d271d6a1471c41723724b48afad59f9675e1b324747fbb7dfae283f97340314c`，
+Python 依赖、RPM、Grafana 与插件不变。前置检查拒绝版本／清单不符、任务忙碌和空间不足；
+停止写入方后单事务迁移，失败恢复旧服务；提交后替换程序与随包看板，并恢复原服务状态。
+前置检查及恢复回执使用该安装的本地 socket，连接时隔离继承的 PostgreSQL 主机、服务和会话选项。
+
+用户确认不备份。操作者必须明确接受迁移提交后不可回退；只能重装旧版并从仍保留的原始日志重建，耗时数小时。
+Issue #72 生产迁移 7–15 分钟、额外空间约 6 GB 是 modeled；两处升级演练及后续生产的 measured 结果分别记录。
+升级入口和记录恢复、人工核对见[升级手册](../../docs/runbooks/production-upgrade.md)。
+2026-10-27 用户补充要求升级及恢复使用 `nohup … &` 后台执行；手册保存独立控制日志、PID和退出码，
+SSH重连后先检查原任务结果，退出码与升级／回滚成功标志共同决定后续步骤。此方式不改变升级入口及不可回退边界。
+同日用户在 R1 整改时确认 [F-74-001(b) 的范围变更](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6446022974)：
+除手册第 6 步 `resume` 外，其余命令与路径仍须在验证机执行；`resume` 本版仅由开发机夹具覆盖。
+实际覆盖是直接调用 `recover()` 验证恢复逻辑及目录中断、以替身入口验证 nohup 包装的挂断与退出码；
+没有真实安装上 `resume` 命令行贯通 PostgreSQL／systemd 的实测，不能以 `apply` 自动回滚代替该项证据。
+手册、报告和发布说明必须保留此限制；本次只调整验证要求，不改变实现或其他验收项。
+验证机和开发机演练后，用户先对照手册验收，再独立评审；生产升级、复测在合并后由用户执行。
+
+独立检查工具包 1.1.0 只接受 v1.2.0／结构 1.13.0，旧产品使用旧工具包 1.0.0。
+内部分拆语句仍绑定已装产品源码；排行函数增加六排序、四档 limit 各三次测量，
+保留旧 p95 首次标识，结果格式、脱敏规则与公开字段白名单不变。
+以上为本轮契约与实施内容；开发机、验证机、生产和人工验收证据须各自成立，不能互相替代。
+两处迁移、真实失败回滚、工具包对照及尚未完成的验收见[本次验证报告](../../docs/reports/v120-upgrade-2026-10-27.md)。
 
 ### 生产使用性能检查（2026-10-22）
 
@@ -397,7 +427,7 @@ postgres 数据保持原属主，以命名读取 ACL、默认 ACL 和 PG 组读�
 目标机已验证全部目录和普通文件可读、PG 新文件继承、重启后 socket／TCP 正常，
 原九个发布版本保持不变。实际计数、socket ACL 失败及修正见
 [权限修正报告](../../docs/reports/kylin-read-access-2026-10-04.md)，操作方法见
-[部署手册](../../docs/runbooks/kylin-offline-deployment.md#71-已有部署补齐读取权限)。
+[部署手册](../../docs/runbooks/kylin-offline-deployment.md#71-以执行账号核对读取权限)。
 外部工具显式收紧权限或移入文件后需复查，不以默认 ACL 保证任意外部操作后的可读性。
 
 ### 已确认的精简预发布与离线手册（2026-10-03）

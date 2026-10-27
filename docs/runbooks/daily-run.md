@@ -1,7 +1,8 @@
 # 每日运行操作说明
 
-对应 [Issue #54](https://github.com/shenxg13/sql-apm/issues/54)，结构版本 1.12.0。本文说明怎样让基线服务器每天自动完成一轮工作，
-以及怎样查看结果和处理问题。它是 `v1.0.0` 随包手册的每日运行章节；完整安装与演练见
+每日运行功能对应 [Issue #54](https://github.com/shenxg13/sql-apm/issues/54)，本文适用 v1.2.0、结构 1.13.0。
+本文说明怎样让基线服务器每天自动完成一轮工作，以及怎样查看结果和处理问题。
+它是 `v1.2.0` 随包手册的每日运行章节；完整安装见
 [生产安装手册](production-installation.md)。文中的集群、来源和路径都是例子。
 
 ## 它做什么
@@ -263,8 +264,8 @@ daily/fetch-logs.sh --config /data/sql-apm/config/fetch-logs.conf --from 2026-09
 每次推送进入独立目录，最后放 `push.complete`；SQL APM 服务器上的收取脚本核对后移入接收目录并放齐全标记。
 脚本只列目录、取大小和读 master 文件，不在 master 上写任何文件（包括临时文件）。
 目录参数在内存拆分，不使用旧版 Bash 会写临时文件的 here-string／here-document。
-推送模板与收取工具随 v1.1.0 程序包交付；生产安装顺序见[生产手册](production-installation.md#8-推送接入)，
-验证边界见[发布说明](../releases/v1.1.0.md)。
+推送模板与收取工具随 v1.2.0 程序包交付；生产安装顺序见[生产手册](production-installation.md#8-推送接入)，
+本版验证边界见[发布说明](../releases/v1.2.0.md)。
 
 **SQL APM 服务器上准备。** 下列主机名和地址均为示例，按实际值替换。两个集群共用一个落地根目录：
 

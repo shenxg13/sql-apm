@@ -1,7 +1,7 @@
 # 检索与看板使用指南
 
-本指南随 v1.0.0 交付，对应结构 1.12.0。示例 SQL、集群 C1、数据库 demo 和用户 analyst 均为人工示例，
-执行时换成自己的筛选值。先按[安装手册](kylin-offline-deployment.md)安装，再从浏览器登录 Grafana。
+本指南随 v1.2.0 交付，对应结构 1.13.0。示例 SQL、集群 C1、数据库 demo 和用户 analyst 均为人工示例，
+执行时换成自己的筛选值。先按[生产安装手册](production-installation.md)安装，再从浏览器登录 Grafana。
 日常查看使用只读数据库账号；它能读取全部 SQL 原文，原文中可能包含业务数据。
 
 命令行检索见 [sqlfind 使用说明](sqlfind-guide.md)。

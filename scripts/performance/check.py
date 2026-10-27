@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SQL APM v1.1.0 performance inspection; production data stays on the host."""
+"""SQL APM v1.2.0 performance inspection; production data stays on the host."""
 import argparse
 from datetime import datetime, timezone
 import json

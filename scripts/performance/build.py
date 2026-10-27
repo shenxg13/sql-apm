@@ -7,16 +7,18 @@ from html import escape
 import io
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tarfile
+from urllib.parse import unquote, urlsplit
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'scripts/deployment'))
 from render_manual import CSS,converter,code_blocks,inspect
 from perfkit import VERSION
 from perfkit.core import digest,encoded
-from perfkit.focus import extract
+from perfkit.focus import extract, extract_settings
 
 
 def build(root,module,out,allow_dirty=False):
@@ -32,6 +34,7 @@ def build(root,module,out,allow_dirty=False):
     for path in sorted((source/'perfkit').glob('*.py'))+[source/'check.py',source/'perfcheck']:
         files[str(path.relative_to(source))]=path.read_bytes()
     files['internal.json']=encoded(extract((root/'sql_apm/storage/schema.sql').read_text()))
+    files['internal-settings.json']=encoded(extract_settings((root/'sql_apm/storage/schema.sql').read_text()))
     for name in ('auto_explain.so','module.json','COPYRIGHT'):
         files['module/'+name]=(module/name).read_bytes()
     module_info=json.loads(files['module/module.json'])
@@ -40,12 +43,24 @@ def build(root,module,out,allow_dirty=False):
     manual=(root/'docs/runbooks/performance-check.md').read_text()
     renderer=converter('manual')
     body=renderer.convert(manual)
-    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.1.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
+    def repository_link(match):
+        parts=urlsplit(unquote(match[1].replace('&amp;','&')))
+        if parts.scheme or parts.netloc or not parts.path:
+            return match[0]
+        target=(root/'docs/runbooks'/parts.path).resolve()
+        if not target.is_relative_to(root) or not target.is_file():
+            raise ValueError('missing manual reference')
+        url='https://github.com/shenxg13/sql-apm/blob/'+commit+'/'+target.relative_to(root).as_posix()
+        if parts.fragment:
+            url+='#'+parts.fragment
+        return 'href="'+escape(url,quote=True)+'"'
+    body=re.sub(r'href="([^"]+)"',repository_link,body)
+    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.2.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
     inspection=inspect(document,code_blocks(manual))
     files['PERFORMANCE.html']=document.encode()
     manifest=dict(format='sql-apm-performance-toolkit/1',version=VERSION,commit=commit,
-                  source_state='working_tree' if dirty else 'committed',product_version='v1.1.0',
-                  schema_version='1.12.0',html_checks=inspection,
+                  source_state='working_tree' if dirty else 'committed',product_version='v1.2.0',
+                  schema_version='1.13.0',html_checks=inspection,
                   files={name:hashlib.sha256(raw).hexdigest() for name,raw in sorted(files.items())})
     files['MANIFEST.json']=encoded(manifest)
     files['SHA256SUMS']=''.join(hashlib.sha256(raw).hexdigest()+'  '+name+'\n' for name,raw in sorted(files.items())).encode()

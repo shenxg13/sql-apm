@@ -203,7 +203,7 @@ maintenance_work_mem 128 MB、max_connections 30、max/min_wal_size 2 GB／256 M
 隔离计数均为整数 0；结构 1.6.0 检查通过，完整命令退出 0。P8 已满足。
 私有数据库已停止并清理，运行环境、日志和报告留在独立目录，证据已回收至开发机。
 
-据本次结果，[部署手册](../runbooks/kylin-offline-deployment.md#101-分词修复版默认四进程首批验证)
+据本次结果，[部署手册](https://github.com/shenxg13/sql-apm/blob/b493557db52e98fdf107dc89fadefe0104b9726b/docs/runbooks/kylin-offline-deployment.md#101-分词修复版默认四进程首批验证)
 对包含修复且完成首批验收的包采用默认四进程，原 #31 包仍保留单进程适用边界。
 九任务辅助工具显式接收交付提交并完整校验包，业务计数仍使用原 Alma 数值；
 旧命令的原产品摘要保护保持不变。随包 HTML 同步新的并发说明，不增加产品依赖。

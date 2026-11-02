@@ -4,8 +4,14 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-10-26
+updated: 2026-11-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573126465
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6573255331
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/72
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6183022357
@@ -441,7 +447,31 @@ PostgreSQL 数据源插件。第一版不加展示类插件；随包看板只依
 - 名称选项仍来自所有保留事件，包括没有基线和只有失败记录的身份；导入事务自动更新名称计数，查询小表去重并保留“全部”在前。
 - 未生成指纹计数等于保留原文总数减去该规则已有指纹结果数。指纹失败也属于已有结果；规则切换、新原文和后续生成均由事务内维护，
   不是近似统计或定时刷新的缓存。实现由[存储主题](../architecture/postgresql-storage.md)及[结构说明](../../docs/design/database-structure.md)维护。
-- 本轮只在开发机测量；生产效果须标为 modeled，生产复测和发版由 #74 负责。事件表按指纹／时间访问、检索聚合和其他面板仍属于 #73。
+- #72 当时只在开发机测量，生产估算为 modeled；#74 后续已完成 v1.2.0 发布和生产复测，实测结论及遗留项见下节。
+
+### v1.2.0 生产复测与后续边界（2026-11-02）
+
+来源：[#74 生产核查](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573126465)、
+[#74 用户决定](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)及
+[#73 接收确认](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6573255331)。
+生产复测已完成；完成取证和处置不表示所有性能门槛都已达到。
+本轮为三个集群、18 类、13 个去重身份、每项三轮，生产保留约 3,018 万条事件。
+
+- 120 排行函数首次 p95、limit 50 为 12.460 秒，未达到每次不超过 10 秒；其余 71 次为 4.641–5.751 秒。
+  用户接受首次超限，不另修排行核心；#73 的完整排行面板 10 秒按缓存后建模，首次读盘只记录。
+  已测完整面板无超时，p95 四档为 5.566–12.976 秒；不把函数六排序覆盖写成完整面板六排序实测。
+- 数据库／用户名下拉框 468 次最大 17.927 ms；七类固定开销摘要 21 次为 28.135–417.795 ms，均达到 1 秒门槛。
+  其他摘要剩余耗时按原契约记录，事件表按指纹／时间访问、检索聚合及面板补查继续由 #73 优化。
+- 120 本轮替代身份七天 200 行明细为 519.807 秒，其中基线统计读取 516.931 秒。
+  核查记录通过合成回放确认：缺失计时分组且规划器选择先调用函数、后过滤的计划时，
+  `mpp_query_statistics` 会把 NULL 分组传给 `mpp_read_statistics`，触发全构建统计读取。
+  这是旧版已有的潜在缺陷；#73 已接收修复及专门回归，当前生产尚未修复，受影响详情仍可能超时。
+- 工具包 1.1.0 新增的 `BEGIN READ ONLY` 字面量进入固定名称表，造成原最高频身份被跳过；
+  原文为 `BEGIN` 仍是推断。原身份的七天明细未验证，不能由替代身份或 `all/history` 代替。
+  工具包修复和原身份生产验证已由 #73 的发版交接留给后续 v1.3，#73 本身不改工具包。
+- 生产日志止于 10 月 28 日，重点分析在 11 月 2 日执行；默认七天窗口不代表完整七天负载。
+  本轮普通计时约 54 小时 41 分、含计划和重点分析合计约 60 小时 18 分；
+  身份、窗口和旧包规模有差异，不据此计算同输入的版本退化或提速倍数。
 
 ## Workflows
 

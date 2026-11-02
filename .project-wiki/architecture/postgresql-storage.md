@@ -240,7 +240,7 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
 来源：[Issue #72](https://github.com/shenxg13/sql-apm/issues/72) 的已确认契约；开发实现与验证见
 [结构说明](../../docs/design/database-structure.md#页面查询的精确汇总)和[验证报告](../../docs/reports/query-performance-2026-10-26.md)。
 已发布 v1.2.0 使用结构 1.13.0；v1.1.0 为 1.12.0。
-#74 已按[结果包证据与用户确认](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)
+Issue #74 已按[结果包证据与用户确认](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)
 判定生产升级完成；生产迁移耗时未实测，性能复测结论与遗留项见
 [检索主题](../features/sql-search-and-views.md#v120-生产复测与后续边界2026-11-02)。
 Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定运行时，再停写、调用同一迁移入口；

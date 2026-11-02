@@ -1,8 +1,8 @@
 # SQL APM 数据库结构说明（按流程）
 
-当前开发结构与已发布 v1.2.0 均为 1.13.0；v1.1.0 使用结构 1.12.0。原稿来源为用户提供的 1.6.0 结构说明，现按结构定义及产品代码更新。
+当前开发结构为 1.14.0；已发布 v1.2.0 为 1.13.0，v1.1.0 为 1.12.0。原稿来源为用户提供的 1.6.0 结构说明，现按结构定义及产品代码更新。
 
-表清单对应结构 1.13.0，共 65 张表，其中 35 张带 `mpp_` 前缀；1.12.0 为每日运行新增的五张见“[每日运行：运行记录](#每日运行运行记录)”。图示按主链展示，未画出的每日运行关系另在对应章节说明。本文按一次 `full` 任务的五个阶段（import → snapshot → build → check → publish）说明每张表存什么、和谁关联、哪些字段最常用。依据是 `sql_apm/storage/schema.sql`。
+表清单对应结构 1.14.0，共 74 张表，其中 44 张带 `mpp_` 前缀；1.12.0 为每日运行新增的五张见“[每日运行：运行记录](#每日运行运行记录)”。图示按主链展示，未画出的每日运行关系另在对应章节说明。本文按一次 `full` 任务的五个阶段（import → snapshot → build → check → publish）说明每张表存什么、和谁关联、哪些字段最常用。依据是 `sql_apm/storage/schema.sql`。
 
 ## 总览
 
@@ -14,7 +14,7 @@
 
 读表之前先知道三件事。
 
-- **主键是带前缀的文本**，没有自增序列。前缀后面要么是随机串（代表一次运行或一个事件），要么是 SHA-256（同样的输入必须得到同一行）。
+- **原有业务主键是带前缀的文本**。1.14.0 查询派生层使用 bigint 短键，并为 scope、analysis、mpp_normalization 增加内部自增 query_key；业务标识和对外输出不变。前缀后面要么是随机串（代表一次运行或一个事件），要么是 SHA-256（同样的输入必须得到同一行）。
 - **`mpp_` 前缀**表示这张表的结构只对 MPP 这类 SQL 系统成立。不带前缀的表（文件、批次、快照、构建、发布、任务）是通用框架。
 - **几乎每张表都带 `scope_id`**（集群名）。外键多写成 `(某 id, scope_id)` 的组合，保证关联两端属于同一个集群。
 
@@ -409,7 +409,36 @@ history 根据月份标记显示结果已清理；results_saved 保留“曾完�
 回填前锁定三张来源表，避免回填快照与安装触发器之间遗漏写入；沿用升级入口的 5 秒锁等待上限，须先停止写入。
 单事务失败整体回滚；空间、耗时、锁和生产模型见[验证报告](../reports/query-performance-2026-10-26.md)。
 
-## 1.6.0 到 1.13.0 的版本沿革
+## 1.14.0 查询派生层
+
+这些表由同事务触发器维护，只承载可从原文、可靠指纹和执行事件重算的信息；
+训练、发布和保留仍使用原来的事实和版本。原有五类字符串标识不缩短，occurrence_id 保留原值。
+
+| 表 | 一行代表 | 重点字段 | 关联 |
+| --- | --- | --- | --- |
+| `mpp_query_text_key` | 一份原文的内部短键 | `sql_key`、`sql_id` | → mpp_sql_text |
+| `mpp_query_structure` | 一套规则下的一个可靠结构 | `structure_key`、`rule_key`、`profile`、`fingerprint_value`、`text_count`、`example_sql_id` | → mpp_normalization |
+| `mpp_query_identity` | 结构、集群、库和用户组成的完整身份 | `identity_key`、`structure_key`、`rule_key`、`scope_key`、`database`、`execution_user` | → mpp_query_structure；NULL 与 NULL 为同一身份分量 |
+| `mpp_query_membership` | 原文属于某套规则下的可靠结构 | `rule_key`、`sql_key`、`structure_key` | → mpp_query_text_key、mpp_query_structure |
+| `mpp_query_record` | 一条事件在一套可靠规则下的查询事实 | `rule_key`、`scope_key`、`identity_key`、`analysis_key`、`sql_key`、`occurrence_id`、`end_at`、`estimated_start_at`、`duration_ms`、`timing_type`、`outcome`、`unit`、`request_shape` | → 短键字典及原始事件；计时等四字段为可逆 smallint 编码 |
+| `mpp_query_identity_total` | 某身份某计时的累计执行 | `identity_key`、`timing_type`、`record_count`、`success_count`、`first_at`、`last_at` | → mpp_query_identity |
+| `mpp_query_text_total` | 规则、原文、身份的累计执行 | `rule_key`、`sql_key`、`identity_key`、`record_count`、`first_at`、`last_at` | → mpp_query_membership、mpp_query_identity |
+| `mpp_query_state` | 全库事件查询事实的修订号 | `singleton`、`revision` | sqlfind 在缓存缺失时检查 |
+| `mpp_query_pending` | 当前事务末尾的一次刷新标记 | `transaction_id` | 延迟约束触发器；提交后为空 |
+
+事件窄表有唯一 `(rule_key,analysis_key,occurrence_id)` 和三条访问索引：
+`(identity_key,timing_type,end_at)`、`(rule_key,scope_key,end_at)`、
+`(rule_key,sql_key,identity_key,end_at)`。原文和指纹先完成已有写入锁，事件语句仅用 transition table
+收集临时受影响键；事务末尾在既有全局元数据锁下刷新，避免每批事件重复扫描和相反锁序。
+新增与删除的窄事实驱动汇总差量，只有删除碰到边界时重算对应最早／最晚时间。
+实际窄事实有增删才使 revision 加一；纯原文／指纹写入且没有关联事件时、发布与清理均不增加它。
+维护用 UPDATE／DELETE 同样刷新；TRUNCATE 必须停止并发写入，允许重建全部派生表。
+
+1.13.0 原结构冻结在 versions 目录。升级持有来源表锁，集合回填后建窄表索引，最后安装维护触发器；
+中途失败整个事务回滚。独立核对入口 `scripts/db/query_records_consistency.sql` 从三张来源表重算，
+分别比较成员关系、结构、完整身份、编码事实与两张汇总，亦检查孤儿引用和待处理标记。
+
+## 1.6.0 到 1.14.0 的版本沿革
 
 | 结构版本 | 变化及兼容性 |
 | --- | --- |
@@ -422,6 +451,7 @@ history 根据月份标记显示结果已清理；results_saved 保留“曾完�
 | 1.11.0（#51） | 表数仍为 57；新增 Grafana 查询函数和只读账号授权；从 1.10.0 带数据升级 |
 | 1.12.0（#54） | 新增五张每日运行记录表及对应只读函数，共 62 张表；从 1.11.0 带数据升级 |
 | 1.13.0（#72） | 增加三张查询汇总表及 overall 部分覆盖索引；从含数据的 1.12.0 回填并升级，保留已有构建 |
+| 1.14.0（#73） | 增加九张查询派生表及三个元数据短键；从含数据的 1.13.0 回填并升级，原有业务列及构建不变 |
 
 这些是结构工具的能力；v1.2.0 起提供从 v1.1.0 带数据原地升级的交付步骤，见[生产升级手册](../runbooks/production-upgrade.md)。
 

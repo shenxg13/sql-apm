@@ -542,7 +542,7 @@ def interactive(finder, args, output):
                     pending = copy(args)
                     pending.order = order
                     try:
-                        updated = search(finder, raw, pending)
+                        updated = finder.reorder(found, order)
                     except KeyboardInterrupt:
                         output.line('已取消检索，保留原排序和列表。')
                         continue

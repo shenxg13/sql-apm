@@ -877,3 +877,138 @@ RETURNS TABLE(started_at timestamptz,finished_at timestamptz,seconds double prec
     run_result text,cluster text,cluster_result text,imported text,failed text,build text,cleanup text,
     raw_files text,other_files bigint,cluster_seconds double precision)
 ```
+
+### mpp_query_prepare_changes
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_prepare_changes -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_prepare_changes() RETURNS void
+```
+
+### mpp_query_write_lock
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_write_lock -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_write_lock() RETURNS trigger
+```
+
+### mpp_query_capture_changes
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_capture_changes -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_capture_changes() RETURNS trigger
+```
+
+### mpp_query_merge_totals
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_merge_totals -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_merge_totals() RETURNS void
+```
+
+### mpp_query_refresh
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_refresh -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_refresh() RETURNS void
+```
+
+### mpp_query_commit_changes
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_commit_changes -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_commit_changes() RETURNS trigger
+```
+
+### mpp_query_records
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_records -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_records(p_normalization text,p_fingerprint text DEFAULT NULL,
+    p_scope text DEFAULT NULL,p_database text DEFAULT NULL,p_user text DEFAULT NULL,
+    p_start timestamptz DEFAULT NULL,p_end timestamptz DEFAULT NULL,p_exact_identity boolean DEFAULT false,
+    p_timings smallint[] DEFAULT NULL,p_sql_id text DEFAULT NULL)
+RETURNS SETOF mpp_query_record
+```
+
+### mpp_query_facts
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_facts -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_facts(p_normalization text,p_fingerprint text DEFAULT NULL,
+    p_scope text DEFAULT NULL,p_database text DEFAULT NULL,p_user text DEFAULT NULL,
+    p_start timestamptz DEFAULT NULL,p_end timestamptz DEFAULT NULL,p_exact_identity boolean DEFAULT false,
+    p_timings smallint[] DEFAULT NULL,p_sql_id text DEFAULT NULL)
+RETURNS TABLE(analysis_id text,occurrence_id text,scope_id text,database text,execution_user text,
+    fingerprint text,timing_type text,unit text,request_shape text,outcome text,end_at timestamptz,
+    estimated_start_at timestamptz,duration_ms numeric,sql_id text)
+```
+
+### mpp_query_fuzzy_candidates
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_fuzzy_candidates -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_fuzzy_candidates(
+    p_normalization text,p_input text,p_scope text DEFAULT NULL,p_database text DEFAULT NULL,
+    p_user text DEFAULT NULL,p_start timestamptz DEFAULT NULL,p_end timestamptz DEFAULT NULL,
+    p_order text DEFAULT 'count',p_mode text DEFAULT 'words')
+RETURNS TABLE (fingerprint text,example_sql_id text,matched_texts bigint,record_count bigint,
+    scopes text[],databases text[],execution_users text[],last_at timestamptz,total_structures bigint,
+    structure_texts bigint,identities bigint,top_scope text,top_database text,top_user text,
+    top_records bigint,top_last_at timestamptz,count_rank bigint,recent_rank bigint)
+```
+
+### mpp_query_group_statistics
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_query_group_statistics -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_query_group_statistics(selected_build text, selected_group text)
+RETURNS SETOF mpp_statistic
+```
+
+### mpp_view_record_facts
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_view_record_facts -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_view_record_facts(p_normalization text,p_fingerprint text,p_identity text,
+    p_timing text,p_start timestamptz,p_end timestamptz,p_sql_id text DEFAULT NULL)
+RETURNS TABLE(analysis_id text,occurrence_id text,sql_id text,outcome text,end_at timestamptz,
+    duration_ms numeric,request_shape text)
+```
+
+### mpp_view_execution_subset
+
+1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+
+<!-- query-function:mpp_view_execution_subset -->
+```sql
+CREATE OR REPLACE FUNCTION mpp_view_execution_subset(p_normalization text,p_fingerprint text,p_identity text,
+    p_timing text,p_build text,p_start timestamptz,p_end timestamptz,p_sql_ids text[] DEFAULT NULL,
+    p_outcomes text DEFAULT NULL,p_min_ms numeric DEFAULT NULL,p_max_ms numeric DEFAULT NULL,
+    p_order text DEFAULT 'latest',p_limit integer DEFAULT 200,p_reference jsonb DEFAULT NULL)
+RETURNS TABLE(end_at timestamptz,duration_ms numeric,outcome text,comparison text,request_shape text,
+    sql_id text,source_file text,source_lines text,training text,analysis_id text,occurrence_id text,
+    matching bigint)
+```

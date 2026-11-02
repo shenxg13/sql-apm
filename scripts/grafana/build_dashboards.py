@@ -347,14 +347,29 @@ FROM mpp_view_ranking('${norm}',""" + RANGE + "," + FILTER_ARGS + """,'${timings
                           '一行是一个 SQL 身份的一类计时。这个数随时间范围和顶部的筛选变化。'), 24))
     layout.line(13, (ranking, 24))
     layout.row('按当前基线版本统计的排行（各集群当前生效版本里已算好的整体基线，与时间范围无关）')
-    baseline = layout.identify(table('SQL 身份排行：当前基线版本（最多 ${limit} 行）', """SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,
+    baseline = layout.identify(table('SQL 身份排行：当前基线版本（最多 ${limit} 行）', """WITH ranking AS MATERIALIZED (
+SELECT * FROM mpp_view_baseline_ranking('${norm}',""" + FILTER_ARGS + """,'${timings:csv}','${base_order}',nullif('${min_samples}','')::bigint,${limit})
+), last_seen AS MATERIALIZED (
+SELECT r.scope_id,r.database,r.execution_user,r.fingerprint,max(t.last_at) last_at
+FROM (SELECT DISTINCT scope_id,database,execution_user,fingerprint FROM ranking) r
+JOIN scope c ON c.scope_id=r.scope_id
+JOIN mpp_normalization n ON n.normalization_id='${norm}'
+JOIN mpp_query_structure s ON s.rule_key=n.query_key AND s.profile='mpp-csv/1' AND s.fingerprint_value=r.fingerprint
+JOIN mpp_query_identity i ON i.structure_key=s.structure_key AND i.scope_key=c.query_key
+  AND i.database=r.database AND i.execution_user=r.execution_user
+JOIN mpp_query_identity_total t USING(identity_key)
+GROUP BY r.scope_id,r.database,r.execution_user,r.fingerprint
+)
+SELECT r.scope_id,r.database,r.execution_user,mpp_view_label('timing',r.timing_type) timing,
   r.included_count,r.active_days,r.p50_ms,r.p95_ms,r.p99_ms,r.max_ms,r.mean_ms,
   CASE WHEN r.p99_met THEN '三项都满足' WHEN r.p95_met THEN 'P99 样本不足' WHEN r.basic_met THEN 'P95、P99 样本不足' ELSE '样本不足' END conditions,
   r.fingerprint,r.ranked_rows,
   """ + detail_url('r.fingerprint', 'r.identity', "h.last_at-interval '7 days'", "h.last_at+interval '1 millisecond'",
                    "||'&var-timing='||r.timing_type") + """ AS url
-FROM mpp_view_baseline_ranking('${norm}',""" + FILTER_ARGS + """,'${timings:csv}','${base_order}',nullif('${min_samples}','')::bigint,${limit}) r
-CROSS JOIN LATERAL (SELECT max(x.last_at) last_at FROM mpp_query_hits('${norm}',r.fingerprint,r.scope_id,r.database,r.execution_user) x) h""",
+FROM ranking r LEFT JOIN last_seen h USING(scope_id,database,execution_user,fingerprint)
+ORDER BY CASE '${base_order}' WHEN 'samples' THEN r.included_count WHEN 'p50' THEN r.p50_ms
+  WHEN 'p95' THEN r.p95_ms WHEN 'p99' THEN r.p99_ms WHEN 'max' THEN r.max_ms ELSE r.mean_ms END DESC NULLS LAST,
+  r.scope_id,r.database,r.execution_user,r.fingerprint,r.timing_type""",
         [('scope_id', '集群'), ('database', '数据库'), ('execution_user', '执行用户'), ('timing', '计时类别'),
          ('included_count', '样本数'), ('active_days', '活跃天数'), ('p50_ms', 'P50', dict(unit='ms')),
          ('p95_ms', 'P95', dict(unit='ms')), ('p99_ms', 'P99', dict(unit='ms')), ('max_ms', '最大', dict(unit='ms')),
@@ -462,15 +477,21 @@ def detail_dashboard():
               description='选了某一份原文时显示它，否则显示同一结构的一份示例。原文按原样保存，带实际取值。'
                           '超过 ' + str(SEGMENT) + ' 个字符的原文分段显示，每段都是原文里连续的一段，不加任何字符；'
                           '标题写明现在是第几段，在右边“当前查看的内容”里换段。'), 14),
-        (table('当前查看的内容', """SELECT * FROM (
-SELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}') content,NULL::text url
+        (table('当前查看的内容', """WITH selected_identity AS MATERIALIZED (
+SELECT * FROM mpp_view_identities('${norm}','${fp}') WHERE identity='${identity}'
+), structure AS MATERIALIZED (
+SELECT s.text_count FROM mpp_query_structure s JOIN mpp_normalization n ON n.query_key=s.rule_key
+WHERE n.normalization_id='${norm}' AND s.profile='mpp-csv/1' AND s.fingerprint_value='${fp}'
+)
+SELECT * FROM (
+SELECT 1 seq,'SQL 身份' item,(SELECT i.label FROM selected_identity i) content,NULL::text url
 UNION ALL SELECT 2,'计时类别',mpp_view_label('timing','${timing}')||CASE WHEN '${timing}' IN ('request','unknown') THEN '' ELSE '：是阶段或调用的记录，不加总成执行次数' END,NULL
-UNION ALL SELECT 3,'原文范围',CASE WHEN '${sid}'='' THEN '同一结构的全部原文（共 '||(SELECT structure_texts FROM mpp_view_sql_text('${norm}','${fp}'))||' 份）'
+UNION ALL SELECT 3,'原文范围',CASE WHEN '${sid}'='' THEN '同一结构的全部原文（共 '||(SELECT text_count FROM structure)||' 份）'
   ELSE '只看一份原文 ${sid}；点这里回到全部原文' END,CASE WHEN '${sid}'<>'' THEN '""" + same_page(sqlid='') + """' END
 UNION ALL SELECT 4,'时间范围','点这里设为这条 SQL 最近一次执行往前 7 天',
   (SELECT '""" + DETAIL + """?'||'${fp:queryparam}&${identity:queryparam}&${timing:queryparam}&${version:queryparam}&var-sqlid=${sid}&${part:queryparam}&${mode:queryparam}&${q:queryparam}&${hit:queryparam}'
      ||'&from='||""" + MS.format("i.last_at-interval '7 days'") + """||'&to='||""" + MS.format("i.last_at+interval '1 millisecond'") + """
-   FROM mpp_view_identities('${norm}','${fp}') i WHERE i.identity='${identity}')
+   FROM selected_identity i)
 UNION ALL SELECT 5,'失败、取消、超时','没有计时类别和耗时，在每个计时类别下都列出',NULL
 UNION ALL SELECT 7,'原文较长','共 '||g.chars||' 个字符，分 '||g.parts||' 段显示，左边是第 '||g.part||' 段；点这里看'||CASE WHEN g.step>0 THEN '下一段' ELSE '上一段' END,
   '""" + same_page(part="'||(g.part+g.step)||'") + """'
@@ -583,7 +604,7 @@ FROM mpp_view_compare(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'${s
     layout.line(4, (stat('范围内的记录：${timing}', """SELECT count(*) AS "合计",count(*) FILTER (WHERE o.outcome='success') AS "成功",
   count(*) FILTER (WHERE o.outcome='failed') AS "失败",count(*) FILTER (WHERE o.outcome='cancelled') AS "取消",
   count(*) FILTER (WHERE o.outcome='timed_out') AS "超时",count(*) FILTER (WHERE o.outcome='unknown') AS "结果未知"
-FROM mpp_view_records(""" + RECORDS + ") o",
+FROM mpp_view_record_facts(""" + RECORDS + ") o",
         description='计时类别是“请求整体”时，这是执行次数；是 Execute、Parse、Bind 时，这是阶段或调用的记录数，不等于执行次数。失败、取消、超时的记录没有计时类别，在每个类别下都计入。'), 24))
     main = chart('timeseries', '每次执行的耗时：${timing}（每格 $__interval；一格里画最慢和最快各一次）', """SELECT p.end_at AS time,
   CASE p.kind WHEN 'slowest' THEN p.duration_ms END AS "每格最慢的一次（一格只有一次时就是它）",
@@ -719,7 +740,7 @@ FROM mpp_view_executions(""" + ARGS + ",'${timing}','${version}'," + RANGE + ",'
     marks = dict(datasource=PG, enable=True, hide=False, name='失败、取消、超时', iconColor='red',
                  filter=dict(exclude=False, ids=[main_id]),
                  target=target("""SELECT min(o.end_at) AS time,mpp_view_label('outcome',o.outcome)||' '||count(*)||' 次' AS text,mpp_view_label('outcome',o.outcome) AS tags
-FROM mpp_view_records(""" + RECORDS + """) o WHERE o.outcome IN ('failed','cancelled','timed_out')
+FROM mpp_view_record_facts(""" + RECORDS + """) o WHERE o.outcome IN ('failed','cancelled','timed_out')
 GROUP BY o.outcome,floor(extract(epoch FROM o.end_at)*200/greatest(extract(epoch FROM ($__timeTo()::timestamptz-$__timeFrom()::timestamptz)),1))
 ORDER BY 1""", ref='Anno'),
                  mappings=dict(time=dict(source='field', value='time'), text=dict(source='field', value='text'),

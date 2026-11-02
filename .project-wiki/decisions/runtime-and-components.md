@@ -4,8 +4,12 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-10-27
+updated: 2026-11-02
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6574427464
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/70
@@ -98,7 +102,11 @@ Python 依赖、RPM、Grafana 与插件不变。前置检查拒绝版本／清�
 前置检查及恢复回执使用该安装的本地 socket，连接时隔离继承的 PostgreSQL 主机、服务和会话选项。
 
 用户确认不备份。操作者必须明确接受迁移提交后不可回退；只能重装旧版并从仍保留的原始日志重建，耗时数小时。
-Issue #72 生产迁移 7–15 分钟、额外空间约 6 GB 是 modeled；两处升级演练及后续生产的 measured 结果分别记录。
+Issue #72 生产迁移 7–15 分钟、额外空间约 6 GB 是 modeled；两处升级演练的 measured 结果分别记录。
+2026-11-02 用户确认不带出生产升级记录，结构检查和自检均已通过；
+[#74 已同步 N11 判定依据](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)，
+由性能结果包的身份和数据证据判定升级完成，不再比较生产迁移耗时与模型及演练实测。
+7–15 分钟模型在生产上保持未实测，不以查询性能结果代替迁移耗时。
 升级入口和记录恢复、人工核对见[升级手册](../../docs/runbooks/production-upgrade.md)。
 2026-10-27 用户补充要求升级及恢复使用 `nohup … &` 后台执行；手册保存独立控制日志、PID和退出码，
 SSH重连后先检查原任务结果，退出码与升级／回滚成功标志共同决定后续步骤。此方式不改变升级入口及不可回退边界。
@@ -113,7 +121,12 @@ SSH重连后先检查原任务结果，退出码与升级／回滚成功标志�
 内部分拆语句仍绑定已装产品源码；排行函数增加六排序、四档 limit 各三次测量，
 保留旧 p95 首次标识，结果格式、脱敏规则与公开字段白名单不变。
 以上为本轮契约与实施内容；开发机、验证机、生产和人工验收证据须各自成立，不能互相替代。
-两处迁移、真实失败回滚、工具包对照及尚未完成的验收见[本次验证报告](../../docs/reports/v120-upgrade-2026-10-27.md)。
+两处迁移、真实失败回滚和工具包对照见[演练时的验证报告](../../docs/reports/v120-upgrade-2026-10-27.md)；
+后续生产复测已完成，实测与未达项处置见[检索主题](../features/sql-search-and-views.md#v120-生产复测与后续边界2026-11-02)。
+按[观察项最终处置](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6574427464)，
+O-74-006 在本次文档同步中处理；O-74-002／003／004 经
+[#73 的发版交接](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6574409447)交后续 v1.3 发版，
+Issue #73 不实施这三项。已发布 v1.2.0 的标签、附件和发布正文保持原样。
 
 ### 生产使用性能检查（2026-10-22）
 

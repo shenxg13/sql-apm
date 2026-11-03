@@ -46,6 +46,7 @@
     "scripts/db/verify_cleanup.py",
     "scripts/db/verify_search.py",
     "scripts/db/verify_sqlfind.py",
+    "scripts/db/query_records_consistency.sql",
     "scripts/tests/sqlfind_terminal.py",
     "scripts/tests/test_sqlfind_configure.py",
     "scripts/db/verify_views.py",

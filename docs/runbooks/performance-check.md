@@ -1,7 +1,7 @@
 # SQL APM 使用性能检查
 
-工具包版本 **1.1.0**，不再接受 v1.1.0；旧产品继续使用原工具包 1.0.0。
-本工具包只适用于已经安装的产品 **v1.2.0／结构 1.13.0**。它检查使用过程的性能，
+工具包版本 **1.2.0**，只支持产品 **v1.3.0／结构 1.14.0**；v1.2.0 继续使用旧工具包 1.1.0。
+本版不保留对 v1.2.0 的支持。它检查使用过程的性能，
 不修改产品，不改配置、不 reload、不重启、不重置统计，也不运行导入、构建和清理。
 无需打开 Grafana 或手工操作 sqlfind。运行时指纹服务须已启动。
 
@@ -44,10 +44,47 @@ setfacl -m u:postgres:rx /data/performance-check
 
 ```bash
 cd /data/performance-check/performance-toolkit
-./perfcheck main --work /data/performance-check/run
+./perfcheck host --work /data/performance-check/run
+./perfcheck inventory --work /data/performance-check/run
+./perfcheck cases --work /data/performance-check/run
 ```
 
-主体依次收集主机、规模、代表用例，然后测量看板、命令行及指纹服务。
+以上先收集主机、规模和代表用例。完整复测接着先采集首次读取指标，再由 sfmon 运行普通计时。
+切换到 postgres 的登录终端，使用本地 peer 连接：
+
+```bash
+cd /data/performance-check/performance-toolkit
+./perfcheck first-read --work /data/performance-check/run
+```
+
+本步骤在每个集群测量最高频身份、原文最多身份的七天详情各面板，以及各集群／全部集群七天排行。
+类别落在同一身份时详情只执行一次，类别映射仍见 cases.json。加载匹配的只读计划模块后切换为
+sql_apm_ro 权限，实际执行已装看板的变量链和面板 SQL；每条只执行一次，并消费结果。
+first-read.json 保留原有计时字段，额外的五个字段都是数值并加入公开元数据白名单：
+
+| 字段 | 含义 |
+| --- | --- |
+| first_ms | 该条第一次执行的客户端毫秒数，含计划采集开销 |
+| first_plan_available | 成功且完整捕获最外层计划为 1；否则为 0 |
+| first_shared_read_blocks | 最外层计划的共享读取块数 |
+| first_local_read_blocks | 最外层计划的本地读取块数 |
+| first_temp_read_blocks | 最外层计划的临时读取块数 |
+
+读取计数使用最外层根节点的包含式数值，不把嵌套函数或子节点相加。
+计划不可得时后三项缺失，不用 0 冒充；模块不匹配则本部分记录 skipped。
+不清理操作系统或 PostgreSQL 缓存；选择用例、前面的变量和面板可能已读过相同页。
+所以“首次执行”不保证冷启动，读取块数为 0 时不能宣称首次读盘性能已验证。
+有 timing.json 或已有首次读取结果的工作目录会拒绝本步骤；重新测量请新建工作目录。
+
+回到 sfmon 的登录终端，运行所有用例、每项三次的普通计时：
+
+```bash
+cd /data/performance-check/performance-toolkit
+./perfcheck timing --work /data/performance-check/run
+```
+
+普通计时测量看板、命令行及指纹服务。独立的 main 快捷入口仍按主机、规模、用例、普通计时运行，
+不自动切换账号或补采首次读取，不能代替上述完整复测顺序。
 每部分结束打印完成状态及秒数；计时部分还显示页面、命令、HTTP 操作及 SQL 数量、
 超时、超参照和其他失败数量，以及各类最慢项的编号和毫秒数。操作与 SQL 分别计数，
 同一操作的多条失败 SQL 不重复计算成多个失败操作。页面超参照表示至少一条 SQL 超过其参照；
@@ -78,7 +115,7 @@ cd /data/performance-check/performance-toolkit
 如果可用时段不足，可先完成 host、inventory、cases，再从 `run/results/cases.json` 选择编号，
 仅运行指定用例，编号参数可重复。每个所选用例仍执行三轮；结果明确标记部分覆盖，不能当作完整检查。
 下面只测第一个用例，适合先估计本机成本；验证机独立轮次实测 137.698 秒，不能据此保证其他用例的耗时。
-完整一轮仍使用前面的 main 命令。
+完整一轮按上述准备、首次读取、普通计时、系统计划及重点分析顺序执行。
 
 ```bash
 ./perfcheck timing --work /data/performance-check/run --case-id case-0001
@@ -109,7 +146,10 @@ cd /data/performance-check/performance-toolkit
 任一类找不到安全输入，就继续同身份的下一份原文，再按同一类别排序尝试下一个身份。
 各候选按八条一批读取，受每集群预算约束；重复身份仍合并。
 `cases.json` 记录跳过的类别、候选序号和名称／公开文本来源，绝不记录冲突值。
-固定名称表采用保守匹配，可能跳过不实际导出的同源名称；打包自检及公共元数据白名单不变。
+固定名称表采用保守匹配，可能跳过不实际导出的同源名称。
+本版修复事务语句冲突：只作为数据库调用参数的 BEGIN／ROLLBACK 等内部 SQL 不进入公开名称表，
+原文为 BEGIN 的身份可以正常入选；手工追加输入走同一检查。公开字段（例如 commit）仍照常检查，
+不为业务输入豁免最终扫描；公开结果中若真出现相同敏感文本仍拒绝打包。
 
 MPP 库名、执行用户名及手工追加输入由操作者决定，不能自动替换。
 如与同一固定名称表冲突，cases 会在计时前停止，只报告类别和本地列表位置；

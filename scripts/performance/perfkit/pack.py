@@ -13,7 +13,8 @@ from . import metadata, overview
 ALLOWED = {'identity.json','cases.json','host.json','inventory.json','health.json','settings.json',
            'timing.json','samples.json','deltas.json','plans.json','focus.json','distribution.json',
            'main-state.json','system-state.json','timing-state.json','cases-state.json',
-           'host-state.json','inventory-state.json','plans-state.json','focus-state.json'}
+           'host-state.json','inventory-state.json','plans-state.json','focus-state.json',
+           'first-read.json','first-read-state.json'}
 
 
 def paths(value,prefix=''):

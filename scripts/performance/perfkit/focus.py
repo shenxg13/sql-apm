@@ -10,7 +10,7 @@ from . import dashboards, plans
 from .core import measure, save, Refused, serializable
 
 
-FUNCTIONS = ('mpp_view_ranking','mpp_view_baseline_ranking','mpp_query_hits','mpp_view_executions')
+FUNCTIONS = ('mpp_view_ranking','mpp_view_baseline_ranking','mpp_query_hits','mpp_view_execution_subset')
 
 
 def extract(source):
@@ -65,7 +65,7 @@ def run(args,work,session):
     source=(Path(__file__).resolve().parents[1]/'internal.json')
     templates=json.loads(source.read_text())
     settings=json.loads(source.with_name('internal-settings.json').read_text())
-    # Bind the templates to exactly the installed v1.2.0 source.
+    # Bind the templates to exactly the installed v1.3.0 source.
     if templates!=extract((args.app/'sql_apm/storage/schema.sql').read_text()):
         raise Refused('internal_statement_source_mismatch')
     if settings!=extract_settings((args.app/'sql_apm/storage/schema.sql').read_text()):
@@ -191,12 +191,12 @@ def run(args,work,session):
                     WHERE timing_type=%s AND sample_state='available'""",
                     (case['norm'],case['fingerprint'],case['identity'],detail['version'],detail['timing']))
                 history=dict(parameters,p_identity=(case['identity'],'text'),p_timing=(detail['timing'],'text'),
-                             p_sql_id=('', 'text'),wanted=(detail['status'] or None,'text[]'),
+                             p_sql_ids=(None, 'text[]'),wanted=(detail['status'] or None,'text[]'),
                              chosen=(detail['version'] or None,'text'),p_min_ms=(None,'numeric'),p_max_ms=(None,'numeric'),
                              p_order=('latest','text'),p_limit=(200,'integer'))
                 history.update({'base.'+key:((base[0].get(key) if base else None),'boolean' if key in ('basic','p95','p99') else 'numeric')
                                 for key in ('p50_ms','p95_ms','p99_ms','basic','p95','p99')})
-                planned('mpp_view_executions',history,label+'/history-'+str(days)+'/internal')
+                planned('mpp_view_execution_subset',history,label+'/history-'+str(days)+'/internal')
                 panel=next(p for p in documents['mpp-detail']['panels'] if p['id']==29)
                 actual(dashboards.interpolate(panel['targets'][0]['rawSql'],detail,start,end),label+'/history-'+str(days)+'/panel-29')
         if module['state']=='loaded':

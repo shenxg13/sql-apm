@@ -4,7 +4,7 @@ import re
 import unicodedata
 
 
-PARTS = ('host','inventory','cases','timing','system','plans','focus')
+PARTS = ('host','inventory','cases','first-read','timing','system','plans','focus')
 STATES = {'complete','failed','interrupted','running','missing'}
 
 
@@ -29,6 +29,8 @@ def alias(value):
 
 
 def groups(documents, part):
+    if part == 'first-read':
+        return [('first-read', documents.get('first-read.json',{}).get('pages',[]))]
     if part == 'timing':
         data = documents.get('timing.json',{})
         return [(key, data.get(key,[])) for key in ('pages','commands','http')]

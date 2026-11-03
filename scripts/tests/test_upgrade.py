@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Upgrade admission and recovery regression without touching a real installation."""
 import copy
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import json
 import os
 from pathlib import Path
@@ -19,7 +21,7 @@ from verify_package import digest
 def package(path, version):
     path.mkdir()
     files = {'requirements.txt': 'same dependencies\n', 'VERSION': version+'\n',
-             'PROGRAM_COMMIT': ('a' if version=='v1.1.0' else 'b')*40+'\n'}
+             'PROGRAM_COMMIT': ('a' if version=='v1.2.0' else 'b')*40+'\n'}
     for dashboard in ('mpp-list','mpp-detail','mpp-search','mpp-status'):
         files['grafana/dashboards/'+dashboard+'.json'] = json.dumps(dict(version=version))
     for name, text in files.items():
@@ -46,7 +48,7 @@ def snapshot(path):
 class Fixture(upgrade.Upgrade):
     def __init__(self, *args):
         super().__init__(*args)
-        self.version='1.12.0'
+        self.version='1.13.0'
         self.busy=False
         self.migration_failure=False
         self.external_busy=False
@@ -69,7 +71,7 @@ class Fixture(upgrade.Upgrade):
     def query(self, sql):
         if 'SELECT version' in sql:
             return [(self.version,)]
-        if 'sum(c.row_count)' in sql:
+        if 'count(*) FROM mpp_occurrence' in sql:
             return [(500,)]
         if 'pg_stat_activity' in sql:
             return [(1,)] if self.external_busy else []
@@ -82,7 +84,7 @@ class Fixture(upgrade.Upgrade):
         if mode=='upgrade':
             if self.migration_failure:
                 raise ValueError('injected migration rollback')
-            self.version='1.13.0'
+            self.version='1.14.0'
 
 
 class UpgradeTests(unittest.TestCase):
@@ -109,11 +111,11 @@ class UpgradeTests(unittest.TestCase):
         (self.root/'pgdata/postmaster.pid').write_text('123\n')
         (self.root/'socket/.s.PGSQL.5432.lock').write_text('123\n')
         (self.root/'runtime-manifest.json').write_text('{}')
-        package(self.root/'app','v1.1.0')
+        package(self.root/'app','v1.2.0')
         (self.root/'app/.venv').mkdir()
         (self.root/'app/.venv/retained').write_text('runtime bytes')
         verification(self.root/'verification','a'*40)
-        package(self.base/'candidate','v1.2.0')
+        package(self.base/'candidate','v1.3.0')
         verification(self.base/'verification','b'*40)
         self.subject=Fixture(self.root,self.base/'candidate',self.base/'verification')
         self.addCleanup(patch.stopall)
@@ -121,20 +123,51 @@ class UpgradeTests(unittest.TestCase):
         patch.object(upgrade,'digest',side_effect=lambda p:upgrade.RUNTIME_MANIFEST_SHA if Path(p).name=='runtime-manifest.json' else digest(p)).start()
         self.disk=patch.object(upgrade.shutil,'disk_usage',return_value=shutil._ntuple_diskusage(100_000_000_000,0,100_000_000_000)).start()
 
-    def test_check_is_read_only_and_accounts_for_retained_builds(self):
+    def test_check_is_read_only_and_accounts_for_events(self):
         before=snapshot(self.root)
         result=self.subject.preflight()
         self.assertGreaterEqual(result['required_free_bytes'],6_000_000_000)
         self.assertEqual(snapshot(self.root),before)
         self.assertEqual(self.subject.operations,['sudo-access'])
         self.assertGreater(upgrade.space_required(100_000_000,0),6_000_000_000)
+        self.assertEqual(result['event_count'],500)
+        self.assertEqual(upgrade.space_required(30_180_000,123),120_064_000_246)
+        self.assertGreater(upgrade.space_required(30_180_001,0),120_064_000_000)
+
+    def test_connection_errors_are_one_safe_stop_line_for_all_commands(self):
+        import psycopg2
+        for action in ('check','apply','resume'):
+            with self.subTest(action=action):
+                subject=upgrade.Upgrade(self.root,self.base/'candidate',self.base/'verification')
+                record=self.root/'upgrades'/'connection-error'
+                record.mkdir(parents=True,exist_ok=True)
+                (record/'state.json').write_text(json.dumps(dict(phase='prepared',
+                    preflight=dict(root=str(self.root),port=5432))))
+                def query():
+                    return subject.query('SELECT 1')
+                args=['upgrade.py',action,'--root',str(self.root),'--candidate',str(self.base/'candidate'),
+                      '--record',str(record),'--confirm-no-rollback']
+                out,err=io.StringIO(),io.StringIO()
+                before=snapshot(self.root)
+                with patch.object(upgrade,'Upgrade',return_value=subject), \
+                     patch.object(subject,'preflight',side_effect=query), \
+                     patch.object(subject,'recover',side_effect=query), \
+                     patch('psycopg2.connect',side_effect=psycopg2.OperationalError('secret-connection-detail')), \
+                     patch.object(sys,'argv',args),redirect_stdout(out),redirect_stderr(err):
+                    self.assertEqual(upgrade.cli(),1)
+                self.assertEqual(snapshot(self.root),before)
+                self.assertEqual(out.getvalue(),'')
+                self.assertEqual(len(err.getvalue().splitlines()),1)
+                self.assertTrue(err.getvalue().startswith('STOP: database connection or authentication failed'))
+                self.assertNotIn('secret-connection-detail',err.getvalue())
+                self.assertNotIn('Traceback',err.getvalue())
 
     def test_preflight_rejections_do_not_modify_installation(self):
         cases=('busy','disk','version','checksum','runtime','socket','dependencies','verification','unresolved')
         for case in cases:
             with self.subTest(case=case):
                 self.subject.busy=case=='busy'
-                self.subject.version='1.11.0' if case=='version' else '1.12.0'
+                self.subject.version='1.11.0' if case=='version' else '1.13.0'
                 self.disk.return_value=shutil._ntuple_diskusage(100_000_000_000,0,1 if case=='disk' else 100_000_000_000)
                 changes=[]
                 if case=='checksum':changes=[(self.root/'app/requirements.txt','corrupt')]
@@ -161,13 +194,13 @@ class UpgradeTests(unittest.TestCase):
         self.assertEqual(snapshot(self.root/'app'),before)
         self.assertEqual(self.subject.services(),states)
         self.assertEqual(self.subject.state['phase'],'rolled-back')
-        self.assertEqual(self.subject.version,'1.12.0')
+        self.assertEqual(self.subject.version,'1.13.0')
 
     def test_success_preserves_runtime_and_original_service_states(self):
         states=self.subject.services()
         self.subject.apply(self.subject.preflight())
         self.assertEqual(self.subject.state['phase'],'complete')
-        self.assertEqual((self.root/'app/VERSION').read_text(),'v1.2.0\n')
+        self.assertEqual((self.root/'app/VERSION').read_text(),'v1.3.0\n')
         self.assertEqual((self.root/'app/.venv/retained').read_text(),'runtime bytes')
         self.assertEqual(self.subject.services(),states)
         for path in (self.root/'app/grafana/dashboards').glob('*.json'):
@@ -185,7 +218,7 @@ class UpgradeTests(unittest.TestCase):
             obj.apply(result)
         self.assertNotIn('stop-sql-apm-daily.service',obj.operations)
         self.assertNotIn('initialize-upgrade',obj.operations)
-        self.assertEqual(obj.version,'1.12.0')
+        self.assertEqual(obj.version,'1.13.0')
         obj.busy=False
         obj.recover()
         self.assertEqual(obj.service_states['sql-apm-daily.timer']['ActiveState'],'active')
@@ -195,7 +228,7 @@ class UpgradeTests(unittest.TestCase):
         for position in range(1,6):
             with self.subTest(rename=position):
                 # Reset each subcase using an independent installation.
-                fresh=UpgradeTests('test_check_is_read_only_and_accounts_for_retained_builds')
+                fresh=UpgradeTests('test_check_is_read_only_and_accounts_for_events')
                 fresh.setUp()
                 try:
                     obj=fresh.subject;result=obj.preflight();original=Path.rename;calls=[]
@@ -204,7 +237,7 @@ class UpgradeTests(unittest.TestCase):
                         if len(calls)==position:raise OSError('injected interruption')
                         return value
                     with patch.object(Path,'rename',interrupted),self.assertRaises(OSError):obj.apply(result)
-                    self.assertEqual(obj.version,'1.13.0')
+                    self.assertEqual(obj.version,'1.14.0')
                     self.assertNotEqual(obj.state['phase'],'rolled-back')
                     obj.recover()
                     self.assertEqual(obj.state['phase'],'complete')

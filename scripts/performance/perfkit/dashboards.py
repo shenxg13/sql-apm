@@ -107,7 +107,7 @@ def target(uid, panel=None):
 
 
 def page(session, document, values, start, end, label, replay, trace,
-         panel_ids=None, interval_ms=300000):
+         panel_ids=None, interval_ms=300000, measure_statement=measure):
     uid, all_values = document['uid'], defaults(document)
     all_values.update(values)
     timings = []
@@ -123,7 +123,7 @@ def page(session, document, values, start, end, label, replay, trace,
             query = query['query']
         sql = interpolate(query,all_values,start,end,interval_ms)
         item = label+'/var/'+ready['name']
-        record, rows = measure(session,sql,label=item,replay=replay,keep=True)
+        record, rows = measure_statement(session,sql,label=item,replay=replay,keep=True)
         record.update(kind='variable', variable=ready['name'])
         timings.append(record)
         trace.append(dict(item=item,sql=sql))
@@ -144,7 +144,7 @@ def page(session, document, values, start, end, label, replay, trace,
     for query in annotations if panel_ids is None else []:
         sql=interpolate(query['rawSql'],all_values,start,end,interval_ms)
         item=label+'/annotation/'+query['refId']
-        record,_=measure(session,sql,label=item,target_ms=5000,replay=replay)
+        record,_=measure_statement(session,sql,label=item,target_ms=5000,replay=replay)
         record.update(kind='annotation',panel='annotation',ref=query['refId'])
         timings.append(record)
         trace.append(dict(item=item,sql=sql))
@@ -158,7 +158,7 @@ def page(session, document, values, start, end, label, replay, trace,
             sql=interpolate(query['rawSql'],all_values,start,end,interval_ms)
             item=label+'/panel/'+str(panel['id'])+'/'+query['refId']
             goal=3000 if uid=='mpp-search' and all_values.get('mode')=='exact' else target(uid,panel['id'])
-            record,_=measure(session,sql,label=item,target_ms=goal,replay=replay)
+            record,_=measure_statement(session,sql,label=item,target_ms=goal,replay=replay)
             record.update(kind='panel',panel=panel['id'],ref=query['refId'])
             timings.append(record)
             trace.append(dict(item=item,sql=sql))

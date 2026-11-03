@@ -119,6 +119,14 @@ def fixed(session=None, app=None, dashboards=None):
             and id(node) not in docstrings]
         statements = {value for value in literals if re.match(
             r'^\s*\(?\s*(SELECT|WITH|SET|SHOW|LOAD|EXPLAIN|UNION)(?:\s|$)',value,re.I)}
+        # Transaction commands are private SQL only when passed to a SQL call.
+        # A bare public field such as "commit" must remain collision-checked.
+        statements.update(node.args[0].value for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+            and node.func.attr in ('query', 'execute') and node.args
+            and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
+            and re.match(r'^\s*(BEGIN|START\s+TRANSACTION|COMMIT|ROLLBACK|END|SAVEPOINT|RELEASE)(?:\s|$)',
+                         node.args[0].value, re.I))
         groups['sql:fields:'+path.name] = sql_fields(statements)
         groups['tool:'+path.name] = [value for value in literals
             if value not in statements and value not in ('postgres','postgres_rss_kib')] + [

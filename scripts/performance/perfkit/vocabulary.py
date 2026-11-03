@@ -114,14 +114,22 @@ def fixed(session=None, app=None, dashboards=None):
         # These two internal strings are normalized by pack.export_document:
         # the process classifier/connection OS account and its old RSS key.
         # They are not exported fixed names. pack.scan still scans both values.
-        literals = [node.value for node in ast.walk(tree)
+        literals = [node for node in ast.walk(tree)
             if isinstance(node, ast.Constant) and isinstance(node.value, str)
             and id(node) not in docstrings]
-        statements = {value for value in literals if re.match(
-            r'^\s*\(?\s*(SELECT|WITH|SET|SHOW|LOAD|EXPLAIN|UNION)(?:\s|$)',value,re.I)}
+        # SQL call arguments are private regardless of their first keyword.
+        # Track occurrences, so an identical public field remains checked.
+        sql_nodes = {id(node.args[0]) for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+            and node.func.attr in ('query', 'execute') and node.args
+            and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)}
+        # Retain recognition of query constants and concatenation fragments.
+        sql_nodes.update(id(node) for node in literals if re.match(
+            r'^\s*\(?\s*(SELECT|WITH|SET|SHOW|LOAD|EXPLAIN|UNION)(?:\s|$)',node.value,re.I))
+        statements = {node.value for node in literals if id(node) in sql_nodes}
         groups['sql:fields:'+path.name] = sql_fields(statements)
-        groups['tool:'+path.name] = [value for value in literals
-            if value not in statements and value not in ('postgres','postgres_rss_kib')] + [
+        groups['tool:'+path.name] = [node.value for node in literals
+            if id(node) not in sql_nodes and node.value not in ('postgres','postgres_rss_kib')] + [
             node.arg for node in ast.walk(tree) if isinstance(node, ast.keyword) and node.arg]
     manifest = directory.parent/'MANIFEST.json'
     if manifest.exists():

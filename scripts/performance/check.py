@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SQL APM v1.2.0 performance inspection; production data stays on the host."""
+"""SQL APM v1.3.0 performance inspection; production data stays on the host."""
 import argparse
 from datetime import datetime, timezone
 import json
@@ -15,7 +15,7 @@ from perfkit import cases, collect, commands, dashboards, pack, plans
 
 def parser():
     result=argparse.ArgumentParser(description='只读性能检查；main、system、pack 分别执行。')
-    result.add_argument('part',choices=['main','host','inventory','cases','timing','system','plans','focus','pack'])
+    result.add_argument('part',choices=['main','host','inventory','cases','first-read','timing','system','plans','focus','pack'])
     result.add_argument('--work',type=Path,required=True)
     result.add_argument('--root',type=Path,default=Path('/data/sql-apm'))
     result.add_argument('--app',type=Path)
@@ -147,7 +147,7 @@ def run(args):
         for value in (dsn,admin):
             if 'password' in parse_dsn(value):
                 raise Refused('inline_password_forbidden')
-        is_admin=args.part in ('system','plans','focus')
+        is_admin=args.part in ('system','plans','focus','first-read')
         if not is_admin and parse_dsn(dsn).get('user')!='sql_apm_ro':
             raise Refused('timing_requires_sql_apm_ro')
         verify_files(args.app,args.dashboards)
@@ -155,6 +155,11 @@ def run(args):
             identity=check_versions(args.app,session)
         identity.update(toolkit_version=VERSION)
         save(work.public/'identity.json',identity)
+        if args.part=='first-read':
+            from perfkit.first_read import run as first_read
+            with work.section('first-read'),Session(admin,args.limit_seconds*1000) as session:
+                idle(session)
+                first_read(args,work,session)
         if args.part in ('main','host'):
             with work.section('host'):
                 save(work.public/'host.json',collect.host_static(args.pgdata,work))

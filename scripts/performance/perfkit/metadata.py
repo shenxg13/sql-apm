@@ -1,5 +1,6 @@
 """Small, position-bound public metadata allowlist; never exempt data values."""
 import json
+import math
 import re
 
 from .core import encoded, Refused
@@ -11,6 +12,9 @@ STAT_COLUMNS = frozenset(('last_analyze', 'last_autoanalyze', 'analyze_count',
                           'autoanalyze_count', 'n_mod_since_analyze'))
 SETTING_NAMES = frozenset(('autovacuum_analyze_scale_factor',
                            'autovacuum_analyze_threshold'))
+FIRST_READ_FIELDS = frozenset(('first_ms', 'first_plan_available', 'first_shared_read_blocks',
+                               'first_local_read_blocks', 'first_temp_read_blocks'))
+FIRST_READ_LOCATION = ('pages', '*', 'statements', '*')
 LOCATIONS = {
     'health.json': {('tables', '*')},
     'deltas.json': {('before', 'tables', '*'), ('after', 'tables', '*'),
@@ -24,6 +28,8 @@ def declaration():
                 statistics_locations={name:sorted('.'.join(path) for path in paths)
                                       for name, paths in LOCATIONS.items()},
                 setting_location='settings.json:values[].name',
+                first_read_numeric_fields=sorted(FIRST_READ_FIELDS),
+                first_read_location='first-read.json:pages[].statements[]',
                 rule='仅固定名称及对应清单、摘要引用；所有业务值和动态文本仍严格检查')
 
 
@@ -42,7 +48,7 @@ def scan_views(files):
     for name, raw in files.items():
         if name in ('SUMMARY.txt', 'FIELDS.json', 'PUBLIC_METADATA.json'):
             continue
-        if name not in LOCATIONS and name != 'settings.json':
+        if name not in LOCATIONS and name not in ('settings.json', 'first-read.json'):
             views[name] = raw
             continue
         approved_paths[name] = set()
@@ -51,6 +57,10 @@ def scan_views(files):
                 pairs = []
                 for key, item in value.items():
                     approved = path in LOCATIONS.get(name, ()) and key in STAT_COLUMNS
+                    if name == 'first-read.json' and path == FIRST_READ_LOCATION and key in FIRST_READ_FIELDS:
+                        if type(item) not in (int, float) or not math.isfinite(item) or item < 0:
+                            raise Refused('invalid_first_read_metric')
+                        approved = True
                     if approved:
                         approved_paths[name].add(field_path(path+(key,)))
                     pairs.append(['' if approved else key, walk(item, path+(key,))])
@@ -90,5 +100,6 @@ def scan_views(files):
         view = declaration()
         view['statistics_columns'] = []
         view['setting_names'] = []
+        view['first_read_numeric_fields'] = []
         views['PUBLIC_METADATA.json'] = encoded(view)
     return views

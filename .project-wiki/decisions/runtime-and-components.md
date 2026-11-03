@@ -4,8 +4,14 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/79
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6574427464
@@ -90,6 +96,39 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### v1.3.0 带数据升级（2026-11-03）
+
+来源：[Issue #79](https://github.com/shenxg13/sql-apm/issues/79) 的已确认契约；本节定义本版交付要求，
+实测状态见[升级验证报告](../../docs/reports/v130-upgrade-2026-11-03.md)。
+只从正式 v1.2.0／结构 1.13.0 升至 v1.3.0／结构 1.14.0，交付 #73；
+固定运行时、Python 依赖、RPM、Grafana 和插件沿用，数据、配置和服务路径保留。
+单事务迁移及回填失败时回滚，提交后不提供回退，不备份；操作者须明确接受从原始日志重建的恢复代价。
+升级预检按当前事件数换算 #73 的工作盘和持续占用模型，公式由[升级手册](../../docs/runbooks/production-upgrade.md)维护。
+连接错误输出简短 STOP，failed 单元的排查及恢复必须在验证机演练。
+后台包装显式禁用 shell 启动文件，保留操作者本次设置的升级路径，避免旧 APM 变量被重新加载。
+该行为来自本版验证机演练发现，证据见升级验证报告；账号已有配置无需修改。
+升级和恢复复制公开看板时保留随包权限，避免后台的私有 umask 使 postgres 无法执行工具包摘要核对；
+该复制步骤已在验证机实际目录和恢复夹具验证。
+
+开发机全量与验证机部分样本分别演练，验证机还覆盖迁移失败、升级后每日运行及新工具包；
+不重新演练全新安装、不重跑九任务、不重启。用户对照手册并以原账号用 PuTTY 试用 sqlfind，
+明确确认后才交独立评审。合并后先经只改文档的独立评审 PR 定稿发布说明，再正式制包和发布。
+2026-11-03，用户对候选 `d7f3060` 明确回复“确认验收”，完成手册和 PuTTY sqlfind 的 T8；
+依据见[用户确认记录](https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097)。
+该确认不代表生产升级或生产性能已验证。
+生产升级与每日运行由用户执行；全量复测使用全部用例、三轮、首次读取、计划和重点分析。
+生产升级记录不带出，沿用结果包身份／数据加用户确认结构检查与自检的判定方式。
+效果目标、已接受差距与生产未达项由在线契约约束，不用开发机模型代替生产实测。
+
+独立工具包 1.2.0 只支持 v1.3.0／1.14.0；旧产品继续使用旧工具包。
+传给 query／execute 的内部 SQL 字面量按调用位置排除，不作为公开名称阻止代表身份入选，手工追加同样检查；
+同名公开字段仍保留检查，最终敏感值扫描不豁免业务输入。
+R1 对名称表过滤的整改按[评审退出条件](https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984)复核：
+两处用新工作目录重跑 cases，代表身份相同才继承原完整结果；发生变化的机器重跑完整工具包。
+首次执行在普通计时之前采集，每个集群的高频／多原文详情及七天排行保留耗时、根节点读取块数，
+新增字段仅允许数值并绑定公开元数据位置。不清缓存，不能把第一次执行或零读取块误称为冷盘实测。
+操作及字段说明见[工具包手册](../../docs/runbooks/performance-check.md)。
 
 ### v1.2.0 带数据升级（2026-10-27）
 

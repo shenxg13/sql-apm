@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upgrade the installed v1.1.0 in place; run using its Python 3.13 interpreter.
+"""Upgrade the installed v1.2.0 in place; run using its Python 3.13 interpreter.
 
 check is read-only. apply journals under ROOT/upgrades only after preflight and
 explicit no-rollback acknowledgement. resume finishes a committed migration;
@@ -12,7 +12,6 @@ import argparse
 from datetime import datetime, timezone
 import fcntl
 import json
-import math
 import os
 from pathlib import Path
 import shutil
@@ -73,10 +72,21 @@ def verify_checksums(directory):
         require(digest(directory / name) == checksum, 'verification checksum differs: ' + name)
 
 
-def space_required(overall_rows, package_bytes):
-    # #72: 221 bytes/index entry; allow three times that for sort/WAL plus
-    # the permanent index. Counts include all retained builds, not just current.
-    return max(6_000_000_000, math.ceil(overall_rows * 221 * 4)) + package_bytes * 2
+def space_required(event_count, package_bytes):
+    # #73/#79: conservative working allowance PLUS persistent structures.
+    # Scale the 30,180,000-event production model; retain a 6 GB small-data floor.
+    # Integer ceiling avoids rounding down a gate at large event counts.
+    modeled = (event_count * 120_064_000_000 + 30_180_000 - 1) // 30_180_000
+    return max(6_000_000_000, modeled) + package_bytes * 2
+
+
+def install_dashboard(source, target):
+    temporary = target.with_suffix('.new')
+    require(not temporary.is_symlink() and not target.is_symlink(), 'dashboard target must not be linked')
+    # The documented background wrapper uses umask 077. Dashboard definitions
+    # are public package files: preserve their mode for postgres verification.
+    shutil.copy2(source, temporary)
+    temporary.replace(target)
 
 
 class Upgrade:
@@ -119,6 +129,8 @@ class Upgrade:
             connection = psycopg2.connect(host=str(self.root / 'socket'), port=self.port, dbname='sql_apm',
                                            user='sql_apm', passfile=str(self.root / 'private/pgpass'),
                                            connect_timeout=10, application_name='sql-apm-upgrade')
+        except psycopg2.Error:
+            raise ValueError('database connection or authentication failed; check local socket, service and password file') from None
         finally:
             os.environ.update(inherited)
         try:
@@ -128,6 +140,8 @@ class Upgrade:
                     cur.execute("SET LOCAL statement_timeout='30s'")
                     cur.execute(sql)
                     return cur.fetchall()
+        except psycopg2.Error:
+            raise ValueError('database query failed; inspect the local database service and upgrade record') from None
         finally:
             connection.close()
 
@@ -163,9 +177,9 @@ class Upgrade:
         require(not self.candidate.is_relative_to(self.root) and not self.verification.is_relative_to(self.root),
                 'unpack the new delivery outside the installation root')
         installed = verify(self.root / 'app', installed=True)
-        require(installed['version'] == 'v1.1.0' and installed['kind'] == 'release', 'installed formal v1.1.0 required')
+        require(installed['version'] == 'v1.2.0' and installed['kind'] == 'release', 'installed formal v1.2.0 required')
         target = verify(self.candidate, installed=True)
-        require(target['version'] == 'v1.2.0', 'candidate v1.2.0 required')
+        require(target['version'] == 'v1.3.0', 'candidate v1.3.0 required')
         verify_checksums(self.verification)
         require((self.verification / 'PROGRAM_COMMIT').read_text().strip() == target['commit'], 'verification commit differs')
         require(digest(self.root / 'app/requirements.txt') == digest(self.candidate / 'requirements.txt'), 'dependencies changed')
@@ -175,7 +189,7 @@ class Upgrade:
         pid = (self.root / 'pgdata/postmaster.pid').read_text().splitlines()[0]
         require((self.root / ('socket/.s.PGSQL.' + str(self.port) + '.lock')).read_text().splitlines()[0] == pid,
                 'socket belongs to a different database instance')
-        require(self.schema() == '1.12.0', 'schema 1.12.0 required')
+        require(self.schema() == '1.13.0', 'schema 1.13.0 required')
         self.idle()
         services = self.services()
         if any(state['LoadState'] == 'loaded' for state in services.values()):
@@ -185,9 +199,7 @@ class Upgrade:
         # The released layout uses pg_default and local WAL, so no volume is silently omitted.
         require(not (self.root / 'pgdata/pg_wal').is_symlink(), 'external WAL needs a separate space assessment')
         require(not list((self.root / 'pgdata/pg_tblspc').iterdir()), 'external tablespaces need a separate space assessment')
-        count = self.query("""SELECT coalesce(sum(c.row_count),0) FROM mpp_build_layer_count c
-            JOIN build b USING(build_id) JOIN mpp_result_partition p USING(partition_id)
-            WHERE c.kind='formal' AND c.layer='overall' AND p.cleaned_at IS NULL""")[0][0]
+        count = self.query('SELECT count(*) FROM mpp_occurrence')[0][0]
         package_bytes = sum(p.stat().st_size for tree in (self.candidate, self.verification) for p in tree.rglob('*') if p.is_file())
         required = space_required(int(count), package_bytes)
         free = min(shutil.disk_usage(self.root).free, shutil.disk_usage(self.root / 'pgdata').free)
@@ -197,7 +209,7 @@ class Upgrade:
             require(json.loads(path.read_text()).get('phase') in ('complete', 'rolled-back'),
                     'unfinished upgrade; use resume with ' + str(path.parent))
         return dict(installed=installed, target=target, services=services, runtime_sha256=RUNTIME_SHA,
-                    overall_rows=int(count), required_free_bytes=required, available_bytes=free,
+                    event_count=int(count), required_free_bytes=required, available_bytes=free,
                     root=str(self.root), candidate=str(self.candidate), verification=str(self.verification), port=self.port)
 
     def persist(self):
@@ -257,10 +269,7 @@ class Upgrade:
             (self.run / 'next-verification').rename(self.root / 'verification')
         for path in (installed / 'grafana/dashboards').glob('mpp-*.json'):
             target = self.root / 'grafana/dashboards/mpp' / path.name
-            temporary = target.with_suffix('.new')
-            require(not temporary.is_symlink() and not target.is_symlink(), 'dashboard target must not be linked')
-            shutil.copyfile(path, temporary)
-            temporary.replace(target)
+            install_dashboard(path, target)
         verify_installed(self.root)
         self.phase('activated')
         self.initialize('check', installed)
@@ -268,18 +277,18 @@ class Upgrade:
         self.command('daily-status', [installed / '.venv/bin/python', '-m', 'sql_apm', 'daily', 'status'])
         self.restore()
         self.phase('complete')
-        print('OK: upgraded to v1.2.0; finish the checks in UPGRADE.html; record=' + str(self.run))
+        print('OK: upgraded to v1.3.0; finish the checks in UPGRADE.html; record=' + str(self.run))
 
     def recover(self):
         self.idle()  # A detached psql may still be committing after its parent died.
         version = self.schema()
-        if version == '1.12.0':
+        if version == '1.13.0':
             require(not (self.run / 'previous-app').exists(), 'old database with replaced program; manual inspection required')
             self.initialize('check', self.root / 'app')
             self.restore()
             self.phase('rolled-back')
-            print('OK: migration rolled back; v1.1.0 and original service states restored')
-        elif version == '1.13.0':
+            print('OK: migration rolled back; v1.2.0 and original service states restored')
+        elif version == '1.14.0':
             self.stop()
             self.phase('committed')
             self.activate()
@@ -308,7 +317,7 @@ class Upgrade:
             # On an ordinary failure reconcile the DB before restoring anything.
             # SIGKILL/power loss requires explicit resume with the same journal.
             try:
-                if self.schema() == '1.12.0':
+                if self.schema() == '1.13.0':
                     self.recover()
             except BaseException:
                 print('STOP: recovery incomplete; keep writers stopped and use resume', file=sys.stderr)
@@ -362,8 +371,14 @@ def main():
                 print('OK: preflight passed; no installation changes made')
 
 
-if __name__ == '__main__':
+def cli():
     try:
         main()
     except (ValueError, OSError, KeyError, KeyboardInterrupt) as error:
-        raise SystemExit('STOP: ' + str(error)) from None
+        print('STOP: ' + str(error), file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(cli())

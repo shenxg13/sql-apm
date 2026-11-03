@@ -453,7 +453,8 @@ history 根据月份标记显示结果已清理；results_saved 保留“曾完�
 | 1.13.0（#72） | 增加三张查询汇总表及 overall 部分覆盖索引；从含数据的 1.12.0 回填并升级，保留已有构建 |
 | 1.14.0（#73） | 增加九张查询派生表及三个元数据短键；从含数据的 1.13.0 回填并升级，原有业务列及构建不变 |
 
-这些是结构工具的能力；v1.2.0 起提供从 v1.1.0 带数据原地升级的交付步骤，见[生产升级手册](../runbooks/production-upgrade.md)。
+这些是结构工具的能力；当前 v1.3.0 仅提供从正式 v1.2.0 带数据原地升级的交付步骤，见[生产升级手册](../runbooks/production-upgrade.md)。
+历史 v1.2.0 从 v1.1.0 升级的步骤见[当时的手册](https://github.com/shenxg13/sql-apm/blob/v1.2.0/docs/runbooks/production-upgrade.md)。
 
 依据为结构定义、迁移和各阶段代码。表数不含动态月分区子表。表清单和所列字段由
 开发机的 `scripts/deployment/check_documents.py` 对照结构定义检查；该命令仅在开发仓库运行。

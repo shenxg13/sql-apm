@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-11-03
 sources:
+  - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/79
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
@@ -110,6 +112,9 @@ confidence: high
 开发机全量与验证机部分样本分别演练，验证机还覆盖迁移失败、升级后每日运行及新工具包；
 不重新演练全新安装、不重跑九任务、不重启。用户对照手册并以原账号用 PuTTY 试用 sqlfind，
 明确确认后才交独立评审。合并后先经只改文档的独立评审 PR 定稿发布说明，再正式制包和发布。
+2026-11-03，用户对候选 `d7f3060` 明确回复“确认验收”，完成手册和 PuTTY sqlfind 的 T8；
+依据见[用户确认记录](https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097)。
+该确认不代表生产升级或生产性能已验证。
 生产升级与每日运行由用户执行；全量复测使用全部用例、三轮、首次读取、计划和重点分析。
 生产升级记录不带出，沿用结果包身份／数据加用户确认结构检查与自检的判定方式。
 效果目标、已接受差距与生产未达项由在线契约约束，不用开发机模型代替生产实测。

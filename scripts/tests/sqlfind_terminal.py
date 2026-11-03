@@ -536,8 +536,37 @@ def verify_drilldown(dsn, owner):
                 getattr(Output(width, stream), method)(expected)
                 assert stream.getvalue().strip() in text, text[-2000:]
 
+            # The first catalog display has not cached its full-text differences.
+            # Confirm a real lock wait before Ctrl-C; repeating while still locked
+            # proves cancellation did not publish a cached result.
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            for _ in range(2):
+                term.send('v\n')
+                deadline = time.monotonic() + 5
+                while True:
+                    with owner.cursor() as cur:
+                        cur.execute("SELECT EXISTS(SELECT FROM pg_locks WHERE "
+                                    "relation='sql_apm.mpp_sql_text'::regclass AND NOT granted)")
+                        if cur.fetchone()[0]:
+                            break
+                    assert time.monotonic() < deadline, 'uncached originals did not wait for lock'
+                    time.sleep(.02)
+                term.send('\x03')
+                cancelled = term.until(prompt, timeout=5)
+                assert '取消' in cancelled and '保留原选择' in cancelled, cancelled
+                term.send('b\n')
+                term.until(listing)
+                term.send('1\n')
+                compare(term.until(prompt), detail)
+            owner.rollback()
             term.send('v\n')
             compare(term.until(prompt), detail, 'originals')
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('v\n')
+            compare(term.until(prompt, timeout=5), detail, 'originals')
+            owner.rollback()
             term.send('h\n')
             for marker, value in [('可选 1-1000：', '1000'), ('指定起止时间 [1]：', '1'),
                                   ('最慢在前 [1]：', '9'), ('最慢在前 [1]：', '2')]:
@@ -621,7 +650,7 @@ def verify_drilldown(dsn, owner):
         finally:
             owner.rollback()
             term.close()
-    print('PASS: interactive search sort/requery/cancel, original list/selection/trace, history sort and persistence at 80/200 columns', flush=True)
+    print('PASS: interactive search sort/requery/cancel, uncached original lock cancellation without cache publication and retry, original selection/trace, history persistence at 80/200 columns', flush=True)
 
 
 def verify(dsn, directory, owner):

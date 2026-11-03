@@ -212,13 +212,17 @@ def verify(pg):
         tables = v.sql("SELECT relname FROM pg_class WHERE relnamespace='sql_apm'::regnamespace "
                        "AND relkind IN ('r','p') AND NOT relispartition ORDER BY relname").splitlines()
         def snapshot():
-            return {t: v.sql('SELECT coalesce(jsonb_agg(to_jsonb(x) ORDER BY to_jsonb(x)::text),\'[]\') FROM "' + t + '" x' +
-                            (" WHERE version='1.12.0'" if t == 'schema_version' else '')) for t in tables}
+            result = {}
+            for table in tables:
+                row = "to_jsonb(x)-'query_key'" if table in ('scope', 'analysis', 'mpp_normalization') else 'to_jsonb(x)'
+                result[table] = v.sql('SELECT coalesce(jsonb_agg(' + row + ' ORDER BY (' + row + ')::text),\'[]\') FROM "' + table + '" x' +
+                                     (" WHERE version='1.12.0'" if table == 'schema_version' else ''))
+            return result
         before = snapshot()
         v.init('upgrade'); v.init('check')
         assert snapshot() == before
         summaries(v)
-        v.require(True, 'populated 1.12 -> 1.13: existing rows and receipts preserved; summaries backfilled exactly')
+        v.require(True, 'populated 1.12 -> 1.14: all original columns and receipts preserved; summaries backfilled exactly')
         v.sql("INSERT INTO mpp_sql_text(sql_id,text,content_sha256) SELECT 'new','SELECT 72',sha256(convert_to('SELECT 72','UTF8'))")
         summaries(v)
         assert v.sql("SELECT mpp_query_missing_rules('N1')") == '1'

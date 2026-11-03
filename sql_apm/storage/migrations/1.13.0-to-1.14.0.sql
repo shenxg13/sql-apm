@@ -281,8 +281,8 @@ BEGIN
                 JOIN mpp_query_text_key k USING(sql_id)
                 JOIN mpp_query_record r ON r.rule_key=c.rule_key AND r.sql_key=k.sql_key;
     END IF;
-    IF NOT rebuilding AND NOT EXISTS(SELECT FROM query_old_records) THEN
-        -- Normal new-file/first-rule writes have no previous projection. The
+    IF NOT EXISTS(SELECT FROM query_old_records) THEN
+        -- New-file/first-rule writes and empty-table backfills have no previous projection. The
         -- source UNION and unique memberships/identities already make each
         -- desired event key unique; sorting it again and copying it is wasted.
         CREATE TEMP TABLE query_removed (LIKE mpp_query_record) ON COMMIT DROP;

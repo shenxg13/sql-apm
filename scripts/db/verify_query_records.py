@@ -132,6 +132,10 @@ def maintenance(pg):
         execute(statements())
         reconcile(db)
         v.require(revision()==1, 'one revision for committed events with reliable fingerprints')
+        execute('SELECT mpp_query_prepare_changes(); '
+                'INSERT INTO pg_temp.mpp_query_rebuild_flag VALUES(true); SELECT mpp_query_refresh()')
+        reconcile(db)
+        v.require(revision()==1, 'rebuild with existing projection preserves totals and does not advance revision')
         execute("INSERT INTO mpp_sql_text(sql_id,text,content_sha256) VALUES('unused','SELECT 73',sha256(convert_to('SELECT 73','UTF8')));")
         execute("INSERT INTO mpp_fingerprint SELECT 'unused-fp','unused',normalization_id,profile,state,value,reason FROM mpp_fingerprint WHERE sql_id='Q1' ON CONFLICT DO NOTHING")
         reconcile(db)

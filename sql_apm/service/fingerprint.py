@@ -111,28 +111,32 @@ class Service:
         # One request at a time: the normalizer is not shared between threads.
         self.lock = threading.Lock()
 
-    def exact(self, raw, filters):
+    def exact(self, raw, filters, cursor=None):
         with self.lock:
+            if cursor is not None:
+                return self._exact(cursor, raw, filters)
             db = connect(self.dsn, self.schema)
             try:
                 db.set_session(readonly=True, isolation_level='REPEATABLE READ')
                 with db, db.cursor() as cur:
-                    result = exact(cur, self.normalizer, raw, filters)
-                    stored = form = None
-                    if len(raw) <= MAX_BYTES:
-                        try:
-                            rules, text = self.rules['normalization_id'], raw.decode('utf-8')
-                            stored = same_text_id(cur, rules, result.get('fingerprint'), text)
-                            if stored is None:
-                                other = other_form(cur, self.normalizer, rules, result.get('fingerprint'), text)
-                                if other:
-                                    # The answer is the command line's for the form the stored text has.
-                                    form, changed, stored = other
-                                    result = exact(cur, self.normalizer, changed, filters)
-                        except (UnicodeError, ValueError):
-                            stored = form = None
+                    return self._exact(cur, raw, filters)
             finally:
                 db.close()
+
+    def _exact(self, cur, raw, filters):
+        result = exact(cur, self.normalizer, raw, filters)
+        stored = form = None
+        if len(raw) <= MAX_BYTES:
+            try:
+                rules, text = self.rules['normalization_id'], raw.decode('utf-8')
+                stored = same_text_id(cur, rules, result.get('fingerprint'), text)
+                if stored is None:
+                    other = other_form(cur, self.normalizer, rules, result.get('fingerprint'), text)
+                    if other:
+                        form, changed, stored = other
+                        result = exact(cur, self.normalizer, changed, filters)
+            except (UnicodeError, ValueError):
+                stored = form = None
         result.update(exact_sql_id=stored, line_breaks=form, rules=self.rules,
                       input=dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()))
         return result

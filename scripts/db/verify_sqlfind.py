@@ -56,7 +56,7 @@ def verify_rendered_notes(dsn, finder):
             refused = next((n['content'] for n in notes if n['item'] == '没有检索'), None)
             expected = refused + '。' if refused else ''.join(n['item'] + ': ' + n['content'] for n in notes)
             result = command(dsn, ['--width', str(width)], query.encode())
-            assert result.returncode == (1 if refused else 0) and not result.stderr
+            assert result.returncode == (1 if refused else 0) and not result.stderr, (result.returncode,result.stdout,result.stderr)
             term = Terminal(dsn, ['--mode', 'words'], width)
             try:
                 term.until('之后 q 退出。')
@@ -341,6 +341,103 @@ def verify_noninteractive(dsn, finder):
     print('PASS: noninteractive history/original/view options, shared results, independent windows, long text, differences, zero records and empty hints', flush=True)
 
 
+def verify_cache(finder, owner):
+    from contextlib import contextmanager
+    from sql_apm.storage.sqlfind import QueryCache
+    log=[]
+    original_cursor=finder.cursor
+    class Trace:
+        def __init__(self,cur):self.cur=cur
+        def execute(self,sql,values=()):
+            log.append(sql)
+            return self.cur.execute(sql,values)
+        def __getattr__(self,key):return getattr(self.cur,key)
+    @contextmanager
+    def traced():
+        with original_cursor() as cur:yield Trace(cur)
+    args=arguments([])
+    with patch.object(finder,'cursor',traced):
+        found=search(finder,b'orders',args)
+        initial=finder.detail(found,'1',args)
+        log.clear()
+        again=finder.detail(found,'1',args)
+        assert not log and initial==again
+        finder.reorder(found,'recent');assert not log
+        changed=finder.detail(found,'1',args,limit=21)
+        assert len(log)==2 and 'revision' in log[0] and 'mpp_view_execution_subset' in log[1],log
+        log.clear()
+        other=finder.detail(found,'1',args,limit=21,order='slowest')
+        assert len(log)==2 and 'revision' in log[0] and 'mpp_view_execution_subset' in log[1],log
+        # Eviction entails a fresh snapshot, never a silent change of revision.
+        found['cache']=QueryCache(1)
+        log.clear()
+        same=finder.detail(found,'1',args)
+        assert {k:v for k,v in same.items() if k!='_found'}=={k:v for k,v in initial.items() if k!='_found'}
+        found['cache']=QueryCache()
+        initial=finder.detail(found,'1',args)
+        log.clear()
+        # No-op facts and metadata-only changes do not invalidate a search.
+        with owner,owner.cursor() as cur:
+            cur.execute('UPDATE mpp_occurrence SET duration_ms=duration_ms WHERE false')
+        finder.detail(found,'1',args,limit=22)
+        assert len(log)==2
+        # Hold a real event mutation uncommitted: old queries remain usable.
+        with owner.cursor() as cur:
+            cur.execute('SELECT analysis_id,occurrence_id,database FROM mpp_occurrence ORDER BY analysis_id,occurrence_id LIMIT 1')
+            analysis,event,database=cur.fetchone()
+            cur.execute("UPDATE mpp_occurrence SET database='cache-test73' WHERE analysis_id=%s AND occurrence_id=%s",(analysis,event))
+        finder.detail(found,'1',args,limit=23)
+        owner.commit()
+        log.clear()
+        finder.detail(found,'1',args)
+        assert not log,'cached display should not query even after import'
+        try:finder.detail(found,'1',args,limit=24)
+        except ValueError as error:assert str(error)=='records_changed'
+        else:raise AssertionError('changed facts accepted')
+        assert len(log)==1 and 'revision' in log[0],log
+        new=search(finder,b'orders',args)
+        assert new['revision']!=found['revision']
+        finder.detail(new,'1',args,limit=24)
+        # --show deliberately does not compare revisions between its short reads.
+        show_args=arguments(['--show','1'])
+        one=search(finder,b'orders',show_args)
+        log.clear();finder.detail(one,'1',show_args)
+        assert not any('SELECT revision' in q for q in log)
+        # Restore the synthetic event so the surrounding read-only digest stays valid.
+        with owner,owner.cursor() as cur:
+            cur.execute('UPDATE mpp_occurrence SET database=%s WHERE analysis_id=%s AND occurrence_id=%s',(database,analysis,event))
+        # A failed operation must not publish any newly staged results.
+        stable=search(finder,b'orders',args)
+        cache=stable['cache']
+        for error in (KeyboardInterrupt, ValueError):
+            try:
+                with finder.cached_cursor(stable) as cur:
+                    cur.execute('SELECT 73 AS cache_stage')
+                    raise error('synthetic cancellation')
+            except error:pass
+            assert not cache.items and cache.size==0
+        with finder.cached_cursor(stable) as cur:
+            cur.execute('SELECT 73 AS cache_stage')
+        assert cache.size<=cache.budget and len(cache.items)==1
+        # Publication does not invalidate events, and the first search retains
+        # its captured current version even if detail has never been opened.
+        from database.retention import clone_build
+        pinned=search(finder,b'orders',args)
+        old_version=pinned['pinned_versions']['C1']['build_id']
+        clone_build(owner,old_version,'cache-version73','2026-06-01',published=True)
+        with owner,owner.cursor() as cur:
+            cur.execute("UPDATE current_version SET (build_id,last_success_at,publication_id)=(SELECT build_id,at,publication_id FROM publication WHERE build_id='cache-version73') WHERE scope_id='C1'")
+            cur.execute('SELECT revision FROM mpp_query_state');assert cur.fetchone()[0]==pinned['revision']
+        detail=finder.detail(pinned,'1',args)
+        assert detail['version']['build_id']==old_version
+        latest=search(finder,b'orders',args)
+        assert latest['pinned_versions']['C1']['build_id']=='cache-version73'
+        assert finder.detail(latest,'1',args)['version']['build_id']=='cache-version73'
+        with owner,owner.cursor() as cur:
+            cur.execute("UPDATE current_version SET (build_id,last_success_at,publication_id)=(SELECT build_id,at,publication_id FROM publication WHERE build_id=%s AND result='published' ORDER BY at DESC LIMIT 1) WHERE scope_id='C1'",(old_version,))
+    print('PASS: K8 operation SQL traces: cache=0, new execution page=revision+page, metadata reuse, uncommitted/committed changes, eviction, re-search, --show, atomic failed cache and pinned publication',flush=True)
+
+
 def verify(pg_bin):
     assert not (ROOT / 'sqlfind').exists() and not (ROOT / 'sqlfind').is_symlink()
     with instance(pg_bin) as (directory, env):
@@ -390,6 +487,14 @@ def verify(pg_bin):
                 assert [{k: r[k] for k in candidates[0]} for r in found['candidates']] == candidates if candidates else not found['candidates']
             if text == 'wide_':
                 assert len(found['candidates']) == 50 and found['candidates'][0]['total_structures'] == 60
+                with finder.cursor() as cur:
+                    recent = rows(cur, 'mpp_view_search', [finder.norm, mode, text,
+                        None, None, None, None, None, 'recent', None])
+                reordered = finder.reorder(found, 'recent')['candidates']
+                assert [{k: r[k] for k in recent[0]} for r in reordered] == recent
+                # The newest global 50 include structures absent from count's
+                # global 50; sorting the truncated count page cannot pass.
+                assert {r['fingerprint'] for r in reordered} != {r['fingerprint'] for r in found['candidates']}
             if text == 'not a sql':
                 assert found['exact']['state'] == 'unreliable_fingerprint'
             if text == data.KEPT_CRLF.replace('\r\n', '\n'):
@@ -557,6 +662,7 @@ def verify(pg_bin):
         from sqlfind_terminal import verify as verify_terminal
         verify_terminal(dsn + '_ro', directory, owner)
         assert contents(owner) == before
+        verify_cache(finder, owner)
         owner.close()
         v.init('check')
         print('RESULT: sqlfind database and entry acceptance passed', flush=True)

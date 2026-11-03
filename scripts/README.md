@@ -382,3 +382,19 @@ v1.1.0 的 `build_bundle.py` 要求复用固定摘要的 v1.0.0 成品，拒绝�
 [性能检查手册](../docs/runbooks/performance-check.md)。
 `verify_browser.py`、`verify_commands.py`、`verify_boundaries.py` 和 `audit.py` 仅供开发机私有环境验收，
 不进入生产工具包；原始浏览器、驱动语句及服务器日志必须保留在本地忽略目录。
+
+### 事件查询派生层验收（开发机）
+
+- `scripts/db/verify_query_records.py`：1.14.0 NULL 统计守卫、同事务派生维护、并发指纹／事件提交、含数据迁移与原列摘要。
+- `scripts/db/query_records_consistency.sql`：从权威原文、指纹和事件独立重算九类差分，不调用维护函数作为预期。
+- `scripts/db/verify_query_records_full.py`：显式指定私有 PG17 副本，保存检索、详情与排行输出、表摘要、首次及三次热查询和嵌套计划；原始结果只写本地忽略目录。
+  `--case-pattern` 限定输出或计时案例；`--plan-timing` 只在独立的计划采集阶段开启算子计时，常规四次查询不带该开销。
+  `supplement` 在同一副本用冻结 1.13.0 模糊函数补做配对计时，并测量真实 sqlfind 常见词详情和六个身份的 HTTP 精确匹配。
+  `fallback` 单列多原文的换行回退；`finder_timing` 分开记录初查、首次详情与缓存返回。
+  共享全量入口的 `rebuild_check --before 已完成构建日志` 可恢复结果核对，先验证输入／配置和分区归属，
+  再排除构建与月份分区标识比较完整业务结果，避免跨月重建误判。
+- `scripts/db/verify_sqlfind_full.py`：对同一全量副本执行真实终端流程，保留操作输出摘要与四轮耗时。
+- `scripts/db/verify_query_performance_full.py` 的配对导入、升级锁／空间观察、构建结果及清理检查可复用；
+  `--source-version` 声明升级前结构，`--fixture-prefix` 隔离后续验证夹具，`--skip-timing` 在另有独立计时阶段时只核对构建结果。
+
+这些入口仅供开发仓库验证，不属于生产工具包，也不连接未明确指定的数据库。

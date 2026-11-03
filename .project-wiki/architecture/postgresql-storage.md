@@ -7,8 +7,12 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - path: docs/reports/query-records-2026-11-03.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/72
@@ -62,7 +66,7 @@ confidence: high
 
 ## Summary
 
-当前开发结构版本 1.13.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.1.0 的结构仍为 1.12.0。
+当前开发结构版本 1.14.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.2.0 的结构为 1.13.0，v1.1.0 为 1.12.0。
 交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
 新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 与每日运行记录见下文各结构版本。
 
@@ -261,6 +265,28 @@ Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定�
 - 冻结 1.12.0 DDL，带数据迁移建立索引、回填汇总、安装触发器；先锁来源表以封闭回填与维护之间的空档。
   沿用 5 秒锁等待上限及单事务回滚，升级须在停止写入的维护窗口执行。既有表数据、构建结果与旧回执保留，结构检查覆盖新增对象及授权。
 - 全量开发数据和三构建形态用于验证；生产时延、额外空间和升级成本是 modeled，不能替代生产验收。
+
+### 事件查询派生结构 1.14.0（2026-11-02）
+
+来源：[Issue #73 设计确认](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798)，
+承接 [D2 设计](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579296749)，以确认评论的两项修订为准。
+本节描述开发实现；当前生产仍为 1.13.0，发布与生产验证不属于该任务。
+开发机证据与生产情景模型见[验证报告](../../docs/reports/query-records-2026-11-03.md)；
+固定基准持续占用、日增和迁移临时空间分别计量。
+
+- 为 scope、analysis、mpp_normalization 增加内部 bigint 键；新增原文字典、结构、完整身份、成员关系、
+  窄事件、两张精确汇总、事件 revision 和延迟刷新标记，共九张表。表总数为 74，外部标识与返回顺序不变。
+- 原文／指纹和事件的语句级 transition table 收集变更键，同一事务末尾只刷新一次。
+  原文元数据写入和最后事件刷新沿用同一全局元数据锁；事件入库不提前取得该锁，避免与独立 SqlWriter 事务互等。
+  只对受影响关联重建窄事实，增删贡献驱动汇总；触及删除边界时才重算最早／最晚时间。
+- 只有实际窄事件变化才增加 revision。纯原文／指纹批次若没有关联事件不增加它；为旧事件补指纹会增加它。
+  发布与清理不维护 revision，也不改动其原有工作流。
+- 冻结 1.13.0 字节，显式升级在停止写入时锁来源、集合回填、随后建事件索引及安装维护触发器。
+  没有旧投影时直接复用新事实临时表，不做差集和整表副本；已有投影的维护及 TRUNCATE 重建仍按差分维护，
+  依据 [R1 纳入决定](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6594646347)。
+  全部旧列、旧版本回执和统计结果保留；失败整体回滚。维护 UPDATE／DELETE 与回滚亦有一致性验证；
+  TRUNCATE 是停止并发写入后的维护操作，允许重建派生层。
+- 索引、短键映射与独立重算入口由[结构说明](../../docs/design/database-structure.md#1140-查询派生层)维护。
 
 ## Workflows
 

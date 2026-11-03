@@ -4,8 +4,12 @@ type: feature
 status: active
 owners:
   - .project-wiki/features/sql-search-and-views.md
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - path: docs/reports/query-records-2026-11-03.md
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573126465
@@ -103,7 +107,7 @@ confidence: high
   设置在本次会话换身份、计时、SQL 和新检索后保留，退出不落盘；默认窗口仍锚定当前身份最近执行。
   回车保留，`r` 恢复 20 条、默认 7 天和最新排序，`q`／Ctrl-C 取消；非法输入重试，查询成功后整体生效，取消或失败保留原设置。
 - 交互检索排序与原文下钻（2026-10-14 用户[确认扩展](https://github.com/shenxg13/sql-apm/issues/62#issuecomment-6162457097)）：
-  候选 `o` 在记录数最多／最近执行间选择，初始值为 `--order`；沿用输入、筛选重查全部候选，再取前 50 个并重编号。
+  候选 `o` 在记录数最多／最近执行间选择，初始值为 `--order`；首次按输入和筛选一次聚合独立生成两套全局前 50 个；切换时复用缓存并重编号。
   排序在本次会话保留；回车保留，q／Ctrl-C 取消，查询失败或取消保持旧列表和排序。
 - 按词／整段的默认原文范围为本次命中集合；完整 SQL 有一字不差的原文时选该份，否则及指纹直查看整个结构。
   此规则替代此前多份命中时默认查询整个结构的历史行为，一次输出采用相同默认值。
@@ -472,6 +476,27 @@ PostgreSQL 数据源插件。第一版不加展示类插件；随包看板只依
 - 生产日志止于 10 月 28 日，重点分析在 11 月 2 日执行；默认七天窗口不代表完整七天负载。
   本轮普通计时约 54 小时 41 分、含计划和重点分析合计约 60 小时 18 分；
   身份、窗口和旧包规模有差异，不据此计算同输入的版本退化或提速倍数。
+
+### 事件查询与会话缓存（2026-11-02）
+
+已确认范围来自 [#73 D2](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579296749)及
+[设计确认修订](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798)。以下为开发实现，尚未发布生产。
+等价性、计划、终端操作与生产情景模型见[验证报告](../../docs/reports/query-records-2026-11-03.md)。
+
+- 无时间筛选的检索、身份和计时读精确汇总；有时间筛选的聚合与明细读按身份或规则／集群／时间索引限定的窄事件。
+  显示列、计时边界、NULL 身份、原文编号、全局排序及训练判定保持原契约。
+  `mpp_query_occurrences` 经 PL/pgSQL 集合函数物化内部结果，外层筛选和 LIMIT 不下推；
+  直接消费时须通过指纹、集群、数据库／用户和时间参数缩小内部范围，见[查询设计](../../docs/design/sql-search.md#查询计划与累积规模)。
+- 统计查询先在 PL/pgSQL 内检查 group_id 非 NULL，才调用共享统计读取；共享函数 NULL 组表示读全部组的接口保留。
+  原文命中判断在排序截取之前集合计算；完整基线排行对返回页身份去重后补全最后执行时间，详情头部复用身份及结构元数据。
+- sqlfind 首次检索在一个短只读可重复读事务内完成归一化、提示、候选和 current_version 快照。
+  两套候选前 50 均从同一次全量聚合独立排名得到；切换候选排序只切换缓存。
+- 同次检索固定当前基线版本；发布后重新检索才选新版本，沿用已清理结果的现有读取守卫。
+  未缓存操作在同一个短只读可重复读事务中先检查事件 revision，一致才执行新查询；变化时要求重新检索。
+  `--show` 单次执行不比较 revision；纯缓存操作不发 SQL，不维持空闲连接或事务。
+- 执行页、原文内容／差异及聚合结果的 LRU 按序列化字节限制在 32 MiB；目录编号单独冻结。
+  取消或失败不发布本次新缓存。换条数／排序只查询执行页，换原文复用同窗口计数与基线统计。
+  存储维护契约见[存储主题](../architecture/postgresql-storage.md#事件查询派生结构-11402026-11-02)。
 
 ## Workflows
 

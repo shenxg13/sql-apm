@@ -346,6 +346,9 @@ def import_check(args):
             ORDER BY e.record_id,(to_jsonb(p)-'problem_id')::text""",
     }
     for stage, app in stages:
+        query_storage=[]
+        query_records=None
+        query_revision=None
         with instance(args.pg_bin, configuration="shared_buffers='512MB'\nwork_mem='16MB'\nmaintenance_work_mem='128MB'\n") as (directory, env):
             v=Verification(args.pg_bin,directory,env); v.init(root=app)
             env.update(PYTHONPATH=str(app),SQL_APM_DSN=f'host={directory}/socket port=55473 dbname=sql_apm user=sql_apm')
@@ -362,7 +365,7 @@ def import_check(args):
                     cur.execute("SET search_path=sql_apm,pg_catalog; SET TIME ZONE 'Asia/Shanghai'; ANALYZE")
                 for table in ('analysis','analysis_file','evidence_record','mpp_occurrence_evidence','source',
                               'scope','source_file','mpp_normalization','mpp_approximate_rule'):
-                    outputs[table]=digest(db,table)
+                    outputs[table]=digest(db,table,('query_key',) if table in ('analysis','scope','mpp_normalization') else ())
                 for label,statement in queries.items():
                     outputs[label]=stream_digest(db,statement)
                 if stage=='after':
@@ -370,12 +373,57 @@ def import_check(args):
                         assert fetch(db,'SELECT DISTINCT name FROM mpp_occurrence_name WHERE kind=%s AND item_count>0 ORDER BY name',(kind,)) == \
                             fetch(db,'SELECT DISTINCT '+column+' FROM mpp_occurrence WHERE '+column+' IS NOT NULL ORDER BY 1')
                     assert fetch(db,'SELECT mpp_query_missing_rules(normalization_id) FROM mpp_normalization') == [(0,)]
-            report[stage]=dict(seconds=seconds,results=outputs)
+                    if fetch(db,"SELECT to_regclass('mpp_query_record')")[0][0]:
+                        from verify_query_records import reconcile
+                        reconcile(db)
+                        query_storage=fetch(db,"SELECT c.relname,pg_table_size(c.oid),pg_indexes_size(c.oid),pg_total_relation_size(c.oid) FROM pg_class c WHERE c.relnamespace='sql_apm'::regnamespace AND c.relkind='r' AND c.relname LIKE 'mpp\\_query\\_%' ORDER BY c.relname")
+                        query_records=fetch(db,'SELECT count(*) FROM mpp_query_record')[0][0]
+                        query_revision=fetch(db,'SELECT revision FROM mpp_query_state')[0][0]
+            report[stage]=dict(seconds=seconds,results=outputs,query_storage=query_storage,
+                               query_records=query_records,query_revision=query_revision)
             save(target/(stage+'.json'),report[stage])
             print(json.dumps(dict(stage=stage,import_seconds=seconds,rows=outputs['events']['rows'])),flush=True)
     assert report['before']['results']==report['after']['results'], 'same_input_import_changed'
     save(target/'comparison.json',dict(equal=True,before_seconds=report['before']['seconds'],after_seconds=report['after']['seconds']))
     print('PASS: real same-input import results identical, name options automatic and missing count zero',flush=True)
+
+
+def compare_build_results(db, prior, build):
+    # New builds have new identities and may belong to another build month.
+    # Verify input/configuration content independently before normalizing those
+    # two storage identities in every complete result row.
+    contexts=fetch(db,"""SELECT b.build_id,b.partition_id,m.manifest,to_jsonb(c)-'config_id'
+        FROM build b JOIN input_manifest m USING(input_id)
+        JOIN config_snapshot c USING(config_id) WHERE b.build_id IN (%s,%s)""",(prior,build))
+    by_id={r[0]:r for r in contexts}
+    assert by_id[prior][2:]==by_id[build][2:], 'rebuild input/configuration changed'
+    compared={}
+    for table in ('mpp_statistic','mpp_observation_statistic','mpp_build_group','mpp_build_observation_group',
+                  'mpp_build_layer_count','mpp_build_timing_coverage'):
+        for selected in (prior,build):
+            if table not in ('mpp_build_layer_count','mpp_build_timing_coverage'):
+                assert not fetch(db,'SELECT FROM '+table+' WHERE build_id=%s AND partition_id<>%s LIMIT 1',
+                                 (selected,by_id[selected][1])), table
+        old=digest(db,table,('build_id','partition_id'),'WHERE build_id=%s',(prior,))
+        new=digest(db,table,('build_id','partition_id'),'WHERE build_id=%s',(build,))
+        assert old==new, table
+        compared[table]=new
+        print(json.dumps(dict(equal=True,table=table,rows=new['rows'])),flush=True)
+    return dict(equal_results=compared,result_omitted_columns=['build_id','partition_id'],
+                input_configuration_equal=True,partitions={key:value[1] for key,value in by_id.items()})
+
+
+def rebuild_check(args):
+    """Resume result verification of a completed build without rebuilding it."""
+    product=json.loads(args.before.read_text().splitlines()[-1])
+    assert product['state']=='succeeded' and product['publication']['result']=='published'
+    build=product['build']['build_id'];prior=product['publication']['previous_build_id']
+    report=dict(build=build,prior=prior,stage_seconds=product['stage_seconds'],
+                seconds=sum(product['stage_seconds'].values()),seconds_basis='sum_reported_stages')
+    with closing(connect(args)) as db:
+        report.update(compare_build_results(db,prior,build))
+        report['query_revision_at_check']=fetch(db,'SELECT revision FROM mpp_query_state')[0][0]
+    save(args.directory/(args.stage+'.json'),report)
 
 
 def rebuild(args):
@@ -385,6 +433,7 @@ def rebuild(args):
     with closing(connect(args)) as db:
         prior=fetch(db,"SELECT build_id FROM current_version WHERE scope_id='120'")[0][0]
         before=fetch(db,'SELECT pg_database_size(current_database())')[0][0]
+        revision=fetch(db,'SELECT revision FROM mpp_query_state')[0][0] if fetch(db,"SELECT to_regclass('mpp_query_state')")[0][0] else None
     tick=time.monotonic()
     log=args.directory/(args.stage+'.log')
     with log.open('x') as stream:
@@ -397,22 +446,18 @@ def rebuild(args):
     product=json.loads(log.read_text().splitlines()[-1]); build=product['build']['build_id']
     assert product['state']=='succeeded' and product['publication']['result']=='published'
     report=dict(seconds=seconds,stage_seconds=product['stage_seconds'],build=build,prior=prior,database_bytes_before=before)
-    if args.compare_current:
+    if args.compare_current and not args.skip_timing:
         # Measure immediately after publication, before the long result digests
         # can give autovacuum additional time to mark the new heap pages visible.
         timing(args)
     with closing(connect(args)) as db:
         report['database_bytes_after']=fetch(db,'SELECT pg_database_size(current_database())')[0][0]
+        if revision is not None:
+            report['query_revision_before']=revision
+            report['query_revision_after']=fetch(db,'SELECT revision FROM mpp_query_state')[0][0]
+            assert report['query_revision_after']==revision, 'rebuild/publication unexpectedly changed event revision'
         if args.compare_current:
-            compared={}
-            for table in ('mpp_statistic','mpp_observation_statistic','mpp_build_group','mpp_build_observation_group',
-                          'mpp_build_layer_count','mpp_build_timing_coverage'):
-                old=digest(db,table,('build_id',),'WHERE build_id=%s',(prior,))
-                new=digest(db,table,('build_id',),'WHERE build_id=%s',(build,))
-                assert old==new, table
-                compared[table]=new
-                print(json.dumps(dict(equal=True,table=table,rows=new['rows'])),flush=True)
-            report['equal_results']=compared
+            report.update(compare_build_results(db,prior,build))
     save(args.directory/(args.stage+'.json'),report)
     print(json.dumps(dict(stage=args.stage,seconds=seconds,stage_seconds=product['stage_seconds'])),flush=True)
 
@@ -421,19 +466,23 @@ def continue_import(args):
     """Import a new synthetic day into the upgraded full database, in its own scope."""
     from ingestion.test_reader import row, write_csv
     out=args.directory/(args.stage+'-input');out.mkdir(mode=0o700)
-    scope='issue72-upgrade';source='issue72-next-day';batch='issue72-next-day'
+    prefix=args.fixture_prefix
+    scope=prefix+'-upgrade';source=prefix+'-next-day';batch=prefix+'-next-day'
     with closing(connect(args)) as db:
         assert fetch(db,"SELECT version FROM schema_version WHERE version='1.13.0'")==[('1.13.0',)]
         assert not fetch(db,'SELECT FROM scope WHERE scope_id=%s',(scope,))
         versions=fetch(db,'SELECT * FROM current_version ORDER BY scope_id')
-        for kind,name in [('database','issue72_new_database'),('user','issue72_new_user')]:
+        revision=fetch(db,'SELECT revision FROM mpp_query_state')[0][0] if fetch(db,"SELECT to_regclass('mpp_query_state')")[0][0] else None
+        size_query="SELECT c.relname,pg_total_relation_size(c.oid) FROM pg_class c WHERE c.relnamespace='sql_apm'::regnamespace AND c.relkind='r' AND c.relname LIKE 'mpp\\_query\\_%' ORDER BY c.relname"
+        storage_before=fetch(db,size_query) if revision is not None else []
+        for kind,name in [('database',prefix+'_new_database'),('user',prefix+'_new_user')]:
             assert not fetch(db,'SELECT FROM mpp_occurrence_name WHERE kind=%s AND name=%s',(kind,name))
     incoming=out/'new-day.csv'
-    write_csv(incoming,[row(text='SELECT id FROM issue72_new_input WHERE id=72',message='duration: 72 ms',
-        **{'0':'2026-09-20 12:00:00 CST','1':'issue72_new_user','2':'issue72_new_database'}) for _ in range(10000)])
+    write_csv(incoming,[row(text='SELECT id FROM '+prefix.replace('-','_')+'_new_input WHERE id=72',message='duration: 72 ms',
+        **{'0':'2026-09-20 12:00:00 CST','1':prefix+'_new_user','2':prefix+'_new_database'}) for _ in range(10000)])
     config=out/'import.json'
     save(config,dict(version=1,clusters=[scope],sources={source:dict(cluster=scope,build='HashData Warehouse 3.13.13',
-        timezone='UTC+08:00',declaration='Issue72 synthetic post-upgrade day')},batches={batch:dict(source=source,
+        timezone='UTC+08:00',declaration=prefix+' synthetic post-upgrade day')},batches={batch:dict(source=source,
         dates=['2026-09-20'],files_confirmed_complete=True,files=[dict(path=str(incoming.resolve()),closed_and_copied=True)])}))
     env={**os.environ,'PYTHONPATH':str(ROOT),
          'SQL_APM_DSN':f'host={args.directory.resolve()}/socket port={args.port} dbname=sql_apm user=sql_apm'}
@@ -445,24 +494,34 @@ def continue_import(args):
     with closing(connect(args)) as db:
         assert fetch(db,'SELECT count(*) FROM mpp_occurrence WHERE scope_id=%s',(scope,))==[(10000,)]
         assert fetch(db,'SELECT * FROM current_version ORDER BY scope_id')==versions
-        for kind,column,name in [('database','database','issue72_new_database'),('user','execution_user','issue72_new_user')]:
+        for kind,column,name in [('database','database',prefix+'_new_database'),('user','execution_user',prefix+'_new_user')]:
             actual=fetch(db,'SELECT DISTINCT name FROM mpp_occurrence_name WHERE kind=%s AND item_count>0 ORDER BY name',(kind,))
             assert (name,) in actual
             assert actual==fetch(db,'SELECT DISTINCT '+column+' FROM mpp_occurrence WHERE '+column+' IS NOT NULL ORDER BY 1')
         norm=context(args,db)['norm']
         assert fetch(db,'SELECT mpp_query_missing_rules(%s)',(norm,))==[(0,)]
+        if revision is not None:
+            from verify_query_records import reconcile
+            revision_after=fetch(db,'SELECT revision FROM mpp_query_state')[0][0]
+            assert revision_after>revision, 'committed events did not advance revision'
+            reconcile(db)
+            storage_after=fetch(db,size_query)
     report=dict(seconds=seconds,events=10000,new_names_automatic=True,current_versions_preserved=True)
+    if revision is not None:
+        report.update(query_revision_before=revision,query_revision_after=revision_after,
+                      query_storage_before=storage_before,query_storage_after=storage_after)
     save(args.directory/(args.stage+'.json'),report);print(json.dumps(report),flush=True)
 
 
 def upgrade(args):
-    """Measure only the explicit private 1.12 -> 1.13 upgrade and its locks."""
+    """Measure an explicit private upgrade from the declared frozen version."""
     directory=args.directory.resolve()
     with closing(connect(args,admin=True)) as db:
-        assert fetch(db,"SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1")==[('1.12.0',)]
+        assert fetch(db,"SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1")==[(args.source_version,)]
         before,lsn=fetch(db,'SELECT pg_database_size(current_database()),pg_current_wal_lsn()')[0]
         temp_before=fetch(db,'SELECT temp_bytes FROM pg_stat_database WHERE datname=current_database()')[0][0]
-    stop=threading.Event(); observed={}; errors=[]; tick=time.monotonic()
+        database_oid=fetch(db,'SELECT oid FROM pg_database WHERE datname=current_database()')[0][0]
+    stop=threading.Event(); observed={}; errors=[]; peaks=dict(temporary=0,temporary_all=0,wal=0); tick=time.monotonic()
     def sample():
         try:
             with closing(connect(args,admin=True)) as db:
@@ -474,6 +533,17 @@ def upgrade(args):
                     for relation,mode,granted in locks:
                         key=(relation,mode,granted); now=time.monotonic()-tick
                         observed.setdefault(key,[now,now])[1]=now
+                    temporary,wal=fetch(db,"SELECT (SELECT coalesce(sum(size),0) FROM pg_ls_tmpdir()),(SELECT coalesce(sum(size),0) FROM pg_ls_waldir())")[0]
+                    peaks['temporary']=max(peaks['temporary'],int(temporary))
+                    peaks['wal']=max(peaks['wal'],int(wal))
+                    # pg_ls_tmpdir excludes temporary relations, which are real
+                    # migration workspace too. This tool only accepts a local
+                    # private cluster, so count its temporary relation files.
+                    relation_bytes=0
+                    for path in (directory/'pgdata/base'/str(database_oid)).glob('t*'):
+                        try:relation_bytes+=path.stat().st_size
+                        except FileNotFoundError:pass
+                    peaks['temporary_all']=max(peaks['temporary_all'],int(temporary)+relation_bytes)
                     stop.wait(.2)
         except Exception as error:
             errors.append(type(error).__name__)
@@ -486,6 +556,8 @@ def upgrade(args):
     finally:
         stop.set();monitor.join()
     report=dict(seconds=seconds,returncode=done.returncode,database_bytes_before=before,sampling_errors=errors,
+                temporary_peak_bytes_observed=peaks['temporary'],wal_peak_bytes_observed=peaks['wal'],
+                temporary_relations_and_sort_peak_bytes_observed=peaks['temporary_all'],
                 locks=[dict(relation=k[0],mode=k[1],granted=k[2],first_seconds=v[0],last_seconds=v[1]) for k,v in sorted(observed.items())])
     with closing(connect(args,admin=True)) as db:
         report['database_bytes_after'],report['wal_bytes']=fetch(db,
@@ -505,16 +577,18 @@ def cleanup(args):
     """Expire a full-size historical fixture, preserving actual current results."""
     from sql_apm.storage.cleanup import CleanupStore
     expected=json.loads(args.before.read_text())
-    source=expected['build']; old='issue72-cleanup-fixture'
+    source=expected['build']; old=args.fixture_prefix+'-cleanup-fixture'
     with closing(connect(args)) as db:
         versions=fetch(db,'SELECT * FROM current_version ORDER BY scope_id')
+        revision=fetch(db,'SELECT revision FROM mpp_query_state')[0][0] if fetch(db,"SELECT to_regclass('mpp_query_state')")[0][0] else None
         assert fetch(db,"SELECT build_id FROM current_version WHERE scope_id='120'")==[(source,)]
         assert not fetch(db,'SELECT FROM build WHERE build_id=%s',(old,))
         tick=time.monotonic()
         with db,db.cursor() as cur:
-            cur.execute("SELECT mpp_ensure_result_partition('120','2026-01-01'::date)");pid=cur.fetchone()[0]
-            patch=dict(build_id=old,partition_id=pid,started_at='2026-01-01T00:00:00+08:00',
-                       finished_at='2026-01-01T00:00:01+08:00',results_saved=True,state='calculated',retry_of=None)
+            month=args.fixture_month
+            cur.execute("SELECT mpp_ensure_result_partition('120',%s::date)",(month,));pid=cur.fetchone()[0]
+            patch=dict(build_id=old,partition_id=pid,started_at=month+'T00:00:00+08:00',
+                       finished_at=month+'T00:00:01+08:00',results_saved=True,state='calculated',retry_of=None)
             cur.execute('INSERT INTO build SELECT (jsonb_populate_record(NULL::build,to_jsonb(b)||%s::jsonb)).* FROM build b WHERE build_id=%s',
                         (Json(patch),source))
             # Copy full rows directly; JSON round trips for millions of rows
@@ -529,12 +603,12 @@ def cleanup(args):
                 cur.execute(sql.SQL('INSERT INTO {} ({}) SELECT {} FROM {} src WHERE src.build_id=%s').format(
                     sql.Identifier(table),sql.SQL(',').join(map(sql.Identifier,columns)),
                     sql.SQL(',').join(expressions),sql.Identifier(table)),values)
-            cur.execute("INSERT INTO publication VALUES (%s,'120',%s,%s,'published',NULL,'2026-01-01T00:00:02+08:00')",
-                        ('PUB:'+old,old,source))
+            cur.execute("INSERT INTO publication VALUES (%s,'120',%s,%s,'published',NULL,%s::timestamptz)",
+                        ('PUB:'+old,old,source,month+'T00:00:02+08:00'))
         fixture_seconds=time.monotonic()-tick
         version=fetch(db,"SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1")[0][0]
         indexes=[]
-        if version=='1.13.0':
+        if version in ('1.13.0','1.14.0'):
             indexes=fetch(db,"""SELECT i.indexrelid,pg_relation_size(i.indexrelid) FROM pg_partition_tree('mpp_statistic_ranking_idx') t
                 JOIN pg_index i ON i.indexrelid=t.relid WHERE i.indrelid=to_regclass('mpp_statistic_p'||%s::text)""",(pid,))
             assert len(indexes)==1 and indexes[0][1]>0
@@ -548,13 +622,20 @@ def cleanup(args):
         assert fetch(db,'SELECT * FROM current_version ORDER BY scope_id')==versions
         if indexes:
             assert not fetch(db,'SELECT FROM pg_class WHERE oid=%s',(indexes[0][0],))
+        if 'partitions' in expected:
+            assert fetch(db,'SELECT partition_id FROM build WHERE build_id=%s',(source,))==[(expected['partitions'][source],)]
         for table,reference in expected['equal_results'].items():
-            assert digest(db,table,('build_id',),'WHERE build_id=%s',(source,))==reference,table
+            assert digest(db,table,expected.get('result_omitted_columns',('build_id',)),
+                          'WHERE build_id=%s',(source,))==reference,table
         for table in ('mpp_statistic','mpp_observation_statistic','mpp_build_group','mpp_build_observation_group'):
             assert fetch(db,'SELECT count(*) FROM '+table+' WHERE partition_id=%s',(pid,))==[(0,)]
+        if revision is not None:
+            assert fetch(db,'SELECT revision FROM mpp_query_state')==[(revision,)], 'cleanup unexpectedly changed event revision'
     report=dict(version=version,seconds=seconds,fixture_seconds=fixture_seconds,ranking_index_bytes=indexes[0][1] if indexes else 0,
                 released_bytes=month['released_bytes'],formal_groups_deleted=month['formal_groups_deleted'],
                 observation_groups_deleted=month['observation_groups_deleted'],current_results_equal=True)
+    if revision is not None:
+        report['query_revision_unchanged']=revision
     save(args.directory/(args.stage+'.json'),report);print(json.dumps(report),flush=True)
 
 
@@ -590,7 +671,7 @@ def compare(args):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('prepare', 'rows', 'timing', 'snapshot', 'compare', 'cli', 'import_check', 'continue_import', 'rebuild', 'upgrade', 'cleanup'))
+    parser.add_argument('mode', choices=('prepare', 'rows', 'timing', 'snapshot', 'compare', 'cli', 'import_check', 'continue_import', 'rebuild', 'rebuild_check', 'upgrade', 'cleanup'))
     parser.add_argument('--directory', type=Path)
     parser.add_argument('--port', type=int, default=55472)
     parser.add_argument('--stage')
@@ -603,6 +684,10 @@ def main():
     parser.add_argument('--batch')
     parser.add_argument('--training-config', type=Path)
     parser.add_argument('--compare-current', action='store_true')
+    parser.add_argument('--skip-timing', action='store_true', help='collect result equality without another performance run')
+    parser.add_argument('--source-version', default='1.12.0')
+    parser.add_argument('--fixture-prefix', default='issue72')
+    parser.add_argument('--fixture-month', default='2026-01-01')
     args = parser.parse_args()
     if args.mode == 'compare':
         if args.before is None or args.after is None: parser.error('--before and --after are required')
@@ -618,6 +703,8 @@ def main():
         parser.error('--training-config is required')
     if args.mode=='cleanup' and args.before is None:
         parser.error('--before must name the successful rebuild --compare-current result')
+    if args.mode=='rebuild_check' and args.before is None:
+        parser.error('--before must name a completed rebuild product log')
     globals()[args.mode](args)
 
 

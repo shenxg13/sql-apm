@@ -1,10 +1,13 @@
 """Read-only adapter for the same query functions used by the search dashboards."""
 import base64
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
+from collections import OrderedDict
+from copy import deepcopy
+import pickle
 from datetime import timedelta
 import json
 
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, Json
 
 from sql_apm.service.fingerprint import Service
 from sql_apm.storage.ingestion import connect
@@ -14,6 +17,69 @@ def rows(cur, function, values):
     # Function names are internal constants, never supplied by the operator.
     cur.execute('SELECT * FROM ' + function + '(' + ','.join(['%s'] * len(values)) + ')', values)
     return [dict(row) for row in cur.fetchall()]
+
+
+class QueryCache:
+    """Bounded, serialized query results; frozen text catalogs are held separately."""
+    def __init__(self, budget=32 * 1024 * 1024):
+        self.budget, self.size = budget, 0
+        self.items = OrderedDict()
+
+    def get(self, key):
+        value = self.items.get(key)
+        if value is None:
+            return None
+        self.items.move_to_end(key)
+        return pickle.loads(value)
+
+    def put(self, key, rows):
+        value = pickle.dumps(rows)
+        cost = len(key) + len(value)
+        if cost > self.budget:
+            return
+        if key in self.items:
+            self.size -= len(key) + len(self.items.pop(key))
+        while self.size + cost > self.budget:
+            old_key, old_value = self.items.popitem(last=False)
+            self.size -= len(old_key) + len(old_value)
+        self.items[key] = value
+        self.size += cost
+
+
+class CachedCursor:
+    """Open one snapshot only on a miss, check revision before any business SQL."""
+    def __init__(self, finder, found, stack):
+        self.finder, self.found, self.stack = finder, found, stack
+        self.pending, self.cur, self.result = {}, None, []
+
+    def execute(self, sql, values=()):
+        key = pickle.dumps((sql, tuple(v.adapted if isinstance(v, Json) else v for v in values)))
+        result = self.pending.get(key)
+        if result is None:
+            result = self.found['cache'].get(key)
+        if result is None:
+            if self.cur is None:
+                self.cur = self.stack.enter_context(self.finder.cursor())
+                if self.found['check_revision']:
+                    self.cur.execute('SELECT revision FROM mpp_query_state')
+                    if self.cur.fetchone()['revision'] != self.found['revision']:
+                        raise ValueError('records_changed')
+            self.cur.execute(sql, values)
+            result = [dict(row) for row in self.cur.fetchall()]
+            self.pending[key] = result
+        # Callers annotate rows. Never mutate either the staged or shared cache.
+        self.result = deepcopy(result)
+
+    def fetchall(self):
+        result, self.result = self.result, []
+        return result
+
+    def fetchone(self):
+        return self.result.pop(0) if self.result else None
+
+    def commit(self):
+        for key, result in self.pending.items():
+            self.found['cache'].put(key, result)
 
 
 class Finder:
@@ -32,20 +98,64 @@ class Finder:
         finally:
             db.close()
 
+    @contextmanager
+    def cached_cursor(self, found):
+        # ExitStack closes/commits the short transaction before publishing cache
+        # entries. Cancellation or any query/commit failure discards all new data.
+        with ExitStack() as stack:
+            cur = CachedCursor(self, found, stack)
+            yield cur
+        cur.commit()
+
     def search(self, raw, args):
         filters = [args.cluster, args.database, args.user]
-        exact = self.service.exact(raw, filters) if args.mode == 'exact' else {}
         text = raw.decode('utf-8')
-        fp, sid = exact.get('fingerprint'), exact.get('exact_sql_id')
         with self.cursor() as cur:
+            cur.execute('SELECT revision FROM mpp_query_state')
+            revision = cur.fetchone()['revision']
+            # The service uses this same snapshot; its tuple cursor is local to
+            # the shared connection, not a second connection or transaction.
+            with cur.connection.cursor() as exact_cursor:
+                exact = self.service.exact(raw, filters, cursor=exact_cursor) if args.mode == 'exact' else {}
+            fp, sid = exact.get('fingerprint'), exact.get('exact_sql_id')
             notes = rows(cur, 'mpp_view_search_note', [self.norm, args.mode, text, fp,
                 exact.get('state'), exact.get('reason'), sid] + filters)
-            candidates = self.candidates(cur, args.mode, fp if args.mode == 'exact' else text, args, sid)
+            orders = self.candidate_orders(cur, args.mode, fp if args.mode == 'exact' else text, args, sid)
             hints = []
             if exact.get('statement_hints'):
                 token = base64.urlsafe_b64encode(json.dumps(exact['statement_hints']).encode()).decode().rstrip('=')
                 hints = rows(cur, 'mpp_view_hints', [self.norm, token] + filters)
-        return dict(notes=notes, candidates=candidates, hints=hints, exact=exact, input=text, catalogs={})
+            cur.execute("""SELECT c.scope_id,v.* FROM current_version c CROSS JOIN LATERAL
+                mpp_view_versions(%s,mpp_view_identity_token(c.scope_id,NULL,NULL)) v WHERE v.is_current""", (self.norm,))
+            versions = {r['scope_id']: dict(r) for r in cur.fetchall()}
+        return dict(notes=notes, candidates=orders[args.order], orders=orders, hints=hints, exact=exact,
+                    input=text, catalogs={}, cache=QueryCache(), revision=revision,
+                    pinned_versions=versions, check_revision=not bool(getattr(args, 'show', None)))
+
+    def reorder(self, found, order):
+        return dict(found, candidates=found['orders'][order])
+
+    def candidate_orders(self, cur, mode, text, args, sid):
+        from sql_apm.cli.search import fingerprint_input
+        if mode == 'exact' or fingerprint_input(text or ''):
+            candidates = self.candidates(cur, mode, text, args, sid)
+            return dict(count=candidates, recent=candidates)
+        if not text or any(n['item']=='没有检索' for n in rows(cur,'mpp_view_search_note',
+                [self.norm,mode,text]+[None]*7)):
+            return dict(count=[],recent=[])
+        cur.execute("""SELECT f.fingerprint,f.example_sql_id,f.matched_texts,f.structure_texts,
+            f.record_count,f.identities,f.scopes,f.databases,f.execution_users,f.last_at,f.total_structures,
+            mpp_view_identity_token(f.top_scope,f.top_database,f.top_user) top_identity,
+            f.top_scope||' / '||coalesce(f.top_database,'（无数据库）')||' / '||coalesce(f.top_user,'（无用户）') top_label,
+            f.top_records,f.top_last_at,CASE WHEN f.matched_texts=1 THEN f.example_sql_id END only_sql_id,
+            t.sql_text example,f.count_rank,f.recent_rank
+            FROM mpp_query_fuzzy_candidates(%s,%s,%s,%s,%s,%s,%s,%s,%s) f
+            LEFT JOIN LATERAL mpp_query_text(f.example_sql_id) t ON true""",
+            [self.norm,text,args.cluster,args.database,args.user,args.start,args.end,args.order,mode])
+        candidates = [dict(row) for row in cur.fetchall()]
+        return {order: [{k:v for k,v in row.items() if k not in ('count_rank','recent_rank')}
+                        for row in sorted(candidates,key=lambda r:r[order+'_rank']) if row[order+'_rank']<=50]
+                for order in ('count','recent')}
 
     def candidates(self, cur, mode, text, args, sid=None):
         values = [self.norm, mode, text, args.cluster, args.database, args.user,
@@ -65,54 +175,38 @@ class Finder:
             function = 'mpp_search_terms' if args.mode == 'words' else 'mpp_search_passage'
             cur.execute('SELECT ' + function + '(%s) AS terms', (found['input'],))
             terms = cur.fetchone()['terms']
-        cur.execute('''SELECT f.sql_id,left(t.text,180) AS example,length(t.text) AS chars,
+        cur.execute('''SELECT k.sql_id,left(t.text,180) AS example,length(t.text) AS chars,
             (%s::text[] IS NULL OR (NOT EXISTS
                 (SELECT FROM unnest(%s::text[]) term WHERE strpos(t.search_text,term)=0)
-                AND EXISTS (SELECT FROM mpp_occurrence o WHERE o.sql_id=f.sql_id
-                    AND (%s::text IS NULL OR o.scope_id=%s)
-                    AND (%s::text IS NULL OR o.database=%s)
-                    AND (%s::text IS NULL OR o.execution_user=%s)
-                    AND (%s::timestamptz IS NULL OR o.end_at>=%s)
-                    AND (%s::timestamptz IS NULL OR o.end_at<%s)))) AS matched
-            FROM mpp_fingerprint f JOIN mpp_sql_text t USING(sql_id)
-            WHERE f.normalization_id=%s AND f.profile='mpp-csv/1'
-                AND f.state='reliable' AND f.value=%s ORDER BY f.sql_id''',
-            (terms, terms, args.cluster, args.cluster, args.database, args.database, args.user, args.user,
-             args.start, args.start, args.end, args.end, self.norm, fp))
+                AND EXISTS (SELECT FROM mpp_query_text_total total JOIN mpp_query_identity i USING(identity_key)
+                    JOIN scope c ON c.query_key=i.scope_key
+                    WHERE total.rule_key=m.rule_key AND total.sql_key=m.sql_key
+                        AND (%s::text IS NULL OR c.scope_id=%s)
+                        AND (%s::text IS NULL OR i.database=%s)
+                        AND (%s::text IS NULL OR i.execution_user=%s)
+                        AND ((%s::timestamptz IS NULL AND %s::timestamptz IS NULL) OR EXISTS (
+                            SELECT FROM mpp_query_record r WHERE r.rule_key=m.rule_key AND r.sql_key=m.sql_key
+                                AND r.identity_key=i.identity_key AND (%s::timestamptz IS NULL OR r.end_at>=%s)
+                                AND (%s::timestamptz IS NULL OR r.end_at<%s)))))) AS matched
+            FROM mpp_query_structure s JOIN mpp_normalization n ON n.query_key=s.rule_key
+            JOIN mpp_query_membership m USING(structure_key) JOIN mpp_query_text_key k USING(sql_key)
+            JOIN mpp_sql_text t USING(sql_id)
+            WHERE n.normalization_id=%s AND s.profile='mpp-csv/1' AND s.fingerprint_value=%s ORDER BY k.sql_id''',
+            (terms,terms,args.cluster,args.cluster,args.database,args.database,args.user,args.user,
+             args.start,args.end,args.start,args.start,args.end,args.end,self.norm,fp))
         return [dict(row, number=n) for n, row in enumerate(cur.fetchall(), 1)]
 
-    def executions(self, cur, fp, token, timing, build, start, end, ids, order, limit):
-        common = [self.norm, fp, token, timing, build, start, end]
-        if ids is None or len(ids) == 1:
-            return rows(cur, 'mpp_view_executions', common +
-                        [ids[0] if ids else None, None, None, None, order, limit])
-        # The global page is selected before enrichment. Each text's rows in that
-        # page form a prefix of its own ordered executions, so ask the existing
-        # function only for that prefix, preserving its comparison/training rules.
-        cur.execute('''WITH page AS MATERIALIZED (
-                SELECT r.*,count(*) OVER () AS matching
-                FROM mpp_view_records(%s,%s,%s,%s,%s,%s) r WHERE r.sql_id=ANY(%s::text[])
-                ORDER BY CASE WHEN %s='slowest' THEN r.duration_ms END DESC NULLS LAST,
-                    r.end_at DESC,r.analysis_id DESC,r.occurrence_id DESC LIMIT %s
-            ), needed AS (SELECT sql_id,count(*)::integer n FROM page GROUP BY sql_id)
-            SELECT e.*,p.matching AS scope_matching FROM needed n
-            CROSS JOIN LATERAL mpp_view_executions(%s,%s,%s,%s,%s,%s,%s,
-                n.sql_id,NULL,NULL,NULL,%s,n.n) e
-            JOIN page p ON p.analysis_id=e.analysis_id AND p.occurrence_id=e.occurrence_id
-            ORDER BY CASE WHEN %s='slowest' THEN e.duration_ms END DESC NULLS LAST,
-                e.end_at DESC,e.analysis_id DESC,e.occurrence_id DESC''',
-            [self.norm, fp, token, timing, start, end, ids, order, limit] + common + [order, order])
-        result = [dict(row) for row in cur.fetchall()]
-        for row in result:
-            row['matching'] = row.pop('scope_matching')
-        return result
+    def executions(self, cur, fp, token, timing, build, start, end, ids, order, limit, statistics):
+        reference = next((s for s in statistics if s['timing_type']==timing and s['sample_state']=='available'), {})
+        return rows(cur, 'mpp_view_execution_subset', [self.norm,fp,token,timing,build,start,end,
+            ids,None,None,None,order,limit,Json(reference,dumps=lambda value:json.dumps(value,default=str))])
 
     def originals(self, detail):
         """Compare full texts only when opening the catalog, including zero-count rows."""
         ids = [r['sql_id'] for r in detail['originals'] if r['in_scope']]
         if not ids:
             return detail
-        with self.cursor() as cur:
+        with self.cached_cursor(detail['_found']) as cur:
             # Reuse the dashboard's common-prefix primitive and overlap rule.
             # Work on the entire text in PostgreSQL; return only bounded snippets.
             cur.execute('''WITH texts AS MATERIALIZED (
@@ -138,7 +232,7 @@ class Finder:
                order='latest', original=None):
         if order not in ('latest', 'slowest') or not 1 <= limit <= 1000:
             raise ValueError('invalid_history_settings')
-        with self.cursor() as cur:
+        with self.cached_cursor(found) as cur:
             if mark.startswith('s'):
                 hint = next((h for h in found['hints'] if 's' + str(h['statement']) == mark), None)
                 if hint is None:
@@ -193,8 +287,9 @@ class Finder:
             timing = timing or timings[0]['timing']
             if timing not in [t['timing'] for t in timings]:
                 raise ValueError('invalid_timing')
-            versions = rows(cur, 'mpp_view_versions', [self.norm, token])
-            version = next((v for v in versions if v['is_current']), None)
+            version = found['pinned_versions'].get(selected['scope_id'])
+            if version:
+                version = {k:v for k,v in version.items() if k!='scope_id'}
             build = version['build_id'] if version and version['selectable'] else None
             statistics = rows(cur, 'mpp_view_statistics', [self.norm, fp, token, build, 'overall'])
             # On entry, the dashboard link anchors the window to the matched identity's
@@ -203,10 +298,10 @@ class Finder:
             start, end = window if window is not None else (last - timedelta(days=7), last + timedelta(milliseconds=1))
             scope_ids = {r['sql_id'] for r in scope}
             executions = self.executions(cur, fp, token, timing, build, start, end,
-                None if len(scope) == len(catalog) else sorted(scope_ids), order, limit)
+                None if len(scope) == len(catalog) else sorted(scope_ids), order, limit, statistics)
             cur.execute('''SELECT sql_id,outcome,mpp_view_label('outcome',outcome) AS label,
                 count(*) AS records,max(end_at) AS last_at
-                FROM mpp_view_records(%s,%s,%s,%s,%s,%s) GROUP BY sql_id,outcome''',
+                FROM mpp_view_record_facts(%s,%s,%s,%s,%s,%s) GROUP BY sql_id,outcome''',
                 (self.norm, fp, token, timing, start, end))
             facts = [dict(row) for row in cur.fetchall()]
             originals = {r['sql_id']: dict(r, records=0, last_at=None, in_scope=r['sql_id'] in scope_ids) for r in catalog}
@@ -235,7 +330,7 @@ class Finder:
                     cur.execute('SELECT mpp_view_label(%s,%s) AS label', (kind, code))
                     labels[kind, code] = cur.fetchone()['label']
         found['catalogs'][fp] = catalog
-        return dict(candidate=chosen, text=text, identities=identities, identity=identity, version=version,
+        return dict(_found=found, candidate=chosen, text=text, identities=identities, identity=identity, version=version,
                     statistics=statistics, timings=timings, timing=timing, start=start, end=end,
                     limit=limit, custom_window=window is not None, order=order,
                     original=original, originals=list(originals.values()),

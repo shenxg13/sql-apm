@@ -26,7 +26,7 @@ class Terminal:
             os.chdir('/tmp')
             command = entry or [str(ROOT / 'bin/sqlfind'), *args]
             os.execve(command[0], command,
-                      dict(os.environ, SQL_APM_DSN=dsn, PYTHONPATH=str(ROOT), **(env or {})))
+                      {**os.environ, 'SQL_APM_DSN': dsn, 'PYTHONPATH': str(ROOT), **(env or {})})
         self.pid, self.output, self.offset = pid, b'', 0
         fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack('HHHH', 24, width, 0, 0))
 
@@ -448,9 +448,10 @@ def verify_history(dsn, owner):
             term.send('r\n')
             restored = finder.detail(exact, '1', exact_args, timing='parse')
             compare(term.until(prompt), restored)
-            # Cancel a real blocked history query, after completing the settings wizard.
+            # Cached metadata is no longer read on a page-size change. Block the
+            # narrow facts needed by the uncached execution page instead.
             with owner.cursor() as cur:
-                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+                cur.execute('LOCK sql_apm.mpp_query_record IN ACCESS EXCLUSIVE MODE')
             term.send('h\n')
             term.until('可选 1-1000：')
             term.send('2\n')
@@ -509,9 +510,11 @@ def verify_drilldown(dsn, owner):
             term.send('o\n')
             term.until('取消。')
             term.send('1\n')
-            time.sleep(0.3)
-            term.send('\x03')
-            assert '保留原排序和列表' in term.until(listing)
+            assert '记录数多的在前' in term.until(listing)
+            term.send('o\n')
+            term.until('取消。')
+            term.send('2\n')
+            assert stream.getvalue().strip() in term.until(listing)
             owner.rollback()
             term.send('l\n')
             assert stream.getvalue().strip() in term.until(listing)
@@ -533,8 +536,37 @@ def verify_drilldown(dsn, owner):
                 getattr(Output(width, stream), method)(expected)
                 assert stream.getvalue().strip() in text, text[-2000:]
 
+            # The first catalog display has not cached its full-text differences.
+            # Confirm a real lock wait before Ctrl-C; repeating while still locked
+            # proves cancellation did not publish a cached result.
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            for _ in range(2):
+                term.send('v\n')
+                deadline = time.monotonic() + 5
+                while True:
+                    with owner.cursor() as cur:
+                        cur.execute("SELECT EXISTS(SELECT FROM pg_locks WHERE "
+                                    "relation='sql_apm.mpp_sql_text'::regclass AND NOT granted)")
+                        if cur.fetchone()[0]:
+                            break
+                    assert time.monotonic() < deadline, 'uncached originals did not wait for lock'
+                    time.sleep(.02)
+                term.send('\x03')
+                cancelled = term.until(prompt, timeout=5)
+                assert '取消' in cancelled and '保留原选择' in cancelled, cancelled
+                term.send('b\n')
+                term.until(listing)
+                term.send('1\n')
+                compare(term.until(prompt), detail)
+            owner.rollback()
             term.send('v\n')
             compare(term.until(prompt), detail, 'originals')
+            with owner.cursor() as cur:
+                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            term.send('v\n')
+            compare(term.until(prompt, timeout=5), detail, 'originals')
+            owner.rollback()
             term.send('h\n')
             for marker, value in [('可选 1-1000：', '1000'), ('指定起止时间 [1]：', '1'),
                                   ('最慢在前 [1]：', '9'), ('最慢在前 [1]：', '2')]:
@@ -591,20 +623,14 @@ def verify_drilldown(dsn, owner):
                 compare(term.until(prompt), changed, 'originals')
             with owner.cursor() as cur:
                 cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
+            # Both original selections and their differences have been read;
+            # replaying them succeeds even while original text is locked.
             term.send('v all\n')
-            time.sleep(0.3)
-            term.send('\x03')
-            assert '保留原选择' in term.until(prompt)
-            owner.rollback()
+            term.until(prompt)
+            term.send('v matched\n')
+            compare(term.until(prompt), changed)
             term.send('v\n')
             compare(term.until(prompt), changed, 'originals')
-            with owner.cursor() as cur:
-                cur.execute('LOCK sql_apm.mpp_sql_text IN ACCESS EXCLUSIVE MODE')
-            term.send('v\n')
-            time.sleep(0.3)
-            term.send('\x03')
-            cancelled = term.until(prompt)
-            assert '取消' in cancelled and '保留原选择' in cancelled, repr(cancelled)
             owner.rollback()
             check_full_text(term, changed, width)
             term.send('n\n')
@@ -624,7 +650,7 @@ def verify_drilldown(dsn, owner):
         finally:
             owner.rollback()
             term.close()
-    print('PASS: interactive search sort/requery/cancel, original list/selection/trace, history sort and persistence at 80/200 columns', flush=True)
+    print('PASS: interactive search sort/requery/cancel, uncached original lock cancellation without cache publication and retry, original selection/trace, history persistence at 80/200 columns', flush=True)
 
 
 def verify(dsn, directory, owner):

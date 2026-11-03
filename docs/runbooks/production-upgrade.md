@@ -133,7 +133,7 @@ sudo -n true
 umask 077
 export APM_UPGRADE_RUN
 APM_UPGRADE_RUN=$(mktemp -d "$APM_UPGRADE/run-apply-XXXXXXXX")
-nohup bash -c '
+nohup env -u BASH_ENV bash --noprofile --norc -c '
   set +e
   "$APM_ROOT/app/.venv/bin/python" -u "$APM_UPGRADE/app/scripts/deployment/upgrade.py" apply \
     --root "$APM_ROOT" --candidate "$APM_UPGRADE/app" --verification "$APM_UPGRADE/verification" \
@@ -150,6 +150,7 @@ printf '后台已启动；请保存控制日志目录：%s\n' "$APM_UPGRADE_RUN"
 **这里返回终端只表示后台已启动，不表示升级成功。** `pid` 是后台包装进程的 PID；
 `console.log` 收集前置检查、进度和错误，`exit-code` 在升级入口退出后写入。
 `-u` 让 Python 输出及时写入日志；标准输入关闭，后台不会等待密码或终端输入。
+后台 shell 不读取启动文件，避免账号中残留的旧版升级变量覆盖本次指定的目录。
 `nohup` 用于在普通 SSH 断开后继续运行；它不能防止重启、掉电或管理员终止进程。
 
 查看进度：
@@ -257,7 +258,7 @@ sudo -n true
 umask 077
 export APM_UPGRADE_RUN
 APM_UPGRADE_RUN=$(mktemp -d "$APM_UPGRADE/run-resume-XXXXXXXX")
-nohup bash -c '
+nohup env -u BASH_ENV bash --noprofile --norc -c '
   set +e
   "$APM_ROOT/python-3.13.16/bin/python3.13" -u "$APM_UPGRADE/app/scripts/deployment/upgrade.py" resume \
     --root "$APM_ROOT" --record "$APM_RECORD" --confirm-no-rollback

@@ -73,6 +73,8 @@ class ToolkitTests(unittest.TestCase):
         self.assertNotIn('first_shared_read_blocks',record)
 
     def test_first_read_allowlist_requires_numeric_values_at_exact_location(self):
+        with self.assertRaises(Refused):
+            scan(scan_views({'first-read.json':encoded({'pages':[{'statements':[{'analyze_count':1}]}]})}),['analyze'])
         good={'pages':[{'statements':[{'first_ms':1.25,'first_shared_read_blocks':3}]}]}
         scan(scan_views({'first-read.json':encoded(good)}),['first_shared_read_blocks'])
         for bad in ({'pages':[{'statements':[{'first_ms':'business-sentinel'}]}]},

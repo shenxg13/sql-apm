@@ -19,7 +19,6 @@ LOCATIONS = {
     'health.json': {('tables', '*')},
     'deltas.json': {('before', 'tables', '*'), ('after', 'tables', '*'),
                     ('delta', 'tables', '*', 'values')},
-    'first-read.json': {FIRST_READ_LOCATION},
 }
 
 
@@ -49,7 +48,7 @@ def scan_views(files):
     for name, raw in files.items():
         if name in ('SUMMARY.txt', 'FIELDS.json', 'PUBLIC_METADATA.json'):
             continue
-        if name not in LOCATIONS and name != 'settings.json':
+        if name not in LOCATIONS and name not in ('settings.json', 'first-read.json'):
             views[name] = raw
             continue
         approved_paths[name] = set()

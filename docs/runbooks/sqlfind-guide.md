@@ -138,4 +138,5 @@ Window → Translation → Remote character set 选择 **UTF-8**，服务器使�
 一次输出查询成功（含无命中、无法生成可靠指纹）退出 0，参数／输入／连接／查询错误退出 1；交互正常退出 0。
 历史 v1.1.0 的部分样本测量只适用于当时数据，见[历史发布说明](../releases/v1.1.0.md)。
 本版开发机全量样本及验证机部分样本的验证见[本版发布说明](../releases/v1.3.0.md)；
-生产复测已完成，实测中的未达项及后续处置见 [#74 用户决定](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)。
+本版生产复测在正式发布后进行。历史 v1.2.0 复测的未达项及后续处置见
+[#74 用户决定](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)。

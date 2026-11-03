@@ -1,4 +1,5 @@
 """Independent inspection boundaries, Grafana substitution and disclosure guards."""
+import ast
 from datetime import datetime,timezone
 import importlib.util
 import json
@@ -26,9 +27,8 @@ from perfkit.vocabulary import fixed, sql_fields, Vocabulary
 class ToolkitTests(unittest.TestCase):
     @unittest.skipUnless(importlib.util.find_spec('pglast') and importlib.util.find_spec('psycopg2'),
                          'requires the pinned PostgreSQL/parser product runtime')
-    def test_begin_identity_and_extra_input_survive_real_fixed_vocabulary(self):
+    def test_internal_sql_identity_and_extra_input_survive_real_fixed_vocabulary(self):
         vocabulary=fixed()
-        self.assertIsNone(vocabulary.collision('BEGIN'))
         self.assertIsNotNone(vocabulary.collision('commit'))
         def query(sql,params=None):
             if sql == 'SHOW statement_timeout':return [{'statement_timeout':'2min'}]
@@ -37,24 +37,53 @@ class ToolkitTests(unittest.TestCase):
             if 'FROM scope' in sql:return [{'scope_id':'SyntheticCluster79'}]
             if 'WITH identities' in sql:
                 return [dict(kind=k,scope_id='SyntheticCluster79',fingerprint='synthetic-fp',database=None,
-                    execution_user=None,candidate_rank=1,events=100,texts=1,structure_texts=1,chars=5)
+                    execution_user=None,candidate_rank=1,events=100,texts=1,structure_texts=1,chars=len(original))
                     for k in range(6)]
-            if 'SELECT t.sql_id,t.text' in sql:return [dict(sql_id='synthetic-original',text='BEGIN')]
+            if 'SELECT t.sql_id,t.text' in sql:return [dict(sql_id='synthetic-original',text=original)]
             if 'mpp_view_identity_token' in sql:return [{'token':'synthetic-identity'}]
             self.fail('unexpected query')
+        for original in ('BEGIN','RESET ROLE','ROLE'):
+            with self.subTest(original=original),tempfile.TemporaryDirectory() as folder:
+                self.assertIsNone(vocabulary.collision(original))
+                root=Path(folder);work=Work(root,root/'product')
+                try:
+                    save(root/'extra.json',[dict(cluster='SyntheticCluster79',mode='exact',input=original)])
+                    with patch('perfkit.cases.fixed',return_value=vocabulary):
+                        selected=cases.choose(Mock(query=Mock(side_effect=query)),work,root/'extra.json')
+                    self.assertEqual(selected[0]['kinds'],list(cases.KINDS))
+                    self.assertEqual(selected[0]['text'],original)
+                    self.assertEqual(selected[-1]['inputs'][0]['text'],original)
+                    public=(work.public/'cases.json').read_bytes()
+                    scan({'cases.json':public},[original])
+                    with self.assertRaises(Refused):scan({'bad.json':encoded({'value':original})},[original])
+                finally:work.close()
+
+    @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
+    def test_all_executed_sql_literals_are_absent_from_tool_names(self):
+        groups=[text for location,text in fixed().groups if location.startswith('tool:')]
+        sources=list((ROOT/'scripts/performance/perfkit').glob('*.py'))+[ROOT/'scripts/performance/check.py']
+        count=0
+        for path in sources:
+            for node in ast.walk(ast.parse(path.read_text())):
+                if (isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute)
+                        and node.func.attr in ('query','execute') and node.args
+                        and isinstance(node.args[0],ast.Constant) and isinstance(node.args[0].value,str)):
+                    count+=1
+                    with self.subTest(source=path.name,line=node.lineno):
+                        self.assertFalse(any(node.args[0].value in text for text in groups))
+        self.assertGreater(count,0)
+
+    @unittest.skipUnless(importlib.util.find_spec('pglast'), 'requires the pinned PostgreSQL parser')
+    def test_public_field_survives_identical_executed_sql_literal(self):
         with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);work=Work(root,root/'product')
-            try:
-                save(root/'extra.json',[dict(cluster='SyntheticCluster79',mode='exact',input='BEGIN')])
-                with patch('perfkit.cases.fixed',return_value=vocabulary):
-                    selected=cases.choose(Mock(query=Mock(side_effect=query)),work,root/'extra.json')
-                self.assertEqual(selected[0]['kinds'],list(cases.KINDS))
-                self.assertEqual(selected[0]['text'],'BEGIN')
-                self.assertEqual(selected[-1]['inputs'][0]['text'],'BEGIN')
-                public=(work.public/'cases.json').read_bytes()
-                scan({'cases.json':public},['BEGIN'])
-                with self.assertRaises(Refused):scan({'bad.json':encoded({'value':'BEGIN'})},['BEGIN'])
-            finally:work.close()
+            root=Path(folder);source=root/'perfkit';source.mkdir()
+            (root/'check.py').write_text('')
+            (source/'fixture.py').write_text("session.query('commit')\ncursor.execute('RESET ROLE')\npublic={'commit':0}\n")
+            with patch('perfkit.vocabulary.__file__',str(source/'vocabulary.py')), \
+                    patch('perfkit.vocabulary.public_runtime',return_value={}):
+                vocabulary=fixed()
+            self.assertEqual(vocabulary.collision('commit'),'tool:fixture.py')
+            self.assertIsNone(vocabulary.collision('RESET ROLE'))
 
     def test_first_read_uses_only_outer_plan_and_keeps_missing_reads_unavailable(self):
         from perfkit.first_read import measured

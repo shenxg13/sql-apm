@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-11-03
 sources:
+  - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984
+    status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/79
@@ -120,7 +122,10 @@ confidence: high
 效果目标、已接受差距与生产未达项由在线契约约束，不用开发机模型代替生产实测。
 
 独立工具包 1.2.0 只支持 v1.3.0／1.14.0；旧产品继续使用旧工具包。
-内部事务控制 SQL 不作为公开名称阻止代表身份入选，手工追加同样检查；最终敏感值扫描不豁免业务输入。
+传给 query／execute 的内部 SQL 字面量按调用位置排除，不作为公开名称阻止代表身份入选，手工追加同样检查；
+同名公开字段仍保留检查，最终敏感值扫描不豁免业务输入。
+R1 对名称表过滤的整改按[评审退出条件](https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984)复核：
+两处用新工作目录重跑 cases，代表身份相同才继承原完整结果；发生变化的机器重跑完整工具包。
 首次执行在普通计时之前采集，每个集群的高频／多原文详情及七天排行保留耗时、根节点读取块数，
 新增字段仅允许数值并绑定公开元数据位置。不清缓存，不能把第一次执行或零读取块误称为冷盘实测。
 操作及字段说明见[工具包手册](../../docs/runbooks/performance-check.md)。

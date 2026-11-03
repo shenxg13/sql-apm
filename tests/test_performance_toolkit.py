@@ -24,6 +24,8 @@ from perfkit.vocabulary import fixed, sql_fields, Vocabulary
 
 
 class ToolkitTests(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('pglast') and importlib.util.find_spec('psycopg2'),
+                         'requires the pinned PostgreSQL/parser product runtime')
     def test_begin_identity_and_extra_input_survive_real_fixed_vocabulary(self):
         vocabulary=fixed()
         self.assertIsNone(vocabulary.collision('BEGIN'))

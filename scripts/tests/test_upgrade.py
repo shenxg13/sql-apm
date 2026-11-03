@@ -198,13 +198,21 @@ class UpgradeTests(unittest.TestCase):
 
     def test_success_preserves_runtime_and_original_service_states(self):
         states=self.subject.services()
-        self.subject.apply(self.subject.preflight())
+        for path in (self.base/'candidate/grafana/dashboards').glob('*.json'):
+            path.chmod(0o644)
+        mask=os.umask(0o077)
+        try:
+            self.subject.apply(self.subject.preflight())
+        finally:
+            os.umask(mask)
         self.assertEqual(self.subject.state['phase'],'complete')
         self.assertEqual((self.root/'app/VERSION').read_text(),'v1.3.0\n')
         self.assertEqual((self.root/'app/.venv/retained').read_text(),'runtime bytes')
         self.assertEqual(self.subject.services(),states)
         for path in (self.root/'app/grafana/dashboards').glob('*.json'):
-            self.assertEqual(path.read_bytes(),(self.root/'grafana/dashboards/mpp'/path.name).read_bytes())
+            installed=self.root/'grafana/dashboards/mpp'/path.name
+            self.assertEqual(path.read_bytes(),installed.read_bytes())
+            self.assertEqual(installed.stat().st_mode & 0o777,0o644)
 
     def test_daily_starting_after_preflight_is_not_killed(self):
         obj=self.subject
@@ -239,9 +247,16 @@ class UpgradeTests(unittest.TestCase):
                     with patch.object(Path,'rename',interrupted),self.assertRaises(OSError):obj.apply(result)
                     self.assertEqual(obj.version,'1.14.0')
                     self.assertNotEqual(obj.state['phase'],'rolled-back')
-                    obj.recover()
+                    mask=os.umask(0o077)
+                    try:
+                        obj.recover()
+                    finally:
+                        os.umask(mask)
                     self.assertEqual(obj.state['phase'],'complete')
                     self.assertEqual((obj.root/'app/.venv/retained').read_text(),'runtime bytes')
+                    for source in (obj.root/'app/grafana/dashboards').glob('*.json'):
+                        target=obj.root/'grafana/dashboards/mpp'/source.name
+                        self.assertEqual(target.stat().st_mode & 0o777,source.stat().st_mode & 0o777)
                 finally:fresh.doCleanups()
                 # Nested cleanup stops our patches as well; restore only for the next setup.
 

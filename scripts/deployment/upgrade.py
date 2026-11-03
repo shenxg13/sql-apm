@@ -80,6 +80,15 @@ def space_required(event_count, package_bytes):
     return max(6_000_000_000, modeled) + package_bytes * 2
 
 
+def install_dashboard(source, target):
+    temporary = target.with_suffix('.new')
+    require(not temporary.is_symlink() and not target.is_symlink(), 'dashboard target must not be linked')
+    # The documented background wrapper uses umask 077. Dashboard definitions
+    # are public package files: preserve their mode for postgres verification.
+    shutil.copy2(source, temporary)
+    temporary.replace(target)
+
+
 class Upgrade:
     def __init__(self, root, candidate, verification, port=5432):
         self.root, self.candidate, self.verification = map(Path, (root, candidate, verification))
@@ -260,10 +269,7 @@ class Upgrade:
             (self.run / 'next-verification').rename(self.root / 'verification')
         for path in (installed / 'grafana/dashboards').glob('mpp-*.json'):
             target = self.root / 'grafana/dashboards/mpp' / path.name
-            temporary = target.with_suffix('.new')
-            require(not temporary.is_symlink() and not target.is_symlink(), 'dashboard target must not be linked')
-            shutil.copyfile(path, temporary)
-            temporary.replace(target)
+            install_dashboard(path, target)
         verify_installed(self.root)
         self.phase('activated')
         self.initialize('check', installed)

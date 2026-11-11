@@ -27,7 +27,7 @@ def verify_daily_migration(v, root):
     assert int(before['mpp_statistic'].split(':')[0]) > 0 and not set(DAILY) & set(tables)
     v.init('upgrade'); v.init('check')
     assert before == state() and columns == shape() and v.sql(TABLES).splitlines() == sorted(tables + DAILY + SUMMARIES + QUERY)
-    assert v.sql("SELECT string_agg(version,',' ORDER BY string_to_array(version,'.')::int[]) FROM schema_version") == '1.11.0,1.12.0,1.13.0,1.14.0'
+    assert v.sql("SELECT string_agg(version,',' ORDER BY string_to_array(version,'.')::int[]) FROM schema_version") == '1.11.0,1.12.0,1.13.0,1.14.0,1.15.0'
     assert v.sql("SELECT count(*) FROM pg_extension WHERE extname<>'plpgsql'") == '0'
     added = functions() - old_functions
     assert old_functions < functions() and {'mpp_daily_lock_key', 'mpp_daily_runs', 'mpp_daily_problems', 'mpp_daily_clusters',
@@ -39,7 +39,7 @@ def verify_daily_migration(v, root):
     reader("INSERT INTO sql_apm.mpp_daily_run (run_id,started_by,state,local_date,stale_after_hours) VALUES ('x','manual','running',current_date,48)", ok=False)
     for mode in ('schema', 'all', 'upgrade', 'check'):
         v.init(mode)
-    assert before == state() and v.sql("SELECT count(*) FROM schema_version") == '4'
+    assert before == state() and v.sql("SELECT count(*) FROM schema_version") == '5'
     v.sql('REVOKE SELECT ON sql_apm.mpp_daily_run FROM sql_apm_ro')
     assert 'incompatible object: mpp_daily_run' in v.init('check', ok=False).stderr
     v.init('schema'); v.init('check')

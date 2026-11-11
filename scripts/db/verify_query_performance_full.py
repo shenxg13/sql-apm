@@ -608,7 +608,7 @@ def cleanup(args):
         fixture_seconds=time.monotonic()-tick
         version=fetch(db,"SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1")[0][0]
         indexes=[]
-        if version in ('1.13.0','1.14.0'):
+        if version in ('1.13.0','1.14.0','1.15.0'):
             indexes=fetch(db,"""SELECT i.indexrelid,pg_relation_size(i.indexrelid) FROM pg_partition_tree('mpp_statistic_ranking_idx') t
                 JOIN pg_index i ON i.indexrelid=t.relid WHERE i.indrelid=to_regclass('mpp_statistic_p'||%s::text)""",(pid,))
             assert len(indexes)==1 and indexes[0][1]>0

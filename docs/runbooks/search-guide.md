@@ -1,6 +1,6 @@
 # 检索与看板使用指南
 
-本指南随 v1.3.0 交付，对应结构 1.14.0。示例 SQL、集群 C1、数据库 demo 和用户 analyst 均为人工示例，
+本指南随 v1.3.1 交付，对应结构 1.15.0。示例 SQL、集群 C1、数据库 demo 和用户 analyst 均为人工示例，
 执行时换成自己的筛选值。先按[生产安装手册](production-installation.md)安装，再从浏览器登录 Grafana。
 日常查看使用只读数据库账号；它能读取全部 SQL 原文，原文中可能包含业务数据。
 
@@ -880,7 +880,7 @@ RETURNS TABLE(started_at timestamptz,finished_at timestamptz,seconds double prec
 
 ### mpp_query_prepare_changes
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_prepare_changes -->
 ```sql
@@ -889,7 +889,7 @@ CREATE OR REPLACE FUNCTION mpp_query_prepare_changes() RETURNS void
 
 ### mpp_query_write_lock
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_write_lock -->
 ```sql
@@ -898,7 +898,7 @@ CREATE OR REPLACE FUNCTION mpp_query_write_lock() RETURNS trigger
 
 ### mpp_query_capture_changes
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_capture_changes -->
 ```sql
@@ -907,7 +907,7 @@ CREATE OR REPLACE FUNCTION mpp_query_capture_changes() RETURNS trigger
 
 ### mpp_query_merge_totals
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_merge_totals -->
 ```sql
@@ -916,7 +916,7 @@ CREATE OR REPLACE FUNCTION mpp_query_merge_totals() RETURNS void
 
 ### mpp_query_refresh
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_refresh -->
 ```sql
@@ -925,7 +925,7 @@ CREATE OR REPLACE FUNCTION mpp_query_refresh() RETURNS void
 
 ### mpp_query_commit_changes
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_commit_changes -->
 ```sql
@@ -934,7 +934,7 @@ CREATE OR REPLACE FUNCTION mpp_query_commit_changes() RETURNS trigger
 
 ### mpp_query_records
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_records -->
 ```sql
@@ -947,7 +947,7 @@ RETURNS SETOF mpp_query_record
 
 ### mpp_query_facts
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_facts -->
 ```sql
@@ -962,7 +962,7 @@ RETURNS TABLE(analysis_id text,occurrence_id text,scope_id text,database text,ex
 
 ### mpp_query_fuzzy_candidates
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_fuzzy_candidates -->
 ```sql
@@ -978,7 +978,7 @@ RETURNS TABLE (fingerprint text,example_sql_id text,matched_texts bigint,record_
 
 ### mpp_query_group_statistics
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_query_group_statistics -->
 ```sql
@@ -988,7 +988,7 @@ RETURNS SETOF mpp_statistic
 
 ### mpp_view_record_facts
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_view_record_facts -->
 ```sql
@@ -1000,7 +1000,7 @@ RETURNS TABLE(analysis_id text,occurrence_id text,sql_id text,outcome text,end_a
 
 ### mpp_view_execution_subset
 
-1.14.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
+1.15.0 内部辅助函数，由公开查询或事务维护调用；运维入口继续使用前述公开函数。
 
 <!-- query-function:mpp_view_execution_subset -->
 ```sql

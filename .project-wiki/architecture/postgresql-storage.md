@@ -9,6 +9,8 @@ owners:
   - docs/design/postgresql-storage.md
 updated: 2026-11-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/84
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/82
     status: current
   - path: docs/reports/query-records-2026-11-03.md
@@ -68,7 +70,9 @@ confidence: high
 
 ## Summary
 
-当前开发结构版本 1.15.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.2.0 的结构为 1.13.0，v1.1.0 为 1.12.0。
+程序版本与结构对应为：v1.3.1／1.15.0、v1.3.0／1.14.0、v1.2.0／1.13.0、v1.1.0／1.12.0；
+各版本发布说明见[结构版本映射](../../docs/design/database-structure.md)。
+结构承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径。
 交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
 新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 与每日运行记录见下文各结构版本。
 
@@ -245,13 +249,13 @@ DDL 在 savepoint 内读取后回滚释放锁，避免连续空库升级累计�
 
 来源：[Issue #72](https://github.com/shenxg13/sql-apm/issues/72) 的已确认契约；开发实现与验证见
 [结构说明](../../docs/design/database-structure.md#页面查询的精确汇总)和[验证报告](../../docs/reports/query-performance-2026-10-26.md)。
-已发布 v1.2.0 使用结构 1.13.0；v1.1.0 为 1.12.0。
+v1.2.0 使用结构 1.13.0；v1.1.0 为 1.12.0。
 Issue #74 已按[结果包证据与用户确认](https://github.com/shenxg13/sql-apm/issues/74#issuecomment-6573185120)
 判定生产升级完成；生产迁移耗时未实测，性能复测结论与遗留项见
 [检索主题](../features/sql-search-and-views.md#v120-生产复测与后续边界2026-11-02)。
 Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定运行时，再停写、调用同一迁移入口；
 不改变本节迁移 SQL。事务失败时旧程序保持，提交后只允许继续完成 1.13.0，不能降级；
-操作和恢复见[生产升级手册](../../docs/runbooks/production-upgrade.md)。
+操作和恢复见 [v1.2.0 升级手册](https://github.com/shenxg13/sql-apm/blob/v1.2.0/docs/runbooks/production-upgrade.md)。
 
 - 增加三张可由原表重算的精确汇总表，非叶表总数 65。语句级触发器与原写入事务一起维护名称选项、原文总数、每个规则已有指纹结果数；
   冲突不写入、回滚、更新、删除和清空都不改变计数含义。没有定时刷新或人工维护步骤。

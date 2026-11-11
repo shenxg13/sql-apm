@@ -3,10 +3,11 @@
 本设计由 [Issue #7](https://github.com/shenxg13/sql-apm/issues/7) 承接
 [逻辑契约 1.0.0](../../.project-wiki/contracts/offline-data-contract.md)。
 用户在实施前核对了单账号、统计明细、空桶及首版普通表方案，并于 2026-09-26 授权实施。
-当前开发物理结构版本为 `1.15.0`（已发布 v1.2.0 为 `1.13.0`），完整列、类型、空值、约束与索引定义以
+程序版本与物理结构对应为：v1.3.1／`1.15.0`、v1.3.0／`1.14.0`、v1.2.0／`1.13.0`、v1.1.0／`1.12.0`。
+各版本发布说明见[结构版本映射](database-structure.md)。完整列、类型、空值、约束与索引定义以
 [DDL](../../sql_apm/storage/schema.sql) 为准；本页解释映射及责任边界。
 
-本页描述存储结构与初始化；#18 的[导入写入器](log-ingestion.md)检查当前 1.15.0 结构回执；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
+本页描述存储结构与初始化；v1.3.1 的[导入写入器](log-ingestion.md)检查 1.15.0 结构回执；#21 的[判定接口](training-decisions.md)复用导入事实，③[统计引擎](baseline-statistics.md)由 #25 交付。
 [验证入口](../../scripts/db/verify.py) 通过 psql 写入合成记录，不证明业务算法正确。
 
 ## 命名、类型与版本

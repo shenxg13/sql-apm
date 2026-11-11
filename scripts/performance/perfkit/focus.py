@@ -61,11 +61,12 @@ def run(args,work,session):
     selected=json.loads((work.private/'cases.json').read_text())
     if not selected:
         raise Refused('focus_requires_representative_identity')
+    targeted=getattr(args,'targeted',False)
     documents=dashboards.load(args.dashboards)
     source=(Path(__file__).resolve().parents[1]/'internal.json')
     templates=json.loads(source.read_text())
     settings=json.loads(source.with_name('internal-settings.json').read_text())
-    # Bind the templates to exactly the installed v1.3.0 source.
+    # Bind the templates to exactly the installed v1.3.1 source.
     if templates!=extract((args.app/'sql_apm/storage/schema.sql').read_text()):
         raise Refused('internal_statement_source_mismatch')
     if settings!=extract_settings((args.app/'sql_apm/storage/schema.sql').read_text()):
@@ -75,6 +76,8 @@ def run(args,work,session):
     result=dict(module=module,shape=[],measurements=[],split=[],limit_seconds=args.limit_seconds)
     trace=[]
     now=datetime.fromisoformat(args.at) if args.at else datetime.now(timezone.utc).replace(microsecond=0)
+    if now.tzinfo is None:
+        raise Refused('time_requires_timezone')
     written={name:0 for name in ('shape','measurements','split','trace')}
     last_checkpoint=[0.0]
     for name in written:
@@ -127,10 +130,12 @@ def run(args,work,session):
             return cur.mogrify(sql,params).decode(session.db.encoding)
     try:
         clusters=sorted({c['scope_id'] for c in selected})
-        result['worst_seconds']=(180*(len(clusters)+1)+32)*args.limit_seconds
+        result['worst_seconds']=((80 if targeted else 180)*(len(clusters)+1)+32)*args.limit_seconds
         result['budget_basis']='at_most_180_statements_per_scope_plus_32_setup_distribution; includes_EXPLAIN_and_lookups'
         for cluster in clusters+[None]:
             case=max((c for c in selected if cluster is None or c['scope_id']==cluster),key=lambda c:(c['events'],c['id']))
+            if targeted and cluster is not None:
+                case=next(c for c in selected if c['scope_id']==cluster and 'executions' in c['kinds'])
             label=work.alias('cluster',cluster) if cluster is not None else 'all'
             values=dashboards.defaults(documents['mpp-list'])
             values.update(norm=case['norm'],cluster=dashboards.token(cluster) if cluster else '*')
@@ -146,7 +151,7 @@ def run(args,work,session):
                 definition=next(v for v in documents['mpp-list']['templating']['list'] if v['name']==variable)
                 actual(dashboards.interpolate(definition['query'],values,now-timedelta(days=1),now),
                        label+'/variable/'+variable,split=True)
-            for limit in (50,100,200,500):
+            for limit in (() if targeted else (50,100,200,500)):
                 stem=label+'/baseline/'+str(limit)
                 parameters=dict(common,p_limit=(limit,'integer'))
                 planned('mpp_view_baseline_ranking',parameters,stem+'/internal')
@@ -177,6 +182,8 @@ def run(args,work,session):
                 values['limit']='100'
                 panel=next(p for p in documents['mpp-list']['panels'] if p['id']==3)
                 actual(dashboards.interpolate(panel['targets'][0]['rawSql'],values,start,end),label+'/range-'+str(days)+'/panel-3')
+                if targeted and (days!=7 or cluster is None):
+                    continue
                 detail=dashboards.defaults(documents['mpp-detail'])
                 detail.update(norm=case['norm'],fp=case['fingerprint'],identity=case['identity'])
                 chosen=session.query('SELECT timing FROM mpp_view_timings(%s,%s,%s) LIMIT 1',
@@ -199,12 +206,29 @@ def run(args,work,session):
                 planned('mpp_view_execution_subset',history,label+'/history-'+str(days)+'/internal')
                 panel=next(p for p in documents['mpp-detail']['panels'] if p['id']==29)
                 actual(dashboards.interpolate(panel['targets'][0]['rawSql'],detail,start,end),label+'/history-'+str(days)+'/panel-29')
+            if targeted and cluster is not None:
+                # Ordinary complete page after first-read; keep the existing focus record format.
+                if module['state']=='loaded':
+                    session.query('SET auto_explain.log_min_duration=-1')
+                session.query('SET ROLE sql_apm_ro')
+                try:
+                    page,_=dashboards.page(session,documents['mpp-detail'],
+                        dict(dashboards.overrides(case,case['inputs'][0]),norm=case['norm']),now-timedelta(days=7),now,
+                        label+'/history-7/page',[],trace)
+                finally:
+                    session.query('RESET ROLE')
+                result['split'].extend(page['statements'])
+                result['measurements'].append(dict(item=label+'/history-7/page',
+                    ms=page['page_estimate_ms'],target_ms=5000,rows=0,
+                    state='error' if page['incomplete'] else 'ok',
+                    attention=page['incomplete'] or page['page_estimate_ms']>5000))
+                checkpoint()
         if module['state']=='loaded':
             session.query('SET auto_explain.log_min_duration=-1')
         distribution={}
         distribution['days']=session.query("""SELECT scope_id,(end_at AT TIME ZONE 'Asia/Shanghai')::date AS log_day,count(*) events
             FROM mpp_occurrence GROUP BY 1,2 ORDER BY 1,2""")
-        distribution['fingerprints']=session.query("""SELECT scope_id,max(events) max_events,max(texts) max_texts,
+        distribution['fingerprints']=[] if targeted else session.query("""SELECT scope_id,max(events) max_events,max(texts) max_texts,
             percentile_cont(ARRAY[0.5,0.9,0.95,0.99]) WITHIN GROUP(ORDER BY events) event_percentiles,
             percentile_cont(ARRAY[0.5,0.9,0.95,0.99]) WITHIN GROUP(ORDER BY texts) text_percentiles
             FROM (SELECT o.scope_id,f.value,count(*) events,count(DISTINCT o.sql_id) texts

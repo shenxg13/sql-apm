@@ -21,7 +21,7 @@ from verify_package import digest
 def package(path, version):
     path.mkdir()
     files = {'requirements.txt': 'same dependencies\n', 'VERSION': version+'\n',
-             'PROGRAM_COMMIT': ('a' if version=='v1.2.0' else 'b')*40+'\n'}
+             'PROGRAM_COMMIT': ('a' if version=='v1.3.0' else 'b')*40+'\n'}
     for dashboard in ('mpp-list','mpp-detail','mpp-search','mpp-status'):
         files['grafana/dashboards/'+dashboard+'.json'] = json.dumps(dict(version=version))
     for name, text in files.items():
@@ -48,8 +48,9 @@ def snapshot(path):
 class Fixture(upgrade.Upgrade):
     def __init__(self, *args):
         super().__init__(*args)
-        self.version='1.13.0'
+        self.version='1.14.0'
         self.busy=False
+        self.daily_busy=False
         self.migration_failure=False
         self.external_busy=False
         self.operations=[]
@@ -71,12 +72,12 @@ class Fixture(upgrade.Upgrade):
     def query(self, sql):
         if 'SELECT version' in sql:
             return [(self.version,)]
-        if 'count(*) FROM mpp_occurrence' in sql:
-            return [(500,)]
         if 'pg_stat_activity' in sql:
             return [(1,)] if self.external_busy else []
         if 'FROM task' in sql:
             return [(1,)] if self.busy else []
+        if 'FROM mpp_daily_run' in sql:
+            return [(1,)] if self.daily_busy else []
         return []
 
     def initialize(self, mode, app):
@@ -84,7 +85,7 @@ class Fixture(upgrade.Upgrade):
         if mode=='upgrade':
             if self.migration_failure:
                 raise ValueError('injected migration rollback')
-            self.version='1.14.0'
+            self.version='1.15.0'
 
 
 class UpgradeTests(unittest.TestCase):
@@ -111,28 +112,50 @@ class UpgradeTests(unittest.TestCase):
         (self.root/'pgdata/postmaster.pid').write_text('123\n')
         (self.root/'socket/.s.PGSQL.5432.lock').write_text('123\n')
         (self.root/'runtime-manifest.json').write_text('{}')
-        package(self.root/'app','v1.2.0')
+        package(self.root/'app','v1.3.0')
         (self.root/'app/.venv').mkdir()
         (self.root/'app/.venv/retained').write_text('runtime bytes')
         verification(self.root/'verification','a'*40)
-        package(self.base/'candidate','v1.3.0')
+        package(self.base/'candidate','v1.3.1')
         verification(self.base/'verification','b'*40)
         self.subject=Fixture(self.root,self.base/'candidate',self.base/'verification')
         self.addCleanup(patch.stopall)
+        patch.object(upgrade,'V130_MANIFEST_SHA',digest(self.root/'app/RELEASE.json')).start()
         patch.object(upgrade,'verify_installed',return_value={}).start()
         patch.object(upgrade,'digest',side_effect=lambda p:upgrade.RUNTIME_MANIFEST_SHA if Path(p).name=='runtime-manifest.json' else digest(p)).start()
         self.disk=patch.object(upgrade.shutil,'disk_usage',return_value=shutil._ntuple_diskusage(100_000_000_000,0,100_000_000_000)).start()
 
-    def test_check_is_read_only_and_accounts_for_events(self):
+    def test_check_is_read_only_and_budgets_only_function_replacement(self):
         before=snapshot(self.root)
         result=self.subject.preflight()
-        self.assertGreaterEqual(result['required_free_bytes'],6_000_000_000)
+        self.assertEqual(result['required_free_bytes'],1_073_741_824+2*result['package_bytes'])
         self.assertEqual(snapshot(self.root),before)
         self.assertEqual(self.subject.operations,['sudo-access'])
-        self.assertGreater(upgrade.space_required(100_000_000,0),6_000_000_000)
-        self.assertEqual(result['event_count'],500)
-        self.assertEqual(upgrade.space_required(30_180_000,123),120_064_000_246)
-        self.assertGreater(upgrade.space_required(30_180_001,0),120_064_000_000)
+        self.assertEqual(upgrade.space_required(123),1_073_742_070)
+        self.assertNotIn('event_count',result)
+        self.disk.return_value=shutil._ntuple_diskusage(2**40,0,result['required_free_bytes'])
+        self.subject.preflight()
+        self.disk.return_value=shutil._ntuple_diskusage(2**40,0,result['required_free_bytes']-1)
+        with self.assertRaisesRegex(ValueError,'insufficient free space'):
+            self.subject.preflight()
+
+    def test_rejects_self_consistent_unreleased_or_other_version_program(self):
+        for version,kind in (('v1.2.0','release'),('v1.3.1','release'),
+                             ('v1.3.0','candidate'),('v1.3.0','release')):
+            with self.subTest(version=version,kind=kind):
+                shutil.rmtree(self.root/'app')
+                package(self.root/'app',version)
+                path=self.root/'app/RELEASE.json'
+                metadata=json.loads(path.read_text())
+                metadata.update(kind=kind,unreleased=True)
+                path.write_text(json.dumps(metadata))
+                (self.root/'app/SHA256SUMS').write_text(''.join(
+                    digest(p)+'  '+str(p.relative_to(self.root/'app'))+'\n'
+                    for p in sorted((self.root/'app').rglob('*')) if p.is_file() and p.name!='SHA256SUMS'))
+                before=snapshot(self.root)
+                with self.assertRaisesRegex(ValueError,'formal v1.3.0'):
+                    self.subject.preflight()
+                self.assertEqual(snapshot(self.root),before)
 
     def test_connection_errors_are_one_safe_stop_line_for_all_commands(self):
         import psycopg2
@@ -163,11 +186,12 @@ class UpgradeTests(unittest.TestCase):
                 self.assertNotIn('Traceback',err.getvalue())
 
     def test_preflight_rejections_do_not_modify_installation(self):
-        cases=('busy','disk','version','checksum','runtime','socket','dependencies','verification','unresolved')
+        cases=('busy','daily','disk','version','checksum','runtime','socket','dependencies','verification','unresolved')
         for case in cases:
             with self.subTest(case=case):
                 self.subject.busy=case=='busy'
-                self.subject.version='1.11.0' if case=='version' else '1.13.0'
+                self.subject.daily_busy=case=='daily'
+                self.subject.version='1.11.0' if case=='version' else '1.14.0'
                 self.disk.return_value=shutil._ntuple_diskusage(100_000_000_000,0,1 if case=='disk' else 100_000_000_000)
                 changes=[]
                 if case=='checksum':changes=[(self.root/'app/requirements.txt','corrupt')]
@@ -194,7 +218,21 @@ class UpgradeTests(unittest.TestCase):
         self.assertEqual(snapshot(self.root/'app'),before)
         self.assertEqual(self.subject.services(),states)
         self.assertEqual(self.subject.state['phase'],'rolled-back')
-        self.assertEqual(self.subject.version,'1.13.0')
+        self.assertEqual(self.subject.version,'1.14.0')
+
+    def test_preflight_refuses_failed_or_running_daily_unit_without_changes(self):
+        for unit,active in (('sql-apm-fingerprint.service','failed'),('sql-apm-daily.service','active')):
+            with self.subTest(unit=unit):
+                def command(name,args):
+                    if name=='service-state':
+                        state=active if args[2]==unit else 'inactive'
+                        return 'LoadState=loaded\nActiveState='+state+'\nUnitFileState=disabled\n'
+                    self.fail('preflight must not mutate services')
+                before=snapshot(self.root)
+                with patch.object(self.subject,'services',lambda:upgrade.Upgrade.services(self.subject)), \
+                     patch.object(self.subject,'command',side_effect=command),self.assertRaises(ValueError):
+                    self.subject.preflight()
+                self.assertEqual(snapshot(self.root),before)
 
     def test_success_preserves_runtime_and_original_service_states(self):
         states=self.subject.services()
@@ -206,7 +244,7 @@ class UpgradeTests(unittest.TestCase):
         finally:
             os.umask(mask)
         self.assertEqual(self.subject.state['phase'],'complete')
-        self.assertEqual((self.root/'app/VERSION').read_text(),'v1.3.0\n')
+        self.assertEqual((self.root/'app/VERSION').read_text(),'v1.3.1\n')
         self.assertEqual((self.root/'app/.venv/retained').read_text(),'runtime bytes')
         self.assertEqual(self.subject.services(),states)
         for path in (self.root/'app/grafana/dashboards').glob('*.json'):
@@ -226,7 +264,7 @@ class UpgradeTests(unittest.TestCase):
             obj.apply(result)
         self.assertNotIn('stop-sql-apm-daily.service',obj.operations)
         self.assertNotIn('initialize-upgrade',obj.operations)
-        self.assertEqual(obj.version,'1.13.0')
+        self.assertEqual(obj.version,'1.14.0')
         obj.busy=False
         obj.recover()
         self.assertEqual(obj.service_states['sql-apm-daily.timer']['ActiveState'],'active')
@@ -236,7 +274,7 @@ class UpgradeTests(unittest.TestCase):
         for position in range(1,6):
             with self.subTest(rename=position):
                 # Reset each subcase using an independent installation.
-                fresh=UpgradeTests('test_check_is_read_only_and_accounts_for_events')
+                fresh=UpgradeTests('test_check_is_read_only_and_budgets_only_function_replacement')
                 fresh.setUp()
                 try:
                     obj=fresh.subject;result=obj.preflight();original=Path.rename;calls=[]
@@ -245,7 +283,7 @@ class UpgradeTests(unittest.TestCase):
                         if len(calls)==position:raise OSError('injected interruption')
                         return value
                     with patch.object(Path,'rename',interrupted),self.assertRaises(OSError):obj.apply(result)
-                    self.assertEqual(obj.version,'1.14.0')
+                    self.assertEqual(obj.version,'1.15.0')
                     self.assertNotEqual(obj.state['phase'],'rolled-back')
                     mask=os.umask(0o077)
                     try:

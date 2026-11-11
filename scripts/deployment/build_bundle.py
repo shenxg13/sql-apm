@@ -85,7 +85,7 @@ def main():
         raise ValueError('a formal release requires the Kylin runtime artifact')
     runtime = inspect_artifact(args.runtime_artifact) if args.runtime_artifact else None
     runtime_sha = digest(args.runtime_artifact / 'runtime.tar.gz') if runtime else None
-    if release['version'] in ('v1.1.0', 'v1.2.0', 'v1.3.0') and runtime_sha != V100_RUNTIME_SHA:
+    if release['version'] in ('v1.1.0', 'v1.2.0', 'v1.3.0', 'v1.3.1') and runtime_sha != V100_RUNTIME_SHA:
         raise ValueError(release['version'] + ' requires the unchanged v1.0.0 Kylin runtime artifact')
     if runtime and runtime['requirements_sha256'] != digest(args.release_dir / 'app/requirements.txt'):
         raise ValueError('runtime dependencies differ from the program lock')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SQL APM v1.3.0 performance inspection; production data stays on the host."""
+"""SQL APM v1.3.1 performance inspection; production data stays on the host."""
 import argparse
 from datetime import datetime, timezone
 import json
@@ -30,6 +30,7 @@ def parser():
     result.add_argument('--limit-seconds',type=int,default=600)
     result.add_argument('--cases-limit-seconds',type=int,default=600,
                         help='每集群选用例预算，1..3600 秒；不改变普通计时超时')
+    result.add_argument('--targeted',action='store_true',help='focus 仅补测时间范围排行、七天详情和明细')
     result.add_argument('--at',help='固定 ISO 时间，用于两次测试／浏览器对照；默认当前时间')
     return result
 
@@ -135,6 +136,8 @@ def run(args):
         raise Refused('limit_must_be_1_to_3600_seconds')
     if not 1<=args.cases_limit_seconds<=3600:
         raise Refused('cases_limit_must_be_1_to_3600_seconds')
+    if args.targeted and args.part!='focus':
+        raise Refused('targeted_requires_focus')
     work=Work(args.work,args.root)
     try:
         if args.part=='pack':

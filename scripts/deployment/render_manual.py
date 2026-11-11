@@ -30,7 +30,7 @@ DOCUMENTS = {
     'SQLFIND.html': dict(title='sqlfind 使用说明', sources=(
         'docs/runbooks/sqlfind-guide.md',)),
     'RELEASE.html': dict(title='发布说明与文档入口', sources=(
-        'docs/releases/v1.3.0.md',)),
+        'docs/releases/v1.3.1.md',)),
 }
 PAGES = DOCUMENTS['INSTALL.html']['sources']
 CSS = '''

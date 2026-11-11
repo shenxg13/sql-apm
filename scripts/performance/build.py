@@ -31,7 +31,7 @@ def build(root,module,out,allow_dirty=False):
         raise ValueError('fresh_output_directory_required')
     files={}
     source=root/'scripts/performance'
-    for path in sorted((source/'perfkit').glob('*.py'))+[source/'check.py',source/'perfcheck']:
+    for path in sorted((source/'perfkit').glob('*.py'))+[source/'check.py',source/'perfcheck',source/'collect_import.sql']:
         files[str(path.relative_to(source))]=path.read_bytes()
     files['internal.json']=encoded(extract((root/'sql_apm/storage/schema.sql').read_text()))
     files['internal-settings.json']=encoded(extract_settings((root/'sql_apm/storage/schema.sql').read_text()))
@@ -55,12 +55,12 @@ def build(root,module,out,allow_dirty=False):
             url+='#'+parts.fragment
         return 'href="'+escape(url,quote=True)+'"'
     body=re.sub(r'href="([^"]+)"',repository_link,body)
-    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.3.0。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
+    document='<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SQL APM 性能检查工具包</title><style>'+CSS+'</style></head><body><p>工具包 '+escape(VERSION)+'；产品 v1.3.1。源码提交 '+commit+'</p><nav>'+renderer.toc+'</nav>'+body+'</body></html>\n'
     inspection=inspect(document,code_blocks(manual))
     files['PERFORMANCE.html']=document.encode()
     manifest=dict(format='sql-apm-performance-toolkit/1',version=VERSION,commit=commit,
-                  source_state='working_tree' if dirty else 'committed',product_version='v1.3.0',
-                  schema_version='1.14.0',html_checks=inspection,
+                  source_state='working_tree' if dirty else 'committed',product_version='v1.3.1',
+                  schema_version='1.15.0',html_checks=inspection,
                   files={name:hashlib.sha256(raw).hexdigest() for name,raw in sorted(files.items())})
     files['MANIFEST.json']=encoded(manifest)
     files['SHA256SUMS']=''.join(hashlib.sha256(raw).hexdigest()+'  '+name+'\n' for name,raw in sorted(files.items())).encode()

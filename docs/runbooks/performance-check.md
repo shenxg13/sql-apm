@@ -1,7 +1,7 @@
 # SQL APM 使用性能检查
 
-工具包版本 **1.2.0**，只支持产品 **v1.3.0／结构 1.14.0**；v1.2.0 继续使用旧工具包 1.1.0。
-本版不保留对 v1.2.0 的支持。它检查使用过程的性能，
+工具包版本 **1.3.0**，只支持产品 **v1.3.1／结构 1.15.0**；v1.3.0 继续使用旧工具包 1.2.0。
+本版不保留对 v1.3.0 的支持。它检查使用过程的性能，
 不修改产品，不改配置、不 reload、不重启、不重置统计，也不运行导入、构建和清理。
 无需打开 Grafana 或手工操作 sqlfind。运行时指纹服务须已启动。
 
@@ -13,29 +13,31 @@
 以下以 sfmon 登录操作。首次先准备父目录：
 
 ```bash
-sudo install -d -o sfmon -g sfmon -m 0700 /data/performance-check
-sudo setfacl -m u:postgres:rx /data/performance-check
+sudo install -d -o sfmon -g sfmon -m 0700 /data/performance-check-v1.3.1
+sudo setfacl -m u:postgres:rx /data/performance-check-v1.3.1
 ```
 
 这是一次性的目录准备；属主和属组为 sfmon，仅额外允许 postgres 遍历和读取父目录。
 sfmon 通常无权在 `/data` 下直接建目录，所以这里使用 sudo；后续工具运行无需 root。
-将工具包和独立交付的 SHA-256 文件放到 `/data/performance-check`。
+将工具包和独立交付的 SHA-256 文件放到 `/data/performance-check-v1.3.1`。
 不要解包到 `/data/sql-apm`。全部输出保存在本次工作目录；需要足够空间保存本地对照和查询记录。
 
 ```bash
-cd /data/performance-check
+cd /data/performance-check-v1.3.1
 sha256sum -c performance-toolkit.tar.gz.sha256
 tar -xzf performance-toolkit.tar.gz
+chmod -R a+rX performance-toolkit
 cd performance-toolkit
 sha256sum -c SHA256SUMS
-install -d -m 0700 /data/performance-check/run
-setfacl -m u:postgres:rwx,d:u:postgres:rwx,d:u:sfmon:rwx /data/performance-check/run
-setfacl -m u:postgres:rx /data/performance-check
+install -d -m 0700 /data/performance-check-v1.3.1/run
+setfacl -m u:postgres:rwx,d:u:postgres:rwx,d:u:sfmon:rwx /data/performance-check-v1.3.1/run
+setfacl -m u:postgres:rx /data/performance-check-v1.3.1
 ```
 
 核对交付记录中的压缩包摘要，再检查包内所有文件。ACL 只允许 sfmon 和 postgres 共享本次工作目录；
 真实 SQL、检索输入、业务身份和重放语句会写入 `run/private`，该目录始终留在本机。
-解包后的工具目录须允许 postgres 读取及遍历；工具目录自身不保存业务结果。
+解包后显式恢复公开工具文件的读取／目录遍历权限，避免升级会话的 umask 077 阻止 postgres 执行。
+工具目录自身不保存业务结果；父目录 ACL 仍限制访问。
 
 ## 第一步：sfmon 运行主体
 
@@ -43,18 +45,18 @@ setfacl -m u:postgres:rx /data/performance-check
 工具额外强制只读，不更改账号的查询超时。若未显式设置 SQL_APM_DSN，命令连接使用同一只读连接及已有密码文件。所有产品 Python 模块以禁止字节码写入的方式运行。
 
 ```bash
-cd /data/performance-check/performance-toolkit
-./perfcheck host --work /data/performance-check/run
-./perfcheck inventory --work /data/performance-check/run
-./perfcheck cases --work /data/performance-check/run
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck host --work /data/performance-check-v1.3.1/run
+./perfcheck inventory --work /data/performance-check-v1.3.1/run
+./perfcheck cases --work /data/performance-check-v1.3.1/run
 ```
 
 以上先收集主机、规模和代表用例。完整复测接着先采集首次读取指标，再由 sfmon 运行普通计时。
 切换到 postgres 的登录终端，使用本地 peer 连接：
 
 ```bash
-cd /data/performance-check/performance-toolkit
-./perfcheck first-read --work /data/performance-check/run
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck first-read --work /data/performance-check-v1.3.1/run
 ```
 
 本步骤在每个集群测量最高频身份、原文最多身份的七天详情各面板，以及各集群／全部集群七天排行。
@@ -79,8 +81,8 @@ first-read.json 保留原有计时字段，额外的五个字段都是数值并�
 回到 sfmon 的登录终端，运行所有用例、每项三次的普通计时：
 
 ```bash
-cd /data/performance-check/performance-toolkit
-./perfcheck timing --work /data/performance-check/run
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck timing --work /data/performance-check-v1.3.1/run
 ```
 
 普通计时测量看板、命令行及指纹服务。独立的 main 快捷入口仍按主机、规模、用例、普通计时运行，
@@ -124,7 +126,7 @@ cd /data/performance-check/performance-toolkit
 完整一轮按上述准备、首次读取、普通计时、系统计划及重点分析顺序执行。
 
 ```bash
-./perfcheck timing --work /data/performance-check/run --case-id case-0001
+./perfcheck timing --work /data/performance-check-v1.3.1/run --case-id case-0001
 ```
 
 同一部分重跑会替换其结果；若要同时保留完整轮次和减少用例的轮次，应分别准备工作目录。
@@ -173,7 +175,7 @@ MPP 库名、执行用户名及手工追加输入由操作者决定，不能自�
 可先单独执行 cases 观察本机成本；普通 timing 始终使用账号原有超时，参数不影响它。
 
 ```bash
-./perfcheck cases --work /data/performance-check/run --cases-limit-seconds 600
+./perfcheck cases --work /data/performance-check-v1.3.1/run --cases-limit-seconds 600
 ```
 
 可在本机建立 JSON 数组文件追加查询，例如：
@@ -186,8 +188,8 @@ MPP 库名、执行用户名及手工追加输入由操作者决定，不能自�
 ```
 
 ```bash
-./perfcheck main --work /data/performance-check/run \
-  --extra-cases /data/performance-check/local-cases.json
+./perfcheck main --work /data/performance-check-v1.3.1/run \
+  --extra-cases /data/performance-check-v1.3.1/local-cases.json
 ```
 
 该文件及其内容不会直接放入结果包。重跑代表用例会替换本次选择；数据不变时自动选择相同。
@@ -197,8 +199,8 @@ MPP 库名、执行用户名及手工追加输入由操作者决定，不能自�
 切换到 postgres 的登录终端，以本地 peer 连接运行。无需 root 权限。
 
 ```bash
-cd /data/performance-check/performance-toolkit
-./perfcheck system --work /data/performance-check/run
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck system --work /data/performance-check-v1.3.1/run
 ```
 
 先读取累计健康指标、非默认及性能相关设置，再对普通计时中超过参照或一秒的语句取计划。
@@ -211,14 +213,14 @@ cd /data/performance-check/performance-toolkit
 慢项多时可能远超普通计时本身，可降低上限，例如仅重跑普通计划：
 
 ```bash
-./perfcheck plans --work /data/performance-check/run --limit-seconds 60
+./perfcheck plans --work /data/performance-check-v1.3.1/run --limit-seconds 60
 ```
 
 ### 重点分析列表与历史
 
 普通慢项之后，逐个集群及“全部”运行：当前版本排行的 50、100、200、500 档，
 时间范围排行和事件最多身份的历史面板的 24 小时、7 天、30 天档。
-先对 v1.3.0 函数内语句做不执行的 EXPLAIN，再分别测量基线核心、前五行的 hits 查询、
+先对 v1.3.1 函数内语句做不执行的 EXPLAIN，再分别测量基线核心、前五行的 hits 查询、
 数据库／用户变量和完整面板。排行核心对 samples、p50、p95、p99、max、mean 六种排序、
 四档 limit 分别执行三次；其他重点分析仍各执行一次，并单独记录计划及数字分布。
 旧 p95 首次的 `/baseline/条数/core` 标识保留，其他排序与轮次增加在同一 split 列表中，结果格式不变。
@@ -237,9 +239,9 @@ cd /data/performance-check/performance-toolkit
 回到 sfmon 的登录终端：
 
 ```bash
-cd /data/performance-check/performance-toolkit
-./perfcheck pack --work /data/performance-check/run
-cd /data/performance-check/run
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck pack --work /data/performance-check-v1.3.1/run
+cd /data/performance-check-v1.3.1/run
 sha256sum -c performance-results.tar.gz.sha256
 install -d -m 0700 review
 tar -xzf performance-results.tar.gz -C review
@@ -289,3 +291,124 @@ sha256sum -c SHA256SUMS
 diskstats 从读完成次数起保留内核原序的计数，负载为 1／5／15 分钟；进程 RSS 为 KiB。
 只读账号无法读取的数据目录大小会在 postgres 的第二步补全。
 主机采样、缓存、I/O、临时文件和节点行数用于后续分析；本工具不自动修改任何参数或索引。
+
+## 导入前后采集
+
+升级后先完成本节的 `before.json`，再开始第一次每日运行。必须在恢复的定时器下次触发之前完成；
+如时间不足，应提前选择其他升级窗口。由 **sfmon** 执行，使用已装 psql 和受保护密码文件。
+本 SQL 只读，按操作者指定的起始时刻选择每日运行，不预设集群或运行编号。
+它不输出 SQL 文本、文件名、自由文本错误或凭据；JSON 仍须用户审阅后才能带出。
+采集包含程序文件中的版本／提交和数据库结构版本；若三者不符合交付记录，先停下核对安装。
+
+先按“准备工作”解包工具包。以下只执行一次，创建全新的采集目录，保留起始时间：
+
+```bash
+export APM_ROOT=/data/sql-apm
+export APM_IMPORT_CAPTURE=/data/performance-check-v1.3.1/import
+export PGPASSFILE="$APM_ROOT/private/pgpass"
+export PYTHONDONTWRITEBYTECODE=1
+unset PGPASSWORD PGSERVICE PGSERVICEFILE PGOPTIONS PGHOSTADDR
+umask 077
+mkdir "$APM_IMPORT_CAPTURE"
+date --iso-8601=seconds > "$APM_IMPORT_CAPTURE/since.txt"
+"$APM_ROOT/postgresql-17.10/bin/psql" -X -q -w \
+  -h "$APM_ROOT/socket" -p 5432 -U sql_apm -d sql_apm \
+  --set=since="$(cat "$APM_IMPORT_CAPTURE/since.txt")" \
+  --set=program_version="$(cat "$APM_ROOT/app/VERSION")" \
+  --set=program_commit="$(cat "$APM_ROOT/app/PROGRAM_COMMIT")" \
+  -f /data/performance-check-v1.3.1/performance-toolkit/collect_import.sql \
+  > "$APM_IMPORT_CAPTURE/before.json.tmp" && \
+  mv "$APM_IMPORT_CAPTURE/before.json.tmp" "$APM_IMPORT_CAPTURE/before.json"
+"$APM_ROOT/app/.venv/bin/python" -m json.tool "$APM_IMPORT_CAPTURE/before.json" >/dev/null
+```
+
+预期退出码 0，JSON 格式为 `sql-apm-import-breakdown/2`，运行数为 0，身份为 v1.3.1／1.15.0。
+若基准已有运行，说明采集前每日运行已开始；保存事实，不将它当作完整的运行前基准。
+随后按已有配置运行一次每日任务，等结束后执行：
+
+```bash
+export APM_ROOT=/data/sql-apm
+export APM_IMPORT_CAPTURE=/data/performance-check-v1.3.1/import
+export PGPASSFILE="$APM_ROOT/private/pgpass"
+export PYTHONDONTWRITEBYTECODE=1
+unset PGPASSWORD PGSERVICE PGSERVICEFILE PGOPTIONS PGHOSTADDR
+test ! -e "$APM_IMPORT_CAPTURE/after.json"
+"$APM_ROOT/postgresql-17.10/bin/psql" -X -q -w \
+  -h "$APM_ROOT/socket" -p 5432 -U sql_apm -d sql_apm \
+  --set=since="$(cat "$APM_IMPORT_CAPTURE/since.txt")" \
+  --set=program_version="$(cat "$APM_ROOT/app/VERSION")" \
+  --set=program_commit="$(cat "$APM_ROOT/app/PROGRAM_COMMIT")" \
+  -f /data/performance-check-v1.3.1/performance-toolkit/collect_import.sql \
+  > "$APM_IMPORT_CAPTURE/after.json.tmp" && \
+  mv "$APM_IMPORT_CAPTURE/after.json.tmp" "$APM_IMPORT_CAPTURE/after.json"
+"$APM_ROOT/app/.venv/bin/python" -m json.tool "$APM_IMPORT_CAPTURE/after.json" >/dev/null
+```
+
+预期只有此次运行，且已结束。两次采集之间不要重置统计、重启数据库或并发导入；
+同时记下是否有并发查询。对照 `stats_reset`、`postmaster_started_at`，值改变或计数倒退时不计算有效增量。
+数据库级重置时间不能发现所有单表重置；操作者仍须保证没有执行单表统计重置。
+采集无需工具包的 `system` 或管理员账号，不加载计划模块，不运行任何产品任务。
+
+字段与口径：
+
+- `counters` 保存窄记录和待维护标记表的累计 `seq_scan`、`seq_tup_read`、`n_tup_ins`、`n_live_tup`。
+  `seq_scan` 相减目标为 0；这些表由集群共享，不能把库级扫描分别归因给各个集群。
+- `stage_reconciliation` 是每次运行、每集群的导入阶段总耗时、天耗时之和及阶段外余量，
+  包括没有新文件的集群。`days` 包含每个来源／日志日的秒数、新增记录、文件数和字节数。
+- `attempts` 是该运行时间内的逐文件尝试；`finished_at-started_at` 是**提交前**计时，
+  不含延迟维护。按成功尝试求和再除以成功尝试的记录总数；整天口径用天耗时之和除以新增记录总数。
+  分母为 0 时记为不可计算，不能填 0；重试、失败和重复跳过单列，不与成功文件混算。
+- 新增原文的定义是 `text_snapshot` 的前后差：全库 `global_distinct_texts` 为按完整内容去重后的
+  原文净新增；每集群 `distinct_complete_texts` 是该集群完整事件引用的不同原文数净增，包含不能指纹化的原文。
+  同一原文首次出现在多个集群时可分别计数，因此集群相加不必等于全库新增。
+  不输出原文内容。若两次之间有多次运行或其他写入，只能记为该区间净增，不能冒充单次运行贡献。
+- 每集群原文计数读取事件键，最多执行 5 分钟；不扫描窄记录，不读取原文或 TOAST。
+  预计每次采集数秒至数分钟（modeled，随历史规模变化）；超时返回失败，保留 `.tmp` 诊断，不能当作完整 JSON。
+  采集自身会影响缓存，随后首次读取指标不代表冷盘。
+
+## 定向补测
+
+v1.3.1 的补测在上述每日运行完成、日志已导入到前一天后执行。使用**全新工作目录**；
+保留以前结果。以下先用 sfmon 采集主机、规模和用例（通常数分钟，modeled）：
+
+```bash
+install -d -m 0700 /data/performance-check-v1.3.1/targeted
+setfacl -m u:postgres:rwx,d:u:postgres:rwx,d:u:sfmon:rwx /data/performance-check-v1.3.1/targeted
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck host --work /data/performance-check-v1.3.1/targeted
+./perfcheck inventory --work /data/performance-check-v1.3.1/targeted
+./perfcheck cases --work /data/performance-check-v1.3.1/targeted
+```
+
+将本次 `private/cases.json` 的最高频身份与上次本机保留文件对照；身份值不带出，只记录是否相同。
+然后在 **postgres 登录终端**按顺序执行首次读取和重点补测：
+
+```bash
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck first-read --work /data/performance-check-v1.3.1/targeted --limit-seconds 60
+./perfcheck focus --targeted --work /data/performance-check-v1.3.1/targeted --limit-seconds 60
+```
+
+预计数分钟至数十分钟（modeled），实际超时项可能延长；单条最多 60 秒。
+先采每集群最高频／原文最多身份的七天详情与各集群／全部集群七天排行的首次耗时和读取块数。
+`focus --targeted` 跳过当前基线六种排序的三轮计时，只测各集群／全部集群的 1、7、30 天时间范围排行，
+以及各集群最高频身份七天 200 行明细和完整详情页。每项一次，保留嵌套计划和已有结果字段。
+详情页为变量链加最慢面板的页面估计，不包含浏览器渲染；`history-7/page` 与 `history-7/panel-29` 分开记录。
+普通页面计时采用 sql_apm_ro 权限；重点语句含计划采集开销，不把首次计时当作冷盘测量。
+
+`distribution.json` 的逐日事件数用于核对窗口实际覆盖的日志日数；自然日可能与滚动 24 小时窗口相交。
+报告同时写窗口端点、相交日期、有效数据天数；一天和七天各集群／全部集群排行目标不超过 5 秒，
+最高频身份七天详情与 200 行明细目标不超过 5 秒，30 天和首次读取只记录。
+未达项目保留实测值，由用户决定后续处理。
+验证机历史样本须在两条命令上使用同一个带时区的 `--at` 固定窗口末端，不能宣称覆盖了生产的近期窗口。
+
+最后回到 **sfmon 登录终端**打包：
+
+```bash
+cd /data/performance-check-v1.3.1/performance-toolkit
+./perfcheck pack --work /data/performance-check-v1.3.1/targeted
+```
+
+预期生成 `performance-results.tar.gz` 及摘要，脱敏检查通过。
+本次没有普通 `timing` 和 `system` 全量步骤，结果摘要会把它们列为未采集；这是定向补测的实际覆盖。
+`private` 留在本机，用户审阅结果包后带出；导入前后的 JSON 单独审阅并带出，不塞入性能结果包。

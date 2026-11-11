@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upgrade the installed v1.2.0 in place; run using its Python 3.13 interpreter.
+"""Upgrade the installed v1.3.0 in place; run using its Python 3.13 interpreter.
 
 check is read-only. apply journals under ROOT/upgrades only after preflight and
 explicit no-rollback acknowledgement. resume finishes a committed migration;
@@ -72,12 +72,14 @@ def verify_checksums(directory):
         require(digest(directory / name) == checksum, 'verification checksum differs: ' + name)
 
 
-def space_required(event_count, package_bytes):
-    # #73/#79: conservative working allowance PLUS persistent structures.
-    # Scale the 30,180,000-event production model; retain a 6 GB small-data floor.
-    # Integer ceiling avoids rounding down a gate at large event counts.
-    modeled = (event_count * 120_064_000_000 + 30_180_000 - 1) // 30_180_000
-    return max(6_000_000_000, modeled) + package_bytes * 2
+# Published v1.3.0 program manifest, verified against the immutable release archive.
+V130_MANIFEST_SHA = 'ef9edfa17a7482a87f4c3d329d6df99072df4aa7eaf843a7df6538dab3663c72'
+
+
+def space_required(package_bytes):
+    # Two function replacements: no backfill, sort, index build or table rewrite.
+    # Reserve 1 GiB for catalog/WAL/logs and twice the unpacked delivery for staging.
+    return 1_073_741_824 + package_bytes * 2
 
 
 def install_dashboard(source, target):
@@ -177,9 +179,10 @@ class Upgrade:
         require(not self.candidate.is_relative_to(self.root) and not self.verification.is_relative_to(self.root),
                 'unpack the new delivery outside the installation root')
         installed = verify(self.root / 'app', installed=True)
-        require(installed['version'] == 'v1.2.0' and installed['kind'] == 'release', 'installed formal v1.2.0 required')
+        require(installed['version'] == 'v1.3.0' and installed['kind'] == 'release', 'installed formal v1.3.0 required')
+        require(digest(self.root / 'app/RELEASE.json') == V130_MANIFEST_SHA, 'installed manifest is not formal v1.3.0')
         target = verify(self.candidate, installed=True)
-        require(target['version'] == 'v1.3.0', 'candidate v1.3.0 required')
+        require(target['version'] == 'v1.3.1', 'candidate v1.3.1 required')
         verify_checksums(self.verification)
         require((self.verification / 'PROGRAM_COMMIT').read_text().strip() == target['commit'], 'verification commit differs')
         require(digest(self.root / 'app/requirements.txt') == digest(self.candidate / 'requirements.txt'), 'dependencies changed')
@@ -189,7 +192,7 @@ class Upgrade:
         pid = (self.root / 'pgdata/postmaster.pid').read_text().splitlines()[0]
         require((self.root / ('socket/.s.PGSQL.' + str(self.port) + '.lock')).read_text().splitlines()[0] == pid,
                 'socket belongs to a different database instance')
-        require(self.schema() == '1.13.0', 'schema 1.13.0 required')
+        require(self.schema() == '1.14.0', 'schema 1.14.0 required')
         self.idle()
         services = self.services()
         if any(state['LoadState'] == 'loaded' for state in services.values()):
@@ -199,9 +202,8 @@ class Upgrade:
         # The released layout uses pg_default and local WAL, so no volume is silently omitted.
         require(not (self.root / 'pgdata/pg_wal').is_symlink(), 'external WAL needs a separate space assessment')
         require(not list((self.root / 'pgdata/pg_tblspc').iterdir()), 'external tablespaces need a separate space assessment')
-        count = self.query('SELECT count(*) FROM mpp_occurrence')[0][0]
         package_bytes = sum(p.stat().st_size for tree in (self.candidate, self.verification) for p in tree.rglob('*') if p.is_file())
-        required = space_required(int(count), package_bytes)
+        required = space_required(package_bytes)
         free = min(shutil.disk_usage(self.root).free, shutil.disk_usage(self.root / 'pgdata').free)
         require(free >= required, 'insufficient free space: need ' + str(required) + ' bytes')
         # Reject unresolved earlier attempts; resume must reconcile those before a new run.
@@ -209,7 +211,7 @@ class Upgrade:
             require(json.loads(path.read_text()).get('phase') in ('complete', 'rolled-back'),
                     'unfinished upgrade; use resume with ' + str(path.parent))
         return dict(installed=installed, target=target, services=services, runtime_sha256=RUNTIME_SHA,
-                    event_count=int(count), required_free_bytes=required, available_bytes=free,
+                    package_bytes=package_bytes, required_free_bytes=required, available_bytes=free,
                     root=str(self.root), candidate=str(self.candidate), verification=str(self.verification), port=self.port)
 
     def persist(self):
@@ -277,18 +279,18 @@ class Upgrade:
         self.command('daily-status', [installed / '.venv/bin/python', '-m', 'sql_apm', 'daily', 'status'])
         self.restore()
         self.phase('complete')
-        print('OK: upgraded to v1.3.0; finish the checks in UPGRADE.html; record=' + str(self.run))
+        print('OK: upgraded to v1.3.1; finish the checks in UPGRADE.html; record=' + str(self.run))
 
     def recover(self):
         self.idle()  # A detached psql may still be committing after its parent died.
         version = self.schema()
-        if version == '1.13.0':
+        if version == '1.14.0':
             require(not (self.run / 'previous-app').exists(), 'old database with replaced program; manual inspection required')
             self.initialize('check', self.root / 'app')
             self.restore()
             self.phase('rolled-back')
-            print('OK: migration rolled back; v1.2.0 and original service states restored')
-        elif version == '1.14.0':
+            print('OK: migration rolled back; v1.3.0 and original service states restored')
+        elif version == '1.15.0':
             self.stop()
             self.phase('committed')
             self.activate()
@@ -317,7 +319,7 @@ class Upgrade:
             # On an ordinary failure reconcile the DB before restoring anything.
             # SIGKILL/power loss requires explicit resume with the same journal.
             try:
-                if self.schema() == '1.13.0':
+                if self.schema() == '1.14.0':
                     self.recover()
             except BaseException:
                 print('STOP: recovery incomplete; keep writers stopped and use resume', file=sys.stderr)
@@ -334,7 +336,7 @@ def main():
     parser.add_argument('--port', type=int, default=5432)
     parser.add_argument('--record', type=Path)
     parser.add_argument('--confirm-no-rollback', action='store_true',
-                        help='确认不备份；迁移提交后不能回退，只能重装旧版并从原始日志重建')
+                        help='确认不备份；迁移只替换两个函数，提交后不能回退，问题由后续修复版本处理')
     args = parser.parse_args()
     require(args.action == 'check' or args.confirm_no_rollback, 'read UPGRADE.html and explicitly pass --confirm-no-rollback')
     root = args.root.absolute()

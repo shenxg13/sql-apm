@@ -90,7 +90,7 @@ def main():
         report['extra_cases']=True
         with tempfile.TemporaryDirectory(dir=args.output) as directory:
             marker=Path(directory)/'RELEASE.json';save(marker,dict(version='v0.0.0'))
-            refused(lambda:check_versions(Path(directory),s),'program_v1_3_0_required')
+            refused(lambda:check_versions(Path(directory),s),'program_v1_3_1_required')
         report['program_mismatch']=True
         mismatch=args.output/'mismatch';shutil.copytree(args.toolkit/'module',mismatch)
         manifest=json.loads((mismatch/'module.json').read_text());manifest['configure']='--different';save(mismatch/'module.json',manifest)
@@ -103,8 +103,8 @@ def main():
     try:
         with admin.cursor() as cur:
             cur.execute('SET search_path=sql_apm,pg_catalog')
-            cur.execute("UPDATE schema_version SET version='1.11.9' WHERE version='1.14.0'")
-        refused(lambda:check_versions(args.app,proxy),'schema_1_14_0_required');admin.rollback()
+            cur.execute("UPDATE schema_version SET version='1.11.9' WHERE version='1.15.0'")
+        refused(lambda:check_versions(args.app,proxy),'schema_1_15_0_required');admin.rollback()
         report['schema_mismatch']=True
         for mode,stage in [('full','import'),('rebuild','build'),('cleanup','cleanup')]:
             with admin.cursor() as cur:

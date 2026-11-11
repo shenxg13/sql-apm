@@ -115,16 +115,16 @@ class ToolkitTests(unittest.TestCase):
         with self.assertRaises(Refused):
             scan(scan_views({'first-read.json':encoded({'elsewhere':{'first_ms':2}})}),['first_ms'])
 
-    def test_toolkit_120_accepts_only_the_new_product_schema_pair(self):
+    def test_toolkit_130_accepts_only_the_new_product_schema_pair(self):
         with tempfile.TemporaryDirectory() as folder:
             app=Path(folder)
-            for product,schema,accepted in [('v1.3.0','1.14.0',True),('v1.2.0','1.13.0',False),
-                                             ('v1.3.0','1.13.0',False),('v1.3.0','1.15.0',False)]:
+            for product,schema,accepted in [('v1.3.1','1.15.0',True),('v1.3.0','1.14.0',False),
+                                             ('v1.3.1','1.13.0',False),('v1.3.1','1.16.0',False)]:
                 with self.subTest(product=product,schema=schema):
                     (app/'RELEASE.json').write_text(json.dumps(dict(version=product)))
                     session=Mock(query=Mock(return_value=[dict(version=schema)]))
                     if accepted:
-                        self.assertEqual(check_versions(app,session)['schema'],'1.14.0')
+                        self.assertEqual(check_versions(app,session)['schema'],'1.15.0')
                     else:
                         with self.assertRaises(Refused):check_versions(app,session)
 

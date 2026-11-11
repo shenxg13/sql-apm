@@ -377,7 +377,7 @@ class HtmlTests(unittest.TestCase):
                 check_upgrade(root)
 
     def test_release_notes_use_the_same_source_and_pin_repository_links(self):
-        source = (ROOT / 'docs/releases/v1.3.0.md').read_text()
+        source = (ROOT / 'docs/releases/v1.3.1.md').read_text()
         notes = release_notes(ROOT, 'a' * 40)
         prefix = 'https://github.com/shenxg13/sql-apm/blob/' + 'a' * 40 + '/docs/'
         self.assertEqual(notes.replace(prefix, '../'), source)

@@ -250,8 +250,8 @@ def check_upgrade(root):
             raise ValueError('upgrade mutation example must acknowledge no rollback')
     if re.search(r'(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])', source):
         raise ValueError('upgrade manual must not contain a machine address')
-    if not all(text in source for text in ('v1.2.0', '1.13.0', 'v1.3.0', '1.14.0',
-                                           '不备份', '不能回退', '原始日志', 'daily status')):
+    if not all(text in source for text in ('v1.3.0', '1.14.0', 'v1.3.1', '1.15.0',
+                                           '不备份', '不能回退', '后续修复版本', 'daily status', 'before.json')):
         raise ValueError('upgrade manual is missing its version or recovery contract')
     return dict(shell_blocks=len(blocks), no_machine_address=True, explicit_confirmation=True)
 

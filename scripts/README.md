@@ -409,3 +409,14 @@ v1.1.0 的 `build_bundle.py` 要求复用固定摘要的 v1.0.0 成品，拒绝�
   `--plans` 单独采集诊断导入，不计入配对耗时；`file-times` 补采文件提交前计时。
   原始文件和详细输出保留本地忽略目录；方法及生产核对交接见
   [验证报告](../docs/reports/query-refresh-2026-11-11.md)。不加入日常检查。
+
+### 导入采集与定向补测
+
+`scripts/performance/collect_import.sql` 随独立工具包 1.3.0 交付，由 sfmon 使用 psql 按起始时间采集 JSON；
+`scripts/db/verify_import_collection.py` 在私有 PG17 回放时间筛选、空运行、独立计数及脱敏边界。
+`perfcheck focus --targeted` 复用既有重点分析，只执行时间范围排行、七天明细与详情页；
+与 host、inventory、cases、first-read、pack 组合，步骤及计数口径见[性能检查手册](../docs/runbooks/performance-check.md)。
+
+`scripts/performance/verify_targeted.py --app DIR --toolkit DIR --module DIR --output NEW_DIR` 使用私有 PG17 合成库，
+运行已构建工具包的定向流程，核对每个集群与全局窗口覆盖、详情／明细、首次计划指标和脱敏结果，
+并确认没有执行普通三轮计时或基线排行全量组合；输出只保留本地。

@@ -4,8 +4,12 @@ type: decision
 status: active
 owners:
   - .project-wiki/decisions/runtime-and-components.md
-updated: 2026-11-03
+updated: 2026-11-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/84#issuecomment-6791980860
+    status: current
+  - path: https://github.com/shenxg13/sql-apm/issues/84
+    status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984
     status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097
@@ -96,6 +100,37 @@ confidence: high
 [知识变更记录](../log.md)用于追溯；涉及 Issue 时以其在线正文和评论核对任务契约。
 
 ## Contracts
+
+### v1.3.1 修复版本交付（2026-11-11）
+
+来源：[Issue #84 已确认契约](https://github.com/shenxg13/sql-apm/issues/84)。
+本节是交付要求；完成情况见[升级验证报告](../../docs/reports/v131-upgrade-2026-11-11.md)，不表示已发布或生产达标。
+从正式 v1.3.0／1.14.0 原地升级到 v1.3.1／1.15.0；仅交付 #82 两函数修复，不改表、索引及数据。
+固定 Kylin 运行时、依赖、RPM、Grafana 沿用。前置检查核对正式程序清单、结构、空闲状态及空间；
+本版空间预算只包含函数替换和程序暂存，公式由[升级手册](../../docs/runbooks/production-upgrade.md)维护。
+不备份、不提供降级；提交前失败自动回滚，提交后的问题由后续修复版本处理。
+原配置、密码、sqlfind 和每日运行单元保留，服务恢复原状态。
+
+验证机先将候选程序的身份／文档及验收包对齐正式 v1.3.0，然后演练失败回滚、正式升级、
+升级后功能、一致性、后续一天导入加构建和定向工具包。开发机不复制全量样本重演，
+迁移与结构脚本摘要相同后继承 #82 带历史证据。用户仅阅读 UPGRADE.html 确认后，才交独立评审。
+`resume` 沿用夹具，连接错误和 failed 单元处理命令未变时继承 #79 同机证据；其他命令和路径本版实测。
+
+2026-11-11，用户阅读候选 `4b30745` 的 UPGRADE.html 后明确回复“确认没问题”，
+完成 [V7 手册阅读验收](https://github.com/shenxg13/sql-apm/issues/84#issuecomment-6791980860)。
+确认对象及 HTML 摘要见升级验证报告；生产升级和性能目标仍须合并后另行核对。
+
+工具包 1.3.0 只支持 v1.3.1／1.15.0，v1.3.0 使用 1.2.0；结果包格式和脱敏规则不变。
+随包只读 SQL 按指定开始时间采集每日运行、文件／天／阶段计时和表统计；
+原文净增按运行前后的全库去重原文数、每集群完整事件引用的不同原文数计算，禁止输出原文、文件名和凭据。
+集群净增不必加总为全库净增；多个运行或并发导入只能归因于采集区间。
+升级后首次每日运行前后均采集；窄记录 seq_scan 增量目标 0，每条记录耗时目标为 v1.2.0 参照的 1.2 倍以内。
+Issue #82 的 +19.59% 是开发机带历史 measured，+19.6%～+21.6% 是生产规模 modeled；生产效果另外实测。
+
+近期数据齐备后补测各集群／全部集群一天和七天排行、最高频身份七天详情与 200 行明细，目标 5 秒；
+30 天及首次读取只记录。复用主机、规模、用例、first-read、focus 的定向模式和打包，不跑全部用例三轮。
+未达项目由用户决定处理。合并后另用文档 PR 定稿发布说明，并完成 v1.3.0 仓库勘误及各版本结构事实；
+正式发布时只追加 v1.3.0 发布正文勘误，旧标签和附件不变。生产升级和补测完成前 Issue 保持打开。
 
 ### v1.3.0 带数据升级（2026-11-03）
 

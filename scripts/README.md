@@ -398,3 +398,14 @@ v1.1.0 的 `build_bundle.py` 要求复用固定摘要的 v1.0.0 成品，拒绝�
   `--source-version` 声明升级前结构，`--fixture-prefix` 隔离后续验证夹具，`--skip-timing` 在另有独立计时阶段时只核对构建结果。
 
 这些入口仅供开发仓库验证，不属于生产工具包，也不连接未明确指定的数据库。
+
+### 带历史导入维护验收（开发机）
+
+- `scripts/db/verify_query_refresh.py`：小型历史库上分别执行冻结 1.14.0 与当前函数，核对元数据／文件提交
+  的嵌套计划、独立结果一致性及 1.14.0 带数据迁移的内容／物理行位置不变。
+- `scripts/db/verify_query_refresh_full.py import|upgrade|consistency|exports|compare|lifecycle|file-times`：显式提供停止的私有 PG17 副本，
+  串行采集带历史配对导入、大表计数、迁移耗时和按自然键导出的逐行派生结果摘要，以及补指纹／构建／发布／清理。每阶段证据不覆盖，结束自动停库。
+  `--seed` 只在验收包装器对随机来源 ID 固定种子，使代表原文的选择可重复；不修改产品实现。
+  `--plans` 单独采集诊断导入，不计入配对耗时；`file-times` 补采文件提交前计时。
+  原始文件和详细输出保留本地忽略目录；方法及生产核对交接见
+  [验证报告](../docs/reports/query-refresh-2026-11-11.md)。不加入日常检查。

@@ -51,7 +51,7 @@
 | [统计计算设计](design/baseline-statistics.md) | 设计／已实现接口 | 正式及观察五层统计、分区自然键、原子保存与失败恢复。 |
 | [训练样本判定设计](design/training-decisions.md) | 设计／已实现接口 | 不可变快照、原文缓存、数据库统一推导及物理边界。 |
 | [日志导入设计](design/log-ingestion.md) | 设计说明 | 文件事务、Execute 单次配对、原文和近似入库、恢复与冲突检测边界。 |
-| [数据库结构说明（按流程）](design/database-structure.md) | 随包结构说明 | 开发结构 1.14.0 的 74 张表、查询派生层、选批及清理流程。 |
+| [数据库结构说明（按流程）](design/database-structure.md) | 随包结构说明 | 开发结构 1.15.0 的 74 张表、查询派生层、选批及清理流程。 |
 | [PostgreSQL 物理结构](design/postgresql-storage.md) | 设计说明 | 逻辑映射、MPP 专属表、独立统计存储及版本迁移边界。 |
 | [PostgreSQL 存储知识](../.project-wiki/architecture/postgresql-storage.md) | 设计说明 | 已实现结构、初始化边界和维护入口。 |
 | [数据契约设计验证](design/offline-data-contract/verification.md) | 分析证据 | 文档及合成样例的实际检查结果和未覆盖的产品运行边界。 |
@@ -131,6 +131,7 @@
 | 文档 | 类型 | 读它了解什么 |
 | --- | --- | --- |
 | [查询性能第一批修复](reports/query-performance-2026-10-26.md) | 验证报告 | 四处查询的等价性、全量前后测量、同月多构建读取量、升级与生产规模模型。 |
+| [带历史导入的增量维护修复](reports/query-refresh-2026-11-11.md) | 验证报告 | 全扫描复现、按键维护、无数据改写迁移、三版本配对与生产核对交接。 |
 | [事件查询派生层与 sqlfind 缓存](reports/query-records-2026-11-03.md) | 验证报告 | 窄事件和精确汇总、NULL 组守卫、会话缓存、全量等价性、导入代价及生产规模模型。 |
 | [SQL 分词 R1 整改验证](reports/sql-scanning-r1-remediation-2026-10-04.md) | 整改验证报告 | 重叠美元标签回退、验收口径同步及修复包全量／两机首批重验。 |
 | [SQL 分词性能与隔离计数验证](reports/sql-scanning-2026-10-04.md) | 实施验证报告 | 初始实现的等价边界、解析池回归、计数口径及全量／两机验收记录。 |

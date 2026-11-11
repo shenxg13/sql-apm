@@ -18,7 +18,7 @@ def verify_window_migration(v, root):
     before = state()
     receipt = v.sql('SELECT row_to_json(s) FROM schema_version s')
     v.init('upgrade'); v.init('check')
-    assert v.sql("SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1") == '1.14.0'
+    assert v.sql("SELECT version FROM schema_version ORDER BY string_to_array(version,'.')::int[] DESC LIMIT 1") == '1.15.0'
     assert state() == before
     assert v.sql("SELECT row_to_json(s) FROM schema_version s WHERE version='1.7.0'") == receipt
     assert v.sql('SELECT bool_and(first_log_at IS NULL AND last_log_at IS NULL) FROM source_file') == 't'

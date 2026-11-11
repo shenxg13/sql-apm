@@ -11,7 +11,7 @@ Usage: scripts/db/initialize.sh {all|bootstrap|schema|check|upgrade}
 
 Connections always name host, port, database and user explicitly.
 bootstrap/all require both admin options. schema/check/upgrade use the project role.
-upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0/1.8.0/1.9.0/1.10.0/1.11.0/1.12.0/1.13.0, to 1.14.0; stop writers first.
+upgrade explicitly migrates verified 1.0.0/1.1.0/1.2.0/1.3.0/1.4.0/1.5.0/1.6.0 empty schemas, or populated 1.7.0/1.8.0/1.9.0/1.10.0/1.11.0/1.12.0/1.13.0/1.14.0, to 1.15.0; stop writers first.
 bootstrap also creates the read-only LOGIN role (default: the project role plus _ro) and sets
 its per-statement timeout; schema/upgrade grant it SELECT. Before upgrading a database
 created by an earlier release, run bootstrap once more as administrator.
@@ -127,11 +127,14 @@ if [[ $mode != bootstrap ]]; then
     v1130_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.13.0.sql")
     v1130_sha256=${v1130_sha256%% *}
     [[ $v1130_sha256 == ae9e79d1eface60d991fb5b67f3c6a59f1546de80cfc7016a6fce38ead5c7ba4 ]] || die 'frozen 1.13.0 DDL checksum mismatch'
+    v1140_sha256=$(sha256sum "$root/sql_apm/storage/versions/1.14.0.sql")
+    v1140_sha256=${v1140_sha256%% *}
+    [[ $v1140_sha256 == c287f40896183fc7d53ae38fe287175cc8dffe6f7af6b1749ebad6ea1a23355b ]] || die 'frozen 1.14.0 DDL checksum mismatch'
     # Released migrations include ../schema.sql. Bind that include to their
     # frozen target without editing the released migration bytes.
     migration_dir=$(mktemp -d)
     trap 'rm -rf -- "$migration_dir"' EXIT
-    for step in 1.5.0-to-1.6.0 1.6.0-to-1.7.0; do
+    for step in 1.5.0-to-1.6.0 1.6.0-to-1.7.0 1.13.0-to-1.14.0; do
         target_version=${step##*-to-}
         mkdir -p "$migration_dir/$step/migrations"
         cp "$root/sql_apm/storage/migrations/$step.sql" "$migration_dir/$step/migrations/step.sql"
@@ -140,7 +143,8 @@ if [[ $mode != bootstrap ]]; then
     "$psql" "${common[@]}" --username="$project_role" --dbname="$database" \
         --set=migration_150_160="$migration_dir/1.5.0-to-1.6.0/migrations/step.sql" \
         --set=migration_160_170="$migration_dir/1.6.0-to-1.7.0/migrations/step.sql" \
-        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=v180_sha256="$v180_sha256" --set=v190_sha256="$v190_sha256" --set=v1100_sha256="$v1100_sha256" --set=v1110_sha256="$v1110_sha256" --set=v1120_sha256="$v1120_sha256" --set=v1130_sha256="$v1130_sha256" --set=check_only="$check_only" \
+        --set=migration_1130_1140="$migration_dir/1.13.0-to-1.14.0/migrations/step.sql" \
+        --set=script_sha256="$script_sha256" --set=legacy_sha256="$legacy_sha256" --set=v110_sha256="$v110_sha256" --set=v120_sha256="$v120_sha256" --set=v130_sha256="$v130_sha256" --set=v140_sha256="$v140_sha256" --set=v150_sha256="$v150_sha256" --set=v160_sha256="$v160_sha256" --set=v170_sha256="$v170_sha256" --set=v180_sha256="$v180_sha256" --set=v190_sha256="$v190_sha256" --set=v1100_sha256="$v1100_sha256" --set=v1110_sha256="$v1110_sha256" --set=v1120_sha256="$v1120_sha256" --set=v1130_sha256="$v1130_sha256" --set=v1140_sha256="$v1140_sha256" --set=check_only="$check_only" \
         --file="$root/sql_apm/storage/$entry"
 fi
 printf 'OK: mode=%s database=%s schema=%s role=%s readonly_role=%s\n' "$mode" "$database" "$schema" "$project_role" "$readonly_role"

@@ -7,8 +7,10 @@ owners:
   - scripts/db/
   - tests/database/
   - docs/design/postgresql-storage.md
-updated: 2026-11-03
+updated: 2026-11-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/82
+    status: current
   - path: docs/reports/query-records-2026-11-03.md
     status: current
   - path: https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798
@@ -66,7 +68,7 @@ confidence: high
 
 ## Summary
 
-当前开发结构版本 1.14.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.2.0 的结构为 1.13.0，v1.1.0 为 1.12.0。
+当前开发结构版本 1.15.0 承接离线逻辑契约 1.0.0，保留初版 DDL 及显式升级路径；已发布 v1.2.0 的结构为 1.13.0，v1.1.0 为 1.12.0。
 交付范围为项目账号、库、schema、表、约束、索引、结构版本、MPP 专属表改名迁移及临时实例验证；
 新增独立近似观察持久化结构；指纹模块已有独立实现，Issue #18 已提供[导入与写入接口](../../docs/design/log-ingestion.md)，③统计由 #25 实现；发布编排见 #29，Grafana 与每日运行记录见下文各结构版本。
 
@@ -270,7 +272,7 @@ Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定�
 
 来源：[Issue #73 设计确认](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579808798)，
 承接 [D2 设计](https://github.com/shenxg13/sql-apm/issues/73#issuecomment-6579296749)，以确认评论的两项修订为准。
-本节描述开发实现；当前生产仍为 1.13.0，发布与生产验证不属于该任务。
+本节记录 #73 的开发实现；v1.3.0 发布与生产验证由 #79 负责。
 开发机证据与生产情景模型见[验证报告](../../docs/reports/query-records-2026-11-03.md)；
 固定基准持续占用、日增和迁移临时空间分别计量。
 
@@ -287,6 +289,22 @@ Issue #74 的 v1.2.0 发布入口先核对已装 1.12.0、程序清单和固定�
   全部旧列、旧版本回执和统计结果保留；失败整体回滚。维护 UPDATE／DELETE 与回滚亦有一致性验证；
   TRUNCATE 是停止并发写入后的维护操作，允许重建派生层。
 - 索引、短键映射与独立重算入口由[结构说明](../../docs/design/database-structure.md#1140-查询派生层)维护。
+
+### 查询派生增量维护 1.15.0（2026-11-11）
+
+依据 [Issue #82](https://github.com/shenxg13/sql-apm/issues/82) 和
+[修复前复现](https://github.com/shenxg13/sql-apm/issues/82#issuecomment-6788620393)，
+1.14.0 的变化键集合连接会选用历史窄记录表的 Hash Join 全扫描；逻辑增量不保证物理读取增量。
+1.15.0 用参数化的键探测限制原文／指纹与文件提交的历史读取；相关删除及更新使用完整键。
+继续沿用元数据事务先取锁、文件事务最后取锁的顺序；显式 TRUNCATE 重建仍允许读取全量。
+
+- 不新增持久表、列或索引。迁移只替换两个维护函数，保留旧业务行、派生行及回执；新装与升级后的结构相同。
+- 冻结 1.14.0 DDL；旧 1.13.0→1.14.0 迁移的相对 schema 引用绑定冻结目标，已发布迁移字节不变。
+- 导入代价必须在**带历史的同源库副本**上配对测量，并读取大表扫描计数；分别记录元数据提交与文件提交。
+  #73 的 +18.3% 只适用于当时的空库四文件测量，不能外推生产已有历史上的日增导入。
+- 小数据回归同时运行冻结旧函数和候选函数，按实际嵌套计划检验历史扫描，不依赖运行耗时。
+  开发 measured 与生产 modeled 分开，证据、限制与生产核对交接见
+  [增量维护验证报告](../../docs/reports/query-refresh-2026-11-11.md)。
 
 ## Workflows
 

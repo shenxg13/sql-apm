@@ -152,6 +152,13 @@ def maintenance(pg):
         v.require(revision()==2, 'identity UPDATE transfers all summary contributions')
         execute("UPDATE mpp_occurrence SET database=NULL,execution_user=NULL")
         reconcile(db)
+        for identity in ("database=NULL,execution_user='known'",
+                         "database='known',execution_user=NULL",
+                         "database=NULL,execution_user=NULL"):
+            before = revision()
+            execute('UPDATE mpp_occurrence SET ' + identity)
+            reconcile(db)
+            v.require(revision()==before+1, 'nullable identity transition preserves all natural rows: ' + identity)
         execute("INSERT INTO mpp_normalization SELECT 'N2',algorithm_version,parser_version,dictionary_schema_version,'next',dictionary_digest_algorithm,'next',rules_ref FROM mpp_normalization WHERE normalization_id='N1'")
         before=revision()
         execute("INSERT INTO mpp_fingerprint SELECT 'second-rule',sql_id,'N2',profile,state,value,reason FROM mpp_fingerprint WHERE fingerprint_id='P1'")

@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-11-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/84#issuecomment-6791980860
+    status: current
   - path: https://github.com/shenxg13/sql-apm/issues/84
     status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984
@@ -113,6 +115,10 @@ confidence: high
 升级后功能、一致性、后续一天导入加构建和定向工具包。开发机不复制全量样本重演，
 迁移与结构脚本摘要相同后继承 #82 带历史证据。用户仅阅读 UPGRADE.html 确认后，才交独立评审。
 `resume` 沿用夹具，连接错误和 failed 单元处理命令未变时继承 #79 同机证据；其他命令和路径本版实测。
+
+2026-11-11，用户阅读候选 `4b30745` 的 UPGRADE.html 后明确回复“确认没问题”，
+完成 [V7 手册阅读验收](https://github.com/shenxg13/sql-apm/issues/84#issuecomment-6791980860)。
+确认对象及 HTML 摘要见升级验证报告；生产升级和性能目标仍须合并后另行核对。
 
 工具包 1.3.0 只支持 v1.3.1／1.15.0，v1.3.0 使用 1.2.0；结果包格式和脱敏规则不变。
 随包只读 SQL 按指定开始时间采集每日运行、文件／天／阶段计时和表统计；

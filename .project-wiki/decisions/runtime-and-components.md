@@ -6,6 +6,8 @@ owners:
   - .project-wiki/decisions/runtime-and-components.md
 updated: 2026-11-11
 sources:
+  - path: https://github.com/shenxg13/sql-apm/issues/84
+    status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6604700984
     status: current
   - path: https://github.com/shenxg13/sql-apm/pull/80#issuecomment-6603880097

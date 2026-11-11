@@ -26,6 +26,7 @@ sfmon 通常无权在 `/data` 下直接建目录，所以这里使用 sudo；后
 cd /data/performance-check-v1.3.1
 sha256sum -c performance-toolkit.tar.gz.sha256
 tar -xzf performance-toolkit.tar.gz
+chmod -R a+rX performance-toolkit
 cd performance-toolkit
 sha256sum -c SHA256SUMS
 install -d -m 0700 /data/performance-check-v1.3.1/run
@@ -35,7 +36,8 @@ setfacl -m u:postgres:rx /data/performance-check-v1.3.1
 
 核对交付记录中的压缩包摘要，再检查包内所有文件。ACL 只允许 sfmon 和 postgres 共享本次工作目录；
 真实 SQL、检索输入、业务身份和重放语句会写入 `run/private`，该目录始终留在本机。
-解包后的工具目录须允许 postgres 读取及遍历；工具目录自身不保存业务结果。
+解包后显式恢复公开工具文件的读取／目录遍历权限，避免升级会话的 umask 077 阻止 postgres 执行。
+工具目录自身不保存业务结果；父目录 ACL 仍限制访问。
 
 ## 第一步：sfmon 运行主体
 
